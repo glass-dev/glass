@@ -1,6 +1,18 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''common types'''
+'''type hinting'''
+
+__all__ = [
+    'RedshiftBins',
+    'NumberOfBins',
+    'Cosmology',
+    'ClsDict',
+    'MatterField',
+    'ConvergenceField',
+    'ShearField',
+    'get_default_ref',
+]
+
 
 from typing import Any, Annotated, get_args, get_origin
 from numpy.typing import ArrayLike
