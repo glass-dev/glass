@@ -96,7 +96,7 @@ if __name__ == '__main__':
         for module in modules:
             try:
                 mod = import_module(module)
-            except ImportError:
+            except ModuleNotFoundError:
                 log.critical('could not import "%s" module', module)
                 sys.exit(1)
             mod_all = getattr(mod, '__all__', [])
