@@ -27,7 +27,7 @@ Cosmology = Annotated[Any, 'name:cosmology']
 ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls']
 
 # random fields
-Random = Annotated['RandomField', 'random']
+Random = Annotated[list['RandomField'], 'random']
 
 # fields
 Matter = Annotated[T, 'name:matter']

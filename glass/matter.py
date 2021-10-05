@@ -7,11 +7,11 @@ __all__ = [
 ]
 
 
-from .types import Matter, Random
+from .types import NumberOfBins, Matter, Random
 from .random import LognormalField
 
 
-def lognormal_matter() -> Matter[Random]:
+def lognormal_matter(nbins: NumberOfBins) -> Matter[Random]:
     '''matter field following a lognormal distribution'''
 
-    return LognormalField(shift=1.0)
+    return [LognormalField(shift=1.0)]*nbins

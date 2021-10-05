@@ -37,14 +37,14 @@ class RandomField(metaclass=ABCMeta):
     Transformations are always applied in place.
     '''
 
-    mean: ArrayLike = 0.0
+    mean: float = 0.0
 
     @classmethod
     def parameters(cls) -> tuple[str]:
         return tuple(f.name for f in dataclass_fields(cls))
 
     @abstractmethod
-    def __call__(self, field: ArrayLike, var_in: ArrayLike, var_out: ArrayLike) -> ArrayLike:
+    def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
         pass
 
 
@@ -52,11 +52,9 @@ class RandomField(metaclass=ABCMeta):
 class NormalField(RandomField):
     '''normal random field'''
 
-    def __call__(self, field: ArrayLike, var_in: ArrayLike, var_out: ArrayLike) -> ArrayLike:
-        # add axis for pixels
-        mean = np.asarray(self.mean)[..., np.newaxis]
+    def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
         # add mean to Gaussian field
-        field += mean
+        field += self.mean
         return field
 
 
@@ -66,22 +64,18 @@ class LognormalField(RandomField):
 
     shift: float = 1.0
 
-    def __call__(self, field: ArrayLike, var_in: ArrayLike, var_out: ArrayLike) -> ArrayLike:
-        # add axis for pixels
-        mean = np.asarray(self.mean)[..., np.newaxis]
-        shift = np.asarray(self.shift)[..., np.newaxis]
-        var_in = np.asarray(var_in)[..., np.newaxis]
+    def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
         # fix the mean of the Gaussian field
-        field += np.log(mean + shift) - var_in/2
+        field += np.log(self.mean + self.shift) - var_in/2
         # exponentiate values in place
         np.exp(field, out=field)
         # lognormal shift
-        field -= shift
+        field -= self.shift
         return field
 
 
 def generate_random_fields(nside: int,
-                           fields: dict[str, RandomField],
+                           fields: dict[str, list[RandomField]],
                            nbins: NumberOfBins,
                            cls: ClsDict,
                            allow_missing_cls: bool = False) -> ArrayLike:
@@ -91,22 +85,10 @@ def generate_random_fields(nside: int,
     debug = log.isEnabledFor(logging.DEBUG)
 
     # expand out the random field definitions for cls
-    _names, _dists, _params = [], [], []
+    _names, _fields = [], []
     for name, field in fields.items():
-        # the names of the individual fields for cls
         _names += [f'{name}[{i}]' for i in range(nbins)]
-        # store the distribution type for transformation of cls
-        _dists += [field.__class__.__name__]*nbins
-        # get all random field parameters broadcast to size nbins
-        params = {}
-        for par in field.parameters():
-            val = getattr(field, par)
-            try:
-                params[par] = np.broadcast_to(val, nbins, True)
-            except ValueError:
-                raise ValueError(f'parameter "{par}" of field "{name}" is incompatible with field size {nbins}')
-        # transpose dict of arrays into array of dicts
-        _params += [dict(zip(params.keys(), values)) for values in zip(*params.values())]
+        _fields += field
 
     # total number of fields to simulate
     n = len(_names)
@@ -114,7 +96,7 @@ def generate_random_fields(nside: int,
     if debug:
         log.debug('simulating %d random fields:', n)
         for i in range(n):
-            log.debug('- %s: %s with %s', _names[i], _dists[i], _params[i])
+            log.debug('- %s: %s', _names[i], _fields[i])
 
     # get the cls of the fields
     _cls = []
@@ -165,30 +147,29 @@ def generate_random_fields(nside: int,
                 var[i] = np.sum((2*l+1)/(4*np.pi)*cl)
 
             # transform the cl
-            field_pair = _dists[i], _dists[j]
-            field_pars = _params[i], _params[j]
+            field_pair = (type(_fields[i]), type(_fields[j]))
 
-            if field_pair == ('NormalField', 'NormalField'):
-                log.debug('- (%s, %s): no transformation', _names[i], _names[j])
+            if field_pair == (NormalField, NormalField):
+                log.debug('- %s: no transformation', field_pair)
 
-            elif field_pair == ('LognormalField', 'NormalField'):
-                alpha = field_pars[0]['mean'] + field_pars[0]['shift']
+            elif field_pair == (LognormalField, NormalField):
+                alpha = _fields[i].mean + _fields[i].shift
                 cl = lognormal_normal_cl(cl, alpha=alpha)
 
-                log.debug('- (%s, %s): lognormal_normal_cl(cl, alpha=%g)', _names[i], _names[j], alpha)
+                log.debug('- %s: lognormal_normal_cl(cl, alpha=%g)', field_pair, alpha)
 
-            elif field_pair == ('NormalField', 'LognormalField'):
-                alpha = field_pars[1]['mean'] + field_pars[1]['shift']
+            elif field_pair == (NormalField, LognormalField):
+                alpha = _fields[j].mean + _fields[j].shift
                 cl = lognormal_normal_cl(cl, alpha=alpha)
 
-                log.debug('- (%s, %s): lognormal_normal_cl(cl, alpha=%g)', _names[i], _names[j], alpha)
+                log.debug('- %s: lognormal_normal_cl(cl, alpha=%g)', field_pair, alpha)
 
-            elif field_pair == ('LognormalField', 'LognormalField'):
-                alpha = field_pars[0]['mean'] + field_pars[0]['shift']
-                alpha2 = field_pars[1]['mean'] + field_pars[1]['shift']
+            elif field_pair == (LognormalField, LognormalField):
+                alpha = _fields[i].mean + _fields[j].shift
+                alpha2 = _fields[j].mean + _fields[j].shift
                 cl = lognormal_cl(cl, alpha=alpha, alpha2=alpha2)
 
-                log.debug('- (%s, %s): lognormal_cl(cl, alpha=%g, alpha2=%g)', _names[i], _names[j], alpha, alpha2)
+                log.debug('- %s: lognormal_cl(cl, alpha=%g, alpha2=%g)', field_pair, alpha, alpha2)
 
             else:
                 raise TypeError(f'missing transformation for field pair {field_pair}')
@@ -217,10 +198,10 @@ def generate_random_fields(nside: int,
     # transform the Gaussian random fields to the output fields
     _maps = {}
     for i, (name, field) in enumerate(fields.items()):
-        index = np.s_[i*nbins:(i+1)*nbins]
 
         # output statistics of the Gaussian field before the transformation
         if debug:
+            index = np.s_[i*nbins:(i+1)*nbins]
             log.debug('- %s:', name)
             log.debug('  - Gaussian field:')
             log.debug('    - min: %s', np.array_str(np.min(maps[index], axis=-1), np.inf))
@@ -230,7 +211,7 @@ def generate_random_fields(nside: int,
             log.debug('    - Evar: %s', np.array_str(gaussian_var[index], np.inf))
 
         # do the transformation
-        _maps[name] = field(maps[index], var_in=gaussian_var[index], var_out=var[index])
+        _maps[name] = [_fields[j](maps[j], var_in=gaussian_var[j], var_out=var[j]) for j in range(i*nbins, (i+1)*nbins)]
 
         # output statistics of the desired field after the transformation
         if debug:
@@ -238,7 +219,7 @@ def generate_random_fields(nside: int,
             log.debug('    - min: %s', np.array_str(np.min(maps[index], axis=-1), np.inf))
             log.debug('    - max: %s', np.array_str(np.max(maps[index], axis=-1), np.inf))
             log.debug('    - mean: %s', np.array_str(np.mean(maps[index], axis=-1), np.inf))
-            log.debug('    - Emean: %s', np.array_str(np.asarray(field.mean), np.inf))
+            log.debug('    - Emean: %s', np.array_str(np.asarray([f.mean for f in _fields[index]]), np.inf))
             log.debug('    - var: %s', np.array_str(np.var(maps[index], axis=-1), np.inf))
             log.debug('    - Evar: %s', np.array_str(var[index], np.inf))
 

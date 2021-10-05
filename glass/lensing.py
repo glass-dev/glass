@@ -36,7 +36,8 @@ def lognormal_convergence(zbins: RedshiftBins) -> Convergence[Random]:
     '''convergence field following a lognormal distribution'''
 
     z = np.add(zbins[:-1], zbins[1:])/2
-    return LognormalField(shift=kappa0_hilbert11(z))
+    kappa0 = kappa0_hilbert11(z)
+    return [LognormalField(shift=k0) for k0 in kappa0]
 
 
 def convergence_from_matter(delta: Matter[ArrayLike],
