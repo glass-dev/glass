@@ -12,13 +12,11 @@ __all__ = [
 import numpy as np
 import healpy as hp
 import logging
+import gaussiancl
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, fields as dataclass_fields
+from functools import singledispatchmethod, partial
 from sortcl import cl_indices
-from gaussiancl import (
-    lognormal_cl,
-    lognormal_normal_cl,
-)
 
 from .types import ArrayLike, ClsList
 
@@ -47,6 +45,16 @@ class RandomField(metaclass=ABCMeta):
     def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
         pass
 
+    @abstractmethod
+    def gaussiancl(self, other):
+        return NotImplemented
+
+    def __and__(self, other):
+        return self.gaussiancl(other)
+
+    def __rand__(self, other):
+        return self.gaussiancl(other)
+
 
 @dataclass
 class NormalField(RandomField):
@@ -56,6 +64,13 @@ class NormalField(RandomField):
         # add mean to Gaussian field
         field += self.mean
         return field
+
+    @singledispatchmethod
+    def gaussiancl(self, other):
+        if type(other) != type(self):
+            return NotImplemented
+
+        return lambda cl: cl
 
 
 @dataclass
@@ -72,6 +87,20 @@ class LognormalField(RandomField):
         # lognormal shift
         field -= self.shift
         return field
+
+    @singledispatchmethod
+    def gaussiancl(self, other):
+        if type(other) != type(self):
+            return NotImplemented
+
+        alpha = self.mean + self.shift
+        alpha2 = other.mean + other.shift
+        return partial(gaussiancl.lognormal_cl, alpha=alpha, alpha2=alpha2)
+
+    @gaussiancl.register
+    def _(self, other: NormalField):
+        alpha = self.mean + self.shift
+        return partial(gaussiancl.lognormal_normal_cl, alpha=alpha)
 
 
 def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) -> ArrayLike:
@@ -121,32 +150,7 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
                 var[i] = np.sum((2*l+1)/(4*np.pi)*cl)
 
             # transform the cl
-            field_pair = (type(fields[i]), type(fields[j]))
-
-            if field_pair == (NormalField, NormalField):
-                log.debug('- %s: no transformation', field_pair)
-
-            elif field_pair == (LognormalField, NormalField):
-                alpha = fields[i].mean + fields[i].shift
-                cl = lognormal_normal_cl(cl, alpha=alpha)
-
-                log.debug('- %s: lognormal_normal_cl(cl, alpha=%g)', field_pair, alpha)
-
-            elif field_pair == (NormalField, LognormalField):
-                alpha = fields[j].mean + fields[j].shift
-                cl = lognormal_normal_cl(cl, alpha=alpha)
-
-                log.debug('- %s: lognormal_normal_cl(cl, alpha=%g)', field_pair, alpha)
-
-            elif field_pair == (LognormalField, LognormalField):
-                alpha = fields[i].mean + fields[j].shift
-                alpha2 = fields[j].mean + fields[j].shift
-                cl = lognormal_cl(cl, alpha=alpha, alpha2=alpha2)
-
-                log.debug('- %s: lognormal_cl(cl, alpha=%g, alpha2=%g)', field_pair, alpha, alpha2)
-
-            else:
-                raise TypeError(f'missing transformation for field pair {field_pair}')
+            cl = (fields[i] & fields[j])(cl)
 
             # compute the Gaussian variance if on the diagonal
             if i == j:
