@@ -15,8 +15,8 @@ import logging
 from inspect import signature
 from functools import cached_property
 
-from .types import ArrayLike, get_default_ref
-from .random import RandomField, generate_random_fields
+from .types import get_annotation
+from .random import generate_random_fields
 
 
 log = logging.getLogger('glass.simulation')
@@ -77,16 +77,16 @@ class Simulation:
         # get type hints with annotations
         hints = t.get_type_hints(func, include_extras=True)
 
-        # get default refs of func from annotated type hints
-        default_refs = {par: get_default_ref(ann) for par, ann in hints.items()}
+        # get annotations from type hints
+        annotations = {par: get_annotation(hint) for par, hint in hints.items()}
 
-        log.debug('default refs for %s: %d', func.__name__, len(default_refs))
-        for par, ref in default_refs.items():
-            log.debug('- %s: %s', par, ref)
+        log.debug('annotations for %s: %d', func.__name__, len(annotations))
+        for par, ann in annotations.items():
+            log.debug('- %s: %s', par, ann)
 
         # resolve default name if None given
-        if name is None:
-            name = default_refs.get('return', None)
+        if name is None and 'return' in annotations:
+            name = annotations['return'].name
         if name is None:
             raise TypeError(f'cannot infer name of unnamed function "{func.__name__}"')
 
@@ -96,14 +96,14 @@ class Simulation:
                 arg = ba.arguments[par]
                 if isinstance(arg, Ref) and arg.name not in self.state:
                     raise NameError(f"parameter '{par}' for function '{func.__name__}' of {name} references unknown name '{arg.name}'")
-            elif par in default_refs and default_refs[par] in self.state:
-                ba.arguments[par] = Ref(default_refs[par])
+            elif par in annotations and annotations[par].name in self.state:
+                ba.arguments[par] = Ref(annotations[par].name)
             elif sig.parameters[par].default is not sig.parameters[par].empty:
                 pass
             else:
                 raise TypeError(f"missing argument '{par}' for function '{func.__name__}' of {name}")
 
-        return name, Call(func, ba.args, ba.kwargs)
+        return name, Call(func, ba.args, ba.kwargs), annotations.get('return', None)
 
     def set_cosmology(self, cosmology):
         '''set the cosmology for the simulation'''
@@ -113,7 +113,7 @@ class Simulation:
     def set_cls(self, func, *args, **kwargs):
         '''set the cls for the simulation'''
 
-        name, self._cls = self._make_call(None, func, args, kwargs)
+        name, self._cls, _ = self._make_call(None, func, args, kwargs)
 
         self.state[name] = None
 
@@ -122,27 +122,12 @@ class Simulation:
     def add_field(self, name, func, *args, **kwargs):
         '''add a field to the simulation'''
 
-        hints = t.get_type_hints(func)
-
-        log.debug('type hints for %s: %d', func.__name__, len(hints))
-        for par, hint in hints.items():
-            log.debug('- %s: %s', par, hint if hint is not ArrayLike else 'ArrayLike')
-
-        # check if random field
-        return_type = hints.get('return', None)
-        if return_type is not None:
-            is_random = isinstance(return_type, type) and issubclass(return_type, RandomField)
-        else:
-            is_random = False
-
-        log.debug('%s is random: %s', func.__name__, is_random)
-
-        name, call = self._make_call(name, func, args, kwargs)
+        name, call, return_info = self._make_call(name, func, args, kwargs)
 
         if name in self.state:
             log.warning('overwriting "%s" with %s', name, call)
 
-        if is_random:
+        if getattr(return_info, 'random', False):
             self._random[name] = call
         else:
             self._fields[name] = call

@@ -7,35 +7,54 @@ __all__ = [
     'NumberOfBins',
     'Cosmology',
     'ClsDict',
-    'MatterField',
-    'ConvergenceField',
-    'ShearField',
-    'get_default_ref',
+    'Random',
+    'Matter',
+    'Convergence',
+    'Shear',
+    'get_annotation',
 ]
 
 
-from typing import Any, Annotated, get_args, get_origin
+from typing import TypeVar, Any, Annotated, NamedTuple, get_args, get_origin
 from numpy.typing import ArrayLike
 
+T = TypeVar('T')
 
 # simulation
-RedshiftBins = Annotated[list[float], 'zbins']
-NumberOfBins = Annotated[int, 'nbins']
-Cosmology = Annotated[Any, 'cosmology']
-ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'cls']
+RedshiftBins = Annotated[list[float], 'name:zbins']
+NumberOfBins = Annotated[int, 'name:nbins']
+Cosmology = Annotated[Any, 'name:cosmology']
+ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls']
+
+# random fields
+Random = Annotated['RandomField', 'random']
 
 # fields
-MatterField = Annotated[ArrayLike, 'matter']
-ConvergenceField = Annotated[ArrayLike, 'convergence']
-ShearField = Annotated[ArrayLike, 'shear']
+Matter = Annotated[T, 'name:matter']
+Convergence = Annotated[T, 'name:convergence']
+Shear = Annotated[T, 'name:shear']
 
 
-def get_default_ref(T):
-    '''return the default ref from an annotated type'''
+class _Annotation(NamedTuple):
+    '''extra information from annotated type hints'''
+
+    name: str
+    random: bool
+
+
+def get_annotation(T):
+    '''return the extra information from annotated type hints'''
+
+    name = None
+    random = False
 
     if get_origin(T) == Annotated:
         args = get_args(T)
-        if len(args) > 1:
-            return args[1]
+        for arg in args[1:]:
+            if isinstance(arg, str):
+                if arg.startswith('name:'):
+                    name = arg[5:]
+                elif arg == 'random':
+                    random = True
 
-    return None
+    return _Annotation(name=name, random=random)
