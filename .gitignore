@@ -1,0 +1,10 @@
+__pycache__
+*.egg-info
+build
+dist
+.tox
+docs/_build
+docs/_api
+*.swp
+.ipynb_checkpoints
+.DS_Store
