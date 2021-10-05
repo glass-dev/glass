@@ -18,7 +18,6 @@ from .simulation import Simulation, Ref
 
 DEFAULT_MODULES = [
     'glass.cls',
-    'glass.random',
     'glass.matter',
     'glass.lensing',
 ]

@@ -4,6 +4,7 @@
 
 
 __all__ = [
+    'lognormal_convergence',
     'convergence_from_matter',
     'shear_from_convergence',
 ]
@@ -13,6 +14,25 @@ import numpy as np
 import healpy as hp
 
 from .types import MatterField, ConvergenceField, ShearField, RedshiftBins, Cosmology
+from .random import LognormalField
+
+
+def kappa0_hilbert11(z):
+    r'''return the shift of a lognormal convergence field
+
+    Uses the fit (38) of Hilbert et al. (2011) to compute the lognormal field
+    shift (i.e. the minimum kappa value).
+
+    '''
+
+    return 0.008*z*(1 + 3.625*z*(1. - 0.272414*z*(1. - 0.0822785*z)))
+
+
+def lognormal_convergence(zbins: RedshiftBins) -> LognormalField[ConvergenceField]:
+    '''convergence field following a lognormal distribution'''
+
+    z = np.add(zbins[:-1], zbins[1:])/2
+    return LognormalField(shift=kappa0_hilbert11(z))
 
 
 def convergence_from_matter(delta: MatterField,
