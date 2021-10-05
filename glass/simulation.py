@@ -55,13 +55,13 @@ class Call(t.NamedTuple):
 
 
 class Simulation:
-    def _make_call(self, origin, func, args, kwargs):
+    def _make_call(self, name, func, args, kwargs):
         # inspect signature bound to given args and kwargs
         sig = signature(func)
         try:
             ba = sig.bind_partial(*args, **kwargs)
         except TypeError as e:
-            raise TypeError(f"{e} for function '{func.__name__}' of {origin}") from None
+            raise TypeError(f"{e} for function '{func.__name__}'") from None
 
         # get type hints with annotations
         hints = t.get_type_hints(func, include_extras=True)
@@ -81,20 +81,26 @@ class Simulation:
         for par, ref in default_refs.items():
             log.debug('- %s: %s', par, ref)
 
+        # resolve default name if None given
+        if name is None:
+            name = default_refs.get('return', None)
+        if name is None:
+            raise TypeError(f'cannot infer name of unnamed function "{func.__name__}"')
+
         # make sure all func parameters can be obtained
         for par in sig.parameters:
             if par in ba.arguments:
                 arg = ba.arguments[par]
                 if isinstance(arg, Ref) and arg.name not in self.state:
-                    raise NameError(f"parameter '{par}' for function '{func.__name__}' of {origin} references unknown name '{arg.name}'")
+                    raise NameError(f"parameter '{par}' for function '{func.__name__}' of {name} references unknown name '{arg.name}'")
             elif par in default_refs and default_refs[par] in self.state:
                 ba.arguments[par] = Ref(default_refs[par])
             elif sig.parameters[par].default is not sig.parameters[par].empty:
                 pass
             else:
-                raise TypeError(f"missing argument '{par}' for function '{func.__name__}' of {origin}")
+                raise TypeError(f"missing argument '{par}' for function '{func.__name__}' of {name}")
 
-        return Call(func, ba.args, ba.kwargs)
+        return name, Call(func, ba.args, ba.kwargs)
 
     def __init__(self, *, nside=None, zbins=None):
 
@@ -116,19 +122,25 @@ class Simulation:
     def set_cls(self, func, *args, **kwargs):
         '''set the cls for the simulation'''
 
-        self._cls = self._make_call('cls', func, args, kwargs)
-        self.state['cls'] = None
-        return self._cls
+        name, self._cls = self._make_call(None, func, args, kwargs)
+
+        self.state[name] = None
+
+        return name, self._cls
 
     def add_field(self, name, func, *args, **kwargs):
         '''add a field to the simulation'''
 
-        call = self._make_call(f"field '{name}'", func, args, kwargs)
+        name, call = self._make_call(name, func, args, kwargs)
+
         if name in self.state:
             log.warning('overwriting "%s" with %s', name, call)
+
         self._fields[name] = call
+
         self.state[name] = None
-        return call
+
+        return name, call
 
     @property
     def nside(self):

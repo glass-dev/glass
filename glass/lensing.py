@@ -12,14 +12,14 @@ __all__ = [
 import numpy as np
 import healpy as hp
 
-from .types import ArrayLike, RedshiftBins, Cosmology
+from .types import MatterField, ConvergenceField, ShearField, RedshiftBins, Cosmology
 
 
-def convergence_from_matter(delta: ArrayLike,
+def convergence_from_matter(delta: MatterField,
                             zbins: RedshiftBins,
                             cosmo: Cosmology,
                             *,
-                            growth: bool = False):
+                            growth: bool = False) -> ConvergenceField:
     '''compute convergence fields from projection of the matter field
 
     For reference, see e.g. Chapter 6.2 of Schneider, Kochanek & Wambsganss
@@ -59,7 +59,7 @@ def convergence_from_matter(delta: ArrayLike,
     return kappa
 
 
-def shear_from_convergence(kappa: ArrayLike):
+def shear_from_convergence(kappa: ConvergenceField) -> ShearField:
     r'''weak lensing shear field from convergence
 
     Notes

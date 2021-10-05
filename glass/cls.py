@@ -14,7 +14,7 @@ from interpcl import interpcl
 from sortcl import cl_indices
 
 
-from .types import RedshiftBins, Cosmology
+from .types import RedshiftBins, Cosmology, ClsDict
 
 
 def cls_from_file(n, file, lmax=None, dipole=True, monopole=False, *, dens=False, lens=False):
@@ -49,7 +49,7 @@ def cls_from_file(n, file, lmax=None, dipole=True, monopole=False, *, dens=False
     return cls
 
 
-def cls_from_pyccl(fields, lmax, zbins: RedshiftBins, cosmo: Cosmology):
+def cls_from_pyccl(fields, lmax, zbins: RedshiftBins, cosmo: Cosmology) -> ClsDict:
     import pyccl
 
     c = pyccl.Cosmology(h=cosmo.H0/100, Omega_c=cosmo.Om, Omega_b=0.05, sigma8=0.8, n_s=0.96)

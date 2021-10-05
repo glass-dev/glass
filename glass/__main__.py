@@ -78,7 +78,7 @@ if __name__ == '__main__':
         log.info('# config')
         log.info('file: %s', args.config.name)
 
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(allow_no_value=True)
         config.optionxform = lambda option: option
         config.read_file(args.config)
 
@@ -151,18 +151,22 @@ if __name__ == '__main__':
 
             for par in config[sect]:
                 if par == 'fields':
-                    kwargs[par] = dict(_.split('=', 1) for _ in config[sect][par].split())
+                    kwargs[par] = dict((_.split('=', 1)*2)[:2] for _ in config[sect][par].split())
                 else:
                     kwargs[par] = parse_arg(config[sect][par], filename=args.config.name)
 
-            call = sim.set_cls(func, **kwargs)
+            name, call = sim.set_cls(func, **kwargs)
 
-            log.info('cls: %s', call)
+            log.info('%s: %s', name, call)
 
         if 'fields' in config:
             log.info('## fields')
 
             for field, func in config['fields'].items():
+                if func is None:
+                    name, func = None, field
+                else:
+                    name = field
                 if func not in namespace:
                     raise NameError(f'fields: {field}: unknown function "{func}"')
                 func = namespace[func]
@@ -172,9 +176,9 @@ if __name__ == '__main__':
                     for par in config[sect]:
                         kwargs[par] = parse_arg(config[sect][par], filename=args.config.name, refs=True)
 
-                call = sim.add_field(field, func, **kwargs)
+                name, call = sim.add_field(name, func, **kwargs)
 
-                log.info('%s: %s', field, call)
+                log.info('%s: %s', name, call)
 
         log.info('# run')
 
