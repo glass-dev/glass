@@ -12,9 +12,13 @@ __all__ = [
 
 import numpy as np
 import healpy as hp
+import logging
 
 from .types import MatterField, ConvergenceField, ShearField, RedshiftBins, Cosmology
 from .random import LognormalField
+
+
+log = logging.getLogger('glass.lensing')
 
 
 def kappa0_hilbert11(z):
@@ -132,13 +136,31 @@ def shear_from_convergence(kappa: ConvergenceField) -> ShearField:
 
     '''
 
-    nside = hp.npix2nside(np.shape(kappa)[-1])
+    log.debug('compute shear maps from convergence maps')
 
-    alms = hp.map2alm(kappa, pol=False, use_pixel_weights=True)
+    size = np.shape(kappa)
 
-    lmax = hp.Alm.getlmax(np.shape(alms)[-1])
+    log.debug('kappa shape: %s', size)
+
+    nside = hp.npix2nside(size[-1])
+
+    log.debug('nside from kappa: %d', nside)
+
+    log.debug('computing kappa alms from kappa maps')
+
+    alms = np.atleast_2d(hp.map2alm(kappa, pol=False, use_pixel_weights=True))
+
+    size = np.shape(alms)
+
+    log.debug('alms shape: %s', size)
+
+    lmax = hp.Alm.getlmax(size[-1])
+
+    log.debug('lmax from alms: %s', lmax)
 
     l = np.arange(lmax+1)
+
+    log.debug('turning kappa alms into gamma alms')
 
     fl = np.sqrt((l+2)*(l+1)*l*(l-1))
     fl /= np.clip(l*(l+1), 1, None)
@@ -147,6 +169,8 @@ def shear_from_convergence(kappa: ConvergenceField) -> ShearField:
         hp.almxfl(alm, fl, inplace=True)
 
     blm = np.zeros_like(alms[0])
+
+    log.debug('transforming gamma alms to gamma maps')
 
     gamma1 = np.empty_like(kappa)
     gamma2 = np.empty_like(kappa)
