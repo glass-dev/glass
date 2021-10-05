@@ -28,6 +28,7 @@ ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls']
 
 # random fields
 Random = Annotated[list['RandomField'], 'random']
+ClsList = list[ArrayLike]
 
 # fields
 Matter = Annotated[T, 'name:matter']

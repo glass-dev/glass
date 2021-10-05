@@ -9,6 +9,7 @@ __all__ = [
 ]
 
 
+import numpy as np
 import typing as t
 import logging
 
@@ -16,6 +17,7 @@ from inspect import signature
 from functools import cached_property
 
 from .types import get_annotation
+from .cls import collect_cls
 from .random import generate_random_fields
 
 
@@ -174,7 +176,7 @@ class Simulation:
 
             log.debug('obtained %d cls:', len(self.state['cls']))
             for a, b in self.state['cls'].keys():
-                log.debug('- (%s, %s)', a, b)
+                log.debug('- %s-%s', a, b)
 
         return self.state['cls']
 
@@ -187,34 +189,57 @@ class Simulation:
         # this will contain all fields by name
         fields = {}
 
-        log.debug('random fields: %d', len(self._random))
+        # number of random fields
+        nrandom = len(self._random)
+
+        log.debug('random fields: %d', nrandom)
 
         # random fields need to be generated first, and all together
-        if len(self._random) > 0:
-            # create the RandomField instances which describe the random fields
-            # to the generate_random_fields function
-            random = {}
-            for field, call in self._random.items():
-                random[field] = call(self.state)
-
-                log.debug('- %s: %s', field, random[field])
-
-            # get the metadata, this gets the cls if not done previously
+        if nrandom > 0:
+            # metadata
             nside = self.nside
             nbins = self.nbins
-            cls = self.cls
+
+            # create the RandomField instances which describe the random fields
+            # to the generate_random_fields function
+            random_names, random_fields = [], []
+            for field, call in self._random.items():
+                log.debug('- %s:', field)
+
+                rns = [f'{field}[{i}]' for i in range(nbins)]
+                rfs = call(self.state)
+
+                if len(rfs) != nbins:
+                    raise TypeError(f'random field "{field}" returned {len(rfs)} item(s) for {nbins} bin(s)')
+
+                for rn, rf in zip(rns, rfs):
+                    log.debug('  - %s: %s', rn, rf)
+
+                random_names += rns
+                random_fields += rfs
+
+            # collect the cls, this also computes the cls if not done before
+            cls = collect_cls(random_names, self.cls)
 
             log.info('generating random fields...')
-            for field in random:
+            for field in self._random:
                 log.info('- %s', field)
 
-            random = generate_random_fields(nside, random, nbins, cls)
+            # sample maps for all of these random fields
+            random_maps = generate_random_fields(nside, random_fields, cls)
+
+            log.debug('shape of random maps: %s', np.shape(random_maps))
+
+            # reshape to number of fields x number of bins
+            random_maps = np.reshape(random_maps, (nrandom, nbins, -1))
+
+            log.debug('reshaped random maps: %s', np.shape(random_maps))
 
             # store the generated maps in the fields for returning
-            fields.update(random)
-
             # also store all random fields in the state for subsequent calls
-            self.state.update(random)
+            for field, m in zip(self._random.keys(), random_maps):
+                fields[field] = m
+                self.state[field] = m
 
         log.debug('fields: %d', len(self._fields))
 

@@ -20,7 +20,7 @@ from gaussiancl import (
     lognormal_normal_cl,
 )
 
-from .types import ArrayLike, NumberOfBins, ClsDict
+from .types import ArrayLike, ClsList
 
 
 log = logging.getLogger('glass.random')
@@ -74,45 +74,19 @@ class LognormalField(RandomField):
         return field
 
 
-def generate_random_fields(nside: int,
-                           fields: dict[str, list[RandomField]],
-                           nbins: NumberOfBins,
-                           cls: ClsDict,
-                           allow_missing_cls: bool = False) -> ArrayLike:
+def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) -> ArrayLike:
     '''generate random fields from cls'''
 
     # debug output computations are expensive, so only do them when necessary
     debug = log.isEnabledFor(logging.DEBUG)
 
-    # expand out the random field definitions for cls
-    _names, _fields = [], []
-    for name, field in fields.items():
-        _names += [f'{name}[{i}]' for i in range(nbins)]
-        _fields += field
-
     # total number of fields to simulate
-    n = len(_names)
+    n = len(fields)
 
     if debug:
         log.debug('simulating %d random fields:', n)
-        for i in range(n):
-            log.debug('- %s: %s', _names[i], _fields[i])
-
-    # get the cls of the fields
-    _cls = []
-    for i, j in zip(*cl_indices(n)):
-        a, b = _names[i], _names[j]
-        if (a, b) in cls:
-            _cls.append(cls[a, b])
-        elif (b, a) in cls:
-            _cls.append(cls[b, a])
-        elif allow_missing_cls:
-            _cls.append(None)
-        else:
-            raise KeyError(f'missing cls: ({a}, {b})')
-
-    if debug:
-        log.debug('collected %d cls, of which %d are None', len(cls), sum(cl is None for cl in cls))
+        for field in fields:
+            log.debug('- %s', field)
 
     # lmax is given by nside
     lmax = 3*nside - 1
@@ -133,7 +107,7 @@ def generate_random_fields(nside: int,
 
     # transform to input cls for the Gaussian random fields
     gaussian_cls = []
-    for i, j, cl in zip(*cl_indices(n), _cls):
+    for i, j, cl in zip(*cl_indices(n), cls):
         # only work on available cls
         if cl is not None:
             # simulating integrated fields by multiplying cls and pw
@@ -147,26 +121,26 @@ def generate_random_fields(nside: int,
                 var[i] = np.sum((2*l+1)/(4*np.pi)*cl)
 
             # transform the cl
-            field_pair = (type(_fields[i]), type(_fields[j]))
+            field_pair = (type(fields[i]), type(fields[j]))
 
             if field_pair == (NormalField, NormalField):
                 log.debug('- %s: no transformation', field_pair)
 
             elif field_pair == (LognormalField, NormalField):
-                alpha = _fields[i].mean + _fields[i].shift
+                alpha = fields[i].mean + fields[i].shift
                 cl = lognormal_normal_cl(cl, alpha=alpha)
 
                 log.debug('- %s: lognormal_normal_cl(cl, alpha=%g)', field_pair, alpha)
 
             elif field_pair == (NormalField, LognormalField):
-                alpha = _fields[j].mean + _fields[j].shift
+                alpha = fields[j].mean + fields[j].shift
                 cl = lognormal_normal_cl(cl, alpha=alpha)
 
                 log.debug('- %s: lognormal_normal_cl(cl, alpha=%g)', field_pair, alpha)
 
             elif field_pair == (LognormalField, LognormalField):
-                alpha = _fields[i].mean + _fields[j].shift
-                alpha2 = _fields[j].mean + _fields[j].shift
+                alpha = fields[i].mean + fields[j].shift
+                alpha2 = fields[j].mean + fields[j].shift
                 cl = lognormal_cl(cl, alpha=alpha, alpha2=alpha2)
 
                 log.debug('- %s: lognormal_cl(cl, alpha=%g, alpha2=%g)', field_pair, alpha, alpha2)
@@ -196,34 +170,29 @@ def generate_random_fields(nside: int,
     log.debug('transforming fields...')
 
     # transform the Gaussian random fields to the output fields
-    _maps = {}
-    for i, (name, field) in enumerate(fields.items()):
+    for i, field in enumerate(fields):
 
-        # output statistics of the Gaussian field before the transformation
+        # statistics of the Gaussian field before the transformation
         if debug:
-            index = np.s_[i*nbins:(i+1)*nbins]
-            log.debug('- %s:', name)
-            log.debug('  - Gaussian field:')
-            log.debug('    - min: %s', np.array_str(np.min(maps[index], axis=-1), np.inf))
-            log.debug('    - max: %s', np.array_str(np.max(maps[index], axis=-1), np.inf))
-            log.debug('    - mean: %s', np.array_str(np.mean(maps[index], axis=-1), np.inf))
-            log.debug('    - var: %s', np.array_str(np.var(maps[index], axis=-1), np.inf))
-            log.debug('    - Evar: %s', np.array_str(gaussian_var[index], np.inf))
+            _min = np.min(maps[i])
+            _max = np.max(maps[i])
+            _mean = np.mean(maps[i])
+            _var = np.var(maps[i])
 
         # do the transformation
-        _maps[name] = [_fields[j](maps[j], var_in=gaussian_var[j], var_out=var[j]) for j in range(i*nbins, (i+1)*nbins)]
+        maps[i] = field(maps[i], var_in=gaussian_var[i], var_out=var[i])
 
         # output statistics of the desired field after the transformation
         if debug:
-            log.debug('  - %s:', field.__class__.__name__)
-            log.debug('    - min: %s', np.array_str(np.min(maps[index], axis=-1), np.inf))
-            log.debug('    - max: %s', np.array_str(np.max(maps[index], axis=-1), np.inf))
-            log.debug('    - mean: %s', np.array_str(np.mean(maps[index], axis=-1), np.inf))
-            log.debug('    - Emean: %s', np.array_str(np.asarray([f.mean for f in _fields[index]]), np.inf))
-            log.debug('    - var: %s', np.array_str(np.var(maps[index], axis=-1), np.inf))
-            log.debug('    - Evar: %s', np.array_str(var[index], np.inf))
+            log.debug('- Gaussian -> %s:', field.__class__.__name__)
+            log.debug('  - min: %g -> %g', _min, np.min(maps[i]))
+            log.debug('  - max: %g -> %g', _max, np.max(maps[i]))
+            log.debug('  - mean: %g -> %g', _mean, np.mean(maps[i]))
+            log.debug('  - Emean: %g -> %g', 0., field.mean)
+            log.debug('  - var: %g -> %g', _var, np.var(maps[i]))
+            log.debug('  - Evar: %g -> %g', gaussian_var[i], var[i])
 
     log.debug('random fields generated')
 
     # fields have been created
-    return _maps
+    return maps
