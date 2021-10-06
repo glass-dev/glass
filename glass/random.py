@@ -164,6 +164,15 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
     # sample the Gaussian random fields in harmonic space
     alms = hp.synalm(gaussian_cls, lmax=lmax, new=True)
 
+    if debug:
+        for i, alm in enumerate(alms):
+            cl = hp.alm2cl(alm)
+            l = np.arange(len(cl))
+            _mean = np.sqrt(4*np.pi*cl[0])
+            _var = np.sum((2*l+1)/(4*np.pi)*cl)
+            log.debug('- mean: %g [%g]', _mean, 0.)
+            log.debug('  var: %g [%g]', _var, gaussian_var[i])
+
     log.debug('computing maps...')
 
     # compute the Gaussian random field maps in real space
@@ -171,30 +180,25 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
     maps = hp.alm2map(alms, nside, lmax=lmax, pixwin=False, pol=False, inplace=True)
     alms = None
 
+    if debug:
+        for i, m in enumerate(maps):
+            log.debug('- mean: %g [%g]', np.mean(m), fields[i].mean)
+            log.debug('  var: %g [%g]', np.var(m), gaussian_var[i])
+            log.debug('  min: %g', np.min(m))
+            log.debug('  max: %g', np.max(m))
+
     log.debug('transforming fields...')
 
     # transform the Gaussian random fields to the output fields
     for i, field in enumerate(fields):
-
-        # statistics of the Gaussian field before the transformation
-        if debug:
-            _min = np.min(maps[i])
-            _max = np.max(maps[i])
-            _mean = np.mean(maps[i])
-            _var = np.var(maps[i])
-
-        # do the transformation
         maps[i] = field(maps[i], var_in=gaussian_var[i], var_out=var[i])
 
-        # output statistics of the desired field after the transformation
-        if debug:
-            log.debug('- Gaussian -> %s:', field.__class__.__name__)
-            log.debug('  - min: %g -> %g', _min, np.min(maps[i]))
-            log.debug('  - max: %g -> %g', _max, np.max(maps[i]))
-            log.debug('  - mean: %g -> %g', _mean, np.mean(maps[i]))
-            log.debug('  - Emean: %g -> %g', 0., field.mean)
-            log.debug('  - var: %g -> %g', _var, np.var(maps[i]))
-            log.debug('  - Evar: %g -> %g', gaussian_var[i], var[i])
+    if debug:
+        for i, m in enumerate(maps):
+            log.debug('- mean: %g [%g]', np.mean(m), fields[i].mean)
+            log.debug('  var: %g [%g]', np.var(m), var[i])
+            log.debug('  min: %g', np.min(m))
+            log.debug('  max: %g', np.max(m))
 
     log.debug('random fields generated')
 
