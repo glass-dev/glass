@@ -26,6 +26,11 @@ DEFAULT_MODULES = [
 LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
 
 
+def getboolean(config, name):
+    b = config.get(name, False)
+    return True if b is None else bool(b)
+
+
 def parse_arg(arg, *, filename='<config>', refs=False):
     try:
         arg = literal_eval(arg)
@@ -116,11 +121,14 @@ if __name__ == '__main__':
         nside = int(config['simulation']['nside'])
         zbins = np.fromstring(config['simulation']['zbins'], sep=' ')
         cls = config['simulation'].get('cls', None)
+        allow_missing_cls = getboolean(config['simulation'], 'allow_missing_cls')
 
         log.info('nside: %d', nside)
         log.info('zbins: %s', zbins)
+        log.info('cls: %s', cls)
+        log.info('allow missing cls: %s', allow_missing_cls)
 
-        sim = Simulation(nside=nside, zbins=zbins)
+        sim = Simulation(nside=nside, zbins=zbins, allow_missing_cls=allow_missing_cls)
 
         if 'cosmology' in config:
             log.info('## cosmology')

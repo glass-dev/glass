@@ -56,10 +56,12 @@ class Call(t.NamedTuple):
 
 
 class Simulation:
-    def __init__(self, *, nside=None, zbins=None):
+    def __init__(self, *, nside=None, zbins=None, allow_missing_cls=False):
         self._cls = None
         self._random = {}
         self._fields = {}
+
+        self.allow_missing_cls = allow_missing_cls
 
         self.state = {}
         if nside is not None:
@@ -219,7 +221,7 @@ class Simulation:
                 random_fields += rfs
 
             # collect the cls, this also computes the cls if not done before
-            cls = collect_cls(random_names, self.cls)
+            cls = collect_cls(random_names, self.cls, allow_missing=self.allow_missing_cls)
 
             log.info('generating random fields...')
             for field in self._random:
