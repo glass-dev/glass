@@ -4,6 +4,7 @@
 
 __all__ = [
     'cls_from_file',
+    'cls_from_files',
     'cls_from_pyccl',
     'cls_from_classy',
 ]
@@ -11,10 +12,11 @@ __all__ = [
 
 import numpy as np
 import logging
+from itertools import combinations_with_replacement
 from interpcl import interpcl
 from sortcl import cl_indices
 
-from .types import RedshiftBins, Cosmology, ClsDict, ClsList
+from .types import RedshiftBins, NumberOfBins, Cosmology, ClsDict, ClsList
 
 
 log = logging.getLogger('glass.cls')
@@ -79,6 +81,42 @@ def cls_from_file(n, file, lmax=None, dipole=True, monopole=False, *, dens=False
         cl = data[f'{names[i]}-{names[j]}']
         cl = interpcl(l, cl, lmax=lmax, dipole=dipole, monopole=monopole)
         cls.append(cl)
+
+    return cls
+
+
+def cls_from_files(pattern: str,
+                   fields: dict[str, str],
+                   nbins: NumberOfBins,
+                   *,
+                   lmax: int = None,
+                   dipole: bool = True,
+                   monopole: bool = False) -> ClsDict:
+    '''read cls from multiple individual files'''
+
+    log.debug('reading cls from multiple files')
+    log.debug('filename pattern: %s')
+
+    fields_and_bins = [(field, name, i) for field, name in fields.items() for i in range(nbins)]
+
+    log.debug('all fields and bins: %s', ', '.join(str(fb) for fb in fields_and_bins))
+
+    cls = {}
+    for (fi, ni, i), (fj, nj, j) in combinations_with_replacement(fields_and_bins, 2):
+        filename = pattern.format(name1=ni, bin01=i, bin1=i+1, name2=nj, bin02=j, bin2=j+1)
+
+        log.debug('file for %s[%d]-%s[%d]: %s', fi, i, fj, j, filename)
+
+        try:
+            l, cl = np.loadtxt(filename, usecols=[0, 1]).T
+        except OSError:
+            l, cl = None, None
+
+        if cl is not None:
+            log.debug('lmax for %s[%d]-%s[%d]: %s', fi, i, fj, j, l[-1])
+            cls[f'{fi}[{i}]', f'{fj}[{j}]'] = interpcl(l, cl, lmax=lmax, dipole=dipole, monopole=monopole)
+        else:
+            log.debug('file not found')
 
     return cls
 
