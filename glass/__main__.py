@@ -176,14 +176,19 @@ if __name__ == '__main__':
                     name = field
                 if func not in namespace:
                     raise NameError(f'fields: {field}: unknown function "{func}"')
-                func = namespace[func]
-                kwargs = {}
+                _func, _args, _kwargs = namespace[func], [], {}
                 sect = f'fields:{field}'
                 if sect in config:
-                    for par in config[sect]:
-                        kwargs[par] = parse_arg(config[sect][par], filename=args.config.name, refs=True)
+                    for par, arg in config[sect].items():
+                        if arg is None:
+                            par, arg = None, par
+                        arg = parse_arg(arg, filename=args.config.name, refs=True)
+                        if par is None:
+                            _args.append(arg)
+                        else:
+                            _kwargs[par] = arg
 
-                name, call = sim.add_field(name, func, **kwargs)
+                name, call = sim.add_field(name, _func, *_args, **_kwargs)
 
                 log.info('%s: %s', name, call)
 
