@@ -128,33 +128,48 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
 
     log.debug('lmax after pixwin is %d', lmax)
 
+    # array to compute variance, used a couple of times below
+    two_l_plus_1_over_four_pi = (2*np.arange(lmax+1)+1)/(4*np.pi)
+
     # variances of the transformed and Gaussian random fields, computed from cls
     var = np.zeros(n)
     gaussian_var = np.zeros(n)
 
-    log.debug('transform cls:')
+    log.debug('transform cls...')
 
     # transform to input cls for the Gaussian random fields
     gaussian_cls = []
     for i, j, cl in zip(*cl_indices(n), cls):
         # only work on available cls
         if cl is not None:
+            # pad shorter arrays with zero
+            # this makes a copy of cl so we are not changing the input
+            if len(cl) < lmax+1:
+                cl = np.pad(cl, (0, lmax+1-len(cl)))
+            else:
+                cl = np.copy(cl[:lmax+1])
+
             # simulating integrated fields by multiplying cls and pw
-            # shorter array sets length
-            cl_len = min(len(cl), lmax+1)
-            cl = cl[:cl_len] * pw[:cl_len]
+            cl *= pw
 
             # compute the variance if on the diagonal
             if i == j:
-                l = np.arange(cl_len)
-                var[i] = np.sum((2*l+1)/(4*np.pi)*cl)
+                var[i] = two_l_plus_1_over_four_pi@cl
+
+            # store monopole and dipole if zero
+            has_monopole = (cl[0] != 0)
+            has_dipole = (cl[1] != 0)
 
             # transform the cl
             cl = (fields[i] & fields[j])(cl)
 
+            # restore monopole and dipole if zero
+            cl[0] *= has_monopole
+            cl[1] *= has_dipole
+
             # compute the Gaussian variance if on the diagonal
             if i == j:
-                gaussian_var[i] = np.sum((2*l+1)/(4*np.pi)*cl)
+                gaussian_var[i] = two_l_plus_1_over_four_pi@cl
 
         # store the Gaussian cl, or None
         gaussian_cls.append(cl)
