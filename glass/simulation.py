@@ -194,20 +194,21 @@ class Simulation:
         # number of random fields
         nrandom = len(self._random)
 
-        log.debug('random fields: %d', nrandom)
+        log.debug('number of random fields: %d', nrandom)
 
         # random fields need to be generated first, and all together
         if nrandom > 0:
-            # metadata
+            # metadata, this computes the cls if not done before
             nside = self.nside
             nbins = self.nbins
+            cls = self.cls
+
+            log.debug('random fields:')
 
             # create the RandomField instances which describe the random fields
             # to the generate_random_fields function
             random_names, random_fields = [], []
             for field, call in self._random.items():
-                log.debug('- %s:', field)
-
                 rns = [f'{field}[{i}]' for i in range(nbins)]
                 rfs = call(self.state)
 
@@ -215,13 +216,13 @@ class Simulation:
                     raise TypeError(f'random field "{field}" returned {len(rfs)} item(s) for {nbins} bin(s)')
 
                 for rn, rf in zip(rns, rfs):
-                    log.debug('  - %s: %s', rn, rf)
+                    log.debug('- %s: %s', rn, rf)
 
                 random_names += rns
                 random_fields += rfs
 
-            # collect the cls, this also computes the cls if not done before
-            cls = collect_cls(random_names, self.cls, allow_missing=self.allow_missing_cls)
+            # collect the cls for these random fields
+            cls = collect_cls(random_names, cls, allow_missing=self.allow_missing_cls)
 
             log.info('generating random fields...')
             for field in self._random:
@@ -243,7 +244,7 @@ class Simulation:
                 fields[field] = m
                 self.state[field] = m
 
-        log.debug('fields: %d', len(self._fields))
+        log.debug('number of nonrandom fields: %d', len(self._fields))
 
         log.info('generating fields...')
 

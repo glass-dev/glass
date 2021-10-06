@@ -43,7 +43,7 @@ def collect_cls(fields: list[str],
             log.debug(f'- {b}-{a}')
             _cls.append(cls[b, a])
         elif allow_missing:
-            log.debug(f'- {a}-{b} MISSING')
+            log.debug(f'- MISSING: {a}-{b}')
             _cls.append(None)
         else:
             raise KeyError(f'missing cls: {a}-{b}')
