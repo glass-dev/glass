@@ -4,6 +4,7 @@
 
 
 __all__ = [
+    'normal_convergence',
     'lognormal_convergence',
     'convergence_from_matter',
     'shear_from_convergence',
@@ -14,8 +15,8 @@ import numpy as np
 import healpy as hp
 import logging
 
-from .types import Matter, Convergence, Shear, Random, ArrayLike, RedshiftBins, Cosmology
-from .random import LognormalField
+from .types import Matter, Convergence, Shear, Random, ArrayLike, NumberOfBins, RedshiftBins, Cosmology
+from .random import NormalField, LognormalField
 
 
 log = logging.getLogger('glass.lensing')
@@ -30,6 +31,12 @@ def kappa0_hilbert11(z):
     '''
 
     return 0.008*z*(1 + 3.625*z*(1. - 0.272414*z*(1. - 0.0822785*z)))
+
+
+def normal_convergence(nbins: NumberOfBins) -> Convergence[Random]:
+    '''convergence field following a normal distribution'''
+
+    return [NormalField()]*nbins
 
 
 def lognormal_convergence(zbins: RedshiftBins) -> Convergence[Random]:
