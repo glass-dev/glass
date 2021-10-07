@@ -8,6 +8,9 @@ __all__ = [
     'Cosmology',
     'ClsDict',
     'Random',
+    'ClsList',
+    'GaussianClsList',
+    'RegGaussianClsList',
     'Matter',
     'Convergence',
     'Shear',
@@ -21,6 +24,7 @@ from numpy.typing import ArrayLike
 T = TypeVar('T')
 
 # simulation
+NSide = Annotated[int, 'name:nside']
 RedshiftBins = Annotated[list[float], 'name:zbins']
 NumberOfBins = Annotated[int, 'name:nbins']
 Cosmology = Annotated[Any, 'name:cosmology']
@@ -29,6 +33,8 @@ ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls']
 # random fields
 Random = Annotated[list['RandomField'], 'random']
 ClsList = list[ArrayLike]
+GaussianClsList = list[ArrayLike]
+RegGaussianClsList = list[ArrayLike]
 
 # fields
 Matter = Annotated[T, 'name:matter']

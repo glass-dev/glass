@@ -6,6 +6,9 @@ __all__ = [
     'RandomField',
     'NormalField',
     'LognormalField',
+    'compute_gaussian_cls',
+    'regularize_gaussian_cls',
+    'generate_random_fields',
 ]
 
 
@@ -18,11 +21,19 @@ from dataclasses import dataclass, fields as dataclass_fields
 from functools import singledispatchmethod, partial
 from sortcl import cl_indices
 
-from .types import ArrayLike, ClsList
+from .types import NSide, ArrayLike, ClsList, GaussianClsList, RegGaussianClsList
 from .numeric import cov_reg_simple, cov_reg_keepdiag
 
 
 log = logging.getLogger('glass.random')
+
+
+def _num_fields_from_num_cls(m: int) -> int:
+    '''get number of fields from number of cls'''
+    n = int((2*m)**0.5)
+    if m != n*(n+1)//2:
+        raise TypeError(f'number of cls is not a triangle number: {m}')
+    return n
 
 
 @dataclass
@@ -43,7 +54,7 @@ class RandomField(metaclass=ABCMeta):
         return tuple(f.name for f in dataclass_fields(cls))
 
     @abstractmethod
-    def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
+    def __call__(self, field: ArrayLike, var: float) -> ArrayLike:
         pass
 
     @abstractmethod
@@ -61,7 +72,7 @@ class RandomField(metaclass=ABCMeta):
 class NormalField(RandomField):
     '''normal random field'''
 
-    def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
+    def __call__(self, field: ArrayLike, var: float) -> ArrayLike:
         # add mean to Gaussian field
         field += self.mean
         return field
@@ -80,9 +91,9 @@ class LognormalField(RandomField):
 
     shift: float = 1.0
 
-    def __call__(self, field: ArrayLike, var_in: float, var_out: float) -> ArrayLike:
+    def __call__(self, field: ArrayLike, var: float) -> ArrayLike:
         # fix the mean of the Gaussian field
-        field += np.log(self.mean + self.shift) - var_in/2
+        field += np.log(self.mean + self.shift) - var/2
         # exponentiate values in place
         np.exp(field, out=field)
         # lognormal shift
@@ -104,88 +115,88 @@ class LognormalField(RandomField):
         return partial(gaussiancl.lognormal_normal_cl, alpha=alpha)
 
 
-def generate_random_fields(nside: int,
-                           fields: list[RandomField],
-                           cls: ClsList,
-                           reg: str = 'simple') -> ArrayLike:
-    '''generate random fields from cls'''
+def compute_gaussian_cls(cls: ClsList,
+                         random_fields: list[RandomField],
+                         nside: NSide = None) -> GaussianClsList:
+    '''transform cls to Gaussian cls for simulation'''
+
+    # number of fields must match number of cls
+    n = len(random_fields)
+    if len(cls) != n*(n+1)//2:
+        raise TypeError(f'requires {n*(n+1)//2} cls for {n} random fields')
+
+    # maximum l in input cls
+    lmax = np.max([len(cl)-1 for cl in cls if cl is not None])
+
+    # get pixel window function if nside is given, or set to unity
+    if nside is not None:
+        pw = hp.pixwin(nside, pol=False, lmax=lmax)
+    else:
+        pw = np.ones(lmax+1)
+
+    # the actual lmax is constrained by what the pixwin function can provide
+    lmax = len(pw) - 1
+
+    # transform input cls to cls for the Gaussian random fields
+    gaussian_cls = []
+    for i, j, cl in zip(*cl_indices(n), cls):
+        # only work on available cls
+        if cl is not None:
+            # simulating integrated maps by multiplying cls and pw
+            # shorter array determines length
+            cl_len = min(len(cl), lmax+1)
+            cl = cl[:cl_len]*pw[:cl_len]
+
+            # autocorrelation must be nonnegative
+            if i == j:
+                neg_cl = np.where(cl < 0)[0]
+                if len(neg_cl) > 0:
+                    log.warn('WARNING: negative cls for field %d', i)
+                    log.debug('negative cls at l = %s', neg_cl)
+
+            # transform the cl
+            cl = (random_fields[i] & random_fields[j])(cl)
+
+            # Gaussian autocorrelation must be nonnegative
+            if i == j:
+                neg_cl = np.where(cl < 0)[0]
+                if len(neg_cl) > 0:
+                    log.warn('WARNING: negative Gaussian cls for field %d', i)
+                    log.debug('negative cls at l = %s', neg_cl)
+
+        # store the Gaussian cl, or None
+        gaussian_cls.append(cl)
+
+    # returns the list of transformed cls in input order
+    return gaussian_cls
+
+
+def regularize_gaussian_cls(cls: GaussianClsList,
+                            method: str = 'simple') -> RegGaussianClsList:
+    '''regularize Gaussian cls for random sampling'''
 
     # debug output computations are expensive, so only do them when necessary
     debug = log.isEnabledFor(logging.DEBUG)
 
-    # total number of fields to simulate
-    n = len(fields)
+    # number of fields
+    n = _num_fields_from_num_cls(len(cls))
 
-    if debug:
-        log.debug('simulating %d random fields:', n)
-        for field in fields:
-            log.debug('- %s', field)
+    # maximum l in input cls
+    lmax = np.max([len(cl)-1 for cl in cls if cl is not None])
 
-    # lmax is given by nside
-    lmax = 3*nside - 1
+    log.debug('create covariance matrix...')
 
-    log.debug('nside is %d, lmax from nside is %d', nside, lmax)
+    # this is the covariance matrix of cls
+    # the leading dimension is l, then it is a n x n covariance matrix
+    # missing entries are zero, which is the default value
+    cov = np.zeros((lmax+1, n, n))
 
-    # get the pixel window function
-    pw = hp.pixwin(nside, pol=False, lmax=lmax)
-    lmax = len(pw) - 1
-
-    log.debug('lmax after pixwin is %d', lmax)
-
-    # array to compute variance, used a couple of times below
-    two_l_plus_1_over_four_pi = (2*np.arange(lmax+1)+1)/(4*np.pi)
-
-    # variances of the transformed and Gaussian random fields, computed from cls
-    var = np.zeros(n)
-    gaussian_var = np.zeros(n)
-
-    log.debug('transform cls...')
-
-    # covariance matrix of cls
-    cov = np.zeros((lmax+1, n, n), dtype=float)
-
-    # transform to input cls for the Gaussian random fields
+    # fill the matrix up by going through the cls in order
+    # if the cls list is ragged, some entries at high l may remain zero
+    # only fill the lower triangular part, everything is symmetric
     for i, j, cl in zip(*cl_indices(n), cls):
-        # only work on available cls
         if cl is not None:
-            # pad shorter arrays with zero
-            # this makes a copy of cl so we are not changing the input
-            if len(cl) < lmax+1:
-                cl = np.pad(cl, (0, lmax+1-len(cl)))
-            else:
-                cl = np.copy(cl[:lmax+1])
-
-            # simulating integrated fields by multiplying cls and pw
-            cl *= pw
-
-            # extra checks on the diagonal
-            if i == j:
-                # autocorrelation must be nonnegative
-                if np.any(cl < 0):
-                    log.warn('WARNING: negative cls for field %d', i)
-
-                # compute the variance if on the diagonal
-                var[i] = two_l_plus_1_over_four_pi@cl
-
-            # store monopole and dipole if zero
-            has_monopole = (cl[0] != 0)
-            has_dipole = (cl[1] != 0)
-
-            # transform the cl
-            cl = (fields[i] & fields[j])(cl)
-
-            # restore monopole and dipole if zero
-            cl[0] *= has_monopole
-            cl[1] *= has_dipole
-
-            # extra checks on the diagonal
-            if i == j:
-                # autocorrelation must be nonnegative
-                if np.any(cl < 0):
-                    log.warn('WARNING: negative Gaussian cls for field %d', i)
-
-            # store the Gaussian cl in matrix (lower triangle only)
-            cov[:, j, i] = cl
+            cov[:len(cl), j, i] = cl
 
     log.debug('check covariance matrix...')
 
@@ -194,92 +205,106 @@ def generate_random_fields(nside: int,
         np.linalg.cholesky(cov + np.finfo(0.).tiny)
     except np.linalg.LinAlgError:
         # matrix needs regularisation
-        do_reg = True
+        pass
     else:
         # matrix is ok
-        do_reg = False
+        return cls
 
-    # perform the regularisation if necessary
-    if do_reg:
-        log.info('cls require regularisation!')
+    log.info('cls require regularisation!')
 
-        log.debug('covariance matrix regularisation...')
-        log.debug('regularisation method: %s', reg)
+    log.debug('covariance matrix regularisation...')
+    log.debug('regularisation method: %s', method)
 
-        if reg is None:
-            reg = cov
-        elif reg == 'simple':
-            reg = cov_reg_simple(cov)
-        elif reg == 'keepdiag':
-            reg = cov_reg_keepdiag(cov)
-        else:
-            raise ValueError(f'unknown method "{reg}" for regularisation')
+    if method == 'simple':
+        reg = cov_reg_simple(cov)
+    elif method == 'keepdiag':
+        reg = cov_reg_keepdiag(cov)
+    else:
+        raise ValueError(f'unknown method "{method}" for regularisation')
 
-        # show the maximum change in each l
-        if debug:
-            # get the diagonal of covariance matrix and regularised
-            _diag_cov = cov.reshape(lmax+1, -1)[:, ::n+1]
-            _diag_reg = reg.reshape(lmax+1, -1)[:, ::n+1]
+    # show the maximum change in each l
+    if debug:
+        # get the diagonal of covariance matrix and regularised
+        _diag_cov = cov.reshape(lmax+1, -1)[:, ::n+1]
+        _diag_reg = reg.reshape(lmax+1, -1)[:, ::n+1]
 
-            _abs = np.fabs(_diag_reg - _diag_cov)
-            _rel = np.divide(_abs, np.fabs(_diag_cov), where=(_diag_cov != 0), out=np.zeros_like(_abs))
-            _max_abs = np.max(_abs, axis=-1)
-            _max_rel = np.max(_rel, axis=-1)
-            _argmax_abs = np.argmax(_max_abs)
-            _argmax_rel = np.argmax(_max_rel)
-            with np.printoptions(precision=3, linewidth=np.inf, floatmode='fixed', sign=' '):
-                log.debug('maximum absolute change in autocorrelation: %g [l = %d]', _max_abs[_argmax_abs], _argmax_abs)
-                log.debug('before:')
-                log.debug('%s', cov[_argmax_abs].diagonal())
-                log.debug('after:')
-                log.debug('%s', reg[_argmax_abs].diagonal())
-                log.debug('maximum relative change in autocorrelation: %g [l = %d]', _max_rel[_argmax_rel], _argmax_rel)
-                log.debug('before:')
-                log.debug('%s', cov[_argmax_rel].diagonal())
-                log.debug('after:')
-                log.debug('%s', reg[_argmax_rel].diagonal())
+        _abs = np.fabs(_diag_reg - _diag_cov)
+        _rel = np.divide(_abs, np.fabs(_diag_cov), where=(_diag_cov != 0), out=np.zeros_like(_abs))
+        _max_abs = np.max(_abs, axis=-1)
+        _max_rel = np.max(_rel, axis=-1)
+        _argmax_abs = np.argmax(_max_abs)
+        _argmax_rel = np.argmax(_max_rel)
+        with np.printoptions(precision=3, linewidth=np.inf, floatmode='fixed', sign=' '):
+            log.debug('maximum absolute change in autocorrelation: %g [l = %d]', _max_abs[_argmax_abs], _argmax_abs)
+            log.debug('before:')
+            log.debug('%s', cov[_argmax_abs].diagonal())
+            log.debug('after:')
+            log.debug('%s', reg[_argmax_abs].diagonal())
+            log.debug('maximum relative change in autocorrelation: %g [l = %d]', _max_rel[_argmax_rel], _argmax_rel)
+            log.debug('before:')
+            log.debug('%s', cov[_argmax_rel].diagonal())
+            log.debug('after:')
+            log.debug('%s', reg[_argmax_rel].diagonal())
 
-        # use the regularised covariance matrix, free up the old array
-        cov = reg
+    # gather regularised Gaussian cls from array
+    reg_gaussian_cls = []
+    for i, j in zip(*cl_indices(n)):
+        # convert this to a contiguous array as its passed to C healpix
+        cl = np.ascontiguousarray(reg[:, j, i])
+        reg_gaussian_cls.append(cl)
 
-    # gather list of Gaussian cls
-    gaussian_cls = []
-    for k, (i, j) in enumerate(zip(*cl_indices(n))):
-        # grab the cl from the lower triangular covariance matrix
-        cl = cov[:, j, i]
+    # return the regularised Gaussian cls
+    return reg_gaussian_cls
 
-        # store in the list, which thus has the synalm order
-        gaussian_cls.append(cl)
 
-        # compute the Gaussian variance if on the diagonal
-        if i == j:
-            gaussian_var[i] = two_l_plus_1_over_four_pi@cl
+def generate_random_fields(nside: NSide,
+                           cls: RegGaussianClsList,
+                           fields: list[RandomField]) -> ArrayLike:
+    '''generate random fields from cls'''
+
+    # debug output computations are expensive, so only do them when necessary
+    debug = log.isEnabledFor(logging.DEBUG)
+
+    # number of fields
+    n = _num_fields_from_num_cls(len(cls))
+
+    log.debug('computing variances...')
+
+    # compute the variances of the Gaussian fields from cls
+    # these may be used by the transforms
+    var = []
+    for i, j, cl in zip(*cl_indices(n), cls):
+        l = np.arange(len(cl))
+        v = np.sum((2*l+1)/(4*np.pi)*cl)
+        var.append(v)
 
     log.debug('sampling alms...')
 
     # sample the Gaussian random fields in harmonic space
-    alms = hp.synalm(gaussian_cls, lmax=lmax, new=True)
+    alms = hp.synalm(cls, new=True)
 
     if debug:
+        lmax = hp.Alm.getlmax(alms[0].size)
+        l = np.arange(lmax+1)
+        two_l_plus_1_over_4_pi = (2*l+1)/(4*np.pi)
         for i, alm in enumerate(alms):
-            cl = hp.alm2cl(alm)
-            l = np.arange(len(cl))
-            _mean = np.sqrt(4*np.pi*cl[0])
-            _var = np.sum((2*l+1)/(4*np.pi)*cl)
+            _cl = hp.alm2cl(alm)
+            _mean = np.sqrt(4*np.pi*_cl[0])
+            _var = two_l_plus_1_over_4_pi@_cl
             log.debug('- mean: %g [%g]', _mean, 0.)
-            log.debug('  var: %g [%g]', _var, gaussian_var[i])
+            log.debug('  var: %g [%g]', _var, var[i])
 
     log.debug('computing maps...')
 
     # compute the Gaussian random field maps in real space
     # can be performed in place because the alms are not needed
-    maps = hp.alm2map(alms, nside, lmax=lmax, pixwin=False, pol=False, inplace=True)
+    maps = hp.alm2map(alms, nside, pixwin=False, pol=False, inplace=True)
     alms = None
 
     if debug:
         for i, m in enumerate(maps):
-            log.debug('- mean: %g [%g]', np.mean(m), fields[i].mean)
-            log.debug('  var: %g [%g]', np.var(m), gaussian_var[i])
+            log.debug('- mean: %g [%g]', np.mean(m), 0.)
+            log.debug('  var: %g [%g]', np.var(m), var[i])
             log.debug('  min: %g', np.min(m))
             log.debug('  max: %g', np.max(m))
 
@@ -287,16 +312,11 @@ def generate_random_fields(nside: int,
 
     # transform the Gaussian random fields to the output fields
     for i, field in enumerate(fields):
-        maps[i] = field(maps[i], var_in=gaussian_var[i], var_out=var[i])
+        log.debug('- field %d: %s', i, field)
 
-    if debug:
-        for i, m in enumerate(maps):
-            log.debug('- mean: %g [%g]', np.mean(m), fields[i].mean)
-            log.debug('  var: %g [%g]', np.var(m), var[i])
-            log.debug('  min: %g', np.min(m))
-            log.debug('  max: %g', np.max(m))
+        maps[i] = field(maps[i], var=var[i])
 
-    log.debug('random fields generated')
+    log.debug('done')
 
     # fields have been created
     return maps

@@ -31,24 +31,17 @@ def collect_cls(fields: list[str],
     # total number of fields in each bin
     n = len(fields)
 
-    log.debug('collecting cls for %d fields...', n)
-
     _cls = []
     for i, j in zip(*cl_indices(n)):
         a, b = fields[i], fields[j]
         if (a, b) in cls:
-            log.debug(f'- {a}-{b}')
             _cls.append(cls[a, b])
         elif (b, a) in cls:
-            log.debug(f'- {b}-{a}')
             _cls.append(cls[b, a])
         elif allow_missing:
-            log.debug(f'- MISSING: {a}-{b}')
             _cls.append(None)
         else:
             raise KeyError(f'missing cls: {a}-{b}')
-
-    log.debug('collected %d cls, of which %d are None', len(_cls), sum(cl is None for cl in _cls))
 
     return _cls
 

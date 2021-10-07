@@ -18,7 +18,7 @@ from functools import cached_property
 
 from .types import get_annotation
 from .cls import collect_cls
-from .random import generate_random_fields
+from .random import compute_gaussian_cls, regularize_gaussian_cls, generate_random_fields
 
 
 log = logging.getLogger('glass.simulation')
@@ -203,8 +203,6 @@ class Simulation:
             nbins = self.nbins
             cls = self.cls
 
-            log.debug('random fields:')
-
             # create the RandomField instances which describe the random fields
             # to the generate_random_fields function
             random_names, random_fields = [], []
@@ -215,21 +213,32 @@ class Simulation:
                 if len(rfs) != nbins:
                     raise TypeError(f'random field "{field}" returned {len(rfs)} item(s) for {nbins} bin(s)')
 
-                for rn, rf in zip(rns, rfs):
-                    log.debug('- %s: %s', rn, rf)
-
                 random_names += rns
                 random_fields += rfs
 
-            # collect the cls for these random fields
+            log.info('list of random fields:')
+            for i, (rn, rf) in enumerate(zip(random_names, random_fields)):
+                log.info('- %d: %s = %s', i, rn, rf)
+
+            log.debug('collecting cls...')
+
             cls = collect_cls(random_names, cls, allow_missing=self.allow_missing_cls)
+
+            log.debug('collected %d cls, of which %d are None', len(cls), sum(cl is None for cl in cls))
+
+            log.info('computing Gaussian cls...')
+
+            gaussian_cls = compute_gaussian_cls(cls, random_fields, nside)
+
+            log.info('regularising Gaussian cls...')
+
+            regularized_cls = regularize_gaussian_cls(gaussian_cls)
 
             log.info('generating random fields...')
             for field in self._random:
                 log.info('- %s', field)
 
-            # sample maps for all of these random fields
-            random_maps = generate_random_fields(nside, random_fields, cls)
+            random_maps = generate_random_fields(nside, regularized_cls, fields)
 
             log.debug('shape of random maps: %s', np.shape(random_maps))
 
