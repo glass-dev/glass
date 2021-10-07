@@ -45,23 +45,30 @@ Shear = Annotated[T, 'name:shear']
 class _Annotation(NamedTuple):
     '''extra information from annotated type hints'''
 
-    name: str
-    random: bool
+    name: str = None
+    random: bool = False
 
 
 def get_annotation(T):
     '''return the extra information from annotated type hints'''
 
-    name = None
-    random = False
-
+    info = {}
     if get_origin(T) == Annotated:
         args = get_args(T)
         for arg in args[1:]:
             if isinstance(arg, str):
-                if arg.startswith('name:'):
-                    name = arg[5:]
-                elif arg == 'random':
-                    random = True
+                key, *val = arg.split(':', maxsplit=1)
+                if key in _Annotation._fields:
+                    # get the field's type hint, fall back to str
+                    typ = _Annotation.__annotations__.get(key, str)
+                    if val:
+                        # cast the given value to appropriate type
+                        info[key] = typ(*val)
+                    elif typ is bool:
+                        # booleans do not need a value to be set
+                        info[key] = True
+                    else:
+                        # no value, do nothing
+                        pass
 
-    return _Annotation(name=name, random=random)
+    return _Annotation(**info)
