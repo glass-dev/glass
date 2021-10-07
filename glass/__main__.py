@@ -113,15 +113,15 @@ if __name__ == '__main__':
         log.info('imported %d definitions', len(namespace))
         log.debug('definitions: %s', ', '.join(namespace.keys()))
 
-        log.info('## simulation')
+        log.info('## config')
 
-        if 'simulation' not in config:
-            raise KeyError('missing section: simulation')
+        if 'config' not in config:
+            raise KeyError('missing section: config')
 
-        nside = int(config['simulation']['nside'])
-        zbins = np.fromstring(config['simulation']['zbins'], sep=' ')
-        cls = config['simulation'].get('cls', None)
-        allow_missing_cls = getboolean(config['simulation'], 'allow_missing_cls')
+        nside = int(config['config']['nside'])
+        zbins = np.fromstring(config['config']['zbins'], sep=' ')
+        cls = config['config'].get('cls', None)
+        allow_missing_cls = getboolean(config['config'], 'allow_missing_cls')
 
         log.info('nside: %d', nside)
         log.info('zbins: %s', zbins)
@@ -166,20 +166,19 @@ if __name__ == '__main__':
 
             log.info('%s: %s', name, call)
 
-        if 'fields' in config:
-            log.info('## fields')
+        if 'simulation' in config:
+            log.info('## simulation')
 
-            for field, func in config['fields'].items():
+            for label, func in config['simulation'].items():
                 if func is None:
-                    name, func = None, field
+                    name, func = None, label
                 else:
-                    name = field
+                    name = label
                 if func not in namespace:
-                    raise NameError(f'fields: {field}: unknown function "{func}"')
+                    raise NameError(f'simulation: {label}: unknown function "{func}"')
                 _func, _args, _kwargs = namespace[func], [], {}
-                sect = f'fields:{field}'
-                if sect in config:
-                    for par, arg in config[sect].items():
+                if label in config:
+                    for par, arg in config[label].items():
                         if arg is None:
                             par, arg = None, par
                         arg = parse_arg(arg, filename=args.config.name, refs=True)
@@ -188,13 +187,13 @@ if __name__ == '__main__':
                         else:
                             _kwargs[par] = arg
 
-                name, call = sim.add_field(name, _func, *_args, **_kwargs)
+                name, call = sim.add(name, _func, *_args, **_kwargs)
 
                 log.info('%s: %s', name, call)
 
         log.info('# run')
 
-        fields = sim.fields
+        sim.run()
 
     except Exception as e:
         log.exception('uncaught exception', exc_info=e)

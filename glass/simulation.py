@@ -59,7 +59,7 @@ class Simulation:
     def __init__(self, *, nside=None, zbins=None, allow_missing_cls=False):
         self._cls = None
         self._random = {}
-        self._fields = {}
+        self._steps = {}
 
         self.allow_missing_cls = allow_missing_cls
 
@@ -123,8 +123,8 @@ class Simulation:
 
         return name, self._cls
 
-    def add_field(self, name, func, *args, **kwargs):
-        '''add a field to the simulation'''
+    def add(self, name, func, *args, **kwargs):
+        '''add a function to the simulation'''
 
         name, call, return_info = self._make_call(name, func, args, kwargs)
 
@@ -134,7 +134,7 @@ class Simulation:
         if getattr(return_info, 'random', False):
             self._random[name] = call
         else:
-            self._fields[name] = call
+            self._steps[name] = call
 
         self.state[name] = None
 
@@ -182,14 +182,10 @@ class Simulation:
 
         return self.state['cls']
 
-    @cached_property
-    def fields(self):
-        '''generate the fields of the simulation'''
+    def run(self):
+        '''run the simulation'''
 
-        log.info('simulating fields...')
-
-        # this will contain all fields by name
-        fields = {}
+        log.info('simulating...')
 
         # number of random fields
         nrandom = len(self._random)
@@ -238,7 +234,7 @@ class Simulation:
             for field in self._random:
                 log.info('- %s', field)
 
-            random_maps = generate_random_fields(nside, regularized_cls, fields)
+            random_maps = generate_random_fields(nside, regularized_cls, random_fields)
 
             log.debug('shape of random maps: %s', np.shape(random_maps))
 
@@ -247,28 +243,21 @@ class Simulation:
 
             log.debug('reshaped random maps: %s', np.shape(random_maps))
 
-            # store the generated maps in the fields for returning
-            # also store all random fields in the state for subsequent calls
+            # store all random fields in the state
             for field, m in zip(self._random.keys(), random_maps):
-                fields[field] = m
                 self.state[field] = m
 
-        log.debug('number of nonrandom fields: %d', len(self._fields))
+        log.debug('number of steps: %d', len(self._steps))
 
-        log.info('generating fields...')
+        log.info('stepping...')
 
-        # now generate all other fields one by one
-        for field, call in self._fields.items():
-            log.info('- %s', field)
+        # now go through steps one by one
+        for name, call in self._steps.items():
+            log.info('- %s', name)
 
             # call the computation, resolving references in the state
-            m = call(self.state)
+            # store the result in the state
+            self.state[name] = call(self.state)
 
-            # store the map in the fields for returning
-            fields[field] = m
-
-            # store the map in the state for subsequent computations
-            self.state[field] = m
-
-        # returning the fields caches this property until it is deleted
-        return fields
+        # return the state as the result of the run
+        return self.state
