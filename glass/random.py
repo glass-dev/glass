@@ -19,6 +19,7 @@ from functools import singledispatchmethod, partial
 from sortcl import cl_indices
 
 from .types import ArrayLike, ClsList
+from .numeric import cov_reg_simple, cov_reg_keepdiag
 
 
 log = logging.getLogger('glass.random')
@@ -103,7 +104,10 @@ class LognormalField(RandomField):
         return partial(gaussiancl.lognormal_normal_cl, alpha=alpha)
 
 
-def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) -> ArrayLike:
+def generate_random_fields(nside: int,
+                           fields: list[RandomField],
+                           cls: ClsList,
+                           reg: str = 'simple') -> ArrayLike:
     '''generate random fields from cls'''
 
     # debug output computations are expensive, so only do them when necessary
@@ -137,8 +141,10 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
 
     log.debug('transform cls...')
 
+    # covariance matrix of cls
+    cov = np.zeros((lmax+1, n, n), dtype=float)
+
     # transform to input cls for the Gaussian random fields
-    gaussian_cls = []
     for i, j, cl in zip(*cl_indices(n), cls):
         # only work on available cls
         if cl is not None:
@@ -152,8 +158,13 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
             # simulating integrated fields by multiplying cls and pw
             cl *= pw
 
-            # compute the variance if on the diagonal
+            # extra checks on the diagonal
             if i == j:
+                # autocorrelation must be nonnegative
+                if np.any(cl < 0):
+                    log.warn('WARNING: negative cls for field %d', i)
+
+                # compute the variance if on the diagonal
                 var[i] = two_l_plus_1_over_four_pi@cl
 
             # store monopole and dipole if zero
@@ -167,12 +178,82 @@ def generate_random_fields(nside: int, fields: list[RandomField], cls: ClsList) 
             cl[0] *= has_monopole
             cl[1] *= has_dipole
 
-            # compute the Gaussian variance if on the diagonal
+            # extra checks on the diagonal
             if i == j:
-                gaussian_var[i] = two_l_plus_1_over_four_pi@cl
+                # autocorrelation must be nonnegative
+                if np.any(cl < 0):
+                    log.warn('WARNING: negative Gaussian cls for field %d', i)
 
-        # store the Gaussian cl, or None
+            # store the Gaussian cl in matrix (lower triangle only)
+            cov[:, j, i] = cl
+
+    log.debug('check covariance matrix...')
+
+    # use cholesky() as a fast way to check for positive semi-definite
+    try:
+        np.linalg.cholesky(cov + np.finfo(0.).tiny)
+    except np.linalg.LinAlgError:
+        # matrix needs regularisation
+        do_reg = True
+    else:
+        # matrix is ok
+        do_reg = False
+
+    # perform the regularisation if necessary
+    if do_reg:
+        log.info('cls require regularisation!')
+
+        log.debug('covariance matrix regularisation...')
+        log.debug('regularisation method: %s', reg)
+
+        if reg is None:
+            reg = cov
+        elif reg == 'simple':
+            reg = cov_reg_simple(cov)
+        elif reg == 'keepdiag':
+            reg = cov_reg_keepdiag(cov)
+        else:
+            raise ValueError(f'unknown method "{reg}" for regularisation')
+
+        # show the maximum change in each l
+        if debug:
+            # get the diagonal of covariance matrix and regularised
+            _diag_cov = cov.reshape(lmax+1, -1)[:, ::n+1]
+            _diag_reg = reg.reshape(lmax+1, -1)[:, ::n+1]
+
+            _abs = np.fabs(_diag_reg - _diag_cov)
+            _rel = np.divide(_abs, np.fabs(_diag_cov), where=(_diag_cov != 0), out=np.zeros_like(_abs))
+            _max_abs = np.max(_abs, axis=-1)
+            _max_rel = np.max(_rel, axis=-1)
+            _argmax_abs = np.argmax(_max_abs)
+            _argmax_rel = np.argmax(_max_rel)
+            with np.printoptions(precision=3, linewidth=np.inf, floatmode='fixed', sign=' '):
+                log.debug('maximum absolute change in autocorrelation: %g [l = %d]', _max_abs[_argmax_abs], _argmax_abs)
+                log.debug('before:')
+                log.debug('%s', cov[_argmax_abs].diagonal())
+                log.debug('after:')
+                log.debug('%s', reg[_argmax_abs].diagonal())
+                log.debug('maximum relative change in autocorrelation: %g [l = %d]', _max_rel[_argmax_rel], _argmax_rel)
+                log.debug('before:')
+                log.debug('%s', cov[_argmax_rel].diagonal())
+                log.debug('after:')
+                log.debug('%s', reg[_argmax_rel].diagonal())
+
+        # use the regularised covariance matrix, free up the old array
+        cov = reg
+
+    # gather list of Gaussian cls
+    gaussian_cls = []
+    for k, (i, j) in enumerate(zip(*cl_indices(n))):
+        # grab the cl from the lower triangular covariance matrix
+        cl = cov[:, j, i]
+
+        # store in the list, which thus has the synalm order
         gaussian_cls.append(cl)
+
+        # compute the Gaussian variance if on the diagonal
+        if i == j:
+            gaussian_var[i] = two_l_plus_1_over_four_pi@cl
 
     log.debug('sampling alms...')
 
