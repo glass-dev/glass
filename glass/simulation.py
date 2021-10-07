@@ -14,7 +14,6 @@ import typing as t
 import logging
 
 from inspect import signature
-from functools import cached_property
 
 from .types import get_annotation
 from .cls import collect_cls
@@ -88,9 +87,12 @@ class Simulation:
         for par, ann in annotations.items():
             log.debug('- %s: %s', par, ann)
 
+        # annotation for return value information
+        return_info = annotations.get('return', get_annotation(None))
+
         # resolve default name if None given
-        if name is None and 'return' in annotations:
-            name = annotations['return'].name
+        if name is None:
+            name = return_info.name
         if name is None:
             raise TypeError(f'cannot infer name of unnamed function "{func.__name__}"')
 
@@ -107,21 +109,12 @@ class Simulation:
             else:
                 raise TypeError(f"missing argument '{par}' for function '{func.__name__}' of {name}")
 
-        return name, Call(func, ba.args, ba.kwargs), annotations.get('return', None)
+        return name, Call(func, ba.args, ba.kwargs), return_info
 
     def set_cosmology(self, cosmology):
         '''set the cosmology for the simulation'''
 
         self.state['cosmology'] = cosmology
-
-    def set_cls(self, func, *args, **kwargs):
-        '''set the cls for the simulation'''
-
-        name, self._cls, _ = self._make_call(None, func, args, kwargs)
-
-        self.state[name] = None
-
-        return name, self._cls
 
     def add(self, name, func, *args, **kwargs):
         '''add a function to the simulation'''
@@ -131,7 +124,9 @@ class Simulation:
         if name in self.state:
             log.warning('overwriting "%s" with %s', name, call)
 
-        if getattr(return_info, 'random', False):
+        if name == 'cls':
+            self._cls = call
+        elif return_info.random:
             self._random[name] = call
         else:
             self._steps[name] = call

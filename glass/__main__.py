@@ -28,10 +28,21 @@ LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
 
 def getboolean(config, name):
     b = config.get(name, False)
-    return True if b is None else bool(b)
+    return True if b is None else config.getboolean(name, False)
 
 
 def parse_arg(arg, *, filename='<config>', refs=False):
+    # only try and parse strings
+    if not isinstance(arg, str):
+        return None
+
+    # nested configs
+    if arg[0] == '\n':
+        lines = arg[1:].split('\n')
+        nested = dict(([_.strip() for _ in _.split('=', 1)] + [None])[:2] for _ in lines if _)
+        return nested
+
+    # try to literally parse the string
     try:
         arg = literal_eval(arg)
     except ValueError:
@@ -120,12 +131,10 @@ if __name__ == '__main__':
 
         nside = int(config['config']['nside'])
         zbins = np.fromstring(config['config']['zbins'], sep=' ')
-        cls = config['config'].get('cls', None)
         allow_missing_cls = getboolean(config['config'], 'allow_missing_cls')
 
         log.info('nside: %d', nside)
         log.info('zbins: %s', zbins)
-        log.info('cls: %s', cls)
         log.info('allow missing cls: %s', allow_missing_cls)
 
         sim = Simulation(nside=nside, zbins=zbins, allow_missing_cls=allow_missing_cls)
@@ -142,29 +151,6 @@ if __name__ == '__main__':
             sim.set_cosmology(cosmo)
 
             log.info('cosmology: %s', cosmo)
-
-        if cls is not None:
-            func = f'cls_from_{cls}'
-            if func not in namespace:
-                raise NameError(f'cannot get cls from {cls}: unknown function "{func}"')
-            func = namespace[func]
-            kwargs = {}
-
-            sect = f'cls:{cls}'
-            if sect not in config:
-                raise KeyError(f'missing section: {sect}')
-
-            log.info('## %s', sect)
-
-            for par in config[sect]:
-                if par == 'fields':
-                    kwargs[par] = dict((_.split('=', 1)*2)[:2] for _ in config[sect][par].split())
-                else:
-                    kwargs[par] = parse_arg(config[sect][par], filename=args.config.name)
-
-            name, call = sim.set_cls(func, **kwargs)
-
-            log.info('%s: %s', name, call)
 
         if 'simulation' in config:
             log.info('## simulation')

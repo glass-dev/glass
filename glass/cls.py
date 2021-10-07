@@ -90,7 +90,7 @@ def cls_from_files(pattern: str,
     log.debug('reading cls from multiple files')
     log.debug('filename pattern: %s')
 
-    fields_and_bins = [(field, name, i) for field, name in fields.items() for i in range(nbins)]
+    fields_and_bins = [(field, name or field, i) for field, name in fields.items() for i in range(nbins)]
 
     log.debug('all fields and bins: %s', ', '.join(str(fb) for fb in fields_and_bins))
 
@@ -125,6 +125,8 @@ def cls_from_pyccl(fields, lmax, zbins: RedshiftBins, cosmo: Cosmology) -> ClsDi
     # add tracers for every field based on its physical type
     names, tracers = [], []
     for field, phys in fields.items():
+        if phys is None:
+            phys = field
         for i, (za, zb) in enumerate(zip(zbins, zbins[1:])):
             nz = ((zz >= za) & (zz < zb)).astype(float)
 
