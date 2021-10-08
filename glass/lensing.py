@@ -15,7 +15,7 @@ import numpy as np
 import healpy as hp
 import logging
 
-from .types import Matter, Convergence, Shear, Random, ArrayLike, NumberOfBins, RedshiftBins, Cosmology
+from .typing import Matter, Convergence, Shear, Random, ArrayLike, NumberOfBins, RedshiftBins, Cosmology
 from .random import NormalField, LognormalField
 
 

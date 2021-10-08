@@ -1,5 +1,5 @@
 def test_get_annotation():
-    from glass.types import get_annotation
+    from glass.typing import get_annotation
     from typing import Annotated
     from itertools import chain, combinations
 
@@ -30,7 +30,7 @@ def test_get_annotation():
 
 
 def test_default_names():
-    from glass.types import (
+    from glass.typing import (
         get_annotation,
         # simulation
         RedshiftBins,

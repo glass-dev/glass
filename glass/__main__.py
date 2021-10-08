@@ -13,7 +13,7 @@ from ast import literal_eval
 
 from . import __version__ as version
 from .simulation import Simulation, Ref
-from .types import annotate
+from .typing import annotate
 
 
 DEFAULT_MODULES = [

@@ -16,7 +16,7 @@ from itertools import combinations_with_replacement
 from interpcl import interpcl
 from sortcl import cl_indices
 
-from .types import RedshiftBins, NumberOfBins, Cosmology, ClsDict, ClsList
+from .typing import RedshiftBins, NumberOfBins, Cosmology, ClsDict, ClsList
 
 
 log = logging.getLogger('glass.cls')

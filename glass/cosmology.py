@@ -8,7 +8,7 @@ __all__ = [
 
 
 from cosmology import LCDM
-from .types import Cosmology
+from .typing import Cosmology
 
 
 def cosmology(**kwargs) -> Cosmology:

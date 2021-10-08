@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-from .types import NumberOfBins, Matter, Random
+from .typing import NumberOfBins, Matter, Random
 from .random import NormalField, LognormalField
 
 

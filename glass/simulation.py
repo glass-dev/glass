@@ -15,7 +15,7 @@ import logging
 
 from inspect import signature
 
-from .types import get_annotation, NSide, ClsDict
+from .typing import get_annotation, NSide, ClsDict
 from .cls import collect_cls
 from .random import compute_gaussian_cls, regularize_gaussian_cls, generate_random_fields
 

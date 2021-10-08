@@ -66,7 +66,7 @@ def my_print_function(my_array, my_other_array, my_name, my_other_name):
 
 
 # some types already used throughout the code
-from glass.types import Annotated, ArrayLike
+from glass.typing import Annotated, ArrayLike
 
 # the Annotated type used by GLASS is simply imported from typing
 # equivalent if you develop something GLASS-compatible but independent:

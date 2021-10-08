@@ -21,7 +21,7 @@ from dataclasses import dataclass, fields as dataclass_fields
 from functools import singledispatchmethod, partial
 from sortcl import cl_indices
 
-from .types import NSide, ArrayLike, ClsList, GaussianClsList, RegGaussianClsList
+from .typing import NSide, ArrayLike, ClsList, GaussianClsList, RegGaussianClsList
 from .numeric import cov_reg_simple, cov_reg_keepdiag
 
 
