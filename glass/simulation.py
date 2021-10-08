@@ -35,6 +35,40 @@ class Call(t.NamedTuple):
     args: t.Sequence
     kwargs: t.Mapping
 
+    @classmethod
+    def make(cls, state, func, *args, **kwargs):
+        # inspect signature bound to given args and kwargs
+        sig = signature(func)
+        try:
+            ba = sig.bind_partial(*args, **kwargs)
+        except TypeError as e:
+            raise TypeError(f"{e} for function '{func.__name__}'") from None
+
+        # get type hints with annotations
+        hints = t.get_type_hints(func, include_extras=True)
+
+        # get annotations from type hints
+        annotations = {par: get_annotation(hint) for par, hint in hints.items()}
+
+        log.debug('annotations for %s: %d', func.__name__, len(annotations))
+        for par, ann in annotations.items():
+            log.debug('- %s: %s', par, ann)
+
+        # make sure all func parameters can be obtained
+        for par in sig.parameters:
+            if par in ba.arguments:
+                arg = ba.arguments[par]
+                if isinstance(arg, Ref) and arg.name not in state:
+                    raise NameError(f"parameter '{par}' of function '{func.__name__}' references unknown name '{arg.name}'")
+            elif par in annotations and annotations[par].name in state:
+                ba.arguments[par] = Ref(annotations[par].name)
+            elif sig.parameters[par].default is not sig.parameters[par].empty:
+                pass
+            else:
+                raise TypeError(f"missing argument '{par}' of function '{func.__name__}'")
+
+        return cls(func, ba.args, ba.kwargs)
+
     def __call__(self, ns):
         args = []
         kwargs = {}
@@ -70,43 +104,10 @@ class Simulation:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
 
-    def _make_call(self, func, args, kwargs):
-        # inspect signature bound to given args and kwargs
-        sig = signature(func)
-        try:
-            ba = sig.bind_partial(*args, **kwargs)
-        except TypeError as e:
-            raise TypeError(f"{e} for function '{func.__name__}'") from None
-
-        # get type hints with annotations
-        hints = t.get_type_hints(func, include_extras=True)
-
-        # get annotations from type hints
-        annotations = {par: get_annotation(hint) for par, hint in hints.items()}
-
-        log.debug('annotations for %s: %d', func.__name__, len(annotations))
-        for par, ann in annotations.items():
-            log.debug('- %s: %s', par, ann)
-
-        # make sure all func parameters can be obtained
-        for par in sig.parameters:
-            if par in ba.arguments:
-                arg = ba.arguments[par]
-                if isinstance(arg, Ref) and arg.name not in self.state:
-                    raise NameError(f"parameter '{par}' of function '{func.__name__}' references unknown name '{arg.name}'")
-            elif par in annotations and annotations[par].name in self.state:
-                ba.arguments[par] = Ref(annotations[par].name)
-            elif sig.parameters[par].default is not sig.parameters[par].empty:
-                pass
-            else:
-                raise TypeError(f"missing argument '{par}' of function '{func.__name__}'")
-
-        return Call(func, ba.args, ba.kwargs)
-
     def add(self, name, func, *args, **kwargs):
         '''add a function to the simulation'''
 
-        call = self._make_call(func, args, kwargs)
+        call = Call.make(self.state, func, *args, **kwargs)
 
         # get the return information of the function:
         # - if there is no '__annotations__' in func return an empty dict
