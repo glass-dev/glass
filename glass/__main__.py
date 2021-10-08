@@ -13,6 +13,7 @@ from ast import literal_eval
 
 from . import __version__ as version
 from .simulation import Simulation, Ref
+from .types import annotate
 
 
 DEFAULT_MODULES = [
@@ -160,7 +161,10 @@ if __name__ == '__main__':
                         else:
                             _kwargs[par] = arg
 
-                name, call = sim.add(name, _func, *_args, **_kwargs)
+                if name is not None:
+                    _func = annotate(_func, name=name)
+
+                name, call = sim.add(_func, *_args, **_kwargs)
 
                 if name:
                     log.info('%s = %s', name, call)

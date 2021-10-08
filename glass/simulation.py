@@ -114,7 +114,7 @@ class Simulation:
         self._add_call(name, Call.make(self.state, self.random_field, name))
         self._random[name] = call
 
-    def add(self, name, func, *args, **kwargs):
+    def add(self, func, *args, **kwargs):
         '''add a function to the simulation'''
 
         call = Call.make(self.state, func, *args, **kwargs)
@@ -125,8 +125,8 @@ class Simulation:
         # - get_annotation(None) returns an empty annotation
         ret = get_annotation(getattr(func, '__annotations__', {}).get('return', None))
 
-        # if name is not given, try to deduce it
-        name = name or ret.name
+        # get name of output from annotation
+        name = ret.name
 
         # if result has a name, make it known to the simulation state
         if name:

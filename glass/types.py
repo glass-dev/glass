@@ -15,9 +15,11 @@ __all__ = [
     'Convergence',
     'Shear',
     'get_annotation',
+    'annotate',
 ]
 
 
+from functools import wraps
 from typing import TypeVar, Any, Annotated, NamedTuple, get_args, get_origin
 from numpy.typing import ArrayLike
 
@@ -72,3 +74,31 @@ def get_annotation(T):
                         pass
 
     return _Annotation(**info)
+
+
+def annotate(func, **annotations):
+    '''annotate a function'''
+
+    @wraps(func)
+    def annotated_func(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    # make a copy of the annotations dict, or we would change original
+    try:
+        a = annotated_func.__annotations__
+    except AttributeError:
+        a = {}
+    else:
+        a = a.copy()
+
+    # set the return annotation by stacking
+    ret = a.get('return', None)
+    for key, val in annotations.items():
+        ret = Annotated[ret, f'{key}:{val}']
+    a['return'] = ret
+
+    # update the annotations
+    annotated_func.__annotations__ = a
+
+    # return the function with the new annotations
+    return annotated_func
