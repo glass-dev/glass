@@ -10,13 +10,13 @@ import sys
 
 from importlib import import_module
 from ast import literal_eval
-from cosmology import LCDM
 
 from . import __version__ as version
 from .simulation import Simulation, Ref
 
 
 DEFAULT_MODULES = [
+    'glass.cosmology',
     'glass.cls',
     'glass.matter',
     'glass.lensing',
@@ -138,19 +138,6 @@ if __name__ == '__main__':
         log.info('allow missing cls: %s', allow_missing_cls)
 
         sim = Simulation(nside=nside, zbins=zbins, allow_missing_cls=allow_missing_cls)
-
-        if 'cosmology' in config:
-            log.info('## cosmology')
-
-            kwargs = {}
-            for par in config['cosmology']:
-                kwargs[par] = parse_arg(config['cosmology'][par], filename=args.config.name)
-
-            cosmo = LCDM(**kwargs)
-
-            sim.set_cosmology(cosmo)
-
-            log.info('cosmology: %s', cosmo)
 
         if 'simulation' in config:
             log.info('## simulation')

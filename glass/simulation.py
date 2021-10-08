@@ -56,6 +56,7 @@ class Call(t.NamedTuple):
 
 class Simulation:
     def __init__(self, *, nside=None, zbins=None, allow_missing_cls=False):
+        self._cosmology = None
         self._cls = None
         self._random = {}
         self._steps = {}
@@ -111,11 +112,6 @@ class Simulation:
 
         return name, Call(func, ba.args, ba.kwargs), return_info
 
-    def set_cosmology(self, cosmology):
-        '''set the cosmology for the simulation'''
-
-        self.state['cosmology'] = cosmology
-
     def add(self, name, func, *args, **kwargs):
         '''add a function to the simulation'''
 
@@ -124,7 +120,9 @@ class Simulation:
         if name in self.state:
             log.warning('overwriting "%s" with %s', name, call)
 
-        if name == 'cls':
+        if name == 'cosmology':
+            self._cosmology = call
+        elif name == 'cls':
             self._cls = call
         elif return_info.random:
             self._random[name] = call
@@ -181,6 +179,11 @@ class Simulation:
         '''run the simulation'''
 
         log.info('simulating...')
+
+        # construct cosmology if given
+        if self._cosmology is not None:
+            log.info('cosmology...')
+            self.state['cosmology'] = self._cosmology(self.state)
 
         # number of random fields
         nrandom = len(self._random)
