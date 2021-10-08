@@ -162,7 +162,10 @@ if __name__ == '__main__':
 
                 name, call = sim.add(name, _func, *_args, **_kwargs)
 
-                log.info('%s: %s', name, call)
+                if name:
+                    log.info('%s = %s', name, call)
+                else:
+                    log.info('%s', call)
 
         log.info('# run')
 

@@ -59,7 +59,7 @@ class Simulation:
         self._cosmology = None
         self._cls = None
         self._random = {}
-        self._steps = {}
+        self._steps = []
 
         self.allow_missing_cls = allow_missing_cls
 
@@ -70,7 +70,7 @@ class Simulation:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
 
-    def _make_call(self, name, func, args, kwargs):
+    def _make_call(self, func, args, kwargs):
         # inspect signature bound to given args and kwargs
         sig = signature(func)
         try:
@@ -88,48 +88,53 @@ class Simulation:
         for par, ann in annotations.items():
             log.debug('- %s: %s', par, ann)
 
-        # annotation for return value information
-        return_info = annotations.get('return', get_annotation(None))
-
-        # resolve default name if None given
-        if name is None:
-            name = return_info.name
-        if name is None:
-            raise TypeError(f'cannot infer name of unnamed function "{func.__name__}"')
-
         # make sure all func parameters can be obtained
         for par in sig.parameters:
             if par in ba.arguments:
                 arg = ba.arguments[par]
                 if isinstance(arg, Ref) and arg.name not in self.state:
-                    raise NameError(f"parameter '{par}' for function '{func.__name__}' of {name} references unknown name '{arg.name}'")
+                    raise NameError(f"parameter '{par}' of function '{func.__name__}' references unknown name '{arg.name}'")
             elif par in annotations and annotations[par].name in self.state:
                 ba.arguments[par] = Ref(annotations[par].name)
             elif sig.parameters[par].default is not sig.parameters[par].empty:
                 pass
             else:
-                raise TypeError(f"missing argument '{par}' for function '{func.__name__}' of {name}")
+                raise TypeError(f"missing argument '{par}' of function '{func.__name__}'")
 
-        return name, Call(func, ba.args, ba.kwargs), return_info
+        return Call(func, ba.args, ba.kwargs)
 
     def add(self, name, func, *args, **kwargs):
         '''add a function to the simulation'''
 
-        name, call, return_info = self._make_call(name, func, args, kwargs)
+        call = self._make_call(func, args, kwargs)
 
-        if name in self.state:
-            log.warning('overwriting "%s" with %s', name, call)
+        # get the return information of the function:
+        # - if there is no '__annotations__' in func return an empty dict
+        # - if there is no 'return' in func.__annotations__ return None
+        # - get_annotation(None) returns an empty annotation
+        ret = get_annotation(getattr(func, '__annotations__', {}).get('return', None))
+
+        # if name is not given, try to deduce it
+        name = name or ret.name
+
+        # if result has a name, make it known to the simulation state
+        if name:
+            # warn before overwriting
+            if name in self.state:
+                log.warning('overwriting "%s" with %s', name, call)
+
+            # set state to None initially, any placeholder value would do
+            self.state[name] = None
 
         if name == 'cosmology':
             self._cosmology = call
         elif name == 'cls':
             self._cls = call
-        elif return_info.random:
+        elif ret.random:
             self._random[name] = call
         else:
-            self._steps[name] = call
-
-        self.state[name] = None
+            # store name of output and call as a pair
+            self._steps.append((name, call))
 
         return name, call
 
@@ -250,8 +255,11 @@ class Simulation:
         log.info('stepping...')
 
         # now go through steps one by one
-        for name, call in self._steps.items():
-            log.info('- %s', name)
+        for name, call in self._steps:
+            if name:
+                log.info('- %s = %s', name, call)
+            else:
+                log.info('- %s', call)
 
             # call the computation, resolving references in the state
             # store the result in the state
