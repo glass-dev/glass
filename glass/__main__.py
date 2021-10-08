@@ -167,8 +167,6 @@ if __name__ == '__main__':
                 else:
                     log.info('%s', call)
 
-        log.info('# run')
-
         sim.run()
 
     except Exception as e:

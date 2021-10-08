@@ -15,7 +15,7 @@ import logging
 
 from inspect import signature
 
-from .types import get_annotation
+from .types import get_annotation, NSide, ClsDict
 from .cls import collect_cls
 from .random import compute_gaussian_cls, regularize_gaussian_cls, generate_random_fields
 
@@ -104,6 +104,16 @@ class Simulation:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
 
+    def _add_call(self, name, call):
+        # return name and functionc call
+        self._steps.append((name, call))
+
+    def _add_random(self, name, call):
+        if len(self._random) == 0:
+            self._add_call('random', Call.make(self.state, self.simulate_random_fields))
+        self._add_call(name, Call.make(self.state, self.random_field, name))
+        self._random[name] = call
+
     def add(self, name, func, *args, **kwargs):
         '''add a function to the simulation'''
 
@@ -127,15 +137,11 @@ class Simulation:
             # set state to None initially, any placeholder value would do
             self.state[name] = None
 
-        if name == 'cosmology':
-            self._cosmology = call
-        elif name == 'cls':
-            self._cls = call
-        elif ret.random:
-            self._random[name] = call
+        # random fields require extra steps
+        if ret.random:
+            self._add_random(name, call)
         else:
-            # store name of output and call as a pair
-            self._steps.append((name, call))
+            self._add_call(name, call)
 
         return name, call
 
@@ -163,104 +169,65 @@ class Simulation:
             raise AttributeError('simulation does not have nbins')
         return self.state['nbins']
 
-    @property
-    def cls(self):
-        '''cls for the simulation'''
+    def simulate_random_fields(self, nside: NSide, cls: ClsDict):
+        '''simulate the random fields in the simulation'''
 
-        if 'cls' not in self.state:
-            raise AttributeError('simulation does not have cls')
+        # create the RandomField instances which describe the random fields
+        # to the generate_random_fields function
+        offsets, fields, names = [], [], []
+        for field, call in self._random.items():
+            offsets.append(len(fields))
+            fields += call(self.state)
+            names += [f'{field}[{i}]' for i in range(len(fields)-len(names))]
+        offsets.append(len(names))
 
-        if self.state['cls'] is None:
-            log.info('obtaining cls...')
+        log.debug('collecting cls...')
 
-            self.state['cls'] = self._cls(self.state)
+        cls = collect_cls(names, cls, allow_missing=self.allow_missing_cls)
 
-            log.debug('obtained %d cls:', len(self.state['cls']))
-            for a, b in self.state['cls'].keys():
-                log.debug('- %s-%s', a, b)
+        log.debug('collected %d cls, of which %d are None', len(cls), sum(cl is None for cl in cls))
 
-        return self.state['cls']
+        log.debug('computing Gaussian cls...')
+
+        gaussian_cls = compute_gaussian_cls(cls, fields, nside)
+
+        log.debug('regularising Gaussian cls...')
+
+        regularized_cls = regularize_gaussian_cls(gaussian_cls)
+
+        log.info('generating random fields...')
+        for i, (name, field) in enumerate(zip(names, fields)):
+            log.info('- %d: %s = %s', i, name, field)
+
+        maps = generate_random_fields(nside, regularized_cls, fields)
+
+        log.debug('shape of random maps: %s', np.shape(maps))
+        log.debug('assigning to fields...')
+
+        # assign maps to fields
+        random = {}
+        for name, first, last in zip(self._random, offsets, offsets[1:]):
+            random[name] = maps[first:last]
+
+            log.debug('- %s: %d', name, last-first)
+
+        # return the dict of fields and their random maps
+        return random
+
+    def random_field(self, name):
+        '''return a random field in the simulation'''
+        return self.state['random'].get(name)
 
     def run(self):
         '''run the simulation'''
 
-        log.info('simulating...')
+        log.info('# simulate')
 
-        # construct cosmology if given
-        if self._cosmology is not None:
-            log.info('cosmology...')
-            self.state['cosmology'] = self._cosmology(self.state)
-
-        # number of random fields
-        nrandom = len(self._random)
-
-        log.debug('number of random fields: %d', nrandom)
-
-        # random fields need to be generated first, and all together
-        if nrandom > 0:
-            # metadata, this computes the cls if not done before
-            nside = self.nside
-            nbins = self.nbins
-            cls = self.cls
-
-            # create the RandomField instances which describe the random fields
-            # to the generate_random_fields function
-            random_names, random_fields = [], []
-            for field, call in self._random.items():
-                rns = [f'{field}[{i}]' for i in range(nbins)]
-                rfs = call(self.state)
-
-                if len(rfs) != nbins:
-                    raise TypeError(f'random field "{field}" returned {len(rfs)} item(s) for {nbins} bin(s)')
-
-                random_names += rns
-                random_fields += rfs
-
-            log.info('list of random fields:')
-            for i, (rn, rf) in enumerate(zip(random_names, random_fields)):
-                log.info('- %d: %s = %s', i, rn, rf)
-
-            log.debug('collecting cls...')
-
-            cls = collect_cls(random_names, cls, allow_missing=self.allow_missing_cls)
-
-            log.debug('collected %d cls, of which %d are None', len(cls), sum(cl is None for cl in cls))
-
-            log.info('computing Gaussian cls...')
-
-            gaussian_cls = compute_gaussian_cls(cls, random_fields, nside)
-
-            log.info('regularising Gaussian cls...')
-
-            regularized_cls = regularize_gaussian_cls(gaussian_cls)
-
-            log.info('generating random fields...')
-            for field in self._random:
-                log.info('- %s', field)
-
-            random_maps = generate_random_fields(nside, regularized_cls, random_fields)
-
-            log.debug('shape of random maps: %s', np.shape(random_maps))
-
-            # reshape to number of fields x number of bins
-            random_maps = np.reshape(random_maps, (nrandom, nbins, -1))
-
-            log.debug('reshaped random maps: %s', np.shape(random_maps))
-
-            # store all random fields in the state
-            for field, m in zip(self._random.keys(), random_maps):
-                self.state[field] = m
-
-        log.debug('number of steps: %d', len(self._steps))
-
-        log.info('stepping...')
-
-        # now go through steps one by one
         for name, call in self._steps:
             if name:
-                log.info('- %s = %s', name, call)
+                log.info('## %s = %s', name, call)
             else:
-                log.info('- %s', call)
+                log.info('## %s', call)
 
             # call the computation, resolving references in the state
             # store the result in the state
