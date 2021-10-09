@@ -9,6 +9,7 @@ import configparser
 import sys
 
 from importlib import import_module
+from importlib.util import find_spec, module_from_spec, LazyLoader
 from ast import literal_eval
 
 from . import __version__ as version
@@ -25,6 +26,16 @@ DEFAULT_MODULES = [
 
 
 LOG_LEVELS = ['debug', 'info', 'warning', 'error', 'critical']
+
+
+def lazy_import_module(name):
+    spec = find_spec(name)
+    if spec is None:
+        return import_module(name)
+    module = module_from_spec(spec)
+    loader = LazyLoader(module.__loader__)
+    loader.exec_module(module)
+    return module
 
 
 def getboolean(config, name):
@@ -113,9 +124,9 @@ if __name__ == '__main__':
         namespace = {}
         for module in modules:
             try:
-                mod = import_module(module)
-            except ModuleNotFoundError:
-                log.critical('could not import "%s" module', module)
+                mod = lazy_import_module(module)
+            except ModuleNotFoundError as e:
+                log.critical('could not import "%s" module: %s', module, e)
                 sys.exit(1)
             mod_all = getattr(mod, '__all__', [])
             for name in mod_all:
