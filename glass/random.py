@@ -7,8 +7,9 @@ __all__ = [
     'NormalField',
     'LognormalField',
     'collect_cls',
-    'compute_gaussian_cls',
+    'transform_gaussian_cls',
     'regularize_gaussian_cls',
+    'transform_regularized_cls',
     'generate_random_fields',
     'field_from_random_fields',
 ]
@@ -23,7 +24,8 @@ from dataclasses import dataclass, fields as dataclass_fields
 from functools import singledispatchmethod, partial
 from sortcl import cl_indices
 
-from .typing import NSide, ArrayLike, RandomFields, RandomMaps, ClsDict, Cls, GaussianCls, RegGaussianCls
+from .typing import (NSide, ArrayLike, RandomFields, RandomMaps, ClsDict, Cls,
+                     GaussianCls, RegGaussianCls, RegularizedCls)
 from .numeric import cov_reg_simple, cov_reg_keepdiag
 
 
@@ -84,7 +86,7 @@ class NormalField(RandomField):
         if type(other) != type(self):
             return NotImplemented
 
-        return lambda cl: cl
+        return lambda cl, inv=False: cl
 
 
 @dataclass
@@ -151,7 +153,7 @@ def collect_cls(random_fields: RandomFields, cls_dict: ClsDict, *, allow_missing
     return cls
 
 
-def compute_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide = None) -> GaussianCls:
+def transform_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide = None) -> GaussianCls:
     '''transform cls to Gaussian cls for simulation'''
 
     # number of fields must match number of cls
@@ -291,6 +293,28 @@ def regularize_gaussian_cls(cls: GaussianCls, method: str = 'simple') -> RegGaus
 
     # return the regularised Gaussian cls
     return reg_gaussian_cls
+
+
+def transform_regularized_cls(cls: RegGaussianCls, random_fields: RandomFields) -> RegularizedCls:
+    '''transform regularized Gaussian Cls to regularized Cls'''
+
+    # number of fields must match number of cls
+    n = len(random_fields)
+    if len(cls) != n*(n+1)//2:
+        raise TypeError(f'requires {n*(n+1)//2} cls for {n} random fields')
+
+    # get the transforms
+    transforms = list(random_fields.values())
+
+    # apply the inverse transforms to the regularized Gaussian cls
+    regularized_cls = []
+    for i, j, cl in zip(*cl_indices(n), cls):
+        if cl is not None:
+            cl = (transforms[i] & transforms[j])(cl, inv=True)
+        regularized_cls.append(cl)
+
+    # returns the list of transformed cls in input order
+    return regularized_cls
 
 
 def generate_random_fields(nside: NSide, cls: RegGaussianCls, fields: RandomFields) -> RandomMaps:

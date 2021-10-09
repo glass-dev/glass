@@ -19,8 +19,9 @@ from inspect import signature
 from .typing import get_annotation, annotate, RandomFields
 from .random import (
     collect_cls,
-    compute_gaussian_cls,
+    transform_gaussian_cls,
     regularize_gaussian_cls,
+    transform_regularized_cls,
     generate_random_fields,
     field_from_random_fields,
 )
@@ -147,8 +148,9 @@ class Simulation:
         if len(self._random) == 0:
             self.add(self.collect_random_fields)
             self.add(collect_cls, allow_missing=self.allow_missing_cls)
-            self.add(compute_gaussian_cls)
+            self.add(transform_gaussian_cls)
             self.add(regularize_gaussian_cls)
+            self.add(transform_regularized_cls)
             self.add(generate_random_fields)
 
         # store the added random field
