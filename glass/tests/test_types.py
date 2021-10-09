@@ -1,6 +1,6 @@
 def test_get_annotation():
     from glass.typing import get_annotation
-    from typing import Annotated
+    from typing import Annotated, Optional
     from itertools import chain, combinations
 
     def powerset(iterable):
@@ -11,6 +11,19 @@ def test_get_annotation():
     a = get_annotation(int)
     assert a.name is None
     assert a.random is False
+    assert a.optional is False
+
+    # resolve annotations of Optional[T]
+    a = get_annotation(Optional[int])
+    assert a.name is None
+    assert a.random is False
+    assert a.optional is True
+
+    # resolve annotations of Optional[Annotated[T]]
+    a = get_annotation(Optional[Annotated[int, 'random']])
+    assert a.name is None
+    assert a.random is True
+    assert a.optional is True
 
     # list of (a, b, c) -- when annotating with `a`, info `b` has value `c`
     tests = [

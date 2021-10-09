@@ -25,7 +25,7 @@ __all__ = [
 
 
 from functools import wraps
-from typing import TypeVar, Any, Annotated, NamedTuple, get_args, get_origin
+from typing import TypeVar, Any, Annotated, Union, NamedTuple, get_args, get_origin
 from numpy.typing import ArrayLike
 
 T = TypeVar('T')
@@ -60,14 +60,21 @@ class _Annotation(NamedTuple):
 
     name: str = None
     random: bool = False
+    optional: bool = False
 
 
 def get_annotation(T):
     '''return the extra information from annotated type hints'''
 
+    orig, args = get_origin(T), get_args(T)
     info = {}
-    if get_origin(T) == Annotated:
-        args = get_args(T)
+
+    if orig == Union and len(args) == 2 and type(None) in args:
+        T = args[0] if isinstance(None, args[1]) else args[1]
+        orig, args = get_origin(T), get_args(T)
+        info['optional'] = True
+
+    if orig == Annotated:
         for arg in args[1:]:
             if isinstance(arg, str):
                 key, *val = arg.split(':', maxsplit=1)
