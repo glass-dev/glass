@@ -22,6 +22,8 @@ DEFAULT_MODULES = [
     'glass.cls',
     'glass.matter',
     'glass.lensing',
+    'glass.analysis',
+    'glass.plotting',
 ]
 
 
