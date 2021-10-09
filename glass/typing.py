@@ -3,14 +3,19 @@
 '''type hinting'''
 
 __all__ = [
+    'NSide',
     'RedshiftBins',
     'NumberOfBins',
     'Cosmology',
     'ClsDict',
     'Random',
-    'ClsList',
-    'GaussianClsList',
-    'RegGaussianClsList',
+    'RandomFields',
+    'RandomMaps',
+    'ListOfCls',
+    'Cls',
+    'GaussianCls',
+    'RegGaussianCls',
+    'RegularizedCls',
     'Matter',
     'Convergence',
     'Shear',
@@ -30,13 +35,19 @@ NSide = Annotated[int, 'name:nside']
 RedshiftBins = Annotated[list[float], 'name:zbins']
 NumberOfBins = Annotated[int, 'name:nbins']
 Cosmology = Annotated[Any, 'name:cosmology']
-ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls']
+ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls_dict']
 
 # random fields
 Random = Annotated[list['RandomField'], 'random']
-ClsList = list[ArrayLike]
-GaussianClsList = list[ArrayLike]
-RegGaussianClsList = list[ArrayLike]
+RandomFields = Annotated[dict[str, list], 'name:random_fields']
+RandomMaps = Annotated[ArrayLike, 'name:random_maps']
+
+# cls for random fields
+ListOfCls = Annotated[list[ArrayLike], 'cls']
+Cls = Annotated[ListOfCls, 'name:cls']
+GaussianCls = Annotated[ListOfCls, 'name:gaussian_cls']
+RegGaussianCls = Annotated[ListOfCls, 'name:reg_gaussian_cls']
+RegularizedCls = Annotated[ListOfCls, 'name:regularized_cls']
 
 # fields
 Matter = Annotated[T, 'name:matter']

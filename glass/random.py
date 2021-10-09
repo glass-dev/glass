@@ -6,9 +6,11 @@ __all__ = [
     'RandomField',
     'NormalField',
     'LognormalField',
+    'collect_cls',
     'compute_gaussian_cls',
     'regularize_gaussian_cls',
     'generate_random_fields',
+    'field_from_random_fields',
 ]
 
 
@@ -21,7 +23,7 @@ from dataclasses import dataclass, fields as dataclass_fields
 from functools import singledispatchmethod, partial
 from sortcl import cl_indices
 
-from .typing import NSide, ArrayLike, ClsList, GaussianClsList, RegGaussianClsList
+from .typing import NSide, ArrayLike, RandomFields, RandomMaps, ClsDict, Cls, GaussianCls, RegGaussianCls
 from .numeric import cov_reg_simple, cov_reg_keepdiag
 
 
@@ -115,15 +117,50 @@ class LognormalField(RandomField):
         return partial(gaussiancl.lognormal_normal_cl, alpha=alpha)
 
 
-def compute_gaussian_cls(cls: ClsList,
-                         random_fields: list[RandomField],
-                         nside: NSide = None) -> GaussianClsList:
+def collect_cls(random_fields: RandomFields, cls_dict: ClsDict, *, allow_missing: bool = False) -> Cls:
+    '''collect cls for a list of random fields'''
+
+    # total number of fields over all bins
+    n = len(random_fields)
+
+    # names of the fields
+    names = list(random_fields.keys())
+
+    log.info('collecting cls for %d random fields...', n)
+    for _ in names:
+        log.debug('- %s', _)
+
+    cls = []
+    for i, j in zip(*cl_indices(n)):
+        a, b = names[i], names[j]
+
+        if (a, b) in cls_dict:
+            cl = cls_dict[a, b]
+        elif (b, a) in cls:
+            cl = cls_dict[b, a]
+        elif allow_missing:
+            cl = None
+            log.warning('WARNING: missing cl: %s-%s', a, b)
+        else:
+            raise KeyError(f'missing cls: {a}-{b}')
+
+        cls.append(cl)
+
+    log.info('collected %d cls, with %d missing', len(cls), sum(_ is None for _ in cls))
+
+    return cls
+
+
+def compute_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide = None) -> GaussianCls:
     '''transform cls to Gaussian cls for simulation'''
 
     # number of fields must match number of cls
     n = len(random_fields)
     if len(cls) != n*(n+1)//2:
         raise TypeError(f'requires {n*(n+1)//2} cls for {n} random fields')
+
+    # get the transforms only
+    transforms = list(random_fields.values())
 
     # maximum l in input cls
     lmax = np.max([len(cl)-1 for cl in cls if cl is not None])
@@ -155,7 +192,7 @@ def compute_gaussian_cls(cls: ClsList,
                     log.debug('negative cls at l = %s', neg_cl)
 
             # transform the cl
-            cl = (random_fields[i] & random_fields[j])(cl)
+            cl = (transforms[i] & transforms[j])(cl)
 
             # Gaussian autocorrelation must be nonnegative
             if i == j:
@@ -171,8 +208,7 @@ def compute_gaussian_cls(cls: ClsList,
     return gaussian_cls
 
 
-def regularize_gaussian_cls(cls: GaussianClsList,
-                            method: str = 'simple') -> RegGaussianClsList:
+def regularize_gaussian_cls(cls: GaussianCls, method: str = 'simple') -> RegGaussianCls:
     '''regularize Gaussian cls for random sampling'''
 
     # debug output computations are expensive, so only do them when necessary
@@ -257,9 +293,7 @@ def regularize_gaussian_cls(cls: GaussianClsList,
     return reg_gaussian_cls
 
 
-def generate_random_fields(nside: NSide,
-                           cls: RegGaussianClsList,
-                           fields: list[RandomField]) -> ArrayLike:
+def generate_random_fields(nside: NSide, cls: RegGaussianCls, fields: RandomFields) -> RandomMaps:
     '''generate random fields from cls'''
 
     # debug output computations are expensive, so only do them when necessary
@@ -311,7 +345,7 @@ def generate_random_fields(nside: NSide,
     log.debug('transforming fields...')
 
     # transform the Gaussian random fields to the output fields
-    for i, field in enumerate(fields):
+    for i, field in enumerate(fields.values()):
         log.debug('- field %d: %s', i, field)
 
         maps[i] = field(maps[i], var=var[i])
@@ -320,3 +354,10 @@ def generate_random_fields(nside: NSide,
 
     # fields have been created
     return maps
+
+
+def field_from_random_fields(name: str, fields: RandomFields, maps: RandomMaps) -> ArrayLike:
+    '''extract a field from a stack of random fields'''
+
+    prefix = f'{name}['
+    return [m for f, m in zip(fields, maps) if f.startswith(prefix)]

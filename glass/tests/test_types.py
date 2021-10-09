@@ -37,6 +37,15 @@ def test_default_names():
         NumberOfBins,
         Cosmology,
         ClsDict,
+        # random fields
+        Random,
+        RandomFields,
+        RandomMaps,
+        # cls for random fields
+        Cls,
+        GaussianCls,
+        RegGaussianCls,
+        RegularizedCls,
         # fields
         Matter,
         Convergence,
@@ -46,7 +55,16 @@ def test_default_names():
     assert get_annotation(RedshiftBins).name == 'zbins'
     assert get_annotation(NumberOfBins).name == 'nbins'
     assert get_annotation(Cosmology).name == 'cosmology'
-    assert get_annotation(ClsDict).name == 'cls'
+    assert get_annotation(ClsDict).name == 'cls_dict'
+
+    assert get_annotation(Random).random is True
+    assert get_annotation(RandomFields).name == 'random_fields'
+    assert get_annotation(RandomMaps).name == 'random_maps'
+
+    assert get_annotation(Cls).name == 'cls'
+    assert get_annotation(GaussianCls).name == 'gaussian_cls'
+    assert get_annotation(RegGaussianCls).name == 'reg_gaussian_cls'
+    assert get_annotation(RegularizedCls).name == 'regularized_cls'
 
     assert get_annotation(Matter[int]).name == 'matter'
     assert get_annotation(Convergence[int]).name == 'convergence'

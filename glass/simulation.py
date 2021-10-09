@@ -9,31 +9,35 @@ __all__ = [
 ]
 
 
-import numpy as np
-import typing as t
 import logging
 
+from typing import NamedTuple, Callable, get_type_hints
 from inspect import signature
 
-from .typing import get_annotation, NSide, ClsDict
-from .cls import collect_cls
-from .random import compute_gaussian_cls, regularize_gaussian_cls, generate_random_fields
+from .typing import get_annotation, annotate, RandomFields
+from .random import (
+    collect_cls,
+    compute_gaussian_cls,
+    regularize_gaussian_cls,
+    generate_random_fields,
+    field_from_random_fields,
+)
 
 
 log = logging.getLogger('glass.simulation')
 
 
-class Ref(t.NamedTuple):
+class Ref(NamedTuple):
     name: str
 
     def __repr__(self):
         return self.name
 
 
-class Call(t.NamedTuple):
-    func: t.Callable
-    args: t.Sequence
-    kwargs: t.Mapping
+class Call(NamedTuple):
+    func: Callable
+    args: list
+    kwargs: dict
 
     @classmethod
     def make(cls, state, func, *args, **kwargs):
@@ -45,7 +49,7 @@ class Call(t.NamedTuple):
             raise TypeError(f"{e} for function '{func.__name__}'") from None
 
         # get type hints with annotations
-        hints = t.get_type_hints(func, include_extras=True)
+        hints = get_type_hints(func, include_extras=True)
 
         # get annotations from type hints
         annotations = {par: get_annotation(hint) for par, hint in hints.items()}
@@ -105,14 +109,38 @@ class Simulation:
             self.state['nbins'] = len(zbins) - 1
 
     def _add_call(self, name, call):
-        # return name and functionc call
+        # if result has a name, make it known to the simulation state
+        if name:
+            # warn before overwriting
+            if name in self.state:
+                log.warning('overwriting "%s" with %s', name, call)
+
+            # set state to None initially, any placeholder value would do
+            self.state[name] = None
+
+        # return name and function call
         self._steps.append((name, call))
 
     def _add_random(self, name, call):
+        # at the first random field, set up the machinery to sample:
+        # - collect the random fields
+        # - collect the cls for the random fields
+        # - transform the cls to Gaussian cls
+        # - regularize the Gaussian cls
+        # - sample the random fields from the regularized Gaussian cls
+        # - transform regularized Gaussian cls to regularized cls (optional)
         if len(self._random) == 0:
-            self._add_call('random', Call.make(self.state, self.simulate_random_fields))
-        self._add_call(name, Call.make(self.state, self.random_field, name))
+            self.add(self.collect_random_fields)
+            self.add(collect_cls, allow_missing=self.allow_missing_cls)
+            self.add(compute_gaussian_cls)
+            self.add(regularize_gaussian_cls)
+            self.add(generate_random_fields)
+
+        # store the added random field
         self._random[name] = call
+
+        # add a call to assign the random field to the given name
+        self.add(annotate(field_from_random_fields, name=name), name)
 
     def add(self, func, *args, **kwargs):
         '''add a function to the simulation'''
@@ -127,15 +155,6 @@ class Simulation:
 
         # get name of output from annotation
         name = ret.name
-
-        # if result has a name, make it known to the simulation state
-        if name:
-            # warn before overwriting
-            if name in self.state:
-                log.warning('overwriting "%s" with %s', name, call)
-
-            # set state to None initially, any placeholder value would do
-            self.state[name] = None
 
         # random fields require extra steps
         if ret.random:
@@ -169,54 +188,20 @@ class Simulation:
             raise AttributeError('simulation does not have nbins')
         return self.state['nbins']
 
-    def simulate_random_fields(self, nside: NSide, cls: ClsDict):
-        '''simulate the random fields in the simulation'''
+    def collect_random_fields(self) -> RandomFields:
+        '''collect the random fields in the simulation'''
 
-        # create the RandomField instances which describe the random fields
-        # to the generate_random_fields function
-        offsets, fields, names = [], [], []
+        random_fields = {}
         for field, call in self._random.items():
-            offsets.append(len(fields))
-            fields += call(self.state)
-            names += [f'{field}[{i}]' for i in range(len(fields)-len(names))]
-        offsets.append(len(names))
+            transforms = call(self.state)
+            for i, t in enumerate(transforms):
+                random_fields[f'{field}[{i}]'] = t
 
-        log.debug('collecting cls...')
+        log.debug('collected %d random fields', len(random_fields))
+        for name, transform in random_fields.items():
+            log.debug('- %s: %s', name, transform)
 
-        cls = collect_cls(names, cls, allow_missing=self.allow_missing_cls)
-
-        log.debug('collected %d cls, of which %d are None', len(cls), sum(cl is None for cl in cls))
-
-        log.debug('computing Gaussian cls...')
-
-        gaussian_cls = compute_gaussian_cls(cls, fields, nside)
-
-        log.debug('regularising Gaussian cls...')
-
-        regularized_cls = regularize_gaussian_cls(gaussian_cls)
-
-        log.info('generating random fields...')
-        for i, (name, field) in enumerate(zip(names, fields)):
-            log.info('- %d: %s = %s', i, name, field)
-
-        maps = generate_random_fields(nside, regularized_cls, fields)
-
-        log.debug('shape of random maps: %s', np.shape(maps))
-        log.debug('assigning to fields...')
-
-        # assign maps to fields
-        random = {}
-        for name, first, last in zip(self._random, offsets, offsets[1:]):
-            random[name] = maps[first:last]
-
-            log.debug('- %s: %d', name, last-first)
-
-        # return the dict of fields and their random maps
-        return random
-
-    def random_field(self, name):
-        '''return a random field in the simulation'''
-        return self.state['random'].get(name)
+        return random_fields
 
     def run(self):
         '''run the simulation'''
