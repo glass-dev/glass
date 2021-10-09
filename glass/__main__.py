@@ -58,6 +58,7 @@ def parse_arg(arg, *, filename='<config>', refs=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='glass', description='generator for large scale structure')
     parser.add_argument('config', type=argparse.FileType('r'), help='configuration file')
+    parser.add_argument('--workdir', '-d', help='working directory for file output')
     parser.add_argument('--quiet', '-q', action='store_true', help='silence console output')
     parser.add_argument('--logfile', help='log to file')
     parser.add_argument('--loglevel', choices=LOG_LEVELS, default='info', help='level for file logging')
@@ -130,15 +131,17 @@ if __name__ == '__main__':
         if 'config' not in config:
             raise KeyError('missing section: config')
 
+        workdir = args.workdir
         nside = int(config['config']['nside'])
         zbins = np.fromstring(config['config']['zbins'], sep=' ')
         allow_missing_cls = getboolean(config['config'], 'allow_missing_cls')
 
+        log.info('workdir: %s', workdir)
         log.info('nside: %d', nside)
         log.info('zbins: %s', zbins)
         log.info('allow missing cls: %s', allow_missing_cls)
 
-        sim = Simulation(nside=nside, zbins=zbins, allow_missing_cls=allow_missing_cls)
+        sim = Simulation(workdir=workdir, nside=nside, zbins=zbins, allow_missing_cls=allow_missing_cls)
 
         if 'simulation' in config:
             log.info('## simulation')

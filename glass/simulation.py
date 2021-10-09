@@ -10,6 +10,8 @@ __all__ = [
 
 
 import logging
+import os
+import time
 
 from typing import NamedTuple, Callable, get_type_hints
 from inspect import signature
@@ -25,6 +27,17 @@ from .random import (
 
 
 log = logging.getLogger('glass.simulation')
+
+
+def mkworkdir(workdir, run):
+    '''create the working directory for a run'''
+
+    rundir = os.path.join(workdir, run)
+    lastrun = os.path.join(workdir, 'lastrun')
+    os.makedirs(rundir, exist_ok=False)
+    with open(lastrun, 'a') as f:
+        f.write(f'{run}\n')
+    return rundir
 
 
 class Ref(NamedTuple):
@@ -93,15 +106,17 @@ class Call(NamedTuple):
 
 
 class Simulation:
-    def __init__(self, *, nside=None, zbins=None, allow_missing_cls=False):
-        self._cosmology = None
-        self._cls = None
+    def __init__(self, *, workdir=None, nside=None, zbins=None, allow_missing_cls=False):
+        self._workdir = workdir
         self._random = {}
         self._steps = []
 
         self.allow_missing_cls = allow_missing_cls
 
+        # initialise the state with some simple properties
         self.state = {}
+        if workdir is not None:
+            self.state['workdir'] = None
         if nside is not None:
             self.state['nside'] = nside
         if zbins is not None:
@@ -207,6 +222,14 @@ class Simulation:
         '''run the simulation'''
 
         log.info('# simulate')
+
+        # set the run id
+        self.state['__run__'] = time.strftime('%y%m%d.%H%M%S')
+
+        log.info('run: %s', self.state['__run__'])
+
+        if self._workdir:
+            self.state['workdir'] = mkworkdir(self._workdir, self.state['__run__'])
 
         for name, call in self._steps:
             if name:

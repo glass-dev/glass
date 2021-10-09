@@ -3,6 +3,7 @@
 '''type hinting'''
 
 __all__ = [
+    'WorkDir',
     'NSide',
     'RedshiftBins',
     'NumberOfBins',
@@ -31,6 +32,7 @@ from numpy.typing import ArrayLike
 T = TypeVar('T')
 
 # simulation
+WorkDir = Annotated[str, 'name:workdir']
 NSide = Annotated[int, 'name:nside']
 RedshiftBins = Annotated[list[float], 'name:zbins']
 NumberOfBins = Annotated[int, 'name:nbins']
