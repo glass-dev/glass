@@ -36,15 +36,11 @@ def plot_cls(workdir: WorkDir = None,
         # number of fields from number of cls
         n = int((2*len(cls))**0.5)
 
-        fig, ax = plt.subplots(n, n, figsize=(n, n), sharex=True, sharey=True)
-
-        fig.subplots_adjust(wspace=0., hspace=0.)
+        fig, ax = plt.subplots(n, n, figsize=(n, n))
 
         for i, j in product(range(n), range(n)):
             if i <= j:
-                ax[i, j].tick_params(which='both', direction='in')
-            if i == j:
-                ax[i, j].tick_params(left=True, labelleft=True)
+                ax[i, j].tick_params(which='both', direction='in', labelsize=4, pad=1, size=3)
             if i > j:
                 ax[i, j].axis('off')
 
@@ -55,6 +51,8 @@ def plot_cls(workdir: WorkDir = None,
                 for i, j, cl in zip(*cl_indices(n), _cls):
                     ax[i, j].loglog(+cl, ls='-', c=_c, alpha=_a)
                     ax[i, j].loglog(-cl, ls='--', c=_c, alpha=_a)
+
+        fig.tight_layout(pad=0.)
 
         log.info('writing %s...', filename)
         fig.savefig(os.path.join(workdir, filename), bbox_inches='tight')
