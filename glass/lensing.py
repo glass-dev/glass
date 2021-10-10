@@ -16,7 +16,7 @@ import healpy as hp
 import logging
 
 from .typing import Matter, Convergence, Shear, Random, ArrayLike, NumberOfBins, RedshiftBins, Cosmology
-from .random import NormalField, LognormalField
+from .random_fields import NormalField, LognormalField
 
 
 log = logging.getLogger('glass.lensing')

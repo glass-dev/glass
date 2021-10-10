@@ -9,7 +9,7 @@ __all__ = [
 
 
 from .typing import NumberOfBins, Matter, Random
-from .random import NormalField, LognormalField
+from .random_fields import NormalField, LognormalField
 
 
 def normal_matter(nbins: NumberOfBins) -> Matter[Random]:
