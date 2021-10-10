@@ -26,7 +26,7 @@ from sortcl import cl_indices
 
 from .typing import (NSide, ArrayLike, RandomFields, RandomMaps, ClsDict, Cls,
                      GaussianCls, RegGaussianCls, RegularizedCls)
-from .numeric import cov_reg_simple, cov_reg_keepdiag
+from .numeric import cov_reg_simple, cov_reg_corr
 
 
 log = logging.getLogger('glass.random')
@@ -210,7 +210,7 @@ def transform_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide =
     return gaussian_cls
 
 
-def regularize_gaussian_cls(cls: GaussianCls, method: str = 'simple') -> RegGaussianCls:
+def regularize_gaussian_cls(cls: GaussianCls, method: str = 'corr') -> RegGaussianCls:
     '''regularize Gaussian cls for random sampling'''
 
     # debug output computations are expensive, so only do them when necessary
@@ -255,8 +255,8 @@ def regularize_gaussian_cls(cls: GaussianCls, method: str = 'simple') -> RegGaus
 
     if method == 'simple':
         reg = cov_reg_simple(cov)
-    elif method == 'keepdiag':
-        reg = cov_reg_keepdiag(cov)
+    elif method == 'corr':
+        reg = cov_reg_corr(cov)
     else:
         raise ValueError(f'unknown method "{method}" for regularisation')
 

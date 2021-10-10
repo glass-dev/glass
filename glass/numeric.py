@@ -22,8 +22,8 @@ def cov_reg_simple(cov):
     return cov
 
 
-def cov_reg_keepdiag(cov, niter=10):
-    '''nearest covariance matrix with same diagonal
+def cov_reg_corr(cov, niter=20):
+    '''covariance matrix from nearest correlation matrix
 
     Uses the algorithm of Higham (2000).
 
@@ -36,48 +36,58 @@ def cov_reg_keepdiag(cov, niter=10):
     if s[-2] != s[-1]:
         raise TypeError('cov is not square')
 
-    # if matrix is positive semi-definite, no need for regularisation
-        # no need for regularisation
-
     # size of the covariance matrix
     n = s[-1]
 
     # make a copy to work on
-    _cov = np.copy(cov)
+    corr = np.copy(cov)
 
     # view onto the diagonal of the correlation matrix
-    _dia = _cov.reshape(s[:-2] + (-1,))[..., ::n+1]
+    diag = corr.reshape(s[:-2] + (-1,))[..., ::n+1]
 
-    # the fixed diagonal
-    _fix = np.copy(_dia)
+    # set correlations with nonpositive diagonal to zero
+    good = (diag > 0)
+    corr *= good[..., np.newaxis, :]
+    corr *= good[..., :, np.newaxis]
+
+    # get sqrt of the diagonal for normalization
+    norm = np.sqrt(diag)
+
+    # compute the correlation matrix
+    np.divide(corr, norm[..., np.newaxis, :], where=good[..., np.newaxis, :], out=corr)
+    np.divide(corr, norm[..., :, np.newaxis], where=good[..., :, np.newaxis], out=corr)
 
     # indices of the upper triangular part of the matrix
-    _tri = (...,) + np.triu_indices(n, 1)
+    triu = (...,) + np.triu_indices(n, 1)
 
     # always keep upper triangular part of matrix fixed to zero
     # otherwise, Dykstra's correction points in the wrong direction
-    _cov[_tri] = 0
+    corr[triu] = 0
 
     # find the nearest covariance matrix with given diagonal
-    _cor = np.zeros_like(_cov)
-    _pro = np.empty_like(_cov)
+    dyks = np.zeros_like(corr)
+    proj = np.empty_like(corr)
     for k in range(niter):
         # apply Dykstra's correction to current result
-        np.subtract(_cov, _cor, out=_pro)
+        np.subtract(corr, dyks, out=proj)
 
         # project onto positive semi-definite matrices
-        w, v = np.linalg.eigh(_pro)
+        w, v = np.linalg.eigh(proj)
         w[w < 0] = 0
-        np.einsum('...ij,...j,...kj->...ik', v, w, v, out=_cov)
+        np.einsum('...ij,...j,...kj->...ik', v, w, v, out=corr)
 
         # keep upper triangular part fixed to zero
-        _cov[_tri] = 0
+        corr[triu] = 0
 
         # compute Dykstra's correction
-        np.subtract(_cov, _pro, out=_cor)
+        np.subtract(corr, proj, out=dyks)
 
-        # project onto matrices with given diagonal
-        _dia[:] = _fix
+        # project onto matrices with unit diagonal
+        diag[good] = 1
+
+    # put the normalisation back to convert correlations to covariance
+    np.multiply(corr, norm[..., np.newaxis, :], out=corr)
+    np.multiply(corr, norm[..., :, np.newaxis], out=corr)
 
     # return the regularised covariance matrix
-    return _cov
+    return corr
