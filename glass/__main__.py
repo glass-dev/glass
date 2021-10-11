@@ -53,7 +53,7 @@ def parse_arg(arg, *, filename='<config>', refs=False):
     # nested configs
     if arg[0] == '\n':
         lines = arg[1:].split('\n')
-        nested = dict(([_.strip() for _ in _.split('=', 1)] + [None])[:2] for _ in lines if _)
+        nested = dict(([_.strip() for _ in _.split('=', 1)]*2)[:2] for _ in lines if _)
         return nested
 
     # try to literally parse the string
@@ -166,21 +166,15 @@ if __name__ == '__main__':
                     name = label
                 if func not in namespace:
                     raise NameError(f'simulation: {label}: unknown function "{func}"')
-                _func, _args, _kwargs = namespace[func], [], {}
+                _func, _kwargs = namespace[func], {}
                 if label in config:
                     for par, arg in config[label].items():
-                        if arg is None:
-                            par, arg = None, par
-                        arg = parse_arg(arg, filename=args.config.name, refs=True)
-                        if par is None:
-                            _args.append(arg)
-                        else:
-                            _kwargs[par] = arg
+                        _kwargs[par] = parse_arg(arg or par, filename=args.config.name, refs=True)
 
                 if name is not None:
                     _func = annotate(_func, name)
 
-                call = sim.add(_func, *_args, **_kwargs)
+                call = sim.add(_func, **_kwargs)
 
                 log.info('%s', call)
 
