@@ -15,7 +15,7 @@ import numpy as np
 import healpy as hp
 import logging
 
-from .typing import Matter, Convergence, Shear, Random, ArrayLike, NumberOfBins, RedshiftBins, Cosmology
+from .typing import MatterFields, ConvergenceFields, ShearFields, RandomConvergenceFields, NumberOfBins, RedshiftBins, Cosmology
 from .random_fields import NormalField, LognormalField
 
 
@@ -33,13 +33,13 @@ def kappa0_hilbert11(z):
     return 0.008*z*(1 + 3.625*z*(1. - 0.272414*z*(1. - 0.0822785*z)))
 
 
-def normal_convergence(nbins: NumberOfBins) -> Convergence[Random]:
+def normal_convergence(nbins: NumberOfBins) -> RandomConvergenceFields:
     '''convergence field following a normal distribution'''
 
     return [NormalField()]*nbins
 
 
-def lognormal_convergence(zbins: RedshiftBins) -> Convergence[Random]:
+def lognormal_convergence(zbins: RedshiftBins) -> RandomConvergenceFields:
     '''convergence field following a lognormal distribution'''
 
     z = np.add(zbins[:-1], zbins[1:])/2
@@ -47,11 +47,11 @@ def lognormal_convergence(zbins: RedshiftBins) -> Convergence[Random]:
     return [LognormalField(shift=k0) for k0 in kappa0]
 
 
-def convergence_from_matter(delta: Matter[ArrayLike],
+def convergence_from_matter(delta: MatterFields,
                             zbins: RedshiftBins,
                             cosmo: Cosmology,
                             *,
-                            growth: bool = False) -> Convergence[ArrayLike]:
+                            growth: bool = False) -> ConvergenceFields:
     '''compute convergence fields from projection of the matter field
 
     For reference, see e.g. Chapter 6.2 of Schneider, Kochanek & Wambsganss
@@ -91,7 +91,7 @@ def convergence_from_matter(delta: Matter[ArrayLike],
     return kappa
 
 
-def shear_from_convergence(kappa: Convergence[ArrayLike]) -> Shear[ArrayLike]:
+def shear_from_convergence(kappa: ConvergenceFields) -> ShearFields:
     r'''weak lensing shear field from convergence
 
     Notes

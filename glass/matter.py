@@ -8,17 +8,17 @@ __all__ = [
 ]
 
 
-from .typing import NumberOfBins, Matter, Random
+from .typing import NumberOfBins, RandomMatterFields
 from .random_fields import NormalField, LognormalField
 
 
-def normal_matter(nbins: NumberOfBins) -> Matter[Random]:
+def normal_matter(nbins: NumberOfBins) -> RandomMatterFields:
     '''matter field following a normal distribution'''
 
     return [NormalField()]*nbins
 
 
-def lognormal_matter(nbins: NumberOfBins) -> Matter[Random]:
+def lognormal_matter(nbins: NumberOfBins) -> RandomMatterFields:
     '''matter field following a lognormal distribution'''
 
     return [LognormalField(shift=1.0)]*nbins

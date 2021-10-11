@@ -8,95 +8,69 @@ __all__ = [
     'RedshiftBins',
     'NumberOfBins',
     'Cosmology',
-    'ClsDict',
-    'Random',
-    'RandomFields',
-    'RandomMaps',
-    'ListOfCls',
     'Cls',
-    'GaussianCls',
-    'RegGaussianCls',
-    'RegularizedCls',
-    'Matter',
-    'Convergence',
-    'Shear',
+    'TheoryCls',
+    'RandomFields',
+    'RandomMatterFields',
+    'RandomConvergenceFields',
+    'Fields',
+    'MatterFields',
+    'ConvergenceFields',
+    'ShearFields',
     'get_annotation',
     'annotate',
 ]
 
 
 from functools import wraps
-from typing import TypeVar, Any, Annotated, Union, NamedTuple, get_args, get_origin
+from typing import TypeVar, Any, Annotated, Union, get_args, get_origin
 from numpy.typing import ArrayLike
 
 T = TypeVar('T')
+NoneType = type(None)
 
 # simulation
-WorkDir = Annotated[str, 'name:workdir']
-NSide = Annotated[int, 'name:nside']
-RedshiftBins = Annotated[list[float], 'name:zbins']
-NumberOfBins = Annotated[int, 'name:nbins']
-Cosmology = Annotated[Any, 'name:cosmology']
-ClsDict = Annotated[dict[tuple[str, str], ArrayLike], 'name:cls_dict']
+WorkDir = Annotated[str, 'glass:workdir']
+NSide = Annotated[int, 'glass:nside']
+RedshiftBins = Annotated[list[float], 'glass:zbins']
+NumberOfBins = Annotated[int, 'glass:nbins']
+Cosmology = Annotated[Any, 'glass:cosmology']
+
+# cls
+Cls = dict[tuple[str, str], ArrayLike]
+TheoryCls = Annotated[Cls, 'glass:theory_cls']
 
 # random fields
-Random = Annotated[list['RandomField'], 'random']
-RandomFields = Annotated[dict[str, list], 'name:random_fields']
-RandomMaps = Annotated[ArrayLike, 'name:random_maps']
-
-# cls for random fields
-ListOfCls = Annotated[list[ArrayLike], 'cls']
-Cls = Annotated[ListOfCls, 'name:cls']
-GaussianCls = Annotated[ListOfCls, 'name:gaussian_cls']
-RegGaussianCls = Annotated[ListOfCls, 'name:reg_gaussian_cls']
-RegularizedCls = Annotated[ListOfCls, 'name:regularized_cls']
+RandomFields = list['RandomField']
+RandomMatterFields = Annotated[RandomFields, 'glass:matter']
+RandomConvergenceFields = Annotated[RandomFields, 'glass:convergence']
 
 # fields
-Matter = Annotated[T, 'name:matter']
-Convergence = Annotated[T, 'name:convergence']
-Shear = Annotated[T, 'name:shear']
+Fields = ArrayLike
+MatterFields = Annotated[Fields, 'glass:matter']
+ConvergenceFields = Annotated[Fields, 'glass:convergence']
+ShearFields = Annotated[Fields, 'glass:shear']
 
 
-class _Annotation(NamedTuple):
-    '''extra information from annotated type hints'''
-
-    name: str = None
-    random: bool = False
-    optional: bool = False
-
-
-def get_annotation(T):
+def get_annotation(hint):
     '''return the extra information from annotated type hints'''
 
-    orig, args = get_origin(T), get_args(T)
-    info = {}
+    orig, args = get_origin(hint), get_args(hint)
+    name = None
 
     if orig == Union and len(args) == 2 and type(None) in args:
-        T = args[0] if isinstance(None, args[1]) else args[1]
-        orig, args = get_origin(T), get_args(T)
-        info['optional'] = True
+        hint = args[0] if isinstance(None, args[1]) else args[1]
+        orig, args = get_origin(hint), get_args(hint)
 
     if orig == Annotated:
         for arg in args[1:]:
-            if isinstance(arg, str):
-                key, *val = arg.split(':', maxsplit=1)
-                if key in _Annotation._fields:
-                    # get the field's type hint, fall back to str
-                    typ = _Annotation.__annotations__.get(key, str)
-                    if val:
-                        # cast the given value to appropriate type
-                        info[key] = typ(*val)
-                    elif typ is bool:
-                        # booleans do not need a value to be set
-                        info[key] = True
-                    else:
-                        # no value, do nothing
-                        pass
+            if isinstance(arg, str) and arg.startswith('glass:'):
+                name = arg.removeprefix('glass:')
 
-    return _Annotation(**info)
+    return name
 
 
-def annotate(func, **annotations):
+def annotate(func, name):
     '''annotate a function'''
 
     @wraps(func)
@@ -105,20 +79,16 @@ def annotate(func, **annotations):
 
     # make a copy of the annotations dict, or we would change original
     try:
-        a = annotated_func.__annotations__
+        annotated_func.__annotations__ = annotated_func.__annotations__.copy()
     except AttributeError:
-        a = {}
-    else:
-        a = a.copy()
+        # no annotations in the first place
+        annotated_func.__annotations__ = {}
 
-    # set the return annotation by stacking
-    ret = a.get('return', None)
-    for key, val in annotations.items():
-        ret = Annotated[ret, f'{key}:{val}']
-    a['return'] = ret
+    # get the original annotation of the function
+    t = annotated_func.__annotations__.get('return', NoneType)
 
-    # update the annotations
-    annotated_func.__annotations__ = a
+    # update the return annotation with the new type hint
+    annotated_func.__annotations__['return'] = Annotated[t, f'glass:{name}']
 
     # return the function with the new annotations
     return annotated_func

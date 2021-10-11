@@ -16,7 +16,7 @@ from itertools import combinations_with_replacement
 from interpcl import interpcl
 from sortcl import cl_indices
 
-from .typing import RedshiftBins, NumberOfBins, Cosmology, ClsDict
+from .typing import RedshiftBins, NumberOfBins, Cosmology, TheoryCls
 
 
 log = logging.getLogger('glass.cls')
@@ -60,8 +60,9 @@ def cls_from_files(pattern: str,
                    *,
                    lmax: int = None,
                    dipole: bool = True,
-                   monopole: bool = False) -> ClsDict:
-    '''read cls from multiple individual files'''
+                   monopole: bool = False,
+                   ) -> TheoryCls:
+    '''read theory cls from multiple individual files'''
 
     log.debug('reading cls from multiple files')
     log.debug('filename pattern: %s')
@@ -90,7 +91,9 @@ def cls_from_files(pattern: str,
     return cls
 
 
-def cls_from_pyccl(fields, lmax, zbins: RedshiftBins, cosmo: Cosmology) -> ClsDict:
+def cls_from_pyccl(fields, lmax, zbins: RedshiftBins, cosmo: Cosmology) -> TheoryCls:
+    '''compute theory cls with pyccl'''
+
     import pyccl
 
     c = pyccl.Cosmology(h=cosmo.H0/100, Omega_c=cosmo.Om, Omega_b=0.05, sigma8=0.8, n_s=0.96)

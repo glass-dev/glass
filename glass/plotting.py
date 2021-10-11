@@ -10,20 +10,16 @@ __all__ = [
 import os
 import logging
 
-from itertools import product
+from itertools import product, chain
 from sortcl import cl_indices
 
-from .typing import WorkDir, Cls, GaussianCls, RegGaussianCls, RegularizedCls
+from .typing import WorkDir
 
 
 log = logging.getLogger('glass.plotting')
 
 
-def plot_cls(workdir: WorkDir = None,
-             cls: Cls = None,
-             gaussian_cls: GaussianCls = None,
-             reg_gaussian_cls: RegGaussianCls = None,
-             regularized_cls: RegularizedCls = None) -> None:
+def plot_cls(workdir: WorkDir = None, **out_cls) -> None:
     '''create triangle plots of cls'''
 
     import matplotlib.pyplot as plt
@@ -32,9 +28,24 @@ def plot_cls(workdir: WorkDir = None,
         log.info('workdir not set, skipping...')
         return
 
+    cls = out_cls.get('cls', None)
+    regularized_cls = out_cls.get('regularized_cls', None)
+    gaussian_cls = out_cls.get('gaussian_cls', None)
+    reg_gaussian_cls = out_cls.get('reg_gaussian_cls', None)
+
     def _plot(filename, cls, name, other_cls=None, other_name=None):
-        # number of fields from number of cls
-        n = int((2*len(cls))**0.5)
+        # get all individual fields for which there are cls
+        fields = []
+        for f in chain.from_iterable(cls.keys()):
+            if f not in fields:
+                fields.append(f)
+        if other_cls is not None:
+            for f in chain.from_iterable(other_cls.keys()):
+                if f not in fields:
+                    fields.append(f)
+
+        # number of distinct fields
+        n = len(fields)
 
         fig, ax = plt.subplots(n, n, figsize=(n, n))
 
@@ -48,9 +59,16 @@ def plot_cls(workdir: WorkDir = None,
                                     (other_cls, other_name, 'r', 0.5)]:
             if _cls is not None:
                 log.info('plotting %s...', _name)
-                for i, j, cl in zip(*cl_indices(n), _cls):
-                    ax[i, j].loglog(+cl, ls='-', c=_c, alpha=_a)
-                    ax[i, j].loglog(-cl, ls='--', c=_c, alpha=_a)
+                for i, j in zip(*cl_indices(n)):
+                    if (fields[i], fields[j]) in _cls:
+                        cl = _cls[fields[i], fields[j]]
+                    elif (fields[j], fields[i]) in _cls:
+                        cl = _cls[fields[j], fields[i]]
+                    else:
+                        cl = None
+                    if cl is not None:
+                        ax[i, j].loglog(+cl, ls='-', c=_c, alpha=_a)
+                        ax[i, j].loglog(-cl, ls='--', c=_c, alpha=_a)
 
         fig.tight_layout(pad=0.)
 

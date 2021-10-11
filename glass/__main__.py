@@ -178,14 +178,11 @@ if __name__ == '__main__':
                             _kwargs[par] = arg
 
                 if name is not None:
-                    _func = annotate(_func, name=name)
+                    _func = annotate(_func, name)
 
-                name, call = sim.add(_func, *_args, **_kwargs)
+                call = sim.add(_func, *_args, **_kwargs)
 
-                if name:
-                    log.info('%s = %s', name, call)
-                else:
-                    log.info('%s', call)
+                log.info('%s', call)
 
         sim.run()
 

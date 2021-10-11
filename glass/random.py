@@ -7,25 +7,24 @@ __all__ = [
     'transform_gaussian_cls',
     'regularize_gaussian_cls',
     'transform_regularized_cls',
+    'gaussian_random_fields',
+    'transform_random_fields',
     'generate_random_fields',
-    'field_from_random_fields',
 ]
 
 
 import numpy as np
 import healpy as hp
 import logging
-from sortcl import cl_indices
+from sortcl import cl_indices, enumerate_cls
 
-from .typing import (NSide, ArrayLike, RandomFields, RandomMaps, ClsDict, Cls,
-                     GaussianCls, RegGaussianCls, RegularizedCls)
 from .numeric import cov_reg_simple, cov_reg_corr
 
 
 log = logging.getLogger('glass.random')
 
 
-def _num_fields_from_num_cls(m: int) -> int:
+def _num_fields_from_num_cls(m):
     '''get number of fields from number of cls'''
     n = int((2*m)**0.5)
     if m != n*(n+1)//2:
@@ -33,14 +32,11 @@ def _num_fields_from_num_cls(m: int) -> int:
     return n
 
 
-def collect_cls(random_fields: RandomFields, cls_dict: ClsDict, *, allow_missing: bool = False) -> Cls:
+def collect_cls(cls_dict, names, *, allow_missing=False):
     '''collect cls for a list of random fields'''
 
-    # total number of fields over all bins
-    n = len(random_fields)
-
-    # names of the fields
-    names = list(random_fields.keys())
+    # number of fields
+    n = len(names)
 
     log.info('collecting cls for %d random fields...', n)
     for _ in names:
@@ -52,7 +48,7 @@ def collect_cls(random_fields: RandomFields, cls_dict: ClsDict, *, allow_missing
 
         if (a, b) in cls_dict:
             cl = cls_dict[a, b]
-        elif (b, a) in cls:
+        elif (b, a) in cls_dict:
             cl = cls_dict[b, a]
         elif allow_missing:
             cl = None
@@ -67,16 +63,18 @@ def collect_cls(random_fields: RandomFields, cls_dict: ClsDict, *, allow_missing
     return cls
 
 
-def transform_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide = None) -> GaussianCls:
+def cls_as_dict(cls, names):
+    '''sort cls into a dictionary given names'''
+    return {(names[i], names[j]): cl for i, j, cl in enumerate_cls(cls) if cl is not None}
+
+
+def transform_gaussian_cls(cls, fields, nside=None):
     '''transform cls to Gaussian cls for simulation'''
 
     # number of fields must match number of cls
-    n = len(random_fields)
+    n = len(fields)
     if len(cls) != n*(n+1)//2:
         raise TypeError(f'requires {n*(n+1)//2} cls for {n} random fields')
-
-    # get the transforms only
-    transforms = list(random_fields.values())
 
     # maximum l in input cls
     lmax = np.max([len(cl)-1 for cl in cls if cl is not None])
@@ -92,7 +90,7 @@ def transform_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide =
 
     # transform input cls to cls for the Gaussian random fields
     gaussian_cls = []
-    for i, j, cl in zip(*cl_indices(n), cls):
+    for i, j, cl in enumerate_cls(cls):
         # only work on available cls
         if cl is not None:
             # simulating integrated maps by multiplying cls and pw
@@ -108,7 +106,7 @@ def transform_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide =
                     log.debug('negative cls at l = %s', neg_cl)
 
             # transform the cl
-            cl = (transforms[i] & transforms[j])(cl)
+            cl = (fields[i] & fields[j])(cl)
 
             # Gaussian autocorrelation must be nonnegative
             if i == j:
@@ -124,7 +122,7 @@ def transform_gaussian_cls(cls: Cls, random_fields: RandomFields, nside: NSide =
     return gaussian_cls
 
 
-def regularize_gaussian_cls(cls: GaussianCls, method: str = 'corr') -> RegGaussianCls:
+def regularize_gaussian_cls(cls, method='corr'):
     '''regularize Gaussian cls for random sampling'''
 
     # debug output computations are expensive, so only do them when necessary
@@ -146,7 +144,7 @@ def regularize_gaussian_cls(cls: GaussianCls, method: str = 'corr') -> RegGaussi
     # fill the matrix up by going through the cls in order
     # if the cls list is ragged, some entries at high l may remain zero
     # only fill the lower triangular part, everything is symmetric
-    for i, j, cl in zip(*cl_indices(n), cls):
+    for i, j, cl in enumerate_cls(cls):
         if cl is not None:
             cov[:len(cl), j, i] = cl
 
@@ -209,46 +207,30 @@ def regularize_gaussian_cls(cls: GaussianCls, method: str = 'corr') -> RegGaussi
     return reg_gaussian_cls
 
 
-def transform_regularized_cls(cls: RegGaussianCls, random_fields: RandomFields) -> RegularizedCls:
+def transform_regularized_cls(cls, fields):
     '''transform regularized Gaussian Cls to regularized Cls'''
 
     # number of fields must match number of cls
-    n = len(random_fields)
+    n = len(fields)
     if len(cls) != n*(n+1)//2:
         raise TypeError(f'requires {n*(n+1)//2} cls for {n} random fields')
 
-    # get the transforms
-    transforms = list(random_fields.values())
-
     # apply the inverse transforms to the regularized Gaussian cls
     regularized_cls = []
-    for i, j, cl in zip(*cl_indices(n), cls):
+    for i, j, cl in enumerate_cls(cls):
         if cl is not None:
-            cl = (transforms[i] & transforms[j])(cl, inv=True)
+            cl = (fields[i] & fields[j])(cl, inv=True)
         regularized_cls.append(cl)
 
     # returns the list of transformed cls in input order
     return regularized_cls
 
 
-def generate_random_fields(nside: NSide, cls: RegGaussianCls, fields: RandomFields) -> RandomMaps:
-    '''generate random fields from cls'''
+def gaussian_random_fields(nside, cls):
+    '''sample Gaussian random fields from cls'''
 
     # debug output computations are expensive, so only do them when necessary
     debug = log.isEnabledFor(logging.DEBUG)
-
-    # number of fields
-    n = _num_fields_from_num_cls(len(cls))
-
-    log.debug('computing variances...')
-
-    # compute the variances of the Gaussian fields from cls
-    # these may be used by the transforms
-    var = []
-    for i, j, cl in zip(*cl_indices(n), cls):
-        l = np.arange(len(cl))
-        v = np.sum((2*l+1)/(4*np.pi)*cl)
-        var.append(v)
 
     log.debug('sampling alms...')
 
@@ -263,8 +245,9 @@ def generate_random_fields(nside: NSide, cls: RegGaussianCls, fields: RandomFiel
             _cl = hp.alm2cl(alm)
             _mean = np.sqrt(4*np.pi*_cl[0])
             _var = two_l_plus_1_over_4_pi@_cl
+            _theory_var = two_l_plus_1_over_4_pi@cls[i]
             log.debug('- mean: %g [%g]', _mean, 0.)
-            log.debug('  var: %g [%g]', _var, var[i])
+            log.debug('  var: %g [%g]', _var, _theory_var)
 
     log.debug('computing maps...')
 
@@ -275,27 +258,98 @@ def generate_random_fields(nside: NSide, cls: RegGaussianCls, fields: RandomFiel
 
     if debug:
         for i, m in enumerate(maps):
+            _theory_var = two_l_plus_1_over_4_pi@cls[i]
             log.debug('- mean: %g [%g]', np.mean(m), 0.)
-            log.debug('  var: %g [%g]', np.var(m), var[i])
+            log.debug('  var: %g [%g]', np.var(m), _theory_var)
             log.debug('  min: %g', np.min(m))
             log.debug('  max: %g', np.max(m))
-
-    log.debug('transforming fields...')
-
-    # transform the Gaussian random fields to the output fields
-    for i, field in enumerate(fields.values()):
-        log.debug('- field %d: %s', i, field)
-
-        maps[i] = field(maps[i], var=var[i])
-
-    log.debug('done')
 
     # fields have been created
     return maps
 
 
-def field_from_random_fields(name: str, fields: RandomFields, maps: RandomMaps) -> ArrayLike:
-    '''extract a field from a stack of random fields'''
+def transform_random_fields(maps, fields, cls):
+    '''apply transformations to Gaussian random fields'''
 
-    prefix = f'{name}['
-    return [m for f, m in zip(fields, maps) if f.startswith(prefix)]
+    # number of fields must match number of cls
+    n = len(fields)
+    if len(cls) != n*(n+1)//2:
+        raise TypeError(f'requires {n*(n+1)//2} cls for {n} random fields')
+
+    log.debug('computing variances...')
+
+    # compute the variances of the Gaussian fields from cls
+    # these may be used by the transforms
+    var = []
+    for i, j, cl in enumerate_cls(cls):
+        if i == j:
+            l = np.arange(len(cl))
+            v = np.sum((2*l+1)/(4*np.pi)*cl)
+            var.append(v)
+
+    log.debug('transforming fields...')
+
+    # transform the Gaussian random fields to the output fields
+    for i, field in enumerate(fields):
+        log.debug('- field %d: %s', i, field)
+
+        maps[i] = field(maps[i], var=var[i])
+
+    # maps have been changed in place, return nonetheless
+    return maps
+
+
+def generate_random_fields(nside, cls, random_fields, *, allow_missing_cls=False,
+                           regularization='corr', return_cls=False):
+    '''generate random fields from cls'''
+
+    # collect the names of all random fields
+    names = [f'{name}[{i}]' for name, _ in random_fields.items() for i in range(len(_))]
+
+    # make a flat list of random fields
+    fields = sum(random_fields.values(), [])
+
+    # collect the flat list of cls for the random fields
+    cls = collect_cls(cls, names, allow_missing=allow_missing_cls)
+
+    # compute the Gaussian cls from the intended output cls
+    gaussian_cls = transform_gaussian_cls(cls, fields, nside)
+
+    # regularize the Gaussian cls and transform the regularized cls back
+    if regularization is not False:
+        reg_gaussian_cls = regularize_gaussian_cls(gaussian_cls, method=regularization)
+        regularized_cls = transform_regularized_cls(reg_gaussian_cls, fields)
+    else:
+        reg_gaussian_cls = gaussian_cls
+        regularized_cls = cls
+
+    # compute the Gaussian random fields
+    maps = gaussian_random_fields(nside, reg_gaussian_cls)
+
+    # transform to the output fields
+    maps = transform_random_fields(maps, fields, cls)
+
+    # assign flat list of maps to fields
+    out_fields = {}
+    map_offset = 0
+    for name, _fields in random_fields.items():
+        length = len(_fields)
+        out_fields[name] = maps[map_offset:map_offset+length]
+        map_offset += length
+
+    # keep track of what this function returns
+    out = out_fields
+
+    # also store the cls used if asked to
+    if return_cls:
+        out_cls = {
+            'cls': cls_as_dict(cls, names),
+            'gaussian_cls': cls_as_dict(gaussian_cls, names),
+            'reg_gaussian_cls': cls_as_dict(reg_gaussian_cls, names),
+            'regularized_cls': cls_as_dict(regularized_cls, names),
+        }
+        out = out, out_cls
+
+    log.debug('random fields generated')
+
+    return out

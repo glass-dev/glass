@@ -16,18 +16,18 @@ import time
 from typing import NamedTuple, Callable, get_type_hints
 from inspect import signature
 
-from .typing import get_annotation, annotate, RandomFields
-from .random import (
-    collect_cls,
-    transform_gaussian_cls,
-    regularize_gaussian_cls,
-    transform_regularized_cls,
-    generate_random_fields,
-    field_from_random_fields,
-)
+from .typing import get_annotation, NSide, TheoryCls, RandomFields
+from .random import generate_random_fields
 
 
 log = logging.getLogger('glass.simulation')
+
+
+def _call_str(func, args, kwargs):
+    '''pretty print a function call'''
+    name = func.__name__
+    args = ', '.join([f'{arg!r}' for arg in args] + [f'{par}={arg!r}' for par, arg in kwargs.items()])
+    return f'{name}({args})'
 
 
 def mkworkdir(workdir, run):
@@ -52,9 +52,14 @@ class Call(NamedTuple):
     func: Callable
     args: list
     kwargs: dict
+    name: str
 
     @classmethod
-    def make(cls, state, func, *args, **kwargs):
+    def make(cls, /, state, func, *args, **kwargs):
+        # if func is not callable below, the error is hard to understand
+        if not callable(func):
+            raise TypeError('func is not callable')
+
         # inspect signature bound to given args and kwargs
         sig = signature(func)
         try:
@@ -72,20 +77,23 @@ class Call(NamedTuple):
         for par, ann in annotations.items():
             log.debug('- %s: %s', par, ann)
 
+        # the return annotation
+        returns = annotations.pop('return', None)
+
         # make sure all func parameters can be obtained
         for par in sig.parameters:
             if par in ba.arguments:
                 arg = ba.arguments[par]
                 if isinstance(arg, Ref) and arg.name not in state:
                     raise NameError(f"parameter '{par}' of function '{func.__name__}' references unknown name '{arg.name}'")
-            elif par in annotations and annotations[par].name in state:
-                ba.arguments[par] = Ref(annotations[par].name)
+            elif par in annotations and annotations[par] in state:
+                ba.arguments[par] = Ref(annotations[par])
             elif sig.parameters[par].default is not sig.parameters[par].empty:
                 pass
             else:
                 raise TypeError(f"missing argument '{par}' of function '{func.__name__}'")
 
-        return cls(func, ba.args, ba.kwargs)
+        return cls(func, ba.args, ba.kwargs, returns)
 
     def __call__(self, ns):
         args = []
@@ -101,15 +109,15 @@ class Call(NamedTuple):
         return self.func(*args, **kwargs)
 
     def __repr__(self):
-        name = self.func.__name__
-        args = ', '.join([f'{arg!r}' for arg in self.args] + [f'{par}={arg!r}' for par, arg in self.kwargs.items()])
-        return f'{name}({args})'
+        r = f'{self.name} = ' if self.name is not None else ''
+        r += _call_str(self.func, self.args, self.kwargs)
+        return r
 
 
 class Simulation:
     def __init__(self, *, workdir=None, nside=None, zbins=None, allow_missing_cls=False):
         self._workdir = workdir
-        self._random = {}
+        self._random_fields = []
         self._steps = []
 
         self.allow_missing_cls = allow_missing_cls
@@ -124,62 +132,71 @@ class Simulation:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
 
-    def _add_call(self, name, call):
+    def _add_call(self, call, position=None):
         # if result has a name, make it known to the simulation state
-        if name:
-            # warn before overwriting
-            if name in self.state:
-                log.warning('overwriting "%s" with %s', name, call)
+        if call.name:
+            if call.name in self.state:
+                # warn about overwriting
+                log.warning('WARNING: overwriting %s', call)
+            else:
+                # set state to None initially, any placeholder value would do
+                self.state[call.name] = None
 
-            # set state to None initially, any placeholder value would do
-            self.state[name] = None
+        # insert call into steps at given position
+        if position is None:
+            self._steps.append(call)
+        else:
+            self._steps.insert(position, call)
 
-        # return name and function call
-        self._steps.append((name, call))
+    def _add_random_fields(self, call):
+        # find the index of the random sampling operation in steps
+        try:
+            pos = next(i for i, s in enumerate(self._steps) if s.func == self.generate_random_fields)
+        except StopIteration:
+            pos = None
 
-    def _add_random(self, name, call):
-        # at the first random field, set up the machinery to sample:
-        # - collect the random fields
-        # - collect the cls for the random fields
-        # - transform the cls to Gaussian cls
-        # - regularize the Gaussian cls
-        # - sample the random fields from the regularized Gaussian cls
-        # - transform regularized Gaussian cls to regularized cls (optional)
-        if len(self._random) == 0:
-            self.add(self.collect_random_fields)
-            self.add(collect_cls, allow_missing=self.allow_missing_cls)
-            self.add(transform_gaussian_cls)
-            self.add(regularize_gaussian_cls)
-            self.add(transform_regularized_cls)
-            self.add(generate_random_fields)
+        # insert the step before the start of the random field generation
+        self._add_call(call, pos)
 
-        # store the added random field
-        self._random[name] = call
+        # add this name to the list of random fields
+        if call.name:
+            self._random_fields.append(call.name)
 
-        # add a call to assign the random field to the given name
-        self.add(annotate(field_from_random_fields, name=name), name)
+        # if random field generation is not in steps, add it
+        if pos is None:
+            pos = len(self._steps)
+            self.add(self.generate_random_fields)
+
+    def generate_random_fields(self, nside: NSide, cls: TheoryCls):
+        '''generate the random fields in the simulation'''
+
+        # collect the random fields, which were called before this
+        fields = {name: self.state[name] for name in self._random_fields}
+
+        # generate the random fields
+        _fields, _cls = generate_random_fields(nside, cls, fields,
+                                               allow_missing_cls=self.allow_missing_cls,
+                                               return_cls=True)
+
+        # store the outputs in the state
+        self.state.update(_fields)
+        self.state.update(_cls)
 
     def add(self, func, *args, **kwargs):
         '''add a function to the simulation'''
 
+        log.debug('adding call: %s', _call_str(func, args, kwargs))
+
         call = Call.make(self.state, func, *args, **kwargs)
 
-        # get the return information of the function:
-        # - if there is no '__annotations__' in func return an empty dict
-        # - if there is no 'return' in func.__annotations__ return None
-        # - get_annotation(None) returns an empty annotation
-        ret = get_annotation(getattr(func, '__annotations__', {}).get('return', None))
-
-        # get name of output from annotation
-        name = ret.name
-
         # random fields require extra steps
-        if ret.random:
-            self._add_random(name, call)
+        return_type = get_type_hints(func).get('return', None)
+        if return_type == RandomFields:
+            self._add_random_fields(call)
         else:
-            self._add_call(name, call)
+            self._add_call(call)
 
-        return name, call
+        return call
 
     @property
     def nside(self):
@@ -205,21 +222,6 @@ class Simulation:
             raise AttributeError('simulation does not have nbins')
         return self.state['nbins']
 
-    def collect_random_fields(self) -> RandomFields:
-        '''collect the random fields in the simulation'''
-
-        random_fields = {}
-        for field, call in self._random.items():
-            transforms = call(self.state)
-            for i, t in enumerate(transforms):
-                random_fields[f'{field}[{i}]'] = t
-
-        log.debug('collected %d random fields', len(random_fields))
-        for name, transform in random_fields.items():
-            log.debug('- %s: %s', name, transform)
-
-        return random_fields
-
     def run(self):
         '''run the simulation'''
 
@@ -233,15 +235,15 @@ class Simulation:
         if self._workdir:
             self.state['workdir'] = mkworkdir(self._workdir, self.state['__run__'])
 
-        for name, call in self._steps:
-            if name:
-                log.info('## %s = %s', name, call)
-            else:
-                log.info('## %s', call)
+        for call in self._steps:
+            log.info('## %s', call)
 
             # call the computation, resolving references in the state
+            result = call(self.state)
+
             # store the result in the state
-            self.state[name] = call(self.state)
+            if call.name:
+                self.state[call.name] = result
 
         # return the state as the result of the run
         return self.state
