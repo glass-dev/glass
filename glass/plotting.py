@@ -28,21 +28,14 @@ def plot_cls(workdir: WorkDir = None, **out_cls) -> None:
         log.info('workdir not set, skipping...')
         return
 
-    cls = out_cls.get('cls', None)
-    regularized_cls = out_cls.get('regularized_cls', None)
-    gaussian_cls = out_cls.get('gaussian_cls', None)
-    reg_gaussian_cls = out_cls.get('reg_gaussian_cls', None)
+    for name, cls in out_cls.items():
+        log.info('plotting %s...', name)
 
-    def _plot(filename, cls, name, other_cls=None, other_name=None):
         # get all individual fields for which there are cls
         fields = []
         for f in chain.from_iterable(cls.keys()):
             if f not in fields:
                 fields.append(f)
-        if other_cls is not None:
-            for f in chain.from_iterable(other_cls.keys()):
-                if f not in fields:
-                    fields.append(f)
 
         # number of distinct fields
         n = len(fields)
@@ -55,28 +48,26 @@ def plot_cls(workdir: WorkDir = None, **out_cls) -> None:
             if i > j:
                 ax[i, j].axis('off')
 
-        for _cls, _name, _c, _a in [(cls, name, 'k', 1.),
-                                    (other_cls, other_name, 'r', 0.5)]:
-            if _cls is not None:
-                log.info('plotting %s...', _name)
-                for i, j in zip(*cl_indices(n)):
-                    if (fields[i], fields[j]) in _cls:
-                        cl = _cls[fields[i], fields[j]]
-                    elif (fields[j], fields[i]) in _cls:
-                        cl = _cls[fields[j], fields[i]]
-                    else:
-                        cl = None
-                    if cl is not None:
-                        ax[i, j].loglog(+cl, ls='-', c=_c, alpha=_a)
-                        ax[i, j].loglog(-cl, ls='--', c=_c, alpha=_a)
+        for i, j in zip(*cl_indices(n)):
+            if (fields[i], fields[j]) in cls:
+                cl = cls[fields[i], fields[j]]
+            elif (fields[j], fields[i]) in cls:
+                cl = cls[fields[j], fields[i]]
+            else:
+                cl = None
+            if cl is not None:
+                ax[i, j].loglog(+cl, ls='-', c='k')
+                ax[i, j].loglog(-cl, ls='--', c='k')
 
         fig.tight_layout(pad=0.)
 
+        for i in range(n):
+            ax[0, i].set_title(fields[i], size=6)
+            ax[i, -1].yaxis.set_label_position('right')
+            ax[i, -1].set_ylabel(fields[i], size=6, rotation=270, va='bottom')
+
+        filename = f'{name}.pdf'
+
         log.info('writing %s...', filename)
+
         fig.savefig(os.path.join(workdir, filename), bbox_inches='tight')
-
-    if cls is not None or regularized_cls is not None:
-        _plot('cls.pdf', cls, 'cls', regularized_cls, 'regularized cls')
-
-    if gaussian_cls is not None or reg_gaussian_cls is not None:
-        _plot('gaussian_cls.pdf', gaussian_cls, 'Gaussian cls', reg_gaussian_cls, 'regularized Gaussian cls')
