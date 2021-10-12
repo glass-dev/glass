@@ -73,11 +73,11 @@ from glass.typing import Annotated, ArrayLike
 #   from typing import Annotated
 
 
-def my_annotated_function(my_array_size=4) -> Annotated[ArrayLike, 'name:foo']:
+def my_annotated_function(my_array_size=4) -> Annotated[ArrayLike, 'glass:foo']:
     '''this is an annotated function
 
     Same as `my_plain_function()` but knows that the default name for its
-    return value is "foo".  This is encoded as an annotation ``'name:foo'``
+    return value is "foo".  This is encoded as an annotation ``'glass:foo'``
     in the return type.
 
     Also has a default argument now, so it doesn't need configuration.
@@ -88,8 +88,8 @@ def my_annotated_function(my_array_size=4) -> Annotated[ArrayLike, 'name:foo']:
 
 
 def my_other_annotated_function(
-        my_input_parameter: Annotated[ArrayLike, 'name:foo']
-    ) -> Annotated[ArrayLike, 'name:bar']:
+        my_input_parameter: Annotated[ArrayLike, 'glass:foo']
+    ) -> Annotated[ArrayLike, 'glass:bar']:
     '''this is another annotated function
 
     Same as `my_other_plain_function()` but knows that its argument has
@@ -101,9 +101,9 @@ def my_other_annotated_function(
 
 
 # instead of always writing out these annotations, you can define aliases
-Foo = Annotated[ArrayLike, 'name:foo']
-Bar = Annotated[ArrayLike, 'name:bar']
-Baz = Annotated[None, 'name:baz']
+Foo = Annotated[ArrayLike, 'glass:foo']
+Bar = Annotated[ArrayLike, 'glass:bar']
+Baz = Annotated[None, 'glass:baz']
 
 
 def my_annotated_print_function(
