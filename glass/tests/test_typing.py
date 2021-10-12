@@ -49,6 +49,7 @@ def test_default_names():
         Cosmology,
         # cls
         TheoryCls,
+        SampleCls,
         # random fields
         RandomMatterFields,
         RandomConvergenceFields,
@@ -65,6 +66,7 @@ def test_default_names():
     assert get_annotation(Cosmology) == 'cosmology'
 
     assert get_annotation(TheoryCls) == 'theory_cls'
+    assert get_annotation(SampleCls) == 'sample_cls'
 
     assert get_annotation(RandomMatterFields) == 'matter'
     assert get_annotation(RandomConvergenceFields) == 'convergence'

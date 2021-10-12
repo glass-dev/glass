@@ -11,6 +11,7 @@ __all__ = [
     'Cosmology',
     'Cls',
     'TheoryCls',
+    'SampleCls',
     'RandomFields',
     'RandomMatterFields',
     'RandomConvergenceFields',
@@ -41,6 +42,7 @@ Cosmology = Annotated[Any, 'glass:cosmology']
 # cls
 Cls = dict[tuple[str, str], ArrayLike]
 TheoryCls = Annotated[Cls, 'glass:theory_cls']
+SampleCls = Annotated[Cls, 'glass:sample_cls']
 
 # random fields
 RandomFields = list['RandomField']
