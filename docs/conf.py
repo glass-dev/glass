@@ -37,7 +37,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-#templates_path = ['_templates']
+# templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -60,7 +60,7 @@ html_static_path = ['_static']
 # If given, this must be the name of an image file (path relative to the
 # configuration directory) that is the logo of the docs, or URL that points an
 # image file for the logo.
-#html_logo = 'glass-logo.png'
+# html_logo = 'glass-logo.png'
 
 
 # -- Options for autosummary -------------------------------------------------

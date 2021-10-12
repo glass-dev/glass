@@ -57,6 +57,7 @@ def test_default_names():
         MatterFields,
         ConvergenceFields,
         ShearFields,
+        GalaxyFields,
     )
 
     assert get_annotation(WorkDir) == 'workdir'
