@@ -57,6 +57,8 @@ def test_default_names():
         MatterFields,
         ConvergenceFields,
         ShearFields,
+        # observations
+        Visibility,
     )
 
     assert get_annotation(WorkDir) == 'workdir'
@@ -74,3 +76,5 @@ def test_default_names():
     assert get_annotation(MatterFields) == 'matter'
     assert get_annotation(ConvergenceFields) == 'convergence'
     assert get_annotation(ShearFields) == 'shear'
+
+    assert get_annotation(Visibility) == 'visibility'

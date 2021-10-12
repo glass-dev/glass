@@ -24,6 +24,7 @@ DEFAULT_MODULES = [
     'glass.lensing',
     'glass.analysis',
     'glass.plotting',
+    'glass.observations',
 ]
 
 
