@@ -18,7 +18,7 @@ from .typing import WorkDir
 log = logging.getLogger('glass.analysis')
 
 
-def write_cls(workdir: WorkDir = None, **out_cls) -> None:
+def write_cls(out_cls, workdir: WorkDir = None) -> None:
     '''write cls to file'''
 
     import fitsio

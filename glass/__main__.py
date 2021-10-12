@@ -45,7 +45,7 @@ def getboolean(config, name):
     return True if b is None else config.getboolean(name, False)
 
 
-def parse_arg(arg, *, filename='<config>', refs=False):
+def parse_arg(arg, *, filename='<config>'):
     # only try and parse strings
     if not isinstance(arg, str):
         return None
@@ -53,15 +53,17 @@ def parse_arg(arg, *, filename='<config>', refs=False):
     # nested configs
     if arg[0] == '\n':
         lines = arg[1:].split('\n')
-        nested = dict(([_.strip() for _ in _.split('=', 1)]*2)[:2] for _ in lines if _)
+        nested = {}
+        for key, val, *_ in ((*map(str.strip, line.split('=', 1)), None) for line in lines if line):
+            nested[key] = parse_arg(val or key, filename=filename)
         return nested
 
     # try to literally parse the string
     try:
         arg = literal_eval(arg)
     except ValueError:
-        if refs:
-            arg = Ref(name=arg)
+        # keep this as an unevaluated reference
+        arg = Ref(arg)
     except SyntaxError as e:
         e.filename = filename
         raise e from None
@@ -169,7 +171,7 @@ if __name__ == '__main__':
                 _func, _kwargs = namespace[func], {}
                 if label in config:
                     for par, arg in config[label].items():
-                        _kwargs[par] = parse_arg(arg or par, filename=args.config.name, refs=True)
+                        _kwargs[par] = parse_arg(arg or par, filename=args.config.name)
 
                 if name is not None:
                     _func = annotate(_func, name)

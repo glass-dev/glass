@@ -19,7 +19,7 @@ from .typing import WorkDir
 log = logging.getLogger('glass.plotting')
 
 
-def plot_cls(workdir: WorkDir = None, **out_cls) -> None:
+def plot_cls(out_cls, workdir: WorkDir = None) -> None:
     '''create triangle plots of cls'''
 
     import matplotlib.pyplot as plt

@@ -101,11 +101,15 @@ def cls_from_pyccl(fields, lmax, zbins: RedshiftBins, cosmo: Cosmology) -> Theor
     zz = np.arange(0., zbins[-1]+0.001, 0.01)
     bz = np.ones_like(zz)
 
+    # physical types, either from dict or same as fields
+    if isinstance(fields, dict):
+        physs = [phys or field for field, phys in fields.items()]
+    else:
+        physs = fields
+
     # add tracers for every field based on its physical type
     names, tracers = [], []
-    for field, phys in fields.items():
-        if phys is None:
-            phys = field
+    for field, phys in zip(fields, physs):
         for i, (za, zb) in enumerate(zip(zbins, zbins[1:])):
             nz = ((zz >= za) & (zz < zb)).astype(float)
 

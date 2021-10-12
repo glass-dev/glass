@@ -15,6 +15,7 @@ import time
 
 from typing import NamedTuple, Callable, get_type_hints
 from inspect import signature
+from collections.abc import Mapping, Sequence
 
 from .typing import get_annotation, NSide, TheoryCls, RandomFields
 from .random import generate_random_fields
@@ -43,6 +44,36 @@ def mkworkdir(workdir, run):
 
 class Ref(NamedTuple):
     name: str
+
+    @staticmethod
+    def check(obj, ns):
+        if isinstance(obj, Ref):
+            if obj.name not in ns:
+                raise NameError(f"name '{obj.name}' is not defined")
+            return True
+        elif isinstance(obj, str):
+            return True
+        elif isinstance(obj, Sequence):
+            return all(Ref.check(item, ns) for item in obj)
+        elif isinstance(obj, Mapping):
+            return all(Ref.check(value, ns) for value in obj.values())
+        else:
+            return True
+
+    @staticmethod
+    def resolve(obj, ns):
+        if isinstance(obj, Ref):
+            if obj.name not in ns:
+                raise NameError(f"name '{obj.name}' is not defined")
+            return ns[obj.name]
+        elif isinstance(obj, str):
+            return obj
+        elif isinstance(obj, Sequence):
+            return obj.__class__(Ref.resolve(item, ns) for item in obj)
+        elif isinstance(obj, Mapping):
+            return obj.__class__((key, Ref.resolve(value, ns)) for key, value in obj.items())
+        else:
+            return obj
 
     def __repr__(self):
         return self.name
@@ -84,13 +115,19 @@ class Call(NamedTuple):
         for par in sig.parameters:
             if par in ba.arguments:
                 arg = ba.arguments[par]
-                if isinstance(arg, Ref) and arg.name not in state:
-                    raise NameError(f"parameter '{par}' of function '{func.__name__}' references unknown name '{arg.name}'")
-            elif par in annotations and annotations[par] in state:
-                ba.arguments[par] = Ref(annotations[par])
-            elif sig.parameters[par].default is not sig.parameters[par].empty:
-                pass
-            else:
+                try:
+                    Ref.check(arg, state)
+                except NameError as e:
+                    raise NameError(f"parameter '{par}' of function '{func.__name__}': {e}") from None
+            elif par in annotations:
+                arg = Ref(annotations[par])
+                try:
+                    Ref.check(arg, state)
+                except NameError:
+                    pass
+                else:
+                    ba.arguments[par] = arg
+            if par not in ba.arguments and sig.parameters[par].default is sig.parameters[par].empty:
                 raise TypeError(f"missing argument '{par}' of function '{func.__name__}'")
 
         return cls(func, ba.args, ba.kwargs, returns)
@@ -99,13 +136,9 @@ class Call(NamedTuple):
         args = []
         kwargs = {}
         for arg in self.args:
-            if isinstance(arg, Ref):
-                arg = ns[arg.name]
-            args.append(arg)
+            args.append(Ref.resolve(arg, ns))
         for par, arg in self.kwargs.items():
-            if isinstance(arg, Ref):
-                arg = ns[arg.name]
-            kwargs[par] = arg
+            kwargs[par] = Ref.resolve(arg, ns)
         return self.func(*args, **kwargs)
 
     def __repr__(self):
@@ -132,15 +165,18 @@ class Simulation:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
 
+    def _add_name(self, name):
+        if name in self.state:
+            # warn about overwriting
+            log.warning('WARNING: overwriting %s', name)
+        else:
+            # set state to None initially, any placeholder value would do
+            self.state[name] = None
+
     def _add_call(self, call, position=None):
         # if result has a name, make it known to the simulation state
         if call.name:
-            if call.name in self.state:
-                # warn about overwriting
-                log.warning('WARNING: overwriting %s', call)
-            else:
-                # set state to None initially, any placeholder value would do
-                self.state[call.name] = None
+            self._add_name(call.name)
 
         # insert call into steps at given position
         if position is None:
@@ -166,6 +202,10 @@ class Simulation:
         if pos is None:
             pos = len(self._steps)
             self.add(self.generate_random_fields)
+            self._add_name('cls')
+            self._add_name('gaussian_cls')
+            self._add_name('reg_gaussian_cls')
+            self._add_name('regularized_cls')
 
     def generate_random_fields(self, nside: NSide, cls: TheoryCls):
         '''generate the random fields in the simulation'''
