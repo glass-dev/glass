@@ -148,15 +148,17 @@ if __name__ == '__main__':
 
         workdir = args.workdir
         nside = int(config['config']['nside'])
+        lmax = int(config['config']['lmax'])
         zbins = np.fromstring(config['config']['zbins'], sep=' ')
         allow_missing_cls = getboolean(config['config'], 'allow_missing_cls')
 
         log.info('workdir: %s', workdir)
         log.info('nside: %d', nside)
+        log.info('lmax: %d', lmax)
         log.info('zbins: %s', zbins)
         log.info('allow missing cls: %s', allow_missing_cls)
 
-        sim = Simulation(workdir=workdir, nside=nside, zbins=zbins, allow_missing_cls=allow_missing_cls)
+        sim = Simulation(workdir=workdir, nside=nside, lmax=lmax, zbins=zbins, allow_missing_cls=allow_missing_cls)
 
         if 'simulation' in config:
             log.info('## simulation')

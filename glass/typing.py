@@ -5,6 +5,7 @@
 __all__ = [
     'WorkDir',
     'NSide',
+    'LMax',
     'RedshiftBins',
     'NumberOfBins',
     'Cosmology',
@@ -32,6 +33,7 @@ NoneType = type(None)
 # simulation
 WorkDir = Annotated[str, 'glass:workdir']
 NSide = Annotated[int, 'glass:nside']
+LMax = Annotated[int, 'glass:lmax']
 RedshiftBins = Annotated[list[float], 'glass:zbins']
 NumberOfBins = Annotated[int, 'glass:nbins']
 Cosmology = Annotated[Any, 'glass:cosmology']

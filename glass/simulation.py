@@ -148,7 +148,7 @@ class Call(NamedTuple):
 
 
 class Simulation:
-    def __init__(self, *, workdir=None, nside=None, zbins=None, allow_missing_cls=False):
+    def __init__(self, *, workdir=None, nside=None, lmax=None, zbins=None, allow_missing_cls=False):
         self._workdir = workdir
         self._random_fields = []
         self._steps = []
@@ -161,6 +161,8 @@ class Simulation:
             self.state['workdir'] = None
         if nside is not None:
             self.state['nside'] = nside
+        if lmax is not None:
+            self.state['lmax'] = lmax
         if zbins is not None:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
