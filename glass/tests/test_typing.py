@@ -74,3 +74,5 @@ def test_default_names():
     assert get_annotation(MatterFields) == 'matter'
     assert get_annotation(ConvergenceFields) == 'convergence'
     assert get_annotation(ShearFields) == 'shear'
+
+    assert get_annotation(GalaxyFields) == 'galaxies'
