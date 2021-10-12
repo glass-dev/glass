@@ -2,7 +2,7 @@
 # license: MIT
 '''wrapper for cosmology'''
 
-__all__ = [
+__glass__ = [
     'cosmology',
 ]
 

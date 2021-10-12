@@ -3,7 +3,7 @@
 '''outputs and analysis'''
 
 
-__all__ = [
+__glass__ = [
     'write_cls',
     'cls_from_fields',
 ]

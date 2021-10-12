@@ -132,7 +132,7 @@ if __name__ == '__main__':
             except ModuleNotFoundError as e:
                 log.critical('could not import "%s" module: %s', module, e)
                 sys.exit(1)
-            mod_all = getattr(mod, '__all__', [])
+            mod_all = getattr(mod, '__glass__', [])
             for name in mod_all:
                 if name in namespace:
                     log.warning('import "%s" from module "%s" shadows import from module "%s"', name, module, namespace[name].__module__)
