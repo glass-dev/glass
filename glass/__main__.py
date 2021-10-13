@@ -63,11 +63,17 @@ def parse_arg(arg, sim, *, filename='<config>'):
     try:
         arg = literal_eval(arg)
     except ValueError:
-        # keep this as an unevaluated reference
-        arg = sim.ref(arg)
+        literal = False
     except SyntaxError as e:
         e.filename = filename
         raise e from None
+    else:
+        literal = True
+
+    # if not a literal, it must be a reference
+    if not literal:
+        arg = sim.ref(arg)
+
     return arg
 
 
