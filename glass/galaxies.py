@@ -11,13 +11,15 @@ from glass.typing import MatterFields, GalaxyFields
 
 log = logging.getLogger('glass.galaxies')
 
-__all__ = [
-    'galaxies_from_matter']
+__glass__ = [
+    'galaxies_from_matter',
+]
 
 
 def galaxies_from_matter(delta: MatterFields,
                          number_of_galaxies_arcmin2,
-                         mask_file=None) -> GalaxyFields:
+                         visibility: Visibility = None,
+                         ) -> GalaxyFields:
     r'''galaxy number density field computed from the matter density field
 
     .. math::
@@ -29,8 +31,7 @@ def galaxies_from_matter(delta: MatterFields,
     log.debug('computing galaxy tracers')
 
     # get the bin axes of the delta array, last axis is pixels
-    nbins = np.shape(delta)[0]
-    npix = np.shape(delta)[1]
+    *nbins, npix = np.shape(delta)
     nside = hp.npix2nside(npix)
 
     # broadcast the number density over the bins, add one axis for pixels
@@ -40,17 +41,6 @@ def galaxies_from_matter(delta: MatterFields,
     except ValueError:
         raise ValueError('matter fields and number densities have incompatible shape: ') from None
 
-    if mask_file is None:
-        mask = None
-    else:
-        # reads the mask from file.
-        # FIXME: this needs to go somewhere else
-        log.debug(f'Reading the given mask from {mask_file}')
-
-        assert os.path.isfile(mask_file) is True, f"[!] Mask not found in {mask_file}"
-
-        mask = hp.read_map(mask_file)
-
     pixel_area = hp.nside2pixarea(nside)
 
     # converts it to galaxies/pixel:
@@ -59,7 +49,7 @@ def galaxies_from_matter(delta: MatterFields,
     # first line creates a new array, other lines modify in place
     lamda = delta + 1
     lamda *= numb
-    if mask is not None:
-        lamda *= mask
+    if visibility is not None:
+        lamda *= visibility
 
     return np.random.poisson(lamda)
