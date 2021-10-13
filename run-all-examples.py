@@ -1,5 +1,6 @@
 import os
 import glob
+import time
 
 from glass.__main__ import main
 
@@ -16,4 +17,7 @@ for example in examples:
     name = os.path.basename(example).removesuffix('.cfg')
     print(f'running {name}...')
 
-    main(['-q', example])
+    main(['-q', '--workdir', 'examples-output', example])
+
+    # sleep one second to prevent output name clashes
+    time.sleep(1)

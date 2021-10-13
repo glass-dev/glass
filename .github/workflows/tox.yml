@@ -33,3 +33,9 @@ jobs:
     - name: Run ${{ matrix.toxenv }}
       run: |
         tox -e ${{ matrix.toxenv }}
+    - name: Upload output
+      if: ${{ matrix.toxenv == 'examples' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: examples-output
+        path: examples-output
