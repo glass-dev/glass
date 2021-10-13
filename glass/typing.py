@@ -19,7 +19,7 @@ __all__ = [
     'MatterFields',
     'ConvergenceFields',
     'ShearFields',
-    'GalaxyFields',
+    'GalaxyTracers',
     'Visibility',
     'get_annotation',
     'annotate',
@@ -58,7 +58,8 @@ ConvergenceFields = Annotated[Fields, 'glass:convergence']
 ShearFields = Annotated[Fields, 'glass:shear']
 
 # tracers
-GalaxyFields = Annotated[Fields, 'glass:galaxies']
+Tracers = ArrayLike
+GalaxyTracers = Annotated[Tracers, 'glass:galaxies']
 
 # observations
 Visibility = Annotated[ArrayLike, 'glass:visibility']

@@ -57,7 +57,8 @@ def test_default_names():
         MatterFields,
         ConvergenceFields,
         ShearFields,
-        GalaxyFields,
+        # tracers
+        GalaxyTracers,
         # observations
         Visibility,
     )
@@ -78,6 +79,6 @@ def test_default_names():
     assert get_annotation(ConvergenceFields) == 'convergence'
     assert get_annotation(ShearFields) == 'shear'
 
-    assert get_annotation(GalaxyFields) == 'galaxies'
+    assert get_annotation(GalaxyTracers) == 'galaxies'
 
     assert get_annotation(Visibility) == 'visibility'

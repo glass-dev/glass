@@ -6,7 +6,7 @@ import numpy as np
 import healpy as hp
 import logging
 
-from glass.typing import MatterFields, GalaxyFields, Visibility
+from glass.typing import MatterFields, GalaxyTracers, Visibility
 
 log = logging.getLogger('glass.galaxies')
 
@@ -18,7 +18,7 @@ __glass__ = [
 def galaxies_from_matter(number_of_galaxies_arcmin2,
                          delta: MatterFields,
                          visibility: Visibility = None,
-                         ) -> GalaxyFields:
+                         ) -> GalaxyTracers:
     r'''galaxy number density field computed from the matter density field
 
     .. math::
