@@ -64,15 +64,21 @@ def parse_arg(arg, sim, *, filename='<config>'):
     try:
         arg = literal_eval(arg)
     except ValueError:
-        # keep this as an unevaluated reference
-        arg = sim.ref(arg)
+        literal = False
     except SyntaxError as e:
         e.filename = filename
         raise e from None
+    else:
+        literal = True
+
+    # if not a literal, it must be a reference
+    if not literal:
+        arg = sim.ref(arg)
+
     return arg
 
 
-if __name__ == '__main__':
+def main(*args):
     parser = argparse.ArgumentParser(prog='glass', description='generator for large scale structure')
     parser.add_argument('config', type=argparse.FileType('r'), help='configuration file')
     parser.add_argument('--workdir', '-d', help='working directory for file output')
@@ -81,7 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('--loglevel', choices=LOG_LEVELS, default='info', help='level for file logging')
     parser.add_argument('--version', action='version', version=f'%(prog)s {version}')
 
-    args = parser.parse_args()
+    args = parser.parse_args(*args)
 
     log = logging.getLogger('glass')
 
@@ -96,6 +102,8 @@ if __name__ == '__main__':
         log_stdout.setLevel('INFO')
         log_stdout.addFilter(lambda record: record.levelno == logging.INFO)
         log.addHandler(log_stdout)
+    else:
+        log_stdout = None
     log_stderr = logging.StreamHandler(sys.stderr)
     log_stderr.setLevel('WARNING')
     log.addHandler(log_stderr)
@@ -105,6 +113,8 @@ if __name__ == '__main__':
         log_file = logging.FileHandler(args.logfile, 'w')
         log_file.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
         log.addHandler(log_file)
+    else:
+        log_file = None
 
     try:
         log.info('GLASS %s', version)
@@ -186,6 +196,15 @@ if __name__ == '__main__':
 
         sim.run()
 
+        # clean up log handlers
+        for h in log_stdout, log_stderr, log_file:
+            if h is not None:
+                log.removeHandler(h)
+
     except Exception as e:
         log.exception('uncaught exception', exc_info=e)
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

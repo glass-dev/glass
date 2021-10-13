@@ -146,7 +146,14 @@ class Simulation:
         ba.apply_defaults()
 
         # get the name of the output from the return annotation
-        name = get_annotation(sig.return_annotation)
+        # use signature only if callable itself has no return annotation
+        # this is because callable may have overwritten the annotation
+        try:
+            name = get_annotation(func.__annotations__['return'])
+        except (AttributeError, KeyError):
+            name = get_annotation(sig.return_annotation)
+
+        log.debug('returns: %s', name)
 
         # construct the function call
         return Call(func, ba.args, ba.kwargs, name)
