@@ -34,10 +34,12 @@ def galaxies_from_matter(delta: MatterFields,
     *nbins, npix = np.shape(delta)
     nside = hp.npix2nside(npix)
 
-    # broadcast the number density over the bins, add one axis for pixels
+    # add pixel axis to number densities
+    numb = np.expand_dims(number_of_galaxies_arcmin2, np.ndim(number_of_galaxies_arcmin2))
+
+    # check if the number density and delta shapes are compatible
     try:
-        # the transverse is there because it doesn't allow me to make a nbins,npix shape
-        numb = np.broadcast_to(number_of_galaxies_arcmin2, (npix, nbins)).T
+        np.broadcast(delta, numb)
     except ValueError:
         raise ValueError('matter fields and number densities have incompatible shape: ') from None
 
