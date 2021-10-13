@@ -40,7 +40,7 @@ def galaxies_from_matter(number_of_galaxies_arcmin2,
     try:
         np.broadcast(delta, numb)
     except ValueError:
-        raise ValueError('matter fields and number densities have incompatible shape: ') from None
+        raise ValueError('matter fields and number densities have incompatible shape') from None
 
     pixel_area = hp.nside2pixarea(nside)
 
