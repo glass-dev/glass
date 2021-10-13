@@ -14,6 +14,7 @@ jobs:
         - flake8
         - test
         - docs
+        - examples
     name: ${{ matrix.toxenv }}
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +24,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.x
+    - name: Install CMake
+      if: ${{ matrix.toxenv == 'examples' }}
+      uses: jwlawson/actions-setup-cmake@v1.11
     - name: Install tox
       run: |
         pip install tox
