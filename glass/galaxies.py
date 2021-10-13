@@ -2,17 +2,19 @@
 # license: MIT
 '''galaxy tracers'''
 
+__glass__ = [
+    'galaxies_from_matter',
+]
+
+
 import numpy as np
 import healpy as hp
 import logging
 
 from glass.typing import MatterFields, GalaxyTracers, Visibility
 
-log = logging.getLogger('glass.galaxies')
 
-__glass__ = [
-    'galaxies_from_matter',
-]
+log = logging.getLogger('glass.galaxies')
 
 
 def galaxies_from_matter(number_of_galaxies_arcmin2,
