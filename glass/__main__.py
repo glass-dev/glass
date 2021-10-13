@@ -25,6 +25,7 @@ DEFAULT_MODULES = [
     'glass.analysis',
     'glass.plotting',
     'glass.observations',
+    'glass.galaxies',
 ]
 
 
