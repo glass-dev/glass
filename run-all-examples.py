@@ -4,7 +4,7 @@ import glob
 from glass.__main__ import main
 
 
-examples_dir = os.path.dirname(__file__)
+examples_dir = os.path.join(os.path.dirname(__file__), 'examples')
 
 print(f'examples directory: {examples_dir}')
 
