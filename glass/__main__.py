@@ -13,7 +13,7 @@ from importlib.util import find_spec, module_from_spec, LazyLoader
 from ast import literal_eval
 
 from . import __version__ as version
-from .simulation import Simulation, Ref
+from .simulation import Simulation
 from .typing import annotate
 
 
@@ -46,7 +46,7 @@ def getboolean(config, name):
     return True if b is None else config.getboolean(name, False)
 
 
-def parse_arg(arg, *, filename='<config>'):
+def parse_arg(arg, sim, *, filename='<config>'):
     # only try and parse strings
     if not isinstance(arg, str):
         return None
@@ -56,7 +56,7 @@ def parse_arg(arg, *, filename='<config>'):
         lines = arg[1:].split('\n')
         nested = {}
         for key, val, *_ in ((*map(str.strip, line.split('=', 1)), None) for line in lines if line):
-            nested[key] = parse_arg(val or key, filename=filename)
+            nested[key] = parse_arg(val or key, sim, filename=filename)
         return nested
 
     # try to literally parse the string
@@ -64,7 +64,7 @@ def parse_arg(arg, *, filename='<config>'):
         arg = literal_eval(arg)
     except ValueError:
         # keep this as an unevaluated reference
-        arg = Ref(arg)
+        arg = sim.ref(arg)
     except SyntaxError as e:
         e.filename = filename
         raise e from None
@@ -174,7 +174,7 @@ if __name__ == '__main__':
                 _func, _kwargs = namespace[func], {}
                 if label in config:
                     for par, arg in config[label].items():
-                        _kwargs[par] = parse_arg(arg or par, filename=args.config.name)
+                        _kwargs[par] = parse_arg(arg or par, sim, filename=args.config.name)
 
                 if name is not None:
                     _func = annotate(_func, name)
