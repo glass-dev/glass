@@ -2,7 +2,7 @@
 # license: MIT
 '''optional module for plotting functions'''
 
-__all__ = [
+__glass__ = [
     'plot_cls',
 ]
 

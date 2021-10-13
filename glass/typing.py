@@ -20,6 +20,7 @@ __all__ = [
     'ConvergenceFields',
     'ShearFields',
     'GalaxyFields',
+    'Visibility',
     'get_annotation',
     'annotate',
 ]
@@ -58,6 +59,9 @@ ShearFields = Annotated[Fields, 'glass:shear']
 
 # tracers
 GalaxyFields = Annotated[Fields, 'glass:galaxies']
+
+# observations
+Visibility = Annotated[ArrayLike, 'glass:visibility']
 
 
 def get_annotation(hint):

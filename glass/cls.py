@@ -2,7 +2,7 @@
 # license: MIT
 '''module for angular power spectra'''
 
-__all__ = [
+__glass__ = [
     'cls_from_file',
     'cls_from_files',
     'cls_from_pyccl',

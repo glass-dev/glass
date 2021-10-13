@@ -3,7 +3,7 @@
 '''weak gravitational lensing'''
 
 
-__all__ = [
+__glass__ = [
     'normal_convergence',
     'lognormal_convergence',
     'convergence_from_matter',

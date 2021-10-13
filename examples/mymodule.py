@@ -2,7 +2,7 @@
 # custom-modules-with-annotations.cfg in that order
 
 # this defines what functions the config can see
-__all__ = [
+__glass__ = [
     # for custom-modules.cfg
     'my_plain_function',
     'my_other_plain_function',
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-# imports are invisible to the config, unless added to __all__
+# imports are invisible to the config, unless added to __glass__
 import numpy as np
 
 

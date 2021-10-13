@@ -2,7 +2,7 @@
 # license: MIT
 '''matter fields'''
 
-__all__ = [
+__glass__ = [
     'normal_matter',
     'lognormal_matter',
 ]

@@ -3,8 +3,6 @@
 '''module for simulation objects'''
 
 __all__ = [
-    'Ref',
-    'Call',
     'Simulation',
 ]
 
@@ -43,37 +41,24 @@ def mkworkdir(workdir, run):
 
 
 class Ref(NamedTuple):
+    state: dict
     name: str
 
     @staticmethod
-    def check(obj, ns):
+    def resolve(obj):
         if isinstance(obj, Ref):
-            if obj.name not in ns:
-                raise NameError(f"name '{obj.name}' is not defined")
-            return True
+            return obj()
         elif isinstance(obj, str):
-            return True
+            return obj
         elif isinstance(obj, Sequence):
-            return all(Ref.check(item, ns) for item in obj)
+            return obj.__class__(Ref.resolve(item) for item in obj)
         elif isinstance(obj, Mapping):
-            return all(Ref.check(value, ns) for value in obj.values())
+            return obj.__class__((key, Ref.resolve(value)) for key, value in obj.items())
         else:
-            return True
+            return obj
 
-    @staticmethod
-    def resolve(obj, ns):
-        if isinstance(obj, Ref):
-            if obj.name not in ns:
-                raise NameError(f"name '{obj.name}' is not defined")
-            return ns[obj.name]
-        elif isinstance(obj, str):
-            return obj
-        elif isinstance(obj, Sequence):
-            return obj.__class__(Ref.resolve(item, ns) for item in obj)
-        elif isinstance(obj, Mapping):
-            return obj.__class__((key, Ref.resolve(value, ns)) for key, value in obj.items())
-        else:
-            return obj
+    def __call__(self):
+        return self.state[self.name]
 
     def __repr__(self):
         return self.name
@@ -85,60 +70,13 @@ class Call(NamedTuple):
     kwargs: dict
     name: str
 
-    @classmethod
-    def make(cls, /, state, func, *args, **kwargs):
-        # if func is not callable below, the error is hard to understand
-        if not callable(func):
-            raise TypeError('func is not callable')
-
-        # inspect signature bound to given args and kwargs
-        sig = signature(func)
-        try:
-            ba = sig.bind_partial(*args, **kwargs)
-        except TypeError as e:
-            raise TypeError(f"{e} for function '{func.__name__}'") from None
-
-        # get type hints with annotations
-        hints = get_type_hints(func, include_extras=True)
-
-        # get annotations from type hints
-        annotations = {par: get_annotation(hint) for par, hint in hints.items()}
-
-        log.debug('annotations for %s: %d', func.__name__, len(annotations))
-        for par, ann in annotations.items():
-            log.debug('- %s: %s', par, ann)
-
-        # the return annotation
-        returns = annotations.pop('return', None)
-
-        # make sure all func parameters can be obtained
-        for par in sig.parameters:
-            if par in ba.arguments:
-                arg = ba.arguments[par]
-                try:
-                    Ref.check(arg, state)
-                except NameError as e:
-                    raise NameError(f"parameter '{par}' of function '{func.__name__}': {e}") from None
-            elif par in annotations:
-                arg = Ref(annotations[par])
-                try:
-                    Ref.check(arg, state)
-                except NameError:
-                    pass
-                else:
-                    ba.arguments[par] = arg
-            if par not in ba.arguments and sig.parameters[par].default is sig.parameters[par].empty:
-                raise TypeError(f"missing argument '{par}' of function '{func.__name__}'")
-
-        return cls(func, ba.args, ba.kwargs, returns)
-
-    def __call__(self, ns):
+    def __call__(self):
         args = []
         kwargs = {}
         for arg in self.args:
-            args.append(Ref.resolve(arg, ns))
+            args.append(Ref.resolve(arg))
         for par, arg in self.kwargs.items():
-            kwargs[par] = Ref.resolve(arg, ns)
+            kwargs[par] = Ref.resolve(arg)
         return self.func(*args, **kwargs)
 
     def __repr__(self):
@@ -166,6 +104,52 @@ class Simulation:
         if zbins is not None:
             self.state['zbins'] = zbins
             self.state['nbins'] = len(zbins) - 1
+
+    def _make_call(self, func, /, *args, **kwargs):
+        # if func is not callable below, the error is hard to understand
+        if not callable(func):
+            raise TypeError('func is not callable')
+
+        # inspect signature of the function
+        sig = signature(func)
+
+        log.debug('updating parameters...')
+
+        # update parameters with defaults from sim
+        params = []
+        for par in sig.parameters.values():
+            log.debug('- %s', par)
+
+            if par.annotation is not par.empty:
+                ann = get_annotation(par.annotation)
+                try:
+                    default = self.ref(ann)
+                except KeyError:
+                    pass
+                else:
+                    par = par.replace(default=default)
+
+                    log.debug('  -> %s', par)
+
+            params.append(par)
+
+        # update signature with updated parameters
+        sig = sig.replace(parameters=params)
+
+        # now bind the given args and kwargs to the signature
+        try:
+            ba = sig.bind(*args, **kwargs)
+        except TypeError as e:
+            raise TypeError(f'{func.__name__}: {e}') from None
+
+        # apply the (updated) defaults in the bound args
+        ba.apply_defaults()
+
+        # get the name of the output from the return annotation
+        name = get_annotation(sig.return_annotation)
+
+        # construct the function call
+        return Call(func, ba.args, ba.kwargs, name)
 
     def _add_name(self, name):
         if name in self.state:
@@ -229,7 +213,7 @@ class Simulation:
 
         log.debug('adding call: %s', _call_str(func, args, kwargs))
 
-        call = Call.make(self.state, func, *args, **kwargs)
+        call = self._make_call(func, *args, **kwargs)
 
         # random fields require extra steps
         return_type = get_type_hints(func).get('return', None)
@@ -239,6 +223,11 @@ class Simulation:
             self._add_call(call)
 
         return call
+
+    def ref(self, name):
+        if name not in self.state:
+            raise KeyError(f'name "{name}" is undefined')
+        return Ref(self.state, name)
 
     @property
     def nside(self):
@@ -281,7 +270,7 @@ class Simulation:
             log.info('## %s', call)
 
             # call the computation, resolving references in the state
-            result = call(self.state)
+            result = call()
 
             # store the result in the state
             if call.name:
