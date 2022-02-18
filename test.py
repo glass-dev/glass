@@ -4,7 +4,7 @@ import numpy as np
 from cosmology import LCDM
 
 from glass.cls import cls_from_pyccl
-from glass.random import lognormal_fields
+from glass.random import normal_fields, lognormal_fields
 from glass.lensing import convergence_from_matter
 from glass.analysis import write_map
 from glass.plotting import interactive_display
@@ -21,16 +21,15 @@ log_h.setFormatter(log_f)
 log.addHandler(log_h)
 
 
-cosmo = LCDM(H0=70, Om=0.3)
+cosmo = LCDM(h=0.7, Om=0.3)
 
-dx = 330.
-nbins = 10
-zbins = cosmo.dc_inv(dx*np.arange(nbins+1))
+dz = 0.1
+zbins = np.arange(0., 1.001, dz)
 
 print('zbins:', zbins)
 
 nside = 1024
-lmax = 3*nside-1
+lmax = nside
 
 generators = [
     (cls_from_pyccl(lmax, cosmo), ('zmin', 'zmax'), 'cls'),

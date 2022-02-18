@@ -7,16 +7,12 @@ import matplotlib.pyplot as plt
 from sortcl import enumerate_cls, cl_indices
 
 
-def cls_from_pyccl(fields, lmax, zbins):
+def cls_from_pyccl(fields, lmax, zbins, dz=1e-4):
     '''compute theory cls with pyccl'''
 
     import pyccl
 
     c = pyccl.Cosmology(h=0.7, Omega_c=0.3, Omega_b=0.05, sigma8=0.8, n_s=0.96)
-
-    zz = np.arange(0., zbins[-1]+0.001, 0.01)
-    bz = np.ones_like(zz)
-    ez = 1/c.h_over_h0(1/(1+zz))
 
     # physical types, either from dict or same as fields
     if isinstance(fields, dict):
@@ -28,7 +24,13 @@ def cls_from_pyccl(fields, lmax, zbins):
     names, tracers = [], []
     for field, phys in zip(fields, physs):
         for i, (za, zb) in enumerate(zip(zbins, zbins[1:])):
-            nz = ((zz >= za) & (zz < zb))*ez
+            zz = np.linspace(za, zb, int(np.ceil((zb-za)/dz) + 0.1))
+            az = 1/(1 + zz)
+            bz = np.ones_like(zz)
+            if phys == 'matter':
+                nz = c.comoving_angular_distance(az)**2/c.h_over_h0(az)
+            elif phys == 'convergence':
+                nz = 1/c.h_over_h0(az)
 
             if phys == 'matter':
                 tracer = pyccl.NumberCountsTracer(c, False, (zz, nz), (zz, bz), None)
@@ -53,7 +55,7 @@ def cls_from_pyccl(fields, lmax, zbins):
 fits = fitsio.FITS('map.fits')
 
 nbins = 10
-lmax = 1000
+lmax = 1024
 
 zbins = []
 for i in range(nbins):
