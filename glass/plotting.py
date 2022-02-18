@@ -5,6 +5,8 @@
 import logging
 import healpy as hp
 
+from ._generator import generator
+
 
 log = logging.getLogger('glass.plotting')
 
@@ -24,11 +26,12 @@ def _nice_grid(n):
     return a, b
 
 
-def interactive_display(maps=[], points=[]):
+@generator('zmin, zmax, maps, points')
+def interactive_display(map_names=[], point_names=[]):
     import matplotlib.pyplot as plt
 
-    plots = [(name, 'map') for name in maps]
-    plots += [(name, 'points') for name in points]
+    plots = [(name, 'map') for name in map_names]
+    plots += [(name, 'points') for name in point_names]
 
     n = len(plots)
     nr, nc = _nice_grid(n)

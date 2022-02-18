@@ -49,9 +49,9 @@ def simulate(zbins, generators):
     log.info('=== initialize ===')
 
     # prime all generators
-    for g, _, _ in generators:
-        name = getattr(g, '__name__', '<anonymous>')
-        log.info('--- %s ---', name)
+    for g in generators:
+        log.info('--- %s ---', g.name)
+        log.debug('signature: %s', g.signature)
         g.send(None)
 
     # this will keep the state of the simulation during iteration
@@ -67,29 +67,29 @@ def simulate(zbins, generators):
         state['zmax'] = zmax
 
         # run all generators for this redshift slice
-        for g, inputs, outputs in generators:
+        for g in generators:
 
             t = time.monotonic()
 
             name = getattr(g, '__name__', '<anonymous>')
 
             log.info('--- %s ---', name)
-            log.debug('signature: %s -> %s', inputs, outputs)
 
-            if inputs is not None:
-                inputs = _getitem_all(state, inputs)
+            if g._inputs is not None:
+                inputs = _getitem_all(state, g._inputs)
+            else:
+                inputs = None
 
             values = g.send(inputs)
 
-            if outputs is not None:
-                _setitem_all(state, outputs, values)
+            if g._outputs is not None:
+                _setitem_all(state, g._outputs, values)
 
             log.info('done in %s', timedelta(seconds=time.monotonic()-t))
 
     log.info('=== finalize ===')
 
     # close all generators
-    for g, _, _ in generators:
-        name = getattr(g, '__name__', '<anonymous>')
-        log.info('--- %s ---', name)
+    for g in generators:
+        log.info('--- %s ---', g.name)
         g.close()

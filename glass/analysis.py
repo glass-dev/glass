@@ -6,10 +6,13 @@ import logging
 from itertools import count
 import fitsio
 
+from ._generator import generator
+
 
 log = logging.getLogger('glass.analysis')
 
 
+@generator('zmin, zmax, maps')
 def write_map(filename, names, *, clobber=False):
     '''write map to FITS file'''
 
@@ -21,7 +24,7 @@ def write_map(filename, names, *, clobber=False):
 
     for i in count(1):
         try:
-            zmin, zmax, *maps = yield
+            zmin, zmax, maps = yield
         except GeneratorExit:
             break
 

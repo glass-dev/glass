@@ -2,7 +2,6 @@
 # license: MIT
 '''simulation of spherical random fields'''
 
-
 import logging
 import numpy as np
 import healpy as hp
@@ -54,8 +53,8 @@ def gaussian_random_fields(nside, rng=None):
     if rng is None:
         rng = np.random.default_rng()
 
-    # initial yield
-    m = None
+    # initial values
+    m = cl = alm = None
 
     # sample the fields from the conditional distribution
     while True:
@@ -85,7 +84,7 @@ def gaussian_random_fields(nside, rng=None):
         m = hp.alm2map(alm + mu, nside, pixwin=False, pol=False, inplace=True)
 
 
-def normal_fields(nside, rng=None):
+def normal_random_fields(nside, rng=None):
     '''sample normal random fields from Cls'''
 
     # set up the underlying Gaussian random field generator
@@ -109,7 +108,7 @@ def normal_fields(nside, rng=None):
         m = grf.send(cls)
 
 
-def lognormal_fields(nside, shift=1., rng=None):
+def lognormal_random_fields(nside, shift=1., rng=None):
     '''sample lognormal random fields from Cls'''
 
     # set up the underlying Gaussian random field generator

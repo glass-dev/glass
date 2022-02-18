@@ -1,12 +1,17 @@
+# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
+# license: MIT
 '''module for angular power spectra'''
 
 import logging
 import numpy as np
 
+from ._generator import generator
+
 
 log = logging.getLogger('glass.cls')
 
 
+@generator('zmin, zmax -> cl')
 def cls_from_pyccl(lmax, cosmo, dz=1e-4, fix_corr=False):
     '''compute theory cls with pyccl'''
 

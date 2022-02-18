@@ -4,7 +4,7 @@ import numpy as np
 from cosmology import LCDM
 
 from glass.cls import cls_from_pyccl
-from glass.random import normal_fields, lognormal_fields
+from glass.matter import lognormal_matter
 from glass.lensing import convergence_from_matter
 from glass.analysis import write_map
 from glass.plotting import interactive_display
@@ -31,12 +31,23 @@ print('zbins:', zbins)
 nside = 1024
 lmax = nside
 
-generators = [
-    (cls_from_pyccl(lmax, cosmo), ('zmin', 'zmax'), 'cls'),
-    (lognormal_fields(nside), 'cls', 'delta'),
-    (convergence_from_matter(cosmo), ('zmin', 'zmax', 'delta'), 'kappa'),
-    (interactive_display(['delta', 'kappa'], []), ('zmin', 'zmax', ('delta', 'kappa'), ()), None),
-    (write_map('map.fits', names=['delta', 'kappa'], clobber=True), ('zmin', 'zmax', 'delta', 'kappa'), None),
-]
+generators = []
+
+g = cls_from_pyccl(lmax, cosmo)
+generators.append(g)
+
+g = lognormal_matter(nside)
+generators.append(g)
+
+g = convergence_from_matter(cosmo)
+generators.append(g)
+
+g = interactive_display(['delta', 'kappa'])
+g.inputs(maps=['delta', 'kappa'], points=[])
+generators.append(g)
+
+g = write_map('map.fits', ['delta', 'kappa'], clobber=True)
+g.inputs(maps=['delta', 'kappa'])
+generators.append(g)
 
 simulate(zbins, generators)

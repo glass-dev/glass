@@ -2,10 +2,11 @@
 # license: MIT
 '''weak gravitational lensing'''
 
-
 import logging
 import numpy as np
 import healpy as hp
+
+from ._generator import generator
 
 
 log = logging.getLogger('glass.lensing')
@@ -106,6 +107,7 @@ def gamma_from_kappa(kappa):
     return gamma1, gamma2
 
 
+@generator('zmin, zmax, delta -> kappa')
 def convergence_from_matter(cosmo):
     '''compute convergence fields from projection of the matter fields'''
 
