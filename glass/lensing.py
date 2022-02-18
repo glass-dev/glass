@@ -6,7 +6,6 @@
 import logging
 import numpy as np
 import healpy as hp
-from scipy.integrate import dblquad
 
 
 log = logging.getLogger('glass.lensing')
@@ -107,67 +106,62 @@ def gamma_from_kappa(kappa):
     return gamma1, gamma2
 
 
-def convergence_from_matter(cosmo, pz=None, *, auto=True):
+def convergence_from_matter(cosmo):
     '''compute convergence fields from projection of the matter fields'''
 
     # prefactor
     f = 3*cosmo.Om/2
 
-    # uniform weighting in comoving distance if not given
-    if pz is None:
-        pz = lambda z: 1/cosmo.e(z)
-
-    # integrand for auto-convergence
-    def autow(z_, z):
-        return pz(z)*cosmo.xm(z_)*cosmo.xm(z_, z)/cosmo.xm(z)*(1 + z_)/cosmo.e(z_)
-
-    if auto:
-        log.info('computing auto-convergence')
-    else:
-        log.info('ignoring auto-convergence')
-
     # get first redshift slice
-    zmin, zmax, delta = yield
+    zmin, zmax, delta3 = yield
 
     # initial values
-    kappa = np.zeros_like(delta)
-    kappa_ = np.zeros_like(delta)
-    delta_ = 0
+    kappa2 = np.zeros_like(delta3)
+    kappa3 = np.zeros_like(delta3)
+    delta2 = 0
     z2 = z3 = 0
     r23 = 1
-
-    # auto-convergence factor, remains zero if not computed
-    a = 0
+    x3 = v3 = 1
 
     # loop redshift slices
     while True:
-        # midpoints of previous, current, and next redshift slice
+        # cycle convergence planes
+        # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
+        # but then we set: kappa3 = (1-t)*kappa1 + ...
+        # so we can set kappa3 to previous kappa2 and modify in place
+        kappa2, kappa3 = kappa3, kappa2
+
+        # redshifts of lensing planes
         z1, z2, z3 = z2, z3, cosmo.xc_inv(np.mean(cosmo.xc([zmin, zmax])))
+
+        # transverse comoving distances
+        x2, x3 = x3, cosmo.xm(z3)
 
         # distance ratio law
         r12 = r23
-        r13, r23 = cosmo.xm([z1, z2], z3)/cosmo.xm(z3)
+        r13, r23 = cosmo.xm([z1, z2], z3)/x3
         t = r13/r12
 
+        # comoving volumes of redshift slices
+        v2, v3 = v3, cosmo.vc(zmin, zmax)
+
         # compute next convergence plane in place of last
-        # subtract the auto-convergence if previously added (... - a*t)
-        kappa_ *= 1-t
-        kappa_ += t*kappa
-        kappa_ += f*((1 + z2)*cosmo.xm(z2)*r23*cosmo.xc(zmin, zmax) - a*t)*delta_
+        kappa3 *= 1-t
+        kappa3 += t*kappa2
+        kappa3 += f*(1 + z2)*r23*v2/x2*delta2
 
-        # cycle convergence planes
-        kappa_, kappa = kappa, kappa_
+        # output some statistics
+        log.info('zsrc: %f', z3)
+        log.info('κbar: %f', np.mean(kappa3))
+        log.info('κmin: %f', np.min(kappa3))
+        log.info('κmax: %f', np.max(kappa3))
+        log.info('κrms: %f', np.sqrt(np.mean(np.square(kappa3))))
 
-        # add auto-convergence of slice if requested
-        if auto:
-            a, aerr = dblquad(autow, zmin, zmax, zmin, lambda z: z)
-            kappa += a*f*delta
-
-        # keep current matter slice for next convergence
-        delta_ = delta
+        # before losing it, keep current matter slice for next round
+        delta2 = delta3
 
         # return and wait for next redshift slice, or stop
         try:
-            zmin, zmax, delta = yield kappa
+            zmin, zmax, delta3 = yield kappa3
         except GeneratorExit:
             break
