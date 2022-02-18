@@ -85,6 +85,30 @@ def gaussian_random_fields(nside, rng=None):
         m = hp.alm2map(alm + mu, nside, pixwin=False, pol=False, inplace=True)
 
 
+def normal_fields(nside, rng=None):
+    '''sample normal random fields from Cls'''
+
+    # set up the underlying Gaussian random field generator
+    grf = gaussian_random_fields(nside, rng)
+
+    # prime generator
+    m = grf.send(None)
+
+    # sample each redshift slice
+    while True:
+        # yield lognormal field and get next cls
+        try:
+            cls = yield m
+        except GeneratorExit:
+            break
+
+        # transform to Gaussian cls (applies pixel window function)
+        cls = transform_cls(cls, lambda cl: cl, nside)
+
+        # get Gaussian random field for cls
+        m = grf.send(cls)
+
+
 def lognormal_fields(nside, shift=1., rng=None):
     '''sample lognormal random fields from Cls'''
 
