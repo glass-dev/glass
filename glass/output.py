@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''analysis and output'''
+'''module for output'''
 
 import logging
 from itertools import count
@@ -9,7 +9,7 @@ import fitsio
 from ._generator import generator
 
 
-log = logging.getLogger('glass.analysis')
+log = logging.getLogger('glass.output')
 
 
 @generator('zmin, zmax, maps')

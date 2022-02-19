@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''plotting and visualisation'''
+'''module for plotting and visualisation'''
 
 import logging
 import healpy as hp
@@ -8,7 +8,7 @@ import healpy as hp
 from ._generator import generator
 
 
-log = logging.getLogger('glass.plotting')
+log = logging.getLogger('glass.plot')
 
 
 def _nice_grid(n):

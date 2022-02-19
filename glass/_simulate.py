@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''simulation control'''
+'''internal module for simulation control'''
 
 import logging
 import time
@@ -8,7 +8,7 @@ from datetime import timedelta
 from collections.abc import Sequence, Mapping
 
 
-log = logging.getLogger('glass.simulation')
+log = logging.getLogger('glass')
 
 
 def _getitem_all(d, k):

@@ -1,53 +1,42 @@
-import logging
-import numpy as np
-
 from cosmology import LCDM
 
-from glass.cls import cls_from_pyccl
-from glass.matter import lognormal_matter
-from glass.lensing import convergence_from_matter
-from glass.analysis import write_map
-from glass.plotting import interactive_display
-from glass.simulation import simulate
-
-
-log = logging.getLogger('glass')
-log.setLevel(logging.DEBUG)
-
-log_h = logging.StreamHandler()
-log_h.setLevel(logging.DEBUG)
-log_f = logging.Formatter('%(message)s')
-log_h.setFormatter(log_f)
-log.addHandler(log_h)
+import glass
+import glass.cls
+import glass.matter
+import glass.lensing
+import glass.plot
+import glass.output
 
 
 cosmo = LCDM(h=0.7, Om=0.3)
 
-dz = 0.1
-zbins = np.arange(0., 1.001, dz)
-
-print('zbins:', zbins)
-
 nside = 1024
 lmax = nside
 
-generators = []
+with glass.logger('debug') as log:
 
-g = cls_from_pyccl(lmax, cosmo)
-generators.append(g)
+    # zbins = glass.xrange(cosmo, 0., 1.001, dx=100.)
+    zbins = glass.zrange(0., 1.001, dz=0.1)
 
-g = lognormal_matter(nside)
-generators.append(g)
+    log.info('zbins: %s', zbins)
 
-g = convergence_from_matter(cosmo)
-generators.append(g)
+    gs = []
 
-g = interactive_display(['delta', 'kappa'])
-g.inputs(maps=['delta', 'kappa'], points=[])
-generators.append(g)
+    g = glass.cls.cls_from_pyccl(lmax, cosmo)
+    gs.append(g)
 
-g = write_map('map.fits', ['delta', 'kappa'], clobber=True)
-g.inputs(maps=['delta', 'kappa'])
-generators.append(g)
+    g = glass.matter.lognormal_matter(nside)
+    gs.append(g)
 
-simulate(zbins, generators)
+    g = glass.lensing.convergence_from_matter(cosmo)
+    gs.append(g)
+
+    g = glass.plot.interactive_display(['delta', 'kappa'])
+    g.inputs(maps=['delta', 'kappa'], points=[])
+    gs.append(g)
+
+    g = glass.output.write_map('map.fits', ['delta', 'kappa'], clobber=True)
+    g.inputs(maps=['delta', 'kappa'])
+    gs.append(g)
+
+    glass.simulate(zbins, gs)
