@@ -110,12 +110,16 @@ def lightcone(generators):
     n = 0
 
     # loop over shells while simulation is running
+    # for each shell, run all generators, then yield the results
+    # for each generator, collect its inputs and store its outputs
+    # stop if any of the generators stops by throwing StopIteration
     while running:
         n += 1
 
+        state['#'] = n
+
         log.info('=== shell %d ===', n)
 
-        # run all generators for this shell
         for g in generators:
 
             t = time.monotonic()
@@ -127,8 +131,6 @@ def lightcone(generators):
             else:
                 inputs = None
 
-            # send inputs to generator and get outputs
-            # if generator stops, stop
             try:
                 values = g.send(inputs)
             except StopIteration:
@@ -141,7 +143,7 @@ def lightcone(generators):
 
             log.info('>>> %s: %s <<<', g.name, timedelta(seconds=time.monotonic()-t))
 
-            yield state
+        yield state
 
     log.info('=== finalize ===')
 
