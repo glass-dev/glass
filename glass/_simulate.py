@@ -5,7 +5,10 @@
 import logging
 import time
 from datetime import timedelta
-from collections.abc import Sequence, Mapping
+from collections.abc import Sequence, Mapping, Iterator, Iterable
+import numpy as np
+
+from ._generator import generator
 
 
 log = logging.getLogger('glass')
@@ -43,7 +46,52 @@ def _setitem_all(d, k, v):
         d[k] = v
 
 
-def simulate(zbins, generators):
+@generator('-> zmin, zmax')
+def zgen(z):
+    '''generator for redshift slices'''
+    if isinstance(z, Iterable):
+        z = iter(z)
+    elif not isinstance(z, Iterator):
+        raise TypeError('must be iterable or iterator')
+    zmin, zmax = None, next(z)
+    yield
+    while True:
+        try:
+            zmin, zmax = zmax, next(z)
+        except StopIteration:
+            break
+        log.info('zmin: %f', zmin)
+        log.info('zmax: %f', zmax)
+        yield zmin, zmax
+
+
+@generator('-> zmin, zmax')
+def zspace(zmin, zmax, *, dz=None, num=None):
+    '''returns redshift slices with uniform redshift spacing'''
+    if (dz is None) == (num is None):
+        raise ValueError('exactly one of "dz" or "num" must be given')
+    if dz is not None:
+        z = np.arange(zmin, zmax, dz)
+    else:
+        z = np.linspace(zmin, zmax, num+1)
+    return zgen(z)
+
+
+@generator('-> zmin, zmax')
+def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
+    '''returns redshift slices with uniform comoving distance spacing'''
+    if (dx is None) == (num is None):
+        raise ValueError('exactly one of "dx" or "num" must be given')
+    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
+    if dx is not None:
+        x = np.arange(xmin, xmax, dx)
+    else:
+        x = np.linspace(xmin, xmax, num+1)
+    z = cosmo.dc_inv(x)
+    return zgen(z)
+
+
+def lightcone(generators):
     '''simulate a light cone'''
 
     log.info('=== initialize ===')
@@ -57,16 +105,17 @@ def simulate(zbins, generators):
     # this will keep the state of the simulation during iteration
     state = {}
 
-    # loop over redshift bins
-    for zmin, zmax in zip(zbins, zbins[1:]):
+    # simulation status
+    running = True
+    n = 0
 
-        log.info('=== %f to %f ===', zmin, zmax)
+    # loop over shells while simulation is running
+    while running:
+        n += 1
 
-        # redshift bounds for this slice
-        state['zmin'] = zmin
-        state['zmax'] = zmax
+        log.info('=== shell %d ===', n)
 
-        # run all generators for this redshift slice
+        # run all generators for this shell
         for g in generators:
 
             t = time.monotonic()
@@ -78,12 +127,21 @@ def simulate(zbins, generators):
             else:
                 inputs = None
 
-            values = g.send(inputs)
+            # send inputs to generator and get outputs
+            # if generator stops, stop
+            try:
+                values = g.send(inputs)
+            except StopIteration:
+                log.info('>>> generator has stopped the simulation <<<')
+                running = False
+                break
 
             if g._outputs is not None:
                 _setitem_all(state, g._outputs, values)
 
-            log.info('done in %s', timedelta(seconds=time.monotonic()-t))
+            log.info('>>> %s: %s <<<', g.name, timedelta(seconds=time.monotonic()-t))
+
+            yield state
 
     log.info('=== finalize ===')
 
