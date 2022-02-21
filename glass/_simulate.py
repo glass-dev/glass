@@ -14,6 +14,51 @@ from ._generator import generator
 log = logging.getLogger('glass')
 
 
+@generator('-> zmin, zmax')
+def zgen(z):
+    '''generator for contiguous redshift slices from a redshift array'''
+    if isinstance(z, Iterable):
+        z = iter(z)
+    elif not isinstance(z, Iterator):
+        raise TypeError('must be iterable or iterator')
+    zmin, zmax = None, next(z)
+    yield
+    while True:
+        try:
+            zmin, zmax = zmax, next(z)
+        except StopIteration:
+            break
+        log.info('zmin: %f', zmin)
+        log.info('zmax: %f', zmax)
+        yield zmin, zmax
+
+
+@generator('-> zmin, zmax')
+def zspace(zmin, zmax, *, dz=None, num=None):
+    '''generator for redshift slices with uniform redshift spacing'''
+    if (dz is None) == (num is None):
+        raise ValueError('exactly one of "dz" or "num" must be given')
+    if dz is not None:
+        z = np.arange(zmin, zmax, dz)
+    else:
+        z = np.linspace(zmin, zmax, num+1)
+    return zgen(z)
+
+
+@generator('-> zmin, zmax')
+def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
+    '''genrator for redshift slices with uniform comoving distance spacing'''
+    if (dx is None) == (num is None):
+        raise ValueError('exactly one of "dx" or "num" must be given')
+    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
+    if dx is not None:
+        x = np.arange(xmin, xmax, dx)
+    else:
+        x = np.linspace(xmin, xmax, num+1)
+    z = cosmo.dc_inv(x)
+    return zgen(z)
+
+
 def _getitem_all(d, k):
     '''recursive dictionary getter'''
     if isinstance(k, str):
@@ -44,51 +89,6 @@ def _setitem_all(d, k, v):
             _setitem_all(d, k[i], v[i])
     else:
         d[k] = v
-
-
-@generator('-> zmin, zmax')
-def zgen(z):
-    '''generator for redshift slices'''
-    if isinstance(z, Iterable):
-        z = iter(z)
-    elif not isinstance(z, Iterator):
-        raise TypeError('must be iterable or iterator')
-    zmin, zmax = None, next(z)
-    yield
-    while True:
-        try:
-            zmin, zmax = zmax, next(z)
-        except StopIteration:
-            break
-        log.info('zmin: %f', zmin)
-        log.info('zmax: %f', zmax)
-        yield zmin, zmax
-
-
-@generator('-> zmin, zmax')
-def zspace(zmin, zmax, *, dz=None, num=None):
-    '''returns redshift slices with uniform redshift spacing'''
-    if (dz is None) == (num is None):
-        raise ValueError('exactly one of "dz" or "num" must be given')
-    if dz is not None:
-        z = np.arange(zmin, zmax, dz)
-    else:
-        z = np.linspace(zmin, zmax, num+1)
-    return zgen(z)
-
-
-@generator('-> zmin, zmax')
-def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
-    '''returns redshift slices with uniform comoving distance spacing'''
-    if (dx is None) == (num is None):
-        raise ValueError('exactly one of "dx" or "num" must be given')
-    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
-    if dx is not None:
-        x = np.arange(xmin, xmax, dx)
-    else:
-        x = np.linspace(xmin, xmax, num+1)
-    z = cosmo.dc_inv(x)
-    return zgen(z)
 
 
 def lightcone(generators):

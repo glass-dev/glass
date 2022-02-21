@@ -1,13 +1,11 @@
 from cosmology import LCDM
 
-import glass
-import glass.cls
-import glass.matter
-import glass.lensing
-
 import healpy as hp
 import fitsio
 import matplotlib.pyplot as plt
+
+import glass
+import glass.cls
 
 
 cosmo = LCDM(h=0.7, Om=0.3)
@@ -15,20 +13,13 @@ cosmo = LCDM(h=0.7, Om=0.3)
 nside = 1024
 lmax = nside
 
-generators = []
-
-# g = glass.xspace(cosmo, 0., 1.001, dx=100.)
-g = glass.zspace(0., 1.001, dz=0.1)
-generators.append(g)
-
-g = glass.cls.cls_from_pyccl(lmax, cosmo)
-generators.append(g)
-
-g = glass.matter.lognormal_matter(nside)
-generators.append(g)
-
-g = glass.lensing.convergence_from_matter(cosmo)
-generators.append(g)
+generators = [
+    # glass.xspace(cosmo, 0., 1.001, dx=100.),
+    glass.zspace(0., 1.001, dz=0.1),
+    glass.cls.cls_from_pyccl(lmax, cosmo),
+    glass.matter.lognormal_matter(nside),
+    glass.lensing.convergence_from_matter(cosmo),
+]
 
 # print the simulation
 for g in generators:
