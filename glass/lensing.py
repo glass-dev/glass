@@ -12,8 +12,9 @@ from ._generator import generator
 log = logging.getLogger('glass.lensing')
 
 
-def gamma_from_kappa(kappa):
-    r'''weak lensing shear field from convergence
+@generator('kappa -> gamma1, gamma2')
+def shear(lmax=None):
+    r'''weak lensing shear from convergence
 
     Notes
     -----
@@ -61,55 +62,47 @@ def gamma_from_kappa(kappa):
 
         2 \gamma_{lm} = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \phi_{lm} \;.
 
-    The shear modes can therefore be obtained from the convergence.
+    The shear modes can therefore be obtained via the convergence, or
+    directly from the deflection potential.
 
     '''
 
-    log.debug('compute shear maps from convergence maps')
+    # set to None for the initial iteration
+    gamma1, gamma2 = None, None
 
-    *nmap, npix = np.shape(kappa)
-    nside = hp.npix2nside(npix)
+    while True:
+        # return the shear field and wait for the next convergence field
+        # break the loop when asked to exit the generator
+        try:
+            kappa = yield gamma1, gamma2
+        except GeneratorExit:
+            break
 
-    log.debug('nside from kappa: %d', nside)
+        alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
-    log.debug('computing kappa alms from kappa maps')
+        # initialise everything on the first iteration
+        if gamma1 is None:
+            nside = hp.get_nside(kappa)
+            lmax = hp.Alm.getlmax(len(alm))
 
-    alm = hp.map2alm(kappa, pol=False, use_pixel_weights=True)
+            log.debug('nside from kappa: %d', nside)
+            log.debug('lmax from alms: %s', lmax)
 
-    *_, nalm = np.shape(alm)
+            blm = np.zeros_like(alm)
 
-    log.debug('number of alms: %s', nalm)
+            l = np.arange(lmax+1)
+            fl = np.sqrt((l+2)*(l+1)*l*(l-1))
+            fl /= np.clip(l*(l+1), 1, None)
+            fl *= -1
 
-    lmax = hp.Alm.getlmax(nalm)
-
-    log.debug('lmax from alms: %s', lmax)
-
-    log.debug('turning kappa alms into gamma alms')
-
-    l = np.arange(lmax+1)
-    fl = np.sqrt((l+2)*(l+1)*l*(l-1))
-    fl /= np.clip(l*(l+1), 1, None)
-    fl *= -1
-    for i in np.ndindex(*nmap):
-        hp.almxfl(alm[i], fl, inplace=True)
-
-    log.debug('transforming gamma alms to gamma maps')
-
-    blm = None
-    gamma1, gamma2 = np.empty((2, *nmap, npix))
-    for i in np.ndindex(*nmap):
-        if blm is None:
-            blm = np.zeros_like(alm[i])
-        g1, g2 = hp.alm2map_spin([alm[i], blm], nside, 2, lmax)
-        gamma1[i] = g1
-        gamma2[i] = g2
-
-    return gamma1, gamma2
+        # convert convergence to shear modes
+        hp.almxfl(alm, fl, inplace=True)
+        gamma1, gamma2 = hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
 @generator('zmin, zmax, delta -> kappa')
-def convergence_from_matter(cosmo):
-    '''compute convergence fields from projection of the matter fields'''
+def multiplane_convergence(cosmo):
+    '''convergence from multiple discrete lensing planes'''
 
     # prefactor
     f = 3*cosmo.Om/2
