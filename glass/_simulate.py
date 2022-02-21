@@ -71,9 +71,7 @@ def simulate(zbins, generators):
 
             t = time.monotonic()
 
-            name = getattr(g, '__name__', '<anonymous>')
-
-            log.info('--- %s ---', name)
+            log.info('--- %s ---', g.name)
 
             if g._inputs is not None:
                 inputs = _getitem_all(state, g._inputs)

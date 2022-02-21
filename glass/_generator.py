@@ -53,10 +53,11 @@ def _update_signature(io, names):
 
 class Generator:
     '''wrapper for low-level Python generators'''
-    def __init__(self, generator, signature=None):
+    def __init__(self, generator, name=None, signature=None):
         '''wrap a low-level generator with optional signature'''
 
         self._generator = generator
+        self._name = name
         self._inputs = None
         self._outputs = None
 
@@ -75,7 +76,7 @@ class Generator:
     @property
     def name(self):
         '''name of the generator'''
-        return getattr(self._generator, '__name__', '<anonymous>')
+        return self._name or '<anonymous>'
 
     @property
     def signature(self):
@@ -96,6 +97,7 @@ def generator(signature):
     def decorator(g):
         @wraps(g)
         def wrapper(*args, **kwargs):
-            return Generator(g(*args, **kwargs), signature)
+            name = getattr(g, '__name__', None)
+            return Generator(g(*args, **kwargs), name, signature)
         return wrapper
     return decorator
