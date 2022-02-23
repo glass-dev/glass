@@ -92,12 +92,16 @@ class Generator:
         self._outputs = _update_signature(self._outputs, names)
 
 
-def generator(signature):
+def generator(signature, *, self=False):
     '''decorator to wrap a low-level generator'''
-    def decorator(g):
-        @wraps(g)
+    def decorator(gf):
+        @wraps(gf)
         def wrapper(*args, **kwargs):
-            name = getattr(g, '__name__', None)
-            return Generator(g(*args, **kwargs), name, signature)
+            name = getattr(gf, '__name__', None)
+            g = object.__new__(Generator)
+            if self:
+                args = [g, *args]
+            g.__init__(gf(*args, **kwargs), name, signature)
+            return g
         return wrapper
     return decorator

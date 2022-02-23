@@ -99,8 +99,9 @@ def lightcone(generators):
     # prime all generators
     for g in generators:
         log.info('--- %s ---', g.name)
-        log.debug('signature: %s', g.signature)
+        log.debug('initial signature: %s', g.signature)
         g.send(None)
+        log.debug('final signature: %s', g.signature)
 
     # this will keep the state of the simulation during iteration
     state = {}
@@ -108,6 +109,7 @@ def lightcone(generators):
     # simulation status
     running = True
     n = 0
+    t0 = time.monotonic()
 
     # loop over shells while simulation is running
     # for each shell, run all generators, then yield the results
@@ -151,3 +153,5 @@ def lightcone(generators):
     for g in generators:
         log.info('--- %s ---', g.name)
         g.close()
+
+    log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
