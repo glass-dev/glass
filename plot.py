@@ -4,67 +4,24 @@ import fitsio
 
 import matplotlib.pyplot as plt
 
-from sortcl import enumerate_cls, cl_indices
+from sortcl import enumerate_cls
 
+import camb
 
-def cls_from_pyccl(fields, lmax, zbins, dz=1e-4):
-    '''compute theory cls with pyccl'''
-
-    import pyccl
-
-    c = pyccl.Cosmology(h=0.7, Omega_c=0.3, Omega_b=0.05, sigma8=0.8, n_s=0.96)
-
-    # physical types, either from dict or same as fields
-    if isinstance(fields, dict):
-        physs = [phys or field for field, phys in fields.items()]
-    else:
-        physs = fields
-
-    # add tracers for every field based on its physical type
-    names, tracers = [], []
-    for field, phys in zip(fields, physs):
-        for i, (za, zb) in enumerate(zip(zbins, zbins[1:])):
-            zz = np.linspace(za, zb, int(np.ceil((zb-za)/dz) + 0.1))
-            az = 1/(1 + zz)
-            bz = np.ones_like(zz)
-            if phys == 'matter':
-                nz = c.comoving_angular_distance(az)**2/c.h_over_h0(az)
-            elif phys == 'convergence':
-                nz = 1/c.h_over_h0(az)
-
-            if phys == 'matter':
-                tracer = pyccl.NumberCountsTracer(c, False, (zz, nz), (zz, bz), None)
-            elif phys == 'convergence':
-                tracer = pyccl.WeakLensingTracer(c, (zz, nz), True, None, False)
-            else:
-                raise ValueError(f'cls_from_pyccl: unknown type "{phys}" for field "{field}"')
-
-            names.append(f'{field}[{i}]')
-            tracers.append(tracer)
-
-    n = len(tracers)
-    l = np.arange(lmax+1)
-
-    cls = {}
-    for i, j in zip(*cl_indices(n)):
-        cls[names[i], names[j]] = pyccl.angular_cl(c, tracers[i], tracers[j], l)
-
-    return cls
-
-
-fits = fitsio.FITS('map.fits')
 
 nbins = 10
 lmax = 1024
 
+l = np.arange(lmax+1)
+
+################################################################################
+
+fits = fitsio.FITS('map.fits')
+
 zbins = []
 for i in range(nbins):
     h = fits[f'MAP{i+1}'].read_header()
-    if len(zbins) == 0:
-        zbins.append(h['ZMIN'])
-    else:
-        assert zbins[-1] == h['ZMIN']
-    zbins.append(h['ZMAX'])
+    zbins.append((h['ZMIN'], h['ZMAX']))
 
 delta = [fits[f'MAP{i+1}'].read(columns=['delta'])['delta'] for i in range(nbins)]
 kappa = [fits[f'MAP{i+1}'].read(columns=['kappa'])['kappa'] for i in range(nbins)]
@@ -72,9 +29,36 @@ kappa = [fits[f'MAP{i+1}'].read(columns=['kappa'])['kappa'] for i in range(nbins
 delta_cls = hp.anafast(delta, lmax=lmax, pol=False, use_pixel_weights=True)
 kappa_cls = hp.anafast(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
-theory_cls = cls_from_pyccl({'delta': 'matter', 'kappa': 'convergence'}, lmax, zbins)
+################################################################################
 
-l = np.arange(lmax+1)
+pars = camb.set_params(H0=70, omch2=0.3*(0.7)**2)
+
+pars.Want_CMB = False
+pars.Want_Cls = True
+pars.SourceTerms.counts_density = True
+pars.SourceTerms.counts_evolve = True
+pars.SourceTerms.counts_redshift = False
+pars.SourceTerms.counts_lensing = False
+pars.SourceTerms.counts_velocity = False
+pars.SourceTerms.counts_radial = False
+pars.SourceTerms.counts_timedelay = False
+pars.SourceTerms.counts_ISW = False
+pars.SourceTerms.counts_potential = False
+
+results = camb.get_background(pars, no_thermo=True)
+
+windows = []
+for i, (zmin, zmax) in enumerate(zbins):
+    z = np.linspace(zmin, zmax, 100)
+    w = ((1 + z)*results.angular_diameter_distance(z))**2/results.h_of_z(z)
+    w /= np.trapz(w, z)
+    windows.append(camb.sources.SplinedSourceWindow(source_type='counts', z=z, W=w))
+    windows.append(camb.sources.SplinedSourceWindow(source_type='lensing', z=z, W=w))
+
+pars.SourceWindows = windows
+
+results = camb.get_results(pars)
+camb_cls = results.get_source_cls_dict(lmax=lmax, raw_cl=True)
 
 ################################################################################
 
@@ -88,7 +72,7 @@ for i in range(nbins+1):
 
 for i, j, cl in enumerate_cls(delta_cls):
     ax[i, j+1].plot(l, (2*l+1)*cl)
-    ax[i, j+1].plot(l, (2*l+1)*theory_cls[f'delta[{i}]', f'delta[{j}]'])
+    ax[i, j+1].plot(l, (2*l+1)*camb_cls[f'W{2*i+1}xW{2*j+1}'])
     ax[i, j+1].set_xscale('symlog', linthresh=10, linscale=0.5)
     ax[i, j+1].set_yscale('symlog', linthresh=1e-4, linscale=0.5)
     ax[i, j+1].set_xlim(0, lmax)
@@ -96,7 +80,7 @@ for i, j, cl in enumerate_cls(delta_cls):
 
 for i, j, cl in enumerate_cls(kappa_cls):
     ax[j+1, i].plot(l, (2*l+1)*cl)
-    ax[j+1, i].plot(l, (2*l+1)*theory_cls[f'kappa[{i}]', f'kappa[{j}]'])
+    ax[j+1, i].plot(l, (2*l+1)*camb_cls[f'W{2*i+2}xW{2*j+2}'])
     ax[j+1, i].set_xscale('symlog', linthresh=10, linscale=0.5)
     ax[j+1, i].set_yscale('symlog', linthresh=1e-7, linscale=0.5)
     ax[j+1, i].set_xlim(0, lmax)

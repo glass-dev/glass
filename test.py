@@ -5,7 +5,9 @@ import fitsio
 import matplotlib.pyplot as plt
 
 import glass
-import glass.cls
+
+import glass.ext.camb
+import camb
 
 
 cosmo = LCDM(h=0.7, Om=0.3)
@@ -13,10 +15,15 @@ cosmo = LCDM(h=0.7, Om=0.3)
 nside = 1024
 lmax = nside
 
+
+# set up CAMB for matter cls
+pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
+
+
 generators = [
     # glass.xspace(cosmo, 0., 1.001, dx=100.),
     glass.zspace(0., 1.001, dz=0.1),
-    glass.cls.cls_from_pyccl(lmax, cosmo),
+    glass.ext.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside),
     glass.lensing.multiplane_convergence(cosmo),
     glass.lensing.shear(lmax),
@@ -26,7 +33,7 @@ generators = [
 for g in generators:
     print(g)
 
-fits = fitsio.FITS('maps.fits', 'rw', clobber=True)
+fits = fitsio.FITS('map.fits', 'rw', clobber=True)
 
 plt.ion()
 plt.figure()
