@@ -189,3 +189,61 @@ def convergence(cosmo, weight='midpoint'):
 
         # before losing it, keep current matter slice for next round
         delta12 = delta23
+
+
+@generator('zmin, zmax, kappa -> kappa_bar')
+def mean_convergence(z, nz, cosmo):
+    '''generate mean convergence of a source distribution'''
+
+    # check inputs
+    if np.ndim(z) != 1 or np.ndim(nz) != 1:
+        raise TypeError('both z and nz must be one-dimensional')
+
+    # initial value
+    zmax_ = kappa_ = 0
+
+    # initial yield
+    kappa_bar = None
+
+    # wait for next convergence plane and return mean, or stop on exit
+    while True:
+        try:
+            zmin, zmax, kappa = yield kappa_bar
+        except GeneratorExit:
+            break
+
+        # only works with contiguous intervals
+        if zmin != zmax_:
+            raise ValueError('redshift intervals must be contiguous')
+
+        # initialise on first iteration
+        if kappa_bar is None:
+            kappa_bar = np.empty_like(kappa)
+
+        # fix zero redshift to be slightly higher, to not divide by zero
+        if zmin == 0:
+            zmin = 1e-10
+
+        # the n(z) grid might not coincide with the redshift intervals
+        # 1) interpolate to get n(zmin), n(zmax)
+        # 2) get those n(z) which are strictly in the bin
+        # 3) put together z, nz values for this redshift interval
+        # 4) normalise
+        nzmin, nzmax = np.interp([zmin, zmax], z, nz)
+        interior = np.greater(z, zmin) & np.less(z, zmax)
+        z_ = np.concatenate([[zmin], z[interior], [zmax]])
+        nz_ = np.concatenate([[nzmin], nz[interior], [nzmax]])
+        nz_ /= np.trapz(nz_, z_)
+
+        # integrated interpolation factor
+        t = np.trapz(cosmo.xm(zmin, z_)/cosmo.xm(z_)*nz_, z_)
+        t /= cosmo.xm(zmin, zmax)/cosmo.xm(zmax)
+
+        # interpolate convergence planes
+        kappa_bar[:] = kappa
+        kappa_bar *= t
+        kappa_bar += (1 - t)*kappa_
+
+        # keep for next iteration
+        zmax_ = zmax
+        kappa_ = kappa
