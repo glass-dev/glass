@@ -62,7 +62,10 @@ def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
 def _getitem_all(d, k):
     '''recursive dictionary getter'''
     if isinstance(k, str):
-        return d[k]
+        if k.endswith('?'):
+            return d.get(k[:-1], None)
+        else:
+            return d[k]
     elif isinstance(k, Sequence):
         return type(k)(_getitem_all(d, i) for i in k)
     elif isinstance(k, Mapping):
