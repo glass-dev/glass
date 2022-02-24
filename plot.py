@@ -53,7 +53,7 @@ for i, (zmin, zmax) in enumerate(zbins):
     w = ((1 + z)*results.angular_diameter_distance(z))**2/results.h_of_z(z)
     w /= np.trapz(w, z)
     windows.append(camb.sources.SplinedSourceWindow(source_type='counts', z=z, W=w))
-    windows.append(camb.sources.SplinedSourceWindow(source_type='lensing', z=z, W=w))
+    windows.append(camb.sources.GaussianSourceWindow(source_type='lensing', redshift=zmax, sigma=0.01))
 
 pars.SourceWindows = windows
 

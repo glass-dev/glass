@@ -25,7 +25,7 @@ generators = [
     glass.zspace(0., 1.001, dz=0.1),
     glass.ext.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside),
-    glass.lensing.multiplane_convergence(cosmo),
+    glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
 ]
 

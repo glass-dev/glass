@@ -101,62 +101,91 @@ def shear(lmax=None):
 
 
 @generator('zmin, zmax, delta -> kappa')
-def multiplane_convergence(cosmo):
-    '''convergence from multiple discrete lensing planes'''
+def convergence(cosmo, weight='midpoint'):
+    '''convergence from integrated matter shells'''
 
     # prefactor
     f = 3*cosmo.Om/2
 
-    # get first redshift slice
-    zmin, zmax, delta3 = yield
+    # these are the different ways in which the matter can be weighted
+    if weight == 'midpoint':
 
-    # initial values
-    kappa2 = np.zeros_like(delta3)
-    kappa3 = np.zeros_like(delta3)
-    delta2 = 0
-    z2 = z3 = 0
-    r23 = 1
-    x3 = v3 = 1
+        log.info('will use midpoint lensing weights')
 
-    # loop redshift slices
+        # consider the lensing weight constant, and integrate the matter
+        def w(zi, zj, zk):
+            z = cosmo.xc_inv(np.mean(cosmo.xc([zi, zj])))
+            x = cosmo.xm(z) if z != 0 else 1.
+            return cosmo.xm(z, zk)/cosmo.xm(zk)*(1 + z)*cosmo.vc(zi, zj)/x
+
+    elif weight == 'integrated':
+
+        log.info('will use integrated lensing weights')
+
+        # consider the matter constant, and integrate the lensing weight
+        def w(zi, zj, zk):
+            z = np.linspace(zi, zj, 100)
+            f = cosmo.xm(z)
+            f *= cosmo.xm(z, zk)/cosmo.xm(zk)
+            f *= (1 + z)/cosmo.e(z)
+            return np.trapz(f, z)
+
+    else:
+        raise ValueError(f'invalid value for weight: {weight}')
+
+    # initial yield
+    kappa3 = None
+
+    # return convergence and get new matter shell, or stop on exit
     while True:
+        try:
+            zmin, zmax, delta23 = yield kappa3
+        except GeneratorExit:
+            break
+
+        # set up variables on first iteration
+        if kappa3 is None:
+            kappa2 = np.zeros_like(delta23)
+            kappa3 = np.zeros_like(delta23)
+            delta12 = 0
+            z2 = z3 = zmin
+            r23 = 1
+            w33 = 0
+
+        # deal with non-contiguous redshift intervals
+        if z3 != zmin:
+            raise NotImplementedError('shells must be contiguous')
+
         # cycle convergence planes
         # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
         # but then we set: kappa3 = (1-t)*kappa1 + ...
         # so we can set kappa3 to previous kappa2 and modify in place
         kappa2, kappa3 = kappa3, kappa2
 
-        # redshifts of lensing planes
-        z1, z2, z3 = z2, z3, cosmo.xc_inv(np.mean(cosmo.xc([zmin, zmax])))
+        # redshifts of source planes
+        z1, z2, z3 = z2, z3, zmax
 
-        # transverse comoving distances
-        x2, x3 = x3, cosmo.xm(z3)
-
-        # distance ratio law
+        # extrapolation law
         r12 = r23
-        r13, r23 = cosmo.xm([z1, z2], z3)/x3
-        t = r13/r12
+        r13, r23 = cosmo.xm([z1, z2], z3)/cosmo.xm(z3)
+        t123 = r13/r12
 
-        # comoving volumes of redshift slices
-        v2, v3 = v3, cosmo.vc(zmin, zmax)
+        # weights for the lensing recurrence
+        w22 = w33
+        w23 = w(z1, z2, z3)
+        w33 = w(z2, z3, z3)
 
         # compute next convergence plane in place of last
-        kappa3 *= 1-t
-        kappa3 += t*kappa2
-        kappa3 += f*(1 + z2)*r23*v2/x2*delta2
+        kappa3 *= 1 - t123
+        kappa3 += t123*kappa2
+        kappa3 += f*(w23 - t123*w22)*delta12
+        kappa3 += f*w33*delta23
 
         # output some statistics
-        log.info('zsrc: %f', z3)
         log.info('κbar: %f', np.mean(kappa3))
         log.info('κmin: %f', np.min(kappa3))
         log.info('κmax: %f', np.max(kappa3))
         log.info('κrms: %f', np.sqrt(np.mean(np.square(kappa3))))
 
         # before losing it, keep current matter slice for next round
-        delta2 = delta3
-
-        # return and wait for next redshift slice, or stop
-        try:
-            zmin, zmax, delta3 = yield kappa3
-        except GeneratorExit:
-            break
+        delta12 = delta23
