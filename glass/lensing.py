@@ -7,6 +7,7 @@ import numpy as np
 import healpy as hp
 
 from ._generator import generator
+from ._utils import restrict_interval
 
 
 log = logging.getLogger('glass.lensing')
@@ -224,15 +225,8 @@ def mean_convergence(z, nz, cosmo):
         if zmin == 0:
             zmin = 1e-10
 
-        # the n(z) grid might not coincide with the redshift intervals
-        # 1) interpolate to get n(zmin), n(zmax)
-        # 2) get those n(z) which are strictly in the bin
-        # 3) put together z, nz values for this redshift interval
-        # 4) normalise
-        nzmin, nzmax = np.interp([zmin, zmax], z, nz)
-        interior = np.greater(z, zmin) & np.less(z, zmax)
-        z_ = np.concatenate([[zmin], z[interior], [zmax]])
-        nz_ = np.concatenate([[nzmin], nz[interior], [nzmax]])
+        # get the normalised restriction of n(z) to the redshift interval
+        nz_, z_ = restrict_interval(nz, z, zmin, zmax)
         nz_ /= np.trapz(nz_, z_)
 
         # integrated interpolation factor
