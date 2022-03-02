@@ -5,6 +5,7 @@
 __version__ = '2022.2.18'
 
 # import submodules
+from . import galaxies  # noqa: F401
 from . import lensing  # noqa: F401
 from . import matter  # noqa: F401
 

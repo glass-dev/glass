@@ -5,6 +5,12 @@
 import numpy as np
 
 
+# constants
+DEGREE2_SPHERE = 60**4//100/np.pi
+ARCMIN2_SPHERE = 60**6//100/np.pi
+ARCSEC2_SPHERE = 60**8//100/np.pi
+
+
 def restrict_interval(f, x, xmin, xmax):
     '''restrict a function to an interval using interpolation'''
 
@@ -30,3 +36,14 @@ def restrict_interval(f, x, xmin, xmax):
     x_ = np.concatenate([[xmin], np.extract(interior, x), [xmax]])
 
     return f_, x_
+
+
+def cumtrapz(f, x, out=None):
+    '''cumulative trapezoidal rule along last axis'''
+
+    if out is None:
+        out = np.empty_like(f)
+
+    np.cumsum((f[..., 1:] + f[..., :-1])/2*np.diff(x), axis=-1, out=out[..., 1:])
+    out[..., 0] = 0
+    return out
