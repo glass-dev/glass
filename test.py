@@ -39,7 +39,7 @@ generators = [
     glass.matter.lognormal_matter(nside),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
-    glass.galaxies.galdist_fullsky(z, dndz, bz),
+    glass.galaxies.gal_dist_fullsky(z, dndz, bz),
 ]
 
 # print the simulation

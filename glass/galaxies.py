@@ -13,8 +13,8 @@ from ._utils import ARCMIN2_SPHERE, restrict_interval, cumtrapz
 log = logging.getLogger(__name__)
 
 
-@generator('zmin, zmax, delta, visibility? -> gal_z, gal_pop, gal_lon, gal_lat')
-def galdist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
+@generator('zmin, zmax, delta, visibility? -> ngal, gal_z, gal_pop, gal_lon, gal_lat')
+def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
     '''sample galaxy distributions from density, bias, and visibility
 
     The galaxies are sampled by rejection sampling over the full sky.  This is
@@ -102,12 +102,12 @@ def galdist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
     nsam = 0
 
     # initial yield
-    red = pop = lon = lat = None
+    ngal = red = pop = lon = lat = None
 
     # wait for next redshift slice and return positions, or stop on exit
     while True:
         try:
-            zmin, zmax, delta, vis = yield red, pop, lon, lat
+            zmin, zmax, delta, vis = yield ngal, red, pop, lon, lat
         except GeneratorExit:
             break
 
