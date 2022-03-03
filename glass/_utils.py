@@ -47,3 +47,68 @@ def cumtrapz(f, x, out=None):
     np.cumsum((f[..., 1:] + f[..., :-1])/2*np.diff(x), axis=-1, out=out[..., 1:])
     out[..., 0] = 0
     return out
+
+
+def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
+    r'''axis ratio of a randomly projected triaxial ellipsoid
+
+    Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
+    ellipsoid, computes the axis ratio `q` of the projection.
+
+    Parameters
+    ----------
+    zeta : array_like
+        Axis ratio of intermediate and major axis.
+    xi : array_like
+        Axis ratio of minor and major axis.
+    size : tuple of int or None
+        Size of the random draw. If `None` is given, size is inferred from
+        other inputs.
+    rng : ~numpy.random.Generator, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Returns
+    -------
+    q : array_like
+        Axis ratio of the randomly projected ellipsoid.
+
+    Notes
+    -----
+    See equations (11) and (12) in [1]_ for details.
+
+    References
+    ----------
+    .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
+
+    '''
+
+    # default RNG if not provided
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # get size from inputs if not explicitly provided
+    if size is None:
+        size = np.broadcast(zeta, xi).shape
+
+    # draw random viewing angle (theta, phi)
+    cos2_theta = rng.uniform(low=-1., high=1., size=size)
+    cos2_theta *= cos2_theta
+    sin2_theta = 1 - cos2_theta
+    cos2_phi = np.cos(rng.uniform(low=0., high=2*np.pi, size=size))
+    cos2_phi *= cos2_phi
+    sin2_phi = 1 - cos2_phi
+
+    # transform arrays to quantities that are used in eq. (11)
+    z2m1 = np.square(zeta)
+    z2m1 -= 1
+    x2 = np.square(xi)
+
+    # eq. (11) multiplied by xi^2 zeta^2
+    A = (1 + z2m1*sin2_phi)*cos2_theta + x2*sin2_theta
+    B2 = 4*z2m1**2*cos2_theta*sin2_phi*cos2_phi
+    C = 1 + z2m1*cos2_phi
+
+    # eq. (12)
+    q = np.sqrt((A+C-np.sqrt((A-C)**2+B2))/(A+C+np.sqrt((A-C)**2+B2)))
+
+    return q

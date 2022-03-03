@@ -40,6 +40,7 @@ generators = [
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
     glass.galaxies.gal_dist_fullsky(z, dndz, bz),
+    glass.galaxies.gal_ellip_ryden04(-2.2, 1.4, 0.57, 0.21),
 ]
 
 # print the simulation
@@ -63,6 +64,7 @@ with glass.logger('debug') as log:
         gamma2 = shell['gamma2']
         gal_pop = shell['gal_pop']
         gal_z = shell['gal_z']
+        gal_eps = np.hypot(shell['gal_e1'], shell['gal_e2'])
 
         assert np.all((zmin <= gal_z) & (gal_z <= zmax))
 
@@ -72,28 +74,44 @@ with glass.logger('debug') as log:
             {'name': 'ZMIN', 'value': zmin, 'comment': 'lower redshift bound'},
             {'name': 'ZMAX', 'value': zmax, 'comment': 'upper redshift bound'},
         ]
-        fits.write_table([delta, kappa], names=['delta', 'kappa'], extname=extname, header=header)
+        # fits.write_table([delta, kappa], names=['delta', 'kappa'], extname=extname, header=header)
 
-        # plot maps
-        plt.suptitle(f'z = {zmin:.3f} ... {zmax:.3f}')
-        plt.subplot(2, 3, 1)
-        hp.mollview(delta, title=r'overdensity $\delta$', hold=True)
-        plt.subplot(2, 3, 2)
-        hp.mollview(kappa, title=r'convergence $\kappa$', hold=True)
-        plt.subplot(2, 3, 3)
-        hp.mollview(gamma1, title=r'shear component $\gamma_1$', hold=True)
-        plt.subplot(2, 3, 4)
-        hp.mollview(gamma2, title=r'shear component $\gamma_2$', hold=True)
+        plt.figure(figsize=(12, 8))
 
         z_ = np.linspace(zmin, zmax, 100)
 
-        # plot galaxies
+        # plot galaxy redshifts
+        plt.subplot(2, 2, 2)
+        plt.cla()
+        plt.title('galaxy redshifts')
         for k in range(2):
             dndz_k = np.interp(z_, z, dndz[k])
-            plt.subplot(2, 3, 5+k)
-            plt.cla()
-            plt.hist(gal_z[gal_pop == k], bins=z_, density=True, histtype='stepfilled', alpha=0.3)
-            plt.plot(z_, dndz_k/np.trapz(dndz_k, z_), ':')
+            h, _ = np.histogram(gal_z[gal_pop == k], bins=z_)
+            zm_ = (z_[:-1]+z_[1:])/2
+            plt.plot(zm_, h, '-k')
+            plt.plot(zm_, ARCMIN2_SPHERE*(dndz_k[:-1]+dndz_k[1:])/2*np.diff(z_), ':r')
+        plt.xlabel(r'$z$')
+
+        # plot galaxy ellipticities
+        plt.subplot(2, 2, 4)
+        plt.cla()
+        plt.title('galaxy ellipticity')
+        plt.hist(gal_eps, bins=50, range=[0, 1], histtype='step')
+        plt.xlabel(r'$\epsilon$')
+
+        # fix layout for plots with axes
+        plt.tight_layout()
+
+        # plot maps
+        plt.suptitle(f'z = {zmin:.3f} ... {zmax:.3f}')
+        plt.subplot(2, 4, 1)
+        hp.mollview(delta, title=r'overdensity $\delta$', hold=True)
+        plt.subplot(2, 4, 2)
+        hp.mollview(kappa, title=r'convergence $\kappa$', hold=True)
+        plt.subplot(2, 4, 5)
+        hp.mollview(gamma1, title=r'shear component $\gamma_1$', hold=True)
+        plt.subplot(2, 4, 6)
+        hp.mollview(gamma2, title=r'shear component $\gamma_2$', hold=True)
 
         # update plot window
         plt.pause(1e-3)

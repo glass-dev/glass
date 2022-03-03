@@ -7,7 +7,7 @@ import numpy as np
 import healpy as hp
 
 from ._generator import generator
-from ._utils import ARCMIN2_SPHERE, restrict_interval, cumtrapz
+from ._utils import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio
 
 
 log = logging.getLogger(__name__)
@@ -221,3 +221,150 @@ def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
         nsam += ngal
 
     log.info('total number of galaxies sampled: %s', f'{nsam:,d}')
+
+
+def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
+    r'''ellipticity distribution following Ryden (2004)
+
+    The ellipticities are sampled by randomly projecting a 3D ellipsoid with
+    principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -
+    B/A)` is normal with mean :math:`\mu` and standard deviation :math:`\sigma`.
+    The distribution of :math:`1 - C/B` is normal with mean :math:`\gamma` and
+    standard deviation :math:`\sigma_\gamma` [2]_.  Both distributions are
+    truncated to produce ratios in the range 0 to 1 using rejection sampling.
+
+    Parameters
+    ----------
+    mu : array_like
+        Mean of the truncated normal for :math:`\log(1 - B/A)`.
+    sigma : array_like
+        Standard deviation for :math:`\log(1 - B/A)`.
+    gamma : array_like
+        Mean of the truncated normal for :math:`1 - C/B`.
+    sigma_gamma : array_like
+        Standard deviation for :math:`1 - C/B`.
+    size : int or tuple of ints or None
+        Sample size.  If ``None``, the size is inferred from the parameters.
+    rng : ~numpy.random.Generator, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Returns
+    -------
+    eps : array_like
+        Ellipticities from projected axis ratios.
+
+    Notes
+    -----
+    If :math:`q = b/a` is the axis ratio of an elliptical isophote with
+    semi-major axis :math:`a` and semi-minor axis :math:`b`, the ellipticity
+    sampled by this function is :math:`\epsilon = (1 - q)/(1 + q)`.
+
+    References
+    ----------
+    .. [1] Ryden B. S., 2004, ApJ, 601, 214.
+    .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
+
+    '''
+
+    # default RNG if not provided
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
+    # first sample unbounded normal, then rejection sample truncation
+    eps = rng.normal(mu, sigma, size=size)
+    bad = (eps > 0)
+    while np.any(bad):
+        eps[bad] = rng.normal(mu, sigma, size=eps[bad].shape)
+        bad = (eps > 0)
+    gam = rng.normal(gamma, sigma_gamma, size=size)
+    bad = (gam < 0) | (gam > 1)
+    while np.any(bad):
+        gam[bad] = rng.normal(gamma, sigma_gamma, size=gam[bad].shape)
+        bad = (gam < 0) | (gam > 1)
+
+    # compute triaxial axis ratios zeta = B/A, xi = C/A
+    zeta = -np.expm1(eps)
+    xi = (1 - gam)*zeta
+
+    # random projection of random triaxial ellipsoid
+    q = triaxial_axis_ratio(zeta, xi, rng=rng)
+
+    # return the ellipticity
+    return (1-q)/(1+q)
+
+
+@generator('ngal -> gal_e1, gal_e2')
+def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
+    r'''generator for galaxy ellipticities following Ryden (2004)
+
+    The ellipticities are sampled by randomly projecting a 3D ellipsoid with
+    principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -
+    B/A)` is truncated normal with mean :math:`\mu` and standard deviation
+    :math:`\sigma`.  The distribution of :math:`1 - C/B` is truncated normal
+    with mean :math:`\gamma` and standard deviation :math:`\sigma_\gamma` [2]_.
+
+    Parameters
+    ----------
+    mu : array_like
+        Mean of the truncated normal for :math:`\log(1 - B/A)`.
+    sigma : array_like
+        Standard deviation for :math:`\log(1 - B/A)`.
+    gamma : array_like
+        Mean of the truncated normal for :math:`1 - C/B`.
+    sigma_gamma : array_like
+        Standard deviation for :math:`1 - C/B`.
+    size : int or tuple of ints or None
+        Sample size.  If ``None``, the size is inferred from the parameters.
+    rng : ~numpy.random.Generator, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Receives
+    --------
+    ngal : int
+        Number of galaxies for which ellipticities are sampled.
+
+    Yields
+    ------
+    gal_e1, gal_e2 : (ngal,) array_like
+        Components of the galaxy ellipticity.
+
+    Notes
+    -----
+    If :math:`q = b/a` is the axis ratio of an elliptical isophote with
+    semi-major axis :math:`a` and semi-minor axis :math:`b`, the ellipticity
+    sampled by this function is :math:`\epsilon = (1 - q)/(1 + q)`.
+
+    References
+    ----------
+    .. [1] Ryden B. S., 2004, ApJ, 601, 214
+    .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
+
+    '''
+
+    # default RNG if not provided
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # initial yield
+    e1 = e2 = None
+
+    # wait for inputs and return ellipticities, or stop on exit
+    while True:
+        try:
+            ngal = yield e1, e2
+        except GeneratorExit:
+            break
+
+        # sample axis ratios according to model
+        # transform to epsilon ellipticity
+        # compute random e1, e2 components
+        e = ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=ngal, rng=rng)
+        t = rng.uniform(0, 2*np.pi, size=np.shape(e))
+        e1 = e*np.cos(t)
+        e2 = e*np.sin(t)
+
+        log.info('per-component std. dev.: %.3f, %.3f', np.std(e1), np.std(e2))
+
+        # mark variables for disposal
+        e = t = None
