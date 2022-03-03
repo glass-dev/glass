@@ -127,7 +127,7 @@ def shear(lmax=None):
         gamma1, gamma2 = hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
-@generator('zmin, zmax, delta -> kappa')
+@generator('zmin, zmax, delta -> zsrc, kappa')
 def convergence(cosmo, weight='midpoint'):
     '''convergence from integrated matter shells'''
 
@@ -161,12 +161,12 @@ def convergence(cosmo, weight='midpoint'):
         raise ValueError(f'invalid value for weight: {weight}')
 
     # initial yield
-    kappa3 = None
+    z3 = kappa3 = None
 
     # return convergence and get new matter shell, or stop on exit
     while True:
         try:
-            zmin, zmax, delta23 = yield kappa3
+            zmin, zmax, delta23 = yield z3, kappa3
         except GeneratorExit:
             break
 
@@ -209,6 +209,7 @@ def convergence(cosmo, weight='midpoint'):
         kappa3 += f*w33*delta23
 
         # output some statistics
+        log.info('zsrc: %f', z3)
         log.info('κbar: %f', np.mean(kappa3))
         log.info('κmin: %f', np.min(kappa3))
         log.info('κmax: %f', np.max(kappa3))
