@@ -1,6 +1,22 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for matter fields'''
+'''
+===================================
+Matter fields (:mod:`glass.matter`)
+===================================
+
+.. currentmodule:: glass.matter
+
+
+Matter distributions
+====================
+
+.. autosummary::
+   :toctree: generated/
+
+   lognormal_matter
+
+'''
 
 from ._generator import generator
 from .random import lognormal_random_fields

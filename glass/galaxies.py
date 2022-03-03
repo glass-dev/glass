@@ -1,6 +1,35 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for galaxies'''
+'''
+================================
+Galaxies (:mod:`glass.galaxies`)
+================================
+
+.. currentmodule:: glass.galaxies
+
+
+Distributions
+=============
+
+.. autosummary::
+   :toctree: generated/
+
+   gal_dist_fullsky
+
+
+Morphology
+==========
+
+Ellipticity
+-----------
+
+.. autosummary::
+   :toctree: generated/
+
+   ellipticity_ryden04
+   gal_ellip_ryden04
+
+'''
 
 import logging
 import numpy as np
@@ -245,7 +274,7 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
         Standard deviation for :math:`1 - C/B`.
     size : int or tuple of ints or None
         Sample size.  If ``None``, the size is inferred from the parameters.
-    rng : ~numpy.random.Generator, optional
+    rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
     Returns
@@ -300,9 +329,10 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
 
     The ellipticities are sampled by randomly projecting a 3D ellipsoid with
     principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -
-    B/A)` is truncated normal with mean :math:`\mu` and standard deviation
-    :math:`\sigma`.  The distribution of :math:`1 - C/B` is truncated normal
-    with mean :math:`\gamma` and standard deviation :math:`\sigma_\gamma` [2]_.
+    B/A)` is normal with mean :math:`\mu` and standard deviation :math:`\sigma`.
+    The distribution of :math:`1 - C/B` is normal with mean :math:`\gamma` and
+    standard deviation :math:`\sigma_\gamma` [2]_.  Both distributions are
+    truncated to produce ratios in the range 0 to 1 using rejection sampling.
 
     Parameters
     ----------
@@ -316,7 +346,7 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
         Standard deviation for :math:`1 - C/B`.
     size : int or tuple of ints or None
         Sample size.  If ``None``, the size is inferred from the parameters.
-    rng : ~numpy.random.Generator, optional
+    rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
     Receives

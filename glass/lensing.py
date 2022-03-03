@@ -1,6 +1,32 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''weak gravitational lensing'''
+'''
+=====================================
+Lensing fields (:mod:`glass.lensing`)
+=====================================
+
+.. currentmodule:: glass.lensing
+
+
+Convergence
+===========
+
+.. autosummary::
+   :toctree: generated/
+
+   convergence
+   mean_convergence
+
+
+Shear
+=====
+
+.. autosummary::
+   :toctree: generated/
+
+   shear
+
+'''
 
 import logging
 import numpy as np

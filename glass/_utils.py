@@ -64,7 +64,7 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     size : tuple of int or None
         Size of the random draw. If `None` is given, size is inferred from
         other inputs.
-    rng : ~numpy.random.Generator, optional
+    rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
     Returns

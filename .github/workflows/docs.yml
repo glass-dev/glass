@@ -1,0 +1,22 @@
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-python@v2
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 0
+    - run: |
+        python3 -m pip install --upgrade pip
+    - run: |
+        python3 -m pip install .[docs]
+    - run: |
+        cd docs && make html
+    - uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html
