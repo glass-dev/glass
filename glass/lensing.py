@@ -7,11 +7,14 @@ Lensing fields (:mod:`glass.lensing`)
 
 .. currentmodule:: glass.lensing
 
+Generators
+==========
 
 Convergence
-===========
+-----------
 
 .. autosummary::
+   :template: generator.rst
    :toctree: generated/
 
    convergence
@@ -19,9 +22,10 @@ Convergence
 
 
 Shear
-=====
+-----
 
 .. autosummary::
+   :template: generator.rst
    :toctree: generated/
 
    shear

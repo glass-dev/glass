@@ -7,11 +7,14 @@ Matter fields (:mod:`glass.matter`)
 
 .. currentmodule:: glass.matter
 
+Generators
+==========
 
-Matter distributions
-====================
+Random fields
+-------------
 
 .. autosummary::
+   :template: generator.rst
    :toctree: generated/
 
    lognormal_matter

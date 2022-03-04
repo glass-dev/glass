@@ -7,18 +7,32 @@ Galaxies (:mod:`glass.galaxies`)
 
 .. currentmodule:: glass.galaxies
 
+Generators
+==========
 
-Distributions
-=============
+Distribution
+------------
 
 .. autosummary::
+   :template: generator.rst
    :toctree: generated/
 
    gal_dist_fullsky
 
 
-Morphology
-==========
+Ellipticity
+-----------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+
+   gal_ellip_ryden04
+   gal_shear_interp
+
+
+Other
+=====
 
 Ellipticity
 -----------
@@ -27,7 +41,6 @@ Ellipticity
    :toctree: generated/
 
    ellipticity_ryden04
-   gal_ellip_ryden04
 
 '''
 
