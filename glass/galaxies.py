@@ -336,7 +336,7 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     return (1-q)/(1+q)
 
 
-@generator('ngal -> gal_e1, gal_e2')
+@generator('ngal -> gal_ell')
 def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     r'''generator for galaxy ellipticities following Ryden (2004)
 
@@ -369,14 +369,19 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
 
     Yields
     ------
-    gal_e1, gal_e2 : (ngal,) array_like
-        Components of the galaxy ellipticity.
+    gal_ell : (ngal,) array_like
+        Array of complex-valued galaxy ellipticity.
 
     Notes
     -----
     If :math:`q = b/a` is the axis ratio of an elliptical isophote with
-    semi-major axis :math:`a` and semi-minor axis :math:`b`, the ellipticity
-    sampled by this function is :math:`\epsilon = (1 - q)/(1 + q)`.
+    semi-major axis :math:`a` and semi-minor axis :math:`b`, and :math:`\phi` is
+    the orientation of the elliptical isophote, the output of this function is
+    the complex-valued :math:`\epsilon`-ellipticity
+
+    .. math::
+
+        \epsilon = \frac{1 - q}{1 + q} \, \mathrm{e}^{\mathrm{i} \, 2\phi} \;.
 
     References
     ----------
@@ -390,24 +395,18 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
         rng = np.random.default_rng()
 
     # initial yield
-    e1 = e2 = None
+    e = None
 
     # wait for inputs and return ellipticities, or stop on exit
     while True:
         try:
-            ngal = yield e1, e2
+            ngal = yield e
         except GeneratorExit:
             break
 
-        # sample axis ratios according to model
-        # transform to epsilon ellipticity
-        # compute random e1, e2 components
-        e = ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=ngal, rng=rng)
-        t = rng.uniform(0, 2*np.pi, size=np.shape(e))
-        e1 = e*np.cos(t)
-        e2 = e*np.sin(t)
+        # compute random complex phase
+        # sample magnitude according to model
+        e = np.exp(1j*rng.uniform(0, 2*np.pi, size=ngal))
+        e *= ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=ngal, rng=rng)
 
-        log.info('per-component std. dev.: %.3f, %.3f', np.std(e1), np.std(e2))
-
-        # mark variables for disposal
-        e = t = None
+        log.info('per-component std. dev.: %.3f, %.3f', np.std(e.real), np.std(e.imag))

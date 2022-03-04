@@ -64,7 +64,7 @@ with glass.logger('debug') as log:
         gamma2 = shell['gamma2']
         gal_pop = shell['gal_pop']
         gal_z = shell['gal_z']
-        gal_eps = np.hypot(shell['gal_e1'], shell['gal_e2'])
+        gal_eps = np.abs(shell['gal_ell'])
 
         assert np.all((zmin <= gal_z) & (gal_z <= zmax))
 
