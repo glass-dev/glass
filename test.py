@@ -41,6 +41,7 @@ generators = [
     glass.lensing.shear(lmax),
     glass.galaxies.gal_dist_fullsky(z, dndz, bz),
     glass.galaxies.gal_ellip_ryden04(-2.2, 1.4, 0.57, 0.21),
+    glass.galaxies.gal_shear_interp(cosmo),
 ]
 
 # print the simulation
@@ -64,7 +65,7 @@ with glass.logger('debug') as log:
         gamma2 = shell['gamma2']
         gal_pop = shell['gal_pop']
         gal_z = shell['gal_z']
-        gal_eps = np.abs(shell['gal_ell'])
+        gal_g = np.abs(shell['gal_she'])
 
         assert np.all((zmin <= gal_z) & (gal_z <= zmax))
 
@@ -95,9 +96,9 @@ with glass.logger('debug') as log:
         # plot galaxy ellipticities
         plt.subplot(2, 2, 4)
         plt.cla()
-        plt.title('galaxy ellipticity')
-        plt.hist(gal_eps, bins=50, range=[0, 1], histtype='step')
-        plt.xlabel(r'$\epsilon$')
+        plt.title('galaxy shear')
+        plt.hist(gal_g, bins=50, range=[0, 1], histtype='step')
+        plt.xlabel(r'$g$')
 
         # fix layout for plots with axes
         plt.tight_layout()
