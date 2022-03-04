@@ -30,7 +30,7 @@ def restrict_interval(f, x, xmin, xmax):
     # then interpolate on the boundary for each extra function axis
     np.compress(interior, f, axis=-1, out=f_[..., 1:-1])
     for i in np.ndindex(*a):
-        f_[i, [0, -1]] = np.interp([xmin, xmax], x, f[i])
+        f_[i][[0, -1]] = np.interp([xmin, xmax], x, f[i])
 
     # get the x values of the restriction
     x_ = np.concatenate([[xmin], np.extract(interior, x), [xmax]])
