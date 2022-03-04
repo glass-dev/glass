@@ -11,5 +11,5 @@ from . import matter  # noqa: F401
 
 # import from internal modules
 from ._generator import generator  # noqa: F401
-from ._simulate import zspace, xspace, lightcone  # noqa: F401
+from ._simulate import zgen, zspace, xspace, lightcone  # noqa: F401
 from ._user import logger  # noqa: F401
