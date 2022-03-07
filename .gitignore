@@ -2,5 +2,5 @@
 .DS_Store
 __pycache__
 docs/_build
-docs/generated
+docs/reference/generated
 docs/examples

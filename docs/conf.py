@@ -47,7 +47,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_book_theme'
+html_theme = 'pydata_sphinx_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -59,13 +59,14 @@ html_logo = '_static/glass.png'
 html_favicon = '_static/glass.ico'
 
 html_theme_options = {
-    'repository_url': 'https://github.com/astro-ph/glass',
-    'repository_branch': 'main',
-    'path_to_docs': 'docs/',
-    'use_download_button': False,
-    'use_fullscreen_button': False,
-    'use_repository_button': True,
-    'use_issues_button': True,
+    'icon_links': [
+        {
+            'name': 'GitHub',
+            'url': 'https://github.com/astro-ph/glass',
+            'icon': 'fab fa-github-square',
+            'type': 'fontawesome',
+        },
+    ],
 }
 
 

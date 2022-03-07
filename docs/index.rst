@@ -2,28 +2,22 @@
 **GLASS**: Generator for Large Scale Structure
 **********************************************
 
-==================
-User documentation
-==================
+.. image:: _static/glass.png
+   :width: 50%
+   :align: center
+   :class: no-scaled-link
+
+
+=============
+Documentation
+=============
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
+   user/index
    examples/index
-   definitions
-
-
-=========
-Reference
-=========
-
-.. toctree::
-   :maxdepth: 1
-
-   matter
-   lensing
-   galaxies
-   observations
+   reference/index
 
 
 ==================
