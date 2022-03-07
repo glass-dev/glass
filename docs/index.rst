@@ -3,6 +3,15 @@
 **********************************************
 
 
+User documentation
+==================
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/index
+
+
 Reference
 =========
 

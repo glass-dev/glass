@@ -30,6 +30,7 @@ author = 'Nicolas Tessore'
 extensions = [
     'numpydoc',
     'sphinx.ext.intersphinx',
+    'sphinx_gallery.gen_gallery',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -75,4 +76,15 @@ html_theme_options = {
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
+}
+
+
+# -- Sphinx Gallery ----------------------------------------------------------
+
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples',
+    'gallery_dirs': 'examples',
+    'reference_url': {
+        'glass': None,
+    },
 }
