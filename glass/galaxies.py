@@ -293,13 +293,12 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     Returns
     -------
     eps : array_like
-        Ellipticities from projected axis ratios.
+        Array of :term:`ellipticity (modulus)` from projected axis ratios.
 
-    Notes
-    -----
-    If :math:`q = b/a` is the axis ratio of an elliptical isophote with
-    semi-major axis :math:`a` and semi-minor axis :math:`b`, the ellipticity
-    sampled by this function is :math:`\epsilon = (1 - q)/(1 + q)`.
+    See also
+    --------
+    gal_ellip_ryden04:
+        Generator for galaxy ellipticities using this distribution.
 
     References
     ----------
@@ -370,18 +369,12 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     Yields
     ------
     gal_ell : (ngal,) array_like
-        Array of complex-valued galaxy ellipticity.
+        Array of galaxy :term:`ellipticity (complex)`.
 
-    Notes
-    -----
-    If :math:`q = b/a` is the axis ratio of an elliptical isophote with
-    semi-major axis :math:`a` and semi-minor axis :math:`b`, and :math:`\phi` is
-    the orientation of the elliptical isophote, the output of this function is
-    the complex-valued :math:`\epsilon`-ellipticity
-
-    .. math::
-
-        \epsilon = \frac{1 - q}{1 + q} \, \mathrm{e}^{\mathrm{i} \, 2\phi} \;.
+    See also
+    --------
+    ellipticity_ryden04:
+        Sample the ellipticity modulus distribution.
 
     References
     ----------

@@ -2,7 +2,7 @@
 **GLASS**: Generator for Large Scale Structure
 **********************************************
 
-
+==================
 User documentation
 ==================
 
@@ -10,8 +10,10 @@ User documentation
    :maxdepth: 1
 
    examples/index
+   glossary
 
 
+=========
 Reference
 =========
 
@@ -23,6 +25,7 @@ Reference
    galaxies
 
 
+==================
 Indices and tables
 ==================
 
