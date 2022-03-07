@@ -10,7 +10,7 @@ User documentation
    :maxdepth: 1
 
    examples/index
-   glossary
+   definitions
 
 
 =========
@@ -23,6 +23,7 @@ Reference
    matter
    lensing
    galaxies
+   observations
 
 
 ==================

@@ -32,6 +32,11 @@ bz = 0.8
 # set up CAMB for matter cls
 pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
 
+# make a random visibility map with low NSIDE
+# also compute its fsky for the extected galaxy count
+v = (np.tanh(hp.synfast(np.exp(-np.arange(lmax+1)), 128)) + 1)/2
+fsky = np.mean(v)
+
 generators = [
     # glass.xspace(cosmo, 0., 1.001, dx=100.),
     glass.zspace(0., 1.001, dz=0.1),
@@ -39,6 +44,7 @@ generators = [
     glass.matter.lognormal_matter(nside),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
+    glass.observations.vis_constant(v, nside),
     glass.galaxies.gal_dist_fullsky(z, dndz, bz),
     glass.galaxies.gal_ellip_ryden04(-2.2, 1.4, 0.57, 0.21),
     glass.galaxies.gal_shear_interp(cosmo),
@@ -66,6 +72,8 @@ with glass.logger('debug') as log:
         gal_pop = shell['gal_pop']
         gal_z = shell['gal_z']
         gal_g = np.abs(shell['gal_she'])
+        gal_lon, gal_lat = shell['gal_lon'], shell['gal_lat']
+        vis = shell['visibility']
 
         assert np.all((zmin <= gal_z) & (gal_z <= zmax))
 
@@ -90,7 +98,7 @@ with glass.logger('debug') as log:
             h, _ = np.histogram(gal_z[gal_pop == k], bins=z_)
             zm_ = (z_[:-1]+z_[1:])/2
             plt.plot(zm_, h, '-k')
-            plt.plot(zm_, ARCMIN2_SPHERE*(dndz_k[:-1]+dndz_k[1:])/2*np.diff(z_), ':r')
+            plt.plot(zm_, ARCMIN2_SPHERE*fsky*(dndz_k[:-1]+dndz_k[1:])/2*np.diff(z_), ':r')
         plt.xlabel(r'$z$')
 
         # plot galaxy ellipticities
@@ -105,14 +113,24 @@ with glass.logger('debug') as log:
 
         # plot maps
         plt.suptitle(f'z = {zmin:.3f} ... {zmax:.3f}')
-        plt.subplot(2, 4, 1)
+        plt.subplot(3, 4, 1)
         hp.mollview(delta, title=r'overdensity $\delta$', hold=True)
-        plt.subplot(2, 4, 2)
+        plt.subplot(3, 4, 2)
         hp.mollview(kappa, title=r'convergence $\kappa$', hold=True)
-        plt.subplot(2, 4, 5)
+        plt.subplot(3, 4, 5)
         hp.mollview(gamma1, title=r'shear component $\gamma_1$', hold=True)
-        plt.subplot(2, 4, 6)
+        plt.subplot(3, 4, 6)
         hp.mollview(gamma2, title=r'shear component $\gamma_2$', hold=True)
+
+        # plot galaxies on a low-resolution map
+        gals = np.zeros(hp.nside2npix(128))
+        ipix = hp.ang2pix(128, gal_lon, gal_lat, lonlat=True)
+        ipix, icnt = np.unique(ipix, return_counts=True)
+        gals[ipix] = icnt
+        plt.subplot(3, 4, 9)
+        hp.mollview(vis, title='visibility', hold=True, min=0, max=1)
+        plt.subplot(3, 4, 10)
+        hp.mollview(gals, title='galaxy counts', hold=True)
 
         # update plot window
         plt.pause(1e-3)

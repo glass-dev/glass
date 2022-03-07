@@ -22,3 +22,14 @@ Definitions
 
       For ellipticity without the orientation, see :term:`ellipticity
       (modulus)`.
+
+   visibility
+      The visibility is defined as the *a priory* probability of observing an
+      object in a given point of the sky.  As such, the visibility is a number
+      between 0 and 1.
+
+   visibility map
+      A visibility map is a HEALPix map that describes the *a priori*
+      probability of observing an object inside a given HEALPix pixel, with
+      pixel values between 0 and 1.  It is hence the averaged, not integrated,
+      map of the :term:`visibility`.

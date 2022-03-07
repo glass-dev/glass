@@ -8,6 +8,7 @@ __version__ = '2022.2.18'
 from . import galaxies  # noqa: F401
 from . import lensing  # noqa: F401
 from . import matter  # noqa: F401
+from . import observations  # noqa: F401
 
 # import from internal modules
 from ._generator import generator  # noqa: F401
