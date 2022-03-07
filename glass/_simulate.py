@@ -148,7 +148,8 @@ def lightcone(generators):
 
             log.info('>>> %s: %s <<<', g.name, timedelta(seconds=time.monotonic()-t))
 
-        yield state
+        else:  # no break
+            yield state
 
     log.info('=== finalize ===')
 
