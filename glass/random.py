@@ -8,7 +8,7 @@ import healpy as hp
 from gaussiancl import lognormal_cl
 
 
-log = logging.getLogger('glass.random')
+log = logging.getLogger(__name__)
 
 
 def transform_cls(cls, tfm, nside=None):
@@ -46,7 +46,7 @@ def transform_cls(cls, tfm, nside=None):
     return gaussian_cls
 
 
-def gaussian_random_fields(nside, rng=None):
+def generate_gaussian(nside, rng=None):
     '''sample Gaussian random fields from Cls'''
 
     # get the default RNG if not given
@@ -84,11 +84,11 @@ def gaussian_random_fields(nside, rng=None):
         m = hp.alm2map(alm + mu, nside, pixwin=False, pol=False, inplace=True)
 
 
-def normal_random_fields(nside, rng=None):
+def generate_normal(nside, rng=None):
     '''sample normal random fields from Cls'''
 
     # set up the underlying Gaussian random field generator
-    grf = gaussian_random_fields(nside, rng)
+    grf = generate_gaussian(nside, rng)
 
     # prime generator
     m = grf.send(None)
@@ -108,11 +108,11 @@ def normal_random_fields(nside, rng=None):
         m = grf.send(cls)
 
 
-def lognormal_random_fields(nside, shift=1., rng=None):
+def generate_lognormal(nside, shift=1., rng=None):
     '''sample lognormal random fields from Cls'''
 
     # set up the underlying Gaussian random field generator
-    grf = gaussian_random_fields(nside, rng)
+    grf = generate_gaussian(nside, rng)
 
     # prime generator
     m = grf.send(None)
