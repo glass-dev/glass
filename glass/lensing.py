@@ -10,25 +10,26 @@ Lensing fields (:mod:`glass.lensing`)
 Generators
 ==========
 
-Convergence
------------
+Single source plane
+-------------------
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
 
    convergence
-   mean_convergence
+   shear
 
 
-Shear
------
+Source distributions
+--------------------
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
 
-   shear
+   lensing_dist
+
 
 '''
 
@@ -223,52 +224,106 @@ def convergence(cosmo, weight='midpoint'):
         delta12 = delta23
 
 
-@generator('zmin, zmax, kappa -> kappa_bar')
-def mean_convergence(z, nz, cosmo):
-    '''generate mean convergence of a source distribution'''
+@generator('zsrc, kappa?, gamma1?, gamma2? -> kappa_bar, gamma1_bar, gamma2_bar')
+def lensing_dist(z, nz, cosmo):
+    '''generate weak lensing maps for source distributions
+
+    This generator takes a single or multiple (via leading axes) redshift
+    distribution(s) of sources and computes their integrated mean lensing maps.
+
+    The generator receives the convergence and/or shear maps for each source
+    plane.  It then averages the lensing maps by interpolation between source
+    planes [1]_, and yields the result up to the last source plane received.
+
+    Parameters
+    ----------
+    z, nz : array_like
+        The redshift distribution(s) of sources.  The redshifts ``z`` must be a
+        1D array.  The density of sources ``nz`` must be at least a 1D array,
+        with the last axis matching ``z``.  Leading axes define multiple source
+        distributions.
+    cosmo : Cosmology
+        A cosmology instance to obtain distance functions.
+
+    Receives
+    --------
+    zsrc : float
+        Source plane redshift.
+    kappa, gamma1, gamma2 : array_like, optional
+        HEALPix maps of convergence and/or shear.  Unavailable maps are ignored.
+
+    Yields
+    ------
+    kappa_bar, gamma1_bar, gamma2_bar : array_like
+        Integrated mean lensing maps, or ``None`` where there are no input maps.
+        The maps have leading axes matching the distribution.
+
+    References
+    ----------
+    .. [1] Tessore et al., in prep.
+
+    '''
 
     # check inputs
-    if np.ndim(z) != 1 or np.ndim(nz) != 1:
-        raise TypeError('both z and nz must be one-dimensional')
+    if np.ndim(z) != 1:
+        raise TypeError('redshifts must be one-dimensional')
+    if np.ndim(nz) == 0:
+        raise TypeError('distribution must be at least one-dimensional')
+    *sh, sz = np.shape(nz)
+    if sz != len(z):
+        raise TypeError('redshift axis mismatch')
 
-    # initial value
-    zmax_ = kappa_ = 0
+    # helper function to get normalisation
+    # takes the leading distribution axes into account
+    def norm(nz_, z_):
+        return np.expand_dims(np.trapz(nz_, z_), np.ndim(nz_)-1)
+
+    # normalise distributios
+    nz = np.divide(nz, norm(nz, z))
+
+    # total accumulated weight for each distribution
+    # shape needs to match leading axes of distributions
+    w = np.zeros((*sh, 1))
+
+    # initial lensing plane
+    # give small redshift > 0 to work around division by zero
+    zsrc = 1e-10
+    kap = gam1 = gam2 = 0
 
     # initial yield
-    kappa_bar = None
+    kap_bar = gam1_bar = gam2_bar = None
 
-    # wait for next convergence plane and return mean, or stop on exit
+    # wait for next source plane and return result, or stop on exit
     while True:
+        zsrc_, kap_, gam1_, gam2_ = zsrc, kap, gam1, gam2
         try:
-            zmin, zmax, kappa = yield kappa_bar
+            zsrc, kap, gam1, gam2 = yield kap_bar, gam1_bar, gam2_bar
         except GeneratorExit:
             break
 
-        # only works with contiguous intervals
-        if zmin != zmax_:
-            raise ValueError('redshift intervals must be contiguous')
+        # integrated maps are initialised to zero on first iteration
+        # integrated maps have leading axes for distributions
+        if kap is not None and kap_bar is None:
+            kap_bar = np.zeros((*sh, np.size(kap)))
+        if gam1 is not None and gam1_bar is None:
+            gam1_bar = np.zeros((*sh, np.size(gam1)))
+        if gam2 is not None and gam2_bar is None:
+            gam2_bar = np.zeros((*sh, np.size(gam2)))
 
-        # initialise on first iteration
-        if kappa_bar is None:
-            kappa_bar = np.empty_like(kappa)
+        # get the restriction of n(z) to the interval between source planes
+        nz_, z_ = restrict_interval(nz, z, zsrc_, zsrc)
 
-        # fix zero redshift to be slightly higher, to not divide by zero
-        if zmin == 0:
-            zmin = 1e-10
+        # get integrated weight and update total weight
+        # then normalise n(z)
+        w_ = norm(nz_, z_)
+        w += w_
+        nz_ /= w_
 
-        # get the normalised restriction of n(z) to the redshift interval
-        nz_, z_ = restrict_interval(nz, z, zmin, zmax)
-        nz_ /= np.trapz(nz_, z_)
+        # integrate interpolation factor against source distributions
+        t = norm(cosmo.xm(zsrc_, z_)/cosmo.xm(z_)*nz_, z_)
+        t /= cosmo.xm(zsrc_, zsrc)/cosmo.xm(zsrc)
 
-        # integrated interpolation factor
-        t = np.trapz(cosmo.xm(zmin, z_)/cosmo.xm(z_)*nz_, z_)
-        t /= cosmo.xm(zmin, zmax)/cosmo.xm(zmax)
-
-        # interpolate convergence planes
-        kappa_bar[:] = kappa
-        kappa_bar *= t
-        kappa_bar += (1 - t)*kappa_
-
-        # keep for next iteration
-        zmax_ = zmax
-        kappa_ = kappa
+        # interpolate convergence planes and integrate over distributions
+        for m, m_, m_bar in (kap, kap_, kap_bar), (gam1, gam1_, gam1_bar), (gam2, gam2_, gam2_bar):
+            if m is not None:
+                m_bar += (t*m + (1-t)*m_ - m_bar)*(w_/w)

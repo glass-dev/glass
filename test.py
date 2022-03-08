@@ -44,6 +44,7 @@ generators = [
     glass.matter.lognormal_matter(nside),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
+    glass.lensing.lensing_dist(z, dndz, cosmo),
     glass.observations.vis_constant(v, nside),
     glass.galaxies.gal_dist_fullsky(z, dndz, bz),
     glass.galaxies.gal_ellip_ryden04(-2.2, 1.4, 0.57, 0.21),
