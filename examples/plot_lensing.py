@@ -46,7 +46,8 @@ z = np.linspace(0, 1, 101)
 nz = np.exp(-(z - 0.5)**2/(0.1)**2)
 
 # set up CAMB parameters for matter angular power spectrum
-pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
+pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2,
+                       NonLinear=camb.model.NonLinear_both)
 
 # generators for a lensing-only simulation
 generators = [
