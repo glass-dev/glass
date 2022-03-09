@@ -87,6 +87,7 @@ cls = hp.anafast([kappa, gamma1, gamma2], pol=True, lmax=lmax)
 
 # get the expected cls from CAMB
 pars.Want_CMB = False
+pars.min_l = 1
 pars.SourceWindows = [camb.sources.SplinedSourceWindow(z=z, W=nz, source_type='lensing')]
 theory_cls = camb.get_results(pars).get_source_cls_dict(lmax=lmax, raw_cl=True)
 

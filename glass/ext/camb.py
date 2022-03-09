@@ -21,6 +21,9 @@ def camb_matter_cl(pars, lmax, *, ncorr=1, evolve=True, limber=False, limber_lmi
     # make a copy of input parameters so we can set the things we need
     pars = pars.copy()
 
+    # need dipole
+    pars.min_l = 1
+
     # set up parameters to only compute the intrinsic matter cls
     pars.Want_CMB = False
     pars.Want_Cls = True
