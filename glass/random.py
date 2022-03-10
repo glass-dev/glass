@@ -11,6 +11,41 @@ from gaussiancl import lognormal_cl
 log = logging.getLogger(__name__)
 
 
+def synalm(cl, rng=None):
+    '''sample spherical harmonic modes from an angular power spectrum
+
+    This is a simplified version of the HEALPix synalm routine with support for
+    random number generator instances.
+
+    '''
+
+    # get the default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # length of the cl array
+    n = len(cl)
+
+    # sanity check
+    if np.any(cl < 0):
+        raise ValueError('negative values in cl')
+
+    # standard normal random variates for alm
+    # sample real and imaginary parts, then view as complex number
+    alm = rng.standard_normal(n*(n+1), np.float64).view(np.complex128)
+
+    # scale standard normal variates by cls
+    # modes with m = 0 are first in array and real-valued
+    f = np.sqrt(cl)/np.sqrt(2)
+    for m in range(n):
+        alm[m*n-m*(m-1)//2:(m+1)*n-m*(m+1)//2] *= f[m:]
+    alm[:n].real += alm[:n].imag
+    alm[:n].imag = 0
+
+    # done with sampling alm
+    return alm
+
+
 def transform_cls(cls, tfm, nside=None):
     '''transform Cls to Gaussian Cls for simulation'''
 
@@ -49,10 +84,6 @@ def transform_cls(cls, tfm, nside=None):
 def generate_gaussian(nside, rng=None):
     '''sample Gaussian random fields from Cls'''
 
-    # get the default RNG if not given
-    if rng is None:
-        rng = np.random.default_rng()
-
     # initial values
     m = cl = alm = None
 
@@ -76,7 +107,7 @@ def generate_gaussian(nside, rng=None):
 
         # sample alm from the conditional distribution
         # does not include the mean, which is added below
-        alm = hp.synalm(cl)
+        alm = synalm(cl, rng)
 
         # transform alm to maps
         # add the mean of the conditional distribution
