@@ -67,7 +67,7 @@ def generate_gaussian(nside, rng=None):
         # update the mean and variance of the conditional distribution
         # on first iteration, sample from unconditional distribution
         if cls[1] is not None:
-            cl = cls[1]/cl
+            cl = cls[1]/np.where(cls[1] != 0, cl, 1)
             mu = hp.almxfl(alm, cl, inplace=True)
             cl = cls[0] - cls[1]*cl
         else:
@@ -127,6 +127,15 @@ def generate_lognormal(nside, shift=1., rng=None):
 
         # transform to Gaussian cls
         cls = transform_cls(cls, lambda cl: lognormal_cl(cl, alpha=shift), nside)
+
+        # perform monopole surgery on cls
+        if cls[0][0] < 0:
+            log.info('monopole surgery required: epsilon = %.2e', -cls[0][0])
+            if cls[0][0] < -1e-2:
+                log.warn('warning: monopole surgery is causing significant changes')
+            for cl in cls:
+                if cl is not None:
+                    cl[0] = 0
 
         # get Gaussian random field for cls
         m = grf.send(cls)
