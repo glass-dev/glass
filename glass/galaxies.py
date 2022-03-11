@@ -27,6 +27,7 @@ Ellipticity
    :template: generator.rst
    :toctree: generated/
 
+   gal_ellip_gaussian
    gal_ellip_ryden04
    gal_shear_interp
 
@@ -336,6 +337,59 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
 
 
 @generator('ngal -> gal_ell')
+def gal_ellip_gaussian(sigma, *, rng=None):
+    r'''generator for Gaussian galaxy ellipticities
+
+    The ellipticities are sampled from a normal distribution with standard
+    deviation ``sigma`` for each component.  Samples where the ellipticity is
+    larger than unity are discarded.  Hence, do not use this function with too
+    large values of ``sigma``, or the sampling will become inefficient.
+
+    Parameters
+    ----------
+    sigma : array_like
+        Standard deviation in each component.
+    rng : :class:`~numpy.random.Generator`, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Receives
+    --------
+    ngal : int
+        Number of galaxies for which ellipticities are sampled.
+
+    Yields
+    ------
+    gal_ell : (ngal,) array_like
+        Array of galaxy :term:`ellipticity (complex)`.
+
+    '''
+
+    # default RNG if not provided
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # initial yield
+    e = None
+
+    # wait for inputs and return ellipticities, or stop on exit
+    while True:
+        try:
+            ngal = yield e
+        except GeneratorExit:
+            break
+
+        # sample complex ellipticities
+        # reject those where abs(e) > 0
+        e = rng.standard_normal(2*ngal, np.float64).view(np.complex128)
+        e *= sigma
+        i = np.where(np.abs(e) > 1)[0]
+        while i:
+            rng.standard_normal(2*len(i), np.float64, e[i].view(np.float64))
+            e[i] *= sigma
+            i = i[np.abs(e[i]) > 1]
+
+
+@generator('ngal -> gal_ell')
 def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     r'''generator for galaxy ellipticities following Ryden (2004)
 
@@ -382,10 +436,6 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
 
     '''
-
-    # default RNG if not provided
-    if rng is None:
-        rng = np.random.default_rng()
 
     # initial yield
     e = None
