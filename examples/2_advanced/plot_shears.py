@@ -3,9 +3,9 @@ Galaxy shear
 ============
 
 This example simulates a galaxy catalogue with shears affected by weak lensing,
-combining the :ref:`sphx_glr_examples_plot_density.py` and
-:ref:`sphx_glr_examples_plot_lensing.py` examples with generators for the
-intrinsic galaxy ellipticity and the resulting shear.
+combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
+:ref:`sphx_glr_examples_1_basic_plot_lensing.py` examples with generators for
+the intrinsic galaxy ellipticity and the resulting shear.
 
 '''
 
@@ -81,41 +81,45 @@ generators = [
 she = np.zeros(hp.nside2npix(nside), dtype=complex)
 
 # keep count of total number of galaxies
-num = 0
+num = np.zeros_like(she, dtype=int)
 
 # iterate and map the galaxy shears to a HEALPix map
 for it in glass.generate(generators):
-    num += it['ngal']
     gal_lon, gal_lat = it['gal_lon'], it['gal_lat']
     gal_she = it['gal_she']
 
     gal_pix = hp.ang2pix(nside, gal_lon, gal_lat, lonlat=True)
     s = np.argsort(gal_pix)
-    pix, start = np.unique(gal_pix[s], return_index=True)
+    pix, start, count = np.unique(gal_pix[s], return_index=True, return_counts=True)
     she[pix] += list(map(np.sum, np.split(gal_she[s], start[1:])))
+    num[pix] += count
 
 
 # %%
 # Analysis
 # --------
 # Compute the angular power spectrum of the observed galaxy shears.  To compare
-# with the expectation, compute the expected noise level from the data.
-#
-# The comparison is not entirely accurate, since we compare the observed shear
-# :math:`E`-mode to the expected convergence, but that should only impact low
-# angular mode numbers.
+# with the expectation, take into account the expected noise level due to shape
+# noise, and the expected mixing matrix for a uniform distribution of points.
 
 # will need number of pixels in map
 npix = len(she)
 
 # get the angular power spectra from the galaxy shears
-cls = hp.anafast([np.zeros(npix), she.real, she.imag], pol=True, lmax=lmax)
+cls = hp.anafast([num, she.real, she.imag], pol=True, lmax=lmax)
 
 # the noise level from discrete observations with shape noise
-nl = (4*np.pi/npix)*(num/npix)*sigma_e**2
+nl = (4*np.pi/npix)*np.mean(num)*sigma_e**2
 
-# expected scaling with number of galaxies
-a = (num/npix)**2
+# factor transforming convergence to shear
+l = np.arange(lmax+1)
+fl = (l+2)*(l+1)*l*(l-1)/np.clip(l**2*(l+1)**2, 1, None)
+
+# mixing matrix for uniform distribution of points
+b = np.mean(num)/npix/2
+a = np.mean(num)**2 - b
+mm = a*np.eye(lmax+1, lmax+1)
+mm += b*np.arange(1, 2*lmax+2, 2)
 
 # get the expected cls from CAMB
 pars.Want_CMB = False
@@ -124,13 +128,12 @@ pars.SourceWindows = [camb.sources.SplinedSourceWindow(z=z, W=dndz, source_type=
 theory_cls = camb.get_results(pars).get_source_cls_dict(lmax=lmax, raw_cl=True)
 
 # plot the realised and expected cls
-l = np.arange(lmax+1)
-plt.plot(l, (2*l+1)*(cls[1] - nl), '-k', lw=2, label='simulation (shear $E$-mode)')
-plt.plot(l, (2*l+1)*(a*theory_cls['W1xW1']), '-r', lw=2, label='expectation (convergence)')
+plt.plot(l, (2*l+1)*(cls[1] - nl), '-k', lw=2, label='simulation')
+plt.plot(l, (2*l+1)*(mm@(fl*theory_cls['W1xW1'])), '-r', lw=2, label='expectation')
 plt.xscale('symlog', linthresh=10, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
 plt.yscale('symlog', linthresh=1e-7, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
 plt.xlabel(r'angular mode number $l$')
-plt.ylabel(r'angular power spectrum $(2l+1) \, C_l$')
+plt.ylabel(r'angular power spectrum $(2l+1) \, C_l^{EE}$')
 plt.legend()
 plt.tight_layout()
 plt.show()
