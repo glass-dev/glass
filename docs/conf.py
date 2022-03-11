@@ -82,10 +82,15 @@ intersphinx_mapping = {
 
 # -- Sphinx Gallery ----------------------------------------------------------
 
+from sphinx_gallery.sorting import ExampleTitleSortKey  # noqa: E402
+
 sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     'gallery_dirs': 'examples',
+    'within_subsection_order': ExampleTitleSortKey,
     'reference_url': {
         'glass': None,
     },
+    'download_all_examples': False,
+    'show_signature': False,
 }
