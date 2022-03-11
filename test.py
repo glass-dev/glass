@@ -32,9 +32,9 @@ bz = 0.8
 # set up CAMB for matter cls
 pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
 
-# make a random visibility map with low NSIDE
+# make a visibility map with low NSIDE
 # also compute its fsky for the extected galaxy count
-v = (np.tanh(hp.synfast(np.exp(-np.arange(lmax+1)), 128)) + 1)/2
+v = glass.observations.vmap_galactic_ecliptic(128)
 fsky = np.mean(v)
 
 generators = [

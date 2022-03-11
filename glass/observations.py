@@ -19,6 +19,18 @@ Visibility
 
    vis_constant
 
+
+Other
+=====
+
+Visibility
+----------
+
+.. autosummary::
+   :toctree: generated/
+
+   vmap_galactic_ecliptic
+
 '''
 
 import logging
@@ -67,3 +79,43 @@ def vis_constant(m, nside=None):
             yield m
         except GeneratorExit:
             break
+
+
+def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
+    '''visibility map masking galactic and ecliptic plane
+
+    This function returns a :term:`visibility map` that blocks out stripes for
+    the galactic and ecliptic planes.  The location of the stripes is set with
+    optional parameters.
+
+    Parameters
+    ----------
+    nside : int
+        The NSIDE parameter of the resulting HEALPix map.
+    galactic, ecliptic : (2,) tuple of float
+        The location of the galactic and ecliptic plane in their respective
+        coordinate systems.
+
+    Returns
+    -------
+    vis : array_like
+        A HEALPix :term:`visibility map`.
+
+    Raises
+    ------
+    TypeError
+        If the ``galactic`` or ``ecliptic`` arguments are not pairs of numbers.
+
+    '''
+    if np.ndim(galactic) != 1 or len(galactic) != 2:
+        raise TypeError('galactic stripe must be a pair of numbers')
+    if np.ndim(ecliptic) != 1 or len(ecliptic) != 2:
+        raise TypeError('ecliptic stripe must be a pair of numbers')
+
+    m = np.ones(hp.nside2npix(nside))
+    m[hp.query_strip(nside, *galactic)] = 0
+    m = hp.Rotator(coord='GC').rotate_map_pixel(m)
+    m[hp.query_strip(nside, *ecliptic)] = 0
+    m = hp.Rotator(coord='CE').rotate_map_pixel(m)
+
+    return m
