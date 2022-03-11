@@ -557,6 +557,10 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
 
     '''
 
+    # get default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
     # initial yield
     e = None
 
