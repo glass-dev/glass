@@ -503,7 +503,7 @@ def gal_ellip_gaussian(sigma, *, rng=None):
         e = rng.standard_normal(2*ngal, np.float64).view(np.complex128)
         e *= sigma
         i = np.where(np.abs(e) > 1)[0]
-        while i:
+        while len(i) > 0:
             rng.standard_normal(2*len(i), np.float64, e[i].view(np.float64))
             e[i] *= sigma
             i = i[np.abs(e[i]) > 1]
