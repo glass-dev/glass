@@ -18,6 +18,7 @@ Distribution
    :toctree: generated/
 
    gal_dist_fullsky
+   gal_dist_uniform
 
 
 Ellipticity
@@ -54,6 +55,125 @@ from ._utils import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_r
 
 
 log = logging.getLogger(__name__)
+
+
+@generator('zmin, zmax -> ngal, gal_z, gal_pop, gal_lon, gal_lat')
+def gal_dist_uniform(z, dndz, *, rng=None):
+    '''sample galaxy distributions uniformly over the sphere
+
+    '''
+
+    # get default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # make sure valid number count distributions are passed
+    if np.ndim(z) != 1:
+        raise TypeError('redshifts must be 1d array')
+    if not np.all(np.diff(z) > 0):
+        raise ValueError('redshifts are not strictly increasing')
+    if not np.all(np.greater_equal(dndz, 0)):
+        raise ValueError('negative number counts in distribution')
+
+    # get axes of the arrays
+    # if redshift axes mismatch, try to broadcast to shape of z
+    # the leading axis of dndz is the populations to sample
+    az, = np.shape(z)
+    *apop, az_ = np.shape(dndz)
+    if az_ != az:
+        dndz = np.broadcast_to(dndz, (*apop, az), subok=True)
+
+    # flatten the population axes, if any, and keep multi-indices as labels
+    if apop:
+        dndz = np.reshape(dndz, (-1, az))
+        npop = len(dndz)
+    else:
+        npop = None
+
+    log.info('number of galaxy populations: %s', npop)
+
+    # keep track of total number of galaxies sampled
+    nsam = 0
+
+    # initial yield
+    ngal = red = pop = lon = lat = None
+
+    # wait for next redshift slice and return positions, or stop on exit
+    while True:
+        try:
+            zmin, zmax = yield ngal, red, pop, lon, lat
+        except GeneratorExit:
+            break
+
+        # get the restriction of dndz to the redshift interval
+        dndz_, z_ = restrict_interval(dndz, z, zmin, zmax)
+
+        # compute the number density of galaxies in redshift interval
+        # the result is potentially an array over populations
+        p = np.trapz(dndz_, z_, axis=-1)
+
+        log.info('galaxies/arcmin2 in interval: %s', p)
+
+        # get the total number of galaxies across all populations
+        # we are assuming Poisson statistics, so we can sample from the sum
+        ntot = np.sum(p, axis=-1)
+
+        log.info('expected total galaxies in interval: %s', f'{ntot*ARCMIN2_SPHERE:,.2f}')
+
+        # if there are no galaxies, we are done
+        if ntot == 0:
+            red = lon = lat = np.empty(0)
+            if npop is not None:
+                pop = np.empty(0)
+            log.info('no galaxies, skipping...')
+            continue
+
+        # normalise the number densities to get propability densities
+        dndz_ /= np.where(p > 0, p, 1)[..., np.newaxis]
+
+        # normalise to get probability to find galaxy in each population
+        p /= ntot
+
+        # compute the mean redshift over all distributions
+        zbar = np.dot(p, np.trapz(dndz_*z_, z_, axis=-1))
+
+        log.info('galaxies mean redshift: %g', zbar)
+
+        # compute cumulative distribution in place for redshift sampling
+        cumtrapz(dndz_, z_, out=dndz_)
+
+        # sample number of galaxies
+        ngal = rng.poisson(ntot*ARCMIN2_SPHERE)
+
+        log.info('number of galaxies to be sampled: %s', f'{ngal:,d}')
+
+        # these will hold the results
+        red = np.empty(ngal)
+        lon = np.empty(ngal)
+        lat = np.empty(ngal)
+        if npop is not None:
+            pop = np.empty(ngal, dtype=int)
+
+        # sample positions uniformly
+        lon = rng.uniform(-180, 180, size=ngal)
+        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal)))
+        if npop is not None:
+            pop = rng.choice(npop, p=p, size=ngal)
+            red = np.empty(ngal)
+            for i in range(npop):
+                sel = (pop == i)
+                nsel = sel.sum()
+                red[sel] = np.interp(rng.uniform(0, 1, size=nsel), dndz_[i], z_)
+        else:
+            red = np.interp(rng.uniform(0, 1, size=ngal), dndz_, z_)
+
+        # mark some variables as disposable
+        dndz_ = z_ = p = None
+
+        # add to total sampled
+        nsam += ngal
+
+    log.info('total number of galaxies sampled: %s', f'{nsam:,d}')
 
 
 @generator('zmin, zmax, delta, visibility? -> ngal, gal_z, gal_pop, gal_lon, gal_lat')

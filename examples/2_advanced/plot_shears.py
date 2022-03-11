@@ -65,7 +65,7 @@ generators = [
     glass.matter.lognormal_matter(nside),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(),
-    glass.galaxies.gal_dist_fullsky(z, dndz),
+    glass.galaxies.gal_dist_uniform(z, dndz),
     glass.galaxies.gal_ellip_gaussian(sigma_e),
     glass.galaxies.gal_shear_interp(cosmo),
 ]
