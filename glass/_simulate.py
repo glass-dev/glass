@@ -94,8 +94,8 @@ def _setitem_all(d, k, v):
         d[k] = v
 
 
-def lightcone(generators):
-    '''simulate a light cone'''
+def generate(generators):
+    '''run generators'''
 
     log.info('=== initialize ===')
 
@@ -110,15 +110,14 @@ def lightcone(generators):
     state = {}
 
     # simulation status
-    running = True
     n = 0
     t0 = time.monotonic()
 
-    # loop over shells while simulation is running
-    # for each shell, run all generators, then yield the results
+    # iterate simulation
+    # for each iteration, run all generators, then yield the results
     # for each generator, collect its inputs and store its outputs
     # stop if any of the generators stops by throwing StopIteration
-    while running:
+    while True:
         n += 1
 
         state['#'] = n
@@ -140,7 +139,6 @@ def lightcone(generators):
                 values = g.send(inputs)
             except StopIteration:
                 log.info('>>> generator has stopped the simulation <<<')
-                running = False
                 break
 
             if g._outputs is not None:
@@ -150,6 +148,10 @@ def lightcone(generators):
 
         else:  # no break
             yield state
+            continue
+
+        # break in inner loop
+        break
 
     log.info('=== finalize ===')
 

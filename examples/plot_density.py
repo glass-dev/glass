@@ -68,7 +68,7 @@ xbin = np.concatenate([-xbin[:0:-1], xbin])
 cube = np.zeros((xbin.size-1,)*3)
 
 # simulate and add galaxies in each matter shell to cube
-for shell in glass.lightcone(generators):
+for shell in glass.generate(generators):
     rgal = cosmo.xc(shell['gal_z'])
     lon, lat = np.deg2rad(shell['gal_lon']), np.deg2rad(shell['gal_lat'])
     x1 = rgal*np.cos(lon)*np.cos(lat)

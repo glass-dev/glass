@@ -62,7 +62,7 @@ plt.figure()
 
 with glass.logger('debug') as log:
 
-    for shell in glass.lightcone(generators):
+    for shell in glass.generate(generators):
 
         i, zmin, zmax = shell['#'], shell['zmin'], shell['zmax']
 

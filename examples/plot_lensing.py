@@ -69,7 +69,7 @@ generators = [
 # previous values are not kept.
 
 # simulate and store the integrated lensing maps
-for shell in glass.lightcone(generators):
+for shell in glass.generate(generators):
     kappa = shell['kappa_bar']
     gamma1 = shell['gamma1_bar']
     gamma2 = shell['gamma2_bar']
