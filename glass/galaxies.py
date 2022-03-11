@@ -402,7 +402,10 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
         e = np.exp(1j*rng.uniform(0, 2*np.pi, size=ngal))
         e *= ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=ngal, rng=rng)
 
-        log.info('per-component std. dev.: %.3f, %.3f', np.std(e.real), np.std(e.imag))
+        if len(e) > 0:
+            log.info('per-component std. dev.: %.3f, %.3f', np.std(e.real), np.std(e.imag))
+        else:
+            log.info('no galaxies')
 
 
 @generator('zsrc, kappa, gamma1, gamma2, gal_z, gal_lon, gal_lat, gal_ell -> gal_she')
