@@ -25,10 +25,12 @@ import numpy as np
 import healpy as hp
 import matplotlib.pyplot as plt
 
-# these are the GLASS imports: cosmology, glass, and the CAMB module from ext
+# these are the GLASS imports: cosmology, glass modules, and the CAMB module
 from cosmology import LCDM
-import glass
-import glass.ext.camb
+import glass.sim
+import glass.camb
+import glass.matter
+import glass.lensing
 
 # also needs camb itself to get the parameter object, and the expectation
 import camb
@@ -51,8 +53,8 @@ pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2,
 
 # generators for a lensing-only simulation
 generators = [
-    glass.zspace(0, 1.01, dz=0.1),
-    glass.ext.camb.camb_matter_cl(pars, lmax),
+    glass.sim.zspace(0, 1.01, dz=0.1),
+    glass.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(),
@@ -69,7 +71,7 @@ generators = [
 # previous values are not kept.
 
 # simulate and store the integrated lensing maps
-for shell in glass.generate(generators):
+for shell in glass.sim.generate(generators):
     kappa = shell['kappa_bar']
     gamma1 = shell['gamma1_bar']
     gamma2 = shell['gamma2_bar']

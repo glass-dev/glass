@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''internal module for simulation control'''
+'''module for simulation control'''
 
 import logging
 import time
@@ -8,10 +8,10 @@ from datetime import timedelta
 from collections.abc import Sequence, Mapping, Iterator, Iterable
 import numpy as np
 
-from ._generator import generator
+from .core import generator
 
 
-log = logging.getLogger('glass')
+log = logging.getLogger(__name__)
 
 
 @generator('-> zmin, zmax')

@@ -37,7 +37,7 @@ import logging
 import numpy as np
 import healpy as hp
 
-from ._generator import generator
+from .core import generator
 
 
 log = logging.getLogger(__name__)

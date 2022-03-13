@@ -37,11 +37,11 @@ import logging
 import numpy as np
 import healpy as hp
 
-from ._generator import generator
-from ._utils import restrict_interval
+from .core import generator
+from .util import restrict_interval
 
 
-log = logging.getLogger('glass.lensing')
+log = logging.getLogger(__name__)
 
 
 @generator('kappa -> gamma1, gamma2')

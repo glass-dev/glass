@@ -50,8 +50,8 @@ import logging
 import numpy as np
 import healpy as hp
 
-from ._generator import generator
-from ._utils import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio
+from .core import generator
+from .util import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio
 
 
 log = logging.getLogger(__name__)

@@ -5,9 +5,13 @@ import healpy as hp
 import fitsio
 import matplotlib.pyplot as plt
 
-import glass
-
-import glass.ext.camb
+import glass.sim
+import glass.camb
+import glass.matter
+import glass.lensing
+import glass.observations
+import glass.galaxies
+import glass.user
 import camb
 
 
@@ -39,8 +43,8 @@ fsky = np.mean(v)
 
 generators = [
     # glass.xspace(cosmo, 0., 1.001, dx=100.),
-    glass.zspace(0., 1.001, dz=0.1),
-    glass.ext.camb.camb_matter_cl(pars, lmax),
+    glass.sim.zspace(0., 1.001, dz=0.1),
+    glass.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
@@ -60,9 +64,9 @@ fits = fitsio.FITS('map.fits', 'rw', clobber=True)
 plt.ion()
 plt.figure()
 
-with glass.logger('debug') as log:
+with glass.user.logger('debug') as log:
 
-    for shell in glass.generate(generators):
+    for shell in glass.sim.generate(generators):
 
         i, zmin, zmax = shell['#'], shell['zmin'], shell['zmax']
 

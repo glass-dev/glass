@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''internal module for user functions'''
+'''module for user functions'''
 
 import logging
 from contextlib import contextmanager

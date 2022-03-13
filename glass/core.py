@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''internal module for generators'''
+'''module for core functionality'''
 
 from functools import wraps
 

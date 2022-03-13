@@ -21,7 +21,7 @@ Random fields
 
 '''
 
-from ._generator import generator
+from .core import generator
 from .random import generate_lognormal
 
 

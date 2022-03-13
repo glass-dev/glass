@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''internal module for implementation utilities'''
+'''module for implementation utilities'''
 
 import numpy as np
 

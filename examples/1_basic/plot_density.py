@@ -19,10 +19,12 @@ works as intended.
 import numpy as np
 import matplotlib.pyplot as plt
 
-# these are the GLASS imports: cosmology, glass, and the CAMB module from ext
+# these are the GLASS imports: cosmology, glass modules, and the CAMB module
 from cosmology import LCDM
-import glass
-import glass.ext.camb
+import glass.sim
+import glass.camb
+import glass.matter
+import glass.galaxies
 
 # also needs camb itself to get the parameter object
 import camb
@@ -47,8 +49,8 @@ pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
 
 # generators for a galaxies-only simulation
 generators = [
-    glass.zspace(z[0], z[-1]+0.01, dz=0.1),
-    glass.ext.camb.camb_matter_cl(pars, lmax),
+    glass.sim.zspace(z[0], z[-1]+0.01, dz=0.1),
+    glass.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside),
     glass.galaxies.gal_dist_fullsky(z, dndz),
 ]
@@ -68,7 +70,7 @@ xbin = np.concatenate([-xbin[:0:-1], xbin])
 cube = np.zeros((xbin.size-1,)*3)
 
 # simulate and add galaxies in each matter shell to cube
-for shell in glass.generate(generators):
+for shell in glass.sim.generate(generators):
     rgal = cosmo.xc(shell['gal_z'])
     lon, lat = np.deg2rad(shell['gal_lon']), np.deg2rad(shell['gal_lat'])
     x1 = rgal*np.cos(lon)*np.cos(lat)
