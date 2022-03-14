@@ -70,6 +70,10 @@ html_theme_options = {
     ],
 }
 
+html_css_files = [
+    'css/custom.css',
+]
+
 
 # -- Intersphinx -------------------------------------------------------------
 

@@ -1,0 +1,12 @@
+.navbar-brand:after {
+    content: "GLASS";
+    color: #666;
+    text-shadow: 0 0 3px #333;
+    font-size: 1.3em;
+    font-weight: 200;
+    font-stretch: 110%;
+    letter-spacing: .1em;
+    line-height: 1;
+    vertical-align: middle;
+    margin-left: 0.2em;
+}
