@@ -36,8 +36,10 @@ Visibility
 import logging
 import numpy as np
 import healpy as hp
+import math
 
 from .core import generator
+from .util import cumtrapz
 
 
 log = logging.getLogger(__name__)
@@ -119,3 +121,120 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     m = hp.Rotator(coord='CE').rotate_map_pixel(m)
 
     return m
+
+
+def equal_spaced_zbins(z, *, nbins=None, dz=None, zfunc=None, zbinedges=None):
+    '''equally spaced redshift tomographic bins edges
+
+    This function creates equally spaced redshift tomograpic bin edges
+    It takes either the number of bins, the size of the bins or a function
+    that returns the a tuple of bin edges.
+
+    Paramters
+    ---------
+    z: array_like
+        The z values as an array corresponding to the dndz
+    nbins: int, optional
+        number of redshift bins to bin the dndz
+    dz: float, optional
+        interval for the size of redshift bins to bin the dndz
+    zbinedges: list, optional
+        a list of bin edges
+    zfunc: function, optional
+        function that returns a tuple of bin edges
+    Returns
+    -------
+    zbins: tuple
+        a tuple with the redshift tomographic bins edges
+    '''
+
+    if len([x for x in [dz, nbins, zbinedges, zfunc] if x is not None]) != 1:
+        raise ValueError('exactly one way to get zbins must be given')
+
+    # make zbins if not already given
+    if dz is not None:
+        zbinedges = np.arange(z[0], z[-1], dz)
+        zbins = list(zip(zbinedges, zbinedges[1:]))
+    if nbins is not None:
+        zbinedges = np.linspace(z[0], z[-1], nbins)
+        zbins = list(zip(zbinedges, zbinedges[1:]))
+    if zbinedges is not None:
+        zbins = list(zip(zbinedges, zbinedges[1:]))
+    if zfunc is not None:
+        zbins = zfunc(z)
+
+    return zbins
+
+
+def equal_dens_zbins(z, dndz, nbins):
+    '''equal density redshift tomographic bin edges
+
+    This function subdivides a dndz into equal galaxy density tomograpic bins
+
+    Paramters
+    ---------
+    z: array_like
+        The z values as an array corresponding to the dndz
+    dndz: array_like
+        The redshift distribution in units of galaxies/arcmin2
+    nbins: int
+        number of redshift bins to bin the dndz
+
+    Returns
+    -------
+    zbins: tuple
+        a tuple with the redshift tomographic bins edges
+
+    '''
+    # needed to get the bin edges
+    cuml_dndz = cumtrapz(dndz, z)
+    cuml_dndz /= cuml_dndz[[-1]]
+    zbinedges = np.interp(np.linspace(0, 1, nbins+1), cuml_dndz, z)
+    # getting the zbins list:
+    zbins = list(zip(zbinedges, zbinedges[1:]))
+
+    return zbins
+
+
+def tomo_gaussian_error(z, dndz, sigma_z, zbins):
+    '''photometric redshift bins with a gaussian error
+
+    This function takes a dndz, redshift bin edges, and applies a
+    gaussian error as in Refregier & Amara, 2007
+
+
+    Parameters
+    ----------
+    z: array_like
+        The z values as an array corresponding to the dndz
+    dndz: array_like
+        The redshift distribution in units of galaxies/arcmin2
+
+    sigma_z: float
+        The photometric redshift error such that the gaussian error is:
+        sigma = sigma_z * (1 + z)
+
+    zbins: tuple
+        a tuple with the redshift tomographic bins edges.
+        Can be generated using glass.observation.equal_dens_zbins or
+        glass.observation.equal_spaced_zbins
+
+    '''
+    # converting zbins into an array:
+    zbins = np.asanyarray(zbins)
+
+    # bin edges and adds a new axis
+    z_lower = zbins[:, 0, np.newaxis]
+    z_upper = zbins[:, 1, np.newaxis]
+
+    # we need a vectorised version of the error function:
+    erf = np.vectorize(math.erf, otypes=(float,))
+
+    # components of the error matrix:
+    z_err_lower = erf((z - z_lower) / (np.sqrt(2) * sigma_z * (1 + z)))
+    z_err_upper = erf((z - z_upper) / (np.sqrt(2) * sigma_z * (1 + z)))
+
+    # putting it all together now:
+    binned_dndz = 0.5 * (z_err_lower - z_err_upper) * dndz
+
+    return binned_dndz
