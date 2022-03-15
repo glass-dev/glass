@@ -53,11 +53,12 @@ def _update_signature(io, names):
 
 class Generator:
     '''wrapper for low-level Python generators'''
-    def __init__(self, generator, name=None, signature=None):
+    def __init__(self, generator, signature=None, name=None, module=None):
         '''wrap a low-level generator with optional signature'''
 
         self._generator = generator
         self._name = name
+        self._module = module
         self._inputs = None
         self._outputs = None
 
@@ -65,7 +66,7 @@ class Generator:
             self._inputs, self._outputs = _parse_signature(signature)
 
     def __repr__(self):
-        return f'Generator({self.name}, {self.signature!r})'
+        return f'Generator({self.qualname}, {self.signature!r})'
 
     def __str__(self):
         return f'{self.name}: {self.signature}'
@@ -77,6 +78,16 @@ class Generator:
     def name(self):
         '''name of the generator'''
         return self._name or '<anonymous>'
+
+    @property
+    def module(self):
+        '''module where the generator is defined'''
+        return self._module or '<anonymous>'
+
+    @property
+    def qualname(self):
+        '''qualified name of the generator'''
+        return f'{self.module}.{self.name}'
 
     @property
     def signature(self):
@@ -98,10 +109,11 @@ def generator(signature, *, self=False):
         @wraps(gf)
         def wrapper(*args, **kwargs):
             name = getattr(gf, '__name__', None)
+            module = getattr(gf, '__module__', None)
             g = object.__new__(Generator)
             if self:
                 args = [g, *args]
-            g.__init__(gf(*args, **kwargs), name, signature)
+            g.__init__(gf(*args, **kwargs), signature, name, module)
             return g
         return wrapper
     return decorator
