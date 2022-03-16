@@ -158,7 +158,8 @@ def fixed_zbins(zmin, zmax, *, nbins=None, dz=None):
 def equal_dens_zbins(z, dndz, nbins):
     '''equal density tomographic redshift bins
 
-    This function subdivides a dndz into equal galaxy density tomograpic bins
+    This function subdivides a source redshift distribution into ``nbins``
+    tomographic redshift bins with equal density.
 
     Paramters
     ---------
