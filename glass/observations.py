@@ -174,7 +174,10 @@ def equal_dens_zbins(z, dndz, nbins):
         List of redshift bin edges.
 
     '''
-    # needed to get the bin edges
+    # compute the normalised cumulative distribution function
+    # first compute the cumulative integral (by trapezoidal rule)
+    # then normalise: the first z is at CDF = 0, the last z at CDF = 1
+    # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
     cuml_dndz = cumtrapz(dndz, z)
     cuml_dndz /= cuml_dndz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins+1), cuml_dndz, z)
