@@ -161,8 +161,8 @@ def equal_dens_zbins(z, dndz, nbins):
     This function subdivides a source redshift distribution into ``nbins``
     tomographic redshift bins with equal density.
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     z: array_like
         The z values as an array corresponding to the dndz
     dndz: array_like
