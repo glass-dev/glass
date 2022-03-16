@@ -170,8 +170,8 @@ def equal_dens_zbins(z, dndz, nbins):
 
     Returns
     -------
-    zbins: tuple
-        a tuple with the redshift tomographic bins edges
+    zbins : list of tuple of float
+        List of redshift bin edges.
 
     '''
     # needed to get the bin edges
