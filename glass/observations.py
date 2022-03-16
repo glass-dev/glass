@@ -185,7 +185,7 @@ def equal_dens_zbins(z, nz, nbins):
     return list(zip(zbinedges, zbinedges[1:]))
 
 
-def tomo_gaussian_error(z, nz, sigma_0, zbins):
+def tomo_nz_gausserr(z, nz, sigma_0, zbins):
     '''tomographic redshift bins with a Gaussian redshift error
 
     This function takes a _true_ overall source redshift distribution ``z``,
