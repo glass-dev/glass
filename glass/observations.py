@@ -123,47 +123,36 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     return m
 
 
-def equal_spaced_zbins(z, *, nbins=None, dz=None, zfunc=None, zbinedges=None):
-    '''equally spaced redshift tomographic bins edges
+def fixed_zbins(zmin, zmax, *, nbins=None, dz=None):
+    '''tomographic redshift bins of fixed size
 
-    This function creates equally spaced redshift tomograpic bin edges
-    It takes either the number of bins, the size of the bins or a function
-    that returns the a tuple of bin edges.
+    This function creates contiguous tomographic redshift bins of fixed size.
+    It takes either the number or size of the bins.
 
-    Paramters
-    ---------
-    z: array_like
-        The z values as an array corresponding to the dndz
-    nbins: int, optional
-        number of redshift bins to bin the dndz
-    dz: float, optional
-        interval for the size of redshift bins to bin the dndz
-    zbinedges: list, optional
-        a list of bin edges
-    zfunc: function, optional
-        function that returns a tuple of bin edges
+    Parameters
+    ----------
+    zmin, zmax : float
+        Extent of the redshift binning.
+    nbins : int, optional
+        Number of redshift bins.  Only one of ``nbins`` and ``dz`` can be given.
+    dz : float, optional
+        Size of redshift bin.  Only one of ``nbins`` and ``dz`` can be given.
+
     Returns
     -------
-    zbins: tuple
-        a tuple with the redshift tomographic bins edges
+    zbins : list of tuple of float
+        List of redshift bin edges.
     '''
 
-    if len([x for x in [dz, nbins, zbinedges, zfunc] if x is not None]) != 1:
-        raise ValueError('exactly one way to get zbins must be given')
+    if (nbins is None) != (dz is None):
+        raise ValueError('either nbins or dz must be given')
 
-    # make zbins if not already given
+    if nbins is not None:
+        zbinedges = np.linspace(z[0], z[-1], nbins+1)
     if dz is not None:
         zbinedges = np.arange(z[0], z[-1], dz)
-        zbins = list(zip(zbinedges, zbinedges[1:]))
-    if nbins is not None:
-        zbinedges = np.linspace(z[0], z[-1], nbins)
-        zbins = list(zip(zbinedges, zbinedges[1:]))
-    if zbinedges is not None:
-        zbins = list(zip(zbinedges, zbinedges[1:]))
-    if zfunc is not None:
-        zbins = zfunc(z)
 
-    return zbins
+    return list(zip(zbinedges, zbinedges[1:]))
 
 
 def equal_dens_zbins(z, dndz, nbins):
