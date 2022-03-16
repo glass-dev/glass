@@ -163,10 +163,8 @@ def equal_dens_zbins(z, dndz, nbins):
 
     Parameters
     ----------
-    z: array_like
-        The z values as an array corresponding to the dndz
-    dndz: array_like
-        The redshift distribution in units of galaxies/arcmin2
+    z, dndz : array_like
+        The source redshift distribution. Must be one-dimensional.
     nbins: int
         number of redshift bins to bin the dndz
 
