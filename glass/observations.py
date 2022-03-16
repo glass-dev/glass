@@ -165,8 +165,8 @@ def equal_dens_zbins(z, dndz, nbins):
     ----------
     z, dndz : array_like
         The source redshift distribution. Must be one-dimensional.
-    nbins: int
-        number of redshift bins to bin the dndz
+    nbins : int
+        Number of redshift bins.
 
     Returns
     -------
