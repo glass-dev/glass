@@ -144,18 +144,18 @@ def fixed_zbins(zmin, zmax, *, nbins=None, dz=None):
         List of redshift bin edges.
     '''
 
-    if (nbins is None) != (dz is None):
+    if (nbins is None) & (dz is None):
         raise ValueError('either nbins or dz must be given')
 
     if nbins is not None:
-        zbinedges = np.linspace(z[0], z[-1], nbins+1)
+        zbinedges = np.linspace(zmin, zmax, nbins+1)
     if dz is not None:
-        zbinedges = np.arange(z[0], z[-1], dz)
+        zbinedges = np.arange(zmin, zmax, dz)
 
     return list(zip(zbinedges, zbinedges[1:]))
 
 
-def equal_dens_zbins(z, dndz, nbins):
+def equal_dens_zbins(z, nz, nbins):
     '''equal density tomographic redshift bins
 
     This function subdivides a source redshift distribution into ``nbins``
@@ -163,7 +163,7 @@ def equal_dens_zbins(z, dndz, nbins):
 
     Parameters
     ----------
-    z, dndz : array_like
+    z, nz : array_like
         The source redshift distribution. Must be one-dimensional.
     nbins : int
         Number of redshift bins.
@@ -178,28 +178,48 @@ def equal_dens_zbins(z, dndz, nbins):
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
-    cuml_dndz = cumtrapz(dndz, z)
-    cuml_dndz /= cuml_dndz[[-1]]
-    zbinedges = np.interp(np.linspace(0, 1, nbins+1), cuml_dndz, z)
+    cuml_nz = cumtrapz(nz, z)
+    cuml_nz /= cuml_nz[[-1]]
+    zbinedges = np.interp(np.linspace(0, 1, nbins+1), cuml_nz, z)
 
     return list(zip(zbinedges, zbinedges[1:]))
 
 
-def tomo_gaussian_error(z, dndz, sigma_z, zbins):
+def tomo_gaussian_error(z, nz, sigma_0, zbins):
     '''tomographic redshift bins with a Gaussian redshift error
 
-    This function takes a dndz, redshift bin edges, and applies a
-    gaussian error as in Refregier & Amara, 2007
+    This function takes a _true_ overall source redshift distribution ``z``,
+    ``dndz`` and returns tomographic source redshift distributions for the
+    tomographic redshift bins given by ``zbins``.  It is assumed that sources
+    are assigned a tomographic redshift bin with a Gaussian error [1]_. The
+    standard deviation of the Gaussian depends on redshift and is given by
+    ``sigma(z) = sigma_0*(1 + z)``.
+
     Parameters
     ----------
-    z, dndz : array_like
+    z, nz : array_like
         The true source redshift distribution. Must be one-dimensional.
     sigma_0 : float
         Redshift error in the tomographic binning at zero redshift.
-    zbins: tuple
-        a tuple with the redshift tomographic bins edges.
-        Can be generated using glass.observation.equal_dens_zbins or
-        glass.observation.equal_spaced_zbins
+    zbins : list of tuple of float
+        List of redshift bin edges.
+
+    Returns
+    -------
+    binned_nz : array_like
+        Tomographic redshift bins convolved with a gaussian error.
+        Array has a shape (nbins, len(z))
+
+    See Also
+    --------
+    glass.observation.equal_dens_zbins :
+        A function to produce equal density zbins
+    glass.observation.equal_spaced_zbins :
+        A function to produce equally spaced zbins
+
+    References
+    ----------
+        [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018. doi:10.1111/j.1365-2966.2007.12271.x
 
     '''
     # converting zbins into an array:
@@ -215,10 +235,10 @@ def tomo_gaussian_error(z, dndz, sigma_z, zbins):
     # compute the probabilities that redshift z ends up between za and zb
     # then apply probability as weights to given dndz
     # leading axis corresponds to the different bins
-    sz = 2**0.5*sigma_0*(1 + z)
-    binned_dndz = erf((z - z_lower)/sz)
-    binned_dndz += erf((z - z_upper)/sz)
-    binned_dndz /= 1 + erf(z/sz)
-    binned_dndz *= dndz
+    sz = (2**0.5)*sigma_0*(1 + z)
+    binned_nz = erf((z - z_lower)/sz)
+    binned_nz -= erf((z - z_upper)/sz)
+    binned_nz /= 1 + erf(z/sz)
+    binned_nz *= nz
 
-    return binned_dndz
+    return binned_nz
