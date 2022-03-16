@@ -144,7 +144,7 @@ def fixed_zbins(zmin, zmax, *, nbins=None, dz=None):
         List of redshift bin edges.
     '''
 
-    if (nbins is None) & (dz is None):
+    if (nbins is None) == (dz is None):
         raise ValueError('either nbins or dz must be given')
 
     if nbins is not None:
@@ -189,7 +189,7 @@ def tomo_nz_gausserr(z, nz, sigma_0, zbins):
     '''tomographic redshift bins with a Gaussian redshift error
 
     This function takes a _true_ overall source redshift distribution ``z``,
-    ``dndz`` and returns tomographic source redshift distributions for the
+    ``nz`` and returns tomographic source redshift distributions for the
     tomographic redshift bins given by ``zbins``.  It is assumed that sources
     are assigned a tomographic redshift bin with a Gaussian error [1]_. The
     standard deviation of the Gaussian depends on redshift and is given by
@@ -212,14 +212,15 @@ def tomo_nz_gausserr(z, nz, sigma_0, zbins):
 
     See Also
     --------
-    glass.observation.equal_dens_zbins :
-        A function to produce equal density zbins
-    glass.observation.equal_spaced_zbins :
-        A function to produce equally spaced zbins
+    equal_dens_zbins :
+        produce equal density redshift bins
+    fixed_zbins :
+        produce redshift bins of fixed size
 
     References
     ----------
-        [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018. doi:10.1111/j.1365-2966.2007.12271.x
+    .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+           doi:10.1111/j.1365-2966.2007.12271.x
 
     '''
     # converting zbins into an array:
@@ -232,10 +233,10 @@ def tomo_nz_gausserr(z, nz, sigma_0, zbins):
     # we need a vectorised version of the error function:
     erf = np.vectorize(math.erf, otypes=(float,))
 
-    # compute the probabilities that redshift z ends up between za and zb
-    # then apply probability as weights to given dndz
+    # compute the probabilities that redshifts z end up in each bin
+    # then apply probability as weights to given nz
     # leading axis corresponds to the different bins
-    sz = (2**0.5)*sigma_0*(1 + z)
+    sz = 2**0.5*sigma_0*(1 + z)
     binned_nz = erf((z - z_lower)/sz)
     binned_nz -= erf((z - z_upper)/sz)
     binned_nz /= 1 + erf(z/sz)
