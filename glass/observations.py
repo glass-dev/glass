@@ -156,7 +156,7 @@ def fixed_zbins(zmin, zmax, *, nbins=None, dz=None):
 
 
 def equal_dens_zbins(z, dndz, nbins):
-    '''equal density redshift tomographic bin edges
+    '''equal density tomographic redshift bins
 
     This function subdivides a dndz into equal galaxy density tomograpic bins
 
