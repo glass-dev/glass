@@ -186,23 +186,16 @@ def equal_dens_zbins(z, dndz, nbins):
 
 
 def tomo_gaussian_error(z, dndz, sigma_z, zbins):
-    '''photometric redshift bins with a gaussian error
+    '''tomographic redshift bins with a Gaussian redshift error
 
     This function takes a dndz, redshift bin edges, and applies a
     gaussian error as in Refregier & Amara, 2007
-
-
     Parameters
     ----------
-    z: array_like
-        The z values as an array corresponding to the dndz
-    dndz: array_like
-        The redshift distribution in units of galaxies/arcmin2
-
-    sigma_z: float
-        The photometric redshift error such that the gaussian error is:
-        sigma = sigma_z * (1 + z)
-
+    z, dndz : array_like
+        The true source redshift distribution. Must be one-dimensional.
+    sigma_0 : float
+        Redshift error in the tomographic binning at zero redshift.
     zbins: tuple
         a tuple with the redshift tomographic bins edges.
         Can be generated using glass.observation.equal_dens_zbins or
@@ -219,11 +212,13 @@ def tomo_gaussian_error(z, dndz, sigma_z, zbins):
     # we need a vectorised version of the error function:
     erf = np.vectorize(math.erf, otypes=(float,))
 
-    # components of the error matrix:
-    z_err_lower = erf((z - z_lower) / (np.sqrt(2) * sigma_z * (1 + z)))
-    z_err_upper = erf((z - z_upper) / (np.sqrt(2) * sigma_z * (1 + z)))
-
-    # putting it all together now:
-    binned_dndz = 0.5 * (z_err_lower - z_err_upper) * dndz
+    # compute the probabilities that redshift z ends up between za and zb
+    # then apply probability as weights to given dndz
+    # leading axis corresponds to the different bins
+    sz = 2**0.5*sigma_0*(1 + z)
+    binned_dndz = erf((z - z_lower)/sz)
+    binned_dndz += erf((z - z_upper)/sz)
+    binned_dndz /= 1 + erf(z/sz)
+    binned_dndz *= dndz
 
     return binned_dndz
