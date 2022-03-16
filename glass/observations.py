@@ -181,10 +181,8 @@ def equal_dens_zbins(z, dndz, nbins):
     cuml_dndz = cumtrapz(dndz, z)
     cuml_dndz /= cuml_dndz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins+1), cuml_dndz, z)
-    # getting the zbins list:
-    zbins = list(zip(zbinedges, zbinedges[1:]))
 
-    return zbins
+    return list(zip(zbinedges, zbinedges[1:]))
 
 
 def tomo_gaussian_error(z, dndz, sigma_z, zbins):
