@@ -123,6 +123,48 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     return m
 
 
+def smail_distr(z, z_median, alpha, beta):
+    r'''Redshifts following the Smail et al. (1994) model.
+
+    The redshift follows the Smail et al. [1]_ redshift distribution.
+
+    Parameters
+    ----------
+    z: array_like
+        An array with redshift values to calculate the distribution over
+    z_median : float or array_like of floats
+        Median redshift of the distribution, must be positive.
+    alpha : float or array_like of floats
+        Power law exponent (z/z0)^\alpha, must be positive.
+    beta : float or array_like of floats
+        Log-power law exponent exp[-(z/z0)^\beta], must be positive.
+
+    Returns
+    -------
+    pz: array_like
+        Redshift distribution PDF following the Smail et al. [1] distribution.
+
+    Notes
+    -----
+    The probability distribution function :math:`p(z)` for redshift :math:`z`
+    is given by Amara & Refregier [2]_ as
+    .. math::
+        p(z) \sim \left(\frac{z}{z_0}\right)^\alpha
+                    \exp\left[-\left(\frac{z}{z_0}\right)^\beta\right] \;.
+    This is the generalised gamma distribution.
+
+    References
+    ----------
+    .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
+    .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
+    '''
+
+    pz = np.power(z, alpha)*np.exp((-1) * np.power(z/(z_median/1.412), beta))
+    pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
+
+    return pz
+
+
 def fixed_zbins(zmin, zmax, *, nbins=None, dz=None):
     '''tomographic redshift bins of fixed size
 
