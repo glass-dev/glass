@@ -130,8 +130,8 @@ def smail_distr(z, z_mode, alpha, beta):
 
     Parameters
     ----------
-    z: array_like
-        An array with redshift values to calculate the distribution over
+    z : array_like
+        Redshift values of the distribution.
     z_mode : float or array_like of floats
         Mode of the redshift distribution, must be positive.
     alpha : float or array_like of floats
@@ -141,22 +141,26 @@ def smail_distr(z, z_mode, alpha, beta):
 
     Returns
     -------
-    pz: array_like
-        Redshift distribution PDF following the Smail et al. [1] distribution.
+    pz : array_like
+        Redshift distribution at the given ``z`` values.
 
     Notes
     -----
     The probability distribution function :math:`p(z)` for redshift :math:`z`
     is given by Amara & Refregier [2]_ as
+
     .. math::
+
         p(z) \sim \left(\frac{z}{z_0}\right)^\alpha
-                    \exp\left[-\left(\frac{z}{z_0}\right)^\beta\right] \;.
-    This is the generalised gamma distribution.
+                    \exp\left[-\left(\frac{z}{z_0}\right)^\beta\right] \;,
+
+    where :math:`z_0` is matched to the given mode of the distribution.
 
     References
     ----------
     .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
+
     '''
     z_mode = np.asanyarray(z_mode)
     alpha = np.asanyarray(alpha)
