@@ -123,7 +123,7 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     return m
 
 
-def smail_distr(z, z_median, alpha, beta):
+def smail_distr(z, zpeak, alpha, beta):
     r'''Redshifts following the Smail et al. (1994) model.
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
@@ -132,11 +132,11 @@ def smail_distr(z, z_median, alpha, beta):
     ----------
     z: array_like
         An array with redshift values to calculate the distribution over
-    z_median : float or array_like of floats
-        Median redshift of the distribution, must be positive.
-    alpha : float or array_like of floats
+    zpeack : float
+        Redshift of the peak of the distribution, must be positive.
+    alpha : float
         Power law exponent (z/z0)^\alpha, must be positive.
-    beta : float or array_like of floats
+    beta : float
         Log-power law exponent exp[-(z/z0)^\beta], must be positive.
 
     Returns
@@ -158,8 +158,8 @@ def smail_distr(z, z_median, alpha, beta):
     .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
     '''
-
-    pz = np.power(z, alpha)*np.exp((-1) * np.power(z/(z_median/1.412), beta))
+    z0 = zpeak * (alpha/beta)**(-1./beta)
+    pz = np.power(z, alpha)*np.exp((-1) * np.power(z/z0, beta))
     pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
 
     return pz
