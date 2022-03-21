@@ -162,14 +162,13 @@ def smail_nz(z, z_mode, alpha, beta):
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
 
     '''
-    z_mode = np.asanyarray(z_mode)
-    alpha = np.asanyarray(alpha)
-    beta = np.asanyarray(beta)
+    z_mode = np.asanyarray(z_mode)[..., np.newaxis]
+    alpha = np.asanyarray(alpha)[..., np.newaxis]
+    beta = np.asanyarray(beta)[..., np.newaxis]
 
-    z0 = z_mode * (alpha/beta)**(-1./beta)
-
-    pz = np.power(z, alpha[..., np.newaxis])
-    pz *= np.exp((-1) * np.power(z/z0[..., np.newaxis], beta[..., np.newaxis]))
+    # pz = np.power(z, alpha[..., np.newaxis])
+    # pz *= np.exp((-1) * np.power(z/z0[..., np.newaxis], beta[..., np.newaxis]))
+    pz = z**alpha*np.exp(-alpha/beta*(z/z_mode)**beta)
     pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
 
     return pz
