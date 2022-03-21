@@ -123,7 +123,7 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     return m
 
 
-def smail_distr(z, z_mode, alpha, beta):
+def smail_nz(z, z_mode, alpha, beta):
     r'''Redshifts following the Smail et al. (1994) model.
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
@@ -132,11 +132,11 @@ def smail_distr(z, z_mode, alpha, beta):
     ----------
     z : array_like
         Redshift values of the distribution.
-    z_mode : float or array_like of floats
+    z_mode : float or array_like
         Mode of the redshift distribution, must be positive.
-    alpha : float or array_like of floats
+    alpha : float or array_like
         Power law exponent (z/z0)^\alpha, must be positive.
-    beta : float or array_like of floats
+    beta : float or array_like
         Log-power law exponent exp[-(z/z0)^\beta], must be positive.
 
     Returns
