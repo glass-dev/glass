@@ -1,13 +1,8 @@
 version: 2
 
 build:
-  os: "ubuntu-20.04"
-  tools:
-    python: "mambaforge-4.10"
-
-conda:
-  environment: .readthedocs/environment.yml
-
+  apt_packages:
+    - gfortran
 python:
   install:
     - method: pip
