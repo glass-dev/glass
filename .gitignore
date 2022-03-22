@@ -3,4 +3,4 @@
 __pycache__
 docs/_build
 docs/reference/generated
-docs/examples
+docs/examples/**/plot*.py
