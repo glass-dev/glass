@@ -16,8 +16,8 @@ in develop mode via pip::
 You might want to have a look at the `documentation`__, as far as it exists at
 this stage.  The `examples`__ page has some code to get you started.
 
-__ https://glass-dev.github.io/glass/
-__ https://glass-dev.github.io/glass/examples/
+__ https://glass.readthedocs.io/
+__ https://glass.readthedocs.io/en/latest/examples/
 
 But there is probably no better way to get started than to get in touch.  Please
 `join our Slack`__ and we can take it from there.

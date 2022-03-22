@@ -99,3 +99,10 @@ sphinx_gallery_conf = {
     'download_all_examples': False,
     'show_signature': False,
 }
+
+
+# -- Read the Docs -----------------------------------------------------------
+
+# fix CAMB on RTD
+if 'READTHEDOCS' in os.environ:
+    del(os.environ['READTHEDOCS'])
