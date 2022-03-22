@@ -97,5 +97,6 @@ sphinx_gallery_conf = {
         'glass': None,
     },
     'download_all_examples': False,
+    'image_srcset': ['2x'],
     'show_signature': False,
 }
