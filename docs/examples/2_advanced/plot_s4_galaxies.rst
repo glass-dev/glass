@@ -19,7 +19,7 @@
 
 
 Stage IV Space Satellite Galaxy Survey
-============
+======================================
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
 *Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
@@ -323,7 +323,7 @@ to build our mock catalogue.
 .. GENERATED FROM PYTHON SOURCE LINES 150-154
 
 Catalogue checks
---------
+----------------
 Here we can perform some simple checks at the catlaogue legal to
 see how our simulation performed.
 
@@ -359,7 +359,7 @@ see how our simulation performed.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  7.728 seconds)
+   **Total running time of the script:** ( 1 minutes  13.345 seconds)
 
 
 .. _sphx_glr_download_examples_2_advanced_plot_s4_galaxies.py:

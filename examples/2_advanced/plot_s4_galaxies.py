@@ -1,6 +1,6 @@
 '''
 Stage IV Space Satellite Galaxy Survey
-============
+======================================
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
 *Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
@@ -148,7 +148,7 @@ print(f"Total Number of galaxies sampled: {num}")
 
 # %%
 # Catalogue checks
-# --------
+# ----------------
 # Here we can perform some simple checks at the catlaogue legal to
 # see how our simulation performed.
 
