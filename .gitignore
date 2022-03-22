@@ -3,4 +3,5 @@
 __pycache__
 docs/_build
 docs/reference/generated
-docs/examples
+docs/examples/**/plot*.py
+docs/examples/**/plot*_codeobj.pickle

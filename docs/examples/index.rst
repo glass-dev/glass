@@ -1,0 +1,107 @@
+:orphan:
+
+
+
+.. _sphx_glr_examples:
+
+
+Examples
+========
+
+These examples show how GLASS can be used in practice, and can be a good
+starting point for more complicated and realistic simulations.
+
+
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_examples_1_basic:
+
+Basic
+-----
+To get started, these examples focus on simulating one thing at a time.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example simulates a matter-only light cone up to redshift 1 and samples galaxies from a un...">
+
+.. only:: html
+
+ .. figure:: /examples/1_basic/images/thumb/sphx_glr_plot_density_thumb.png
+     :alt: Galaxy distribution
+
+     :ref:`sphx_glr_examples_1_basic_plot_density.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/1_basic/plot_density
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example computes weak lensing maps (convergence and shear) for a redshift distribution of ...">
+
+.. only:: html
+
+ .. figure:: /examples/1_basic/images/thumb/sphx_glr_plot_lensing_thumb.png
+     :alt: Weak lensing
+
+     :ref:`sphx_glr_examples_1_basic_plot_lensing.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/1_basic/plot_lensing
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_examples_2_advanced:
+
+Advanced
+--------
+More advanced examples, combining multiple interacting generators.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example simulates a galaxy catalogue with shears affected by weak lensing, combining the s...">
+
+.. only:: html
+
+ .. figure:: /examples/2_advanced/images/thumb/sphx_glr_plot_shears_thumb.png
+     :alt: Galaxy shear
+
+     :ref:`sphx_glr_examples_2_advanced_plot_shears.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/2_advanced/plot_shears
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
