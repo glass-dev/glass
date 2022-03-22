@@ -1,8 +1,5 @@
 version: 2
 
-build:
-  apt_packages:
-    - gfortran
 python:
   install:
     - method: pip
