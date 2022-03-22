@@ -157,7 +157,7 @@ CAMB) for the given redshift distribution of sources.
 
 .. image-sg:: /examples/1_basic/images/sphx_glr_plot_lensing_001.png
    :alt: plot lensing
-   :srcset: /examples/1_basic/images/sphx_glr_plot_lensing_001.png
+   :srcset: /examples/1_basic/images/sphx_glr_plot_lensing_001.png, /examples/1_basic/images/sphx_glr_plot_lensing_001_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
 

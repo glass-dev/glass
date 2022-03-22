@@ -194,7 +194,7 @@ noise, and the expected mixing matrix for a uniform distribution of points.
 
 .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_shears_001.png
    :alt: plot shears
-   :srcset: /examples/2_advanced/images/sphx_glr_plot_shears_001.png
+   :srcset: /examples/2_advanced/images/sphx_glr_plot_shears_001.png, /examples/2_advanced/images/sphx_glr_plot_shears_001_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
 

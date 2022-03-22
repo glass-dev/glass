@@ -155,7 +155,7 @@ each other.
 
 .. image-sg:: /examples/1_basic/images/sphx_glr_plot_density_001.png
    :alt: plot density
-   :srcset: /examples/1_basic/images/sphx_glr_plot_density_001.png
+   :srcset: /examples/1_basic/images/sphx_glr_plot_density_001.png, /examples/1_basic/images/sphx_glr_plot_density_001_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
 
