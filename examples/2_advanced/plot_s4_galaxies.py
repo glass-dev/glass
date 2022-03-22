@@ -3,7 +3,7 @@ Stage IV Space Satellite Galaxy Survey
 ============
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
-_Euclid_ and _Roman_ combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
+*Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
 :ref:`sphx_glr_examples_1_basic_plot_lensing.py` examples with generators for
 the intrinsic galaxy ellipticity and the resulting shear with some auxiliary functions.
 
@@ -78,6 +78,7 @@ nbins = 10
 zedges = glass.observations.equal_dens_zbins(z, dndz, nbins=nbins)
 bin_nz = glass.observations.tomo_nz_gausserr(z, dndz, sigma_z0, zedges)
 
+# %%
 # Plotting the overall redshift distribution and the
 # distribution for each of the equal density tomographic bins
 plt.ion()
@@ -95,7 +96,8 @@ plt.legend()
 plt.tight_layout()
 plt.pause(1e-3)
 
-# make a visibility map with low NSIDE
+# %%
+# Make a visibility map with low NSIDE
 # also compute its fsky for the extected galaxy count
 stageIV_mask = glass.observations.vmap_galactic_ecliptic(nside)
 
@@ -103,7 +105,7 @@ stageIV_mask = glass.observations.vmap_galactic_ecliptic(nside)
 hp.mollview(stageIV_mask, title='Stage IV Space Survey-like Mask', unit='Visibility')
 plt.pause(1e-3)
 
-
+# %%
 # generators for the clustering and lensing
 generators = [
     glass.sim.zspace(0., 3.0001, dz=dz),

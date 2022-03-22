@@ -22,7 +22,7 @@ Stage IV Space Satellite Galaxy Survey
 ============
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
-_Euclid_ and _Roman_ combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
+*Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
 :ref:`sphx_glr_examples_1_basic_plot_lensing.py` examples with generators for
 the intrinsic galaxy ellipticity and the resulting shear with some auxiliary functions.
 
@@ -96,7 +96,7 @@ Here we setup the overall photometric redshift distribution
 and separate it into equal density tomographic bins
 with photometric redshift errors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-120
+.. GENERATED FROM PYTHON SOURCE LINES 66-81
 
 .. code-block:: default
 
@@ -115,8 +115,22 @@ with photometric redshift errors.
     zedges = glass.observations.equal_dens_zbins(z, dndz, nbins=nbins)
     bin_nz = glass.observations.tomo_nz_gausserr(z, dndz, sigma_z0, zedges)
 
-    # Plotting the overall redshift distribution and the
-    # distribution for each of the equal density tomographic bins
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
+
+Plotting the overall redshift distribution and the
+distribution for each of the equal density tomographic bins
+
+.. GENERATED FROM PYTHON SOURCE LINES 84-99
+
+.. code-block:: default
+
     plt.ion()
     plt.figure(figsize=(10, 5))
     plt.title("Stage IV Space Telescope - Photometric Distribution: equal density bins")
@@ -132,8 +146,27 @@ with photometric redshift errors.
     plt.tight_layout()
     plt.pause(1e-3)
 
-    # make a visibility map with low NSIDE
-    # also compute its fsky for the extected galaxy count
+
+
+
+.. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
+   :alt: Stage IV Space Telescope - Photometric Distribution: equal density bins
+   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 100-102
+
+Make a visibility map with low NSIDE
+also compute its fsky for the extected galaxy count
+
+.. GENERATED FROM PYTHON SOURCE LINES 102-108
+
+.. code-block:: default
+
     stageIV_mask = glass.observations.vmap_galactic_ecliptic(nside)
 
     # checking the mask:
@@ -141,7 +174,25 @@ with photometric redshift errors.
     plt.pause(1e-3)
 
 
-    # generators for the clustering and lensing
+
+
+.. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png
+   :alt: Stage IV Space Survey-like Mask
+   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 109-110
+
+generators for the clustering and lensing
+
+.. GENERATED FROM PYTHON SOURCE LINES 110-122
+
+.. code-block:: default
+
     generators = [
         glass.sim.zspace(0., 3.0001, dz=dz),
         glass.camb.camb_matter_cl(pars, lmax),
@@ -157,35 +208,18 @@ with photometric redshift errors.
 
 
 
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
-         :alt: Stage IV Space Telescope - Photometric Distribution: equal density bins
-         :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
-         :class: sphx-glr-multi-img
-
-    *
-
-      .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png
-         :alt: Stage IV Space Survey-like Mask
-         :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png
-         :class: sphx-glr-multi-img
 
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 121-125
+.. GENERATED FROM PYTHON SOURCE LINES 123-127
 
 Simulation
 ----------
 Simulate the galaxies with shears.  In each iteration, get the quantities of interest
 to build our mock catalogue.
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-147
+.. GENERATED FROM PYTHON SOURCE LINES 127-149
 
 .. code-block:: default
 
@@ -286,14 +320,14 @@ to build our mock catalogue.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-152
+.. GENERATED FROM PYTHON SOURCE LINES 150-154
 
 Catalogue checks
 --------
 Here we can perform some simple checks at the catlaogue legal to
 see how our simulation performed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-165
+.. GENERATED FROM PYTHON SOURCE LINES 154-167
 
 .. code-block:: default
 
@@ -325,7 +359,7 @@ see how our simulation performed.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  8.667 seconds)
+   **Total running time of the script:** ( 1 minutes  7.728 seconds)
 
 
 .. _sphx_glr_download_examples_2_advanced_plot_s4_galaxies.py:
