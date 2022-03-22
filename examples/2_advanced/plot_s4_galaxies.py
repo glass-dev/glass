@@ -108,8 +108,8 @@ plt.pause(1e-3)
 generators = [
     glass.sim.zspace(0., 3.0001, dz=dz),
     glass.camb.camb_matter_cl(pars, lmax),
-    glass.matter.lognormal_matter(nside),
-    glass.lensing.convergence(cosmo, rng=rng),
+    glass.matter.lognormal_matter(nside, rng=rng),
+    glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
     glass.observations.vis_constant(stageIV_mask, nside=nside),
     glass.galaxies.gal_dist_fullsky(z, bin_nz, bz=bz, rng=rng),
