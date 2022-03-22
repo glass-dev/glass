@@ -151,7 +151,7 @@ distribution for each of the equal density tomographic bins
 
 .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
    :alt: Stage IV Space Telescope - Photometric Distribution: equal density bins
-   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
+   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png, /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
 
@@ -178,7 +178,7 @@ also compute its fsky for the extected galaxy count
 
 .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png
    :alt: Stage IV Space Survey-like Mask
-   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png
+   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002.png, /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_002_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
 
@@ -349,7 +349,7 @@ see how our simulation performed.
 
 .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003.png
    :alt: Stage IV Space Telescope - Catalogue's Photometric Distribution
-   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003.png
+   :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003.png, /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
 
