@@ -18,8 +18,8 @@
 .. _sphx_glr_examples_2_advanced_plot_s4_galaxies.py:
 
 
-Stage IV Space Satellite Galaxy Survey
-======================================
+Stage-IV Galaxy Survey
+======================
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
 *Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
@@ -27,7 +27,7 @@ This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy
 the intrinsic galaxy ellipticity and the resulting shear with some auxiliary functions.
 
 The focus in this example is mock catalogue generation using auxiliary functions
-built for simulating Stage-IV galaxies.
+built for simulating Stage IV galaxy surveys.
 
 .. GENERATED FROM PYTHON SOURCE LINES 15-26
 
@@ -38,7 +38,7 @@ previous examples.
 
 In addition to a generator for intrinsic galaxy ellipticities,
 following a normal distribution, we also show how to use auxiliary functions
-to generate photometric redshift distributions and visibility masks.
+to generate tomographic redshift distributions and visibility masks.
 
 Finally, there is a generator that applies the reduced shear from the lensing
 maps to the intrinsic ellipticities, producing the galaxy shears.
@@ -52,7 +52,7 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
     import healpy as hp
     import matplotlib.pyplot as plt
 
-    # these are the GLASS imports: cosmology and glass ifself
+    # these are the GLASS imports: cosmology and the glass meta-module
     from cosmology import LCDM
     from glass import glass
 
@@ -92,9 +92,9 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
 
 Simulation Setup
 ----------------
-Here we setup the overall photometric redshift distribution
+Here we setup the overall source redshift distribution
 and separate it into equal density tomographic bins
-with photometric redshift errors.
+with the typical redshift errors of a photometric survey.
 
 .. GENERATED FROM PYTHON SOURCE LINES 66-81
 
@@ -127,24 +127,23 @@ with photometric redshift errors.
 Plotting the overall redshift distribution and the
 distribution for each of the equal density tomographic bins
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-99
+.. GENERATED FROM PYTHON SOURCE LINES 84-98
 
 .. code-block:: default
 
-    plt.ion()
-    plt.figure(figsize=(10, 5))
+    plt.figure()
     plt.title("Stage IV Space Telescope - Photometric Distribution: equal density bins")
-    SumNz = np.zeros_like(bin_nz[0])
+    sum_nz = np.zeros_like(bin_nz[0])
     for nz in bin_nz:
         plt.fill_between(z, nz, alpha=0.5)
-        SumNz = SumNz + nz
+        sum_nz = sum_nz + nz
     plt.fill_between(z, dndz, alpha=0.2, label='dn/dz')
-    plt.plot(z, SumNz, ls='--', label="Sum of the bins")
+    plt.plot(z, sum_nz, ls='--', label="Sum of the bins")
     plt.ylabel("dN/dz - gal/arcmin2")
     plt.xlabel("z")
     plt.legend()
     plt.tight_layout()
-    plt.pause(1e-3)
+    plt.show()
 
 
 
@@ -158,20 +157,20 @@ distribution for each of the equal density tomographic bins
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
+.. GENERATED FROM PYTHON SOURCE LINES 99-101
 
-Make a visibility map with low NSIDE
-also compute its fsky for the extected galaxy count
+Make a visibility map typical of a space telescope survey, seeing both
+hemispheres, and low visibility in the galactic and ecliptic bands.
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-108
+.. GENERATED FROM PYTHON SOURCE LINES 101-107
 
 .. code-block:: default
 
-    stageIV_mask = glass.observations.vmap_galactic_ecliptic(nside)
+    vis = glass.observations.vmap_galactic_ecliptic(nside)
 
     # checking the mask:
-    hp.mollview(stageIV_mask, title='Stage IV Space Survey-like Mask', unit='Visibility')
-    plt.pause(1e-3)
+    hp.mollview(vis, title='Stage IV Space Survey-like Mask', unit='Visibility')
+    plt.show()
 
 
 
@@ -185,11 +184,11 @@ also compute its fsky for the extected galaxy count
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-110
+.. GENERATED FROM PYTHON SOURCE LINES 108-109
 
 generators for the clustering and lensing
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-122
+.. GENERATED FROM PYTHON SOURCE LINES 109-121
 
 .. code-block:: default
 
@@ -199,7 +198,7 @@ generators for the clustering and lensing
         glass.matter.lognormal_matter(nside, rng=rng),
         glass.lensing.convergence(cosmo),
         glass.lensing.shear(lmax),
-        glass.observations.vis_constant(stageIV_mask, nside=nside),
+        glass.observations.vis_constant(vis, nside=nside),
         glass.galaxies.gal_dist_fullsky(z, bin_nz, bz=bz, rng=rng),
         glass.galaxies.gal_ellip_gaussian(sigma_e, rng=rng),
         glass.galaxies.gal_shear_interp(cosmo),
@@ -212,20 +211,17 @@ generators for the clustering and lensing
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-127
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
 Simulation
 ----------
 Simulate the galaxies with shears.  In each iteration, get the quantities of interest
 to build our mock catalogue.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-149
+.. GENERATED FROM PYTHON SOURCE LINES 126-143
 
 .. code-block:: default
 
-
-    # keep count of total number of galaxies
-    num = 0
 
     # we will store the catalogue as a dictionary:
     catalogue = {'RA': np.array([]), 'DEC': np.array([]), 'TRUE_Z': np.array([]),
@@ -233,8 +229,6 @@ to build our mock catalogue.
 
     # iterate and store the quantities of interest for our mock catalogue:
     for shell in glass.sim.generate(generators):
-        print(f"Generating shell #: {shell['#']}")
-        num += shell['ngal']
         # let's assume here that lon lat here are RA and DEC:
         catalogue['RA'] = np.append(catalogue['RA'], shell['gal_lon'])
         catalogue['DEC'] = np.append(catalogue['DEC'], shell['gal_lat'])
@@ -243,7 +237,7 @@ to build our mock catalogue.
         catalogue['E2'] = np.append(catalogue['E2'], shell['gal_ell'].imag)
         catalogue['TOMO_ID'] = np.append(catalogue['TOMO_ID'], shell['gal_pop'])
 
-    print(f"Total Number of galaxies sampled: {num}")
+    print(f"Total Number of galaxies sampled: {len(catalogue['TRUE_Z'])}")
 
 
 
@@ -255,94 +249,34 @@ to build our mock catalogue.
 
  .. code-block:: none
 
-    Generating shell #: 1
-    Generating shell #: 2
-    Generating shell #: 3
-    Generating shell #: 4
-    Generating shell #: 5
-    Generating shell #: 6
-    Generating shell #: 7
-    Generating shell #: 8
-    Generating shell #: 9
-    Generating shell #: 10
-    Generating shell #: 11
-    Generating shell #: 12
-    Generating shell #: 13
-    Generating shell #: 14
-    Generating shell #: 15
-    Generating shell #: 16
-    Generating shell #: 17
-    Generating shell #: 18
-    Generating shell #: 19
-    Generating shell #: 20
-    Generating shell #: 21
-    Generating shell #: 22
-    Generating shell #: 23
-    Generating shell #: 24
-    Generating shell #: 25
-    Generating shell #: 26
-    Generating shell #: 27
-    Generating shell #: 28
-    Generating shell #: 29
-    Generating shell #: 30
-    Generating shell #: 31
-    Generating shell #: 32
-    Generating shell #: 33
-    Generating shell #: 34
-    Generating shell #: 35
-    Generating shell #: 36
-    Generating shell #: 37
-    Generating shell #: 38
-    Generating shell #: 39
-    Generating shell #: 40
-    Generating shell #: 41
-    Generating shell #: 42
-    Generating shell #: 43
-    Generating shell #: 44
-    Generating shell #: 45
-    Generating shell #: 46
-    Generating shell #: 47
-    Generating shell #: 48
-    Generating shell #: 49
-    Generating shell #: 50
-    Generating shell #: 51
-    Generating shell #: 52
-    Generating shell #: 53
-    Generating shell #: 54
-    Generating shell #: 55
-    Generating shell #: 56
-    Generating shell #: 57
-    Generating shell #: 58
-    Generating shell #: 59
-    Generating shell #: 60
     Total Number of galaxies sampled: 22512724
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-154
+.. GENERATED FROM PYTHON SOURCE LINES 144-148
 
 Catalogue checks
 ----------------
 Here we can perform some simple checks at the catlaogue legal to
 see how our simulation performed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-167
+.. GENERATED FROM PYTHON SOURCE LINES 148-161
 
 .. code-block:: default
 
 
     # redshift distribution of tomographic bins & input distributions
-    plt.figure(figsize=(10, 5))
+    plt.figure()
     plt.title("Stage IV Space Telescope - Catalogue's Photometric Distribution")
     plt.ylabel("dN/dz - normalised")
     plt.xlabel("z")
-    [plt.hist(catalogue['TRUE_Z'][catalogue['TOMO_ID'] == i], edgecolor='black', alpha=0.4,
-              bins=50, density=1, label=f'Catalogue Bin-{i}') for i in range(0, 10)]
-    [plt.fill_between(z, (bin_nz[i]/n_arcmin2)*nbins, alpha=0.6, hatch='//', label=f'Input bin-{i}') for i in range(0, 10)]
+    for i in range(0, 10):
+        plt.hist(catalogue['TRUE_Z'][catalogue['TOMO_ID'] == i], histtype='stepfilled', edgecolor='none', alpha=0.8, bins=50, density=1, label=f'Catalogue Bin-{i}')
+    for i in range(0, 10):
+        plt.plot(z, (bin_nz[i]/n_arcmin2)*nbins, alpha=0.8, label=f'Input bin-{i}')
     plt.plot(z, dndz/n_arcmin2*nbins, ls='--', c='k')
     plt.legend(ncol=2)
-    plt.ioff()
     plt.show()
 
 
@@ -359,7 +293,7 @@ see how our simulation performed.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  13.345 seconds)
+   **Total running time of the script:** ( 1 minutes  7.620 seconds)
 
 
 .. _sphx_glr_download_examples_2_advanced_plot_s4_galaxies.py:

@@ -109,7 +109,7 @@ More advanced examples, combining multiple interacting generators.
 .. only:: html
 
  .. figure:: /examples/2_advanced/images/thumb/sphx_glr_plot_s4_galaxies_thumb.png
-     :alt: Stage IV Space Satellite Galaxy Survey
+     :alt: Stage-IV Galaxy Survey
 
      :ref:`sphx_glr_examples_2_advanced_plot_s4_galaxies.py`
 

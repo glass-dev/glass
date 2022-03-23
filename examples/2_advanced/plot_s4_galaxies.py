@@ -1,6 +1,6 @@
 '''
-Stage IV Space Satellite Galaxy Survey
-======================================
+Stage-IV Galaxy Survey
+======================
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
 *Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
@@ -86,9 +86,9 @@ plt.title("Stage IV Space Telescope - Photometric Distribution: equal density bi
 sum_nz = np.zeros_like(bin_nz[0])
 for nz in bin_nz:
     plt.fill_between(z, nz, alpha=0.5)
-    SumNz = SumNz + nz
+    sum_nz = sum_nz + nz
 plt.fill_between(z, dndz, alpha=0.2, label='dn/dz')
-plt.plot(z, SumNz, ls='--', label="Sum of the bins")
+plt.plot(z, sum_nz, ls='--', label="Sum of the bins")
 plt.ylabel("dN/dz - gal/arcmin2")
 plt.xlabel("z")
 plt.legend()
@@ -101,7 +101,7 @@ plt.show()
 vis = glass.observations.vmap_galactic_ecliptic(nside)
 
 # checking the mask:
-hp.mollview(stageIV_mask, title='Stage IV Space Survey-like Mask', unit='Visibility')
+hp.mollview(vis, title='Stage IV Space Survey-like Mask', unit='Visibility')
 plt.show()
 
 # %%
@@ -112,7 +112,7 @@ generators = [
     glass.matter.lognormal_matter(nside, rng=rng),
     glass.lensing.convergence(cosmo),
     glass.lensing.shear(lmax),
-    glass.observations.vis_constant(stageIV_mask, nside=nside),
+    glass.observations.vis_constant(vis, nside=nside),
     glass.galaxies.gal_dist_fullsky(z, bin_nz, bz=bz, rng=rng),
     glass.galaxies.gal_ellip_gaussian(sigma_e, rng=rng),
     glass.galaxies.gal_shear_interp(cosmo),
@@ -130,8 +130,6 @@ catalogue = {'RA': np.array([]), 'DEC': np.array([]), 'TRUE_Z': np.array([]),
 
 # iterate and store the quantities of interest for our mock catalogue:
 for shell in glass.sim.generate(generators):
-    print(f"Generating shell #: {shell['#']}")
-    num += shell['ngal']
     # let's assume here that lon lat here are RA and DEC:
     catalogue['RA'] = np.append(catalogue['RA'], shell['gal_lon'])
     catalogue['DEC'] = np.append(catalogue['DEC'], shell['gal_lat'])
@@ -140,7 +138,7 @@ for shell in glass.sim.generate(generators):
     catalogue['E2'] = np.append(catalogue['E2'], shell['gal_ell'].imag)
     catalogue['TOMO_ID'] = np.append(catalogue['TOMO_ID'], shell['gal_pop'])
 
-print(f"Total Number of galaxies sampled: {num}")
+print(f"Total Number of galaxies sampled: {len(catalogue['TRUE_Z'])}")
 
 # %%
 # Catalogue checks
