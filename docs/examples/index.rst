@@ -101,6 +101,27 @@ More advanced examples, combining multiple interacting generators.
    :hidden:
 
    /examples/2_advanced/plot_shears
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as...">
+
+.. only:: html
+
+ .. figure:: /examples/2_advanced/images/thumb/sphx_glr_plot_s4_galaxies_thumb.png
+     :alt: Stage IV Galaxy Survey
+
+     :ref:`sphx_glr_examples_2_advanced_plot_s4_galaxies.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/2_advanced/plot_s4_galaxies
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
