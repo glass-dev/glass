@@ -139,7 +139,7 @@ for shell in glass.sim.generate(generators):
     catalogue['E2'] = np.append(catalogue['E2'], shell['gal_ell'].imag)
     catalogue['TOMO_ID'] = np.append(catalogue['TOMO_ID'], shell['gal_pop'])
 
-print(f'Total Number of galaxies sampled: {len(catalogue['TRUE_Z']):,}')
+print(f"Total Number of galaxies sampled: {len(catalogue['TRUE_Z']):,}")
 
 # %%
 # Catalogue checks

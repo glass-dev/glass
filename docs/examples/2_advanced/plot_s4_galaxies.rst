@@ -18,7 +18,7 @@
 .. _sphx_glr_examples_2_advanced_plot_s4_galaxies.py:
 
 
-Stage-IV Galaxy Survey
+Stage IV Galaxy Survey
 ======================
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
@@ -96,7 +96,7 @@ Here we setup the overall source redshift distribution
 and separate it into equal density tomographic bins
 with the typical redshift errors of a photometric survey.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-81
+.. GENERATED FROM PYTHON SOURCE LINES 66-82
 
 .. code-block:: default
 
@@ -104,13 +104,14 @@ with the typical redshift errors of a photometric survey.
     # setting up the random number generator:
     rng = np.random.default_rng(seed=42)
 
-    # photometric redshift distribution following a Smail distribution
+    # true redshift distribution following a Smail distribution
     z = np.linspace(0, 3.0, 1000)
     dndz = glass.observations.smail_nz(z, z_mode=0.9, alpha=2., beta=1.5)
     dndz *= n_arcmin2
     bz = 1.2
 
-    # equal density bins:
+    # compute bin edges with equal density
+    # then make tomographic bins, assuming photometric redshift errors
     nbins = 10
     zedges = glass.observations.equal_dens_zbins(z, dndz, nbins=nbins)
     bin_nz = glass.observations.tomo_nz_gausserr(z, dndz, sigma_z0, zedges)
@@ -122,17 +123,17 @@ with the typical redshift errors of a photometric survey.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-84
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
 Plotting the overall redshift distribution and the
 distribution for each of the equal density tomographic bins
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-98
+.. GENERATED FROM PYTHON SOURCE LINES 85-99
 
 .. code-block:: default
 
     plt.figure()
-    plt.title("Stage IV Space Telescope - Photometric Distribution: equal density bins")
+    plt.title('redshift distributions')
     sum_nz = np.zeros_like(bin_nz[0])
     for nz in bin_nz:
         plt.fill_between(z, nz, alpha=0.5)
@@ -149,7 +150,7 @@ distribution for each of the equal density tomographic bins
 
 
 .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png
-   :alt: Stage IV Space Telescope - Photometric Distribution: equal density bins
+   :alt: redshift distributions
    :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001.png, /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_001_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
@@ -157,12 +158,12 @@ distribution for each of the equal density tomographic bins
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-101
+.. GENERATED FROM PYTHON SOURCE LINES 100-102
 
 Make a visibility map typical of a space telescope survey, seeing both
 hemispheres, and low visibility in the galactic and ecliptic bands.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-107
+.. GENERATED FROM PYTHON SOURCE LINES 102-108
 
 .. code-block:: default
 
@@ -184,11 +185,11 @@ hemispheres, and low visibility in the galactic and ecliptic bands.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+.. GENERATED FROM PYTHON SOURCE LINES 109-110
 
 generators for the clustering and lensing
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-121
+.. GENERATED FROM PYTHON SOURCE LINES 110-122
 
 .. code-block:: default
 
@@ -211,14 +212,14 @@ generators for the clustering and lensing
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-126
+.. GENERATED FROM PYTHON SOURCE LINES 123-127
 
 Simulation
 ----------
 Simulate the galaxies with shears.  In each iteration, get the quantities of interest
 to build our mock catalogue.
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-143
+.. GENERATED FROM PYTHON SOURCE LINES 127-144
 
 .. code-block:: default
 
@@ -237,7 +238,7 @@ to build our mock catalogue.
         catalogue['E2'] = np.append(catalogue['E2'], shell['gal_ell'].imag)
         catalogue['TOMO_ID'] = np.append(catalogue['TOMO_ID'], shell['gal_pop'])
 
-    print(f"Total Number of galaxies sampled: {len(catalogue['TRUE_Z'])}")
+    print(f"Total Number of galaxies sampled: {len(catalogue['TRUE_Z']):,}")
 
 
 
@@ -249,32 +250,32 @@ to build our mock catalogue.
 
  .. code-block:: none
 
-    Total Number of galaxies sampled: 22512724
+    Total Number of galaxies sampled: 22,512,724
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-148
+.. GENERATED FROM PYTHON SOURCE LINES 145-149
 
 Catalogue checks
 ----------------
-Here we can perform some simple checks at the catlaogue legal to
+Here we can perform some simple checks at the catalogue level to
 see how our simulation performed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-161
+.. GENERATED FROM PYTHON SOURCE LINES 149-162
 
 .. code-block:: default
 
 
     # redshift distribution of tomographic bins & input distributions
     plt.figure()
-    plt.title("Stage IV Space Telescope - Catalogue's Photometric Distribution")
+    plt.title('redshifts in catalogue')
     plt.ylabel("dN/dz - normalised")
     plt.xlabel("z")
     for i in range(0, 10):
-        plt.hist(catalogue['TRUE_Z'][catalogue['TOMO_ID'] == i], histtype='stepfilled', edgecolor='none', alpha=0.8, bins=50, density=1, label=f'Catalogue Bin-{i}')
+        plt.hist(catalogue['TRUE_Z'][catalogue['TOMO_ID'] == i], histtype='stepfilled', edgecolor='none', alpha=0.5, bins=50, density=1, label=f'cat. bin {i}')
     for i in range(0, 10):
-        plt.plot(z, (bin_nz[i]/n_arcmin2)*nbins, alpha=0.8, label=f'Input bin-{i}')
+        plt.plot(z, (bin_nz[i]/n_arcmin2)*nbins, alpha=0.5, label=f'inp. bin {i}')
     plt.plot(z, dndz/n_arcmin2*nbins, ls='--', c='k')
     plt.legend(ncol=2)
     plt.show()
@@ -282,7 +283,7 @@ see how our simulation performed.
 
 
 .. image-sg:: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003.png
-   :alt: Stage IV Space Telescope - Catalogue's Photometric Distribution
+   :alt: redshifts in catalogue
    :srcset: /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003.png, /examples/2_advanced/images/sphx_glr_plot_s4_galaxies_003_2_0x.png 2.0x
    :class: sphx-glr-single-img
 
