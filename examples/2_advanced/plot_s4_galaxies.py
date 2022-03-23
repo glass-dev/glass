@@ -1,5 +1,5 @@
 '''
-Stage-IV Galaxy Survey
+Stage IV Galaxy Survey
 ======================
 
 This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
@@ -67,13 +67,14 @@ pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
 # setting up the random number generator:
 rng = np.random.default_rng(seed=42)
 
-# photometric redshift distribution following a Smail distribution
+# true redshift distribution following a Smail distribution
 z = np.linspace(0, 3.0, 1000)
 dndz = glass.observations.smail_nz(z, z_mode=0.9, alpha=2., beta=1.5)
 dndz *= n_arcmin2
 bz = 1.2
 
-# equal density bins:
+# compute bin edges with equal density
+# then make tomographic bins, assuming photometric redshift errors
 nbins = 10
 zedges = glass.observations.equal_dens_zbins(z, dndz, nbins=nbins)
 bin_nz = glass.observations.tomo_nz_gausserr(z, dndz, sigma_z0, zedges)
@@ -82,7 +83,7 @@ bin_nz = glass.observations.tomo_nz_gausserr(z, dndz, sigma_z0, zedges)
 # Plotting the overall redshift distribution and the
 # distribution for each of the equal density tomographic bins
 plt.figure()
-plt.title("Stage IV Space Telescope - Photometric Distribution: equal density bins")
+plt.title('redshift distributions')
 sum_nz = np.zeros_like(bin_nz[0])
 for nz in bin_nz:
     plt.fill_between(z, nz, alpha=0.5)
@@ -138,23 +139,23 @@ for shell in glass.sim.generate(generators):
     catalogue['E2'] = np.append(catalogue['E2'], shell['gal_ell'].imag)
     catalogue['TOMO_ID'] = np.append(catalogue['TOMO_ID'], shell['gal_pop'])
 
-print(f"Total Number of galaxies sampled: {len(catalogue['TRUE_Z'])}")
+print(f'Total Number of galaxies sampled: {len(catalogue['TRUE_Z']):,}')
 
 # %%
 # Catalogue checks
 # ----------------
-# Here we can perform some simple checks at the catlaogue legal to
+# Here we can perform some simple checks at the catalogue level to
 # see how our simulation performed.
 
 # redshift distribution of tomographic bins & input distributions
 plt.figure()
-plt.title("Stage IV Space Telescope - Catalogue's Photometric Distribution")
+plt.title('redshifts in catalogue')
 plt.ylabel("dN/dz - normalised")
 plt.xlabel("z")
 for i in range(0, 10):
-    plt.hist(catalogue['TRUE_Z'][catalogue['TOMO_ID'] == i], histtype='stepfilled', edgecolor='none', alpha=0.8, bins=50, density=1, label=f'Catalogue Bin-{i}')
+    plt.hist(catalogue['TRUE_Z'][catalogue['TOMO_ID'] == i], histtype='stepfilled', edgecolor='none', alpha=0.5, bins=50, density=1, label=f'cat. bin {i}')
 for i in range(0, 10):
-    plt.plot(z, (bin_nz[i]/n_arcmin2)*nbins, alpha=0.8, label=f'Input bin-{i}')
+    plt.plot(z, (bin_nz[i]/n_arcmin2)*nbins, alpha=0.5, label=f'inp. bin {i}')
 plt.plot(z, dndz/n_arcmin2*nbins, ls='--', c='k')
 plt.legend(ncol=2)
 plt.show()
