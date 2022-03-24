@@ -23,6 +23,18 @@ Visibility
 Other
 =====
 
+Redshift distributions
+----------------------
+
+.. autosummary::
+   :toctree: generated/
+   
+   smail_nz
+   fixed_zbins
+   equal_dens_zbins
+   tomo_nz_gausserr
+
+
 Visibility
 ----------
 
