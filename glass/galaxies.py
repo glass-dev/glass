@@ -33,6 +33,16 @@ Ellipticity
    gal_shear_interp
 
 
+Photometric redshifts
+---------------------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+
+   gal_phz_gausserr
+
+
 Other
 =====
 
@@ -663,3 +673,72 @@ def gal_shear_interp(cosmo):
 
         # compute lensed ellipticities
         g = (e + g)/(1 + g.conj()*e)
+
+
+@generator('gal_z -> gal_z_phot')
+def gal_phz_gausserr(sigma_0, rng=None):
+    r'''photometric redshift with Gaussian error
+
+    A simple toy model of photometric redshift errors that assumes a Gaussian
+    error with redshift-dependent standard deviation :math:`\sigma(z) = (1 + z)
+    \sigma_0` [1]_.
+
+    Parameters
+    ----------
+    sigma_0 : float
+        Redshift error in the tomographic binning at zero redshift.
+    rng : :class:`~numpy.random.Generator`, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Yields
+    ------
+    gal_z_phot : (ngal,) array_like
+        Photometric galaxy redshifts assuming Gaussian errors.
+
+    Receives
+    --------
+    gal_z : (ngal,) array_like
+        Galaxy redshifts.
+
+    See Also
+    --------
+    glass.observations.tomo_nz_gausserr :
+        create tomographic redshift distributions assuming the same model
+
+    References
+    ----------
+    .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+           doi:10.1111/j.1365-2966.2007.12271.x
+
+    Examples
+    --------
+    See the :ref:`sphx_glr_examples_1_basic_photoz.py` example.
+
+    '''
+
+    # get default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # initial yield
+    zphot = None
+
+    # sample photometric redshift for all true galaxy redshifts
+    # normal random variates are truncated to positive values
+    while True:
+        try:
+            z = yield zphot
+        except GeneratorExit:
+            break
+
+        size = np.shape(z)
+        z = np.reshape(z, (-1,))
+
+        zphot = rng.normal(z, (1 + z)*sigma_0)
+
+        trunc = np.where(zphot < 0)[0]
+        while trunc.size:
+            zphot[trunc] = rng.normal(z[trunc], (1 + z[trunc])*sigma_0)
+            trunc = trunc[zphot[trunc] < 0]
+
+        zphot = zphot.reshape(size)

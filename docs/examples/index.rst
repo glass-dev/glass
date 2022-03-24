@@ -49,6 +49,27 @@ To get started, these examples focus on simulating one thing at a time.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example simulates galaxies with a simple photometric redshift model.">
+
+.. only:: html
+
+ .. figure:: /examples/1_basic/images/thumb/sphx_glr_photoz_thumb.png
+     :alt: Photometric redshifts
+
+     :ref:`sphx_glr_examples_1_basic_photoz.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/1_basic/photoz
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example computes weak lensing maps (convergence and shear) for a redshift distribution of ...">
 
 .. only:: html
