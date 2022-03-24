@@ -136,7 +136,7 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
 
 
 def smail_nz(z, z_mode, alpha, beta):
-    r'''Redshifts following the Smail et al. (1994) model.
+    r'''redshift distribution following Smail et al. (1994)
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
 
