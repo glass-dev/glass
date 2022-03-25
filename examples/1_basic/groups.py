@@ -70,9 +70,10 @@ for shell in glass.sim.generate(generators):
 
 norm = glass.util.ARCMIN2_SPHERE*(z[-1] - z[0])/40
 
-for zz, nz in (low_z, dndz_low), (high_z, dndz_high):
-    plt.hist(zz, bins=40, range=(z[0], z[-1]), histtype='stepfilled', alpha=0.5)
+for zz, nz, label in (low_z, dndz_low, 'low-z'), (high_z, dndz_high, 'high-z'):
+    plt.hist(zz, bins=40, range=(z[0], z[-1]), histtype='stepfilled', alpha=0.5, label=label)
     plt.plot(z, norm*nz, '-k', lw=1, alpha=0.5)
 plt.xlabel('redshift $z$')
 plt.ylabel('number of galaxies')
+plt.legend()
 plt.show()

@@ -112,18 +112,19 @@ Plots
 -----
 Plot the two distributions together with the expected inputs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-79
+.. GENERATED FROM PYTHON SOURCE LINES 70-80
 
 .. code-block:: default
 
 
     norm = glass.util.ARCMIN2_SPHERE*(z[-1] - z[0])/40
 
-    for zz, nz in (low_z, dndz_low), (high_z, dndz_high):
-        plt.hist(zz, bins=40, range=(z[0], z[-1]), histtype='stepfilled', alpha=0.5)
+    for zz, nz, label in (low_z, dndz_low, 'low-z'), (high_z, dndz_high, 'high-z'):
+        plt.hist(zz, bins=40, range=(z[0], z[-1]), histtype='stepfilled', alpha=0.5, label=label)
         plt.plot(z, norm*nz, '-k', lw=1, alpha=0.5)
     plt.xlabel('redshift $z$')
     plt.ylabel('number of galaxies')
+    plt.legend()
     plt.show()
 
 
@@ -140,7 +141,7 @@ Plot the two distributions together with the expected inputs.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.377 seconds)
+   **Total running time of the script:** ( 0 minutes  0.500 seconds)
 
 
 .. _sphx_glr_download_examples_1_basic_groups.py:
