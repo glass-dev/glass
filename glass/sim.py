@@ -154,6 +154,7 @@ def generate(generators):
 
     # this will keep the state of the simulation during iteration
     state = State()
+    state['state'] = state
 
     # simulation status
     n = 0
@@ -188,3 +189,36 @@ def generate(generators):
         _gencall(g, GeneratorExit)
 
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
+
+
+@generator('state -> group', self=True)
+def group(self, name, generators):
+    r'''group generators under a common name'''
+
+    # tag group generator and update the output name
+    self.tag(name)
+    self.outputs(group=name)
+
+    # tag and prime sub-generators
+    for g in generators:
+        g.tag(*self.tags)
+        _gencall(g, None)
+
+    # initial yield
+    state = None
+
+    # on every iteration, store sub-generators output in sub-state
+    while True:
+        try:
+            context = yield state
+        except GeneratorExit:
+            break
+
+        state = State(context=context)
+        state['state'] = state
+        for g in generators:
+            _gencall(g, state)
+
+    # finalise sub-generators
+    for g in generators:
+        _gencall(g, GeneratorExit)
