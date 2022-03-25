@@ -49,6 +49,27 @@ To get started, these examples focus on simulating one thing at a time.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how generators can be grouped.  Groups provide a layered namespace fo...">
+
+.. only:: html
+
+ .. figure:: /examples/1_basic/images/thumb/sphx_glr_groups_thumb.png
+     :alt: Generator groups
+
+     :ref:`sphx_glr_examples_1_basic_groups.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/1_basic/groups
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example simulates galaxies with a simple photometric redshift model.">
 
 .. only:: html
