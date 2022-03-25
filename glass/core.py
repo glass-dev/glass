@@ -59,6 +59,7 @@ class Generator:
         self._generator = generator
         self._name = name
         self._module = module
+        self._tags = []
         self._inputs = None
         self._outputs = None
 
@@ -88,6 +89,20 @@ class Generator:
     def qualname(self):
         '''qualified name of the generator'''
         return f'{self.module}.{self.name}'
+
+    @property
+    def tags(self):
+        '''tags of the generator'''
+        return self._tags
+
+    def tag(self, *tags):
+        '''add tags to generator'''
+        self._tags += tags
+
+    @property
+    def label(self):
+        '''label of the generator, including name and tags'''
+        return ' - '.join(self.tags + [self.name])
 
     @property
     def signature(self):
