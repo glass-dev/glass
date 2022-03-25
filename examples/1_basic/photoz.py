@@ -9,24 +9,16 @@ This example simulates galaxies with a simple photometric redshift model.
 # %%
 # Setup
 # -----
-# Set up a galaxy positions-only GLASS simulation.  It needs very little:
-# a way to obtain matter angular power spectra (here: CAMB) and a redshift
-# distribution of galaxies to sample from (here: uniform in volume).  Then add
-# a model for photometric redshifts with Gaussian errors.
+# The simplest galaxies-only GLASS simulation, sampling galaxies uniformly over
+# the sphere using some redshift distribution.  Then add a model for photometric
+# redshifts with Gaussian errors.
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-# these are the GLASS imports: cosmology and the glass meta-module
-from cosmology import LCDM
+# these are the GLASS imports: only the glass meta-module
 from glass import glass
 
-# also needs camb itself to get the parameter object
-import camb
-
-
-# cosmology for the simulation
-cosmo = LCDM(h=0.7, Om=0.3)
 
 # basic parameters of the simulation
 nside = 128
@@ -42,15 +34,10 @@ phz_sigma_0 = 0.05
 z = np.linspace(0, 3, 301)
 dndz = n_arcmin2*glass.observations.smail_nz(z, 1.0, 2.2, 1.5)
 
-# set up CAMB parameters for matter angular power spectrum
-pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
-
-# generators for a galaxies-only simulation
+# generators for a uniform galaxies simulation
 generators = [
     glass.sim.zspace(z[0], z[-1]+0.01, dz=0.25),
-    glass.camb.camb_matter_cl(pars, lmax),
-    glass.matter.lognormal_matter(nside),
-    glass.galaxies.gal_dist_fullsky(z, dndz),
+    glass.galaxies.gal_dist_uniform(z, dndz),
     glass.galaxies.gal_phz_gausserr(phz_sigma_0),
 ]
 
@@ -64,7 +51,7 @@ generators = [
 ztrue = np.empty(0)
 zphot = np.empty(0)
 
-# simulate and add galaxies in each matter shell to cube
+# simulate and add galaxies in each matter shell to arrays
 for shell in glass.sim.generate(generators):
     ztrue = np.append(ztrue, shell['gal_z'])
     zphot = np.append(zphot, shell['gal_z_phot'])
