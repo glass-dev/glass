@@ -28,7 +28,7 @@ Redshift distributions
 
 .. autosummary::
    :toctree: generated/
-   
+
    smail_nz
    fixed_zbins
    equal_dens_zbins
@@ -277,6 +277,8 @@ def tomo_nz_gausserr(z, nz, sigma_0, zbins):
         produce equal density redshift bins
     fixed_zbins :
         produce redshift bins of fixed size
+    glass.galaxies.gal_phz_gausserr :
+        generate photometric galaxy redshifts assuming the same model
 
     References
     ----------

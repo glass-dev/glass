@@ -92,6 +92,8 @@ from sphinx_gallery.sorting import ExampleTitleSortKey  # noqa: E402
 sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     'gallery_dirs': 'examples',
+    'filename_pattern': r'/.*\.py',
+    'ignore_pattern': r'/_',
     'within_subsection_order': ExampleTitleSortKey,
     'reference_url': {
         'glass': None,

@@ -3,6 +3,6 @@
 __pycache__
 docs/_build
 docs/reference/generated
-docs/examples/**/plot*.py
-docs/examples/**/plot*_codeobj.pickle
+docs/examples/**/*.py
+docs/examples/**/*_codeobj.pickle
 docs/examples/**/sg_execution_times.rst
