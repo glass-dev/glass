@@ -153,15 +153,14 @@ number of galaxies in each bin.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-88
+.. GENERATED FROM PYTHON SOURCE LINES 83-87
 
 After the photometric bins are defined, make histograms of the *true* redshift
-distribution :math:`n(z)` using the *photometric* redshifts for binning.
+distribution :math:`n(z)` using the *photometric* redshifts for binning.  Use
+the :func:`~glass.observations.tomo_nz_gausserr()` function to also plot the
+expected tomographic redshift distributions with the same model.
 
-Use the :func:`~glass.observations.tomo_nz_gausserr()` to get the expected
-tomographic redshift distributions using the same Gaussian error model.
-
-.. GENERATED FROM PYTHON SOURCE LINES 88-99
+.. GENERATED FROM PYTHON SOURCE LINES 87-98
 
 .. code-block:: default
 
@@ -191,7 +190,7 @@ tomographic redshift distributions using the same Gaussian error model.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.534 seconds)
+   **Total running time of the script:** ( 0 minutes  0.535 seconds)
 
 
 .. _sphx_glr_download_examples_1_basic_photoz.py:

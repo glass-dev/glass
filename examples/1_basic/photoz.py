@@ -81,10 +81,9 @@ zbins = glass.observations.equal_dens_zbins(z, dndz, nbins)
 
 # %%
 # After the photometric bins are defined, make histograms of the *true* redshift
-# distribution :math:`n(z)` using the *photometric* redshifts for binning.
-#
-# Use the :func:`~glass.observations.tomo_nz_gausserr()` to get the expected
-# tomographic redshift distributions using the same Gaussian error model.
+# distribution :math:`n(z)` using the *photometric* redshifts for binning.  Use
+# the :func:`~glass.observations.tomo_nz_gausserr()` function to also plot the
+# expected tomographic redshift distributions with the same model.
 
 tomo_nz = glass.observations.tomo_nz_gausserr(z, dndz, phz_sigma_0, zbins)
 tomo_nz *= glass.util.ARCMIN2_SPHERE*(z[-1] - z[0])/40
