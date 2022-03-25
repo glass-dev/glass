@@ -126,6 +126,23 @@ class State(UserDict):
             self.data[key] = value
 
 
+def _gencall(generator, state):
+    '''call a generator'''
+
+    t = time.monotonic()
+
+    log.info('--- %s ---', generator.label)
+
+    if state is None:
+        generator.send(None)
+    elif state is GeneratorExit:
+        generator.close()
+    else:
+        state[generator._outputs] = generator.send(state[generator._inputs])
+
+    log.info('>>> %s: %s <<<', generator.label, timedelta(seconds=time.monotonic()-t))
+
+
 def generate(generators):
     '''run generators'''
 
@@ -133,10 +150,7 @@ def generate(generators):
 
     # prime all generators
     for g in generators:
-        log.info('--- %s ---', g.name)
-        log.debug('initial signature: %s', g.signature)
-        g.send(None)
-        log.debug('final signature: %s', g.signature)
+        _gencall(g, None)
 
     # this will keep the state of the simulation during iteration
     state = State()
@@ -157,31 +171,20 @@ def generate(generators):
         log.info('=== shell %d ===', n)
 
         for g in generators:
-
-            t = time.monotonic()
-
-            log.info('--- %s ---', g.name)
-
             try:
-                state[g._outputs] = g.send(state[g._inputs])
+                _gencall(g, state)
             except StopIteration:
                 log.info('>>> generator has stopped the simulation <<<')
                 break
-
-            log.info('>>> %s: %s <<<', g.name, timedelta(seconds=time.monotonic()-t))
-
         else:  # no break
             yield state
             continue
-
-        # break in inner loop
         break
 
     log.info('=== finalize ===')
 
     # close all generators
     for g in generators:
-        log.info('--- %s ---', g.name)
-        g.close()
+        _gencall(g, GeneratorExit)
 
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
