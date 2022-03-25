@@ -5,6 +5,7 @@
 import logging
 import time
 from datetime import timedelta
+from collections import UserDict
 from collections.abc import Sequence, Mapping, Iterator, Iterable
 import numpy as np
 
@@ -59,39 +60,70 @@ def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
     return zgen(z)
 
 
-def _getitem_all(d, k):
-    '''recursive dictionary getter'''
-    if isinstance(k, str):
-        if k.endswith('?'):
-            return d.get(k[:-1], None)
+class State(UserDict):
+    '''simulation state with recursive lookups and context'''
+
+    Nothing = object()
+
+    def __init__(self, data=None, context=None, **kwargs):
+        super().__init__(data, **kwargs)
+        self.context = context
+
+    def __setitem__(self, key, value):
+        self.setall(key, value)
+
+    def __getitem__(self, key):
+        return self.getall(key)
+
+    def getcontext(self, key, default=Nothing):
+        '''return item from self or context'''
+        if key in self.data:
+            return self.data[key]
+        if self.context is not None:
+            try:
+                return self.context[key]
+            except KeyError:
+                pass
+        if default is not State.Nothing:
+            return default
+        raise KeyError(key)
+
+    def getall(self, key):
+        '''recursive dictionary getter'''
+        if key is None:
+            return None
+        elif isinstance(key, str):
+            if key.endswith('?'):
+                return self.getcontext(key[:-1], None)
+            else:
+                return self.getcontext(key)
+        elif isinstance(key, Sequence):
+            return type(key)(self.getall(k) for k in key)
+        elif isinstance(key, Mapping):
+            return type(key)((k, self.getall(key[k])) for k in key)
         else:
-            return d[k]
-    elif isinstance(k, Sequence):
-        return type(k)(_getitem_all(d, i) for i in k)
-    elif isinstance(k, Mapping):
-        return type(k)((i, _getitem_all(d, k[i])) for i in k)
-    else:
-        return d[k]
+            return self.getcontext(key)
 
-
-def _setitem_all(d, k, v):
-    '''recursive dictionary setter'''
-    if isinstance(k, str):
-        d[k] = v
-    elif isinstance(k, Sequence):
-        if not isinstance(v, Sequence):
-            raise TypeError('cannot set sequence of keys with non-sequence of values')
-        if len(k) != len(v):
-            raise ValueError(f'cannot set {len(k)} items with {len(v)} values')
-        for k_, v_ in zip(k, v):
-            _setitem_all(d, k_, v_)
-    elif isinstance(k, Mapping):
-        if not isinstance(v, Mapping):
-            raise TypeError('cannot set mapping of keys with non-mapping of values')
-        for i in k:
-            _setitem_all(d, k[i], v[i])
-    else:
-        d[k] = v
+    def setall(self, key, value):
+        '''recursive dictionary setter'''
+        if key is None:
+            pass
+        elif isinstance(key, str):
+            self.data[key] = value
+        elif isinstance(key, Sequence):
+            if not isinstance(value, Sequence):
+                raise TypeError('cannot set sequence of keys with non-sequence of values')
+            if len(key) != len(value):
+                raise ValueError(f'cannot set {len(key)} items with {len(value)} values')
+            for k, v in zip(key, value):
+                self.setall(k, v)
+        elif isinstance(key, Mapping):
+            if not isinstance(value, Mapping):
+                raise TypeError('cannot set mapping of keys with non-mapping of values')
+            for k in key:
+                self.setall(key[k], value[k])
+        else:
+            self.data[key] = value
 
 
 def generate(generators):
@@ -107,7 +139,7 @@ def generate(generators):
         log.debug('final signature: %s', g.signature)
 
     # this will keep the state of the simulation during iteration
-    state = {}
+    state = State()
 
     # simulation status
     n = 0
@@ -130,19 +162,11 @@ def generate(generators):
 
             log.info('--- %s ---', g.name)
 
-            if g._inputs is not None:
-                inputs = _getitem_all(state, g._inputs)
-            else:
-                inputs = None
-
             try:
-                values = g.send(inputs)
+                state[g._outputs] = g.send(state[g._inputs])
             except StopIteration:
                 log.info('>>> generator has stopped the simulation <<<')
                 break
-
-            if g._outputs is not None:
-                _setitem_all(state, g._outputs, values)
 
             log.info('>>> %s: %s <<<', g.name, timedelta(seconds=time.monotonic()-t))
 
