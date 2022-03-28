@@ -3,6 +3,10 @@
 **GLASS**: Generator for Large Scale Structure
 **********************************************
 
+.. image:: https://badges.gitter.im/glass-dev/glass.svg
+   :alt: Join the chat at https://gitter.im/glass-dev/glass
+   :target: https://gitter.im/glass-dev/glass?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 This is an early access repository for GLASS.
 
 The best way to install the current code is to clone the repository and install
