@@ -23,6 +23,13 @@ this stage.  The `examples`__ page has some code to get you started.
 __ https://glass.readthedocs.io/
 __ https://glass.readthedocs.io/en/latest/examples/
 
+If you want to run the examples yourself, you currently also need the `CAMB
+module for GLASS`__::
+
+    pip install git+https://github.com/glass-dev/glass-camb.git#egg=glass-camb
+
+__ https://github.com/glass-dev/glass-camb
+
 But there is probably no better way to get started than to get in touch.  Please
 `join our Slack`__ and we can take it from there.
 
