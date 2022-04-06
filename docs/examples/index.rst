@@ -28,6 +28,27 @@ To get started, these examples focus on simulating one thing at a time.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to implement and use a new model.">
+
+.. only:: html
+
+ .. figure:: /examples/1_basic/images/thumb/sphx_glr_create_new_model_thumb.png
+     :alt: Creating a new model
+
+     :ref:`sphx_glr_examples_1_basic_create_new_model.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/1_basic/create_new_model
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example simulates a matter-only light cone up to redshift 1 and samples galaxies from a un...">
 
 .. only:: html
