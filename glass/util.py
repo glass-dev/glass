@@ -3,6 +3,7 @@
 '''module for implementation utilities'''
 
 import numpy as np
+from numba import njit
 
 
 # constants
@@ -112,3 +113,95 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     q = np.sqrt((A+C-np.sqrt((A-C)**2+B2))/(A+C+np.sqrt((A-C)**2+B2)))
 
     return q
+
+
+@njit(nogil=True)
+def _tally(count, indices):
+    '''compiled function to tally with unit weights'''
+    for i in indices:
+        count[i] += 1
+
+
+@njit(nogil=True)
+def _tallyw(count, indices, weights):
+    '''compiled function to tally with given weights'''
+    for i, w in zip(indices, weights):
+        count[i] += w
+
+
+def tally(count, indices, weights=None):
+    '''tally indices into array of counts
+
+    Tally given indices into an array of counts.  The counts are optionally
+    weighted.
+
+    Counts are not zeroed on input to enable continued tallying.
+
+    Parameters
+    ----------
+    count : (N,) array_like
+        Total count for each index.
+    indices : (M,) array_like
+        Indices to be tallied.  Each index ``i`` must be ``0 <= i < N``.
+    weights : (M,) array_like, optional
+        Weight for each index.  If not given, unit weights are assumed.
+
+    See Also
+    --------
+    accumulate : similar function to sum values by indices
+
+    '''
+
+    if weights is None:
+        _tally(count, indices)
+    else:
+        _tallyw(count, indices, weights)
+
+
+@njit(nogil=True)
+def _accumulate(total, count, indices, values):
+    '''compiled function to accumulate values with unit weights'''
+    for i, v in zip(indices, values):
+        total[i] += v
+        count[i] += 1
+
+
+@njit(nogil=True)
+def _accumulatew(total, count, indices, values, weights):
+    '''compiled function to accumulate values with given weights'''
+    for i, v, w in zip(indices, values, weights):
+        total[i] += w*v
+        count[i] += w
+
+
+def accumulate(total, count, values, indices, weights=None):
+    '''accumulate values into array of totals
+
+    Accumulate given values and indices into arrays of totals and counts.  The
+    values are optionally weighted.
+
+    Totals and counts are not zeroed on input to enable continued accumulation.
+
+    Parameters
+    ----------
+    total : (N,) array_like
+        Array of accumulated values.
+    count : (N,) array_like
+        Total count for each index.
+    values : (M,) array_like
+        Values to be accumulated.
+    indices : (M,) array_like
+        Indices for values.  Each index ``i`` must be ``0 <= i < N``.
+    weights : (npos,) array_like, optional
+        Weight for each value.  If not given, unit weights are assumed.
+
+    See Also
+    --------
+    tally : similar function to sum counts by indices
+
+    '''
+
+    if weights is None:
+        _accumulate(total, count, indices, values)
+    else:
+        _accumulatew(total, count, indices, values, weights)
