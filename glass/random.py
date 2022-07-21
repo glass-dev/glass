@@ -61,6 +61,9 @@ def transform_cls(cls, tfm, nside=None):
     # the actual lmax is constrained by what the pixwin function can provide
     lmax = len(pw) - 1
 
+    # band limit if nside is provided
+    llim = 3*nside - 1 if nside is not None else None
+
     # transform input cls to cls for the Gaussian random fields
     gaussian_cls = []
     for cl in cls:
@@ -70,6 +73,10 @@ def transform_cls(cls, tfm, nside=None):
             # shorter array determines length
             cl_len = min(len(cl), lmax+1)
             cl = cl[:cl_len]*pw[:cl_len]
+
+            # pad the cls up to bandlimit if provided
+            if llim and llim > cl_len:
+                cl = np.pad(cl, (0, llim-cl_len))
 
             # transform the cl
             cl = tfm(cl)
