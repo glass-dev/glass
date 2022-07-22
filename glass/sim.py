@@ -179,8 +179,11 @@ def generate(generators):
                 log.info('>>> generator has stopped the simulation <<<')
                 break
         else:  # no break
-            log.info('>>> shell %d: %s <<<', n, timedelta(seconds=time.monotonic()-ts))
+            ty = time.monotonic()
+            log.info('--- yield ---')
             yield state
+            log.info('>>> yield: %s <<<', timedelta(seconds=time.monotonic()-ty))
+            log.info('»»» shell %d: %s «««', n, timedelta(seconds=time.monotonic()-ts))
             continue
         break
 
