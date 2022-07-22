@@ -166,6 +166,7 @@ def generate(generators):
     # stop if any of the generators stops by throwing StopIteration
     while True:
         n += 1
+        ts = time.monotonic()
 
         state['#'] = n
 
@@ -178,6 +179,7 @@ def generate(generators):
                 log.info('>>> generator has stopped the simulation <<<')
                 break
         else:  # no break
+            log.info('>>> shell %d: %s <<<', n, timedelta(seconds=time.monotonic()-ts))
             yield state
             continue
         break
