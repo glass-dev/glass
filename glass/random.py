@@ -65,7 +65,7 @@ def transform_cls(cls, tfm, nside=None):
 
     # get pixel window function if nside is given, or set to unity
     if nside is not None:
-        pw = hp.pixwin(nside, pol=False, lmax=(llim or lmax))
+        pw = hp.pixwin(nside, pol=False, lmax=llim)
     else:
         pw = np.ones(lmax+1)
 
