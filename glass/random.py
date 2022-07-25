@@ -61,7 +61,7 @@ def transform_cls(cls, tfm, nside=None):
     lmax = np.max([len(cl)-1 for cl in cls if cl is not None])
 
     # map limit if nside is provided
-    llim = int(12**0.5*nside - 1) if nside is not None else None
+    llim = 3*nside - 1 if nside is not None else None
 
     # get pixel window function if nside is given, or set to unity
     if nside is not None:
