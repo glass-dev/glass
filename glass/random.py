@@ -11,6 +11,14 @@ from gaussiancl import lognormal_cl
 log = logging.getLogger(__name__)
 
 
+def _exp_decay_cl(lmax, cl):
+    '''exponential decay of power spectrum up to lmax'''
+    l0 = len(cl)
+    l = np.arange(l0, lmax+1)
+    t = np.log(cl[-2]/cl[-1])/np.log((l0-2)/(l0-1))
+    return np.concatenate([cl, cl[-1]*np.exp(t*(l/(l0-1) - 1))])
+
+
 def synalm(cl, rng=None):
     '''sample spherical harmonic modes from an angular power spectrum
 
@@ -52,31 +60,31 @@ def transform_cls(cls, tfm, nside=None):
     # maximum l in input cls
     lmax = np.max([len(cl)-1 for cl in cls if cl is not None])
 
+    # map limit if nside is provided
+    llim = 12**0.5*nside - 1 if nside is not None else None
+
     # get pixel window function if nside is given, or set to unity
     if nside is not None:
-        pw = hp.pixwin(nside, pol=False, lmax=lmax)
+        pw = hp.pixwin(nside, pol=False, lmax=(llim or lmax))
     else:
         pw = np.ones(lmax+1)
 
     # the actual lmax is constrained by what the pixwin function can provide
     lmax = len(pw) - 1
 
-    # band limit if nside is provided
-    llim = 3*nside - 1 if nside is not None else None
-
     # transform input cls to cls for the Gaussian random fields
     gaussian_cls = []
     for cl in cls:
         # only work on available cls
         if cl is not None:
+            # extrapolate the cl if possible
+            if llim and llim >= len(cl):
+                cl = _exp_decay_cl(llim, cl)
+
             # simulating integrated maps by multiplying cls and pw
             # shorter array determines length
             cl_len = min(len(cl), lmax+1)
             cl = cl[:cl_len]*pw[:cl_len]
-
-            # pad the cls up to bandlimit if provided
-            if llim and llim > cl_len:
-                cl = np.pad(cl, (0, llim-cl_len))
 
             # transform the cl
             cl = tfm(cl)
