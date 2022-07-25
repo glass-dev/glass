@@ -1,11 +1,13 @@
-**********************************************
-**GLASS**: Generator for Large Scale Structure
-**********************************************
-
 .. image:: _static/glass.png
    :width: 50%
    :align: center
    :class: no-scaled-link
+
+|
+
+**********************************************
+**GLASS**: Generator for Large Scale Structure
+**********************************************
 
 ========
 Synopsis
