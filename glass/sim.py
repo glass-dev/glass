@@ -40,7 +40,7 @@ def zspace(zmin, zmax, *, dz=None, num=None):
     if (dz is None) == (num is None):
         raise ValueError('exactly one of "dz" or "num" must be given')
     if dz is not None:
-        z = np.arange(zmin, zmax, dz)
+        z = np.arange(zmin, np.nextafter(zmax+dz, zmax), dz)
     else:
         z = np.linspace(zmin, zmax, num+1)
     return zgen(z)
@@ -53,7 +53,7 @@ def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
         raise ValueError('exactly one of "dx" or "num" must be given')
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
     if dx is not None:
-        x = np.arange(xmin, xmax, dx)
+        x = np.arange(xmin, np.nextafter(xmax+dx, xmax), dx)
     else:
         x = np.linspace(xmin, xmax, num+1)
     z = cosmo.dc_inv(x)
