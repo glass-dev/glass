@@ -2,11 +2,13 @@
 # license: MIT
 '''simulation of spherical random fields'''
 
+from itertools import repeat
 import logging
 import numpy as np
 import healpy as hp
 from gaussiancl import lognormal_cl
 
+SQRT2 = 2**0.5
 
 log = logging.getLogger(__name__)
 
@@ -19,39 +21,60 @@ def _exp_decay_cl(lmax, cl):
     return np.concatenate([cl, cl[-1]*np.exp(t*(l/(l0-1) - 1))])
 
 
-def synalm(cl, rng=None):
-    '''sample spherical harmonic modes from an angular power spectrum
+def iternorm(k, cov, n=()):
+    '''return the vector a and variance sigma^2 for iterative normal sampling'''
 
-    This is a simplified version of the HEALPix synalm routine with support for
-    random number generator instances.
+    m = np.zeros((*n, k, k))
+    a = np.zeros((*n, k))
+    s = np.zeros((*n,))
+    q = (*n, k+1)
+    j = 0 if k > 0 else None
 
-    '''
+    for i, x in enumerate(cov):
+        x = np.asanyarray(x)
+        if x.shape != q:
+            try:
+                x = np.broadcast_to(x, q)
+            except ValueError:
+                raise TypeError(f'covariance row {i}: shape {x.shape} cannot be broadcast to {q}') from None
 
-    # get the default RNG if not given
-    if rng is None:
-        rng = np.random.default_rng()
+        # only need to update matrix A if there are correlations
+        if k > 0:
+            # compute new entries of matrix A
+            m[..., :, j] = 0
+            m[..., [j], :] = np.matmul(a[..., np.newaxis, :], m)
+            m[..., j, j] = np.where(s != 0, -1, 0)
+            np.divide(m[..., j, :], -s[..., np.newaxis], where=(m[..., j, :] != 0), out=m[..., j, :])
 
-    # length of the cl array
-    n = len(cl)
+            # compute new vector a
+            c = x[..., 1:, np.newaxis]
+            a = np.matmul(m[..., :j], c[..., k-j:, :])
+            a += np.matmul(m[..., j:], c[..., :k-j, :])
+            a = a.reshape(*n, k)
 
-    # sanity check
-    if np.any(cl < 0):
-        raise ValueError('negative values in cl')
+            # next rolling index
+            j = (j - 1) % k
 
-    # standard normal random variates for alm
-    # sample real and imaginary parts, then view as complex number
-    alm = rng.standard_normal(n*(n+1), np.float64).view(np.complex128)
+        # compute new standard deviation
+        s = x[..., 0] - np.einsum('...i,...i', a, a)
+        if np.any(s < 0):
+            raise ValueError('covariance matrix is not positive definite')
+        s = np.sqrt(s)
 
-    # scale standard normal variates by cls
-    # modes with m = 0 are first in array and real-valued
-    f = np.sqrt(cl)/np.sqrt(2)
+        # yield the next index, vector a, and standard deviation s
+        yield j, a, s
+
+
+def multalm(alm, bl, inplace=False):
+    '''multiply alm by bl'''
+    n = len(bl)
+    if inplace:
+        out = np.asanyarray(alm)
+    else:
+        out = np.copy(alm)
     for m in range(n):
-        alm[m*n-m*(m-1)//2:(m+1)*n-m*(m+1)//2] *= f[m:]
-    alm[:n].real += alm[:n].imag
-    alm[:n].imag = 0
-
-    # done with sampling alm
-    return alm
+        out[m*n-m*(m-1)//2:(m+1)*n-m*(m+1)//2] *= bl[m:]
+    return out
 
 
 def transform_cls(cls, tfm, nside=None):
@@ -101,8 +124,12 @@ def transform_cls(cls, tfm, nside=None):
 def generate_gaussian(nside, rng=None):
     '''sample Gaussian random fields from Cls'''
 
-    # initial values
-    m = cl = alm = None
+    # get the default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # initial value
+    m = None
 
     # sample the fields from the conditional distribution
     while True:
@@ -112,24 +139,47 @@ def generate_gaussian(nside, rng=None):
         except GeneratorExit:
             break
 
-        # update the mean and variance of the conditional distribution
-        # on first iteration, sample from unconditional distribution
-        if cls[1] is not None:
-            cl = cls[1]/np.where(cls[1] != 0, cl, 1)
-            mu = hp.almxfl(alm, cl, inplace=True)
-            cl = cls[0] - cls[1]*cl
-        else:
-            mu = 0
-            cl = cls[0]
+        # set up the iterative sampling on the first pass
+        if m is None:
+            k = len(cls) - 1
+            n = len(cls[0])
+            cov = np.zeros((n, k + 1))
+            z = np.zeros(n*(n+1)//2, dtype=np.complex128)
+            y = np.zeros((n*(n+1)//2, k), dtype=np.complex128)
+            ni = iternorm(k, repeat(cov), (n,))
 
-        # sample alm from the conditional distribution
-        # does not include the mean, which is added below
-        alm = synalm(cl, rng)
+        # set the new covariance matrix row
+        for i, cl in enumerate(cls):
+            if i == 0 and np.any(cl < 0):
+                raise ValueError('negative values in cl')
+            cov[..., i] = cl if cl is not None else 0
+
+        # get the conditional distribution
+        j, a, s = next(ni)
+
+        # standard normal random variates for alm
+        # sample real and imaginary parts, then view as complex number
+        rng.standard_normal(n*(n+1), np.float64, z.view(np.float64))
+
+        # scale by standard deviation of the conditional distribution
+        # variance is distributed over real and imaginary part
+        alm = multalm(z, s/SQRT2)
+
+        # add the mean of the conditional distribution
+        for i in range(k):
+            alm += multalm(y[:, i], a[:, i])
+
+        # store the standard normal in y array at the indicated index
+        if j is not None:
+            y[:, j] = z
+
+        # modes with m = 0 are real-valued and come first in array
+        alm[:n].real += alm[:n].imag
+        alm[:n].imag = 0
 
         # transform alm to maps
-        # add the mean of the conditional distribution
-        # can be performed in place on the temporary array
-        m = hp.alm2map(alm + mu, nside, pixwin=False, pol=False, inplace=True)
+        # can be performed in place on the temporary alm array
+        m = hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
 def generate_normal(nside, rng=None):
