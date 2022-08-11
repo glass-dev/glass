@@ -1,7 +1,6 @@
 .navbar-brand:after {
     content: "GLASS";
-    color: #666;
-    text-shadow: 0 0 3px #333;
+    color: var(--pst-color-primary);
     font-size: 1.3em;
     font-weight: 200;
     font-stretch: 110%;
