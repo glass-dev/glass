@@ -93,10 +93,13 @@ pars.min_l = 1
 pars.SourceWindows = [camb.sources.SplinedSourceWindow(z=z, W=nz, source_type='lensing')]
 theory_cls = camb.get_results(pars).get_source_cls_dict(lmax=lmax, raw_cl=True)
 
+# get the pixel window function
+pw = hp.pixwin(nside, lmax=lmax)
+
 # plot the realised and expected cls
 l = np.arange(lmax+1)
 plt.plot(l, (2*l+1)*cls[0], '-k', lw=2, label='simulation')
-plt.plot(l, (2*l+1)*theory_cls['W1xW1'], '-r', lw=2, label='expectation')
+plt.plot(l, (2*l+1)*theory_cls['W1xW1']*pw**2, '-r', lw=2, label='expectation')
 plt.xscale('symlog', linthresh=10, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
 plt.yscale('symlog', linthresh=1e-7, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
 plt.xlabel(r'angular mode number $l$')
