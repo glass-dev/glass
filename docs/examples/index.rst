@@ -82,6 +82,23 @@ To get started, these examples focus on simulating one thing at a time.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example simulates only the matter field in nested shells up to redshift 1.">
+
+.. only:: html
+
+  .. image:: /examples/1_basic/images/thumb/sphx_glr_matter_thumb.png
+    :alt: Matter distribution
+
+  :ref:`sphx_glr_examples_1_basic_matter.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Matter distribution</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example simulates galaxies with a simple photometric redshift model.">
 
 .. only:: html
