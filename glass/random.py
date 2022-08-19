@@ -8,8 +8,6 @@ import numpy as np
 import healpy as hp
 from gaussiancl import lognormal_cl
 
-SQRT2 = 2**0.5
-
 log = logging.getLogger(__name__)
 
 
@@ -154,6 +152,9 @@ def generate_gaussian(nside, rng=None):
                 raise ValueError('negative values in cl')
             cov[..., i] = cl if cl is not None else 0
 
+        # covariance is per component
+        cov /= 2
+
         # get the conditional distribution
         j, a, s = next(ni)
 
@@ -163,7 +164,7 @@ def generate_gaussian(nside, rng=None):
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
-        alm = multalm(z, s/SQRT2)
+        alm = multalm(z, s)
 
         # add the mean of the conditional distribution
         for i in range(k):
