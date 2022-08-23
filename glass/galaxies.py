@@ -29,6 +29,7 @@ Ellipticity
    :toctree: generated/
 
    gal_ellip_gaussian
+   gal_ellip_intnorm
    gal_ellip_ryden04
    gal_shear_interp
 
@@ -517,6 +518,53 @@ def gal_ellip_gaussian(sigma, *, rng=None):
             rng.standard_normal(2*len(i), np.float64, e[i].view(np.float64))
             e[i] *= sigma
             i = i[np.abs(e[i]) > 1]
+
+
+@generator('ngal -> gal_ell')
+def gal_ellip_intnorm(sigma_eta, *, rng=None):
+    r'''generator for galaxy ellipticities with intrinsic normal distribution
+
+    The ellipticities are sampled from an intrinsic normal distribution with
+    standard deviation ``sigma_eta`` for each component.
+
+    Parameters
+    ----------
+    sigma_eta : array_like
+        Standard deviation in each component of the normal coordinates.
+    rng : :class:`~numpy.random.Generator`, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Receives
+    --------
+    ngal : int
+        Number of galaxies for which ellipticities are sampled.
+
+    Yields
+    ------
+    gal_ell : (ngal,) array_like
+        Array of galaxy :term:`ellipticity (complex)`.
+
+    '''
+
+    # default RNG if not provided
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # initial yield
+    e = None
+
+    # wait for inputs and return ellipticities, or stop on exit
+    while True:
+        try:
+            ngal = yield e
+        except GeneratorExit:
+            break
+
+        # sample complex ellipticities
+        e = rng.standard_normal(2*ngal, np.float64).view(np.complex128)
+        e *= sigma_eta
+        r = np.hypot(e.real, e.imag)
+        e *= np.tanh(r/2)/r
 
 
 @generator('ngal -> gal_ell')
