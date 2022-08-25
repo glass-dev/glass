@@ -17,6 +17,7 @@ Random fields
    :template: generator.rst
    :toctree: generated/
 
+   gaussian_matter
    lognormal_matter
 
 '''
