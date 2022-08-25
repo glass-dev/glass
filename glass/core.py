@@ -72,6 +72,9 @@ class Generator:
     def __str__(self):
         return f'{self.name}: {self.signature}'
 
+    def __iter__(self):
+        return iter(self._generator)
+
     def __getattr__(self, attr):
         return getattr(self._generator, attr)
 
