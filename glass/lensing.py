@@ -132,7 +132,26 @@ def shear(lmax=None):
         gamma1, gamma2 = hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
-@generator('zmin, zmax, delta -> zsrc, kappa')
+def _lens_wht_midpoint(cosmo, zsrc, z, w):
+    '''midpoint weights for the approximate extrapolation law'''
+    v = np.trapz(w, z)
+    if v == 0:
+        return 0.
+    zbar = np.trapz(z*w, z)/v
+    wbar = np.interp(zbar, z, w)
+    f = cosmo.xm(zbar)/cosmo.xm(zsrc)*cosmo.xm(zbar, zsrc)
+    f *= (1 + zbar)/cosmo.e(zbar)
+    return f/wbar*v
+
+
+def _lens_wht_integrated(cosmo, zsrc, z, w):
+    '''integrated weights for the approximate extrapolation law'''
+    f = cosmo.xm(z)/cosmo.xm(zsrc)*cosmo.xm(z, zsrc)
+    f *= (1 + z)/cosmo.e(z)
+    return np.trapz(f, z)
+
+
+@generator('zmin, zmax, delta, wz -> zsrc, kappa')
 def convergence(cosmo, weight='midpoint'):
     '''convergence from integrated matter shells'''
 
@@ -144,23 +163,13 @@ def convergence(cosmo, weight='midpoint'):
 
         log.info('will use midpoint lensing weights')
 
-        # consider the lensing weight constant, and integrate the matter
-        def w(zi, zj, zk):
-            z = cosmo.xc_inv(np.mean(cosmo.xc([zi, zj])))
-            x = cosmo.xm(z) if z != 0 else 1.
-            return cosmo.xm(z, zk)/cosmo.xm(zk)*(1 + z)*cosmo.vc(zi, zj)/x
+        _lens_wht = _lens_wht_midpoint
 
     elif weight == 'integrated':
 
         log.info('will use integrated lensing weights')
 
-        # consider the matter constant, and integrate the lensing weight
-        def w(zi, zj, zk):
-            z = np.linspace(zi, zj, 100)
-            f = cosmo.xm(z)
-            f *= cosmo.xm(z, zk)/cosmo.xm(zk)
-            f *= (1 + z)/cosmo.e(z)
-            return np.trapz(f, z)
+        _lens_wht = _lens_wht_integrated
 
     else:
         raise ValueError(f'invalid value for weight: {weight}')
@@ -171,7 +180,7 @@ def convergence(cosmo, weight='midpoint'):
     # return convergence and get new matter shell, or stop on exit
     while True:
         try:
-            zmin, zmax, delta23 = yield z3, kappa3
+            zmin, zmax, delta23, (z, w) = yield z3, kappa3
         except GeneratorExit:
             break
 
@@ -183,6 +192,8 @@ def convergence(cosmo, weight='midpoint'):
             z2 = z3 = zmin
             r23 = 1
             w33 = 0
+            z_ = np.full(2, zmin)
+            w_ = np.zeros_like(z_)
 
         # deal with non-contiguous redshift intervals
         if z3 != zmin:
@@ -204,8 +215,8 @@ def convergence(cosmo, weight='midpoint'):
 
         # weights for the lensing recurrence
         w22 = w33
-        w23 = w(z1, z2, z3)
-        w33 = w(z2, z3, z3)
+        w23 = _lens_wht(cosmo, z3, z_, w_)
+        w33 = _lens_wht(cosmo, z3, z, w)
 
         # compute next convergence plane in place of last
         kappa3 *= 1 - t123
@@ -222,6 +233,7 @@ def convergence(cosmo, weight='midpoint'):
 
         # before losing it, keep current matter slice for next round
         delta12 = delta23
+        z_, w_ = z, w
 
 
 @generator('zsrc, kappa?, gamma1?, gamma2? -> kappa_bar, gamma1_bar, gamma2_bar')
