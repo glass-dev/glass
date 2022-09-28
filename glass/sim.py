@@ -15,6 +15,27 @@ from .core import generator
 log = logging.getLogger(__name__)
 
 
+class GeneratorError(RuntimeError):
+    '''raised when an error occurred in a generator'''
+
+    def __init__(self, generator, state):
+        '''construct a GeneratorError for generator and shell'''
+        self._generator = generator
+        self._state = state
+        g, n = generator.label, state['#']
+        super().__init__(f'shell {n}: uncaught exception in {g}')
+
+    @property
+    def generator(self):
+        '''the generator that caused the exception'''
+        return self._generator
+
+    @property
+    def state(self):
+        '''the state of the simulation when the exception occurred'''
+        return self._state
+
+
 @generator('-> zmin, zmax')
 def zgen(z):
     '''generator for contiguous redshift slices from a redshift array'''
@@ -144,7 +165,15 @@ def _gencall(generator, state):
 
 
 def generate(generators):
-    '''run generators'''
+    '''run generators
+
+    Raises
+    ------
+    GeneratorError
+        If an uncaught exception is raised by a generator.  The original
+        exception is the `__cause__` of the GeneratorError.
+
+    '''
 
     log.info('=== initialize ===')
 
@@ -164,6 +193,7 @@ def generate(generators):
     # for each iteration, run all generators, then yield the results
     # for each generator, collect its inputs and store its outputs
     # stop if any of the generators stops by throwing StopIteration
+    # raise a GeneratorError if there is an uncaught exception
     while True:
         n += 1
         ts = time.monotonic()
@@ -178,6 +208,8 @@ def generate(generators):
             except StopIteration:
                 log.info('>>> generator has stopped the simulation <<<')
                 break
+            except BaseException as e:
+                raise GeneratorError(g, state) from e
         else:  # no break
             ty = time.monotonic()
             log.info('--- yield ---')
