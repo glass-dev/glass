@@ -4,7 +4,6 @@
 
 import logging
 import time
-import traceback
 from datetime import timedelta
 from collections import UserDict
 from collections.abc import Sequence, Mapping, Iterator, Iterable
@@ -14,20 +13,6 @@ from .core import generator
 
 
 log = logging.getLogger(__name__)
-
-
-def _truncate_tb(exc):
-    '''return a generator's exception with truncated traceback'''
-
-    tb = exc.__traceback__
-    st = iter(traceback.extract_tb(tb))
-    fn = next(st).filename
-
-    while tb and fn != __file__:
-        tb, fn = tb.tb_next, next(st).filename
-    while tb and fn == __file__:
-        tb, fn = tb.tb_next, next(st).filename
-    return exc.with_traceback(tb or exc.__traceback__)
 
 
 class GeneratorError(RuntimeError):
@@ -224,7 +209,7 @@ def generate(generators):
                 log.info('>>> generator has stopped the simulation <<<')
                 break
             except BaseException as e:
-                raise GeneratorError(g, state) from _truncate_tb(e)
+                raise GeneratorError(g, state) from e
         else:  # no break
             ty = time.monotonic()
             log.info('--- yield ---')

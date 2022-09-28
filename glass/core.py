@@ -123,15 +123,16 @@ class Generator:
 
 def generator(signature, *, self=False):
     '''decorator to wrap a low-level generator'''
-    def decorator(gf):
-        @wraps(gf)
+    def decorator(f):
+        @wraps(f)
         def wrapper(*args, **kwargs):
-            name = getattr(gf, '__name__', None)
-            module = getattr(gf, '__module__', None)
+            name = getattr(f, '__name__', None)
+            module = getattr(f, '__module__', None)
             g = object.__new__(Generator)
             if self:
                 args = [g, *args]
-            g.__init__(gf(*args, **kwargs), signature, name, module)
+            generator = f(*args, **kwargs)
+            g.__init__(generator, signature, name, module)
             return g
         return wrapper
     return decorator
