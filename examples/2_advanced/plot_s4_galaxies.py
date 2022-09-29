@@ -2,10 +2,12 @@
 Stage IV Galaxy Survey
 ======================
 
-This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
-*Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
+This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy
+Survey such as *Euclid* and *Roman* combining the
+:ref:`sphx_glr_examples_1_basic_plot_density.py` and
 :ref:`sphx_glr_examples_1_basic_plot_lensing.py` examples with generators for
-the intrinsic galaxy ellipticity and the resulting shear with some auxiliary functions.
+the intrinsic galaxy ellipticity and the resulting shear with some auxiliary
+functions.
 
 The focus in this example is mock catalogue generation using auxiliary functions
 built for simulating Stage IV galaxy surveys.
@@ -36,14 +38,17 @@ from glass import glass
 import camb
 
 # cosmology for the simulation
-cosmo = LCDM(h=0.7, Om=0.3)
+h = 0.7
+Oc = 0.25
+Ob = 0.05
+cosmo = LCDM(h=h, Om=Oc+Ob)
 
 # basic parameters of the simulation
 nside = 512
 lmax = nside
 
-# size of the dz of each shell to integrate along the LoS:
-dz = 0.05
+# comoving distance size in Mpc of each shell to integrate along the LoS:
+dx = 200
 
 # galaxy density (using 1/100 of the expected galaxy number density for Stage-IV)
 n_arcmin2 = 0.3
@@ -55,7 +60,8 @@ sigma_e = 0.27
 sigma_z0 = 0.03
 
 # set up CAMB parameters for matter angular power spectrum
-pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
+pars = camb.set_params(H0=100*h, omch2=Oc*h**2, ombh2=Ob*h**2)
+
 
 # %%
 # Simulation Setup
@@ -68,7 +74,7 @@ pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
 rng = np.random.default_rng(seed=42)
 
 # true redshift distribution following a Smail distribution
-z = np.linspace(0, 3.0, 1000)
+z = np.linspace(0, 3, 1000)
 dndz = glass.observations.smail_nz(z, z_mode=0.9, alpha=2., beta=1.5)
 dndz *= n_arcmin2
 bz = 1.2
@@ -108,7 +114,8 @@ plt.show()
 # %%
 # generators for the clustering and lensing
 generators = [
-    glass.sim.zspace(0., 3.0001, dz=dz),
+    glass.sim.xspace(cosmo, 0., 3., dx=dx),
+    glass.matter.mat_wht_redshift(),
     glass.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside, rng=rng),
     glass.lensing.convergence(cosmo),

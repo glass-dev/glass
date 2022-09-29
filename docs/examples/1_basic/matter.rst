@@ -30,7 +30,7 @@ Setup
 Set up a matter-only GLASS simulation, which requires a way to obtain matter
 angular power spectra (here: CAMB) and the sampling itself (here: lognormal).
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-49
+.. GENERATED FROM PYTHON SOURCE LINES 14-50
 
 .. code-block:: default
 
@@ -64,6 +64,7 @@ angular power spectra (here: CAMB) and the sampling itself (here: lognormal).
     # generators for a matter-only simulation
     generators = [
         glass.sim.xspace(cosmo, 0, zend, dx=200.),
+        glass.matter.mat_wht_density(cosmo),
         glass.camb.camb_matter_cl(pars, lmax),
         glass.matter.lognormal_matter(nside),
     ]
@@ -76,14 +77,14 @@ angular power spectra (here: CAMB) and the sampling itself (here: lognormal).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-54
+.. GENERATED FROM PYTHON SOURCE LINES 51-55
 
 Simulation
 ----------
 Run the simulation.  For each shell, plot an orthographic annulus of the
 matter distribution.
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-83
+.. GENERATED FROM PYTHON SOURCE LINES 55-84
 
 .. code-block:: default
 
@@ -131,7 +132,7 @@ matter distribution.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  51.054 seconds)
+   **Total running time of the script:** ( 1 minutes  48.858 seconds)
 
 
 .. _sphx_glr_download_examples_1_basic_matter.py:
