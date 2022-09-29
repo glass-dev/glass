@@ -68,8 +68,8 @@ html_theme_options = {
     'icon_links': [
         {
             'name': 'GitHub',
-            'url': 'https://github.com/astro-ph/glass',
-            'icon': 'fab fa-github-square',
+            'url': 'https://github.com/glass-dev/glass',
+            'icon': 'fab fa-github',
             'type': 'fontawesome',
         },
     ],
