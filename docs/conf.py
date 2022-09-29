@@ -62,7 +62,7 @@ html_theme_options = {
     'external_links': [
         {
             'name': 'Examples',
-            'url': 'https://glass.readthedocs.org/projects/examples/',
+            'url': 'https://glass.readthedocs.io/projects/examples/',
         },
     ],
     'icon_links': [
