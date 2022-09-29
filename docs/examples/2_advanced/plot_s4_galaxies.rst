@@ -21,15 +21,17 @@
 Stage IV Galaxy Survey
 ======================
 
-This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy Survey such as
-*Euclid* and *Roman* combining the :ref:`sphx_glr_examples_1_basic_plot_density.py` and
+This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy
+Survey such as *Euclid* and *Roman* combining the
+:ref:`sphx_glr_examples_1_basic_plot_density.py` and
 :ref:`sphx_glr_examples_1_basic_plot_lensing.py` examples with generators for
-the intrinsic galaxy ellipticity and the resulting shear with some auxiliary functions.
+the intrinsic galaxy ellipticity and the resulting shear with some auxiliary
+functions.
 
 The focus in this example is mock catalogue generation using auxiliary functions
 built for simulating Stage IV galaxy surveys.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-26
+.. GENERATED FROM PYTHON SOURCE LINES 17-28
 
 Setup
 -----
@@ -43,7 +45,7 @@ to generate tomographic redshift distributions and visibility masks.
 Finally, there is a generator that applies the reduced shear from the lensing
 maps to the intrinsic ellipticities, producing the galaxy shears.
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-60
+.. GENERATED FROM PYTHON SOURCE LINES 28-66
 
 .. code-block:: default
 
@@ -60,14 +62,17 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
     import camb
 
     # cosmology for the simulation
-    cosmo = LCDM(h=0.7, Om=0.3)
+    h = 0.7
+    Oc = 0.25
+    Ob = 0.05
+    cosmo = LCDM(h=h, Om=Oc+Ob)
 
     # basic parameters of the simulation
     nside = 512
     lmax = nside
 
-    # size of the dz of each shell to integrate along the LoS:
-    dz = 0.05
+    # comoving distance size in Mpc of each shell to integrate along the LoS:
+    dx = 200
 
     # galaxy density (using 1/100 of the expected galaxy number density for Stage-IV)
     n_arcmin2 = 0.3
@@ -79,7 +84,7 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
     sigma_z0 = 0.03
 
     # set up CAMB parameters for matter angular power spectrum
-    pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2)
+    pars = camb.set_params(H0=100*h, omch2=Oc*h**2, ombh2=Ob*h**2)
 
 
 
@@ -88,7 +93,8 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-66
+
+.. GENERATED FROM PYTHON SOURCE LINES 67-72
 
 Simulation Setup
 ----------------
@@ -96,7 +102,7 @@ Here we setup the overall source redshift distribution
 and separate it into equal density tomographic bins
 with the typical redshift errors of a photometric survey.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-82
+.. GENERATED FROM PYTHON SOURCE LINES 72-88
 
 .. code-block:: default
 
@@ -105,7 +111,7 @@ with the typical redshift errors of a photometric survey.
     rng = np.random.default_rng(seed=42)
 
     # true redshift distribution following a Smail distribution
-    z = np.linspace(0, 3.0, 1000)
+    z = np.linspace(0, 3, 1000)
     dndz = glass.observations.smail_nz(z, z_mode=0.9, alpha=2., beta=1.5)
     dndz *= n_arcmin2
     bz = 1.2
@@ -123,12 +129,12 @@ with the typical redshift errors of a photometric survey.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 89-91
 
 Plotting the overall redshift distribution and the
 distribution for each of the equal density tomographic bins
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-99
+.. GENERATED FROM PYTHON SOURCE LINES 91-105
 
 .. code-block:: default
 
@@ -158,12 +164,12 @@ distribution for each of the equal density tomographic bins
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 Make a visibility map typical of a space telescope survey, seeing both
 hemispheres, and low visibility in the galactic and ecliptic bands.
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-108
+.. GENERATED FROM PYTHON SOURCE LINES 108-114
 
 .. code-block:: default
 
@@ -185,16 +191,17 @@ hemispheres, and low visibility in the galactic and ecliptic bands.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-110
+.. GENERATED FROM PYTHON SOURCE LINES 115-116
 
 generators for the clustering and lensing
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-122
+.. GENERATED FROM PYTHON SOURCE LINES 116-129
 
 .. code-block:: default
 
     generators = [
-        glass.sim.zspace(0., 3.0001, dz=dz),
+        glass.sim.xspace(cosmo, 0., 3., dx=dx),
+        glass.matter.mat_wht_redshift(),
         glass.camb.camb_matter_cl(pars, lmax),
         glass.matter.lognormal_matter(nside, rng=rng),
         glass.lensing.convergence(cosmo),
@@ -212,14 +219,14 @@ generators for the clustering and lensing
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-127
+.. GENERATED FROM PYTHON SOURCE LINES 130-134
 
 Simulation
 ----------
 Simulate the galaxies with shears.  In each iteration, get the quantities of interest
 to build our mock catalogue.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-144
+.. GENERATED FROM PYTHON SOURCE LINES 134-151
 
 .. code-block:: default
 
@@ -246,23 +253,21 @@ to build our mock catalogue.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Total Number of galaxies sampled: 22,512,724
+    Total Number of galaxies sampled: 22,396,677
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-149
+.. GENERATED FROM PYTHON SOURCE LINES 152-156
 
 Catalogue checks
 ----------------
 Here we can perform some simple checks at the catalogue level to
 see how our simulation performed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-162
+.. GENERATED FROM PYTHON SOURCE LINES 156-169
 
 .. code-block:: default
 
@@ -294,32 +299,20 @@ see how our simulation performed.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  7.620 seconds)
+   **Total running time of the script:** ( 1 minutes  54.447 seconds)
 
 
 .. _sphx_glr_download_examples_2_advanced_plot_s4_galaxies.py:
 
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
-
-
-
-  .. container:: sphx-glr-download sphx-glr-download-python
-
-     :download:`Download Python source code: plot_s4_galaxies.py <plot_s4_galaxies.py>`
-
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_s4_galaxies.ipynb <plot_s4_galaxies.ipynb>`
-
-
 .. only:: html
 
- .. rst-class:: sphx-glr-signature
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download Python source code: plot_s4_galaxies.py <plot_s4_galaxies.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download Jupyter notebook: plot_s4_galaxies.ipynb <plot_s4_galaxies.ipynb>`

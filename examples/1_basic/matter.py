@@ -41,6 +41,7 @@ pars = camb.set_params(H0=100*h, omch2=Oc*h**2, ombh2=Ob*h**2)
 # generators for a matter-only simulation
 generators = [
     glass.sim.xspace(cosmo, 0, zend, dx=200.),
+    glass.matter.mat_wht_density(cosmo),
     glass.camb.camb_matter_cl(pars, lmax),
     glass.matter.lognormal_matter(nside),
 ]

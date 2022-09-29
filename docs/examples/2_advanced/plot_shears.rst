@@ -40,7 +40,7 @@ be realistic, but enables the example to get away with fewer total galaxies.
 Finally, there is a generator that applies the reduced shear from the lensing
 maps to the intrinsic ellipticities, producing the galaxy shears.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-77
+.. GENERATED FROM PYTHON SOURCE LINES 24-76
 
 .. code-block:: default
 
@@ -49,20 +49,19 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
     import healpy as hp
     import matplotlib.pyplot as plt
 
-    # these are the GLASS imports: cosmology, glass modules, and the CAMB module
+    # these are the GLASS imports: cosmology and the glass meta-module
     from cosmology import LCDM
-    import glass.sim
-    import glass.camb
-    import glass.matter
-    import glass.lensing
-    import glass.galaxies
+    from glass import glass
 
     # also needs camb itself to get the parameter object, and the expectation
     import camb
 
 
     # cosmology for the simulation
-    cosmo = LCDM(h=0.7, Om=0.3)
+    h = 0.7
+    Oc = 0.25
+    Ob = 0.05
+    cosmo = LCDM(h=h, Om=Oc+Ob)
 
     # basic parameters of the simulation
     nside = 512
@@ -81,12 +80,12 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
     dndz *= n_arcmin2/np.trapz(dndz, z)
 
     # set up CAMB parameters for matter angular power spectrum
-    pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2,
-                           NonLinear=camb.model.NonLinear_both)
+    pars = camb.set_params(H0=100*h, omch2=Oc*h**2, ombh2=Ob*h**2)
 
     # generators for lensing and galaxies
     generators = [
-        glass.sim.zspace(0, 1.01, dz=0.1),
+        glass.sim.zspace(0, 1., dz=0.1),
+        glass.matter.mat_wht_redshift(),
         glass.camb.camb_matter_cl(pars, lmax),
         glass.matter.lognormal_matter(nside),
         glass.lensing.convergence(cosmo),
@@ -104,14 +103,14 @@ maps to the intrinsic ellipticities, producing the galaxy shears.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-82
+.. GENERATED FROM PYTHON SOURCE LINES 77-81
 
 Simulation
 ----------
 Simulate the galaxies with shears.  In each iteration, get the shears and map
 them to a HEALPix map for later analysis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-101
+.. GENERATED FROM PYTHON SOURCE LINES 81-100
 
 .. code-block:: default
 
@@ -141,7 +140,7 @@ them to a HEALPix map for later analysis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-107
+.. GENERATED FROM PYTHON SOURCE LINES 101-106
 
 Analysis
 --------
@@ -149,43 +148,49 @@ Compute the angular power spectrum of the observed galaxy shears.  To compare
 with the expectation, take into account the expected noise level due to shape
 noise, and the expected mixing matrix for a uniform distribution of points.
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-143
+.. GENERATED FROM PYTHON SOURCE LINES 106-148
 
 .. code-block:: default
 
 
-    # will need number of pixels in map
-    npix = len(she)
-
     # get the angular power spectra from the galaxy shears
-    cls = hp.anafast([num, she.real, she.imag], pol=True, lmax=lmax)
+    cls = hp.anafast([num, she.real, she.imag], pol=True, lmax=lmax, use_pixel_weights=True)
 
-    # the noise level from discrete observations with shape noise
-    nl = (4*np.pi/npix)*np.mean(num)*sigma_e**2
+    # get the theory cls from CAMB
+    pars.NonLinear = 'NonLinear_both'
+    pars.Want_CMB = False
+    pars.min_l = 1
+    pars.set_for_lmax(lmax)
+    pars.SourceWindows = [camb.sources.SplinedSourceWindow(z=z, W=dndz, source_type='lensing')]
+    theory_cls = camb.get_results(pars).get_source_cls_dict(lmax=lmax, raw_cl=True)
 
     # factor transforming convergence to shear
     l = np.arange(lmax+1)
     fl = (l+2)*(l+1)*l*(l-1)/np.clip(l**2*(l+1)**2, 1, None)
 
-    # mixing matrix for uniform distribution of points
-    b = np.mean(num)/npix/2
-    a = np.mean(num)**2 - b
-    mm = a*np.eye(lmax+1, lmax+1)
-    mm += b*np.arange(1, 2*lmax+2, 2)
+    # number of arcmin2 in sphere
+    ARCMIN2_SPHERE = 60**6//100/np.pi
 
-    # get the expected cls from CAMB
-    pars.Want_CMB = False
-    pars.min_l = 1
-    pars.SourceWindows = [camb.sources.SplinedSourceWindow(z=z, W=dndz, source_type='lensing')]
-    theory_cls = camb.get_results(pars).get_source_cls_dict(lmax=lmax, raw_cl=True)
+    # will need number of pixels in map for the expectation
+    npix = len(she)
+
+    # compute the mean number of shears per pixel
+    nbar = ARCMIN2_SPHERE/npix*n_arcmin2
+
+    # the noise level from discrete observations with shape noise
+    nl = 4*np.pi*nbar/npix*sigma_e**2 * (l >= 2)
+
+    # mixing matrix for uniform distribution of points
+    mm = (nbar**2 - nbar/(npix-1))*np.eye(lmax+1, lmax+1) + (2*l+1)*nbar/(npix-1)/2
+    mm[:2, :] = mm[:, :2] = 0
 
     # plot the realised and expected cls
-    plt.plot(l, (2*l+1)*(cls[1] - nl), '-k', lw=2, label='simulation')
-    plt.plot(l, (2*l+1)*(mm@(fl*theory_cls['W1xW1'])), '-r', lw=2, label='expectation')
+    plt.plot(l, cls[1] - nl, '-k', lw=2, label='simulation')
+    plt.plot(l, mm@(fl*theory_cls['W1xW1']), '-r', lw=2, label='expectation')
     plt.xscale('symlog', linthresh=10, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
-    plt.yscale('symlog', linthresh=1e-7, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
-    plt.xlabel(r'angular mode number $l$')
-    plt.ylabel(r'angular power spectrum $(2l+1) \, C_l^{EE}$')
+    plt.yscale('symlog', linthresh=1e-9, linscale=0.5, subs=[2, 3, 4, 5, 6, 7, 8, 9])
+    plt.xlabel('angular mode number $l$')
+    plt.ylabel('angular power spectrum $C_l^{EE}$')
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -204,32 +209,20 @@ noise, and the expected mixing matrix for a uniform distribution of points.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  37.905 seconds)
+   **Total running time of the script:** ( 0 minutes  46.454 seconds)
 
 
 .. _sphx_glr_download_examples_2_advanced_plot_shears.py:
 
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
-
-
-
-  .. container:: sphx-glr-download sphx-glr-download-python
-
-     :download:`Download Python source code: plot_shears.py <plot_shears.py>`
-
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_shears.ipynb <plot_shears.ipynb>`
-
-
 .. only:: html
 
- .. rst-class:: sphx-glr-signature
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download Python source code: plot_shears.py <plot_shears.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download Jupyter notebook: plot_shears.ipynb <plot_shears.ipynb>`

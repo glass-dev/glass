@@ -96,7 +96,8 @@ sphinx_gallery_conf = {
     'ignore_pattern': r'/_',
     'within_subsection_order': ExampleTitleSortKey,
     'reference_url': {
-        'glass': None,
+        # FIXME: issue with sphinx v5.?.? and sphinx-gallery
+        # 'glass': None,
     },
     'download_all_examples': False,
     'image_srcset': ['2x'],

@@ -48,19 +48,19 @@ collect and integrate the contributions to the lensing from each shell.
     import healpy as hp
     import matplotlib.pyplot as plt
 
-    # these are the GLASS imports: cosmology, glass modules, and the CAMB module
+    # these are the GLASS imports: cosmology and the glass meta-module
     from cosmology import LCDM
-    import glass.sim
-    import glass.camb
-    import glass.matter
-    import glass.lensing
+    from glass import glass
 
     # also needs camb itself to get the parameter object, and the expectation
     import camb
 
 
     # cosmology for the simulation
-    cosmo = LCDM(h=0.7, Om=0.3)
+    h = 0.7
+    Oc = 0.25
+    Ob = 0.05
+    cosmo = LCDM(h=h, Om=(Oc+Ob))
 
     # basic parameters of the simulation
     nside = 512
@@ -71,12 +71,12 @@ collect and integrate the contributions to the lensing from each shell.
     nz = np.exp(-(z - 0.5)**2/(0.1)**2)
 
     # set up CAMB parameters for matter angular power spectrum
-    pars = camb.set_params(H0=100*cosmo.h, omch2=cosmo.Om*cosmo.h**2,
-                           NonLinear=camb.model.NonLinear_both)
+    pars = camb.set_params(H0=100*h, omch2=Oc*h**2, ombh2=Ob*h**2)
 
     # generators for a lensing-only simulation
     generators = [
         glass.sim.zspace(0, 1.01, dz=0.1),
+        glass.matter.mat_wht_redshift(),
         glass.camb.camb_matter_cl(pars, lmax),
         glass.matter.lognormal_matter(nside),
         glass.lensing.convergence(cosmo),
@@ -128,17 +128,18 @@ To make sure the simulation works, compute the angular power spectrum ``cls``
 of the simulated convergence field, and compare with the expectation (from
 CAMB) for the given redshift distribution of sources.
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-109
+.. GENERATED FROM PYTHON SOURCE LINES 86-110
 
 .. code-block:: default
 
 
     # get the angular power spectra of the lensing maps
-    cls = hp.anafast([kappa, gamma1, gamma2], pol=True, lmax=lmax)
+    cls = hp.anafast([kappa, gamma1, gamma2], pol=True, lmax=lmax, use_pixel_weights=True)
 
     # get the expected cls from CAMB
     pars.Want_CMB = False
     pars.min_l = 1
+    pars.set_for_lmax(lmax, lens_potential_accuracy=1)
     pars.SourceWindows = [camb.sources.SplinedSourceWindow(z=z, W=nz, source_type='lensing')]
     theory_cls = camb.get_results(pars).get_source_cls_dict(lmax=lmax, raw_cl=True)
 
@@ -170,7 +171,7 @@ CAMB) for the given redshift distribution of sources.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  37.187 seconds)
+   **Total running time of the script:** ( 0 minutes  40.276 seconds)
 
 
 .. _sphx_glr_download_examples_1_basic_plot_lensing.py:
