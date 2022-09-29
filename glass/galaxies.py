@@ -760,7 +760,7 @@ def gal_phz_gausserr(sigma_0, rng=None):
 
     Examples
     --------
-    See the :ref:`sphx_glr_examples_1_basic_photoz.py` example.
+    See the :doc:`examples:basic/photoz` example.
 
     '''
 

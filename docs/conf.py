@@ -30,7 +30,6 @@ author = 'Nicolas Tessore'
 extensions = [
     'numpydoc',
     'sphinx.ext.intersphinx',
-    'sphinx_gallery.gen_gallery',
     'sphinxcontrib.mermaid',
 ]
 
@@ -60,6 +59,12 @@ html_logo = '_static/glass.png'
 html_favicon = '_static/glass.ico'
 
 html_theme_options = {
+    'external_links': [
+        {
+            'name': 'Examples',
+            'url': 'https://glass.readthedocs.org/projects/examples/',
+        },
+    ],
     'icon_links': [
         {
             'name': 'GitHub',
@@ -82,24 +87,5 @@ html_css_files = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
-}
-
-
-# -- Sphinx Gallery ----------------------------------------------------------
-
-from sphinx_gallery.sorting import ExampleTitleSortKey  # noqa: E402
-
-sphinx_gallery_conf = {
-    'examples_dirs': '../examples',
-    'gallery_dirs': 'examples',
-    'filename_pattern': r'/.*\.py',
-    'ignore_pattern': r'/_',
-    'within_subsection_order': ExampleTitleSortKey,
-    'reference_url': {
-        # FIXME: issue with sphinx v5.?.? and sphinx-gallery
-        # 'glass': None,
-    },
-    'download_all_examples': False,
-    'image_srcset': ['2x'],
-    'show_signature': False,
+    'examples': ('https://glass.readthedocs.io/projects/examples/en/latest/', None),
 }

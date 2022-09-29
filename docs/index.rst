@@ -29,7 +29,6 @@ Documentation
    :maxdepth: 2
 
    user/index
-   examples/index
    reference/index
 
 
