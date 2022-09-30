@@ -78,19 +78,8 @@ def multalm(alm, bl, inplace=False):
 def transform_cls(cls, tfm, nside=None):
     '''transform Cls to Gaussian Cls for simulation'''
 
-    # maximum l in input cls
-    lmax = max(len(cl)-1 for cl in cls if cl is not None)
-
     # bandlimit if nside is provided
     llim = 3*nside - 1 if nside is not None else None
-
-    # get pixel window function if nside is given, or set to unity
-    if nside is not None:
-        log.info('using pixel window function for NSIDE=%d', nside)
-        pw = hp.pixwin(nside, pol=False, lmax=llim)
-        pw *= pw
-    else:
-        pw = np.ones(lmax+1)
 
     # transform input cls to cls for the Gaussian random fields
     gaussian_cls = []
@@ -102,12 +91,7 @@ def transform_cls(cls, tfm, nside=None):
                 log.info('exponentially decaying cl from %d to %d', len(cl)-1, llim)
                 cl = _exp_decay_cl(llim, cl)
 
-            # simulating integrated maps by multiplying cls and pw
-            # shorter array determines length
-            n = min(len(cl), len(pw))
-            cl = cl[:n]*pw[:n]
-
-            log.info('transforming cl with LMAX=%d', n-1)
+            log.info('transforming cl with LMAX=%d', len(cl)-1)
 
             # transform the cl
             cl = tfm(cl)

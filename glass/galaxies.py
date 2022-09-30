@@ -62,7 +62,7 @@ import numpy as np
 import healpy as hp
 
 from .generator import receives, yields
-from .util import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio
+from .util import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio, hp_integrate
 
 
 log = logging.getLogger(__name__)
@@ -310,7 +310,7 @@ def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
             log.info('no galaxies, skipping...')
             continue
 
-        # normalise the number densities to get propability densities
+        # normalise the number densities to get probability densities
         dndz_ /= np.where(p > 0, p, 1)[..., np.newaxis]
 
         # normalise to get probability to find galaxy in each population
@@ -326,8 +326,10 @@ def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
 
         # compute the distribution of the galaxies
         # first, compute the galaxy overdensity using the bias function
-        # then, modifying the array in place, turn into number count
+        # second, average overdensity over HEALPix pixels
+        # third, modifying the array in place, turn into number count
         dist = bf(delta, zbar)
+        dist = hp_integrate(dist)
         dist += 1
         dist *= ARCMIN2_SPHERE/np.shape(dist)[-1]*ntot
 

@@ -3,6 +3,7 @@
 '''module for implementation utilities'''
 
 import numpy as np
+import healpy as hp
 
 # constants
 DEGREE2_SPHERE = 60**4//100/np.pi
@@ -111,3 +112,11 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     q = np.sqrt((A+C-np.sqrt((A-C)**2+B2))/(A+C+np.sqrt((A-C)**2+B2)))
 
     return q
+
+
+def hp_integrate(m, nside=None, lmax=None):
+    '''integrate pixels of a HEALPix map in harmonic space'''
+    if nside is None:
+        nside = hp.get_nside(m)
+    alm = hp.map2alm(m, lmax=lmax, pol=False, use_pixel_weights=True)
+    return hp.alm2map(alm, nside, lmax=lmax, pixwin=True, inplace=True)
