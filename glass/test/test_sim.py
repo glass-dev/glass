@@ -3,15 +3,13 @@ import pytest
 
 def test_generator_error():
 
-    from glass.core import generator
     from glass.sim import generate, GeneratorError, State
 
-    @generator('# ->')
     def mygenerator():
-        while True:
-            n = yield
+        for n in range(5):
             if n == 3:
                 raise ZeroDivisionError
+            yield
 
     g = mygenerator()
 

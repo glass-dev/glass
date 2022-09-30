@@ -22,7 +22,7 @@ class GeneratorError(RuntimeError):
         '''construct a GeneratorError for generator and shell'''
         self._generator = generator
         self._state = state
-        g, n = generator.label, state['#']
+        g, n = generator.__name__, state['#']
         super().__init__(f'shell {n}: uncaught exception in {g}')
 
     @property
@@ -147,22 +147,23 @@ class State(UserDict):
             self.data[key] = value
 
 
-def _gencall(generator, state):
+def _gencall(generator, state, initial=False):
     '''call a generator'''
 
     t = time.monotonic()
 
     log.info('--- %s ---', generator.__name__)
 
-    if state is None:
-        initial = getattr(generator, 'initial', None)
-        state[initial] = generator.send(None)
-    elif state is GeneratorExit:
-        generator.close()
-    else:
-        receives = getattr(generator, 'receives', None)
-        yields = getattr(generator, 'yields', None)
+    if state is not None:
+        if initial:
+            receives = None
+            yields = getattr(generator, 'initial', None)
+        else:
+            receives = getattr(generator, 'receives', None)
+            yields = getattr(generator, 'yields', None)
         state[yields] = generator.send(state[receives])
+    else:
+        generator.close()
 
     log.info('>>> %s: %s <<<', generator.__name__, timedelta(seconds=time.monotonic()-t))
 
@@ -180,13 +181,13 @@ def generate(generators):
 
     log.info('=== initialize ===')
 
-    # prime all generators
-    for g in generators:
-        _gencall(g, None)
-
     # this will keep the state of the simulation during iteration
     state = State()
     state['state'] = state
+
+    # prime all generators
+    for g in generators:
+        _gencall(g, state, initial=True)
 
     # simulation status
     n = 0
@@ -226,7 +227,7 @@ def generate(generators):
 
     # close all generators
     for g in generators:
-        _gencall(g, GeneratorExit)
+        _gencall(g, None)
 
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
 
