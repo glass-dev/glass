@@ -239,16 +239,18 @@ def group(self, name, generators):
     # set the generator inputs and outputs
     self.receives = 'state'
     self.yields = name
+    self.initial = name
 
     # also update the name of the group for printing
     self.__name__ += f' "{name}"'
 
+    # the initial state of the group
+    state = State()
+    state['state'] = state
+
     # prime sub-generators
     for g in generators:
-        _gencall(g, None)
-
-    # initial yield
-    state = None
+        _gencall(g, state, initial=True)
 
     # on every iteration, store sub-generators output in sub-state
     while True:
@@ -257,11 +259,10 @@ def group(self, name, generators):
         except GeneratorExit:
             break
 
-        state = State(context=context)
-        state['state'] = state
+        state.context = context
         for g in generators:
             _gencall(g, state)
 
     # finalise sub-generators
     for g in generators:
-        _gencall(g, GeneratorExit)
+        _gencall(g, None)
