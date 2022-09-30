@@ -61,14 +61,15 @@ import logging
 import numpy as np
 import healpy as hp
 
-from .core import generator
+from .generator import receives, yields
 from .util import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio
 
 
 log = logging.getLogger(__name__)
 
 
-@generator('zmin, zmax -> ngal, gal_z, gal_pop, gal_lon, gal_lat')
+@receives('zmin', 'zmax')
+@yields('ngal', 'gal_z', 'gal_pop', 'gal_lon', 'gal_lat')
 def gal_dist_uniform(z, dndz, *, rng=None):
     '''sample galaxy distributions uniformly over the sphere
 
@@ -187,7 +188,8 @@ def gal_dist_uniform(z, dndz, *, rng=None):
     log.info('total number of galaxies sampled: %s', f'{nsam:,d}')
 
 
-@generator('zmin, zmax, delta, visibility? -> ngal, gal_z, gal_pop, gal_lon, gal_lat')
+@receives('zmin', 'zmax', 'delta', 'visibility?')
+@yields('ngal', 'gal_z', 'gal_pop', 'gal_lon', 'gal_lat')
 def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
     '''sample galaxy distributions from density, bias, and visibility
 
@@ -467,7 +469,8 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     return (1-q)/(1+q)
 
 
-@generator('ngal -> gal_ell')
+@receives('ngal')
+@yields('gal_ell')
 def gal_ellip_gaussian(sigma, *, rng=None):
     r'''generator for Gaussian galaxy ellipticities
 
@@ -520,7 +523,8 @@ def gal_ellip_gaussian(sigma, *, rng=None):
             i = i[np.abs(e[i]) > 1]
 
 
-@generator('ngal -> gal_ell')
+@receives('ngal')
+@yields('gal_ell')
 def gal_ellip_intnorm(sigma_eta, *, rng=None):
     r'''generator for galaxy ellipticities with intrinsic normal distribution
 
@@ -567,7 +571,8 @@ def gal_ellip_intnorm(sigma_eta, *, rng=None):
         e *= np.tanh(r/2)/r
 
 
-@generator('ngal -> gal_ell')
+@receives('ngal')
+@yields('gal_ell')
 def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     r'''generator for galaxy ellipticities following Ryden (2004)
 
@@ -640,7 +645,8 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
             log.info('no galaxies')
 
 
-@generator('zsrc, kappa, gamma1, gamma2, gal_z, gal_lon, gal_lat, gal_ell -> gal_she')
+@receives('zsrc', 'kappa', 'gamma1', 'gamma2', 'gal_z', 'gal_lon', 'gal_lat', 'gal_ell')
+@yields('gal_she')
 def gal_shear_interp(cosmo):
     '''generator for observed galaxy shears from interpolated lensing
 
@@ -723,7 +729,8 @@ def gal_shear_interp(cosmo):
         g = (e + g)/(1 + g.conj()*e)
 
 
-@generator('gal_z -> gal_z_phot')
+@receives('gal_z')
+@yields('gal_z_phot')
 def gal_phz_gausserr(sigma_0, rng=None):
     r'''photometric redshift with Gaussian error
 

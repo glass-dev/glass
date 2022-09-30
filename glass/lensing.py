@@ -37,14 +37,15 @@ import logging
 import numpy as np
 import healpy as hp
 
-from .core import generator
+from .generator import receives, yields
 from .util import restrict_interval
 
 
 log = logging.getLogger(__name__)
 
 
-@generator('kappa -> gamma1, gamma2')
+@receives('kappa')
+@yields('gamma1', 'gamma2')
 def shear(lmax=None):
     r'''weak lensing shear from convergence
 
@@ -151,7 +152,8 @@ def _lens_wht_integrated(cosmo, zsrc, z, w):
     return np.trapz(f, z)
 
 
-@generator('zmin, zmax, delta, wz -> zsrc, kappa')
+@receives('zmin', 'zmax', 'delta', 'wz')
+@yields('zsrc', 'kappa')
 def convergence(cosmo, weight='midpoint'):
     '''convergence from integrated matter shells'''
 
@@ -236,7 +238,8 @@ def convergence(cosmo, weight='midpoint'):
         z_, w_ = z, w
 
 
-@generator('zsrc, kappa?, gamma1?, gamma2? -> kappa_bar, gamma1_bar, gamma2_bar')
+@receives('zsrc', 'kappa?', 'gamma1?', 'gamma2?')
+@yields('kappa_bar', 'gamma1_bar', 'gamma2_bar')
 def lensing_dist(z, nz, cosmo):
     '''generate weak lensing maps for source distributions
 

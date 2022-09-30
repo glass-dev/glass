@@ -9,7 +9,7 @@ from collections import UserDict
 from collections.abc import Sequence, Mapping, Iterator, Iterable
 import numpy as np
 
-from .core import generator
+from .generator import self, yields
 
 
 log = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class GeneratorError(RuntimeError):
         return self._state
 
 
-@generator('-> zmin, zmax')
+@yields('zmin', 'zmax')
 def zgen(z):
     '''generator for contiguous redshift slices from a redshift array'''
     if isinstance(z, Iterable):
@@ -55,7 +55,7 @@ def zgen(z):
         yield zmin, zmax
 
 
-@generator('-> zmin, zmax')
+@yields('zmin', 'zmax')
 def zspace(zmin, zmax, *, dz=None, num=None):
     '''generator for redshift slices with uniform redshift spacing'''
     if (dz is None) == (num is None):
@@ -67,7 +67,7 @@ def zspace(zmin, zmax, *, dz=None, num=None):
     return zgen(z)
 
 
-@generator('-> zmin, zmax')
+@yields('zmin', 'zmax')
 def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
     '''genrator for redshift slices with uniform comoving distance spacing'''
     if (dx is None) == (num is None):
@@ -152,16 +152,19 @@ def _gencall(generator, state):
 
     t = time.monotonic()
 
-    log.info('--- %s ---', generator.label)
+    log.info('--- %s ---', generator.__name__)
 
     if state is None:
-        generator.send(None)
+        initial = getattr(generator, 'initial', None)
+        state[initial] = generator.send(None)
     elif state is GeneratorExit:
         generator.close()
     else:
-        state[generator._outputs] = generator.send(state[generator._inputs])
+        receives = getattr(generator, 'receives', None)
+        yields = getattr(generator, 'yields', None)
+        state[yields] = generator.send(state[receives])
 
-    log.info('>>> %s: %s <<<', generator.label, timedelta(seconds=time.monotonic()-t))
+    log.info('>>> %s: %s <<<', generator.__name__, timedelta(seconds=time.monotonic()-t))
 
 
 def generate(generators):
@@ -228,17 +231,19 @@ def generate(generators):
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
 
 
-@generator('state -> group', self=True)
+@self
 def group(self, name, generators):
-    r'''group generators under a common name'''
+    '''group generators under a common name'''
 
-    # tag group generator and update the output name
-    self.tag(name)
-    self.outputs(group=name)
+    # set the generator inputs and outputs
+    self.receives = 'state'
+    self.yields = name
 
-    # tag and prime sub-generators
+    # also update the name of the group for printing
+    self.__name__ += f' "{name}"'
+
+    # prime sub-generators
     for g in generators:
-        g.tag(*self.tags)
         _gencall(g, None)
 
     # initial yield
