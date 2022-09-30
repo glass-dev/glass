@@ -64,7 +64,7 @@ def zspace(zmin, zmax, *, dz=None, num=None):
         z = np.arange(zmin, np.nextafter(zmax+dz, zmax), dz)
     else:
         z = np.linspace(zmin, zmax, num+1)
-    return zgen(z)
+    yield from zgen(z)
 
 
 @yields('zmin', 'zmax')
@@ -78,7 +78,7 @@ def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
     else:
         x = np.linspace(xmin, xmax, num+1)
     z = cosmo.dc_inv(x)
-    return zgen(z)
+    yield from zgen(z)
 
 
 class State(UserDict):
