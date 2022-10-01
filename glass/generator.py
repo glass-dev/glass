@@ -2,11 +2,12 @@
 # license: MIT
 '''module for generator definition'''
 
+from collections.abc import Generator
 from functools import wraps, partial
 
 
-class Generator:
-    '''wrapper for generators with named receives and yields'''
+class WrappedGenerator(Generator):
+    '''wrapper for generators'''
 
     __slots__ = 'generator', 'receives', 'yields', 'initial'
 
@@ -40,6 +41,18 @@ class Generator:
         '''call next() on wrapped generator'''
         return next(self.generator)
 
+    def send(self, value):
+        '''call send() on wrapped generator'''
+        return self.generator.send(value)
+
+    def throw(self, value):
+        '''call throw() on wrapped generator'''
+        return self.generator.throw(value)
+
+    def close(self):
+        '''call close() on wrapped generator'''
+        return self.generator.close()
+
     def __getattr__(self, name):
         '''get an attribute of the wrapped generator'''
         if name in self.__slots__:
@@ -57,23 +70,13 @@ class Generator:
         object.__setattr__(obj, name, value)
 
 
-def wrap_generator(f, *, self=False, receives=None, yields=None, initial=None):
-    '''wrap a function that returns a generator'''
+def wrap_generator(f, receives=None, yields=None, initial=None):
+    '''wrap a generator function'''
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if self:
-            g = Generator(None, receives, yields, initial)
-            g.generator = f(g, *args, **kwargs)
-        else:
-            generator = f(*args, **kwargs)
-            g = Generator(generator, receives, yields, initial)
-        return g
+        g = f(*args, **kwargs)
+        return WrappedGenerator(g, receives, yields, initial)
     return wrapper
-
-
-def self(f):
-    '''decorator to make a self-referential generator'''
-    return wrap_generator(f, self=True)
 
 
 def _stripargs(first=None, *other):

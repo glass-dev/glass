@@ -9,7 +9,7 @@ from collections import UserDict
 from collections.abc import Sequence, Mapping, Iterator, Iterable
 import numpy as np
 
-from .generator import self, yields
+from .generator import receives, yields, initial
 
 
 log = logging.getLogger(__name__)
@@ -232,37 +232,41 @@ def generate(generators):
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
 
 
-@self
-def group(self, name, generators):
+def group(name, generators):
     '''group generators under a common name'''
 
-    # set the generator inputs and outputs
-    self.receives = 'state'
-    self.yields = name
-    self.initial = name
+    # create a generator with the named output
+    @receives('state')
+    @yields(name)
+    @initial(name)
+    def generator():
+        # the initial state of the group
+        state = State()
+        state['state'] = state
+
+        # prime sub-generators
+        for g in generators:
+            _gencall(g, state, initial=True)
+
+        # on every iteration, store sub-generators output in sub-state
+        while True:
+            try:
+                context = yield state
+            except GeneratorExit:
+                break
+
+            # update context of group state
+            state.context = context
+
+            for g in generators:
+                _gencall(g, state)
+
+        # finalise sub-generators
+        for g in generators:
+            _gencall(g, None)
 
     # also update the name of the group for printing
-    self.__name__ += f' "{name}"'
+    generator.__name__ = f'group "{name}"'
 
-    # the initial state of the group
-    state = State()
-    state['state'] = state
-
-    # prime sub-generators
-    for g in generators:
-        _gencall(g, state, initial=True)
-
-    # on every iteration, store sub-generators output in sub-state
-    while True:
-        try:
-            context = yield state
-        except GeneratorExit:
-            break
-
-        state.context = context
-        for g in generators:
-            _gencall(g, state)
-
-    # finalise sub-generators
-    for g in generators:
-        _gencall(g, None)
+    # return the generator just created
+    return generator()

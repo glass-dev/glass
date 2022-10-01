@@ -1,48 +1,51 @@
-def test_generator_class():
-    from glass.generator import Generator
+from unittest.mock import Mock
 
-    class WrappedGenerator:
-        myattr = object()
 
-    gen, rec, yie, ini = WrappedGenerator(), object(), object(), object()
+def test_wrapped_generator():
+    from glass.generator import WrappedGenerator
+    from collections.abc import Generator
 
-    g = Generator(gen, rec, yie, ini)
+    gen, rec, yie, ini = Mock(), object(), object(), object()
+
+    gen.myattr = object()
+
+    g = WrappedGenerator(gen, rec, yie, ini)
     assert isinstance(g, Generator)
     assert g.generator is gen
     assert g.receives is rec
     assert g.yields is yie
     assert g.initial is ini
-    assert g.myattr is WrappedGenerator.myattr
+    assert g.myattr is gen.myattr
 
-    g = Generator(gen)
+    g = WrappedGenerator(gen)
     assert isinstance(g, Generator)
     assert g.generator is gen
     assert g.receives is None
     assert g.yields is None
     assert g.initial is None
 
-    g2 = Generator(g)
+    g2 = WrappedGenerator(g)
     assert g2 is g
     assert g.generator is gen
     assert g.receives is None
     assert g.yields is None
     assert g.initial is None
 
-    g3 = Generator(g, receives=rec)
+    g3 = WrappedGenerator(g, receives=rec)
     assert g3 is g
     assert g.generator is gen
     assert g.receives is rec
     assert g.yields is None
     assert g.initial is None
 
-    g4 = Generator(g, yields=yie)
+    g4 = WrappedGenerator(g, yields=yie)
     assert g4 is g
     assert g.generator is gen
     assert g.receives is rec
     assert g.yields is yie
     assert g.initial is None
 
-    g5 = Generator(g, initial=ini)
+    g5 = WrappedGenerator(g, initial=ini)
     assert g5 is g
     assert g.generator is gen
     assert g.receives is rec
@@ -52,7 +55,8 @@ def test_generator_class():
 
 def test_wrap_generator():
 
-    from glass.generator import wrap_generator, Generator
+    from glass.generator import wrap_generator
+    from collections.abc import Generator
 
     rec, yie, ini = object(), object(), object()
 
@@ -79,22 +83,6 @@ def test_wrap_generator():
     assert g.yields is yie
     assert g.initial is ini
     assert list(g) == [1, 2, 3]
-
-    def f(self):
-        yield self
-
-    w = wrap_generator(f, self=True)
-    g = w()
-    assert next(g) is g
-
-    w2 = wrap_generator(w)
-    g = w2()
-    assert next(g) is g
-
-    w = wrap_generator(f)
-    w2 = wrap_generator(w, self=True)
-    g = w2()
-    assert next(g) is g
 
 
 def test_decorators():

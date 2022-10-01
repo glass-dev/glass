@@ -39,13 +39,13 @@ def test_group():
 
     g = group('test', [generator])
 
-    generator.send.return_value = value
-
-    state = g.send(None)
-
     assert g.receives == 'state'
     assert g.yields == 'test'
     assert g.initial == 'test'
+
+    generator.send.return_value = value
+
+    state = g.send(None)
 
     assert generator.send.called
     assert generator.send.call_args.args == (None,)
