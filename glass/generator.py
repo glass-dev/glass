@@ -3,7 +3,7 @@
 '''module for generator definition'''
 
 from collections.abc import Generator
-from functools import wraps, partial
+from functools import wraps
 
 
 class WrappedGenerator(Generator):
@@ -11,27 +11,12 @@ class WrappedGenerator(Generator):
 
     __slots__ = 'generator', 'receives', 'yields', 'initial'
 
-    def __new__(cls, generator=None, *args, **kwargs):
-        '''only create a generator wrapper if not already wrapped'''
-        if isinstance(generator, cls):
-            obj = generator
-        else:
-            obj = object.__new__(cls)
-            object.__setattr__(obj, 'receives', None)
-            object.__setattr__(obj, 'yields', None)
-            object.__setattr__(obj, 'initial', None)
-        return obj
-
-    def __init__(self, generator=None, receives=None, yields=None, initial=None):
+    def __init__(self, generator, receives=None, yields=None, initial=None):
         '''wrap a generator'''
-        if generator is not self:
-            self.generator = generator
-        if receives is not None:
-            self.receives = receives
-        if yields is not None:
-            self.yields = yields
-        if initial is not None:
-            self.initial = initial
+        self.generator = generator
+        self.receives = receives
+        self.yields = yields
+        self.initial = initial
 
     def __iter__(self):
         '''call iter() on wrapped generator'''
@@ -70,30 +55,16 @@ class WrappedGenerator(Generator):
         object.__setattr__(obj, name, value)
 
 
-def wrap_generator(f, receives=None, yields=None, initial=None):
-    '''wrap a generator function'''
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        g = f(*args, **kwargs)
-        return WrappedGenerator(g, receives, yields, initial)
-    return wrapper
+def generator(f=None, /, *, receives=None, yields=None, initial=None):
+    '''decorator to wrap a generator function'''
 
+    if f is not None:
+        return generator()(f)
 
-def _stripargs(first=None, *other):
-    '''strip args tuple'''
-    return [first, *other] if other else first
-
-
-def receives(*args):
-    '''decorator to label inputs of generator functions'''
-    return partial(wrap_generator, receives=_stripargs(*args))
-
-
-def yields(*args):
-    '''decorator to label outputs of generator functions'''
-    return partial(wrap_generator, yields=_stripargs(*args))
-
-
-def initial(*args):
-    '''decorator to label initial output of generator functions'''
-    return partial(wrap_generator, initial=_stripargs(*args))
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            g = f(*args, **kwargs)
+            return WrappedGenerator(g, receives, yields, initial)
+        return wrapper
+    return decorator

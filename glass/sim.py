@@ -9,7 +9,7 @@ from collections import UserDict
 from collections.abc import Sequence, Mapping, Iterator, Iterable
 import numpy as np
 
-from .generator import receives, yields, initial
+from .generator import generator
 
 
 log = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class GeneratorError(RuntimeError):
         return self._state
 
 
-@yields('zmin', 'zmax')
+@generator(yields=('zmin', 'zmax'))
 def zgen(z):
     '''generator for contiguous redshift slices from a redshift array'''
     if isinstance(z, Iterable):
@@ -55,7 +55,7 @@ def zgen(z):
         yield zmin, zmax
 
 
-@yields('zmin', 'zmax')
+@generator(yields=('zmin', 'zmax'))
 def zspace(zmin, zmax, *, dz=None, num=None):
     '''generator for redshift slices with uniform redshift spacing'''
     if (dz is None) == (num is None):
@@ -67,7 +67,7 @@ def zspace(zmin, zmax, *, dz=None, num=None):
     yield from zgen(z)
 
 
-@yields('zmin', 'zmax')
+@generator(yields=('zmin', 'zmax'))
 def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
     '''genrator for redshift slices with uniform comoving distance spacing'''
     if (dx is None) == (num is None):
@@ -236,10 +236,11 @@ def group(name, generators):
     '''group generators under a common name'''
 
     # create a generator with the named output
-    @receives('state')
-    @yields(name)
-    @initial(name)
-    def generator():
+    @generator(
+        receives='state',
+        yields=name,
+        initial=name)
+    def g():
         # the initial state of the group
         state = State()
         state['state'] = state
@@ -266,7 +267,7 @@ def group(name, generators):
             _gencall(g, None)
 
     # also update the name of the group for printing
-    generator.__name__ = f'group "{name}"'
+    g.__name__ = f'group "{name}"'
 
     # return the generator just created
-    return generator()
+    return g()

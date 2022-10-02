@@ -50,14 +50,14 @@ import numpy as np
 import healpy as hp
 import math
 
-from .generator import yields
+from .generator import generator
 from .util import cumtrapz
 
 
 log = logging.getLogger(__name__)
 
 
-@yields('visibility')
+@generator(yields='visibility')
 def vis_constant(m, nside=None):
     '''constant visibility map
 
