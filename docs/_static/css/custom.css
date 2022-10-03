@@ -9,3 +9,12 @@
     vertical-align: middle;
     margin-left: 0.2em;
 }
+
+.bd-header .navbar-nav li a.nav-link.nav-external {
+    color: var(--pst-color-secondary);
+    opacity: 0.8;
+}
+
+.bd-header .navbar-nav li a.nav-link.nav-external:hover {
+    opacity: 1.0;
+}
