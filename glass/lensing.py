@@ -37,14 +37,23 @@ import logging
 import numpy as np
 import healpy as hp
 
-from .generator import generator
+from .generator import generator, optional
 from .util import restrict_interval
 
+from .sim import ZMIN, ZMAX
+from .matter import DELTA, WZ
 
 log = logging.getLogger(__name__)
 
+# variable definitions
+ZSRC = 'weak lensing source redshift'
+KAPPA = 'weak lensing convergence'
+GAMMA = 'weak lensing shear'
+KAPPA_BAR = 'weak lensing mean convergence over distribution'
+GAMMA_BAR = 'weak lensing mean shear over distribution'
 
-@generator(receives='kappa', yields=('gamma1', 'gamma2'))
+
+@generator(receives=KAPPA, yields=GAMMA)
 def shear(lmax=None):
     r'''weak lensing shear from convergence
 
@@ -100,20 +109,20 @@ def shear(lmax=None):
     '''
 
     # set to None for the initial iteration
-    gamma1, gamma2 = None, None
+    gamma = None
 
     while True:
         # return the shear field and wait for the next convergence field
         # break the loop when asked to exit the generator
         try:
-            kappa = yield gamma1, gamma2
+            kappa = yield gamma
         except GeneratorExit:
             break
 
         alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
         # initialise everything on the first iteration
-        if gamma1 is None:
+        if gamma is None:
             nside = hp.get_nside(kappa)
             lmax = hp.Alm.getlmax(len(alm))
 
@@ -129,7 +138,7 @@ def shear(lmax=None):
 
         # convert convergence to shear modes
         hp.almxfl(alm, fl, inplace=True)
-        gamma1, gamma2 = hp.alm2map_spin([alm, blm], nside, 2, lmax)
+        gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
 def _lens_wht_midpoint(cosmo, zsrc, z, w):
@@ -152,8 +161,8 @@ def _lens_wht_integrated(cosmo, zsrc, z, w):
 
 
 @generator(
-    receives=('zmin', 'zmax', 'delta', 'wz'),
-    yields=('zsrc', 'kappa'))
+    receives=(ZMIN, ZMAX, DELTA, WZ),
+    yields=(ZSRC, KAPPA))
 def convergence(cosmo, weight='midpoint'):
     '''convergence from integrated matter shells'''
 
@@ -239,8 +248,8 @@ def convergence(cosmo, weight='midpoint'):
 
 
 @generator(
-    receives=('zsrc', 'kappa?', 'gamma1?', 'gamma2?'),
-    yields=('kappa_bar', 'gamma1_bar', 'gamma2_bar'))
+    receives=(ZSRC, optional(KAPPA), optional(GAMMA)),
+    yields=(KAPPA_BAR, GAMMA_BAR))
 def lensing_dist(z, nz, cosmo):
     '''generate weak lensing maps for source distributions
 
@@ -308,12 +317,13 @@ def lensing_dist(z, nz, cosmo):
 
     # initial yield
     kap_bar = gam1_bar = gam2_bar = None
+    result = None
 
     # wait for next source plane and return result, or stop on exit
     while True:
         zsrc_, kap_, gam1_, gam2_ = zsrc, kap, gam1, gam2
         try:
-            zsrc, kap, gam1, gam2 = yield kap_bar, gam1_bar, gam2_bar
+            zsrc, kap, (gam1, gam2) = yield result
         except GeneratorExit:
             break
 
@@ -343,3 +353,5 @@ def lensing_dist(z, nz, cosmo):
         for m, m_, m_bar in (kap, kap_, kap_bar), (gam1, gam1_, gam1_bar), (gam2, gam2_, gam2_bar):
             if m is not None:
                 m_bar += (t*m + (1-t)*m_ - m_bar)*(w_/w)
+
+        result = kap_bar, (gam1_bar, gam2_bar)

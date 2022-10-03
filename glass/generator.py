@@ -68,3 +68,8 @@ def generator(f=None, /, *, receives=None, yields=None, initial=None):
             return WrappedGenerator(g, receives, yields, initial)
         return wrapper
     return decorator
+
+
+def optional(name, /):
+    '''mark generator input as optional'''
+    return f'{name}?'

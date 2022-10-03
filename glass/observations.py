@@ -56,8 +56,11 @@ from .util import cumtrapz
 
 log = logging.getLogger(__name__)
 
+# variable definitions
+VIS = 'visibility'
 
-@generator(yields='visibility')
+
+@generator(yields=VIS)
 def vis_constant(m, nside=None):
     '''constant visibility map
 

@@ -14,6 +14,10 @@ from .generator import generator
 
 log = logging.getLogger(__name__)
 
+# variable definitions
+ZMIN = 'lower redshift bound'
+ZMAX = 'upper redshift bound'
+
 
 class GeneratorError(RuntimeError):
     '''raised when an error occurred in a generator'''
@@ -36,7 +40,7 @@ class GeneratorError(RuntimeError):
         return self._state
 
 
-@generator(yields=('zmin', 'zmax'))
+@generator(yields=(ZMIN, ZMAX))
 def zgen(z):
     '''generator for contiguous redshift slices from a redshift array'''
     if isinstance(z, Iterable):
@@ -55,7 +59,7 @@ def zgen(z):
         yield zmin, zmax
 
 
-@generator(yields=('zmin', 'zmax'))
+@generator(yields=(ZMIN, ZMAX))
 def zspace(zmin, zmax, *, dz=None, num=None):
     '''generator for redshift slices with uniform redshift spacing'''
     if (dz is None) == (num is None):
@@ -67,7 +71,7 @@ def zspace(zmin, zmax, *, dz=None, num=None):
     yield from zgen(z)
 
 
-@generator(yields=('zmin', 'zmax'))
+@generator(yields=(ZMIN, ZMAX))
 def xspace(cosmo, zmin, zmax, *, dx=None, num=None):
     '''genrator for redshift slices with uniform comoving distance spacing'''
     if (dx is None) == (num is None):

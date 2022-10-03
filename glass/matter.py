@@ -41,8 +41,15 @@ import numpy as np
 from .generator import generator
 from .random import generate_lognormal, generate_normal
 
+from .sim import ZMIN, ZMAX
 
-@generator(receives=('zmin', 'zmax'), yields='wz')
+# variable definitions
+WZ = 'matter weight function'
+CL = 'angular matter power spectrum'
+DELTA = 'matter density contrast'
+
+
+@generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_function(w):
     '''generate matter weights from a weight function'''
     wz = None
@@ -56,7 +63,7 @@ def mat_wht_function(w):
         wz = (z, w(z))
 
 
-@generator(receives=('zmin', 'zmax'), yields='wz')
+@generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_redshift():
     '''uniform matter weights in redshift
 
@@ -67,7 +74,7 @@ def mat_wht_redshift():
     yield from mat_wht_function(lambda z: np.clip(z/0.1, None, 1))
 
 
-@generator(receives=('zmin', 'zmax'), yields='wz')
+@generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_distance(cosmo):
     '''uniform matter weights in comoving distance
 
@@ -78,25 +85,25 @@ def mat_wht_distance(cosmo):
     yield from mat_wht_function(lambda z: np.clip(z/0.1, None, 1)/cosmo.e(z))
 
 
-@generator(receives=('zmin', 'zmax'), yields='wz')
+@generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_volume(cosmo):
     '''uniform matter weights in comoving volume'''
     yield from mat_wht_function(lambda z: cosmo.xm(z)**2/cosmo.e(z))
 
 
-@generator(receives=('zmin', 'zmax'), yields='wz')
+@generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_density(cosmo):
     '''uniform matter weights in matter density'''
     yield from mat_wht_function(lambda z: cosmo.rho_m(z)*cosmo.xm(z)**2/cosmo.e(z))
 
 
-@generator(receives='cl', yields='delta')
+@generator(receives=CL, yields=DELTA)
 def lognormal_matter(nside, rng=None):
     '''generate lognormal matter fields from Cls'''
     yield from generate_lognormal(nside, shift=1., rng=rng)
 
 
-@generator(receives='cl', yields='delta')
+@generator(receives=CL, yields=DELTA)
 def gaussian_matter(nside, rng=None):
     '''generate Gaussian matter fields from Cls'''
     yield from generate_normal(nside, rng=rng)
