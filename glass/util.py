@@ -38,6 +38,17 @@ def restrict_interval(f, x, xmin, xmax):
     return f_, x_
 
 
+def trapz_product(f, *ff, axis=-1):
+    '''trapezoidal rule for a product of functions'''
+    x, _ = f
+    for x_, _ in ff:
+        x = np.union1d(x, x_[(x_ > x[0]) & (x_ < x[-1])])
+    y = np.interp(x, *f)
+    for f_ in ff:
+        y *= np.interp(x, *f_)
+    return np.trapz(y, x, axis=axis)
+
+
 def cumtrapz(f, x, out=None):
     '''cumulative trapezoidal rule along last axis'''
 

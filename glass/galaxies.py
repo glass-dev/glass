@@ -7,22 +7,88 @@ Galaxies (:mod:`glass.galaxies`)
 
 .. currentmodule:: glass.galaxies
 
-Generators
-==========
 
-Distribution
-------------
+Galaxy bias
+===========
+
+Variables
+---------
+
+.. autodata:: B
+.. autodata:: BFN
+
+
+Generators
+----------
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
 
-   gal_dist_fullsky
-   gal_dist_uniform
+   gal_b_const
+   gal_b_eff
+   gal_bias_linear
+   gal_bias_loglinear
+   gal_bias_function
 
 
-Ellipticity
------------
+Galaxy distribution
+===================
+
+Variables
+---------
+
+.. autodata:: NGAL
+.. autodata:: NZ
+.. autodata:: GAL_LEN
+.. autodata:: GAL_LON
+.. autodata:: GAL_LAT
+
+
+Generators
+----------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+
+   gal_density_const
+   gal_density_dndz
+   gal_positions_mat
+   gal_positions_unif
+
+
+Galaxy redshifts
+================
+
+Variables
+---------
+
+.. autodata:: GAL_Z
+.. autodata:: GAL_POP
+
+
+Generators
+----------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+
+   gal_redshifts_nz
+
+
+Galaxy ellipticities
+====================
+
+Variables
+---------
+
+.. autodata:: GAL_ELL
+
+
+Generators
+----------
 
 .. autosummary::
    :template: generator.rst
@@ -31,29 +97,53 @@ Ellipticity
    gal_ellip_gaussian
    gal_ellip_intnorm
    gal_ellip_ryden04
+
+
+Other
+-----
+
+.. autosummary::
+   :toctree: generated/
+
+   ellipticity_ryden04
+
+
+Galaxy shears
+=============
+
+Variables
+---------
+
+.. autodata:: GAL_SHE
+
+
+Generators
+----------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+
    gal_shear_interp
 
 
 Photometric redshifts
----------------------
+=====================
+
+Variables
+---------
+
+.. autodata:: GAL_PHZ
+
+
+Generators
+----------
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
 
    gal_phz_gausserr
-
-
-Other
-=====
-
-Ellipticity
------------
-
-.. autosummary::
-   :toctree: generated/
-
-   ellipticity_ryden04
 
 '''
 
@@ -62,10 +152,11 @@ import numpy as np
 import healpy as hp
 
 from .generator import generator, optional
-from .util import ARCMIN2_SPHERE, restrict_interval, cumtrapz, triaxial_axis_ratio, hp_integrate
+from .util import (ARCMIN2_SPHERE, restrict_interval, trapz_product, cumtrapz,
+                   triaxial_axis_ratio, hp_integrate)
 
 from .sim import ZMIN, ZMAX
-from .matter import DELTA
+from .matter import DELTA, WZ
 from .lensing import ZSRC, KAPPA, GAMMA
 from .observations import VIS
 
@@ -73,152 +164,271 @@ from .observations import VIS
 log = logging.getLogger(__name__)
 
 # variable definitions
-NGAL = 'number of galaxies'
-GAL_Z = 'galaxy redshifts'
-GAL_POP = 'galaxy populations'
+B = 'galaxy bias parameter'
+'''Parameter used in galaxy bias models.  In nonlinear galaxy bias models, this
+should usually be the linearised galaxy bias near :math:`\\delta = 0`.'''
+BFN = 'galaxy bias function'
+'''Callable :math:`B_g` that implements a galaxy bias model :math:`\\delta_g =
+B_g(\\delta)`.'''
+NGAL = 'mean galaxy density'
+'''Expected number of galaxies per arcmin2.'''
+NZ = 'galaxy redshift distribution'
+'''Redshift distribution function :math:`n(z)` of galaxies.  The function does
+not have to be normalised.'''
+GAL_LEN = 'galaxy count'
+'''The total number of sampled galaxies, i.e. the length of the galaxy column
+data.'''
 GAL_LON = 'galaxy longitudes'
+'''Column data with sampled galaxy longitudes.'''
 GAL_LAT = 'galaxy latitudes'
+'''Column data with sampled galaxy latitudes.'''
+GAL_Z = 'galaxy redshifts'
+'''Column data with sampled galaxy redshifts.'''
+GAL_POP = 'galaxy populations'
+'''Column data with sampled galaxy populations, or ``None`` if no galaxy
+populations were given.'''
 GAL_ELL = 'galaxy ellipticities'
+'''Column data with sampled galaxy ellipticities.'''
 GAL_SHE = 'galaxy shears'
+'''Column data with sampled galaxy shears, i.e. the weakly-lensed galaxy
+ellipticities.'''
 GAL_PHZ = 'galaxy photometric redshifts'
+'''Column data with sampled photometric galaxy redshifts.'''
+
+
+@generator(yields=B)
+def gal_b_const(b):
+    '''constant bias parameter
+
+    This generator yields the given bias parameter ``b`` for every iteration.
+
+    Parameters
+    ----------
+    b : float
+        Constant bias parameter.
+
+    '''
+    while True:
+        yield b
+
+
+@generator(receives=WZ, yields=B)
+def gal_b_eff(z, bz):
+    '''effective bias parameter from a redshift-dependent bias function
+
+    This generator takes a redshift-dependent galaxy bias function :math:`b(z)`
+    and computes an effective galaxy bias parameter :math:`\\bar{b}_i` for
+    iteration :math:`i` using the matter weight function.
+
+    Parameters
+    ----------
+    z, bz : array_like
+        Redshifts and values of bias function :math:`b(z)`.
+
+    Notes
+    -----
+    The effective bias parameter :math:`\\bar{b}_i`` in shell :math:`i` is
+    computed using the matter weight function :math:`W_i` as the weighted
+    average
+
+    .. math::
+
+        \\bar{b} = \\frac{\\int_{z_{i-1}}^{z_i} b(z) \\, W(z) \\, dz}
+                         {\\int_{z_{i-1}}^{z_i} W(z) \\, dz}  \\;.
+
+    '''
+    b = None
+    while True:
+        z_, wz = yield b
+        b = trapz_product((z, bz), (z_, wz))/np.trapz(wz, z_)
+
+
+@generator(receives=B, yields=BFN)
+def gal_bias_linear():
+    '''linear galaxy bias model :math:`\\delta_g = b \\, \\delta`'''
+    b = 1
+    while True:
+        b = yield (lambda delta: b*delta)
+
+
+@generator(receives=B, yields=BFN)
+def gal_bias_loglinear():
+    '''log-linear galaxy bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`'''
+
+    def f(delta, b):
+        delta_g = np.log1p(delta)
+        delta_g *= b
+        np.expm1(delta_g, out=delta_g)
+        return delta_g
+
+    b = 1
+    while True:
+        b = yield (lambda delta: f(delta, b))
+
+
+def gal_bias_function(bias_function, args=()):
+    '''generic galaxy bias model :math:`\\delta_g = B_g(\\delta)`'''
+
+    if not callable(bias_function):
+        raise TypeError('bias function is not callable')
+
+    @generator(receives=args, yields=BFN)
+    def g():
+        args = ()
+        while True:
+            args = yield (lambda delta: bias_function(delta, *args))
+
+    g.__name__ = gal_bias_function.__name__
+
+    return g()
+
+
+@generator(yields=NGAL)
+def gal_density_const(ngal=None):
+    '''constant galaxy density
+
+    Parameters
+    ----------
+    ngal : float
+        Constant galaxy density in units of 1/arcmin2.
+
+    Yields
+    ------
+    :data:`NGAL`, float
+        Expected galaxy density, equal to ``ngal`` on every iteration.
+
+    Receives
+    --------
+
+    '''
+
+    log.info('constant galaxy density: %g', ngal)
+
+    while True:
+        yield ngal
 
 
 @generator(
     receives=(ZMIN, ZMAX),
-    yields=(NGAL, GAL_Z, GAL_POP, GAL_LON, GAL_LAT))
-def gal_dist_uniform(z, dndz, *, rng=None):
-    '''sample galaxy distributions uniformly over the sphere
-
-    '''
-
-    # get default RNG if not given
-    if rng is None:
-        rng = np.random.default_rng()
-
-    # make sure valid number count distributions are passed
-    if np.ndim(z) != 1:
-        raise TypeError('redshifts must be 1d array')
-    if not np.all(np.diff(z) > 0):
-        raise ValueError('redshifts are not strictly increasing')
-    if not np.all(np.greater_equal(dndz, 0)):
-        raise ValueError('negative number counts in distribution')
-
-    # get axes of the arrays
-    # if redshift axes mismatch, try to broadcast to shape of z
-    # the leading axis of dndz is the populations to sample
-    az, = np.shape(z)
-    *apop, az_ = np.shape(dndz)
-    if az_ != az:
-        dndz = np.broadcast_to(dndz, (*apop, az), subok=True)
-
-    # flatten the population axes, if any, and keep multi-indices as labels
-    if apop:
-        dndz = np.reshape(dndz, (-1, az))
-        npop = len(dndz)
-    else:
-        npop = None
-
-    log.info('number of galaxy populations: %s', npop)
-
-    # keep track of total number of galaxies sampled
-    nsam = 0
-
-    # initial yield
-    ngal = red = pop = lon = lat = None
-
-    # wait for next redshift slice and return positions, or stop on exit
-    while True:
-        try:
-            zmin, zmax = yield ngal, red, pop, lon, lat
-        except GeneratorExit:
-            break
-
-        # get the restriction of dndz to the redshift interval
-        dndz_, z_ = restrict_interval(dndz, z, zmin, zmax)
-
-        # compute the number density of galaxies in redshift interval
-        # the result is potentially an array over populations
-        p = np.trapz(dndz_, z_, axis=-1)
-
-        log.info('galaxies/arcmin2 in interval: %s', p)
-
-        # get the total number of galaxies across all populations
-        # we are assuming Poisson statistics, so we can sample from the sum
-        ntot = np.sum(p, axis=-1)
-
-        log.info('expected total galaxies in interval: %s', f'{ntot*ARCMIN2_SPHERE:,.2f}')
-
-        # if there are no galaxies, we are done
-        if ntot == 0:
-            red = lon = lat = np.empty(0)
-            if npop is not None:
-                pop = np.empty(0)
-            log.info('no galaxies, skipping...')
-            continue
-
-        # normalise the number densities to get propability densities
-        dndz_ /= np.where(p > 0, p, 1)[..., np.newaxis]
-
-        # normalise to get probability to find galaxy in each population
-        p /= ntot
-
-        # compute the mean redshift over all distributions
-        zbar = np.dot(p, np.trapz(dndz_*z_, z_, axis=-1))
-
-        log.info('galaxies mean redshift: %g', zbar)
-
-        # compute cumulative distribution in place for redshift sampling
-        cumtrapz(dndz_, z_, out=dndz_)
-
-        # sample number of galaxies
-        ngal = rng.poisson(ntot*ARCMIN2_SPHERE)
-
-        log.info('number of galaxies to be sampled: %s', f'{ngal:,d}')
-
-        # these will hold the results
-        red = np.empty(ngal)
-        lon = np.empty(ngal)
-        lat = np.empty(ngal)
-        if npop is not None:
-            pop = np.empty(ngal, dtype=int)
-
-        # sample positions uniformly
-        lon = rng.uniform(-180, 180, size=ngal)
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal)))
-        if npop is not None:
-            pop = rng.choice(npop, p=p, size=ngal)
-            red = np.empty(ngal)
-            for i in range(npop):
-                sel = (pop == i)
-                nsel = sel.sum()
-                red[sel] = np.interp(rng.uniform(0, 1, size=nsel), dndz_[i], z_)
-        else:
-            red = np.interp(rng.uniform(0, 1, size=ngal), dndz_, z_)
-
-        # mark some variables as disposable
-        dndz_ = z_ = p = None
-
-        # add to total sampled
-        nsam += ngal
-
-    log.info('total number of galaxies sampled: %s', f'{nsam:,d}')
-
-
-@generator(
-    receives=(ZMIN, ZMAX, DELTA, optional(VIS)),
-    yields=(NGAL, GAL_Z, GAL_POP, GAL_LON, GAL_LAT))
-def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
-    '''sample galaxy distributions from density, bias, and visibility
-
-    The galaxies are sampled by rejection sampling over the full sky.  This is
-    potentially very inefficient if the visible sky is small.
+    yields=(NGAL, NZ))
+def gal_density_dndz(z, dndz, *, ngal=None):
+    '''galaxy density from a redshift distribution
 
     Distributions for multiple populations of galaxies (e.g. different
     photometric redshift bins) can be passed as a leading axis of the ``dndz``
-    array.  However, the spatial distribution of galaxies (i.e. the bias and
-    visibility) does not take different galaxy populations into account.  For
-    individual biases and visibilities, use a :func:`~glass.group` with one
-    :func:`galaxy_positions` generator per source population.
+    array.
+
+    If ``ngal`` is given, the distribution is normalised such that the total
+    number of galaxies over the entire redshift range is ``ngal``.
+
+    Yields
+    ------
+    :data:`NGAL`, float
+        Expected galaxy density, computed from the given distribution.
+    :data:`NZ`, tuple of (K,), (..., K) array_like
+        The restriction of ``z``, ``dndz`` to the current interval.  Leading
+        array axes of ``dndz`` are treated as different galaxy populations.
+
+    Receives
+    --------
+    :data:`~glass.sim.ZMIN`, float
+        Lower bound for redshift distribution.
+    :data:`~glass.sim.ZMAX`, float
+        Upper bound for redshift distribution.
+
+    '''
+
+    # make sure valid number count distributions are passed
+    if np.ndim(z) != 1:
+        raise TypeError('redshifts must be 1d array')
+    if not np.all(np.diff(z) > 0):
+        raise ValueError('redshifts are not strictly increasing')
+    if np.shape(z) != np.shape(dndz)[-1:]:
+        raise TypeError('redshift and distribution axes mismatch')
+    if not np.all(np.greater_equal(dndz, 0)):
+        raise ValueError('negative number counts in distribution')
+
+    # normalise distribution if ngal is given
+    if ngal is not None:
+        dndz = dndz/np.trapz(dndz, z)[..., np.newaxis]*ngal
+
+    # print number of populations from leading axes of distribution
+    npop = np.prod(np.shape(dndz)[:-1], dtype=int)
+
+    log.info('number of galaxy populations: %d', npop)
+
+    # initial yield
+    result = None
+
+    while True:
+        zmin, zmax = yield result
+
+        # get the restriction of dndz to the redshift interval
+        dndz_, z_ = restrict_interval(dndz, z, zmin, zmax)
+
+        # compute the number density of galaxies in redshift interval
+        # the result is potentially an array over populations
+        npop = np.trapz(dndz_, z_, axis=-1)
+
+        log.info('galaxies/arcmin2 in interval: %s', npop)
+
+        # sum over population axes
+        ngal = np.sum(npop, axis=None)
+
+        # the result to yield
+        result = ngal, (z_, dndz_)
+
+        # clean up
+        del z_, dndz_, npop
+
+
+@generator(
+    receives=(NGAL, DELTA, optional(BFN), optional(VIS)),
+    yields=(GAL_LEN, GAL_LON, GAL_LAT))
+def gal_positions_mat(*, remove_monopole=False, rng=None):
+    '''galaxy positions from matter distribution and a bias model
+
+    The map of expected galaxy number counts is constructed from the galaxy
+    number density, matter density contrast, an optional bias function, and an
+    optional visibility map.
+
+    If ``remove_monopole`` is set, the monopole of the computed galaxy density
+    contrast is removed.  Over the full sky, the mean number density of the map
+    will then match the given number density exactly.  This, however, means that
+    an effectively different bias model is being used, unless the monopole is
+    already zero in the first place.
+
+    The galaxies are sampled by rejection sampling over the full sky.  This is
+    potentially inefficient if the visible sky is small.
+
+    Parameters
+    ----------
+    remove_monopole : bool, optional
+        If set, the monopole of the galaxy density contrast is fixed to zero.
+
+    Yields
+    ------
+    :data:`GAL_LEN`, int
+        Number of sampled galaxies.
+    :data:`GAL_LON`, (GAL_LEN,) array_like
+        Column of longitudes for sampled galaxies.
+    :data:`GAL_LAT`, (GAL_LEN,) array_like
+        Column of latitudes for sampled galaxies.
+
+    Receives
+    --------
+    :data:`NGAL`
+        The mean galaxy density.  The output may have a different mean if the
+        monopole of the resulting galaxy density contrast is not zero.
+    :data:`~glass.matter.DELTA`
+        The matter density contrast.  This is fed into the galaxy bias model to
+        produce the galaxy density contrast.
+    :data:`BFN`, optional
+        The galaxy bias function.  If not given, the galaxy density contrast is
+        equal to the matter density contrast.
+    :data:`~glass.observations.VIS`, optional
+        Visibility map for the observed galaxies.  This is multiplied with the
+        full sky galaxy number map, and both must have the same NSIDE parameter.
 
     '''
 
@@ -226,196 +436,228 @@ def gal_dist_fullsky(z, dndz, bz=None, *, bias='log-linear', rng=None):
     if rng is None:
         rng = np.random.default_rng()
 
-    # make sure valid number count distributions are passed
-    if np.ndim(z) != 1:
-        raise TypeError('redshifts must be 1d array')
-    if not np.all(np.diff(z) > 0):
-        raise ValueError('redshifts are not strictly increasing')
-    if not np.all(np.greater_equal(dndz, 0)):
-        raise ValueError('negative number counts in distribution')
-    if bz is not None and np.ndim(bz) > 1:
-        raise TypeError('bias must be number or 1d array')
-
-    # get axes of the arrays
-    # if redshift axes mismatch, try to broadcast to shape of z
-    # the leading axis of dndz is the populations to sample
-    az, = np.shape(z)
-    *apop, az_ = np.shape(dndz)
-    if az_ != az:
-        dndz = np.broadcast_to(dndz, (*apop, az), subok=True)
-    if bz is not None and np.shape(bz) != (az,):
-        bz = np.broadcast_to(bz, az, subok=True)
-
-    # flatten the population axes, if any, and keep multi-indices as labels
-    if apop:
-        dndz = np.reshape(dndz, (-1, az))
-        npop = len(dndz)
-    else:
-        npop = None
-
-    log.info('number of galaxy populations: %s', npop)
-
-    # define the bias function, as requested
-    # arguments are delta and the mean redshift of the interval
-    # return value must be a new array which will be modified in place later
-    if bz is None:
-
-        # just make a copy of the input
-        def bf(delta, zbar):
-            return np.copy(delta)
-
-    elif bias == 'linear':
-
-        # a linear bias model: delta_g = b*delta
-        def bf(delta, zbar):
-            b = np.interp(zbar, z, bz)
-            return b*delta
-
-    elif bias == 'log-linear':
-
-        # a log-linear bias model: log(1 + delta_g) = b*log(1 + delta)
-        def bf(delta, zbar):
-            b = np.interp(zbar, z, bz)
-            delta_g = np.log1p(delta)
-            delta_g *= b
-            np.expm1(delta_g, out=delta_g)
-            return delta_g
-
-    elif bias == 'function':
-
-        # custom bias function
-        if not callable(bz):
-            raise TypeError('a "function" bias requires a callable bz')
-        bf = bz
-
-    else:
-        raise ValueError(f'invalid value for bias: {bias}')
-
-    # keep track of total number of galaxies sampled
-    nsam = 0
+    # keep track of the total number of galaxies sampled
+    ntot = 0
 
     # initial yield
-    ngal = red = pop = lon = lat = None
+    result = None
 
-    # wait for next redshift slice and return positions, or stop on exit
+    # return positions and wait for next redshift slice
     while True:
         try:
-            zmin, zmax, delta, vis = yield ngal, red, pop, lon, lat
+            ngal, delta, b, v = yield result
         except GeneratorExit:
             break
 
-        # get the restriction of dndz to the redshift interval
-        dndz_, z_ = restrict_interval(dndz, z, zmin, zmax)
+        # compute galaxy density contrast from bias model
+        if b is None:
+            n = np.copy(delta)
+        else:
+            n = b(delta)
 
-        # compute the number density of galaxies in redshift interval
-        # the result is potentially an array over populations
-        p = np.trapz(dndz_, z_, axis=-1)
+        # remove monopole if asked to
+        if remove_monopole:
+            n -= np.mean(n, keepdims=True)
 
-        log.info('galaxies/arcmin2 in interval: %s', p)
+        # turn into number count, modifying the array in place
+        n += 1
+        n *= ARCMIN2_SPHERE/n.size*ngal
 
-        # get the total number of galaxies across all populations
-        # we are assuming Poisson statistics, so we can sample from the sum
-        ntot = np.sum(p, axis=-1)
-
-        log.info('expected total galaxies in interval: %s', f'{ntot*ARCMIN2_SPHERE:,.2f}')
-
-        # if there are no galaxies, we are done
-        if ntot == 0:
-            red = lon = lat = np.empty(0)
-            if npop is not None:
-                pop = np.empty(0)
-            log.info('no galaxies, skipping...')
-            continue
-
-        # normalise the number densities to get probability densities
-        dndz_ /= np.where(p > 0, p, 1)[..., np.newaxis]
-
-        # normalise to get probability to find galaxy in each population
-        p /= ntot
-
-        # compute the mean redshift over all distributions
-        zbar = np.dot(p, np.trapz(dndz_*z_, z_, axis=-1))
-
-        log.info('galaxies mean redshift: %g', zbar)
-
-        # compute cumulative distribution in place for redshift sampling
-        cumtrapz(dndz_, z_, out=dndz_)
-
-        # compute the distribution of the galaxies
-        # first, compute the galaxy overdensity using the bias function
-        # second, average overdensity over HEALPix pixels
-        # third, modifying the array in place, turn into number count
-        dist = bf(delta, zbar)
-        dist = hp_integrate(dist)
-        dist += 1
-        dist *= ARCMIN2_SPHERE/np.shape(dist)[-1]*ntot
-
-        log.info('expected total galaxies from density: %s', f'{np.sum(dist):,.2f}')
+        # average galaxy density contrast over HEALPix pixels
+        n = hp_integrate(n)
 
         # apply visibility if given
-        if vis is not None:
-            dist *= vis
+        if v is not None:
+            n *= v
 
         # expected number of visible galaxies
-        nvis = np.sum(dist)
+        nsum = np.sum(n)
 
-        log.info('expected visible galaxies from density: %s', f'{nvis:,.2f}')
+        log.info('expected visible galaxies: %s', f'{nsum:,.2f}')
 
         # sample number of galaxies
-        ngal = rng.poisson(nvis)
+        nsam = rng.poisson(nsum)
 
-        log.info('number of galaxies to be sampled: %s', f'{ngal:,d}')
+        log.info('sampled number of galaxies: %s', f'{nsam:,d}')
 
-        # turn into conditional probability distribution
-        dist /= np.max(dist)
+        # scaling for probability distribution
+        nmax = np.max(n)
 
-        log.info('sampling efficiency: %g', np.mean(dist))
+        log.info('sampling efficiency: %g', nsum/n.size/nmax)
 
         # for converting randomly sampled positions to HEALPix indices
-        nside = hp.get_nside(dist)
+        nside = hp.get_nside(n)
 
         # these will hold the results
-        red = np.empty(ngal)
-        lon = np.empty(ngal)
-        lat = np.empty(ngal)
-        if npop is not None:
-            pop = np.empty(ngal, dtype=int)
+        lon = np.empty(nsam)
+        lat = np.empty(nsam)
 
         # rejection sampling of galaxies
         # propose batches of 10000 galaxies over the full sky
-        # then accept or reject based on the spatial distribution in dist
-        # for accepted galaxies, pick a population and then a redshift
-        nrem = ngal
+        # then accept or reject based on the spatial distribution in n
+        nrem = nsam
         while nrem > 0:
             npro = min(nrem, 10000)
             lon_pro = rng.uniform(-180, 180, size=npro)
             lat_pro = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=npro)))
             pix_pro = hp.ang2pix(nside, lon_pro, lat_pro, lonlat=True)
-            acc = (rng.uniform(0, 1, size=npro) < dist[pix_pro])
+            acc = (rng.uniform(0, nmax, size=npro) < n[pix_pro])
             nacc = acc.sum()
-            sli = slice(ngal-nrem, ngal-nrem+nacc)
-            if npop is not None:
-                pop_ = rng.choice(npop, p=p, size=nacc)
-                red_ = np.empty(nacc)
-                for i in range(npop):
-                    sel = (pop_ == i)
-                    nsel = sel.sum()
-                    red_[sel] = np.interp(rng.uniform(0, 1, size=nsel), dndz_[i], z_)
-                pop[sli] = pop_
-                red[sli] = red_
-            else:
-                red[sli] = np.interp(rng.uniform(0, 1, size=nacc), dndz_, z_)
+            sli = slice(nsam-nrem, nsam-nrem+nacc)
             lon[sli] = lon_pro[acc]
             lat[sli] = lat_pro[acc]
             nrem -= nacc
+            del lon_pro, lat_pro, pix_pro, acc
 
-        # mark some variables as disposable
-        dndz_ = z_ = p = dist = lon_pro = lat_pro = pix_pro = acc = None
+        # results of the sampling
+        result = nsam, lon, lat
 
         # add to total sampled
-        nsam += ngal
+        ntot += nsam
 
-    log.info('total number of galaxies sampled: %s', f'{nsam:,d}')
+        # clean up potentially large arrays; outputs are still kept in result
+        del delta, v, n, lon, lat
+
+    log.info('total number of galaxies sampled: %s', f'{ntot:,d}')
+
+
+@generator(
+    receives=NGAL,
+    yields=(GAL_LEN, GAL_LON, GAL_LAT))
+def gal_positions_unif(*, rng=None):
+    '''galaxy positions uniformly over the sphere
+
+    Yields
+    ------
+    :data:`GAL_LEN`, int
+        Number of sampled galaxies.
+    :data:`GAL_LON`, (GAL_LEN,) array_like
+        Column of longitudes for sampled galaxies.
+    :data:`GAL_LAT`, (GAL_LEN,) array_like
+        Column of latitudes for sampled galaxies.
+
+    Receives
+    --------
+    :data:`NGAL`, array_like
+        Expected galaxy density.
+
+    '''
+
+    # get default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # keep track of the total number of galaxies sampled
+    ntot = 0
+
+    # initial yield
+    result = None
+
+    # sample positions uniformly
+    while True:
+        try:
+            ngal = yield result
+        except GeneratorExit:
+            break
+
+        # expected number of visible galaxies
+        nlam = ARCMIN2_SPHERE*ngal
+
+        log.info('expected number of galaxies: %s', f'{nlam:,.2f}')
+
+        # sample number of galaxies
+        nsam = rng.poisson(nlam)
+
+        log.info('sampled number of galaxies: %s', f'{nsam:,d}')
+
+        # sample uniformly over the sphere
+        lon = rng.uniform(-180, 180, size=nsam)
+        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=nsam)))
+
+        # results of the sampling
+        result = nsam, lon, lat
+
+        # add to total sampled
+        ntot += nsam
+
+        # clean up potentially large arrays; outputs are still kept in result
+        del lon, lat
+
+    log.info('total number of galaxies sampled: %s', f'{ntot:,d}')
+
+
+@generator(
+    receives=(NZ, GAL_LEN),
+    yields=(GAL_Z, GAL_POP))
+def gal_redshifts_nz(*, rng=None):
+    '''galaxy redshifts from a distribution
+
+    Yields
+    ------
+    :data:`GAL_Z`, (GAL_LEN,) array_like
+        Redshifts sampled from :data:`NZ`.
+    :data:`GAL_POP`, (GAL_LEN,) tuple of int array_like or None
+        Index of the galaxy population from the leading axes of :data:`NZ`; or
+        ``None`` if there are no galaxy populations.
+
+    Receives
+    --------
+    :data:`NZ`, tuple of (N,), (..., N) array_like
+        Redshifts and densities of the galaxy redshift distribution.  Leading
+        axes in the density are treated as different galaxy populations.
+    :data:`GAL_LEN` int
+        Number of galaxies to be sampled, i.e. length of galaxy data column.
+
+    '''
+
+    # get default RNG if not given
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # initial yield
+    result = None
+
+    # wait for next redshift slice and return redshifts, or stop on exit
+    while True:
+        try:
+            (z, nz), n = yield result
+        except GeneratorExit:
+            break
+
+        # get galaxy populations
+        if np.ndim(nz) > 1:
+            pop = list(np.ndindex(np.shape(nz)[:-1]))
+        else:
+            pop = None
+
+        log.info('number of galaxy populations: %d', len(pop) if pop else 1)
+
+        # compute the as-yet unnormalised CDF of each galaxy population
+        cdf = cumtrapz(nz, z)
+
+        # compute probability to be in each galaxy population
+        p = cdf[..., -1]/cdf[..., -1].sum(axis=None, keepdims=True)
+
+        # now normalise the CDFs
+        cdf /= cdf[..., -1:]
+
+        log.info('relative size of populations: %s', p)
+
+        # sample redshifts and populations
+        if pop is not None:
+            x = rng.choice(len(pop), p=p, size=n)
+            gal_z = np.empty(n)
+            for i, j in enumerate(pop):
+                s = (x == i)
+                gal_z[s] = np.interp(rng.uniform(0, 1, size=s.sum()), cdf[j], z)
+            gal_pop = np.take(pop, x)
+            del x, s
+        else:
+            gal_z = np.interp(rng.uniform(0, 1, size=n), cdf, z)
+            gal_pop = None
+
+        # next yield
+        result = gal_z, gal_pop
 
 
 def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
@@ -488,7 +730,7 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     return (1-q)/(1+q)
 
 
-@generator(receives=NGAL, yields=GAL_ELL)
+@generator(receives=GAL_LEN, yields=GAL_ELL)
 def gal_ellip_gaussian(sigma, *, rng=None):
     r'''generator for Gaussian galaxy ellipticities
 
@@ -504,15 +746,15 @@ def gal_ellip_gaussian(sigma, *, rng=None):
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
-    Receives
-    --------
-    ngal : int
-        Number of galaxies for which ellipticities are sampled.
-
     Yields
     ------
-    gal_ell : (ngal,) array_like
+    :data:`GAL_ELL`, (GAL_LEN,) array_like
         Array of galaxy :term:`ellipticity (complex)`.
+
+    Receives
+    --------
+    :data:`GAL_LEN`, int
+        Number of galaxies for which ellipticities are sampled.
 
     '''
 
@@ -541,7 +783,7 @@ def gal_ellip_gaussian(sigma, *, rng=None):
             i = i[np.abs(e[i]) > 1]
 
 
-@generator(receives=NGAL, yields=GAL_ELL)
+@generator(receives=GAL_LEN, yields=GAL_ELL)
 def gal_ellip_intnorm(sigma_eta, *, rng=None):
     r'''generator for galaxy ellipticities with intrinsic normal distribution
 
@@ -555,15 +797,15 @@ def gal_ellip_intnorm(sigma_eta, *, rng=None):
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
-    Receives
-    --------
-    ngal : int
-        Number of galaxies for which ellipticities are sampled.
-
     Yields
     ------
-    gal_ell : (ngal,) array_like
+    :data:`GAL_ELL`, (GAL_LEN,) array_like
         Array of galaxy :term:`ellipticity (complex)`.
+
+    Receives
+    --------
+    :data:`GAL_LEN`, int
+        Number of galaxies for which ellipticities are sampled.
 
     '''
 
@@ -588,7 +830,7 @@ def gal_ellip_intnorm(sigma_eta, *, rng=None):
         e *= np.tanh(r/2)/r
 
 
-@generator(receives=NGAL, yields=GAL_ELL)
+@generator(receives=GAL_LEN, yields=GAL_ELL)
 def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     r'''generator for galaxy ellipticities following Ryden (2004)
 
@@ -614,15 +856,15 @@ def gal_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
-    Receives
-    --------
-    ngal : int
-        Number of galaxies for which ellipticities are sampled.
-
     Yields
     ------
-    gal_ell : (ngal,) array_like
+    :data:`GAL_ELL`, (GAL_LEN,) array_like
         Array of galaxy :term:`ellipticity (complex)`.
+
+    Receives
+    --------
+    :data:`GAL_LEN`, int
+        Number of galaxies for which ellipticities are sampled.
 
     See also
     --------
