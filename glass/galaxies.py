@@ -283,29 +283,36 @@ def gal_bias_function(bias_function, args=()):
     return g()
 
 
-@generator(yields=NGAL)
-def gal_density_const(ngal=None):
+@generator(receives=(ZMIN, ZMAX), yields=NGAL)
+def gal_density_const(dndz):
     '''constant galaxy density
 
     Parameters
     ----------
-    ngal : float
-        Constant galaxy density in units of 1/arcmin2.
+    dndz : float
+        Constant galaxy density in units of 1/arcmin2/dz.
 
     Yields
     ------
     :data:`NGAL`, float
-        Expected galaxy density, equal to ``ngal`` on every iteration.
+        Expected galaxy density, equal to ``dndz*(ZMAX-ZMIN)`` for each
+        iteration.
 
     Receives
     --------
+    :data:`~glass.sim.ZMIN`, float
+        Lower bound of redshift interval.
+    :data:`~glass.sim.ZMAX`, float
+        Upper bound of redshift interval.
 
     '''
 
-    log.info('constant galaxy density: %g', ngal)
+    log.info('constant galaxy density: %g/arcmin2/dz', dndz)
 
+    ngal = None
     while True:
-        yield ngal
+        zmin, zmax = yield ngal
+        ngal = dndz*(zmax - zmin)
 
 
 @generator(
