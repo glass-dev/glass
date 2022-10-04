@@ -39,14 +39,3 @@ def test_decorator():
     assert g.yields is yie
     assert g.initial is ini
     assert list(g) == [1, 2, 3]
-
-    @generator
-    def f():
-        yield
-
-    assert f.__name__ == 'f'
-    g = f()
-    assert isinstance(g, Generator)
-    assert g.receives is None
-    assert g.yields is None
-    assert g.initial is None

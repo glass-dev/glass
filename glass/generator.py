@@ -55,12 +55,8 @@ class WrappedGenerator(Generator):
         object.__setattr__(obj, name, value)
 
 
-def generator(f=None, /, *, receives=None, yields=None, initial=None):
+def generator(receives=None, yields=None, initial=None):
     '''decorator to wrap a generator function'''
-
-    if f is not None:
-        return generator()(f)
-
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -70,6 +66,6 @@ def generator(f=None, /, *, receives=None, yields=None, initial=None):
     return decorator
 
 
-def optional(name, /):
+def optional(name):
     '''mark generator input as optional'''
     return f'{name}?'
