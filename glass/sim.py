@@ -93,6 +93,7 @@ class State(UserDict):
     def __init__(self, data=None, context=None, **kwargs):
         super().__init__(data, **kwargs)
         self.context = context
+        self.data['state'] = self
 
     def __setitem__(self, key, value):
         self.setall(key, value)
@@ -151,23 +152,21 @@ class State(UserDict):
             self.data[key] = value
 
 
-def _gencall(generator, state, initial=False):
+def _gencall(generator, state):
     '''call a generator'''
 
     t = time.monotonic()
 
     log.info('--- %s ---', generator.__name__)
 
-    if state is not None:
-        if initial:
-            receives = None
-            yields = getattr(generator, 'initial', None)
-        else:
-            receives = getattr(generator, 'receives', None)
-            yields = getattr(generator, 'yields', None)
-        state[yields] = generator.send(state[receives])
-    else:
+    if state is GeneratorExit:
         generator.close()
+    elif state is None:
+        generator.send(None)
+    else:
+        receives = getattr(generator, 'receives', None)
+        yields = getattr(generator, 'yields', None)
+        state[yields] = generator.send(state[receives])
 
     log.info('>>> %s: %s <<<', generator.__name__, timedelta(seconds=time.monotonic()-t))
 
@@ -185,13 +184,9 @@ def generate(generators):
 
     log.info('=== initialize ===')
 
-    # this will keep the state of the simulation during iteration
-    state = State()
-    state['state'] = state
-
     # prime all generators
     for g in generators:
-        _gencall(g, state, initial=True)
+        _gencall(g, None)
 
     # simulation status
     n = 0
@@ -206,6 +201,7 @@ def generate(generators):
         n += 1
         ts = time.monotonic()
 
+        state = State()
         state['#'] = n
 
         log.info('=== shell %d ===', n)
@@ -231,7 +227,7 @@ def generate(generators):
 
     # close all generators
     for g in generators:
-        _gencall(g, None)
+        _gencall(g, GeneratorExit)
 
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
 
@@ -240,18 +236,14 @@ def group(name, generators):
     '''group generators under a common name'''
 
     # create a generator with the named output
-    @generator(
-        receives='state',
-        yields=name,
-        initial=name)
+    @generator(receives='state', yields=name)
     def g():
-        # the initial state of the group
-        state = State()
-        state['state'] = state
-
         # prime sub-generators
         for g in generators:
-            _gencall(g, state, initial=True)
+            _gencall(g, None)
+
+        # initial yield
+        state = None
 
         # on every iteration, store sub-generators output in sub-state
         while True:
@@ -260,15 +252,14 @@ def group(name, generators):
             except GeneratorExit:
                 break
 
-            # update context of group state
-            state.context = context
+            state = State(context=context)
 
             for g in generators:
                 _gencall(g, state)
 
         # finalise sub-generators
         for g in generators:
-            _gencall(g, None)
+            _gencall(g, GeneratorExit)
 
     # also update the name of the group for printing
     g.__name__ = f'group "{name}"'

@@ -28,37 +28,30 @@ def test_group():
     from unittest.mock import Mock
     from glass.sim import group
 
-    value = object()
-    other = object()
-
     generator = Mock()
     generator.__name__ = 'foo'
-    generator.receives = 'bar'
-    generator.yields = 'baz'
-    generator.initial = 'bar'
+    generator.receives = None
+    generator.yields = 'bar'
 
     g = group('test', [generator])
 
     assert g.receives == 'state'
     assert g.yields == 'test'
-    assert g.initial == 'test'
 
-    generator.send.return_value = value
+    generator.send.return_value = None
 
     state = g.send(None)
 
     assert generator.send.called
     assert generator.send.call_args.args == (None,)
-    assert state['bar'] is value
 
-    generator.send.return_value = other
+    generator.send.return_value = object()
 
     state = g.send(None)
 
     assert generator.send.call_count == 2
-    assert generator.send.call_args.args == (value,)
-    assert state['bar'] is value
-    assert state['baz'] is other
+    assert generator.send.call_args.args == (None,)
+    assert state['bar'] is generator.send.return_value
 
     g.close()
 

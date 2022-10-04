@@ -9,14 +9,13 @@ from functools import wraps
 class WrappedGenerator(Generator):
     '''wrapper for generators'''
 
-    __slots__ = 'generator', 'receives', 'yields', 'initial'
+    __slots__ = 'generator', 'receives', 'yields'
 
-    def __init__(self, generator, receives=None, yields=None, initial=None):
+    def __init__(self, generator, receives=None, yields=None):
         '''wrap a generator'''
         self.generator = generator
         self.receives = receives
         self.yields = yields
-        self.initial = initial
 
     def __iter__(self):
         '''call iter() on wrapped generator'''
@@ -55,14 +54,14 @@ class WrappedGenerator(Generator):
         object.__setattr__(obj, name, value)
 
 
-def generator(receives=None, yields=None, initial=None):
+def generator(receives=None, yields=None):
     '''decorator to wrap a generator function'''
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             g = f(*args, **kwargs)
             g.__name__ = wrapper.__name__
-            return WrappedGenerator(g, receives, yields, initial)
+            return WrappedGenerator(g, receives, yields)
         return wrapper
     return decorator
 
