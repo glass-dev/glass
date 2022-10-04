@@ -61,6 +61,7 @@ def generator(receives=None, yields=None, initial=None):
         @wraps(f)
         def wrapper(*args, **kwargs):
             g = f(*args, **kwargs)
+            g.__name__ = wrapper.__name__
             return WrappedGenerator(g, receives, yields, initial)
         return wrapper
     return decorator
