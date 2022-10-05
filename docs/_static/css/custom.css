@@ -1,5 +1,4 @@
-.navbar-brand:after {
-    content: "GLASS";
+.navbar-brand.logo .title {
     color: var(--pst-color-primary);
     font-size: 1.3em;
     font-weight: 200;

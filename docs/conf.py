@@ -59,6 +59,9 @@ html_logo = '_static/glass.png'
 html_favicon = '_static/glass.ico'
 
 html_theme_options = {
+    'logo': {
+        'text': project,
+    },
     'external_links': [
         {
             'name': 'Examples',
