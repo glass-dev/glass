@@ -16,7 +16,9 @@ log = logging.getLogger(__name__)
 
 # variable definitions
 ZMIN = 'lower redshift bound'
+'''Redshift of the lower boundary of the current shell.'''
 ZMAX = 'upper redshift bound'
+'''Redshift of the upper boundary of the current shell.'''
 
 
 class GeneratorError(RuntimeError):

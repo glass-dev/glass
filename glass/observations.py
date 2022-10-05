@@ -1,49 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''
-========================================
-Observations (:mod:`glass.observations`)
-========================================
-
-.. currentmodule:: glass.observations
-
-Generators
-==========
-
-Visibility
-----------
-
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-
-   vis_constant
-
-
-Other
-=====
-
-Redshift distributions
-----------------------
-
-.. autosummary::
-   :toctree: generated/
-
-   smail_nz
-   fixed_zbins
-   equal_dens_zbins
-   tomo_nz_gausserr
-
-
-Visibility
-----------
-
-.. autosummary::
-   :toctree: generated/
-
-   vmap_galactic_ecliptic
-
-'''
+'''module for observational effects and survey properties'''
 
 import logging
 import numpy as np

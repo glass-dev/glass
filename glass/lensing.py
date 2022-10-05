@@ -1,37 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''
-=====================================
-Lensing fields (:mod:`glass.lensing`)
-=====================================
-
-.. currentmodule:: glass.lensing
-
-Generators
-==========
-
-Single source plane
--------------------
-
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-
-   convergence
-   shear
-
-
-Source distributions
---------------------
-
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-
-   lensing_dist
-
-
-'''
+'''module for weak gravitational lensing'''
 
 import logging
 import numpy as np
