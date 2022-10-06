@@ -7,7 +7,7 @@ import numpy as np
 from .generator import generator
 from .random import generate_lognormal, generate_normal
 
-from .sim import ZMIN, ZMAX
+from .cosmology import ZMIN, ZMAX
 
 # variable definitions
 WZ = 'matter weight function'

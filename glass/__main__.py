@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from runpy import run_path
 from pdb import post_mortem
 
-from glass.sim import GeneratorError
+from glass.core import GeneratorError
 
 
 @contextmanager

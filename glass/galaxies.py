@@ -10,7 +10,7 @@ from .generator import generator, optional
 from .util import (ARCMIN2_SPHERE, restrict_interval, trapz_product, cumtrapz,
                    triaxial_axis_ratio, hp_integrate)
 
-from .sim import ZMIN, ZMAX
+from .cosmology import ZMIN, ZMAX
 from .matter import DELTA, WZ
 from .lensing import ZSRC, KAPPA, GAMMA
 from .observations import VIS
@@ -155,9 +155,9 @@ def gal_density_const(dndz):
 
     Receives
     --------
-    :data:`~glass.sim.ZMIN`, float
+    :data:`~glass.cosmology.ZMIN`, float
         Lower bound of redshift interval.
-    :data:`~glass.sim.ZMAX`, float
+    :data:`~glass.cosmology.ZMAX`, float
         Upper bound of redshift interval.
 
     '''
@@ -193,9 +193,9 @@ def gal_density_dndz(z, dndz, *, ngal=None):
 
     Receives
     --------
-    :data:`~glass.sim.ZMIN`, float
+    :data:`~glass.cosmology.ZMIN`, float
         Lower bound for redshift distribution.
-    :data:`~glass.sim.ZMAX`, float
+    :data:`~glass.cosmology.ZMAX`, float
         Upper bound for redshift distribution.
 
     '''

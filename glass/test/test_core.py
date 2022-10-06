@@ -3,7 +3,7 @@ import pytest
 
 def test_generator_error():
 
-    from glass.sim import generate, GeneratorError, State
+    from glass.core import generate, GeneratorError, State
 
     def mygenerator():
         for n in range(5):
@@ -26,7 +26,7 @@ def test_generator_error():
 def test_group():
 
     from unittest.mock import Mock
-    from glass.sim import group
+    from glass.core import group
 
     generator = Mock()
     generator.__name__ = 'foo'

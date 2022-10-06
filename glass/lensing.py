@@ -9,7 +9,7 @@ import healpy as hp
 from .generator import generator, optional
 from .util import restrict_interval
 
-from .sim import ZMIN, ZMAX
+from .cosmology import ZMIN, ZMAX
 from .matter import DELTA, WZ
 
 log = logging.getLogger(__name__)
