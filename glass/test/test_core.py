@@ -13,8 +13,8 @@ def test_generator_error():
 
     g = mygenerator()
 
-    with pytest.raises(GeneratorError, match='shell 3: ') as exc_info:
-        for shell in generate([g]):
+    with pytest.raises(GeneratorError, match='iteration 3: ') as exc_info:
+        for state in generate([g]):
             pass
 
     e = exc_info.value

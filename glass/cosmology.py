@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 # variable definitions
 ZMIN = 'lower redshift bound'
-'''Redshift of the lower boundary of the current shell.'''
+'''Lower bound of the current redshift interval.'''
 ZMAX = 'upper redshift bound'
-'''Redshift of the upper boundary of the current shell.'''
+'''Upper bound of the current redshift interval.'''
 
 
 @generator(yields=(ZMIN, ZMAX))

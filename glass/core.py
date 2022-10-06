@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for simulation control'''
+'''module for core functionality'''
 
 import logging
 import time
@@ -26,11 +26,11 @@ class GeneratorError(RuntimeError):
     '''raised when an error occurred in a generator'''
 
     def __init__(self, generator, state):
-        '''construct a GeneratorError for generator and shell'''
+        '''construct a GeneratorError for generator and state'''
         self._generator = generator
         self._state = state
         g, n = generator.__name__, state[ITER]
-        super().__init__(f'shell {n}: uncaught exception in {g}')
+        super().__init__(f'iteration {n}: uncaught exception in {g}')
 
     @property
     def generator(self):
@@ -162,7 +162,7 @@ def generate(generators):
         state = State()
         state[ITER] = n
 
-        log.info('=== shell %d ===', n)
+        log.info('=== iteration %d ===', n)
 
         for g in generators:
             try:
@@ -177,7 +177,7 @@ def generate(generators):
             log.info('--- yield ---')
             yield state
             log.info('>>> yield: %s <<<', timedelta(seconds=time.monotonic()-ty))
-            log.info('»»» shell %d: %s «««', n, timedelta(seconds=time.monotonic()-ts))
+            log.info('»»» iteration %d: %s «««', n, timedelta(seconds=time.monotonic()-ts))
             continue
         break
 
