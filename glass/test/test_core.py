@@ -56,3 +56,44 @@ def test_group():
     g.close()
 
     assert generator.close.called
+
+
+def test_save_load(tmp_path):
+
+    from glass.core import save, load
+
+    # also test appending of .glass suffix, so not given here
+    filename = tmp_path / 'test'
+
+    g = save(filename, ['var_a', 'var_b', 'var_c'])
+
+    assert g.receives == ('var_a', 'var_b', 'var_c')
+    assert g.yields is None
+
+    # prime generator
+    g.send(None)
+
+    # send values: ITER, var_a, var_b, var_c
+    g.send(('a', 'b', 'c'))
+    g.send(('A', 'B', 'C'))
+
+    # done
+    g.close()
+
+    assert (tmp_path / 'test.glass').exists()
+
+    g = load(filename)
+
+    assert g.receives is None
+    assert g.yields == ('var_a', 'var_b', 'var_c')
+
+    # prime generator
+    g.send(None)
+
+    # load values: var_a, var_b, var_c
+    assert g.send(None) == ('a', 'b', 'c')
+    assert g.send(None) == ('A', 'B', 'C')
+
+    # end of iteration
+    with pytest.raises(StopIteration):
+        g.send(None)

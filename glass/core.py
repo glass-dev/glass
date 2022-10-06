@@ -4,6 +4,9 @@
 
 import logging
 import time
+import os.path
+import pickle
+from functools import wraps
 from datetime import timedelta
 from collections import UserDict
 from collections.abc import Sequence, Mapping
@@ -14,6 +17,11 @@ from .generator import generator
 log = logging.getLogger(__name__)
 
 
+# variable definitions
+ITER = 'iteration'
+'''The number of the current iteration, starting from 1.'''
+
+
 class GeneratorError(RuntimeError):
     '''raised when an error occurred in a generator'''
 
@@ -21,7 +29,7 @@ class GeneratorError(RuntimeError):
         '''construct a GeneratorError for generator and shell'''
         self._generator = generator
         self._state = state
-        g, n = generator.__name__, state['#']
+        g, n = generator.__name__, state[ITER]
         super().__init__(f'shell {n}: uncaught exception in {g}')
 
     @property
@@ -152,7 +160,7 @@ def generate(generators):
         ts = time.monotonic()
 
         state = State()
-        state['#'] = n
+        state[ITER] = n
 
         log.info('=== shell %d ===', n)
 
@@ -215,4 +223,117 @@ def group(name, generators):
     g.__name__ = f'group "{name}"'
 
     # return the generator just created
+    return g()
+
+
+def save(filename, variables):
+    '''Save variables to file on each iteration.
+
+    This generator receives the nominated variables on each iteration and saves
+    their values to ``filename``.  The variables can subsequently be read from
+    the file and iterated using the :func:`load` generator.
+
+    Parameters
+    ----------
+    filename : str
+        Filename for the stored variables.  If ``filename`` does not end in
+        ``'.glass'``, the suffix will be appended.
+    variables : list of str
+        The variables to be saved.
+
+    Yields
+    ------
+    ---
+
+    Receives
+    --------
+    (variables)
+        All nominated variables.
+
+    Warnings
+    --------
+    No checking at all is perfomed on the given list of variables.  Make sure
+    that it contains everything that may be required for a subsequent run.
+
+    '''
+
+    # make filename with '.glass' extension
+    root, ext = os.path.splitext(filename)
+    if ext != '.glass':
+        filename = root + ext + '.glass'
+
+    # construct generator which receives ITER and all variables
+    @generator(receives=(*variables,))
+    @wraps(save)
+    def g():
+        log.info('filename: %s', filename)
+        log.info('variables:')
+        for v in variables:
+            log.info('- %s', v)
+        with open(filename, 'wb') as f:
+            pickle.dump(variables, f)
+            while True:
+                values = yield
+                pickle.dump(values, f)
+
+    return g()
+
+
+def load(filename):
+    '''Load variables from file on each iteration.
+
+    This generator reads the saved variables from ``filename`` and yields their
+    values on each iteration.  The file would normally be created with the
+    :func:`save` generator.
+
+    Parameters
+    ----------
+    filename : str
+        Filename for the stored variables.  If ``filename`` does not end in
+        ``'.glass'``, the suffix will be appended.
+
+    Yields
+    ------
+    (variables)
+        All saved variables.
+
+    Receives
+    --------
+    ---
+
+    Warnings
+    --------
+    To allow loading of any kind of data, this function uses the :mod:`pickle`
+    module, which can in principle be used to execute arbitrary code on loading.
+    Therefore, you should only load data that you trust.
+
+    '''
+
+    # make filename with '.glass' extension
+    root, ext = os.path.splitext(filename)
+    if ext != '.glass':
+        filename = root + ext + '.glass'
+
+    # read variables from archive
+    with open(filename, 'rb') as f:
+        variables = pickle.load(f)
+
+    # construct generator which yields all variables
+    @generator(yields=(*variables,))
+    @wraps(load)
+    def g():
+        log.info('filename: %s', filename)
+        with open(filename, 'rb') as f:
+            variables = pickle.load(f)
+            log.info('variables:')
+            for v in variables:
+                log.info('- %s', v)
+            values = None
+            while True:
+                yield values
+                try:
+                    values = pickle.load(f)
+                except EOFError:
+                    break
+
     return g()
