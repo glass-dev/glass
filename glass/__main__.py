@@ -44,7 +44,8 @@ def _update_argv(path, argv=[]):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='run a GLASS script')
+    parser = argparse.ArgumentParser(prog='python -m glass',
+                                     description='run a GLASS script')
     parser.add_argument('-l', '--loglevel', default='info', help='control the level of logging')
     parser.add_argument('-D', '--debugger', action='store_true', help='enter debugger on error')
     parser.add_argument('path', help='path to Python script')
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    thescript = args.path + (' '.join(args.args) if args.args else '')
+    thescript = ' '.join([args.path, *args.args])
 
     with logger(args.loglevel) as logger:
         logger.info('running script: %s', thescript)
