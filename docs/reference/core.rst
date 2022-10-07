@@ -17,6 +17,8 @@ Generation
 ==========
 
 .. autofunction:: generate
+.. autofunction:: run
+
 .. autoexception:: GeneratorError
    :members: generator, state
 

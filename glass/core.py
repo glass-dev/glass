@@ -190,6 +190,30 @@ def generate(generators):
     log.info('>>> done in %s <<<', timedelta(seconds=time.monotonic()-t0))
 
 
+def run(generators):
+    '''Run all generators without yielding.
+
+    This function runs the given generators without yielding the results of each
+    iteration.
+
+    Parameters
+    ----------
+    generators : list of generator
+        The generators to run.
+
+    Notes
+    -----
+    Calling :func:`run` is functionally equivalent to calling :func:`generate`
+    in a trivial loop::
+
+        for _ in generate(generators):
+            pass
+
+    '''
+    for _ in generate(generators):
+        pass
+
+
 def group(name, generators):
     '''group generators under a common name'''
 
