@@ -170,7 +170,7 @@ def generate(generators):
             except StopIteration:
                 log.info('>>> generator has stopped the simulation <<<')
                 break
-            except BaseException as e:
+            except Exception as e:
                 raise GeneratorError(g, state) from e
         else:  # no break
             ty = time.monotonic()
