@@ -129,7 +129,7 @@ def _gencall(generator, state):
     log.info('>>> %s: %s <<<', generator.__name__, timedelta(seconds=time.monotonic()-t))
 
 
-def generate(generators):
+def generate(generators, yields=None):
     '''run generators
 
     Raises
@@ -175,7 +175,10 @@ def generate(generators):
         else:  # no break
             ty = time.monotonic()
             log.info('--- yield ---')
-            yield state
+            if yields is None:
+                yield state
+            else:
+                yield state[yields]
             log.info('>>> yield: %s <<<', timedelta(seconds=time.monotonic()-ty))
             log.info('»»» iteration %d: %s «««', n, timedelta(seconds=time.monotonic()-ts))
             continue

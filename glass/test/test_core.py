@@ -23,6 +23,46 @@ def test_generator_error():
     assert isinstance(e.state, State)
 
 
+def test_generate():
+
+    from unittest.mock import Mock
+    from glass.core import generate, State
+
+    g = Mock()
+    g.__name__ = 'generator'
+    g.receives = None
+    g.yields = 'alphabet'
+    g.send.side_effect = [None, 'abc', 'def', StopIteration]
+
+    # yields state
+    gen = generate([g])
+
+    state = next(gen)
+    assert isinstance(state, State)
+    assert state['alphabet'] == 'abc'
+
+    state = next(gen)
+    assert state['alphabet'] == 'def'
+
+    with pytest.raises(StopIteration):
+        next(gen)
+
+    # reset
+    g.send.side_effect = [None, 'abc', 'def', StopIteration]
+
+    # yields variable
+    gen = generate([g], 'alphabet')
+
+    alphabet = next(gen)
+    assert alphabet == 'abc'
+
+    alphabet = next(gen)
+    assert alphabet == 'def'
+
+    with pytest.raises(StopIteration):
+        next(gen)
+
+
 def test_group():
 
     from unittest.mock import Mock
