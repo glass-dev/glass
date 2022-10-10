@@ -118,14 +118,14 @@ def _lens_wht_midpoint(cosmo, zsrc, z, w):
     zbar = np.trapz(z*w, z)/v
     wbar = np.interp(zbar, z, w)
     f = cosmo.xm(zbar)/cosmo.xm(zsrc)*cosmo.xm(zbar, zsrc)
-    f *= (1 + zbar)/cosmo.e(zbar)
+    f *= (1 + zbar)/cosmo.ef(zbar)
     return f/wbar*v
 
 
 def _lens_wht_integrated(cosmo, zsrc, z, w):
     '''integrated weights for the approximate extrapolation law'''
     f = cosmo.xm(z)/cosmo.xm(zsrc)*cosmo.xm(z, zsrc)
-    f *= (1 + z)/cosmo.e(z)
+    f *= (1 + z)/cosmo.ef(z)
     return np.trapz(f, z)
 
 
@@ -136,7 +136,7 @@ def convergence(cosmo, weight='midpoint'):
     '''convergence from integrated matter shells'''
 
     # prefactor
-    f = 3*cosmo.Om/2
+    f = 3*cosmo.omega_m/2
 
     # these are the different ways in which the matter can be weighted
     if weight == 'midpoint':
@@ -281,7 +281,7 @@ def lensing_dist(z, nz, cosmo):
 
     # initial lensing plane
     # give small redshift > 0 to work around division by zero
-    zsrc = 1e-10
+    zsrc = 1e-6
     kap = gam1 = gam2 = 0
 
     # initial yield

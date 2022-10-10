@@ -48,19 +48,19 @@ def mat_wht_distance(cosmo):
     numerical issues with some codes for angular power spectra.
 
     '''
-    yield from mat_wht_function(lambda z: np.clip(z/0.1, None, 1)/cosmo.e(z))
+    yield from mat_wht_function(lambda z: np.clip(z/0.1, None, 1)/cosmo.ef(z))
 
 
 @generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_volume(cosmo):
     '''uniform matter weights in comoving volume'''
-    yield from mat_wht_function(lambda z: cosmo.xm(z)**2/cosmo.e(z))
+    yield from mat_wht_function(lambda z: cosmo.xm(z)**2/cosmo.ef(z))
 
 
 @generator(receives=(ZMIN, ZMAX), yields=WZ)
 def mat_wht_density(cosmo):
     '''uniform matter weights in matter density'''
-    yield from mat_wht_function(lambda z: cosmo.rho_m(z)*cosmo.xm(z)**2/cosmo.e(z))
+    yield from mat_wht_function(lambda z: cosmo.rho_m_z(z)*cosmo.xm(z)**2/cosmo.ef(z))
 
 
 @generator(receives=CL, yields=DELTA)
