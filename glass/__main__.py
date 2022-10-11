@@ -13,7 +13,7 @@ from glass.core import GeneratorError
 
 
 @contextmanager
-def logger(level='info'):
+def set_logger(level='info'):
     '''context manager for logging'''
     level = str(level).upper()
     log = logging.getLogger('glass')
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     thescript = ' '.join([args.path, *args.args])
 
-    with logger(args.loglevel) as logger:
+    with set_logger(args.loglevel) as logger:
         logger.info('running script: %s', thescript)
         try:
             with _update_argv(args.path, args.args):
