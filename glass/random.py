@@ -3,20 +3,13 @@
 '''simulation of spherical random fields'''
 
 from itertools import repeat
+from functools import partial
 import logging
 import numpy as np
 import healpy as hp
 from gaussiancl import lognormal_cl
 
 log = logging.getLogger(__name__)
-
-
-def _exp_decay_cl(lmax, cl):
-    '''exponential decay of power spectrum up to lmax'''
-    l0 = len(cl)
-    l = np.arange(l0, lmax+1)
-    t = np.log(cl[-2]/cl[-1])/np.log((l0-2)/(l0-1))
-    return np.concatenate([cl, cl[-1]*np.exp(t*(l/(l0-1) - 1))])
 
 
 def iternorm(k, cov, n=()):
@@ -75,29 +68,33 @@ def multalm(alm, bl, inplace=False):
     return out
 
 
-def transform_cls(cls, tfm, nside=None):
+def transform_cls(cls, tfm, itfm, nside=None):
     '''transform Cls to Gaussian Cls for simulation'''
-
-    # bandlimit if nside is provided
-    llim = 3*nside - 1 if nside is not None else None
 
     # transform input cls to cls for the Gaussian random fields
     gaussian_cls = []
     for cl in cls:
         # only work on available cls
         if cl is not None:
-            # extrapolate the cl if necessary
-            if llim and llim >= len(cl):
-                log.info('exponentially decaying cl from %d to %d', len(cl)-1, llim)
-                cl = _exp_decay_cl(llim, cl)
+            n = len(cl)
 
-            log.info('transforming cl with LMAX=%d', len(cl)-1)
+            log.info('transforming cl with LMAX=%d', n-1)
 
             # transform the cl
-            cl = tfm(cl)
+            gl = tfm(cl)
+
+            # correct for the zero-padding in the realised map
+            if nside is not None:
+                log.info('correcting Gaussian cl for NSIDE=%d map', nside)
+                nmap = int(12**0.5*nside)
+                cl_ = itfm(np.pad(gl, (0, nmap-n)))
+                gl = tfm(cl - (cl_[:n] - cl))
+        else:
+            # no cl means no Gaussian cl
+            gl = None
 
         # store the Gaussian cl, or None
-        gaussian_cls.append(cl)
+        gaussian_cls.append(gl)
 
     # returns the list of transformed cls in input order
     return gaussian_cls
@@ -184,8 +181,9 @@ def generate_normal(nside, rng=None):
         except GeneratorExit:
             break
 
-        # transform to Gaussian cls (applies pixel window function)
-        cls = transform_cls(cls, lambda cl: cl, nside)
+        # transform to Gaussian cls
+        nop = lambda cl: cl  # noqa: E731
+        cls = transform_cls(cls, nop, nop, nside)
 
         # get Gaussian random field for cls
         m = grf.send(cls)
@@ -209,7 +207,9 @@ def generate_lognormal(nside, shift=1., rng=None):
             break
 
         # transform to Gaussian cls
-        cls = transform_cls(cls, lambda cl: lognormal_cl(cl, alpha=shift), nside)
+        tfm = partial(lognormal_cl, alpha=shift)
+        itfm = partial(lognormal_cl, alpha=shift, inv=True)
+        cls = transform_cls(cls, tfm, itfm, nside)
 
         # perform monopole surgery on cls
         if cls[0][0] < 0:
