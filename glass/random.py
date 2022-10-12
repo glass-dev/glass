@@ -87,8 +87,9 @@ def transform_cls(cls, tfm, itfm, nside=None):
             if nside is not None:
                 log.info('correcting Gaussian cl for NSIDE=%d map', nside)
                 nmap = int(12**0.5*nside)
-                cl_ = itfm(np.pad(gl, (0, nmap-n)))
-                gl = tfm(cl - (cl_[:n] - cl))
+                for _ in range(3):
+                    cl_ = itfm(np.pad(gl, (0, nmap-n)))
+                    gl = tfm(cl - (cl_[:n] - cl))
         else:
             # no cl means no Gaussian cl
             gl = None
