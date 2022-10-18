@@ -3,11 +3,10 @@
 '''simulation of spherical random fields'''
 
 from itertools import repeat
-from functools import partial
 import logging
 import numpy as np
 import healpy as hp
-from gaussiancl import lognormal_cl
+from gaussiancl import gaussiancl
 
 log = logging.getLogger(__name__)
 
@@ -68,37 +67,38 @@ def multalm(alm, bl, inplace=False):
     return out
 
 
-def transform_cls(cls, tfm, itfm, nside=None):
+def transform_cls(cls, tfm, pars):
     '''transform Cls to Gaussian Cls for simulation'''
 
     # transform input cls to cls for the Gaussian random fields
-    gaussian_cls = []
+    gls = []
     for cl in cls:
         # only work on available cls
         if cl is not None:
-            n = len(cl)
+            log.info('computing Gaussian cl of size %d', len(cl))
 
-            log.info('transforming cl with LMAX=%d', n-1)
+            if cl[0] == 0:
+                log.warning('warning: ignoring zero monopole')
+                monopole = 0.
+            else:
+                monopole = False
 
-            # transform the cl
-            gl = tfm(cl)
+            gl, err, niter, tol = gaussiancl(cl, tfm, pars, monopole=monopole,
+                                             return_iter=True, return_tol=True)
 
-            # correct for the zero-padding in the realised map
-            if nside is not None:
-                log.info('correcting Gaussian cl for NSIDE=%d map', nside)
-                nmap = int(12**0.5*nside)
-                for _ in range(3):
-                    cl_ = itfm(np.pad(gl, (0, nmap-n)))
-                    gl = tfm(cl - (cl_[:n] - cl))
+            if err > 0:
+                log.warning('WARNING: maximum iterations reached, inexact transform')
+            elif err < 0:
+                log.warning('WARNING: no accurate solution, inexact transform')
+            log.info('relative error after %d iterations: %g', niter, tol)
         else:
-            # no cl means no Gaussian cl
             gl = None
 
         # store the Gaussian cl, or None
-        gaussian_cls.append(gl)
+        gls.append(gl)
 
     # returns the list of transformed cls in input order
-    return gaussian_cls
+    return gls
 
 
 def generate_gaussian(nside, rng=None):
@@ -183,8 +183,7 @@ def generate_normal(nside, rng=None):
             break
 
         # transform to Gaussian cls
-        nop = lambda cl: cl  # noqa: E731
-        cls = transform_cls(cls, nop, nop, nside)
+        cls = transform_cls(cls, 'normal', ())
 
         # get Gaussian random field for cls
         m = grf.send(cls)
@@ -208,30 +207,17 @@ def generate_lognormal(nside, shift=1., rng=None):
             break
 
         # transform to Gaussian cls
-        tfm = partial(lognormal_cl, alpha=shift)
-        itfm = partial(lognormal_cl, alpha=shift, inv=True)
-        cls = transform_cls(cls, tfm, itfm, nside)
+        gls = transform_cls(cls, 'lognormal', (shift,))
 
-        # perform monopole surgery on cls
-        if cls[0][0] < 0:
-            log.info('monopole surgery required: epsilon = %.2e', -cls[0][0])
-            if cls[0][0] < -1e-2:
-                log.warn('warning: monopole surgery is causing significant changes')
-            for cl in cls:
-                if cl is not None:
-                    cl[0] = 0
+        # get Gaussian random field for gls
+        m = grf.send(gls)
 
-        # get Gaussian random field for cls
-        m = grf.send(cls)
+        # fix mean of the Gaussian random field for lognormal transformation
+        m -= np.dot(np.arange(1, 2*len(gls[0]), 2), gls[0])/(4*np.pi)/2
 
-        # variance of Gaussian random field
-        var = np.dot(np.arange(1, 2*len(cls[0]), 2), cls[0])/(4*np.pi)
-
-        # fix mean of the Gaussian random field
-        m += np.log(shift) - var/2
-
-        # exponentiate values in place
-        np.exp(m, out=m)
+        # exponentiate values in place and subtract 1 in one operation
+        np.expm1(m, out=m)
 
         # lognormal shift
-        m -= shift
+        if shift != 1:
+            m *= shift
