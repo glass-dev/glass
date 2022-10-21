@@ -95,8 +95,8 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     return m
 
 
-def smail_nz(z, z_mode, alpha, beta):
-    r'''redshift distribution following Smail et al. (1994)
+def smail_nz(z, z_mode, alpha, beta, *, norm=None):
+    r'''Redshift distribution following Smail et al. (1994).
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
 
@@ -110,6 +110,8 @@ def smail_nz(z, z_mode, alpha, beta):
         Power law exponent (z/z0)^\alpha, must be positive.
     beta : float or array_like
         Log-power law exponent exp[-(z/z0)^\beta], must be positive.
+    norm : float or array_like, optional
+        If given, the normalisation of the distribution.
 
     Returns
     -------
@@ -140,6 +142,9 @@ def smail_nz(z, z_mode, alpha, beta):
 
     pz = z**alpha*np.exp(-alpha/beta*(z/z_mode)**beta)
     pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
+
+    if norm is not None:
+        pz *= norm
 
     return pz
 
