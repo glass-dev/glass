@@ -30,25 +30,33 @@ def mat_wht_function(w):
 
 
 @generator(receives=(ZMIN, ZMAX), yields=WZ)
-def mat_wht_redshift():
+def mat_wht_redshift(zlin=None):
     '''uniform matter weights in redshift
 
-    The weight ramps up linearly from 0 at z=0 to 1 at z=0.1 to prevent
-    numerical issues with some codes for angular power spectra.
+    If ``zlin`` is given, the weight ramps up linearly from 0 at z=0 to 1 at
+    z=zlin.  This can help prevent numerical issues with some codes for angular
+    power spectra.
 
     '''
-    yield from mat_wht_function(lambda z: np.clip(z/0.1, None, 1))
+    if zlin is None:
+        yield from mat_wht_function(lambda z: np.ones_like(z))
+    else:
+        yield from mat_wht_function(lambda z: np.clip(z/zlin, None, 1))
 
 
 @generator(receives=(ZMIN, ZMAX), yields=WZ)
-def mat_wht_distance(cosmo):
+def mat_wht_distance(cosmo, zlin=None):
     '''uniform matter weights in comoving distance
 
-    The weight ramps up linearly from 0 at z=0 to its value at z=0.1 to prevent
-    numerical issues with some codes for angular power spectra.
+    If ``zlin`` is given, the weight ramps up linearly from 0 at z=0 to its
+    value at z=zlin.  This can help prevent numerical issues with some codes for
+    angular power spectra.
 
     '''
-    yield from mat_wht_function(lambda z: np.clip(z/0.1, None, 1)/cosmo.ef(z))
+    if zlin is None:
+        yield from mat_wht_function(lambda z: 1/cosmo.ef(z))
+    else:
+        yield from mat_wht_function(lambda z: np.clip(z/zlin, None, 1)/cosmo.ef(z))
 
 
 @generator(receives=(ZMIN, ZMAX), yields=WZ)
