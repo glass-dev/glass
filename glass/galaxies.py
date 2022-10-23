@@ -823,7 +823,9 @@ def gal_shear_interp(cosmo):
             break
 
         # interpolation weight for galaxy redshift given source planes
-        t = (cosmo.xm(zsrc_, z)/cosmo.xm(z))/(cosmo.xm(zsrc_, zsrc)/cosmo.xm(zsrc))
+        t = cosmo.xm(zsrc_, z)
+        np.divide(t, cosmo.xm(z), where=(t != 0), out=t)
+        t /= cosmo.xm(zsrc_, zsrc)/cosmo.xm(zsrc)
 
         # get the lensing maps at galaxy position
         # interpolate in redshifts
@@ -839,15 +841,16 @@ def gal_shear_interp(cosmo):
                 v[s] = m_[ipix_]
                 v[s] *= 1 - t[s]
                 v[s] += t[s]*m[ipix]
+            del v, m, m_
 
-        # compute reduced shear in place and forget about convergence
-        k -= 1
-        np.negative(k, out=k)
-        g /= k
-        k = None
+        # compute reduced shear in place
+        g /= 1 - k
 
         # compute lensed ellipticities
         g = (e + g)/(1 + g.conj()*e)
+
+        # clean up
+        del z, lon, lat, e, k
 
 
 @generator(receives=GAL_Z, yields=GAL_PHZ)
