@@ -83,14 +83,11 @@ def transform_cls(cls, tfm, pars):
             else:
                 monopole = False
 
-            gl, err, niter, tol = gaussiancl(cl, tfm, pars, monopole=monopole,
-                                             return_iter=True, return_tol=True)
+            gl, info, err, niter = gaussiancl(cl, tfm, pars, monopole=monopole)
 
-            if err > 0:
-                log.warning('WARNING: maximum iterations reached, inexact transform')
-            elif err < 0:
-                log.warning('WARNING: no accurate solution, inexact transform')
-            log.info('relative error after %d iterations: %g', niter, tol)
+            if info == 0:
+                log.warning('WARNING: solution did not converge, inexact transform')
+            log.info('relative error after %d iterations: %g', niter, err)
         else:
             gl = None
 
@@ -185,6 +182,8 @@ def generate_normal(nside, rng=None):
         # transform to Gaussian cls
         cls = transform_cls(cls, 'normal', ())
 
+        log.info('generating Gaussian random field')
+
         # get Gaussian random field for cls
         m = grf.send(cls)
 
@@ -209,8 +208,12 @@ def generate_lognormal(nside, shift=1., rng=None):
         # transform to Gaussian cls
         gls = transform_cls(cls, 'lognormal', (shift,))
 
+        log.info('generating Gaussian random field')
+
         # get Gaussian random field for gls
         m = grf.send(gls)
+
+        log.info('transforming to lognormal distribution')
 
         # fix mean of the Gaussian random field for lognormal transformation
         m -= np.dot(np.arange(1, 2*len(gls[0]), 2), gls[0])/(4*np.pi)/2
