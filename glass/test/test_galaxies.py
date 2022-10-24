@@ -5,7 +5,7 @@ def test_gal_ellip_intnorm():
 
     from glass.galaxies import gal_ellip_intnorm
 
-    gen = gal_ellip_intnorm(0.561)
+    gen = gal_ellip_intnorm(0.256)
     gen.send(None)
 
     ngal = 1_000_000

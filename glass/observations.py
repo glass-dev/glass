@@ -95,6 +95,44 @@ def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):
     return m
 
 
+def gaussian_nz(z, mean, sigma, *, norm=None):
+    r'''Gaussian redshift distribution.
+
+    The redshift follows a Gaussian distribution with the given mean and
+    standard deviation.
+
+    If ``mean`` or ``sigma`` are array_like, their axes will be the leading
+    axes of the redshift distribution.
+
+    Parameters
+    ----------
+    z : array_like
+        Redshift values of the distribution.
+    mode : float or array_like
+        Mean(s) of the redshift distribution.
+    sigma : float or array_like
+        Standard deviation(s) of the redshift distribution.
+    norm : float or array_like, optional
+        If given, the normalisation of the distribution.
+
+    Returns
+    -------
+    nz : array_like
+        Redshift distribution at the given ``z`` values.
+
+    '''
+    mean = np.reshape(mean, np.shape(mean) + (1,)*np.ndim(z))
+    sigma = np.reshape(sigma, np.shape(sigma) + (1,)*np.ndim(z))
+
+    nz = np.exp(-((z - mean)/sigma)**2/2)
+    nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]
+
+    if norm is not None:
+        nz *= norm
+
+    return nz
+
+
 def smail_nz(z, z_mode, alpha, beta, *, norm=None):
     r'''Redshift distribution following Smail et al. (1994).
 

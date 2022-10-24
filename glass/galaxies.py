@@ -101,24 +101,27 @@ def gal_b_eff(z, bz):
 @generator(receives=B, yields=BFN)
 def gal_bias_linear():
     '''linear galaxy bias model :math:`\\delta_g = b \\, \\delta`'''
+
     b = 1
     while True:
-        b = yield (lambda delta: b*delta)
+        b = yield (lambda delta: np.clip(b*delta, -1, None))
 
 
 @generator(receives=B, yields=BFN)
 def gal_bias_loglinear():
     '''log-linear galaxy bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`'''
 
-    def f(delta, b):
-        delta_g = np.log1p(delta)
-        delta_g *= b
-        np.expm1(delta_g, out=delta_g)
-        return delta_g
+    def _bfn(b):
+        def f(delta):
+            delta_g = np.log1p(delta)
+            delta_g *= b
+            np.expm1(delta_g, out=delta_g)
+            return delta_g
+        return f
 
     b = 1
     while True:
-        b = yield (lambda delta: f(delta, b))
+        b = yield _bfn(b)
 
 
 def gal_bias_function(bias_function, args=()):
@@ -247,7 +250,7 @@ def gal_density_dndz(z, dndz, *, ngal=None):
 @generator(
     receives=(NGAL, DELTA, optional(BFN), optional(VIS)),
     yields=(GAL_LEN, GAL_LON, GAL_LAT))
-def gal_positions_mat(*, remove_monopole=False, rng=None):
+def gal_positions_bias(*, remove_monopole=False, rng=None):
     '''galaxy positions from matter distribution and a bias model
 
     The map of expected galaxy number counts is constructed from the galaxy
@@ -508,10 +511,10 @@ def gal_redshifts_nz(*, rng=None):
         # sample redshifts and populations
         if pop is not None:
             x = rng.choice(len(pop), p=p, size=n)
-            gal_z = np.empty(n)
+            gal_z = rng.uniform(0, 1, size=n)
             for i, j in enumerate(pop):
                 s = (x == i)
-                gal_z[s] = np.interp(rng.uniform(0, 1, size=s.sum()), cdf[j], z)
+                gal_z[s] = np.interp(gal_z[s], cdf[j], z)
             gal_pop = np.take(pop, x)
             del x, s
         else:
@@ -646,7 +649,7 @@ def gal_ellip_gaussian(sigma, *, rng=None):
 
 
 @generator(receives=GAL_LEN, yields=GAL_ELL)
-def gal_ellip_intnorm(sigma_eta, *, rng=None):
+def gal_ellip_intnorm(sigma, *, rng=None):
     r'''generator for galaxy ellipticities with intrinsic normal distribution
 
     The ellipticities are sampled from an intrinsic normal distribution with
@@ -654,8 +657,8 @@ def gal_ellip_intnorm(sigma_eta, *, rng=None):
 
     Parameters
     ----------
-    sigma_eta : array_like
-        Standard deviation in each component of the normal coordinates.
+    sigma : array_like
+        Standard deviation of the ellipticity in each component.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
@@ -671,9 +674,16 @@ def gal_ellip_intnorm(sigma_eta, *, rng=None):
 
     '''
 
+    # make sure sigma is admissible
+    if not 0 <= sigma < 0.5**0.5:
+        raise ValueError('sigma must be between 0 and sqrt(0.5)')
+
     # default RNG if not provided
     if rng is None:
         rng = np.random.default_rng()
+
+    # convert to sigma_eta using fit
+    sigma_eta = sigma*((8 + 5*sigma**2)/(2 - 4*sigma**2))**0.5
 
     # initial yield
     e = None
@@ -690,6 +700,10 @@ def gal_ellip_intnorm(sigma_eta, *, rng=None):
         e *= sigma_eta
         r = np.hypot(e.real, e.imag)
         e *= np.tanh(r/2)/r
+
+        mu = np.mean(e)
+        log.info('ellipticity mean: %+.3f%+.3fi', mu.real, mu.imag)
+        log.info('ellipticity sigma: %.3f', (np.var(e)/2)**0.5)
 
 
 @generator(receives=GAL_LEN, yields=GAL_ELL)
