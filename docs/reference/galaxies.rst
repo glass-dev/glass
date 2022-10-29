@@ -53,7 +53,7 @@ Generators
 
    gal_density_const
    gal_density_dndz
-   gal_positions_bias
+   gal_positions_mat
    gal_positions_unif
 
 

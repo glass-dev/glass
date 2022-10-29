@@ -250,7 +250,7 @@ def gal_density_dndz(z, dndz, *, ngal=None):
 @generator(
     receives=(NGAL, DELTA, optional(BFN), optional(VIS)),
     yields=(GAL_LEN, GAL_LON, GAL_LAT))
-def gal_positions_bias(*, remove_monopole=False, rng=None):
+def gal_positions_mat(*, remove_monopole=False, rng=None):
     '''galaxy positions from matter distribution and a bias model
 
     The map of expected galaxy number counts is constructed from the galaxy
