@@ -83,14 +83,14 @@ def test_group():
     state = g.send(None)
 
     assert generator.send.called
-    assert generator.send.call_args.args == (None,)
+    generator.send.assert_called_with(None)
 
     generator.send.return_value = object()
 
     state = g.send(None)
 
     assert generator.send.call_count == 2
-    assert generator.send.call_args.args == (None,)
+    generator.send.assert_called_with(None)
     assert state['bar'] is generator.send.return_value
 
     g.close()
