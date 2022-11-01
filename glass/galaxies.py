@@ -4,7 +4,7 @@
 
 import logging
 import numpy as np
-import healpy as hp
+import healpix
 
 from .generator import generator, optional
 from .util import (ARCMIN2_SPHERE, restrict_interval, trapz_product, cumtrapz,
@@ -104,7 +104,7 @@ def gal_bias_linear():
 
     b = 1
     while True:
-        b = yield (lambda delta: np.clip(b*delta, -1, None))
+        b = yield (lambda delta: b*delta)
 
 
 @generator(receives=B, yields=BFN)
@@ -251,7 +251,7 @@ def gal_density_dndz(z, dndz, *, ngal=None):
     receives=(NGAL, DELTA, optional(BFN), optional(VIS)),
     yields=(GAL_LEN, GAL_LON, GAL_LAT))
 def gal_positions_mat(*, remove_monopole=False, rng=None):
-    '''galaxy positions from matter distribution and a bias model
+    '''Galaxy positions tracing the matter density.
 
     The map of expected galaxy number counts is constructed from the galaxy
     number density, matter density contrast, an optional bias function, and an
@@ -301,8 +301,8 @@ def gal_positions_mat(*, remove_monopole=False, rng=None):
     if rng is None:
         rng = np.random.default_rng()
 
-    # keep track of the total number of galaxies sampled
-    ntot = 0
+    # keep track of the overall number of galaxies sampled
+    nall = 0
 
     # initial yield
     result = None
@@ -335,62 +335,58 @@ def gal_positions_mat(*, remove_monopole=False, rng=None):
         if v is not None:
             n *= v
 
-        # expected number of visible galaxies
-        nsum = np.sum(n)
+        # clip number density at zero
+        np.clip(n, 0, None, out=n)
 
-        log.info('expected visible galaxies: %s', f'{nsum:,.2f}')
+        log.info('expected number of galaxies: %s', f'{n.sum():,.2f}')
 
-        # sample number of galaxies
-        nsam = rng.poisson(nsum)
+        # sample actual galaxy number in each pixel
+        n = rng.poisson(n)
 
-        log.info('sampled number of galaxies: %s', f'{nsam:,d}')
+        # total number of sampled galaxies
+        ntot = n.sum()
 
-        # scaling for probability distribution
-        nmax = np.max(n)
-
-        log.info('sampling efficiency: %g', nsum/n.size/nmax)
+        log.info('realised number of galaxies: %s', f'{ntot:,d}')
 
         # for converting randomly sampled positions to HEALPix indices
-        nside = hp.get_nside(n)
+        npix = n.shape[-1]
+        nside = healpix.npix2nside(npix)
 
         # these will hold the results
-        lon = np.empty(nsam)
-        lat = np.empty(nsam)
+        lon = np.empty(ntot)
+        lat = np.empty(ntot)
 
-        # rejection sampling of galaxies
-        # propose batches of 10000 galaxies over the full sky
-        # then accept or reject based on the spatial distribution in n
-        nrem = nsam
-        while nrem > 0:
-            npro = min(nrem, 10000)
-            lon_pro = rng.uniform(-180, 180, size=npro)
-            lat_pro = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=npro)))
-            pix_pro = hp.ang2pix(nside, lon_pro, lat_pro, lonlat=True)
-            acc = (rng.uniform(0, nmax, size=npro) < n[pix_pro])
-            nacc = acc.sum()
-            sli = slice(nsam-nrem, nsam-nrem+nacc)
-            lon[sli] = lon_pro[acc]
-            lat[sli] = lat_pro[acc]
-            nrem -= nacc
-            del lon_pro, lat_pro, pix_pro, acc
+        # sample batches of 10000 pixels
+        batch = 10_000
+        ncur = 0
+        for i in range(0, npix, batch):
+            k = n[i:i+batch]
+            bpix = np.repeat(np.arange(i, i+k.size), k)
+            blon, blat = healpix.randang(nside, bpix, lonlat=True, rng=rng)
+            lon[ncur:ncur+blon.size] = blon
+            lat[ncur:ncur+blat.size] = blat
+            ncur += bpix.size
+            del k, bpix, blon, blat
+
+        assert ncur == ntot, 'internal error in sampling'
 
         # results of the sampling
-        result = nsam, lon, lat
+        result = ntot, lon, lat
 
-        # add to total sampled
-        ntot += nsam
+        # add to overall sampled
+        nall += ntot
 
         # clean up potentially large arrays; outputs are still kept in result
         del delta, v, n, lon, lat
 
-    log.info('total number of galaxies sampled: %s', f'{ntot:,d}')
+    log.info('total number of galaxies sampled: %s', f'{nall:,d}')
 
 
 @generator(
     receives=NGAL,
     yields=(GAL_LEN, GAL_LON, GAL_LAT))
 def gal_positions_unif(*, rng=None):
-    '''galaxy positions uniformly over the sphere
+    '''Galaxy positions uniform over the sphere.
 
     Yields
     ------
@@ -412,8 +408,8 @@ def gal_positions_unif(*, rng=None):
     if rng is None:
         rng = np.random.default_rng()
 
-    # keep track of the total number of galaxies sampled
-    ntot = 0
+    # keep track of the overall number of galaxies sampled
+    nall = 0
 
     # initial yield
     result = None
@@ -431,24 +427,24 @@ def gal_positions_unif(*, rng=None):
         log.info('expected number of galaxies: %s', f'{nlam:,.2f}')
 
         # sample number of galaxies
-        nsam = rng.poisson(nlam)
+        ntot = rng.poisson(nlam)
 
-        log.info('sampled number of galaxies: %s', f'{nsam:,d}')
+        log.info('sampled number of galaxies: %s', f'{ntot:,d}')
 
         # sample uniformly over the sphere
-        lon = rng.uniform(-180, 180, size=nsam)
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=nsam)))
+        lon = rng.uniform(-180, 180, size=ntot)
+        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ntot)))
 
         # results of the sampling
-        result = nsam, lon, lat
+        result = ntot, lon, lat
 
-        # add to total sampled
-        ntot += nsam
+        # add to overall sampled
+        nall += ntot
 
         # clean up potentially large arrays; outputs are still kept in result
         del lon, lat
 
-    log.info('total number of galaxies sampled: %s', f'{ntot:,d}')
+    log.info('total number of galaxies sampled: %s', f'{nall:,d}')
 
 
 @generator(
@@ -846,11 +842,12 @@ def gal_shear_interp(cosmo):
         ngal = len(z)
         k = np.empty(ngal)
         g = np.empty(ngal, dtype=complex)
-        nside, nside_ = hp.get_nside(kap), hp.get_nside(kap_)
+        nside = healpix.npix2nside(kap.shape[-1])
+        nside_ = healpix.npix2nside(kap_.shape[-1])
         for i in range(0, ngal, 10000):
             s = slice(i, i+10000)
-            ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True)
-            ipix_ = hp.ang2pix(nside_, lon[s], lat[s], lonlat=True)
+            ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
+            ipix_ = healpix.ang2pix(nside_, lon[s], lat[s], lonlat=True)
             for v, m, m_ in (k, kap, kap_), (g.real, gam1, gam1_), (g.imag, gam2, gam2_):
                 v[s] = m_[ipix_]
                 v[s] *= 1 - t[s]
