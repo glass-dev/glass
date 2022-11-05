@@ -2,12 +2,15 @@
 # license: MIT
 '''module for large scale structure'''
 
+import logging
 import numpy as np
 
 from .generator import generator
 from .random import generate_lognormal, generate_normal
 
 from .cosmology import ZMIN, ZMAX
+
+logger = logging.getLogger(__name__)
 
 # variable definitions
 WZ = 'matter weight function'
@@ -41,6 +44,7 @@ def mat_wht_redshift(zlin=None):
     if zlin is None:
         yield from mat_wht_function(lambda z: np.ones_like(z))
     else:
+        logger.info('using linear ramp between z=0 and z=%g', zlin)
         yield from mat_wht_function(lambda z: np.clip(z/zlin, None, 1))
 
 
@@ -56,6 +60,7 @@ def mat_wht_distance(cosmo, zlin=None):
     if zlin is None:
         yield from mat_wht_function(lambda z: 1/cosmo.ef(z))
     else:
+        logger.info('using linear ramp between z=0 and z=%g', zlin)
         yield from mat_wht_function(lambda z: np.clip(z/zlin, None, 1)/cosmo.ef(z))
 
 
