@@ -100,7 +100,7 @@ def test_group():
 
 def test_save_load(tmp_path):
 
-    from glass.core import save, load
+    from glass.core import save, load, GeneratorStop
 
     # also test appending of .glass suffix, so not given here
     filename = tmp_path / 'test'
@@ -135,5 +135,6 @@ def test_save_load(tmp_path):
     assert g.send(None) == ('A', 'B', 'C')
 
     # end of iteration
+    assert g.send(None) is GeneratorStop
     with pytest.raises(StopIteration):
         g.send(None)

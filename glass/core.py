@@ -22,6 +22,16 @@ ITER = 'iteration'
 '''The number of the current iteration, starting from 1.'''
 
 
+GeneratorStop = object()
+'''Sentinel value to stop iteration.
+
+Generators can yield GeneratorStop to stop the iteration without having to
+return and therefore close themselves.  This defers generator clean-up until all
+generators are finalised.
+
+'''
+
+
 class GeneratorError(RuntimeError):
     '''raised when an error occurred in a generator'''
 
@@ -124,7 +134,10 @@ def _gencall(generator, state):
     else:
         receives = getattr(generator, 'receives', None)
         yields = getattr(generator, 'yields', None)
-        state[yields] = generator.send(state[receives])
+        result = generator.send(state[receives])
+        if result is GeneratorStop:
+            raise StopIteration
+        state[yields] = result
 
     log.info('>>> %s: %s <<<', generator.__name__, timedelta(seconds=time.monotonic()-t))
 
@@ -168,7 +181,7 @@ def generate(generators, yields=None):
             try:
                 _gencall(g, state)
             except StopIteration:
-                log.info('>>> generator has stopped the simulation <<<')
+                log.info('>>> generator has stopped the iteration <<<')
                 break
             except Exception as e:
                 raise GeneratorError(g, state) from e
@@ -228,19 +241,24 @@ def group(name, generators):
             _gencall(g, None)
 
         # initial yield
-        state = None
+        result = None
 
         # on every iteration, store sub-generators output in sub-state
         while True:
             try:
-                context = yield state
+                context = yield result
             except GeneratorExit:
                 break
 
             state = State(context=context)
 
-            for g in generators:
-                _gencall(g, state)
+            try:
+                for g in generators:
+                    _gencall(g, state)
+            except StopIteration:
+                result = GeneratorStop
+            else:
+                result = state
 
         # finalise sub-generators
         for g in generators:
@@ -362,5 +380,6 @@ def load(filename):
                     values = pickle.load(f)
                 except EOFError:
                     break
+        yield GeneratorStop
 
     return g()
