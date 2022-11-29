@@ -18,8 +18,8 @@ VIS = 'visibility'
 
 
 @generator(yields=VIS)
-def vis_constant(m, nside=None):
-    '''constant visibility map
+def gen_constant_visibility(m, nside=None):
+    '''Generator for a constant visibility map.
 
     Makes a copy of the given :term:`visibility map` and yields it on every
     iteration.  If a ``nside`` parameter is given, the map is resampled to that
@@ -47,12 +47,9 @@ def vis_constant(m, nside=None):
         log.info('visibility map: NSIDE=%d', nside)
         m = np.copy(m)
 
-    # yield on every iteration, or stop on exit
+    # yield on every iteration
     while True:
-        try:
-            yield m
-        except GeneratorExit:
-            break
+        yield m
 
 
 def vmap_galactic_ecliptic(nside, galactic=(30, 90), ecliptic=(20, 80)):

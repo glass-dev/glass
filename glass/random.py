@@ -2,17 +2,22 @@
 # license: MIT
 '''simulation of spherical random fields'''
 
-from itertools import repeat
-import logging
+from numbers import Number
+import warnings
 import numpy as np
 import healpy as hp
 from gaussiancl import gaussiancl
 
-log = logging.getLogger(__name__)
 
-
-def iternorm(k, cov, n=()):
+def iternorm(k, cov, size=None):
     '''return the vector a and variance sigma^2 for iterative normal sampling'''
+
+    if size is None:
+        n = ()
+    elif isinstance(size, Number):
+        n = (size,)
+    else:
+        n = size
 
     m = np.zeros((*n, k, k))
     a = np.zeros((*n, k))
@@ -32,7 +37,7 @@ def iternorm(k, cov, n=()):
         if k > 0:
             # compute new entries of matrix A
             m[..., :, j] = 0
-            m[..., [j], :] = np.matmul(a[..., np.newaxis, :], m)
+            m[..., j:j+1, :] = np.matmul(a[..., np.newaxis, :], m)
             m[..., j, j] = np.where(s != 0, -1, 0)
             np.divide(m[..., j, :], -s[..., np.newaxis], where=(m[..., j, :] != 0), out=m[..., j, :])
 
@@ -55,6 +60,20 @@ def iternorm(k, cov, n=()):
         yield j, a, s
 
 
+def cls2cov(cls, nl, nf, nc):
+    '''Return array of cls as a covariance matrix for iterative sampling.'''
+    cov = np.zeros((nl, nc+1))
+    end = 0
+    for j in range(nf):
+        begin, end = end, end + j + 1
+        for i, cl in enumerate(cls[begin:end][:nc+1]):
+            if i == 0 and np.any(cl < 0):
+                raise ValueError('negative values in cl')
+            cov[:, i] = cl if cl is not None else 0
+        cov /= 2
+        yield cov
+
+
 def multalm(alm, bl, inplace=False):
     '''multiply alm by bl'''
     n = len(bl)
@@ -67,76 +86,82 @@ def multalm(alm, bl, inplace=False):
     return out
 
 
-def transform_cls(cls, tfm, pars):
-    '''transform Cls to Gaussian Cls for simulation'''
+def transform_cls(cls, tfm, pars=()):
+    '''Transform Cls to Gaussian Cls.'''
 
-    # transform input cls to cls for the Gaussian random fields
     gls = []
     for cl in cls:
-        # only work on available cls
         if cl is not None:
-            log.info('computing Gaussian cl of size %d', len(cl))
-
             if cl[0] == 0:
-                log.warning('warning: ignoring zero monopole')
                 monopole = 0.
             else:
-                monopole = False
+                monopole = None
 
             gl, info, err, niter = gaussiancl(cl, tfm, pars, monopole=monopole)
 
             if info == 0:
-                log.warning('WARNING: solution did not converge, inexact transform')
-            log.info('relative error after %d iterations: %g', niter, err)
+                warnings.warn('Gaussian cl did not converge, inexact transform')
         else:
             gl = None
 
-        # store the Gaussian cl, or None
         gls.append(gl)
 
-    # returns the list of transformed cls in input order
     return gls
 
 
-def generate_gaussian(nside, rng=None):
-    '''sample Gaussian random fields from Cls'''
+def generate_grf(cls, nside, ncorr=None, *, rng=None):
+    '''Iteratively sample Gaussian random fields from Cls.
+
+    A generator that iteratively samples HEALPix maps of Gaussian random fields
+    with the given angular power spectra ``cls`` and resolution parameter
+    ``nside``.
+
+    The optional argument ``ncorr`` can be used to artificially limit now many
+    realised fields are correlated.  This saves memory, as only `ncorr` previous
+    fields need to be kept.
+
+    The ``cls`` array must contain the auto-correlation of each new field
+    followed by the cross-correlations with all previous fields in reverse
+    order::
+
+        cls = [cl_00,
+               cl_11, cl_10,
+               cl_22, cl_21, cl_20,
+               ...]
+
+    Missing entries can be set to ``None``.
+
+    '''
 
     # get the default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
 
-    # initial value
-    m = None
+    # number of cls and number of fields
+    ncls = len(cls)
+    ngrf = int((2*ncls)**0.5)
+
+    # number of correlated fields if not specified
+    if ncorr is None:
+        ncorr = ngrf - 1
+
+    # number of modes
+    n = max((len(cl) for cl in cls if cl is not None), default=0)
+    if n == 0:
+        raise ValueError('all cls are empty')
+
+    # generates the covariance matrix for the iterative sampler
+    cov = cls2cov(cls, n, ngrf, ncorr)
+
+    # working arrays for the iterative sampling
+    z = np.zeros(n*(n+1)//2, dtype=np.complex128)
+    y = np.zeros((n*(n+1)//2, ncorr), dtype=np.complex128)
+
+    # generate the conditional normal distribution for iterative sampling
+    conditional_dist = iternorm(ncorr, cov, size=n)
 
     # sample the fields from the conditional distribution
-    while True:
-        # yield random field and get cls for the next redshift slice
-        try:
-            cls = yield m
-        except GeneratorExit:
-            break
-
-        # set up the iterative sampling on the first pass
-        if m is None:
-            k = len(cls) - 1
-            n = len(cls[0])
-            cov = np.zeros((n, k + 1))
-            z = np.zeros(n*(n+1)//2, dtype=np.complex128)
-            y = np.zeros((n*(n+1)//2, k), dtype=np.complex128)
-            ni = iternorm(k, repeat(cov), (n,))
-
-        # set the new covariance matrix row
-        for i, cl in enumerate(cls):
-            if i == 0 and np.any(cl < 0):
-                raise ValueError('negative values in cl')
-            cov[..., i] = cl if cl is not None else 0
-
-        # covariance is per component
-        cov /= 2
-
-        # get the conditional distribution
-        j, a, s = next(ni)
-
+    for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
         rng.standard_normal(n*(n+1), np.float64, z.view(np.float64))
@@ -146,7 +171,7 @@ def generate_gaussian(nside, rng=None):
         alm = multalm(z, s)
 
         # add the mean of the conditional distribution
-        for i in range(k):
+        for i in range(ncorr):
             alm += multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
@@ -159,68 +184,37 @@ def generate_gaussian(nside, rng=None):
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
-        m = hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
+        yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
-def generate_normal(nside, rng=None):
+def generate_normal(cls, nside, ncorr=None, *, rng=None):
     '''sample normal random fields from Cls'''
 
-    # set up the underlying Gaussian random field generator
-    grf = generate_gaussian(nside, rng)
+    # transform to Gaussian cls
+    gls = transform_cls(cls, 'normal')
 
-    # prime generator
-    m = grf.send(None)
-
-    # sample each redshift slice
-    while True:
-        # yield lognormal field and get next cls
-        try:
-            cls = yield m
-        except GeneratorExit:
-            break
-
-        # transform to Gaussian cls
-        cls = transform_cls(cls, 'normal', ())
-
-        log.info('generating Gaussian random field')
-
-        # get Gaussian random field for cls
-        m = grf.send(cls)
+    # sample maps of Gaussian random fields, no processing needed
+    for m in generate_grf(gls, nside, ncorr, rng=rng):
+        yield m
 
 
-def generate_lognormal(nside, shift=1., rng=None):
+def generate_lognormal(cls, nside, shift=1., ncorr=None, *, rng=None):
     '''sample lognormal random fields from Cls'''
 
-    # set up the underlying Gaussian random field generator
-    grf = generate_gaussian(nside, rng)
+    # transform to Gaussian cls
+    gls = transform_cls(cls, 'lognormal', (shift,))
 
-    # prime generator
-    m = grf.send(None)
-
-    # sample each redshift slice
-    while True:
-        # yield lognormal field and get next cls
-        try:
-            cls = yield m
-        except GeneratorExit:
-            break
-
-        # transform to Gaussian cls
-        gls = transform_cls(cls, 'lognormal', (shift,))
-
-        log.info('generating Gaussian random field')
-
-        # get Gaussian random field for gls
-        m = grf.send(gls)
-
-        log.info('transforming to lognormal distribution')
-
+    # sample maps of Gaussian random fields and transform to lognormal
+    for m in generate_grf(gls, nside, ncorr, rng=rng):
         # fix mean of the Gaussian random field for lognormal transformation
-        m -= np.dot(np.arange(1, 2*len(gls[0]), 2), gls[0])/(4*np.pi)/2
+        m -= np.var(m)/2
 
         # exponentiate values in place and subtract 1 in one operation
         np.expm1(m, out=m)
 
-        # lognormal shift
+        # lognormal shift, unless unity
         if shift != 1:
             m *= shift
+
+        # yield the lognormal map
+        yield m

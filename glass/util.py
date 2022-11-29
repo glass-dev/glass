@@ -131,3 +131,13 @@ def hp_integrate(m, nside=None, lmax=None):
         nside = hp.get_nside(m)
     alm = hp.map2alm(m, lmax=lmax, pol=False, use_pixel_weights=True)
     return hp.alm2map(alm, nside, lmax=lmax, pixwin=True, inplace=True)
+
+
+def format_array(fmt, a):
+    '''format an array using a format string'''
+    s = np.empty_like(a, dtype=object)
+    for i, x in np.ndenumerate(a):
+        s[i] = fmt.format(x)
+    if s.shape == ():
+        s = s.item()
+    return s
