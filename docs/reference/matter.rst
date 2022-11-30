@@ -4,31 +4,38 @@ Matter fields (:mod:`glass.matter`)
 
 .. currentmodule:: glass.matter
 
-Generators
-==========
-
-Random fields
--------------
+Matter shells
+=============
 
 .. autosummary::
-   :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   gaussian_matter
-   lognormal_matter
+   redshift_shells
+   distance_shells
 
 
 Weight functions
-----------------
+================
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   redshift_weights
+   distance_weights
+   volume_weights
+   density_weights
+   make_weights
+
+
+Random field generators
+=======================
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   mat_wht_function
-   mat_wht_redshift
-   mat_wht_distance
-   mat_wht_volume
-   mat_wht_density
+   gen_gaussian_matter
+   gen_lognormal_matter

@@ -15,8 +15,8 @@ Single source plane
    :toctree: generated/
    :nosignatures:
 
-   convergence
-   shear
+   gen_convergence
+   gen_shear
 
 
 Source distributions
@@ -27,4 +27,4 @@ Source distributions
    :toctree: generated/
    :nosignatures:
 
-   lensing_dist
+   gen_lensing_dist

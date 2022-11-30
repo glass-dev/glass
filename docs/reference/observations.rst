@@ -4,25 +4,12 @@ Observations (:mod:`glass.observations`)
 
 .. currentmodule:: glass.observations
 
-Generators
-==========
-
-Visibility
-----------
-
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   vis_constant
-
-
-Other
-=====
 
 Redshift distributions
-----------------------
+======================
+
+Functions
+---------
 
 .. autosummary::
    :toctree: generated/
@@ -35,10 +22,24 @@ Redshift distributions
 
 
 Visibility
-----------
+==========
+
+Functions
+---------
 
 .. autosummary::
    :toctree: generated/
    :nosignatures:
 
    vmap_galactic_ecliptic
+
+
+Generators
+----------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   gen_constant_visibility
