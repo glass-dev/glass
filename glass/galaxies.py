@@ -18,11 +18,6 @@ from .observations import VIS
 log = logging.getLogger(__name__)
 
 # variable definitions
-NGAL = 'mean galaxy density'
-'''Expected number of galaxies per arcmin2.'''
-NZ = 'galaxy redshift distribution'
-'''Redshift distribution function :math:`n(z)` of galaxies.  The function does
-not have to be normalised.'''
 GAL_LEN = 'galaxy count'
 '''The total number of sampled galaxies, i.e. the length of the galaxy column
 data.'''
