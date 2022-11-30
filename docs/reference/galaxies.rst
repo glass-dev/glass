@@ -8,100 +8,71 @@ Galaxies (:mod:`glass.galaxies`)
 Galaxy bias
 ===========
 
-Variables
+Functions
 ---------
 
-.. autodata:: B
-.. autodata:: BFN
-
-
-Generators
-----------
-
 .. autosummary::
-   :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   gal_b_const
-   gal_b_eff
-   gal_bias_linear
-   gal_bias_loglinear
-   gal_bias_function
+   effective_bias
+   linear_bias
+   loglinear_bias
 
 
 Galaxy distribution
 ===================
 
-Variables
+Functions
 ---------
 
-.. autodata:: NGAL
-.. autodata:: NZ
-.. autodata:: GAL_LEN
-.. autodata:: GAL_LON
-.. autodata:: GAL_LAT
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
 
+   constant_densities
+   densities_from_dndz
+   
 
 Generators
 ----------
+
+.. autodata:: GAL_LEN
+.. autodata:: GAL_LON
+.. autodata:: GAL_LAT
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   gal_density_const
-   gal_density_dndz
-   gal_positions_mat
-   gal_positions_unif
+   gen_positions_from_matter
+   gen_uniform_positions
 
 
 Galaxy redshifts
 ================
 
-Variables
----------
+Generators
+----------
 
 .. autodata:: GAL_Z
 .. autodata:: GAL_POP
-
-
-Generators
-----------
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   gal_redshifts_nz
+   gen_redshifts_from_nz
+   gen_uniform_redshifts
 
 
 Galaxy ellipticities
 ====================
 
-Variables
+Functions
 ---------
-
-.. autodata:: GAL_ELL
-
-
-Generators
-----------
-
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   gal_ellip_gaussian
-   gal_ellip_intnorm
-   gal_ellip_ryden04
-
-
-Other
------
 
 .. autosummary::
    :toctree: generated/
@@ -110,41 +81,48 @@ Other
    ellipticity_ryden04
 
 
-Galaxy shears
-=============
-
-Variables
----------
-
-.. autodata:: GAL_SHE
-
-
 Generators
 ----------
+
+.. autodata:: GAL_ELL
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   gal_shear_interp
+   gen_ellip_gaussian
+   gen_ellip_intnorm
+   gen_ellip_ryden04
+
+
+Galaxy shears
+=============
+
+Generators
+----------
+
+.. autodata:: GAL_SHE
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   gen_shear_interp
 
 
 Photometric redshifts
 =====================
 
-Variables
----------
-
-.. autodata:: GAL_PHZ
-
-
 Generators
 ----------
+
+.. autodata:: GAL_PHZ
 
 .. autosummary::
    :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-   gal_phz_gausserr
+   gen_phz_gausserr

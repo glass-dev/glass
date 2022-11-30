@@ -7,14 +7,10 @@ Core functionality (:mod:`glass.core`)
 This module contains the core functions of GLASS.
 
 
-Variables
-=========
-
-.. autodata:: ITER
-
-
 Generation
 ==========
+
+.. autodata:: ITER
 
 .. autofunction:: generate
 .. autofunction:: run
@@ -38,13 +34,3 @@ the same variables from multiple generators.  Groups can be nested.
         For an example of how groups can be used.
 
 .. autofunction:: group
-
-
-Saving and loading
-==================
-
-Generator outputs can be saved and loaded using the :func:`save` and
-:func:`load` generators.
-
-.. autofunction:: save
-.. autofunction:: load
