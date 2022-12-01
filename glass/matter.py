@@ -7,11 +7,9 @@ from collections import namedtuple
 import numpy as np
 
 from .generator import generator
-from .random import generate_lognormal, generate_normal
+from .random import transform_cls, generate_lognormal, generate_normal
 
 logger = logging.getLogger(__name__)
-
-FWHM_FACTOR = 4*np.log(2)
 
 # variable definitions
 DELTA = 'matter density contrast'
@@ -96,12 +94,33 @@ def density_weights(shells, cosmo):
 @generator(yields=DELTA)
 def gen_lognormal_matter(cls, nside, ncorr=None, *, rng=None):
     '''generate lognormal matter fields from Cls'''
+
+    # lognormal shift, fixed for now
+    shift = 1.
+
+    logger.info('computing Gaussian cls')
+
+    # transform to Gaussian cls
+    gls = transform_cls(cls, 'lognormal', (shift,), ncorr=ncorr)
+
+    # initial yield
     yield
-    yield from generate_lognormal(cls, nside, shift=1., ncorr=ncorr, rng=rng)
+
+    # return the iteratively sampled random fields
+    yield from generate_lognormal(gls, nside, shift=shift, ncorr=ncorr, rng=rng)
 
 
 @generator(yields=DELTA)
 def gen_gaussian_matter(cls, nside, ncorr=None, *, rng=None):
     '''generate Gaussian matter fields from Cls'''
+
+    logger.info('computing Gaussian cls')
+
+    # transform to Gaussian cls
+    gls = transform_cls(cls, 'normal', ncorr=ncorr)
+
+    # initial yield
     yield
-    yield from generate_normal(cls, nside, ncorr=ncorr, rng=rng)
+
+    # return the iteratively sampled random fields
+    yield from generate_normal(gls, nside, ncorr=ncorr, rng=rng)
