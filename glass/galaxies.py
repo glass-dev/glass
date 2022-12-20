@@ -736,11 +736,14 @@ def gen_ellip_intnorm(sigma, *, rng=None):
         e = rng.standard_normal(2*ngal, np.float64).view(np.complex128)
         e *= sigma_eta
         r = np.hypot(e.real, e.imag)
-        e *= np.tanh(r/2)/r
+        e *= np.divide(np.tanh(r/2), r, where=(r > 0), out=r)
 
-        mu = np.mean(e)
-        log.info('ellipticity mean: %+.3f%+.3fi', mu.real, mu.imag)
-        log.info('ellipticity sigma: %.3f', (np.var(e)/2)**0.5)
+        if ngal > 0:
+            mu = np.mean(e)
+            log.info('ellipticity mean: %+.3f%+.3fi', mu.real, mu.imag)
+            log.info('ellipticity sigma: %.3f', (np.var(e)/2)**0.5)
+        else:
+            log.info('(number of galaxies is zero, no ellipticities sampled)')
 
 
 @generator(receives=GAL_LEN, yields=GAL_ELL)
