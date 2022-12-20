@@ -98,6 +98,7 @@ def gen_lognormal_matter(cls, nside, ncorr=None, *, rng=None):
     # lognormal shift, fixed for now
     shift = 1.
 
+    logger.info('correlating %s shells', 'all' if ncorr is None else str(ncorr))
     logger.info('computing Gaussian cls')
 
     # transform to Gaussian cls
@@ -114,13 +115,10 @@ def gen_lognormal_matter(cls, nside, ncorr=None, *, rng=None):
 def gen_gaussian_matter(cls, nside, ncorr=None, *, rng=None):
     '''generate Gaussian matter fields from Cls'''
 
-    logger.info('computing Gaussian cls')
-
-    # transform to Gaussian cls
-    gls = transform_cls(cls, 'normal', ncorr=ncorr)
+    logger.info('correlating %s shells', 'all' if ncorr is None else str(ncorr))
 
     # initial yield
     yield
 
     # return the iteratively sampled random fields
-    yield from generate_normal(gls, nside, ncorr=ncorr, rng=rng)
+    yield from generate_normal(cls, nside, ncorr=ncorr, rng=rng)
