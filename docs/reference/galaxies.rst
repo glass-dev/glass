@@ -110,6 +110,7 @@ Generators
    :toctree: generated/
    :nosignatures:
 
+   gen_shear_simple
    gen_shear_interp
 
 

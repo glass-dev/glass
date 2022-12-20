@@ -820,6 +820,74 @@ def gen_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
 
 
 @generator(
+    receives=(KAPPA, GAMMA, GAL_LON, GAL_LAT, GAL_ELL),
+    yields=GAL_SHE)
+def gen_shear_simple(cosmo):
+    '''generator for observed galaxy shears from non-interpolated lensing
+
+    Takes lensing maps for convergence and shear and produces a lensed
+    ellipticity (shear) for each intrinsic galaxy ellipticity.
+
+    The lensing maps are taken from the upper boundary of the matter shell,
+    and not interpolated.
+
+    Parameters
+    ----------
+    cosmo : cosmology
+        Cosmology instance for distance functions.
+
+    Receives
+    --------
+    :data:`~glass.lensing.KAPPA`, array_like
+    :data:`~glass.lensing.GAMMA`, array_like
+        HEALPix maps for convergence and shear.
+    :data:`GAL_LON`, (N,) array_like
+    :data:`GAL_LAT`, (N,) array_like
+        Arrays for galaxy positions.
+    :data:`GAL_ELL`, (N,) array_like
+        Array of galaxy :term:`ellipticity (complex)`.
+
+    Yields
+    ------
+    :data:`GAL_SHE`, (N,) array_like
+        Array of complex-valued observed galaxy shears (lensed ellipticities).
+
+    '''
+
+    # initial values
+    kap = gam1 = gam2 = np.zeros(12)
+
+    # initial yield
+    kap, (gam1, gam2), lon, lat, e = yield
+
+    while True:
+        # get the lensing maps at galaxy position
+        ngal = len(e)
+        k = np.empty(ngal)
+        g = np.empty(ngal, dtype=complex)
+        nside = healpix.npix2nside(kap.shape[-1])
+        for i in range(0, ngal, 10000):
+            s = slice(i, i+10000)
+            ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
+            k[s] = kap[ipix]
+            g.real[s] = gam1[ipix]
+            g.imag[s] = gam2[ipix]
+            del ipix
+
+        # compute reduced shear in place
+        g /= 1 - k
+
+        # compute lensed ellipticities
+        g = (e + g)/(1 + g.conj()*e)
+
+        # clean up
+        del kap, gam1, gam2, lon, lat, e
+
+        # yield galaxy shears and receive new data
+        kap, (gam1, gam2), lon, lat, e = yield g
+
+
+@generator(
     receives=(ZSRC, KAPPA, GAMMA, GAL_Z, GAL_LON, GAL_LAT, GAL_ELL),
     yields=GAL_SHE)
 def gen_shear_interp(cosmo):
