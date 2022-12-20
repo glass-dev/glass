@@ -91,6 +91,7 @@ Generators
    :toctree: generated/
    :nosignatures:
 
+   gen_ellip_zero
    gen_ellip_gaussian
    gen_ellip_intnorm
    gen_ellip_ryden04

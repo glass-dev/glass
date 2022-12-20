@@ -603,6 +603,36 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
 
 
 @generator(receives=GAL_LEN, yields=GAL_ELL)
+def gen_ellip_zero(*, rng=None):
+    r'''generator for zero galaxy ellipticities
+
+    This generator yields zero ellipticity for all galaxies, so that the
+    resulting galaxy shear after lensing has no shape noise.
+
+    Parameters
+    ----------
+    rng : :class:`~numpy.random.Generator`, optional
+        Random number generator.  If not given, a default RNG will be used.
+
+    Yields
+    ------
+    :data:`GAL_ELL`, (GAL_LEN,) array_like
+        Array of galaxy :term:`ellipticity (complex)`.
+
+    Receives
+    --------
+    :data:`GAL_LEN`, int
+        Number of galaxies for which ellipticities are sampled.
+
+    '''
+
+    n = yield
+    while True:
+        ell = np.zeros(n, dtype=complex)
+        n = yield ell
+
+
+@generator(receives=GAL_LEN, yields=GAL_ELL)
 def gen_ellip_gaussian(sigma, *, rng=None):
     r'''generator for Gaussian galaxy ellipticities
 
