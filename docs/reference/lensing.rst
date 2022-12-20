@@ -4,11 +4,15 @@ Lensing fields (:mod:`glass.lensing`)
 
 .. currentmodule:: glass.lensing
 
-Generators
-==========
+Lensing fields
+==============
 
-Single source plane
--------------------
+Generators
+----------
+
+.. autodata:: ZSRC
+.. autodata:: KAPPA
+.. autodata:: GAMMA
 
 .. autosummary::
    :template: generator.rst
@@ -20,7 +24,13 @@ Single source plane
 
 
 Source distributions
---------------------
+====================
+
+Generators
+----------
+
+.. autodata:: KAPPA_BAR
+.. autodata:: GAMMA_BAR
 
 .. autosummary::
    :template: generator.rst

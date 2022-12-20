@@ -16,10 +16,17 @@ log = logging.getLogger(__name__)
 
 # variable definitions
 ZSRC = 'weak lensing source redshift'
+'''The source redshift for which the lensing fields are evaluated.'''
 KAPPA = 'weak lensing convergence'
+'''The convergence field from weak lensing, commonly called :math:`\\kappa`, for
+the source redshift :data:`ZSRC`.'''
 GAMMA = 'weak lensing shear'
+'''The shear field from weak lensing, commonly called :math:`\\gamma`, for the
+source redshift :data:`ZSRC`.'''
 KAPPA_BAR = 'weak lensing mean convergence over distribution'
+'''The integrated convergence field of a source distribution :math:`n(z)`.'''
 GAMMA_BAR = 'weak lensing mean shear over distribution'
+'''The integrated shear field of a source distribution :math:`n(z)`.'''
 
 
 LensingWeights = namedtuple('LensingWeights', ['z', 'w'])
