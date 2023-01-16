@@ -3,7 +3,6 @@
 '''module for weak gravitational lensing'''
 
 import logging
-from collections import namedtuple
 import numpy as np
 import healpy as hp
 
@@ -27,80 +26,6 @@ KAPPA_BAR = 'weak lensing mean convergence over distribution'
 '''The integrated convergence field of a source distribution :math:`n(z)`.'''
 GAMMA_BAR = 'weak lensing mean shear over distribution'
 '''The integrated shear field of a source distribution :math:`n(z)`.'''
-
-
-LensingWeights = namedtuple('LensingWeights', ['z', 'w'])
-LensingWeights.__doc__ = '''Lensing weights for each matter shell.'''
-
-
-def compute_weights(func, shells, matter_weights, cosmo):
-    '''Compute lensing weights from a given function.'''
-
-    f = 3*cosmo.omega_m/2
-
-    # output arrays of values
-    n = len(shells) - 1
-    za, wa = np.empty(n), np.empty((n, 3))
-
-    # set up initial values for recurrence
-    z2 = z3 = shells[0]
-    r23 = 1
-    w33 = 0
-    zmat = wmat = np.zeros(2)
-
-    for i, zsrc in enumerate(shells[1:]):
-
-        # redshifts of source planes
-        z1, z2, z3 = z2, z3, zsrc
-
-        # extrapolation law
-        r12 = r23
-        r13, r23 = cosmo.xm([z1, z2], z3)/cosmo.xm(z3)
-        t123 = r13/r12
-
-        # weights for the lensing recurrence
-        w22 = w33
-        w23 = func(z1, z2, zsrc, zmat, wmat)
-        zmat, wmat = matter_weights.z[i], matter_weights.w[i]
-        w33 = func(z2, z3, zsrc, zmat, wmat)
-
-        # combinations of weights in extrapolation law
-        w1 = t123
-        w2 = f*(w23 - t123*w22)
-        w3 = f*w33
-
-        # store in array
-        za[i], wa[i] = zsrc, [w1, w2, w3]
-
-    return LensingWeights(za, wa)
-
-
-def midpoint_weights(shells, matter_weights, cosmo):
-    '''Compute midpoint lensing weights.'''
-
-    def func(zmin, zmax, zsrc, zmat, wmat):
-        v = np.trapz(wmat, zmat)
-        if v == 0:
-            return 0.
-        zbar = np.trapz(zmat*wmat, zmat)/v
-        wbar = np.interp(zbar, zmat, wmat)
-        f = cosmo.xm(zbar)/cosmo.xm(zsrc)*cosmo.xm(zbar, zsrc)
-        f *= (1 + zbar)/cosmo.ef(zbar)
-        return f/wbar*v
-
-    return compute_weights(func, shells, matter_weights, cosmo)
-
-
-def integrated_weights(shells, matter_weights, cosmo):
-    '''Compute integrated lensing weights.'''
-
-    def func(zmin, zmax, zsrc, zmat, wmat):
-        z = np.linspace(zmin, zmax, 200)
-        f = cosmo.xm(z)/cosmo.xm(zsrc)*cosmo.xm(z, zsrc)
-        f *= (1 + z)/cosmo.ef(z)
-        return np.trapz(f, z)
-
-    return compute_weights(func, shells, matter_weights, cosmo)
 
 
 @generator(receives=KAPPA, yields=GAMMA)
@@ -194,19 +119,37 @@ def gen_shear(lmax=None):
 @generator(
     receives=DELTA,
     yields=(ZSRC, KAPPA))
-def gen_convergence(weights):
+def gen_convergence(mweights, cosmo):
     '''convergence from integrated matter shells'''
 
-    # initial yield
-    delta23 = yield
+    f = 3*cosmo.omega_m/2
 
-    # set up variables for recurrence
-    kappa2 = np.zeros_like(delta23)
-    kappa3 = np.zeros_like(delta23)
-    delta12 = 0
+    # initial yield to get the first mass plane
+    delta3 = yield
 
-    # go through matter shells, new values for delta23 are obtained at the end
-    for zsrc, (w1, w2, w3) in zip(weights.z, weights.w):
+    # set up initial values for recurrence
+    z2 = z3 = x3 = m3 = 0
+    r23 = 1
+    kappa2 = np.zeros_like(delta3)
+    kappa3 = np.zeros_like(delta3)
+    delta2 = 0
+
+    # go through matter shells, new values for delta3 are obtained at the end
+    for z, w in zip(mweights.z, mweights.w):
+
+        # redshift "mass" in weight
+        m2, m3 = m3, np.trapz(w, z)
+
+        # redshifts of source planes
+        z1, z2, z3 = z2, z3, np.trapz(w*z, z)/m3
+
+        # extrapolation law
+        x2, x3 = x3, cosmo.xm(z3)
+        r12, (r13, r23) = r23, cosmo.xm([z1, z2], z3)/x3
+        t3 = r13/r12
+
+        # lensing weight of matter plane to be added
+        w3 = f * x2*r23 * (1 + z2)/cosmo.ef(z2) * m2
 
         # cycle convergence planes
         # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
@@ -215,23 +158,22 @@ def gen_convergence(weights):
         kappa2, kappa3 = kappa3, kappa2
 
         # compute next convergence plane in place of last
-        kappa3 *= 1 - w1
-        kappa3 += w1*kappa2
-        kappa3 += w2*delta12
-        kappa3 += w3*delta23
+        kappa3 *= 1 - t3
+        kappa3 += t3*kappa2
+        kappa3 += w3*delta2
 
         # output some statistics
-        log.info('zsrc: %f', zsrc)
+        log.info('zsrc: %f', z3)
         log.info('κbar: %f', np.mean(kappa3))
         log.info('κmin: %f', np.min(kappa3))
         log.info('κmax: %f', np.max(kappa3))
         log.info('κrms: %f', np.sqrt(np.mean(np.square(kappa3))))
 
         # keep current matter field for next iteration
-        delta12 = delta23
+        delta2 = delta3
 
         # yield convergence and return new matter field
-        delta23 = yield zsrc, kappa3
+        delta3 = yield z3, kappa3
 
 
 @generator(

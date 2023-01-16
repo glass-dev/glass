@@ -11,7 +11,7 @@ from .util import (ARCMIN2_SPHERE, restrict_interval, trapz_product, cumtrapz,
                    triaxial_axis_ratio, hp_integrate, format_array)
 
 from .matter import DELTA
-from .lensing import ZSRC, KAPPA, GAMMA
+from .lensing import KAPPA, GAMMA
 from .observations import VIS
 
 
@@ -822,7 +822,7 @@ def gen_ellip_ryden04(mu, sigma, gamma, sigma_gamma, *, rng=None):
 @generator(
     receives=(KAPPA, GAMMA, GAL_LON, GAL_LAT, GAL_ELL),
     yields=GAL_SHE)
-def gen_shear_simple(cosmo):
+def gen_shear(*, reduced_shear=True):
     '''generator for observed galaxy shears from non-interpolated lensing
 
     Takes lensing maps for convergence and shear and produces a lensed
@@ -833,8 +833,9 @@ def gen_shear_simple(cosmo):
 
     Parameters
     ----------
-    cosmo : cosmology
-        Cosmology instance for distance functions.
+    reduced_shear : bool, optional
+        If ``False``, galaxy shears are not reduced by the convergence.
+        Default is ``True``.
 
     Receives
     --------
@@ -874,106 +875,21 @@ def gen_shear_simple(cosmo):
             g.imag[s] = gam2[ipix]
             del ipix
 
-        # compute reduced shear in place
-        g /= 1 - k
+        if reduced_shear:
+            # compute reduced shear in place
+            g /= 1 - k
 
-        # compute lensed ellipticities
-        g = (e + g)/(1 + g.conj()*e)
+            # compute lensed ellipticities
+            g = (e + g)/(1 + g.conj()*e)
+        else:
+            # simple sum of shears
+            g += e
 
         # clean up
         del kap, gam1, gam2, lon, lat, e
 
         # yield galaxy shears and receive new data
         kap, (gam1, gam2), lon, lat, e = yield g
-
-
-@generator(
-    receives=(ZSRC, KAPPA, GAMMA, GAL_Z, GAL_LON, GAL_LAT, GAL_ELL),
-    yields=GAL_SHE)
-def gen_shear_interp(cosmo):
-    '''generator for observed galaxy shears from interpolated lensing
-
-    Takes lensing maps for convergence and shear and produces a lensed
-    ellipticity (shear) for each intrinsic galaxy ellipticity.
-
-    The lensing maps are interpolated over the redshift interval using each
-    individual galaxy redshift [1]_.
-
-    Parameters
-    ----------
-    cosmo : cosmology
-        Cosmology instance for distance functions.
-
-    Receives
-    --------
-    zsrc : float
-        Source plane redshift of lensing maps.
-    kappa, gamma1, gamma2 : array_like
-        HEALPix maps for convergence and shear.
-    gal_z : (ngal,) array_like
-        Array of galaxy redshifts.
-    gal_lon, gal_lat : (ngal,) array_like
-        Arrays for galaxy positions.
-    gal_ell : (ngal,) array_like
-        Array of complex-valued intrinsic galaxy ellipticities.
-
-    Yields
-    ------
-    gal_she : (ngal,) array_like
-        Array of complex-valued observed galaxy shears (lensed ellipticities).
-
-    References
-    ----------
-    .. [1] Tessore et al., in prep
-
-    '''
-
-    # initial values
-    zsrc = 0
-    kap = gam1 = gam2 = np.zeros(12)
-
-    # initial yield
-    g = None
-
-    # yield shears and get a new shell, or stop on exit
-    # always keep previous lensing plane
-    while True:
-        zsrc_, kap_, gam1_, gam2_ = zsrc, kap, gam1, gam2
-        try:
-            zsrc, kap, (gam1, gam2), z, lon, lat, e = yield g
-        except GeneratorExit:
-            break
-
-        # interpolation weight for galaxy redshift given source planes
-        t = cosmo.xm(zsrc_, z)
-        np.divide(t, cosmo.xm(z), where=(t != 0), out=t)
-        t /= cosmo.xm(zsrc_, zsrc)/cosmo.xm(zsrc)
-
-        # get the lensing maps at galaxy position
-        # interpolate in redshifts
-        ngal = len(z)
-        k = np.empty(ngal)
-        g = np.empty(ngal, dtype=complex)
-        nside = healpix.npix2nside(kap.shape[-1])
-        nside_ = healpix.npix2nside(kap_.shape[-1])
-        for i in range(0, ngal, 10000):
-            s = slice(i, i+10000)
-            ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
-            ipix_ = healpix.ang2pix(nside_, lon[s], lat[s], lonlat=True)
-            for v, m, m_ in (k, kap, kap_), (g.real, gam1, gam1_), (g.imag, gam2, gam2_):
-                v[s] = m_[ipix_]
-                v[s] *= 1 - t[s]
-                v[s] += t[s]*m[ipix]
-            del v, m, m_
-
-        # compute reduced shear in place
-        g /= 1 - k
-
-        # compute lensed ellipticities
-        g = (e + g)/(1 + g.conj()*e)
-
-        # clean up
-        del z, lon, lat, e, k
 
 
 @generator(receives=GAL_Z, yields=GAL_PHZ)
