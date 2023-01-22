@@ -92,3 +92,11 @@ intersphinx_mapping = {
     'numpy': ('https://numpy.org/doc/stable/', None),
     'examples': ('https://glass.readthedocs.io/projects/examples/en/latest/', None),
 }
+
+
+# -- numpydoc ----------------------------------------------------------------
+
+# Whether to create a Sphinx table of contents for the lists of class methods
+# and attributes. If a table of contents is made, Sphinx expects each entry to
+# have a separate page.
+numpydoc_class_members_toctree = False
