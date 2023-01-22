@@ -1,6 +1,25 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''simulation of spherical random fields'''
+'''
+Random fields (:mod:`glass.fields`)
+===================================
+
+.. currentmodule:: glass.fields
+
+The :mod:`glass.fields` module provides functionality for simulating random
+fields on the sphere.  This is done in the form of HEALPix maps.
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   gaussian_gls
+   lognormal_gls
+   generate_gaussian
+   generate_lognormal
+
+'''
 
 from numbers import Number
 import warnings
@@ -69,7 +88,12 @@ def cls2cov(cls, nl, nf, nc):
         for i, cl in enumerate(cls[begin:end][:nc+1]):
             if i == 0 and np.any(cl < 0):
                 raise ValueError('negative values in cl')
-            cov[:, i] = cl if cl is not None else 0
+            if cl is None:
+                cov[:, i] = 0
+            else:
+                n = len(cl)
+                cov[:n, i] = cl
+                cov[n:, i] = 0
         cov /= 2
         yield cov
 
@@ -86,15 +110,8 @@ def multalm(alm, bl, inplace=False):
     return out
 
 
-def transform_cls(cls, tfm, pars=(), *, ncorr=None):
+def transform_cls(cls, tfm, pars=()):
     '''Transform Cls to Gaussian Cls.'''
-
-    if ncorr is not None:
-        n = int((2*len(cls))**0.5)
-        if n*(n+1)//2 != len(cls):
-            raise ValueError('length of cls array is not a triangle number')
-        cls = [cls[i*(i+1)//2+j] if j <= ncorr else None for i in range(n) for j in range(i+1)]
-
     gls = []
     for cl in cls:
         if cl is not None:
@@ -102,20 +119,53 @@ def transform_cls(cls, tfm, pars=(), *, ncorr=None):
                 monopole = 0.
             else:
                 monopole = None
-
             gl, info, err, niter = gaussiancl(cl, tfm, pars, monopole=monopole)
-
             if info == 0:
                 warnings.warn('Gaussian cl did not converge, inexact transform')
         else:
             gl = None
-
         gls.append(gl)
-
     return gls
 
 
-def generate_grf(cls, nside, ncorr=None, *, rng=None):
+def gaussian_gls(cls, *, lmax=None, ncorr=None, nside=None):
+    '''Compute Gaussian Cls for a Gaussian random field.
+
+    Depending on the given arguments, this truncates the angular power spectra
+    to ``lmax``, removes all but ``ncorr`` correlations between fields, and
+    applies the HEALPix pixel window function of the given ``nside``.  If no
+    arguments are given, no action is performed.
+
+    '''
+
+    if ncorr is not None:
+        n = int((2*len(cls))**0.5)
+        if n*(n+1)//2 != len(cls):
+            raise ValueError('length of cls array is not a triangle number')
+        cls = [cls[i*(i+1)//2+j] if j <= ncorr else None for i in range(n) for j in range(i+1)]
+
+    if nside is not None:
+        pw = hp.pixwin(nside, lmax=lmax)
+
+    gls = []
+    for cl in cls:
+        if cl is not None:
+            if lmax is not None:
+                cl = cl[:lmax+1]
+            if nside is not None:
+                n = min(len(cl), len(pw))
+                cl = cl[:n] * pw[:n]**2
+        gls.append(cl)
+    return gls
+
+
+def lognormal_gls(cls, shift=-1, *, lmax=None, ncorr=None, nside=None):
+    '''Compute Gaussian Cls for a lognormal random field.'''
+    gls = gaussian_gls(cls, lmax=lmax, ncorr=ncorr, nside=nside)
+    return transform_cls(gls, 'lognormal', (shift,))
+
+
+def generate_gaussian(cls, nside, ncorr=None, *, rng=None):
     '''Iteratively sample Gaussian random fields from Cls.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
@@ -193,17 +243,16 @@ def generate_grf(cls, nside, ncorr=None, *, rng=None):
         yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
-def generate_normal(gls, nside, ncorr=None, *, rng=None):
-    '''sample normal random fields from Gaussian Cls'''
-    for m in generate_grf(gls, nside, ncorr, rng=rng):
-        yield m
-
-
 def generate_lognormal(gls, nside, shift=1., ncorr=None, *, rng=None):
-    '''sample lognormal random fields from Gaussian Cls'''
-    for m in generate_grf(gls, nside, ncorr, rng=rng):
+    '''Iterative sample lognormal random fields from Gaussian Cls.'''
+    for i, m in enumerate(generate_gaussian(gls, nside, ncorr, rng=rng)):
+        # compute the variance of the auto-correlation
+        cl = gls[i*(i+1)//2]
+        ell = np.arange(len(cl))
+        var = np.sum((2*ell + 1)*cl)/(4*np.pi)
+
         # fix mean of the Gaussian random field for lognormal transformation
-        m -= np.var(m)/2
+        m -= var/2
 
         # exponentiate values in place and subtract 1 in one operation
         np.expm1(m, out=m)

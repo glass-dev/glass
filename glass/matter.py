@@ -1,22 +1,56 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for large scale structure'''
+'''
+Matter (:mod:`glass.matter`)
+============================
 
-import logging
+.. currentmodule:: glass.matter
+
+The :mod:`glass.matter` module provides functionality for discretising and
+simulating the matter distribution in the universe.
+
+Matter shells
+-------------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   distance_shells
+   redshift_shells
+
+
+Matter weights
+--------------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   MatterWeights
+   uniform_weights
+   distance_weights
+   volume_weights
+   density_weights
+
+'''
+
 from collections import namedtuple
 import numpy as np
 
-from .generator import generator
-from .random import transform_cls, generate_lognormal, generate_normal
 
-logger = logging.getLogger(__name__)
-
-# variable definitions
-DELTA = 'matter density contrast'
-
-
-MatterWeights = namedtuple('MatterWeightFunction', ['z', 'w'])
+MatterWeights = namedtuple('MatterWeights', ['z', 'w'])
 MatterWeights.__doc__ = '''Matter weight functions for shells.'''
+MatterWeights.z.__doc__ = '''List of redshift arrays :math:`z`.'''
+MatterWeights.w.__doc__ = '''List of weight arrays :math:`w(z)`.'''
+
+
+def effective_redshifts(weights: MatterWeights):
+    '''Compute the effective redshifts of matter weight functions.'''
+    return np.array([np.trapz(w*z, z, axis=-1)/np.trapz(w, z, axis=-1)
+                     for z, w in zip(weights.z, weights.w)])
 
 
 def redshift_shells(zmin, zmax, *, dz=None, num=None):
@@ -53,8 +87,8 @@ def make_weights(shells, wfun, subs=200):
     return MatterWeights(za, wa)
 
 
-def redshift_weights(shells, zlin=None):
-    '''Uniform matter weights in redshift.
+def uniform_weights(shells, zlin=None):
+    '''Matter weights with uniform distribution in redshift.
 
     If ``zlin`` is given, the weight ramps up linearly from 0 at z=0 to 1 at
     z=zlin.  This can help prevent numerical issues with some codes for angular
@@ -89,36 +123,3 @@ def volume_weights(shells, cosmo):
 def density_weights(shells, cosmo):
     '''Uniform matter weights in matter density.'''
     return make_weights(shells, lambda z: cosmo.rho_m_z(z)*cosmo.xm(z)**2/cosmo.ef(z))
-
-
-@generator(yields=DELTA)
-def gen_lognormal_matter(cls, nside, ncorr=None, *, rng=None):
-    '''generate lognormal matter fields from Cls'''
-
-    # lognormal shift, fixed for now
-    shift = 1.
-
-    logger.info('correlating %s shells', 'all' if ncorr is None else str(ncorr))
-    logger.info('computing Gaussian cls')
-
-    # transform to Gaussian cls
-    gls = transform_cls(cls, 'lognormal', (shift,), ncorr=ncorr)
-
-    # initial yield
-    yield
-
-    # return the iteratively sampled random fields
-    yield from generate_lognormal(gls, nside, shift=shift, ncorr=ncorr, rng=rng)
-
-
-@generator(yields=DELTA)
-def gen_gaussian_matter(cls, nside, ncorr=None, *, rng=None):
-    '''generate Gaussian matter fields from Cls'''
-
-    logger.info('correlating %s shells', 'all' if ncorr is None else str(ncorr))
-
-    # initial yield
-    yield
-
-    # return the iteratively sampled random fields
-    yield from generate_normal(cls, nside, ncorr=ncorr, rng=rng)

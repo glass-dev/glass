@@ -1,35 +1,44 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for weak gravitational lensing'''
+'''
+Lensing (:mod:`glass.lensing`)
+==============================
 
-import logging
+.. currentmodule:: glass.lensing
+
+The :mod:`glass.lensing` module provides functionality for simulating
+gravitational lensing by the matter distribution in the universe.
+
+Iterative lensing
+-----------------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   MultiPlaneConvergence
+   multi_plane_weights
+   multi_plane_matrix
+
+
+Lensing fields
+--------------
+
+.. autosummary::
+   :template: generator.rst
+   :toctree: generated/
+   :nosignatures:
+
+   shear_from_convergence
+
+'''
+
 import numpy as np
 import healpy as hp
 
-from .generator import generator, optional
-from .util import restrict_interval
 
-from .matter import DELTA
-
-log = logging.getLogger(__name__)
-
-# variable definitions
-ZSRC = 'weak lensing source redshift'
-'''The source redshift for which the lensing fields are evaluated.'''
-KAPPA = 'weak lensing convergence'
-'''The convergence field from weak lensing, commonly called :math:`\\kappa`, for
-the source redshift :data:`ZSRC`.'''
-GAMMA = 'weak lensing shear'
-'''The shear field from weak lensing, commonly called :math:`\\gamma`, for the
-source redshift :data:`ZSRC`.'''
-KAPPA_BAR = 'weak lensing mean convergence over distribution'
-'''The integrated convergence field of a source distribution :math:`n(z)`.'''
-GAMMA_BAR = 'weak lensing mean shear over distribution'
-'''The integrated shear field of a source distribution :math:`n(z)`.'''
-
-
-@generator(receives=KAPPA, yields=GAMMA)
-def gen_shear(lmax=None):
+def shear_from_convergence(kappa, lmax=None, *, discretized=True):
     r'''weak lensing shear from convergence
 
     Notes
@@ -83,204 +92,126 @@ def gen_shear(lmax=None):
 
     '''
 
-    # set to None for the initial iteration
-    gamma = None
+    nside = hp.get_nside(kappa)
+    if lmax is None:
+        lmax = 3*nside - 1
 
-    while True:
-        # return the shear field and wait for the next convergence field
-        # break the loop when asked to exit the generator
-        try:
-            kappa = yield gamma
-        except GeneratorExit:
-            break
+    # compute alm
+    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
-        alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
+    # zero B-modes
+    blm = np.zeros_like(alm)
 
-        # initialise everything on the first iteration
-        if gamma is None:
-            nside = hp.get_nside(kappa)
-            lmax = hp.Alm.getlmax(len(alm))
+    # factor to convert convergence alm to shear alm
+    l = np.arange(lmax+1)
+    fl = np.sqrt((l+2)*(l+1)*l*(l-1))
+    fl /= np.clip(l*(l+1), 1, None)
+    fl *= -1
 
-            log.debug('nside from kappa: %d', nside)
-            log.debug('lmax from alms: %s', lmax)
+    # if discretised, factor out spin-0 kernel and apply spin-2 kernel
+    if discretized:
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
+        fl *= pw2/pw0
 
-            blm = np.zeros_like(alm)
+    # apply correction to E-modes
+    hp.almxfl(alm, fl, inplace=True)
 
-            l = np.arange(lmax+1)
-            fl = np.sqrt((l+2)*(l+1)*l*(l-1))
-            fl /= np.clip(l*(l+1), 1, None)
-            fl *= -1
-
-        # convert convergence to shear modes
-        hp.almxfl(alm, fl, inplace=True)
-        gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    # transform to shear maps
+    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
-@generator(
-    receives=DELTA,
-    yields=(ZSRC, KAPPA))
-def gen_convergence(mweights, cosmo):
-    '''convergence from integrated matter shells'''
+def multi_plane_weights(zsrc, weights):
+    '''Compute weights for multi-plane lensing from matter weights.'''
+    return np.array([np.trapz(w, z)/np.interp(z_, z, w)
+                     for z_, z, w in zip(zsrc, weights.z, weights.w)])
 
-    f = 3*cosmo.omega_m/2
 
-    # initial yield to get the first mass plane
-    delta3 = yield
+class MultiPlaneConvergence:
+    '''Compute convergence fields iteratively from multiple matter planes.'''
 
-    # set up initial values for recurrence
-    z2 = z3 = x3 = m3 = 0
-    r23 = 1
-    kappa2 = np.zeros_like(delta3)
-    kappa3 = np.zeros_like(delta3)
-    delta2 = 0
+    def __init__(self, cosmo):
+        '''Create a new instance to iteratively compute the convergence.'''
+        self.cosmo = cosmo
 
-    # go through matter shells, new values for delta3 are obtained at the end
-    for z, w in zip(mweights.z, mweights.w):
+        # set up initial values of variables
+        self.z2 = 0
+        self.z3 = 0
+        self.x3 = 0
+        self.w3 = 0
+        self.r23 = 1
+        self.delta3 = 0
+        self.kappa2 = None
+        self.kappa3 = None
 
-        # redshift "mass" in weight
-        m2, m3 = m3, np.trapz(w, z)
+    def add_plane(self, delta, z, w=1.):
+        '''Add a mass plane at redshift ``z`` to the convergence.'''
 
-        # redshifts of source planes
-        z1, z2, z3 = z2, z3, np.trapz(w*z, z)/m3
+        if z <= self.z3:
+            raise ValueError('source redshift must be increasing')
+
+        # cycle mass plane, ...
+        delta2, self.delta3 = self.delta3, delta
+
+        # redshifts of source planes, ...
+        z1, self.z2, self.z3 = self.z2, self.z3, z
+
+        # and weights of mass plane
+        w2, self.w3 = self.w3, w
 
         # extrapolation law
-        x2, x3 = x3, cosmo.xm(z3)
-        r12, (r13, r23) = r23, cosmo.xm([z1, z2], z3)/x3
-        t3 = r13/r12
+        x2, self.x3 = self.x3, self.cosmo.xm(self.z3)
+        r12 = self.r23
+        r13, self.r23 = self.cosmo.xm([z1, self.z2], self.z3)/self.x3
+        t = r13/r12
 
-        # lensing weight of matter plane to be added
-        w3 = f * x2*r23 * (1 + z2)/cosmo.ef(z2) * m2
+        # lensing weight of mass plane to be added
+        f = 3*self.cosmo.omega_m/2
+        f *= x2*self.r23
+        f *= (1 + self.z2)/self.cosmo.ef(self.z2)
+        f *= w2
+
+        # create kappa planes on first iteration
+        if self.kappa2 is None:
+            self.kappa2 = np.zeros_like(delta)
+            self.kappa3 = np.zeros_like(delta)
 
         # cycle convergence planes
         # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
         # but then we set: kappa3 = (1-t)*kappa1 + ...
         # so we can set kappa3 to previous kappa2 and modify in place
-        kappa2, kappa3 = kappa3, kappa2
+        self.kappa2, self.kappa3 = self.kappa3, self.kappa2
 
         # compute next convergence plane in place of last
-        kappa3 *= 1 - t3
-        kappa3 += t3*kappa2
-        kappa3 += w3*delta2
+        self.kappa3 *= 1 - t
+        self.kappa3 += t*self.kappa2
+        self.kappa3 += f*delta2
 
-        # output some statistics
-        log.info('zsrc: %f', z3)
-        log.info('κbar: %f', np.mean(kappa3))
-        log.info('κmin: %f', np.min(kappa3))
-        log.info('κmax: %f', np.max(kappa3))
-        log.info('κrms: %f', np.sqrt(np.mean(np.square(kappa3))))
+    @property
+    def z(self):
+        '''The redshift of the current convergence plane.'''
+        return self.z3
 
-        # keep current matter field for next iteration
-        delta2 = delta3
+    @property
+    def kappa(self):
+        '''The current convergence plane.'''
+        return self.kappa3
 
-        # yield convergence and return new matter field
-        delta3 = yield z3, kappa3
+    @property
+    def delta(self):
+        '''The current matter plane.'''
+        return self.delta3
+
+    @property
+    def w(self):
+        '''The weight of the current matter plane.'''
+        return self.w3
 
 
-@generator(
-    receives=(ZSRC, optional(KAPPA), optional(GAMMA)),
-    yields=(KAPPA_BAR, GAMMA_BAR))
-def gen_lensing_dist(z, nz, cosmo):
-    '''generate weak lensing maps for source distributions
-
-    This generator takes a single or multiple (via leading axes) redshift
-    distribution(s) of sources and computes their integrated mean lensing maps.
-
-    The generator receives the convergence and/or shear maps for each source
-    plane.  It then averages the lensing maps by interpolation between source
-    planes [1]_, and yields the result up to the last source plane received.
-
-    Parameters
-    ----------
-    z, nz : array_like
-        The redshift distribution(s) of sources.  The redshifts ``z`` must be a
-        1D array.  The density of sources ``nz`` must be at least a 1D array,
-        with the last axis matching ``z``.  Leading axes define multiple source
-        distributions.
-    cosmo : Cosmology
-        A cosmology instance to obtain distance functions.
-
-    Receives
-    --------
-    zsrc : float
-        Source plane redshift.
-    kappa, gamma1, gamma2 : array_like, optional
-        HEALPix maps of convergence and/or shear.  Unavailable maps are ignored.
-
-    Yields
-    ------
-    kappa_bar, gamma1_bar, gamma2_bar : array_like
-        Integrated mean lensing maps, or ``None`` where there are no input maps.
-        The maps have leading axes matching the distribution.
-
-    References
-    ----------
-    .. [1] Tessore et al., in prep.
-
-    '''
-
-    # check inputs
-    if np.ndim(z) != 1:
-        raise TypeError('redshifts must be one-dimensional')
-    if np.ndim(nz) == 0:
-        raise TypeError('distribution must be at least one-dimensional')
-    *sh, sz = np.shape(nz)
-    if sz != len(z):
-        raise TypeError('redshift axis mismatch')
-
-    # helper function to get normalisation
-    # takes the leading distribution axes into account
-    def norm(nz_, z_):
-        return np.expand_dims(np.trapz(nz_, z_), np.ndim(nz_)-1)
-
-    # normalise distributios
-    nz = np.divide(nz, norm(nz, z))
-
-    # total accumulated weight for each distribution
-    # shape needs to match leading axes of distributions
-    w = np.zeros((*sh, 1))
-
-    # initial lensing plane
-    # give small redshift > 0 to work around division by zero
-    zsrc = 1e-6
-    kap = gam1 = gam2 = 0
-
-    # initial yield
-    kap_bar = gam1_bar = gam2_bar = None
-    result = None
-
-    # wait for next source plane and return result, or stop on exit
-    while True:
-        zsrc_, kap_, gam1_, gam2_ = zsrc, kap, gam1, gam2
-        try:
-            zsrc, kap, (gam1, gam2) = yield result
-        except GeneratorExit:
-            break
-
-        # integrated maps are initialised to zero on first iteration
-        # integrated maps have leading axes for distributions
-        if kap is not None and kap_bar is None:
-            kap_bar = np.zeros((*sh, np.size(kap)))
-        if gam1 is not None and gam1_bar is None:
-            gam1_bar = np.zeros((*sh, np.size(gam1)))
-        if gam2 is not None and gam2_bar is None:
-            gam2_bar = np.zeros((*sh, np.size(gam2)))
-
-        # get the restriction of n(z) to the interval between source planes
-        nz_, z_ = restrict_interval(nz, z, zsrc_, zsrc)
-
-        # get integrated weight and update total weight
-        # then normalise n(z)
-        w_ = norm(nz_, z_)
-        w += w_
-        nz_ /= w_
-
-        # integrate interpolation factor against source distributions
-        t = norm(cosmo.xm(zsrc_, z_)/cosmo.xm(z_)*nz_, z_)
-        t /= cosmo.xm(zsrc_, zsrc)/cosmo.xm(zsrc)
-
-        # interpolate convergence planes and integrate over distributions
-        for m, m_, m_bar in (kap, kap_, kap_bar), (gam1, gam1_, gam1_bar), (gam2, gam2_, gam2_bar):
-            if m is not None:
-                m_bar += (t*m + (1-t)*m_ - m_bar)*(w_/w)
-
-        result = kap_bar, (gam1_bar, gam2_bar)
+def multi_plane_matrix(redshifts, weights, cosmo):
+    '''Compute the matrix of lensing contribution from each shell.'''
+    mpc = MultiPlaneConvergence(cosmo)
+    mat = np.eye(len(redshifts))
+    for m, z, w in zip(mat, redshifts, weights):
+        mpc.add_plane(m.copy(), z, w)
+        m[:] = mpc.kappa
+    return mat

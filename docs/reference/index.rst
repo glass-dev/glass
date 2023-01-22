@@ -3,9 +3,11 @@ Reference manual
 ================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   core
+   fields
+   points
+   shapes
    matter
    lensing
    galaxies
