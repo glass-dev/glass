@@ -159,13 +159,13 @@ def gaussian_gls(cls, *, lmax=None, ncorr=None, nside=None):
     return gls
 
 
-def lognormal_gls(cls, shift=-1, *, lmax=None, ncorr=None, nside=None):
+def lognormal_gls(cls, shift=1., *, lmax=None, ncorr=None, nside=None):
     '''Compute Gaussian Cls for a lognormal random field.'''
     gls = gaussian_gls(cls, lmax=lmax, ncorr=ncorr, nside=nside)
     return transform_cls(gls, 'lognormal', (shift,))
 
 
-def generate_gaussian(cls, nside, ncorr=None, *, rng=None):
+def generate_gaussian(cls, nside, *, ncorr=None, rng=None):
     '''Iteratively sample Gaussian random fields from Cls.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
@@ -243,9 +243,9 @@ def generate_gaussian(cls, nside, ncorr=None, *, rng=None):
         yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
-def generate_lognormal(gls, nside, shift=1., ncorr=None, *, rng=None):
+def generate_lognormal(gls, nside, shift=1., *, ncorr=None, rng=None):
     '''Iterative sample lognormal random fields from Gaussian Cls.'''
-    for i, m in enumerate(generate_gaussian(gls, nside, ncorr, rng=rng)):
+    for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         cl = gls[i*(i+1)//2]
         ell = np.arange(len(cl))
