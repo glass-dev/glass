@@ -1,0 +1,14 @@
+on:
+  release:
+    types:
+      - published
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx run build
+      - uses: pypa/gh-action-pypi-publish@v1.6.4
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_token }}
