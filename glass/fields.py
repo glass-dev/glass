@@ -165,24 +165,24 @@ def lognormal_gls(cls, shift=1., *, lmax=None, ncorr=None, nside=None):
     return transform_cls(gls, 'lognormal', (shift,))
 
 
-def generate_gaussian(cls, nside, *, ncorr=None, rng=None):
+def generate_gaussian(gls, nside, *, ncorr=None, rng=None):
     '''Iteratively sample Gaussian random fields from Cls.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
-    with the given angular power spectra ``cls`` and resolution parameter
+    with the given angular power spectra ``gls`` and resolution parameter
     ``nside``.
 
     The optional argument ``ncorr`` can be used to artificially limit now many
     realised fields are correlated.  This saves memory, as only `ncorr` previous
     fields need to be kept.
 
-    The ``cls`` array must contain the auto-correlation of each new field
+    The ``gls`` array must contain the auto-correlation of each new field
     followed by the cross-correlations with all previous fields in reverse
     order::
 
-        cls = [cl_00,
-               cl_11, cl_10,
-               cl_22, cl_21, cl_20,
+        gls = [gl_00,
+               gl_11, gl_10,
+               gl_22, gl_21, gl_20,
                ...]
 
     Missing entries can be set to ``None``.
@@ -193,21 +193,21 @@ def generate_gaussian(cls, nside, *, ncorr=None, rng=None):
     if rng is None:
         rng = np.random.default_rng()
 
-    # number of cls and number of fields
-    ncls = len(cls)
-    ngrf = int((2*ncls)**0.5)
+    # number of gls and number of fields
+    ngls = len(gls)
+    ngrf = int((2*ngls)**0.5)
 
     # number of correlated fields if not specified
     if ncorr is None:
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(cl) for cl in cls if cl is not None), default=0)
+    n = max((len(gl) for gl in gls if gl is not None), default=0)
     if n == 0:
-        raise ValueError('all cls are empty')
+        raise ValueError('all gls are empty')
 
     # generates the covariance matrix for the iterative sampler
-    cov = cls2cov(cls, n, ngrf, ncorr)
+    cov = cls2cov(gls, n, ngrf, ncorr)
 
     # working arrays for the iterative sampling
     z = np.zeros(n*(n+1)//2, dtype=np.complex128)
@@ -247,9 +247,9 @@ def generate_lognormal(gls, nside, shift=1., *, ncorr=None, rng=None):
     '''Iterative sample lognormal random fields from Gaussian Cls.'''
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
-        cl = gls[i*(i+1)//2]
-        ell = np.arange(len(cl))
-        var = np.sum((2*ell + 1)*cl)/(4*np.pi)
+        gl = gls[i*(i+1)//2]
+        ell = np.arange(len(gl))
+        var = np.sum((2*ell + 1)*gl)/(4*np.pi)
 
         # fix mean of the Gaussian random field for lognormal transformation
         m -= var/2
