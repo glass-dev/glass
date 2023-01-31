@@ -1,4 +1,4 @@
-name: Build wheels
+name: build
 on:
   push:
     branches:
@@ -10,34 +10,20 @@ on:
     types:
       - published
 jobs:
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.4
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./wheelhouse/*.whl
-  build_sdist:
-    name: Build source distribution
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build sdist
-        run: pipx run build --sdist
+      - run: pipx run build
       - uses: actions/upload-artifact@v3
         with:
           path: dist/*.tar.gz
-  upload_pypi:
-    name: Upload to PyPI
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
+  publish:
     if: github.event_name == 'release' && github.event.action == 'published'
+    name: publish
+    needs: build
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
         with:
