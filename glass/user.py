@@ -9,13 +9,27 @@ User utilities (:mod:`glass.user`)
 The :mod:`glass.user` module contains convenience functions for users of the
 library.
 
+
+Input and output
+----------------
+
 .. autosummary::
-   :template: generator.rst
    :toctree: generated/
    :nosignatures:
 
-    Profiler
-    profile
+   save_cls
+   load_cls
+
+
+Profiling
+---------
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   Profiler
+   profile
 
 '''
 
@@ -24,8 +38,35 @@ import time
 import tracemalloc
 from datetime import timedelta
 from contextlib import contextmanager
+import numpy as np
 
 logger = logging.getLogger(__name__)
+
+
+def save_cls(filename, cls):
+    '''Save a list of Cls to file.
+
+    Uses :func:`numpy.savez` internally. The filename should therefore have a
+    ``.npz`` suffix, or it will be given one.
+
+    '''
+
+    split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])
+    values = np.concatenate([cl for cl in cls if cl is not None])
+    np.savez(filename, values=values, split=split)
+
+
+def load_cls(filename):
+    '''Load a list of Cls from file.
+
+    Uses :func:`numpy.load` internally.
+
+    '''
+
+    with np.load(filename) as npz:
+        values = npz['values']
+        split = npz['split']
+    return np.split(values, split)
 
 
 def _memf(n: int):

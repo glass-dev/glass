@@ -114,7 +114,7 @@ def transform_cls(cls, tfm, pars=()):
     '''Transform Cls to Gaussian Cls.'''
     gls = []
     for cl in cls:
-        if cl is not None:
+        if cl is not None and len(cl) > 0:
             if cl[0] == 0:
                 monopole = 0.
             else:
@@ -123,7 +123,7 @@ def transform_cls(cls, tfm, pars=()):
             if info == 0:
                 warnings.warn('Gaussian cl did not converge, inexact transform')
         else:
-            gl = None
+            gl = []
         gls.append(gl)
     return gls
 
@@ -142,14 +142,14 @@ def gaussian_gls(cls, *, lmax=None, ncorr=None, nside=None):
         n = int((2*len(cls))**0.5)
         if n*(n+1)//2 != len(cls):
             raise ValueError('length of cls array is not a triangle number')
-        cls = [cls[i*(i+1)//2+j] if j <= ncorr else None for i in range(n) for j in range(i+1)]
+        cls = [cls[i*(i+1)//2+j] if j <= ncorr else [] for i in range(n) for j in range(i+1)]
 
     if nside is not None:
         pw = hp.pixwin(nside, lmax=lmax)
 
     gls = []
     for cl in cls:
-        if cl is not None:
+        if cl is not None and len(cl) > 0:
             if lmax is not None:
                 cl = cl[:lmax+1]
             if nside is not None:
