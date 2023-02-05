@@ -39,9 +39,11 @@ Matter weights
 '''
 
 from collections import namedtuple
-from typing import Sequence, Optional, Callable
+from typing import Sequence, Optional, Callable, TYPE_CHECKING
 import numpy as np
-from cosmology import Cosmology
+
+if TYPE_CHECKING:
+    from cosmology import Cosmology
 
 MatterWeights = namedtuple('MatterWeights', ['z', 'w'])
 MatterWeights.__doc__ = '''Matter weight functions for shells.'''
@@ -68,7 +70,7 @@ def redshift_shells(zmin: float, zmax: float, *, dz: Optional[float] = None,
     return z
 
 
-def distance_shells(cosmo: Cosmology, zmin: float, zmax: float, *,
+def distance_shells(cosmo: 'Cosmology', zmin: float, zmax: float, *,
                     dx: Optional[float] = None, num: Optional[int] = None
                     ) -> np.ndarray:
     '''shells with uniform comoving distance spacing'''
@@ -115,7 +117,7 @@ def uniform_weights(shells: Sequence[float], zlin: Optional[float] = None
     return make_weights(shells, wfun)
 
 
-def distance_weights(shells: Sequence[float], cosmo: Cosmology,
+def distance_weights(shells: Sequence[float], cosmo: 'Cosmology',
                      zlin: Optional[float] = None) -> MatterWeights:
     '''Uniform matter weights in comoving distance.
 
@@ -134,7 +136,8 @@ def distance_weights(shells: Sequence[float], cosmo: Cosmology,
     return make_weights(shells, wfun)
 
 
-def volume_weights(shells: Sequence[float], cosmo: Cosmology) -> MatterWeights:
+def volume_weights(shells: Sequence[float], cosmo: 'Cosmology'
+                   ) -> MatterWeights:
     '''Uniform matter weights in comoving volume.'''
     def wfun(z: np.ndarray) -> np.ndarray:
         return cosmo.xm(z)**2/cosmo.ef(z)
@@ -142,7 +145,8 @@ def volume_weights(shells: Sequence[float], cosmo: Cosmology) -> MatterWeights:
     return make_weights(shells, wfun)
 
 
-def density_weights(shells: Sequence[float], cosmo: Cosmology) -> MatterWeights:
+def density_weights(shells: Sequence[float], cosmo: 'Cosmology'
+                    ) -> MatterWeights:
     '''Uniform matter weights in matter density.'''
     def wfun(z: np.ndarray) -> np.ndarray:
         return cosmo.rho_m_z(z)*cosmo.xm(z)**2/cosmo.ef(z)
