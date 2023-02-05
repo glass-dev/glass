@@ -200,7 +200,7 @@ def galaxy_shear(lon, lat, eps, kappa, gamma1, gamma2, *, reduced_shear=True):
     lon, lat : array_like
         Arrays for galaxy longitudes and latitudes.
     eps : array_like
-        Array of galaxy :term:`ellipticity (complex)`.
+        Array of galaxy :term:`ellipticity`.
     kappa, gamma1, gamma2 : array_like
         HEALPix maps for convergence and two components of shear.
     reduced_shear : bool, optional

@@ -27,9 +27,27 @@ Citation
 --------
 
 If you use GLASS simulations or the GLASS library in your research, please cite
-the original paper.
+the original GLASS paper [(Tessore+ 2023)](CITATION.md) in your publications.
+
+
+Getting in touch
+----------------
+
+The best way to get help about the code is currently to get in touch.
+
+If you would like to start a discussion with the wider GLASS community about
+e.g. a design decision or API change, you can use our [Discussions] page.
+
+If you are running into problems, suspect a bug, or have a quick question, you
+can chat on our [Gitter channel].
+
+If you are looking for a longer, asynchronous discussion, e.g. about
+implementing new models or creating extensions, you can join our [Slack
+workspace].
 
 
 [documentation]: https://glass.readthedocs.io/
 [examples]: https://glass.readthedocs.io/projects/examples/
-[glass-camb]: https://github.com/glass-dev/glass-camb/
+[Discussions]: https://github.com/orgs/glass-dev/discussions
+[Gitter channel]: https://gitter.im/glass-dev/glass
+[Slack workspace]: https://glass-dev.github.io/slack

@@ -131,7 +131,7 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     Returns
     -------
     eps : array_like
-        Array of :term:`ellipticity (complex)` from projected axis ratios.
+        Array of :term:`ellipticity` from projected axis ratios.
 
     References
     ----------
@@ -192,7 +192,7 @@ def ellipticity_gaussian(size, sigma, *, rng=None):
     Returns
     -------
     eps : array_like
-        Array of galaxy :term:`ellipticity (complex)`.
+        Array of galaxy :term:`ellipticity`.
 
     '''
 
@@ -231,7 +231,7 @@ def ellipticity_intnorm(size, sigma, *, rng=None):
     Returns
     -------
     eps : array_like
-        Array of galaxy :term:`ellipticity (complex)`.
+        Array of galaxy :term:`ellipticity`.
 
     '''
 
