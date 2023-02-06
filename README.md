@@ -30,8 +30,8 @@ this repository:
 Citation
 --------
 
-If you use GLASS simulations or the GLASS library in your research, please cite
-the original GLASS paper [(Tessore+ 2023)](CITATION.md) in your publications.
+If you use GLASS simulations or the GLASS library in your research, please [cite
+the original GLASS paper](CITATION.md) in your publications.
 
 
 Getting in touch
