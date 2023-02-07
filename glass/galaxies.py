@@ -25,10 +25,13 @@ as typically observed in a cosmological galaxy survey.
 import numpy as np
 import healpix
 
+from typing import Sequence, Optional, Tuple
+from numpy.typing import ArrayLike
+
 from .math import restrict_interval, cumtrapz
 
 
-def constant_densities(dndz, zbins):
+def constant_densities(dndz: float, zbins: ArrayLike) -> np.ndarray:
     '''Constant galaxy density in redshift bins.
 
     Parameters
@@ -47,7 +50,9 @@ def constant_densities(dndz, zbins):
     return dndz*np.diff(zbins)
 
 
-def density_from_dndz(z, dndz, *, axis=None, ntot=None, bins=None):
+def density_from_dndz(z: np.ndarray, dndz: np.ndarray, *,
+                      axis: Optional[int] = None, ntot: Optional[float] = None,
+                      bins: Optional[Sequence[float]] = None) -> np.ndarray:
     '''Galaxy density from a redshift distribution.
 
     Computes the galaxy density from a given distribution.
@@ -121,7 +126,11 @@ def density_from_dndz(z, dndz, *, axis=None, ntot=None, bins=None):
     return ngal
 
 
-def redshifts_from_nz(size, z, nz, *, zmin=None, zmax=None, rng=None):
+def redshifts_from_nz(size: int, z: np.ndarray, nz: np.ndarray, *,
+                      zmin: Optional[float] = None,
+                      zmax: Optional[float] = None,
+                      rng: Optional[np.random.Generator] = None
+                      ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
     '''Generate galaxy redshifts from a source distribution.
 
     Parameters
@@ -189,7 +198,9 @@ def redshifts_from_nz(size, z, nz, *, zmin=None, zmax=None, rng=None):
     return gal_z, gal_pop
 
 
-def galaxy_shear(lon, lat, eps, kappa, gamma1, gamma2, *, reduced_shear=True):
+def galaxy_shear(lon: np.ndarray, lat: np.ndarray, eps: np.ndarray,
+                 kappa: np.ndarray, gamma1: np.ndarray, gamma2: np.ndarray, *,
+                 reduced_shear: bool = True) -> np.ndarray:
     '''Observed galaxy shears from weak lensing.
 
     Takes lensing maps for convergence and shear and produces a lensed
@@ -243,7 +254,8 @@ def galaxy_shear(lon, lat, eps, kappa, gamma1, gamma2, *, reduced_shear=True):
     return g
 
 
-def gaussian_phz(z, sigma_0, rng=None):
+def gaussian_phz(z: np.ndarray, sigma_0: float,
+                 rng: Optional[np.random.Generator] = None) -> np.ndarray:
     r'''Photometric redshifts assuming a Gaussian error.
 
     A simple toy model of photometric redshift errors that assumes a Gaussian
