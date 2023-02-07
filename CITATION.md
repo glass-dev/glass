@@ -2,7 +2,9 @@ Citation
 ========
 
 If you use GLASS simulations or the GLASS library in your research, please cite
-the original GLASS paper in your publications:
+the GLASS paper in your publications.
+
+Here is the bibliography entry from [NASA/ADS](https://ui.adsabs.harvard.edu/abs/2023arXiv230201942T):
 
 ```bib
 @ARTICLE{2023arXiv230201942T,
