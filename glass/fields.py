@@ -29,15 +29,14 @@ from gaussiancl import gaussiancl
 # typing
 from typing import (Any, Union, Tuple, Generator, Optional, Sequence, Callable,
                     Iterable)
-from numpy.typing import NDArray
 
 # types
-Array = NDArray[np.floating[Any]]
+Array = np.ndarray
 Size = Union[None, int, Tuple[int, ...]]
 Iternorm = Tuple[Optional[int], Array, Array]
 ClTransform = Union[str, Callable[[Array], Array]]
 Cls = Sequence[Union[Array, Sequence[float]]]
-Alms = NDArray[np.complexfloating[Any, Any]]
+Alms = np.ndarray
 
 
 def iternorm(k: int, cov: Iterable[Array], size: Size = None
