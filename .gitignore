@@ -2,10 +2,6 @@
 .DS_Store
 __pycache__
 docs/_build
-docs/reference/generated
-docs/examples/**/*.py
-docs/examples/**/*_codeobj.pickle
-docs/examples/**/sg_execution_times.rst
 .tox
 build
 dist

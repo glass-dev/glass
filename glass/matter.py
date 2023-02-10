@@ -12,28 +12,20 @@ simulating the matter distribution in the universe.
 Matter shells
 -------------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   distance_shells
-   redshift_shells
+.. autofunction:: distance_shells
+.. autofunction:: redshift_shells
 
 
 Matter weights
 --------------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
+.. autoclass:: MatterWeights
+   :exclude-members: count, index
 
-   MatterWeights
-   uniform_weights
-   distance_weights
-   volume_weights
-   density_weights
+.. autofunction:: uniform_weights
+.. autofunction:: distance_weights
+.. autofunction:: volume_weights
+.. autofunction:: density_weights
 
 '''
 
