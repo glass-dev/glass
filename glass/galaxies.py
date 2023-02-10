@@ -9,16 +9,14 @@ Galaxies (:mod:`glass.galaxies`)
 The :mod:`glass.galaxies` module provides functionality for simulating galaxies
 as typically observed in a cosmological galaxy survey.
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
+Functions
+---------
 
-    constant_densities
-    density_from_dndz
-    redshifts_from_nz
-    galaxy_shear
-    gaussian_phz
+.. autofunction:: constant_densities
+.. autofunction:: density_from_dndz
+.. autofunction:: redshifts_from_nz
+.. autofunction:: galaxy_shear
+.. autofunction:: gaussian_phz
 
 '''
 

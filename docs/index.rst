@@ -1,13 +1,7 @@
-.. image:: _static/glass.png
-   :width: 50%
-   :align: center
-   :class: no-scaled-link
 
-|
-
-**********************************************
-**GLASS**: Generator for Large Scale Structure
-**********************************************
+***********************************************
+*GLASS* --- Generator for Large Scale Structure
+***********************************************
 
 GLASS, the generator for large scale structure, is a library for performing the
 kind of simulation that is useful in the field of cosmology.  As the name
@@ -17,13 +11,14 @@ wide range of cosmological and astrophysical simulations on the sphere, thanks
 to its ultra-flexible design and open architecture.
 
 
-=============
-Documentation
-=============
+=================
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 2
 
+   Examples <https://glass.readthedocs.io/projects/examples/>
    user/index
    reference/index
 

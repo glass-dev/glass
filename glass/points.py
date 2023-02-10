@@ -12,26 +12,16 @@ processes on the sphere and sampling random positions.
 Sampling
 --------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   positions_from_delta
-   uniform_positions
+.. autofunction:: positions_from_delta
+.. autofunction:: uniform_positions
 
 
 Bias
 ----
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   effective_bias
-   linear_bias
-   loglinear_bias
+.. autofunction:: effective_bias
+.. autofunction:: linear_bias
+.. autofunction:: loglinear_bias
 
 '''
 

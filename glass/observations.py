@@ -13,27 +13,17 @@ observational effects of surveys.
 Redshift distribution
 ---------------------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-    gaussian_nz
-    smail_nz
-    fixed_zbins
-    equal_dens_zbins
-    tomo_nz_gausserr
+.. autofunction:: gaussian_nz
+.. autofunction:: smail_nz
+.. autofunction:: fixed_zbins
+.. autofunction:: equal_dens_zbins
+.. autofunction:: tomo_nz_gausserr
 
 
 Visibility
 ----------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   vmap_galactic_ecliptic
+.. autofunction:: vmap_galactic_ecliptic
 
 
 '''

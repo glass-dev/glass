@@ -9,15 +9,13 @@ Random fields (:mod:`glass.fields`)
 The :mod:`glass.fields` module provides functionality for simulating random
 fields on the sphere.  This is done in the form of HEALPix maps.
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
+Functions
+---------
 
-   gaussian_gls
-   lognormal_gls
-   generate_gaussian
-   generate_lognormal
+.. autofunction:: gaussian_gls
+.. autofunction:: lognormal_gls
+.. autofunction:: generate_gaussian
+.. autofunction:: generate_lognormal
 
 '''
 
