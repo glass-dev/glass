@@ -24,11 +24,17 @@ Lensing fields
 
 '''
 
+from typing import Optional, Sequence, TYPE_CHECKING
 import numpy as np
 import healpy as hp
 
+if TYPE_CHECKING:
+    from cosmology import Cosmology
+    from .matter import MatterWeights
 
-def shear_from_convergence(kappa, lmax=None, *, discretized=True):
+
+def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
+                           discretized: bool = True) -> np.ndarray:
     r'''weak lensing shear from convergence
 
     Notes
@@ -110,7 +116,8 @@ def shear_from_convergence(kappa, lmax=None, *, discretized=True):
     return hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
-def multi_plane_weights(zsrc, weights):
+def multi_plane_weights(zsrc: Sequence[float], weights: 'MatterWeights'
+                        ) -> np.ndarray:
     '''Compute weights for multi-plane lensing from matter weights.'''
     return np.array([np.trapz(w, z)/np.interp(z_, z, w)
                      for z_, z, w in zip(zsrc, weights.z, weights.w)])
@@ -119,21 +126,21 @@ def multi_plane_weights(zsrc, weights):
 class MultiPlaneConvergence:
     '''Compute convergence fields iteratively from multiple matter planes.'''
 
-    def __init__(self, cosmo):
+    def __init__(self, cosmo: 'Cosmology') -> None:
         '''Create a new instance to iteratively compute the convergence.'''
         self.cosmo = cosmo
 
         # set up initial values of variables
-        self.z2 = 0
-        self.z3 = 0
-        self.x3 = 0
-        self.w3 = 0
-        self.r23 = 1
-        self.delta3 = 0
-        self.kappa2 = None
-        self.kappa3 = None
+        self.z2: float = 0.
+        self.z3: float = 0.
+        self.x3: float = 0.
+        self.w3: float = 0.
+        self.r23: float = 1.
+        self.delta3: np.ndarray = np.array(0.)
+        self.kappa2: Optional[np.ndarray] = None
+        self.kappa3: Optional[np.ndarray] = None
 
-    def add_plane(self, delta, z, w=1.):
+    def add_plane(self, delta: np.ndarray, z: float, w: float = 1.) -> None:
         '''Add a mass plane at redshift ``z`` to the convergence.'''
 
         if z <= self.z3:
@@ -177,27 +184,28 @@ class MultiPlaneConvergence:
         self.kappa3 += f*delta2
 
     @property
-    def z(self):
+    def z(self) -> float:
         '''The redshift of the current convergence plane.'''
         return self.z3
 
     @property
-    def kappa(self):
+    def kappa(self) -> Optional[np.ndarray]:
         '''The current convergence plane.'''
         return self.kappa3
 
     @property
-    def delta(self):
+    def delta(self) -> np.ndarray:
         '''The current matter plane.'''
         return self.delta3
 
     @property
-    def w(self):
+    def w(self) -> float:
         '''The weight of the current matter plane.'''
         return self.w3
 
 
-def multi_plane_matrix(redshifts, weights, cosmo):
+def multi_plane_matrix(redshifts: Sequence[float], weights: Sequence[float],
+                       cosmo: 'Cosmology') -> np.ndarray:
     '''Compute the matrix of lensing contribution from each shell.'''
     mpc = MultiPlaneConvergence(cosmo)
     mat = np.eye(len(redshifts))

@@ -19,19 +19,32 @@ Functions
 
 '''
 
-from numbers import Number
 import warnings
 import numpy as np
 import healpy as hp
 from gaussiancl import gaussiancl
 
+# typing
+from typing import (Any, Union, Tuple, Generator, Optional, Sequence, Callable,
+                    Iterable)
 
-def iternorm(k, cov, size=None):
+# types
+Array = np.ndarray
+Size = Union[None, int, Tuple[int, ...]]
+Iternorm = Tuple[Optional[int], Array, Array]
+ClTransform = Union[str, Callable[[Array], Array]]
+Cls = Sequence[Union[Array, Sequence[float]]]
+Alms = np.ndarray
+
+
+def iternorm(k: int, cov: Iterable[Array], size: Size = None
+             ) -> Generator[Iternorm, None, None]:
     '''return the vector a and variance sigma^2 for iterative normal sampling'''
 
+    n: Tuple[int, ...]
     if size is None:
         n = ()
-    elif isinstance(size, Number):
+    elif isinstance(size, int):
         n = (size,)
     else:
         n = size
@@ -51,7 +64,7 @@ def iternorm(k, cov, size=None):
                 raise TypeError(f'covariance row {i}: shape {x.shape} cannot be broadcast to {q}') from None
 
         # only need to update matrix A if there are correlations
-        if k > 0:
+        if j is not None:
             # compute new entries of matrix A
             m[..., :, j] = 0
             m[..., j:j+1, :] = np.matmul(a[..., np.newaxis, :], m)
@@ -77,18 +90,19 @@ def iternorm(k, cov, size=None):
         yield j, a, s
 
 
-def cls2cov(cls, nl, nf, nc):
+def cls2cov(cls: Cls, nl: int, nf: int, nc: int
+            ) -> Generator[Array, None, None]:
     '''Return array of cls as a covariance matrix for iterative sampling.'''
     cov = np.zeros((nl, nc+1))
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][:nc+1]):
-            if i == 0 and np.any(cl < 0):
-                raise ValueError('negative values in cl')
             if cl is None:
                 cov[:, i] = 0
             else:
+                if i == 0 and np.any(np.less(cl, 0)):
+                    raise ValueError('negative values in cl')
                 n = len(cl)
                 cov[:n, i] = cl
                 cov[n:, i] = 0
@@ -96,7 +110,7 @@ def cls2cov(cls, nl, nf, nc):
         yield cov
 
 
-def multalm(alm, bl, inplace=False):
+def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
     '''multiply alm by bl'''
     n = len(bl)
     if inplace:
@@ -108,7 +122,8 @@ def multalm(alm, bl, inplace=False):
     return out
 
 
-def transform_cls(cls, tfm, pars=()):
+def transform_cls(cls: Cls, tfm: ClTransform, pars: Tuple[Any, ...] = ()
+                  ) -> Cls:
     '''Transform Cls to Gaussian Cls.'''
     gls = []
     for cl in cls:
@@ -126,7 +141,9 @@ def transform_cls(cls, tfm, pars=()):
     return gls
 
 
-def gaussian_gls(cls, *, lmax=None, ncorr=None, nside=None):
+def gaussian_gls(cls: Cls, *, lmax: Optional[int] = None,
+                 ncorr: Optional[int] = None, nside: Optional[int] = None
+                 ) -> Cls:
     '''Compute Gaussian Cls for a Gaussian random field.
 
     Depending on the given arguments, this truncates the angular power spectra
@@ -157,13 +174,17 @@ def gaussian_gls(cls, *, lmax=None, ncorr=None, nside=None):
     return gls
 
 
-def lognormal_gls(cls, shift=1., *, lmax=None, ncorr=None, nside=None):
+def lognormal_gls(cls: Cls, shift: float = 1., *, lmax: Optional[int] = None,
+                  ncorr: Optional[int] = None, nside: Optional[int] = None
+                  ) -> Cls:
     '''Compute Gaussian Cls for a lognormal random field.'''
     gls = gaussian_gls(cls, lmax=lmax, ncorr=ncorr, nside=nside)
     return transform_cls(gls, 'lognormal', (shift,))
 
 
-def generate_gaussian(gls, nside, *, ncorr=None, rng=None):
+def generate_gaussian(gls: Cls, nside: int, *, ncorr: Optional[int] = None,
+                      rng: Optional[np.random.Generator] = None
+                      ) -> Generator[Array, None, None]:
     '''Iteratively sample Gaussian random fields from Cls.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
@@ -234,14 +255,17 @@ def generate_gaussian(gls, nside, *, ncorr=None, rng=None):
 
         # modes with m = 0 are real-valued and come first in array
         alm[:n].real += alm[:n].imag
-        alm[:n].imag = 0
+        alm[:n].imag[:] = 0
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
         yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
-def generate_lognormal(gls, nside, shift=1., *, ncorr=None, rng=None):
+def generate_lognormal(gls: Cls, nside: int, shift: float = 1., *,
+                       ncorr: Optional[int] = None,
+                       rng: Optional[np.random.Generator] = None
+                       ) -> Generator[Array, None, None]:
     '''Iterative sample lognormal random fields from Gaussian Cls.'''
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
