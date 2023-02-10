@@ -12,25 +12,15 @@ gravitational lensing by the matter distribution in the universe.
 Iterative lensing
 -----------------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   MultiPlaneConvergence
-   multi_plane_weights
-   multi_plane_matrix
+.. autoclass:: MultiPlaneConvergence
+.. autofunction:: multi_plane_weights
+.. autofunction:: multi_plane_matrix
 
 
 Lensing fields
 --------------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   shear_from_convergence
+.. autofunction:: shear_from_convergence
 
 '''
 

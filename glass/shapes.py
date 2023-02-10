@@ -12,25 +12,15 @@ observed shapes of objects, such as e.g. galaxies.
 Ellipticity
 -----------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   ellipticity_gaussian
-   ellipticity_intnorm
-   ellipticity_ryden04
+.. autofunction:: ellipticity_gaussian
+.. autofunction:: ellipticity_intnorm
+.. autofunction:: ellipticity_ryden04
 
 
 Utilities
 ---------
 
-.. autosummary::
-   :template: generator.rst
-   :toctree: generated/
-   :nosignatures:
-
-   triaxial_axis_ratio
+.. autofunction:: triaxial_axis_ratio
 
 '''
 

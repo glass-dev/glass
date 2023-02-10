@@ -13,23 +13,15 @@ library.
 Input and output
 ----------------
 
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   save_cls
-   load_cls
+.. autofunction:: save_cls
+.. autofunction:: load_cls
 
 
 Profiling
 ---------
 
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   Profiler
-   profile
+.. autoclass:: Profiler
+.. autofunction:: profile
 
 '''
 
