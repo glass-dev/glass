@@ -6,5 +6,6 @@ User guide
    :maxdepth: 2
 
    getting_started
+   releases
    extensions
    definitions
