@@ -56,8 +56,6 @@ html_static_path = ['_static']
 
 html_logo = '_static/glass.png'
 
-html_title = 'GLASS'
-
 html_favicon = '_static/glass.ico'
 
 html_theme_options = {
