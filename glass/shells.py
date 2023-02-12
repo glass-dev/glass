@@ -22,7 +22,6 @@ Window function tools
 .. autofunction:: restrict
 .. autofunction:: partition
 .. autofunction:: effective_redshifts
-.. autofunction:: normalize_windows
 
 
 Redshift grids
