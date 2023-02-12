@@ -90,6 +90,11 @@ intersphinx_mapping = {
 }
 
 
+# -- autodoc -----------------------------------------------------------------
+
+autodoc_typehints = 'none'
+
+
 # -- numpydoc ----------------------------------------------------------------
 
 # Whether to create a Sphinx table of contents for the lists of class methods

@@ -1,1 +1,0 @@
-.. automodule:: glass.matter

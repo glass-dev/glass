@@ -5,10 +5,10 @@ Reference manual
 .. toctree::
    :maxdepth: 1
 
+   shells
    fields
    points
    shapes
-   matter
    lensing
    galaxies
    observations
