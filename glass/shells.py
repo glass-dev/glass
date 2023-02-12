@@ -183,9 +183,10 @@ def partition(z: ArrayLike1D, f: ArrayLike1D, zs: Sequence[ArrayLike1D],
     *(Mi,)*.  Redshifts ``zs[i]`` and sizes *Mi* can differ for
     different values of *i*.
 
-    The partitions has redshifts that are the union of the redshifts of
-    the function and each window over the support of said window.
-    Intermediate function values are found by linear interpolation
+    The partitioned functions have redshifts that are the union of the
+    redshifts of the original function and each window over the support
+    of said window.  Intermediate function values are found by linear
+    interpolation
 
     Parameters
     ----------
