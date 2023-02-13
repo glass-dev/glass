@@ -13,7 +13,6 @@ Iterative lensing
 -----------------
 
 .. autoclass:: MultiPlaneConvergence
-.. autofunction:: multi_plane_weights
 .. autofunction:: multi_plane_matrix
 
 
@@ -24,13 +23,12 @@ Lensing fields
 
 '''
 
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Optional, Sequence, Tuple, TYPE_CHECKING
 import numpy as np
 import healpy as hp
 
 if TYPE_CHECKING:
     from cosmology import Cosmology
-    from .matter import MatterWeights
 
 
 def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
@@ -116,13 +114,6 @@ def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
     return hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
-def multi_plane_weights(zsrc: Sequence[float], weights: 'MatterWeights'
-                        ) -> np.ndarray:
-    '''Compute weights for multi-plane lensing from matter weights.'''
-    return np.array([np.trapz(w, z)/np.interp(z_, z, w)
-                     for z_, z, w in zip(zsrc, weights.z, weights.w)])
-
-
 class MultiPlaneConvergence:
     '''Compute convergence fields iteratively from multiple matter planes.'''
 
@@ -140,20 +131,37 @@ class MultiPlaneConvergence:
         self.kappa2: Optional[np.ndarray] = None
         self.kappa3: Optional[np.ndarray] = None
 
-    def add_plane(self, delta: np.ndarray, z: float, w: float = 1.) -> None:
-        '''Add a mass plane at redshift ``z`` to the convergence.'''
+    def add_window(self, delta: np.ndarray, z: np.ndarray, w: np.ndarray,
+                   zsrc: Optional[float] = None) -> None:
+        '''Add a mass plane from a window function to the convergence.
 
-        if z <= self.z3:
+        The source plane redshift can be given using ``zsrc``.
+        Otherwise, the mean redshift of the window is used.
+
+        '''
+
+        if zsrc is None:
+            zsrc = np.trapz(z*w, z)/np.trapz(w, z)
+
+        lens_weight = np.trapz(w, z)/np.interp(zsrc, z, w)
+
+        self.add_plane(delta, zsrc, lens_weight)
+
+    def add_plane(self, delta: np.ndarray, zsrc: float, wlens: float = 1.
+                  ) -> None:
+        '''Add a mass plane at redshift ``zsrc`` to the convergence.'''
+
+        if zsrc <= self.z3:
             raise ValueError('source redshift must be increasing')
 
         # cycle mass plane, ...
         delta2, self.delta3 = self.delta3, delta
 
         # redshifts of source planes, ...
-        z1, self.z2, self.z3 = self.z2, self.z3, z
+        z1, self.z2, self.z3 = self.z2, self.z3, zsrc
 
         # and weights of mass plane
-        w2, self.w3 = self.w3, w
+        w2, self.w3 = self.w3, wlens
 
         # extrapolation law
         x2, self.x3 = self.x3, self.cosmo.xm(self.z3)
@@ -184,7 +192,7 @@ class MultiPlaneConvergence:
         self.kappa3 += f*delta2
 
     @property
-    def z(self) -> float:
+    def zsrc(self) -> float:
         '''The redshift of the current convergence plane.'''
         return self.z3
 
@@ -199,17 +207,21 @@ class MultiPlaneConvergence:
         return self.delta3
 
     @property
-    def w(self) -> float:
+    def wlens(self) -> float:
         '''The weight of the current matter plane.'''
         return self.w3
 
 
-def multi_plane_matrix(redshifts: Sequence[float], weights: Sequence[float],
-                       cosmo: 'Cosmology') -> np.ndarray:
-    '''Compute the matrix of lensing contribution from each shell.'''
+def multi_plane_matrix(zs: Sequence[np.ndarray], ws: Sequence[np.ndarray],
+                       cosmo: 'Cosmology', zsrcs: Optional[np.ndarray] = None
+                       ) -> Tuple[np.ndarray, np.ndarray]:
+    '''Compute the matrix of lensing contributions from each shell.'''
     mpc = MultiPlaneConvergence(cosmo)
-    mat = np.eye(len(redshifts))
-    for m, z, w in zip(mat, redshifts, weights):
-        mpc.add_plane(m.copy(), z, w)
-        m[:] = mpc.kappa
-    return mat
+    zout = np.empty(len(zs))
+    wmat = np.eye(len(zs))
+    for i, (z, w) in enumerate(zip(zs, ws)):
+        zsrc = zsrcs[i] if zsrcs is not None else None
+        mpc.add_window(wmat[i].copy(), z, w, zsrc)
+        zout[i] = mpc.zsrc
+        wmat[i, :] = mpc.kappa
+    return zout, wmat

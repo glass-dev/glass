@@ -20,6 +20,11 @@ Bias
 ----
 
 .. autofunction:: effective_bias
+
+
+Bias models
+-----------
+
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
@@ -28,24 +33,22 @@ Bias
 import numpy as np
 import healpix
 
-from .math import ARCMIN2_SPHERE, restrict_interval, trapz_product
+from .math import ARCMIN2_SPHERE, trapz_product
 
 
-def effective_bias(z, b, shells, weights):
+def effective_bias(bias_z, bias_b, window_z, window_w):
     '''Effective bias parameter from a redshift-dependent bias function.
 
-    This function takes a redshift-dependent bias function :math:`b(z)` and
-    computes an effective bias parameter :math:`\\bar{b}_i` for each shell
-    :math:`i` using the matter weight function.
+    This function takes a redshift-dependent bias function :math:`b(z)`
+    and computes an effective bias parameter :math:`\\bar{b}` for a
+    given window function :math:`w(z)`.
 
     Parameters
     ----------
-    z, b : array_like
-        Redshifts and values of bias function :math:`b(z)`.
-    shells : array_like
-        Redshifts of the shell boundaries.
-    weights : :class:`glass.matter.MatterWeights`
-        The matter weight function for the shells.
+    bias_z, bias_b : array_like
+        Redshifts and values of the bias function :math:`b(z)`.
+    window_z, window_w : array_like
+        Redshifts and values of the window function :math:`w(z)`.
 
     Returns
     -------
@@ -54,21 +57,18 @@ def effective_bias(z, b, shells, weights):
 
     Notes
     -----
-    The effective bias parameter :math:`\\bar{b}_i` in shell :math:`i` is
-    computed using the matter weight function :math:`W` as the weighted
+    The effective bias parameter :math:`\\bar{b}` in shell :math:`i` is
+    computed using the window function :math:`w(z)` as the weighted
     average
 
     .. math::
 
-        \\bar{b}_i = \\frac{\\int_{z_{i-1}}^{z_i} b(z) \\, W(z) \\, dz}
-                           {\\int_{z_{i-1}}^{z_i} W(z) \\, dz}  \\;.
+        \\bar{b} = \\frac{\\int b(z) \\, w(z) \\, dz}{\\int w(z) \\, dz}
+        \\;.
 
     '''
-    beff = np.empty(len(shells)-1)
-    for i, (zmin, zmax) in enumerate(zip(shells, shells[1:])):
-        w_, z_ = restrict_interval(weights.w, weights.z, zmin, zmax)
-        beff[i] = trapz_product((z, b), (z_, w_))/np.trapz(w_, z_)
-    return beff
+    norm = np.trapz(window_w, window_z)
+    return trapz_product((bias_z, bias_b), (window_z, window_w))/norm
 
 
 def linear_bias(delta, b):
