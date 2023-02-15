@@ -46,13 +46,6 @@ e.g. a design decision or API change, you can use our Discussions__ page.
 
 __ https://github.com/orgs/glass-dev/discussions
 
-If you are running into problems, suspect a bug, or have a quick question, you
-can chat on our `Gitter channel`__.
-
-__ https://gitter.im/glass-dev/glass
-
-If you are looking for a longer, asynchronous discussion, e.g. about
-implementing new models or creating extensions, you can join our `Slack
-workspace`__.
+We also have a public `Slack workspace`__ for discussions about the project.
 
 __ https://glass-dev.github.io/slack
