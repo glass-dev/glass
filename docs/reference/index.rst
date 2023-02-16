@@ -1,6 +1,6 @@
-================
-Reference manual
-================
+==================
+Function reference
+==================
 
 .. toctree::
    :maxdepth: 1
