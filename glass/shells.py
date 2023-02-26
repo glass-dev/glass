@@ -41,7 +41,7 @@ Weight functions
 '''
 
 import warnings
-from typing import NamedTuple
+from collections import namedtuple
 import numpy as np
 
 from .math import ndinterp
@@ -74,8 +74,8 @@ def density_weight(z: ArrayLike, cosmo: 'Cosmology') -> np.ndarray:
     return cosmo.rho_m_z(z)*cosmo.xm(z)**2/cosmo.ef(z)
 
 
-class RadialWindow(NamedTuple):
-    '''A radial window, defined by a window function.
+RadialWindow = namedtuple('RadialWindow', 'za, wa, zeff')
+RadialWindow.__doc__ = '''A radial window, defined by a window function.
 
     The radial window is defined by a window function in redshift, which
     is given by a pair of arrays ``za``, ``wa``.
@@ -85,8 +85,8 @@ class RadialWindow(NamedTuple):
     the window function.
 
     To prevent accidental inconsistencies, instances of this type are
-    immutable (however, the array entries are **not** immutable; do not
-    change them in place)::
+    immutable (however, the array entries may **not** be immutable; do
+    not change them in place)::
 
         >>> from glass.shells import RadialWindow
         >>> w1 = RadialWindow(..., ..., zeff=0.1)
@@ -116,15 +116,9 @@ class RadialWindow(NamedTuple):
     _replace
 
     '''
-
-    za: ArrayLike1D
-    '''Redshift array.'''
-
-    wa: ArrayLike1D
-    '''Weight array.'''
-
-    zeff: float
-    '''Effective redshift.'''
+RadialWindow.za.__doc__ = '''Redshift array; the abscissae of the window function.'''
+RadialWindow.wa.__doc__ = '''Weight array; the values (ordinates) of the window function.'''
+RadialWindow.zeff.__doc__ = '''Effective redshift of the window.'''
 
 
 def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
