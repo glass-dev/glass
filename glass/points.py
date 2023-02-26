@@ -36,7 +36,7 @@ import healpix
 from .math import ARCMIN2_SPHERE, trapz_product
 
 
-def effective_bias(bias_z, bias_b, window_z, window_w):
+def effective_bias(z, bz, w):
     '''Effective bias parameter from a redshift-dependent bias function.
 
     This function takes a redshift-dependent bias function :math:`b(z)`
@@ -45,21 +45,20 @@ def effective_bias(bias_z, bias_b, window_z, window_w):
 
     Parameters
     ----------
-    bias_z, bias_b : array_like
+    z, bz : array_like
         Redshifts and values of the bias function :math:`b(z)`.
-    window_z, window_w : array_like
-        Redshifts and values of the window function :math:`w(z)`.
+    w : :class:`~glass.shells.RadialWindow`
+        The radial window function :math:`w(z)`.
 
     Returns
     -------
     beff : array_like
-        Effective bias parameter for each shell.
+        Effective bias parameter for the window.
 
     Notes
     -----
-    The effective bias parameter :math:`\\bar{b}` in shell :math:`i` is
-    computed using the window function :math:`w(z)` as the weighted
-    average
+    The effective bias parameter :math:`\\bar{b}` is computed using the
+    window function :math:`w(z)` as the weighted average
 
     .. math::
 
@@ -67,8 +66,8 @@ def effective_bias(bias_z, bias_b, window_z, window_w):
         \\;.
 
     '''
-    norm = np.trapz(window_w, window_z)
-    return trapz_product((bias_z, bias_b), (window_z, window_w))/norm
+    norm = np.trapz(w.wa, w.za)
+    return trapz_product((z, bz), (w.za, w.wa))/norm
 
 
 def linear_bias(delta, b):

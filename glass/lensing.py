@@ -23,12 +23,14 @@ Lensing fields
 
 '''
 
-from typing import Optional, Sequence, Tuple, TYPE_CHECKING
 import numpy as np
 import healpy as hp
 
+# typing support
+from typing import Optional, Sequence, TYPE_CHECKING
 if TYPE_CHECKING:
     from cosmology import Cosmology
+    from .shells import RadialWindow
 
 
 def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
@@ -131,19 +133,16 @@ class MultiPlaneConvergence:
         self.kappa2: Optional[np.ndarray] = None
         self.kappa3: Optional[np.ndarray] = None
 
-    def add_window(self, delta: np.ndarray, z: np.ndarray, w: np.ndarray,
-                   zsrc: Optional[float] = None) -> None:
+    def add_window(self, delta: np.ndarray, w: 'RadialWindow') -> None:
         '''Add a mass plane from a window function to the convergence.
 
-        The source plane redshift can be given using ``zsrc``.
-        Otherwise, the mean redshift of the window is used.
+        The lensing weight is computed from the window function, and the
+        source plane redshift is the effective redshift of the window.
 
         '''
 
-        if zsrc is None:
-            zsrc = np.trapz(z*w, z)/np.trapz(w, z)
-
-        lens_weight = np.trapz(w, z)/np.interp(zsrc, z, w)
+        zsrc = w.zeff
+        lens_weight = np.trapz(w.wa, w.za)/np.interp(zsrc, w.za, w.wa)
 
         self.add_plane(delta, zsrc, lens_weight)
 
@@ -212,16 +211,12 @@ class MultiPlaneConvergence:
         return self.w3
 
 
-def multi_plane_matrix(zs: Sequence[np.ndarray], ws: Sequence[np.ndarray],
-                       cosmo: 'Cosmology', zsrcs: Optional[np.ndarray] = None
-                       ) -> Tuple[np.ndarray, np.ndarray]:
+def multi_plane_matrix(ws: Sequence['RadialWindow'], cosmo: 'Cosmology'
+                       ) -> np.ndarray:
     '''Compute the matrix of lensing contributions from each shell.'''
     mpc = MultiPlaneConvergence(cosmo)
-    zout = np.empty(len(zs))
-    wmat = np.eye(len(zs))
-    for i, (z, w) in enumerate(zip(zs, ws)):
-        zsrc = zsrcs[i] if zsrcs is not None else None
-        mpc.add_window(wmat[i].copy(), z, w, zsrc)
-        zout[i] = mpc.zsrc
+    wmat = np.eye(len(ws))
+    for i, w in enumerate(ws):
+        mpc.add_window(wmat[i].copy(), w)
         wmat[i, :] = mpc.kappa
-    return zout, wmat
+    return wmat

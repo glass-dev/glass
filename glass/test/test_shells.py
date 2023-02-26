@@ -8,69 +8,70 @@ def test_tophat_windows():
     zb = [0.0, 0.1, 0.2, 0.5, 1.0, 2.0]
     dz = 0.005
 
-    zp, wp = tophat_windows(zb, dz)
+    ws = tophat_windows(zb, dz)
 
-    assert len(zp) == len(wp) == len(zb)-1
+    assert len(ws) == len(zb)-1
 
-    assert all(z0 == z[0] and zn == z[-1]
-               for z, z0, zn in zip(zp, zb, zb[1:]))
+    assert all(z0 == w.za[0] and zn == w.za[-1]
+               for w, z0, zn in zip(ws, zb, zb[1:]))
 
-    assert all(zn <= z0+len(z)*dz <= zn+dz
-               for z, z0, zn in zip(zp, zb, zb[1:]))
+    assert all(zn <= z0+len(w.za)*dz <= zn+dz
+               for w, z0, zn in zip(ws, zb, zb[1:]))
 
-    assert all(np.all(w == 1) for w in wp)
+    assert all(np.all(w.wa == 1) for w in ws)
 
 
 def test_restrict():
-    from glass.shells import restrict
+    from glass.shells import restrict, RadialWindow
 
     # Gaussian test function
     z = np.linspace(0., 5., 1000)
     f = np.exp(-((z - 2.)/0.5)**2/2)
 
     # window for restriction
-    za = [1., 2., 3., 4.]
-    wa = [0., .5, .5, 0.]
+    w = RadialWindow(za=[1., 2., 3., 4.], wa=[0., .5, .5, 0.], zeff=None)
 
-    zr, fr = restrict(z, f, za, wa)
+    zr, fr = restrict(z, f, w)
 
-    assert zr[0] == za[0] and zr[-1] == za[-1]
+    assert zr[0] == w.za[0] and zr[-1] == w.za[-1]
 
     assert fr[0] == fr[-1] == 0.
 
-    for zi, wi in zip(za, wa):
+    for zi, wi in zip(w.za, w.wa):
         i = np.searchsorted(zr, zi)
         assert zr[i] == zi
         assert fr[i] == wi*np.interp(zi, z, f)
 
     for zi, fi in zip(z, f):
-        if za[0] <= zi <= za[-1]:
+        if w.za[0] <= zi <= w.za[-1]:
             i = np.searchsorted(zr, zi)
             assert zr[i] == zi
-            assert fr[i] == fi*np.interp(zi, za, wa)
+            assert fr[i] == fi*np.interp(zi, w.za, w.wa)
 
 
 def test_partition():
-    from glass.shells import partition
+    from glass.shells import partition, RadialWindow
 
     # Gaussian test function
     z = np.linspace(0., 5., 1000)
     f = np.exp(-((z - 2.)/0.5)**2/2)
 
     # overlapping triangular weight functions
-    zs = [[0., 1., 2.], [1., 2., 3.], [2., 3., 4.], [3., 4., 5.]]
-    ws = [[0., 1., 0.], [0., 1., 0.], [0., 1., 0.], [0., 1., 0.]]
+    ws = [RadialWindow(za=[0., 1., 2.], wa=[0., 1., 0.], zeff=None),
+          RadialWindow(za=[1., 2., 3.], wa=[0., 1., 0.], zeff=None),
+          RadialWindow(za=[2., 3., 4.], wa=[0., 1., 0.], zeff=None),
+          RadialWindow(za=[3., 4., 5.], wa=[0., 1., 0.], zeff=None)]
 
-    zp, fp = partition(z, f, zs, ws)
+    zp, fp = partition(z, f, ws)
 
-    assert len(zp) == len(fp) == len(zs)
+    assert len(zp) == len(fp) == len(ws)
 
-    for zr, za in zip(zp, zs):
-        assert np.all((zr >= za[0]) & (zr <= za[-1]))
+    for zr, w in zip(zp, ws):
+        assert np.all((zr >= w.za[0]) & (zr <= w.za[-1]))
 
-    for zr, fr, za, wa in zip(zp, fp, zs, ws):
+    for zr, fr, w in zip(zp, fp, ws):
         f_ = np.interp(zr, z, f, left=0., right=0.)
-        w_ = np.interp(zr, za, wa, left=0., right=0.)
+        w_ = np.interp(zr, w.za, w.wa, left=0., right=0.)
         npt.assert_allclose(fr, f_*w_)
 
     f_ = sum(np.interp(z, zr, fr, left=0., right=0.)
@@ -80,6 +81,6 @@ def test_partition():
     assert f_[0] == f_[-1] == 0.
 
     # find first and last index where total weight becomes unity
-    i, j = np.searchsorted(z, [zs[0][1], zs[-1][1]])
+    i, j = np.searchsorted(z, [ws[0].za[1], ws[-1].za[1]])
 
     npt.assert_allclose(f_[i:j], f[i:j], atol=1e-15)
