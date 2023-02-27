@@ -13,6 +13,7 @@ matter shells, i.e. the radial discretisation of the light cone.
 Window functions
 ----------------
 
+.. autoclass:: RadialWindow
 .. autofunction:: tophat_windows
 
 
@@ -21,7 +22,6 @@ Window function tools
 
 .. autofunction:: restrict
 .. autofunction:: partition
-.. autofunction:: effective_redshifts
 
 
 Redshift grids
@@ -41,6 +41,7 @@ Weight functions
 '''
 
 import warnings
+from collections import namedtuple
 import numpy as np
 
 from .math import ndinterp
@@ -73,9 +74,56 @@ def density_weight(z: ArrayLike, cosmo: 'Cosmology') -> np.ndarray:
     return cosmo.rho_m_z(z)*cosmo.xm(z)**2/cosmo.ef(z)
 
 
+RadialWindow = namedtuple('RadialWindow', 'za, wa, zeff')
+RadialWindow.__doc__ = '''A radial window, defined by a window function.
+
+    The radial window is defined by a window function in redshift, which
+    is given by a pair of arrays ``za``, ``wa``.
+
+    The radial window also has an effective redshift, stored in the
+    ``zeff`` attribute, which should be a representative redshift for
+    the window function.
+
+    To prevent accidental inconsistencies, instances of this type are
+    immutable (however, the array entries may **not** be immutable; do
+    not change them in place)::
+
+        >>> from glass.shells import RadialWindow
+        >>> w1 = RadialWindow(..., ..., zeff=0.1)
+        >>> w1.zeff = 0.15
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        AttributeError: can't set attribute
+
+    To create a new instance with a changed attribute value, use the
+    ``._replace`` method::
+
+        >>> w1 = w1._replace(zeff=0.15)
+        >>> w1
+        RadialWindow(za=..., wa=..., zeff=0.15)
+
+    Attributes
+    ----------
+    za : (N,) array_like
+        Redshift array; the abscissae of the window function.
+    wa : (N,) array_like
+        Weight array; the values (ordinates) of the window function.
+    zeff : float
+        Effective redshift of the window.
+
+    Methods
+    -------
+    _replace
+
+    '''
+RadialWindow.za.__doc__ = '''Redshift array; the abscissae of the window function.'''
+RadialWindow.wa.__doc__ = '''Weight array; the values (ordinates) of the window function.'''
+RadialWindow.zeff.__doc__ = '''Effective redshift of the window.'''
+
+
 def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
-                   wfunc: Optional[WeightFunc] = None
-                   ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+                   weight: Optional[WeightFunc] = None
+                   ) -> List[RadialWindow]:
     '''Tophat window functions from the given redshift bin edges.
 
     Uses the *N+1* given redshifts as bin edges to construct *N* tophat
@@ -83,7 +131,11 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
     approximately equal to ``dz``.
 
     An optional weight function :math:`w(z)` can be given using
-    ``wfunc``; it is applied to the tophat windows.
+    ``weight``; it is applied to the tophat windows.
+
+    The resulting windows functions are :class:`RadialWindow` instances.
+    Their effective redshifts are the mean redshifts of the (weighted)
+    tophat bins.
 
     Parameters
     ----------
@@ -91,13 +143,13 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
         Redshift bin edges for the tophat window functions.
     dz : float, optional
         Approximate spacing of the redshift grid.
-    wfunc : callable, optional
+    weight : callable, optional
         If given, a weight function to be applied to the window
         functions.
 
     Returns
     -------
-    zs, ws : (N,) list of array_like
+    ws : (N,) list of :class:`RadialWindow`
         List of window functions.
 
     '''
@@ -106,29 +158,23 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
     if zbins[0] != 0:
         warnings.warn('first tophat window does not start at redshift zero')
 
-    wf: WeightFunc
-    if wfunc is not None:
-        wf = wfunc
+    wht: WeightFunc
+    if weight is not None:
+        wht = weight
     else:
-        wf = np.ones_like
+        wht = np.ones_like
 
-    zs, ws = [], []
+    ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
         n = max(round((zmax - zmin)/dz), 2)
         z = np.linspace(zmin, zmax, n)
-        zs.append(z)
-        ws.append(wf(z))
-    return zs, ws
+        w = wht(z)
+        zeff = np.trapz(w*z, z)/np.trapz(w, z)
+        ws.append(RadialWindow(z, w, zeff))
+    return ws
 
 
-def effective_redshifts(zs: Sequence[ArrayLike1D], ws: Sequence[ArrayLike1D]
-                        ) -> np.ndarray:
-    '''Compute the effective redshifts of window functions.'''
-    return np.ndarray([np.trapz(w*z, z, axis=-1)/np.trapz(w, z, axis=-1)
-                       for z, w in zip(zs, ws)])
-
-
-def restrict(z: ArrayLike1D, f: ArrayLike1D, za: ArrayLike1D, wa: ArrayLike1D
+def restrict(z: ArrayLike1D, f: ArrayLike1D, w: RadialWindow
              ) -> Tuple[np.ndarray, np.ndarray]:
     '''Restrict a function to a redshift window.
 
@@ -139,8 +185,8 @@ def restrict(z: ArrayLike1D, f: ArrayLike1D, za: ArrayLike1D, wa: ArrayLike1D
     *(N,)* and function values ``f`` of shape *(..., N)*, with any
     number of leading axes allowed.
 
-    The window function :math:`w(z)` is given by redshifts ``zr`` and
-    values ``wr``, which must have the same shape *(M,)*.
+    The window function :math:`w(z)` is given by ``w``, which must be a
+    :class:`RadialWindow` instance or compatible with it.
 
     The restriction has redshifts that are the union of the redshifts of
     the function and window over the support of the window.
@@ -150,7 +196,7 @@ def restrict(z: ArrayLike1D, f: ArrayLike1D, za: ArrayLike1D, wa: ArrayLike1D
     ----------
     z, f : array_like
         The function to be restricted.
-    za, wa : array_like
+    w : :class:`RadialWindow`
         The window function for the restriction.
 
     Returns
@@ -160,15 +206,14 @@ def restrict(z: ArrayLike1D, f: ArrayLike1D, za: ArrayLike1D, wa: ArrayLike1D
 
     '''
 
-    z_ = np.compress(np.greater(z, za[0]) & np.less(z, za[-1]), z)
-    zr = np.union1d(za, z_)
-    fr = ndinterp(zr, z, f, left=0., right=0.) * ndinterp(zr, za, wa)
+    z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
+    zr = np.union1d(w.za, z_)
+    fr = ndinterp(zr, z, f, left=0., right=0.) * ndinterp(zr, w.za, w.wa)
     return zr, fr
 
 
-def partition(z: ArrayLike1D, f: ArrayLike1D, zs: Sequence[ArrayLike1D],
-              ws: Sequence[ArrayLike1D]
-              ) -> Tuple[np.ndarray, np.ndarray]:
+def partition(z: ArrayLike1D, f: ArrayLike1D, ws: Sequence[RadialWindow]
+              ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
     '''Partition a function by a sequence of windows.
 
     Partitions the given function into a sequence of functions
@@ -178,10 +223,8 @@ def partition(z: ArrayLike1D, f: ArrayLike1D, zs: Sequence[ArrayLike1D],
     *(N,)* and function values ``f`` of shape *(..., N)*, with any
     number of leading axes allowed.
 
-    The window functions are pairs ``(zs[i], ws[i])`` of redshifts and
-    values where both ``zs[i]`` and ``ws[i]`` must have the same shape
-    *(Mi,)*.  Redshifts ``zs[i]`` and sizes *Mi* can differ for
-    different values of *i*.
+    The window functions are given by the sequence ``ws`` of
+    :class:`RadialWindow` or compatible entries.
 
     The partitioned functions have redshifts that are the union of the
     redshifts of the original function and each window over the support
@@ -192,7 +235,7 @@ def partition(z: ArrayLike1D, f: ArrayLike1D, zs: Sequence[ArrayLike1D],
     ----------
     z, f : array_like
         The function to be partitioned.
-    zs, ws : sequence of array_like
+    ws : sequence of :class:`RadialWindow`
         Ordered sequence of window functions for the partition.
 
     Returns
@@ -203,8 +246,8 @@ def partition(z: ArrayLike1D, f: ArrayLike1D, zs: Sequence[ArrayLike1D],
     '''
 
     zp, fp = [], []
-    for za, wa in zip(zs, ws):
-        zr, fr = restrict(z, f, za, wa)
+    for w in ws:
+        zr, fr = restrict(z, f, w)
         zp.append(zr)
         fp.append(fr)
     return zp, fp

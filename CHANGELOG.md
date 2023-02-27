@@ -19,15 +19,16 @@ based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Changed
 
-- The `glass.lensing.multi_plane_matrix` function now takes sequences `zs, ws`
-  of window functions, as well as an optional array `zsrcs` of explicit source
-  redshifts.
+- Instead of an array of shell boundaries and `MatterWeights`, the shells are
+  entirely defined by a `RadialWindow` window function.
+- The `glass.lensing.multi_plane_matrix` function now takes a sequence of
+  window functions.
 - The arguments of `glass.lensing.MultiPlaneConvergence.add_plane` are called
   `zsrc` and `wlens` instead of the more ambiguous `z` and `w`. The properties
   `MultiPlaneConvergence.z` and `MultiPlaneConvergence.w` that return these
   values are similarly changed.
-- The `glass.points.effective_bias` now takes a single window function `z, w`
-  as input and computes its effective bias parameter.
+- The `glass.points.effective_bias` now takes a single window function as input
+  and computes its effective bias parameter.
 - Some type hints added to library functions
 
 
