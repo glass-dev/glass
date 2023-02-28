@@ -5,7 +5,6 @@ User guide
 .. toctree::
    :maxdepth: 2
 
-   getting_started
-   releases
-   extensions
+   how-glass-works
+   publications
    definitions
