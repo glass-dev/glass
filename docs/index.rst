@@ -3,6 +3,8 @@
 *GLASS* --- Generator for Large Scale Structure
 ***********************************************
 
+.. image:: _static/spheres.png
+
 GLASS, the generator for large scale structure, is a library for performing the
 kind of simulation that is useful in the field of cosmology.  As the name
 suggests, the code was originally designed to simulate cosmic matter, weak

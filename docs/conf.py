@@ -31,6 +31,7 @@ extensions = [
     'numpydoc',
     'sphinx.ext.intersphinx',
     'sphinxcontrib.katex',
+    'matplotlib.sphinxext.plot_directive',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -101,3 +102,23 @@ autodoc_typehints = 'none'
 # and attributes. If a table of contents is made, Sphinx expects each entry to
 # have a separate page.
 numpydoc_class_members_toctree = False
+
+
+# -- plot_directive ----------------------------------------------------------
+
+# Whether to show a link to the source in HTML (default: True).
+plot_html_show_source_link = False
+
+# Whether to show links to the files in HTML (default: True).
+plot_html_show_formats = False
+
+# File formats to generate (default: ['png', 'hires.png', 'pdf']).
+plot_formats = [('svg', 150), ('png', 150)]
+
+# A dictionary containing any non-standard rcParams that should be applied
+# before each plot (default: {}).
+plot_rcparams = {
+    'axes.facecolor': (1.0, 1.0, 1.0, 1.0),
+    'savefig.facecolor': (1.0, 1.0, 1.0, 0.5),
+    'savefig.transparent': False,
+}
