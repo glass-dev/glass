@@ -8,6 +8,9 @@ based on [Keep a Changelog](https://keepachangelog.com).
 [Unreleased]
 ------------
 
+[2023.2] - 1 Mar 2023
+---------------------
+
 ### Added
 
 - The `glass.lensing.MultiPlaneConvergence.add_window` method to add a
@@ -46,13 +49,14 @@ based on [Keep a Changelog](https://keepachangelog.com).
   `glass.shells` module.
 
 
-[2023.1] - 2023-01-31
----------------------
+[2023.1] - 31 Jan 2023
+----------------------
 
 ### Added
 
 - Initial wide release for GLASS paper
 
 
-[Unreleased]: https://github.com/glass-dev/glass/compare/v2023.1...HEAD
+[Unreleased]: https://github.com/glass-dev/glass/compare/v2023.2...HEAD
+[2023.2]: https://github.com/glass-dev/glass/compare/v2023.1...v2023.2
 [2023.1]: https://github.com/glass-dev/glass/releases/tag/v2023.1
