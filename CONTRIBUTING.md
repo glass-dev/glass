@@ -1,31 +1,74 @@
 Contributing guidelines
 =======================
 
-Committing
-----------
+Workflow
+--------
 
-Commits to the `main` branch should have messages that start with one of the
-following prefixes to indicate the nature of the commit:
+Every change to the repository should come out of an issue where the change is
+discussed.
 
-    API: an (incompatible) API change
-    BUG: bug fix
-    DEP: deprecate something, or remove a deprecated object
-    DOC: documentation
-    ENH: enhancement
-    INF: project infrastructure (dev tools, packaging, etc.)
-    MNT: maintenance commit (refactoring, typos, etc.)
-    REV: revert an earlier commit
-    STY: style fix (whitespace, PEP8)
-    TST: addition or modification of tests
-    TYP: static typing
-    REL: related to releasing GLASS
+[Pull requests](#pull-requests) should always follow from the discussion in an
+existing issue.  The only exception are minor, obvious changes such as fixing
+typos in the documentation.
 
-Note that these apply to a commit that makes it into the `main` branch; for a
-pull request on GitHub, that is the eventually squashed and merged commit.
-The individual commits in a pull request can have arbitrary commit messages.
+The discussion in a pull request should only be about the low-level details of
+its implementation.  All high-level, conceptual discussion belongs to the issue
+to which the pull request refers.
 
-Pull requests on GitHub should have a label that matches the above prefixes, in
-addition to any other applicable label (e.g. affected modules).
+
+Pull requests
+-------------
+
+Pull requests to the `main` branch should have titles of the following form:
+
+    TYPE: Subject line
+
+The title can optionally refer to the module which is being changed:
+
+    TYPE(module): Subject line
+
+The `TYPE` prefix should indicate the nature of the change and must be taken
+from the following list:
+
+    API -- an (incompatible) API change
+    BUG -- bug fix
+    DEP -- deprecate something, or remove a deprecated object
+    DEV -- development infrastructure (tools, packaging, etc.)
+    DOC -- documentation
+    ENH -- enhancement
+    MNT -- maintenance commit (refactoring, typos, etc.)
+    REV -- revert an earlier commit
+    STY -- style fix (whitespace, PEP8)
+    TST -- addition or modification of tests
+    TYP -- static typing
+    REL -- related to releasing GLASS
+
+The optional `module` tag should indicate which modules are affected by the
+change, and refer to an existing module name.
+
+The body of the pull request should contain a description of the changes, and
+any relevant details or caveats of the implementation.
+
+The pull request should not repeat or summarise the discussion of its
+associated issue.  Instead, it should link to the issue using git's so-called
+"trailers".  These are lines of the form `key: value` which are separated from
+the message body by a blank line.
+
+To generically refer to an issue without any further action, use `Refs` and
+one or more GitHub issue numbers:
+
+    Refs: #12
+    Refs: #25, #65
+
+To indicate that the pull request shall close an open issue, use `Closes` and
+a single GitHub issue number:
+
+    Closes: #17
+
+You can use any of the other common git trailers.  In particular, you can use
+`CC` to notify others of your pull request via their GitHub user names:
+
+    CC: @octocat
 
 
 Versioning
