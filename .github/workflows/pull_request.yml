@@ -25,6 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          commitlintRulesPath: "./commitlint.rules.js"
+          commitlintRulesPath: ".commitlint.rules.js"
           commitTitleMatch: false
           ignoreCommits: true

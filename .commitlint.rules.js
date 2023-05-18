@@ -1,6 +1,7 @@
 module.exports = {
   rules: {
     "header-max-length": [2, "always", 65],
+    "subject-case": [0, "always", "sentence-case"],
     "scope-enum": [2, "always", ["all", "fields", "galaxies", "lensing",
                                  "math", "observations", "points", "shapes",
                                  "shells", "user"]],
