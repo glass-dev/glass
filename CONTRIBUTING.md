@@ -51,8 +51,8 @@ any relevant details or caveats of the implementation.
 
 The pull request should not repeat or summarise the discussion of its
 associated issue.  Instead, it should link to the issue using git's so-called
-"trailers".  These are lines of the form `key: value` which are separated from
-the message body by a blank line.
+"trailers".  These are lines of the form `key: value` which are at the end of
+the pull request description, separated from the message body by a blank line.
 
 To generically refer to an issue without any further action, use `Refs` and
 one or more GitHub issue numbers:
@@ -63,12 +63,12 @@ one or more GitHub issue numbers:
 To indicate that the pull request shall close an open issue, use `Closes` and
 a single GitHub issue number:
 
-    Closes: #17
+    Fixes: #17
 
 You can use any of the other common git trailers.  In particular, you can use
-`CC` to notify others of your pull request via their GitHub user names:
+`Cc` to notify others of your pull request via their GitHub user names:
 
-    CC: @octocat
+    Cc: @octocat
 
 
 Versioning
