@@ -33,7 +33,7 @@ Bias models
 import numpy as np
 import healpix
 
-from .math import ARCMIN2_SPHERE, trapz_product
+from .math import ARCMIN2_SPHERE, broadcast_leading_axes, trapz_product
 
 
 def effective_bias(z, bz, w):
@@ -98,9 +98,12 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
     used, unless the monopole is already zero in the first place.
 
     The function supports multi-dimensional input for the ``ngal``,
-    ``delta``, ``bias``, and ``vis`` parameters.  Leading axes are
-    broadcast to the same shape, and treated as separate populations of
-    points, which are sampled independently.
+    ``delta``, ``bias``, and ``vis`` parameters.  Extra dimensions are
+    broadcast to a common shape, and treated as separate populations of
+    points.  These are then sampled independently, and the results
+    concatenated into a flat list of longitudes and latitudes.  The
+    number of points per population is returned in ``count`` as an array
+    in the shape of the extra dimensions.
 
     Parameters
     ----------
@@ -128,13 +131,11 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
 
     Returns
     -------
-    lon, lat : array_like or list of array_like
-        Columns of longitudes and latitudes for the sampled points.  For
-        multi-dimensional inputs, 1-D lists of points corresponding to
-        the flattened leading dimensions are returned.
-    count : int or list of ints
-        The number of sampled points.  For multi-dimensional inputs, a
-        1-D list of counts corresponding to the flattened leading
+    lon, lat : array_like
+        Columns of longitudes and latitudes for the sampled points.
+    count : int or array_like
+        The number of sampled points.  If multiple populations are
+        sampled, an array of counts in the shape of the extra
         dimensions is returned.
 
     '''
@@ -149,26 +150,25 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
     elif not callable(bias_model):
         raise ValueError('bias_model must be string or callable')
 
-    # figure out a common shape for inputs' leading dimensions
-    *delta_dims, delta_npix = np.shape(delta)
-    input_dims = [np.shape(ngal), delta_dims]
+    # broadcast inputs to common shape of extra dimensions
+    inputs = [(ngal, 0), (delta, 1)]
     if bias is not None:
-        input_dims += [np.shape(bias)]
+        inputs += [(bias, 0)]
     if vis is not None:
-        *vis_dims, vis_npix = np.shape(vis)
-        input_dims += [vis_dims]
-    dims = np.broadcast_shapes(*input_dims)
-
-    # broadcast inputs to common shape of leading dimensions
-    ngal = np.broadcast_to(ngal, dims)
-    delta = np.broadcast_to(delta, dims + (delta_npix,))
+        inputs += [(vis, 1)]
+    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)
     if bias is not None:
-        bias = np.broadcast_to(bias, dims)
+        bias, *rest = rest
     if vis is not None:
-        vis = np.broadcast_to(vis, dims + (vis_npix,))
+        vis, *rest = rest
 
-    # keep track of results for each leading dimensions
-    lons, lats, counts = [], [], []
+    # the output arrays, concatenated over all dimensions
+    ntot = 0
+    lon = np.empty(0)
+    lat = np.empty(0)
+
+    # keep track of counts for each leading dimensions
+    count = np.empty(dims, dtype=int)
 
     # iterate the leading dimensions
     for k in np.ndindex(dims):
@@ -197,23 +197,25 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
         # sample actual number in each pixel
         n = rng.poisson(n)
 
-        # total number of sampled points
-        ntot = n.sum()
-
         # for converting randomly sampled positions to HEALPix indices
         npix = n.shape[-1]
         nside = healpix.npix2nside(npix)
 
-        # these will hold the results
-        lon = np.empty(ntot)
-        lat = np.empty(ntot)
+        # number of points for this population
+        count[k] = n.sum()
+
+        # current and new total number of sampled points
+        ncur, ntot = ntot, ntot + count[k]
+
+        # resize the output arrays to hold the new sample
+        lon.resize(ntot, refcheck=False)
+        lat.resize(ntot, refcheck=False)
 
         # sample batches of 10000 pixels
         batch = 10_000
-        ncur = 0
         for i in range(0, npix, batch):
-            k = n[i:i+batch]
-            bpix = np.repeat(np.arange(i, i+k.size), k)
+            r = n[i:i+batch]
+            bpix = np.repeat(np.arange(i, i+r.size), r)
             blon, blat = healpix.randang(nside, bpix, lonlat=True, rng=rng)
             lon[ncur:ncur+blon.size] = blon
             lat[ncur:ncur+blat.size] = blat
@@ -221,18 +223,11 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
 
         assert ncur == ntot, 'internal error in sampling'
 
-        # store results
-        lons.append(lon)
-        lats.append(lat)
-        counts.append(ntot)
+    # return a plain scalar of counts if there are no dims
+    if not dims:
+        count = count.item()
 
-    # do not return lists if there were no leading dimensions
-    if dims:
-        result = lons, lats, counts
-    else:
-        result = lons[0], lats[0], counts[0]
-
-    return result
+    return lon, lat, count
 
 
 def uniform_positions(ngal, *, rng=None):
@@ -250,13 +245,10 @@ def uniform_positions(ngal, *, rng=None):
     Returns
     -------
     lon, lat : array_like or list of array_like
-        Columns of longitudes and latitudes for the sampled points.  For
-        array inputs, 1-D lists of points corresponding to the
-        flattened array dimensions are returned.
+        Columns of longitudes and latitudes for the sampled points.
     count : int or list of ints
-        The number of sampled points.  For array inputs, a 1-D list of
-        counts corresponding to the flattened array dimensions is
-        returned.
+        The number of sampled points.  For array inputs, an array of
+        counts with the same shape is returned.
 
     '''
 
@@ -265,33 +257,33 @@ def uniform_positions(ngal, *, rng=None):
         rng = np.random.default_rng()
 
     # sample number of galaxies
-    ntot = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
+    count = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
 
     # extra dimensions of the output
-    dims = np.shape(ntot)
+    dims = np.shape(count)
 
     # make sure ntot is an array even if scalar
-    ntot = np.broadcast_to(ntot, dims)
+    count = np.broadcast_to(count, dims)
 
     # arrays for results
-    lons, lats, counts = [], [], []
+    ntot = 0
+    lon = np.empty(0)
+    lat = np.empty(0)
 
     # sample each set of points
     for k in np.ndindex(dims):
 
+        # resize output arrays
+        ncur, ntot = ntot, ntot + count[k]
+        lon.resize(ntot, refcheck=False)
+        lat.resize(ntot, refcheck=False)
+
         # sample uniformly over the sphere
-        lon = rng.uniform(-180, 180, size=ntot[k])
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ntot[k])))
+        lon[ncur:ntot] = rng.uniform(-180, 180, size=count[k])
+        lat[ncur:ntot] = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=count[k])))
 
-        # store results
-        lons.append(lon)
-        lats.append(lat)
-        counts.append(ntot[k])
+    # return plain scalar if there are no dims
+    if not dims:
+        count = count.item()
 
-    # do not return lists if there were no leading dimensions
-    if dims:
-        result = lons, lats, counts
-    else:
-        result = lons[0], lats[0], counts[0]
-
-    return result
+    return lon, lat, count

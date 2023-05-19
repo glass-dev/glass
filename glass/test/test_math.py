@@ -2,6 +2,21 @@ import numpy as np
 import numpy.testing as npt
 
 
+def test_broadcast_leading_axes():
+    from glass.math import broadcast_leading_axes
+
+    a = 0
+    b = np.zeros((4, 10))
+    c = np.zeros((3, 1, 5, 6))
+
+    dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))
+
+    assert dims == (3, 4)
+    assert a.shape == (3, 4)
+    assert b.shape == (3, 4, 10)
+    assert c.shape == (3, 4, 5, 6)
+
+
 def test_ndinterp():
     from glass.math import ndinterp
 
