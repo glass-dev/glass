@@ -65,11 +65,11 @@ def trapz_product(f, *ff, axis=-1):
     return np.trapz(y, x, axis=axis)
 
 
-def cumtrapz(f, x, out=None):
+def cumtrapz(f, x, dtype=None, out=None):
     '''cumulative trapezoidal rule along last axis'''
 
     if out is None:
-        out = np.empty_like(f)
+        out = np.empty_like(f, dtype=dtype)
 
     np.cumsum((f[..., 1:] + f[..., :-1])/2*np.diff(x), axis=-1, out=out[..., 1:])
     out[..., 0] = 0
