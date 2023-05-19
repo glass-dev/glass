@@ -70,3 +70,71 @@ def test_redshifts_from_nz():
 
     with pytest.raises(ValueError):
         redshifts_from_nz(count, z, nz)
+
+
+def test_gaussian_phz():
+    import numpy as np
+    from glass.galaxies import gaussian_phz
+
+    # test sampling
+
+    # case: zero variance
+
+    z = np.linspace(0, 1, 100)
+    sigma_0 = 0.
+
+    phz = gaussian_phz(z, sigma_0)
+
+    np.testing.assert_array_equal(z, phz)
+
+    # case: truncated normal
+
+    z = 0.
+    sigma_0 = np.ones(100)
+
+    phz = gaussian_phz(z, sigma_0)
+
+    assert phz.shape == (100,)
+    assert np.all(phz >= 0)
+
+    # test interface
+
+    # case: scalar redshift, scalar sigma_0
+
+    z = 1.
+    sigma_0 = 0.
+
+    phz = gaussian_phz(z, sigma_0)
+
+    assert np.ndim(phz) == 0
+    assert phz == z
+
+    # case: array redshift, scalar sigma_0
+
+    z = np.linspace(0, 1, 10)
+    sigma_0 = 0.
+
+    phz = gaussian_phz(z, sigma_0)
+
+    assert phz.shape == (10,)
+    np.testing.assert_array_equal(z, phz)
+
+    # case: scalar redshift, array sigma_0
+
+    z = 1.
+    sigma_0 = np.zeros(10)
+
+    phz = gaussian_phz(z, sigma_0)
+
+    assert phz.shape == (10,)
+    np.testing.assert_array_equal(z, phz)
+
+    # case: array redshift, array sigma_0
+
+    z = np.linspace(0, 1, 10)
+    sigma_0 = np.zeros((11, 1))
+
+    phz = gaussian_phz(z, sigma_0)
+
+    assert phz.shape == (11, 10)
+    np.testing.assert_array_equal(np.broadcast_to(z, (11, 10)), phz)

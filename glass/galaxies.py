@@ -23,7 +23,6 @@ from __future__ import annotations
 import numpy as np
 import healpix
 
-from typing import Optional
 from numpy.typing import ArrayLike
 
 from .math import broadcast_leading_axes, cumtrapz
@@ -146,33 +145,34 @@ def galaxy_shear(lon: np.ndarray, lat: np.ndarray, eps: np.ndarray,
     return g
 
 
-def gaussian_phz(z: np.ndarray, sigma_0: float,
-                 rng: Optional[np.random.Generator] = None) -> np.ndarray:
+def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike,
+                 rng: np.random.Generator | None = None) -> np.ndarray:
     r'''Photometric redshifts assuming a Gaussian error.
 
-    A simple toy model of photometric redshift errors that assumes a Gaussian
-    error with redshift-dependent standard deviation :math:`\sigma(z) = (1 + z)
-    \sigma_0` [1]_.
+    A simple toy model of photometric redshift errors that assumes a
+    Gaussian error with redshift-dependent standard deviation
+    :math:`\sigma(z) = (1 + z) \sigma_0` [1]_.
 
     Parameters
     ----------
     z : array_like
         True redshifts.
-    sigma_0 : float
+    sigma_0 : float or array_like
         Redshift error in the tomographic binning at zero redshift.
     rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+        Random number generator.  If not given, a default RNG is used.
 
     Returns
     -------
     phz : array_like
-        Photometric redshifts assuming Gaussian errors, of the same shape as
-        ``z``.
+        Photometric redshifts assuming Gaussian errors, of the same
+        shape as ``z``.
 
     See Also
     --------
     glass.observations.tomo_nz_gausserr :
-        Create tomographic redshift distributions assuming the same model.
+        Create tomographic redshift distributions assuming the same
+        model.
 
     References
     ----------
@@ -189,14 +189,19 @@ def gaussian_phz(z: np.ndarray, sigma_0: float,
     if rng is None:
         rng = np.random.default_rng()
 
-    size = np.shape(z)
-    z = np.reshape(z, (-1,))
+    sigma = np.add(1, z)*sigma_0
+    dims = np.shape(sigma)
 
-    zphot = rng.normal(z, (1 + z)*sigma_0)
+    zphot = rng.normal(z, sigma)
 
-    trunc = np.where(zphot < 0)[0]
-    while trunc.size:
-        zphot[trunc] = rng.normal(z[trunc], (1 + z[trunc])*sigma_0)
-        trunc = trunc[zphot[trunc] < 0]
+    if not dims:
+        while zphot < 0:
+            zphot = rng.normal(z, sigma)
+    else:
+        z = np.broadcast_to(z, dims)
+        trunc = np.where(zphot < 0)[0]
+        while trunc.size:
+            zphot[trunc] = rng.normal(z[trunc], sigma[trunc])
+            trunc = trunc[zphot[trunc] < 0]
 
-    return zphot.reshape(size)
+    return zphot
