@@ -33,30 +33,30 @@ def redshifts_from_nz(count: int | ArrayLike, z: ArrayLike, nz: ArrayLike, *,
                       ) -> np.ndarray:
     '''Generate galaxy redshifts from a source distribution.
 
-    The function supports multi-dimensional input if ``count`` is an
-    array or there are multiple axes in the ``z`` or ``nz`` arrays.  In
-    this case, the shape of ``count`` and the leading dimensions of
-    ``z`` and ``nz`` are broadcast into a common shape, and redshifts
-    are sampled independently for each dimension.  The return value is
-    then a list of redshift samples.
+    The function supports sampling from multiple populations of
+    redshifts if ``count`` is an array or if there are additional axes
+    in the ``z`` or ``nz`` arrays.  In this case, the shape of ``count``
+    and the leading dimensions of ``z`` and ``nz`` are broadcast to a
+    common shape, and redshifts are sampled independently for each extra
+    dimension.  The results are concatenated into a flat array.
 
     Parameters
     ----------
     count : int or array_like
         Number of redshifts to sample.  If an array is given, its shape
-        is broadcast against the leading dimensions of ``z`` and ``nz``.
+        is broadcast against the leading axes of ``z`` and ``nz``.
     z, nz : array_like
-        Source distribution.  Leading dimensions are broadcast against
-        the shape of ``count``.
+        Source distribution.  Leading axes are broadcast against the
+        shape of ``count``.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
 
     Returns
     -------
-    redshifts : array_like or list of array_like
-        Redshifts sampled from the given source distribution.  If the input
-        was multi-dimensional, returns a 1-D list of samples corresponding
-        to the flattened input dimensions.
+    redshifts : array_like
+        Redshifts sampled from the given source distribution.  For
+        inputs with extra dimensions, returns a flattened 1-D array of
+        samples from all populations.
 
     '''
 
