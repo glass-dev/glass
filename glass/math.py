@@ -11,6 +11,43 @@ ARCMIN2_SPHERE = 60**6//100/np.pi
 ARCSEC2_SPHERE = 60**8//100/np.pi
 
 
+def broadcast_leading_axes(*args):
+    '''Broadcast all but the last N axes.
+
+    Returns the shape of the broadcast dimensions, and all input arrays
+    with leading axes matching that shape.
+
+    Example
+    -------
+    Broadcast all dimensions of ``a``, all except the last dimension of
+    ``b``, and all except the last two dimensions of ``c``.
+
+    >>> a = 0
+    >>> b = np.zeros((4, 10))
+    >>> c = np.zeros((3, 1, 5, 6))
+    >>> dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))
+    >>> dims
+    (3, 4)
+    >>> a.shape
+    (3, 4)
+    >>> b.shape
+    (3, 4, 10)
+    >>> c.shape
+    (3, 4, 5, 6)
+
+    '''
+
+    shapes, trails = [], []
+    for a, n in args:
+        s = np.shape(a)
+        i = len(s) - n
+        shapes.append(s[:i])
+        trails.append(s[i:])
+    dims = np.broadcast_shapes(*shapes)
+    arrs = (np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails))
+    return (dims, *arrs)
+
+
 def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):
     '''interpolate multi-dimensional array over axis'''
     return np.apply_along_axis(partial(np.interp, x, xp), axis, fp,
