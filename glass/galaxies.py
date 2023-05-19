@@ -31,7 +31,7 @@ from .math import broadcast_leading_axes, cumtrapz
 
 def redshifts_from_nz(count: int | ArrayLike, z: ArrayLike, nz: ArrayLike, *,
                       rng: np.random.Generator | None = None
-                      ) -> np.ndarray | list[np.ndarray]:
+                      ) -> np.ndarray:
     '''Generate galaxy redshifts from a source distribution.
 
     The function supports multi-dimensional input if ``count`` is an
