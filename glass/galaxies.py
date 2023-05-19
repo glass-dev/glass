@@ -34,20 +34,20 @@ def redshifts_from_nz(count: int | ArrayLike, z: ArrayLike, nz: ArrayLike, *,
     '''Generate galaxy redshifts from a source distribution.
 
     The function supports sampling from multiple populations of
-    redshifts if ``count`` is an array or if there are additional axes
-    in the ``z`` or ``nz`` arrays.  In this case, the shape of ``count``
-    and the leading dimensions of ``z`` and ``nz`` are broadcast to a
-    common shape, and redshifts are sampled independently for each extra
-    dimension.  The results are concatenated into a flat array.
+    redshifts if *count* is an array or if there are additional axes in
+    the *z* or *nz* arrays.  In this case, the shape of *count* and the
+    leading dimensions of *z* and *nz* are broadcast to a common shape,
+    and redshifts are sampled independently for each extra dimension.
+    The results are concatenated into a flat array.
 
     Parameters
     ----------
     count : int or array_like
         Number of redshifts to sample.  If an array is given, its shape
-        is broadcast against the leading axes of ``z`` and ``nz``.
+        is broadcast against the leading axes of *z* and *nz*.
     z, nz : array_like
         Source distribution.  Leading axes are broadcast against the
-        shape of ``count``.
+        shape of *count*.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
 
@@ -166,7 +166,7 @@ def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike,
     -------
     phz : array_like
         Photometric redshifts assuming Gaussian errors, of the same
-        shape as ``z``.
+        shape as *z*.
 
     See Also
     --------
