@@ -25,7 +25,7 @@ import healpix
 
 from numpy.typing import ArrayLike
 
-from .math import broadcast_leading_axes, cumtrapz
+from .core.array import broadcast_leading_axes, cumtrapz
 
 
 def redshifts_from_nz(count: int | ArrayLike, z: ArrayLike, nz: ArrayLike, *,

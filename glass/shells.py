@@ -44,8 +44,7 @@ import warnings
 from collections import namedtuple
 import numpy as np
 
-from .math import ndinterp
-
+from .core.array import ndinterp
 
 # type checking
 from typing import (Union, Sequence, List, Tuple, Optional, Callable,

@@ -35,7 +35,7 @@ import math
 from typing import Optional, Tuple, List
 from numpy.typing import ArrayLike
 
-from .math import cumtrapz
+from .core.array import cumtrapz
 
 
 def vmap_galactic_ecliptic(nside: int, galactic: Tuple[float, float] = (30, 90),
