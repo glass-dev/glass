@@ -3,7 +3,7 @@ import numpy.testing as npt
 
 
 def test_broadcast_leading_axes():
-    from glass.math import broadcast_leading_axes
+    from glass.core.array import broadcast_leading_axes
 
     a = 0
     b = np.zeros((4, 10))
@@ -18,7 +18,7 @@ def test_broadcast_leading_axes():
 
 
 def test_ndinterp():
-    from glass.math import ndinterp
+    from glass.core.array import ndinterp
 
     # test 1d interpolation
 

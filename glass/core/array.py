@@ -1,14 +1,9 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for mathematical utilities'''
+'''module for array utilities'''
 
 import numpy as np
 from functools import partial
-
-# constants
-DEGREE2_SPHERE = 60**4//100/np.pi
-ARCMIN2_SPHERE = 60**6//100/np.pi
-ARCSEC2_SPHERE = 60**8//100/np.pi
 
 
 def broadcast_leading_axes(*args):

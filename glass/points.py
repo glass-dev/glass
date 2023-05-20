@@ -33,7 +33,8 @@ Bias models
 import numpy as np
 import healpix
 
-from .math import ARCMIN2_SPHERE, broadcast_leading_axes, trapz_product
+from .core.array import broadcast_leading_axes, trapz_product
+from .core.constants import ARCMIN2_SPHERE
 
 
 def effective_bias(z, bz, w):
