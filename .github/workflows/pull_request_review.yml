@@ -1,0 +1,17 @@
+name: Pull Request Review
+
+on:
+  pull_request_review:
+    branches:
+      - main
+    types:
+      - submitted
+
+jobs:
+  approved:
+    name: Approved
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Reviewed-By
+        uses: ntessore/add-reviewed-by-action@v1

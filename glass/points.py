@@ -33,7 +33,8 @@ Bias models
 import numpy as np
 import healpix
 
-from .math import ARCMIN2_SPHERE, trapz_product
+from .core.array import broadcast_leading_axes, trapz_product
+from .core.constants import ARCMIN2_SPHERE
 
 
 def effective_bias(z, bz, w):
@@ -87,41 +88,56 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
                          bias_model='linear', remove_monopole=False, rng=None):
     '''Generate positions tracing a density contrast.
 
-    The map of expected number counts is constructed from the number density,
-    density contrast, an optional bias model, and an optional visibility map.
+    The map of expected number counts is constructed from the number
+    density, density contrast, an optional bias model, and an optional
+    visibility map.
 
-    If ``remove_monopole`` is set, the monopole of the computed density contrast
-    is removed.  Over the full sky, the mean number density of the map will then
-    match the given number density exactly.  This, however, means that an
-    effectively different bias model is being used, unless the monopole is
-    already zero in the first place.
+    If ``remove_monopole`` is set, the monopole of the computed density
+    contrast is removed.  Over the full sky, the mean number density of
+    the map will then match the given number density exactly.  This,
+    however, means that an effectively different bias model is being
+    used, unless the monopole is already zero in the first place.
+
+    The function supports multi-dimensional input for the ``ngal``,
+    ``delta``, ``bias``, and ``vis`` parameters.  Extra dimensions are
+    broadcast to a common shape, and treated as separate populations of
+    points.  These are then sampled independently, and the results
+    concatenated into a flat list of longitudes and latitudes.  The
+    number of points per population is returned in ``count`` as an array
+    in the shape of the extra dimensions.
 
     Parameters
     ----------
-    ngal : float
+    ngal : float or array_like
         Number density, expected number of points per arcmin2.
     delta : array_like
-        Map of the input density contrast.  This is fed into the bias model to
-        produce the density contrast for sampling.
-    bias : float, optional
+        Map of the input density contrast.  This is fed into the bias
+        model to produce the density contrast for sampling.
+    bias : float or array_like, optional
         Bias parameter, is passed as an argument to the bias model.
     vis : array_like, optional
-        Visibility map for the observed points.  This is multiplied with the
-        full sky number count map, and must hence be of compatible shape.
+        Visibility map for the observed points.  This is multiplied with
+        the full sky number count map, and must hence be of compatible
+        shape.
     bias_model : str or callable, optional
-        The bias model to apply.  If a string, refers to a function in the
-        points module, e.g. ``'linear'`` for ``glass.points.linear_bias`` or
-        ``'loglinear'`` for ``glass.points.loglinear_bias``.
+        The bias model to apply.  If a string, refers to a function in
+        the :mod:`~glass.points` module, e.g. ``'linear'`` for
+        :func:`linear_bias()` or ``'loglinear'`` for
+        :func:`loglinear_bias`.
     remove_monopole : bool, optional
-        If true, the monopole of the density contrast after biasing is fixed to
-        zero.
+        If true, the monopole of the density contrast after biasing is
+        fixed to zero.
     rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+        Random number generator.  If not given, a default RNG is used.
 
     Returns
     -------
     lon, lat : array_like
         Columns of longitudes and latitudes for the sampled points.
+    count : int or array_like
+        The number of sampled points.  If multiple populations are
+        sampled, an array of counts in the shape of the extra
+        dimensions is returned.
 
     '''
 
@@ -135,71 +151,105 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
     elif not callable(bias_model):
         raise ValueError('bias_model must be string or callable')
 
-    # compute density contrast from bias model, or copy
-    if bias is None:
-        n = np.copy(delta)
-    else:
-        n = bias_model(delta, bias)
-
-    # remove monopole if asked to
-    if remove_monopole:
-        n -= np.mean(n, keepdims=True)
-
-    # turn into number count, modifying the array in place
-    n += 1
-    n *= ARCMIN2_SPHERE/n.size*ngal
-
-    # apply visibility if given
+    # broadcast inputs to common shape of extra dimensions
+    inputs = [(ngal, 0), (delta, 1)]
+    if bias is not None:
+        inputs += [(bias, 0)]
     if vis is not None:
-        n *= vis
+        inputs += [(vis, 1)]
+    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)
+    if bias is not None:
+        bias, *rest = rest
+    if vis is not None:
+        vis, *rest = rest
 
-    # clip number density at zero
-    np.clip(n, 0, None, out=n)
+    # the output arrays, concatenated over all dimensions
+    ntot = 0
+    lon = np.empty(0)
+    lat = np.empty(0)
 
-    # sample actual number in each pixel
-    n = rng.poisson(n)
+    # keep track of counts for each leading dimensions
+    count = np.empty(dims, dtype=int)
 
-    # total number of sampled points
-    ntot = n.sum()
+    # iterate the leading dimensions
+    for k in np.ndindex(dims):
 
-    # for converting randomly sampled positions to HEALPix indices
-    npix = n.shape[-1]
-    nside = healpix.npix2nside(npix)
+        # compute density contrast from bias model, or copy
+        if bias is None:
+            n = np.copy(delta[k])
+        else:
+            n = bias_model(delta[k], bias[k])
 
-    # these will hold the results
-    lon = np.empty(ntot)
-    lat = np.empty(ntot)
+        # remove monopole if asked to
+        if remove_monopole:
+            n -= np.mean(n, keepdims=True)
 
-    # sample batches of 10000 pixels
-    batch = 10_000
-    ncur = 0
-    for i in range(0, npix, batch):
-        k = n[i:i+batch]
-        bpix = np.repeat(np.arange(i, i+k.size), k)
-        blon, blat = healpix.randang(nside, bpix, lonlat=True, rng=rng)
-        lon[ncur:ncur+blon.size] = blon
-        lat[ncur:ncur+blat.size] = blat
-        ncur += bpix.size
+        # turn into number count, modifying the array in place
+        n += 1
+        n *= ARCMIN2_SPHERE/n.size*ngal[k]
 
-    assert ncur == ntot, 'internal error in sampling'
+        # apply visibility if given
+        if vis is not None:
+            n *= vis[k]
 
-    return lon, lat
+        # clip number density at zero
+        np.clip(n, 0, None, out=n)
+
+        # sample actual number in each pixel
+        n = rng.poisson(n)
+
+        # for converting randomly sampled positions to HEALPix indices
+        npix = n.shape[-1]
+        nside = healpix.npix2nside(npix)
+
+        # number of points for this population
+        count[k] = n.sum()
+
+        # current and new total number of sampled points
+        ncur, ntot = ntot, ntot + count[k]
+
+        # resize the output arrays to hold the new sample
+        lon.resize(ntot, refcheck=False)
+        lat.resize(ntot, refcheck=False)
+
+        # sample batches of 10000 pixels
+        batch = 10_000
+        for i in range(0, npix, batch):
+            r = n[i:i+batch]
+            bpix = np.repeat(np.arange(i, i+r.size), r)
+            blon, blat = healpix.randang(nside, bpix, lonlat=True, rng=rng)
+            lon[ncur:ncur+blon.size] = blon
+            lat[ncur:ncur+blat.size] = blat
+            ncur += bpix.size
+
+        assert ncur == ntot, 'internal error in sampling'
+
+    # return a plain scalar of counts if there are no dims
+    if not dims:
+        count = count.item()
+
+    return lon, lat, count
 
 
 def uniform_positions(ngal, *, rng=None):
     '''Generate positions uniformly over the sphere.
 
+    The function supports array input for the ``ngal`` parameter.
+
     Parameters
     ----------
-    ngal : float
+    ngal : float or array_like
         Number density, expected number of positions per arcmin2.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
     Returns
     -------
-    lon, lat : array_like
+    lon, lat : array_like or list of array_like
         Columns of longitudes and latitudes for the sampled points.
+    count : int or list of ints
+        The number of sampled points.  For array inputs, an array of
+        counts with the same shape is returned.
 
     '''
 
@@ -208,10 +258,33 @@ def uniform_positions(ngal, *, rng=None):
         rng = np.random.default_rng()
 
     # sample number of galaxies
-    ntot = rng.poisson(ARCMIN2_SPHERE*ngal)
+    count = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
 
-    # sample uniformly over the sphere
-    lon = rng.uniform(-180, 180, size=ntot)
-    lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ntot)))
+    # extra dimensions of the output
+    dims = np.shape(count)
 
-    return lon, lat
+    # make sure ntot is an array even if scalar
+    count = np.broadcast_to(count, dims)
+
+    # arrays for results
+    ntot = 0
+    lon = np.empty(0)
+    lat = np.empty(0)
+
+    # sample each set of points
+    for k in np.ndindex(dims):
+
+        # resize output arrays
+        ncur, ntot = ntot, ntot + count[k]
+        lon.resize(ntot, refcheck=False)
+        lat.resize(ntot, refcheck=False)
+
+        # sample uniformly over the sphere
+        lon[ncur:ntot] = rng.uniform(-180, 180, size=count[k])
+        lat[ncur:ntot] = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=count[k])))
+
+    # return plain scalar if there are no dims
+    if not dims:
+        count = count.item()
+
+    return lon, lat, count
