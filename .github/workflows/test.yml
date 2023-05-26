@@ -18,12 +18,16 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.7'
-    - run: pipx run --spec '.[test]' pytest --pyargs glass
+        python-version: ${{ matrix.python-version }}
+    - run: pip install -c .github/test-constraints.txt '.[test]'
+    - run: pytest --pyargs glass
   build:
     name: Build
     runs-on: ubuntu-latest
