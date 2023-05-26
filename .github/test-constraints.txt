@@ -1,0 +1,2 @@
+--prefer-binary
+--only-binary numpy,scipy,healpy,healpix
