@@ -4,6 +4,21 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2023.5 (31 May 2023)
+--------------------
+
+- The point sampling functions in :mod:`glass.points` now accept extra
+  dimensions, and will broadcast leading axes across their inputs.  They also
+  return an additional scalar or array with the counts of sampled galaxies.
+
+- The redshift sampling function :func:`glass.galaxies.redshifts_from_nz` now
+  supports array input for the ``counts`` argument.  It accepts e.g. the number
+  of galaxies returned by the position sampling.
+
+- The profiling functionality in :mod:`glass.user` was removed in favour of
+  external packages.
+
+
 2023.2 (1 Mar 2023)
 -------------------
 

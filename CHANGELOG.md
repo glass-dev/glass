@@ -5,8 +5,25 @@ All notable changes to the project are documented in this file.  The format is
 based on [Keep a Changelog](https://keepachangelog.com).
 
 
-[Unreleased]
-------------
+[2023.5]  (31 May 2023)
+-----------------------
+
+### Added
+
+- Allow dimensional input to the sampling functions in `glass.points` (#80)
+- The `redshifts_from_nz()` function supports `count` arrays (#83)
+
+### Changed
+
+- Position sampling returns counts alongside points (#80)
+- `redshifts_from_nz()` no longer returns `gal_pop` (#83)
+- Move core functionality that is used by other, user-facing modules into the
+  `glass.core` module (#88)
+
+### Removed
+
+- Remove profiling functions (#89)
+
 
 [2023.2] - 1 Mar 2023
 ---------------------
@@ -57,6 +74,6 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - Initial wide release for GLASS paper
 
 
-[Unreleased]: https://github.com/glass-dev/glass/compare/v2023.2...HEAD
+[2023.5]: https://github.com/glass-dev/glass/compare/v2023.2...v2023.5
 [2023.2]: https://github.com/glass-dev/glass/compare/v2023.1...v2023.2
 [2023.1]: https://github.com/glass-dev/glass/releases/tag/v2023.1
