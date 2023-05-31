@@ -61,3 +61,19 @@ There currently are a fair amount of breaking changes between *GLASS* releases.
 For production use, it is therefore **strongly** recommended that you install
 *GLASS* in a clean environment (venv, conda, etc.) and **pin the GLASS version
 for the duration of your project**.
+
+
+Announcements
+-------------
+
+To keep up with new GLASS releases, you can subscribe to our announcement
+mailing list, which only receives 1 email per release.  To subscribe, use the
+`mailing list page`__, or send an email to ``listserv@jiscmail.ac.uk`` with any
+subject and the following message body::
+
+    subscribe glass <Your name>
+
+where ``<Your name>`` is your full name, or ``ANONYMOUS`` if you prefer. You
+will be sent a confirmation email in return.
+
+__ https://jiscmail.ac.uk/lists/GLASS.html
