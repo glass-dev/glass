@@ -77,14 +77,8 @@ Versioning
 The target is to have a new *GLASS* release at the beginning of each month, as
 long as there have been changes.
 
-As soon as a new version has been released, the package information on the
-`main` branch should be updated to the in-development version number
-`yyyy.mm.dev0`.
-
-Each breaking change should increment the in-development version number, e.g.
-from `.dev0` to `.dev1`.  This is so that extension packages can catch up to
-the core library at their own pace, and depend on the correct in-development
-version.
+The current version number is automatically inferred from the last release
+(i.e. git tag), subsequent unreleased commits, and local changes, if any.
 
 
 Releasing
@@ -93,8 +87,6 @@ Releasing
 To release a new version of *GLASS*, there should be a commit titled
 `REL: glass yyyy.mm` that includes the following changes:
 
-* The version of the `glass` core library is changed from `yyyy.mm.devN` to
-  `yyyy.mm`.
 * The current `Unreleased` section in the [changelog](CHANGELOG.md) is renamed
   to `yyyy.mm (DD Mon YYYY)` and a new "Unreleased" section is started.  The
   links to changesets at the bottom of the file have to be updated accordingly.
@@ -110,10 +102,6 @@ the release should be a copy of its release note.
 
 Creating the release will automatically start the build process that uploads
 Python packages for the new version to PyPI.
-
-Immediately after the release has been created, a new commit should increase
-the minor version number and start a new development version (see
-[versioning](#versioning)).
 
 If any *GLASS* extension packages depend on the new release, new versions of
 these packages should be produced as soon as the new release is published to
