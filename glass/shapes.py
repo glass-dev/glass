@@ -24,8 +24,10 @@ Utilities
 
 '''
 
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
@@ -162,22 +164,25 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     return e
 
 
-def ellipticity_gaussian(size, sigma, *, rng=None):
+def ellipticity_gaussian(count: int | ArrayLike, sigma: ArrayLike, *,
+                         rng: np.random.Generator | None = None
+                         ) -> NDArray:
     r'''Sample Gaussian galaxy ellipticities.
 
-    The ellipticities are sampled from a normal distribution with standard
-    deviation ``sigma`` for each component.  Samples where the ellipticity is
-    larger than unity are discarded.  Hence, do not use this function with too
-    large values of ``sigma``, or the sampling will become inefficient.
+    The ellipticities are sampled from a normal distribution with
+    standard deviation ``sigma`` for each component.  Samples where the
+    ellipticity is larger than unity are discarded.  Hence, do not use
+    this function with too large values of ``sigma``, or the sampling
+    will become inefficient.
 
     Parameters
     ----------
-    size : int
+    count : int or array_like
         Number of ellipticities to be sampled.
     sigma : array_like
         Standard deviation in each component.
     rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+        Random number generator.  If not given, a default RNG is used.
 
     Returns
     -------
@@ -190,33 +195,45 @@ def ellipticity_gaussian(size, sigma, *, rng=None):
     if rng is None:
         rng = np.random.default_rng()
 
+    # bring inputs into common shape
+    count, sigma = np.broadcast_arrays(count, sigma)
+
+    # allocate flattened output array
+    eps = np.empty(count.sum(), dtype=np.complex128)
+
     # sample complex ellipticities
     # reject those where abs(e) > 0
-    e = rng.standard_normal(2*size, np.float64).view(np.complex128)
-    e *= sigma
-    i = np.where(np.abs(e) > 1)[0]
-    while len(i) > 0:
-        rng.standard_normal(2*len(i), np.float64, e[i].view(np.float64))
-        e[i] *= sigma
-        i = i[np.abs(e[i]) > 1]
+    i = 0
+    for k in np.ndindex(count.shape):
+        e = rng.standard_normal(2*count[k], np.float64).view(np.complex128)
+        e *= sigma[k]
+        r = np.where(np.abs(e) > 1)[0]
+        while len(r) > 0:
+            rng.standard_normal(2*len(r), np.float64, e[r].view(np.float64))
+            e[r] *= sigma[k]
+            r = r[np.abs(e[r]) > 1]
+        eps[i:i+count[k]] = e
+        i += count[k]
 
-    return e
+    return eps
 
 
-def ellipticity_intnorm(size, sigma, *, rng=None):
+def ellipticity_intnorm(count: int | ArrayLike, sigma: ArrayLike, *,
+                        rng: np.random.Generator | None = None
+                        ) -> NDArray:
     r'''Sample galaxy ellipticities with intrinsic normal distribution.
 
-    The ellipticities are sampled from an intrinsic normal distribution with
-    standard deviation ``sigma`` for each component.
+    The ellipticities are sampled from an intrinsic normal distribution
+    with standard deviation ``sigma`` for each component.
 
     Parameters
     ----------
-    size : int
+    count : int | array_like
         Number of ellipticities to sample.
     sigma : array_like
         Standard deviation of the ellipticity in each component.
     rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+        Random number generator.  If not given, a default RNG is used.
 
     Returns
     -------
@@ -225,21 +242,31 @@ def ellipticity_intnorm(size, sigma, *, rng=None):
 
     '''
 
-    # make sure sigma is admissible
-    if not 0 <= sigma < 0.5**0.5:
-        raise ValueError('sigma must be between 0 and sqrt(0.5)')
-
     # default RNG if not provided
     if rng is None:
         rng = np.random.default_rng()
 
+    # bring inputs into common shape
+    count, sigma = np.broadcast_arrays(count, sigma)
+
+    # make sure sigma is admissible
+    if not np.all((0 <= sigma) & (sigma < 0.5**0.5)):
+        raise ValueError('sigma must be between 0 and sqrt(0.5)')
+
     # convert to sigma_eta using fit
     sigma_eta = sigma*((8 + 5*sigma**2)/(2 - 4*sigma**2))**0.5
 
-    # sample complex ellipticities
-    e = rng.standard_normal(2*size, np.float64).view(np.complex128)
-    e *= sigma_eta
-    r = np.hypot(e.real, e.imag)
-    e *= np.divide(np.tanh(r/2), r, where=(r > 0), out=r)
+    # allocate flattened output array
+    eps = np.empty(count.sum(), dtype=np.complex128)
 
-    return e
+    # sample complex ellipticities
+    i = 0
+    for k in np.ndindex(count.shape):
+        e = rng.standard_normal(2*count[k], np.float64).view(np.complex128)
+        e *= sigma_eta[k]
+        r = np.hypot(e.real, e.imag)
+        e *= np.divide(np.tanh(r/2), r, where=(r > 0), out=r)
+        eps[i:i+count[k]] = e
+        i += count[k]
+
+    return eps
