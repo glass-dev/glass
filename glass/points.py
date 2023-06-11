@@ -85,7 +85,8 @@ def loglinear_bias(delta, b):
 
 
 def positions_from_delta(ngal, delta, bias=None, vis=None, *,
-                         bias_model='linear', remove_monopole=False, rng=None):
+                         bias_model='linear', remove_monopole=False,
+                         batch=1_000_000, rng=None):
     '''Generate positions tracing a density contrast.
 
     The map of expected number counts is constructed from the number
@@ -127,11 +128,13 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
     remove_monopole : bool, optional
         If true, the monopole of the density contrast after biasing is
         fixed to zero.
+    batch : int, optional
+        Maximum number of positions to yield in one batch.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
 
-    Returns
-    -------
+    Yields
+    ------
     lon, lat : array_like
         Columns of longitudes and latitudes for the sampled points.
     count : int or array_like
@@ -163,14 +166,6 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
     if vis is not None:
         vis, *rest = rest
 
-    # the output arrays, concatenated over all dimensions
-    ntot = 0
-    lon = np.empty(0)
-    lat = np.empty(0)
-
-    # keep track of counts for each leading dimensions
-    count = np.empty(dims, dtype=int)
-
     # iterate the leading dimensions
     for k in np.ndindex(dims):
 
@@ -198,37 +193,52 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
         # sample actual number in each pixel
         n = rng.poisson(n)
 
+        # total number of points
+        count = n.sum()
+        # don't go through pixels if there are no points
+        if count == 0:
+            continue
+
         # for converting randomly sampled positions to HEALPix indices
         npix = n.shape[-1]
         nside = healpix.npix2nside(npix)
 
-        # number of points for this population
-        count[k] = n.sum()
+        # create a mask to report the count in the right axis
+        if dims:
+            cmask = np.zeros(dims, dtype=int)
+            cmask[k] = 1
+        else:
+            cmask = 1
 
-        # current and new total number of sampled points
-        ncur, ntot = ntot, ntot + count[k]
+        # sample the map in batches
+        step = 1000
+        start, stop, size = 0, 0, 0
+        while count:
+            # tally this group of pixels
+            q = np.cumsum(n[stop:stop+step])
+            # does this group of pixels fill the batch?
+            if size + q[-1] < min(batch, count):
+                # no, we need the next group of pixels to fill the batch
+                stop += step
+                size += q[-1]
+            else:
+                # how many pixels from this group do we need?
+                stop += np.searchsorted(q, batch - size, side='right')
+                # if the first pixel alone is too much, use it anyway
+                if stop == start:
+                    stop += 1
+                # sample this batch of pixels
+                ipix = np.repeat(np.arange(start, stop), n[start:stop])
+                lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
+                # next batch
+                start, size = stop, 0
+                # keep track of remaining number of points
+                count -= ipix.size
+                # yield the batch
+                yield lon, lat, ipix.size*cmask
 
-        # resize the output arrays to hold the new sample
-        lon.resize(ntot, refcheck=False)
-        lat.resize(ntot, refcheck=False)
-
-        # sample batches of 10000 pixels
-        batch = 10_000
-        for i in range(0, npix, batch):
-            r = n[i:i+batch]
-            bpix = np.repeat(np.arange(i, i+r.size), r)
-            blon, blat = healpix.randang(nside, bpix, lonlat=True, rng=rng)
-            lon[ncur:ncur+blon.size] = blon
-            lat[ncur:ncur+blat.size] = blat
-            ncur += bpix.size
-
-        assert ncur == ntot, 'internal error in sampling'
-
-    # return a plain scalar of counts if there are no dims
-    if not dims:
-        count = count.item()
-
-    return lon, lat, count
+        # make sure that the correct number of pixels was sampled
+        assert np.sum(n[stop:]) == 0
 
 
 def uniform_positions(ngal, *, rng=None):
@@ -243,8 +253,8 @@ def uniform_positions(ngal, *, rng=None):
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG will be used.
 
-    Returns
-    -------
+    Yields
+    ------
     lon, lat : array_like or list of array_like
         Columns of longitudes and latitudes for the sampled points.
     count : int or list of ints
@@ -258,33 +268,26 @@ def uniform_positions(ngal, *, rng=None):
         rng = np.random.default_rng()
 
     # sample number of galaxies
-    count = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
+    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
 
     # extra dimensions of the output
-    dims = np.shape(count)
+    dims = np.shape(ngal)
 
     # make sure ntot is an array even if scalar
-    count = np.broadcast_to(count, dims)
-
-    # arrays for results
-    ntot = 0
-    lon = np.empty(0)
-    lat = np.empty(0)
+    ngal = np.broadcast_to(ngal, dims)
 
     # sample each set of points
     for k in np.ndindex(dims):
 
-        # resize output arrays
-        ncur, ntot = ntot, ntot + count[k]
-        lon.resize(ntot, refcheck=False)
-        lat.resize(ntot, refcheck=False)
-
         # sample uniformly over the sphere
-        lon[ncur:ntot] = rng.uniform(-180, 180, size=count[k])
-        lat[ncur:ntot] = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=count[k])))
+        lon = rng.uniform(-180, 180, size=ngal[k])
+        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))
 
-    # return plain scalar if there are no dims
-    if not dims:
-        count = count.item()
+        # report count
+        if dims:
+            count = np.zeros(dims, dtype=int)
+            count[k] = ngal[k]
+        else:
+            count = int(ngal[k])
 
-    return lon, lat, count
+        yield lon, lat, count
