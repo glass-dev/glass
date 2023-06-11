@@ -1,5 +1,16 @@
+import numpy as np
+
+
+def catpos(pos):
+    lon, lat, cnt = [], [], 0
+    for lo, la, co in pos:
+        lon = np.concatenate([lon, lo])
+        lat = np.concatenate([lat, la])
+        cnt = cnt + co
+    return lon, lat, cnt
+
+
 def test_positions_from_delta():
-    import numpy as np
     from glass.points import positions_from_delta
 
     # case: single-dimensional input
@@ -9,7 +20,7 @@ def test_positions_from_delta():
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = positions_from_delta(ngal, delta, bias, vis)
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -21,10 +32,11 @@ def test_positions_from_delta():
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = positions_from_delta(ngal, delta, bias, vis)
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
     assert cnt.shape == (2,)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)
+    assert lat.shape == (cnt.sum(),)
 
     # case: multi-dimensional delta
 
@@ -33,10 +45,11 @@ def test_positions_from_delta():
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = positions_from_delta(ngal, delta, bias, vis)
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
     assert cnt.shape == (3, 2)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)
+    assert lat.shape == (cnt.sum(),)
 
     # case: multi-dimensional broadcasting
 
@@ -45,10 +58,11 @@ def test_positions_from_delta():
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = positions_from_delta(ngal, delta, bias, vis)
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
     assert cnt.shape == (3, 2)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)
+    assert lat.shape == (cnt.sum(),)
 
 
 def test_uniform_positions():
@@ -58,7 +72,7 @@ def test_uniform_positions():
 
     ngal = 1e-3
 
-    lon, lat, cnt = uniform_positions(ngal)
+    lon, lat, cnt = catpos(uniform_positions(ngal))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -67,7 +81,7 @@ def test_uniform_positions():
 
     ngal = [1e-3, 2e-3, 3e-3]
 
-    lon, lat, cnt = uniform_positions(ngal)
+    lon, lat, cnt = catpos(uniform_positions(ngal))
 
     assert cnt.shape == (3,)
     assert lon.shape == lat.shape == (cnt.sum(),)
@@ -76,7 +90,7 @@ def test_uniform_positions():
 
     ngal = [[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]]
 
-    lon, lat, cnt = uniform_positions(ngal)
+    lon, lat, cnt = catpos(uniform_positions(ngal))
 
     assert cnt.shape == (3, 2)
     assert lon.shape == lat.shape == (cnt.sum(),)
