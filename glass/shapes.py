@@ -169,10 +169,11 @@ def ellipticity_gaussian(count: int | ArrayLike, sigma: ArrayLike, *,
                          ) -> NDArray:
     r'''Sample Gaussian galaxy ellipticities.
 
-    The ellipticities are sampled from a normal distribution with standard
-    deviation ``sigma`` for each component.  Samples where the ellipticity is
-    larger than unity are discarded.  Hence, do not use this function with too
-    large values of ``sigma``, or the sampling will become inefficient.
+    The ellipticities are sampled from a normal distribution with
+    standard deviation ``sigma`` for each component.  Samples where the
+    ellipticity is larger than unity are discarded.  Hence, do not use
+    this function with too large values of ``sigma``, or the sampling
+    will become inefficient.
 
     Parameters
     ----------
@@ -181,7 +182,7 @@ def ellipticity_gaussian(count: int | ArrayLike, sigma: ArrayLike, *,
     sigma : array_like
         Standard deviation in each component.
     rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+        Random number generator.  If not given, a default RNG is used.
 
     Returns
     -------
