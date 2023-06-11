@@ -1,7 +1,8 @@
+glass/_version.py
+
 .*.swp
 .DS_Store
 __pycache__
 docs/_build
-.tox
 build
 dist
