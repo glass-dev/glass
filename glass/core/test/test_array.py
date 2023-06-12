@@ -90,3 +90,17 @@ def test_ndinterp():
                             [[[2.15], [2.25], [2.35], [2.45]],
                              [[2.45], [2.35], [2.25], [2.15]],
                              [[2.15], [2.45], [2.25], [2.35]]]], atol=1e-15)
+
+
+def test_trapz_product():
+    from glass.core.array import trapz_product
+
+    x1 = np.linspace(0, 2, 100)
+    f1 = np.full_like(x1, 2.0)
+
+    x2 = np.linspace(1, 2, 10)
+    f2 = np.full_like(x2, 0.5)
+
+    s = trapz_product((x1, f1), (x2, f2))
+
+    assert np.allclose(s, 1.0)

@@ -53,7 +53,8 @@ def trapz_product(f, *ff, axis=-1):
     '''trapezoidal rule for a product of functions'''
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(x, x_[(x_ > x[0]) & (x_ < x[-1])])
+        x = np.union1d(x[(x >= x_[0]) & (x <= x_[-1])],
+                       x_[(x_ >= x[0]) & (x_ <= x[-1])])
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
