@@ -6,6 +6,12 @@ The *GLASS* code uses the following mathematical definitions.
 
 .. glossary::
 
+   deflection
+      The deflection :math:`\alpha` due to weak gravitational lensing is either
+      a spin-1 complex number or a real vector with two components.  It
+      describes the displacement of a position by an angle :math:`|\alpha|`
+      in the direction of the tangent vector :math:`\vec{\alpha}`.
+
    ellipticity
       If :math:`q = b/a` is the axis ratio of an elliptical isophote with
       semi-major axis :math:`a` and semi-minor axis :math:`b`, and :math:`\phi`

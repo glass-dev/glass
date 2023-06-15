@@ -21,6 +21,12 @@ Lensing fields
 
 .. autofunction:: shear_from_convergence
 
+
+Applying lensing
+----------------
+
+.. autofunction:: deflect
+
 '''
 
 import numpy as np
@@ -28,7 +34,9 @@ import healpy as hp
 
 # typing support
 from typing import Optional, Sequence, TYPE_CHECKING
+from numpy.typing import NDArray, ArrayLike
 if TYPE_CHECKING:
+    # to prevent circular dependencies, only import these for type checking
     from cosmology import Cosmology
     from .shells import RadialWindow
 
@@ -220,3 +228,59 @@ def multi_plane_matrix(ws: Sequence['RadialWindow'], cosmo: 'Cosmology'
         mpc.add_window(wmat[i].copy(), w)
         wmat[i, :] = mpc.kappa
     return wmat
+
+
+def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
+    """Apply deflections to positions.
+
+    Takes an array of :term:`deflection` values and applies them
+    to the given positions.
+
+    Parameters
+    ----------
+    lon, lat : array_like
+        Longitudes and latitudes to be deflected.
+    alpha : array_like
+        Deflection values.  Must be complex-valued or have a leading
+        axis of size 2 for the two components of the deflection.
+
+    Returns
+    -------
+    lon, lat : array_like
+        Longitudes and latitudes after deflection.
+
+    Notes
+    -----
+    Deflections on the sphere are defined as follows:  The deflection
+    :math:`\\alpha` transports the point with spherical coordinates
+    :math:`(\\thera, \\phi)` a spherical distance :math:`|\\alpha|`
+    along the geodesic with tangent vector :math:`\\alpha` in the
+    original point.
+
+    """
+
+    alpha = np.asanyarray(alpha)
+    if np.iscomplexobj(alpha):
+        alpha1, alpha2 = alpha.real, alpha.imag
+    else:
+        alpha1, alpha2 = alpha
+
+    # we know great-circle navigation:
+    # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
+    #              cosθ cos|α| + sinθ sin|α| cosγ)
+    # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
+
+    t = np.radians(lat)
+    ct, st = np.sin(t), np.cos(t)  # sin and cos flipped: lat not co-lat
+
+    a = np.hypot(alpha1, alpha2)
+    g = np.arctan2(alpha2, alpha1)
+    ca, sa = np.cos(a), np.sin(a)
+    cg, sg = np.cos(g), np.sin(g)
+
+    # flipped atan2 arguments for lat instead of co-lat
+    tp = np.arctan2(ct*ca + st*sa*cg, np.hypot(ct*sa - st*ca*cg, st*sg))
+
+    d = np.arctan2(sa*sg, st*ca - ct*sa*cg)
+
+    return lon - np.degrees(d), np.degrees(tp)
