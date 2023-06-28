@@ -77,7 +77,7 @@ def from_convergence(kappa: NDArray, lmax: Optional[int] = None, *,
     Notes
     -----
     The weak lensing fields are computed from the convergence or
-    deflection potential in the following way.[1]_
+    deflection potential in the following way. [1]_
 
     Define the spin-raising and spin-lowering operators of the
     spin-weighted spherical harmonics as
