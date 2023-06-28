@@ -6,6 +6,16 @@ The *GLASS* code uses the following mathematical definitions.
 
 .. glossary::
 
+   deflection
+      The deflection :math:`\alpha` is a complex value with spin weight
+      :math:`1`.  It describes the displacement of a position along a geodesic
+      (i.e. great circle).  The angular distance of the displacement is the
+      absolute value :math:`|\alpha|`.  The direction of the displacement is
+      the angle given by the complex argument :math:`\arg\alpha`, such that
+      :math:`\arg\alpha = 0^\circ` is north, :math:`\arg\alpha = 90^\circ` is
+      east, :math:`\arg\alpha = 180^\circ` is south, and :math:`\arg\alpha =
+      -90^\circ` is west.
+
    ellipticity
       If :math:`q = b/a` is the axis ratio of an elliptical isophote with
       semi-major axis :math:`a` and semi-minor axis :math:`b`, and :math:`\phi`

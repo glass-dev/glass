@@ -19,7 +19,14 @@ Iterative lensing
 Lensing fields
 --------------
 
+.. autofunction:: from_convergence
 .. autofunction:: shear_from_convergence
+
+
+Applying lensing
+----------------
+
+.. autofunction:: deflect
 
 '''
 
@@ -27,23 +34,53 @@ import numpy as np
 import healpy as hp
 
 # typing support
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Optional, Sequence, Tuple, TYPE_CHECKING
+from numpy.typing import NDArray, ArrayLike
 if TYPE_CHECKING:
+    # to prevent circular dependencies, only import these for type checking
     from cosmology import Cosmology
     from .shells import RadialWindow
 
 
-def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
-                           discretized: bool = True) -> np.ndarray:
-    r'''weak lensing shear from convergence
+def from_convergence(kappa: NDArray, lmax: Optional[int] = None, *,
+                     potential: bool = False,
+                     deflection: bool = False,
+                     shear: bool = False,
+                     discretized: bool = True,
+                     ) -> Tuple[NDArray, ...]:
+    r'''Compute other weak lensing maps from the convergence.
+
+    Takes a weak lensing convergence map and returns one or more of
+    deflection potential, deflection, and shear maps.  The maps are
+    computed via spherical harmonic transforms.
+
+    Parameters
+    ----------
+    kappa : array_like
+        HEALPix map of the convergence field.
+    lmax : int, optional
+        Maximum angular mode number to use in the transform.
+    potential, deflection, shear : bool, optional
+        Which lensing maps to return.
+
+    Returns
+    -------
+    psi : array_like
+        Map of the deflection potential.  Only returned if ``potential``
+        is true.
+    alpha : array_like
+        Map of the deflection (complex).  Only returned if ``deflection``
+        if true.
+    gamma : array_like
+        Map of the shear (complex).  Only returned if ``shear`` is true.
 
     Notes
     -----
-    The shear field is computed from the convergence or deflection potential in
-    the following way.
+    The weak lensing fields are computed from the convergence or
+    deflection potential in the following way. [1]_
 
-    Define the spin-raising and spin-lowering operators of the spin-weighted
-    spherical harmonics as
+    Define the spin-raising and spin-lowering operators of the
+    spin-weighted spherical harmonics as
 
     .. math::
 
@@ -52,39 +89,141 @@ def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
         \bar{\eth} {}_sY_{lm}
         = -\sqrt{(l+s)(l-s+1)} \, {}_{s-1}Y_{lm} \;.
 
-    The convergence field :math:`\kappa` is related to the deflection potential
-    field :math:`\phi` as
+    The convergence field :math:`\kappa` is related to the deflection
+    potential field :math:`\psi` by the Poisson equation,
 
     .. math::
 
-        2 \kappa = \eth\bar{\eth} \, \phi = \bar{\eth}\eth \, \phi \;.
+        2 \kappa
+        = \eth\bar{\eth} \, \psi
+        = \bar{\eth}\eth \, \psi \;.
 
     The convergence modes :math:`\kappa_{lm}` are hence related to the
-    deflection potential modes :math:`\phi_{lm}` as
+    deflection potential modes :math:`\psi_{lm}` as
 
     .. math::
 
-        2 \kappa_{lm} = -l \, (l+1) \, \phi_{lm} \;.
+        2 \kappa_{lm}
+        = -l \, (l+1) \, \psi_{lm} \;.
 
-    The shear field :math:`\gamma` is related to the deflection potential field
-    as
-
-    .. math::
-
-        2 \gamma = \eth\eth \, \phi
-        \quad\text{or}\quad
-        2 \gamma = \bar{\eth}\bar{\eth} \, \phi \;,
-
-    depending on the definition of the shear field spin weight as :math:`2` or
-    :math:`-2`.  In either case, the shear modes :math:`\gamma_{lm}` are
-    related to the deflection potential modes as
+    The :term:`deflection` :math:`\alpha` is the gradient of the
+    deflection potential :math:`\psi`.  On the sphere, this is
 
     .. math::
 
-        2 \gamma_{lm} = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \phi_{lm} \;.
+        \alpha
+        = \eth \, \psi \;.
 
-    The shear modes can therefore be obtained via the convergence, or
-    directly from the deflection potential.
+    The deflection field has spin weight :math:`1` in the HEALPix
+    convention, in order for points to be deflected towards regions of
+    positive convergence.  The modes :math:`\alpha_{lm}` of the
+    deflection field are hence
+
+    .. math::
+
+        \alpha_{lm}
+        = \sqrt{l \, (l+1)} \, \psi_{lm} \;.
+
+    The shear field :math:`\gamma` is related to the deflection
+    potential :math:`\psi` and deflection :math:`\alpha` as
+
+    .. math::
+
+        2 \gamma
+        = \eth\eth \, \psi
+        = \eth \, \alpha \;,
+
+    and thus has spin weight :math:`2`.  The shear modes
+    :math:`\gamma_{lm}` are related to the deflection potential modes as
+
+    .. math::
+
+        2 \gamma_{lm}
+        = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
+
+    References
+    ----------
+    .. [1] Tessore N., et al., OJAp, 6, 11 (2023).
+           doi:10.21105/astro.2302.01942
+
+    '''
+
+    # no output means no computation, return empty tuple
+    if not (potential or deflection or shear):
+        return ()
+
+    # get the NSIDE parameter
+    nside = hp.get_nside(kappa)
+    if lmax is None:
+        lmax = 3*nside - 1
+
+    # compute alm
+    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
+
+    # mode number; all conversions are factors of this
+    l = np.arange(lmax+1)
+
+    # this tuple will be returned
+    results = ()
+
+    # convert convergence to potential
+    fl = np.divide(-2, l*(l+1), where=(l > 0), out=np.zeros(lmax+1))
+    hp.almxfl(alm, fl, inplace=True)
+
+    # if potential is requested, compute map and add to output
+    if potential:
+        psi = hp.alm2map(alm, nside, lmax=lmax)
+        results += (psi,)
+
+    # if no spin-weighted maps are requested, stop here
+    if not (deflection or shear):
+        return results
+
+    # zero B-modes for spin-weighted maps
+    blm = np.zeros_like(alm)
+
+    # compute deflection alms in place
+    fl = np.sqrt(l*(l+1))
+    # TODO: missing spin-1 pixel window function here
+    hp.almxfl(alm, fl, inplace=True)
+
+    # if deflection is requested, compute spin-1 maps and add to output
+    if deflection:
+        alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
+        alpha = alpha[0] + 1j*alpha[1]
+        results += (alpha,)
+
+    # if no shear is requested, stop here
+    if not shear:
+        return results
+
+    # compute shear alms in place
+    # if discretised, factor out spin-0 kernel and apply spin-2 kernel
+    fl = np.sqrt((l-1)*(l+2), where=(l > 0), out=np.zeros(lmax+1))
+    fl /= 2
+    if discretized:
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
+        fl *= pw2/pw0
+    hp.almxfl(alm, fl, inplace=True)
+
+    # transform to shear maps
+    gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    gamma = gamma[0] + 1j*gamma[1]
+    results += (gamma,)
+
+    # all done
+    return results
+
+
+def shear_from_convergence(kappa: np.ndarray, lmax: Optional[int] = None, *,
+                           discretized: bool = True) -> np.ndarray:
+    r'''Weak lensing shear from convergence.
+
+    .. deprecated:: 2023.6
+       Use the more general :func:`from_convergence` function instead.
+
+    Computes the shear from the convergence using a spherical harmonic
+    transform.
 
     '''
 
@@ -220,3 +359,61 @@ def multi_plane_matrix(ws: Sequence['RadialWindow'], cosmo: 'Cosmology'
         mpc.add_window(wmat[i].copy(), w)
         wmat[i, :] = mpc.kappa
     return wmat
+
+
+def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
+    """Apply deflections to positions.
+
+    Takes an array of :term:`deflection` values and applies them
+    to the given positions.
+
+    Parameters
+    ----------
+    lon, lat : array_like
+        Longitudes and latitudes to be deflected.
+    alpha : array_like
+        Deflection values.  Must be complex-valued or have a leading
+        axis of size 2 for the real and imaginary component.
+
+    Returns
+    -------
+    lon, lat : array_like
+        Longitudes and latitudes after deflection.
+
+    Notes
+    -----
+    Deflections on the sphere are :term:`defined <deflection>` as
+    follows:  The complex deflection :math:`\\alpha` transports a point
+    on the sphere an angular distance :math:`|\\alpha|` along the
+    geodesic with bearing :math:`\\arg\\alpha` in the original point.
+
+    In the language of differential geometry, this function is the
+    exponential map.
+
+    """
+
+    alpha = np.asanyarray(alpha)
+    if np.iscomplexobj(alpha):
+        alpha1, alpha2 = alpha.real, alpha.imag
+    else:
+        alpha1, alpha2 = alpha
+
+    # we know great-circle navigation:
+    # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
+    #              cosθ cos|α| + sinθ sin|α| cosγ)
+    # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
+
+    t = np.radians(lat)
+    ct, st = np.sin(t), np.cos(t)   # sin and cos flipped: lat not co-lat
+
+    a = np.hypot(alpha1, alpha2)    # abs(alpha)
+    g = np.arctan2(alpha2, alpha1)  # arg(alpha)
+    ca, sa = np.cos(a), np.sin(a)
+    cg, sg = np.cos(g), np.sin(g)
+
+    # flipped atan2 arguments for lat instead of co-lat
+    tp = np.arctan2(ct*ca + st*sa*cg, np.hypot(ct*sa - st*ca*cg, st*sg))
+
+    d = np.arctan2(sa*sg, st*ca - ct*sa*cg)
+
+    return lon - np.degrees(d), np.degrees(tp)
