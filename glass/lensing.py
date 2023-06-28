@@ -114,10 +114,10 @@ def from_convergence(kappa: NDArray, lmax: Optional[int] = None, *,
         \alpha
         = \eth \, \psi \;.
 
-    The deflection field is given the spin weight :math:`1` in the
-    HEALPix convention, so that points are deflected towards regions of
+    The deflection field has spin weight :math:`1` in the HEALPix
+    convention, in order for points to be deflected towards regions of
     positive convergence.  The modes :math:`\alpha_{lm}` of the
-    deflection field are
+    deflection field are hence
 
     .. math::
 
