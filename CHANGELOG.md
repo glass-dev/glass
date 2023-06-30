@@ -5,6 +5,37 @@ All notable changes to the project are documented in this file.  The format is
 based on [Keep a Changelog](https://keepachangelog.com).
 
 
+[2023.6]  (30 Jun 2023)
+-----------------------
+
+### Added
+
+- `deflect()` applies deflections to positions
+- `from_convergence()` returns other lensing fields given the convergence
+- A new `glass.ext` namespace, reserved for extensions
+
+### Changed
+
+- The `glass` module is no longer a namespace package
+- The point sampling functions `positions_from_delta()` and
+  `uniform_positions()` now return an iterator
+- `ellipticity_gaussian()` and `ellipticity_intnorm()` accept array inputs
+- Use pyproject.toml for packaging
+
+### Deprecated
+
+- `shear_from_convergence()` is deprecated in favour of `from_convergence()`
+
+### Removed
+
+- The `glass.all` meta-module is no longer necessary
+
+### Fixed
+
+- Incorrect extrapolation in `glass.core.array.trapz_product()`, causing a bug
+  in `glass.points.effective_bias()`
+
+
 [2023.5]  (31 May 2023)
 -----------------------
 
@@ -74,6 +105,7 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - Initial wide release for GLASS paper
 
 
+[2023.6]: https://github.com/glass-dev/glass/compare/v2023.5...v2023.6
 [2023.5]: https://github.com/glass-dev/glass/compare/v2023.2...v2023.5
 [2023.2]: https://github.com/glass-dev/glass/compare/v2023.1...v2023.2
 [2023.1]: https://github.com/glass-dev/glass/releases/tag/v2023.1

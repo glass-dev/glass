@@ -4,6 +4,39 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+
+2023.6 (30 Jun 2023)
+--------------------
+
+- There is some support for simulating the deflections due to weak
+  gravitational lensing:
+
+  - The :func:`~glass.lensing.deflect` function applies deflections to
+    positions.
+
+  - The :func:`~glass.lensing.from_convergence` function returns one or more
+    other lensing fields given the convergence.
+
+  - The ``shear_from_convergence()`` function is deprecated in favour of
+    ``from_convergence()``.
+
+- The ``glass`` module is no longer a namespace package.  The new ``glass.ext``
+  namespace is reserved for extensions instead.  This is done to follow best
+  practices, so that a bad extension can no longer break all of *GLASS* by
+  mistake.  The ``glass.all`` meta-module is no longer necessary.
+
+- The point sampling functions :func:`~glass.points.positions_from_delta` and
+  :func:`~glass.points.uniform_positions` now return an iterator over points.
+  This has lead to orders-of-magnitude improvements in memory use and
+  performance when simulating galaxies at Euclid/LSST densities.
+
+- The ellipticity sampling functions :func:`~glass.shapes.ellipticity_gaussian`
+  and :func:`~glass.shapes.ellipticity_intnorm` accept array inputs.
+
+- A bug causing incorrect results from :func:`~glass.points.effective_bias` has
+  been fixed.
+
+
 2023.5 (31 May 2023)
 --------------------
 
