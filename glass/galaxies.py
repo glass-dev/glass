@@ -145,7 +145,9 @@ def galaxy_shear(lon: np.ndarray, lat: np.ndarray, eps: np.ndarray,
     return g
 
 
-def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike,
+def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike, *,
+                 lower: ArrayLike | None = None,
+                 upper: ArrayLike | None = None,
                  rng: np.random.Generator | None = None) -> np.ndarray:
     r'''Photometric redshifts assuming a Gaussian error.
 
@@ -159,6 +161,8 @@ def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike,
         True redshifts.
     sigma_0 : float or array_like
         Redshift error in the tomographic binning at zero redshift.
+    lower, upper : float or array_like, optional
+        Bounds for the returned photometric redshifts.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
 
@@ -167,6 +171,12 @@ def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike,
     phz : array_like
         Photometric redshifts assuming Gaussian errors, of the same
         shape as *z*.
+
+    Warnings
+    --------
+    The *lower* and *upper* bounds are implemented using plain rejection
+    sampling from the non-truncated normal distribution.  If bounds are
+    used, they should always contain significant probability mass.
 
     See Also
     --------
@@ -194,14 +204,25 @@ def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike,
 
     zphot = rng.normal(z, sigma)
 
+    print(zphot)
+
+    if lower is None:
+        lower = 0.
+    if upper is None:
+        upper = np.inf
+
+    if not np.all(lower < upper):
+        raise ValueError("requires lower < upper")
+
     if not dims:
-        while zphot < 0:
+        while zphot < lower or zphot > upper:
             zphot = rng.normal(z, sigma)
     else:
         z = np.broadcast_to(z, dims)
-        trunc = np.where(zphot < 0)[0]
+        trunc = np.where((zphot < lower) | (zphot > upper))[0]
         while trunc.size:
-            zphot[trunc] = rng.normal(z[trunc], sigma[trunc])
-            trunc = trunc[zphot[trunc] < 0]
+            znew = rng.normal(z[trunc], sigma[trunc])
+            zphot[trunc] = znew
+            trunc = trunc[(znew < lower) | (znew > upper)]
 
     return zphot
