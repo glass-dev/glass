@@ -97,6 +97,17 @@ def test_gaussian_phz():
     assert phz.shape == (100,)
     assert np.all(phz >= 0)
 
+    # case: upper and lower bound
+
+    z = 1.
+    sigma_0 = np.ones(100)
+
+    phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
+
+    assert phz.shape == (100,)
+    assert np.all(phz >= 0.5)
+    assert np.all(phz <= 1.5)
+
     # test interface
 
     # case: scalar redshift, scalar sigma_0
