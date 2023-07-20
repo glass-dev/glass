@@ -204,8 +204,6 @@ def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike, *,
 
     zphot = rng.normal(z, sigma)
 
-    print(zphot)
-
     if lower is None:
         lower = 0.
     if upper is None:
