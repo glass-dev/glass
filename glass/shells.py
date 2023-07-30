@@ -10,11 +10,15 @@ The :mod:`glass.shells` module provides functions for the definition of
 matter shells, i.e. the radial discretisation of the light cone.
 
 
+.. _reference-window-functions:
+
 Window functions
 ----------------
 
 .. autoclass:: RadialWindow
 .. autofunction:: tophat_windows
+.. autofunction:: linear_windows
+.. autofunction:: cubic_windows
 
 
 Window function tools
@@ -151,6 +155,10 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
     ws : (N,) list of :class:`RadialWindow`
         List of window functions.
 
+    See Also
+    --------
+    :ref:`user-window-functions`
+
     '''
     if len(zbins) < 2:
         raise ValueError('zbins must have at least two entries')
@@ -170,6 +178,118 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
         w = wht(z)
         zeff = np.trapz(w*z, z)/np.trapz(w, z)
         ws.append(RadialWindow(z, w, zeff))
+    return ws
+
+
+def linear_windows(zgrid: ArrayLike1D, dz: float = 1e-3,
+                   weight: Optional[WeightFunc] = None,
+                   ) -> List[RadialWindow]:
+    '''Linear interpolation window functions.
+
+    Uses the *N+2* given redshifts as nodes to construct *N* triangular
+    window functions between the first and last node.  These correspond
+    to linear interpolation of radial functions.  The redshift spacing
+    of the windows is approximately equal to ``dz``.
+
+    An optional weight function :math:`w(z)` can be given using
+    ``weight``; it is applied to the triangular windows.
+
+    The resulting windows functions are :class:`RadialWindow` instances.
+    Their effective redshifts correspond to the given nodes.
+
+    Parameters
+    ----------
+    zgrid : (N+2,) array_like
+        Redshift grid for the triangular window functions.
+    dz : float, optional
+        Approximate spacing of the redshift grid.
+    weight : callable, optional
+        If given, a weight function to be applied to the window
+        functions.
+
+    Returns
+    -------
+    ws : (N,) list of :class:`RadialWindow`
+        List of window functions.
+
+    See Also
+    --------
+    :ref:`user-window-functions`
+
+    '''
+    if len(zgrid) < 3:
+        raise ValueError('nodes must have at least 3 entries')
+    if zgrid[0] != 0:
+        warnings.warn('first triangular window does not start at z=0')
+
+    ws = []
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
+        n = max(round((zmid - zmin)/dz), 2) - 1
+        m = max(round((zmax - zmid)/dz), 2)
+        z = np.concatenate([np.linspace(zmin, zmid, n, endpoint=False),
+                            np.linspace(zmid, zmax, m)])
+        w = np.concatenate([np.linspace(0., 1., n, endpoint=False),
+                            np.linspace(1., 0., m)])
+        if weight is not None:
+            w *= weight(z)
+        ws.append(RadialWindow(z, w, zmid))
+    return ws
+
+
+def cubic_windows(zgrid: ArrayLike1D, dz: float = 1e-3,
+                  weight: Optional[WeightFunc] = None,
+                  ) -> List[RadialWindow]:
+    '''Cubic interpolation window functions.
+
+    Uses the *N+2* given redshifts as nodes to construct *N* cubic
+    Hermite spline window functions between the first and last node.
+    These correspond to cubic spline interpolation of radial functions.
+    The redshift spacing of the windows is approximately equal to
+    ``dz``.
+
+    An optional weight function :math:`w(z)` can be given using
+    ``weight``; it is applied to the cubic spline windows.
+
+    The resulting windows functions are :class:`RadialWindow` instances.
+    Their effective redshifts correspond to the given nodes.
+
+    Parameters
+    ----------
+    zgrid : (N+2,) array_like
+        Redshift grid for the cubic spline window functions.
+    dz : float, optional
+        Approximate spacing of the redshift grid.
+    weight : callable, optional
+        If given, a weight function to be applied to the window
+        functions.
+
+    Returns
+    -------
+    ws : (N,) list of :class:`RadialWindow`
+        List of window functions.
+
+    See Also
+    --------
+    :ref:`user-window-functions`
+
+    '''
+    if len(zgrid) < 3:
+        raise ValueError('nodes must have at least 3 entries')
+    if zgrid[0] != 0:
+        warnings.warn('first cubic spline window does not start at z=0')
+
+    ws = []
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
+        n = max(round((zmid - zmin)/dz), 2) - 1
+        m = max(round((zmax - zmid)/dz), 2)
+        z = np.concatenate([np.linspace(zmin, zmid, n, endpoint=False),
+                            np.linspace(zmid, zmax, m)])
+        u = np.linspace(0., 1., n, endpoint=False)
+        v = np.linspace(1., 0., m)
+        w = np.concatenate([u**2*(3-2*u), v**2*(3-2*v)])
+        if weight is not None:
+            w *= weight(z)
+        ws.append(RadialWindow(z, w, zmid))
     return ws
 
 
