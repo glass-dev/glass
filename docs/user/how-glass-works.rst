@@ -44,7 +44,6 @@ which are flat and non-overlapping.
         plt.fill_between(za, np.zeros_like(wa), wa, alpha=0.5)
         plt.annotate(f'shell {i+1}', (zeff, 0.5), ha='center', va='center')
 
-    plt.ylim(0., 2.)
     plt.xlabel('redshift $z$')
     plt.ylabel('window function $W(z)$')
     plt.tight_layout()
@@ -61,6 +60,48 @@ This results in the sequence :math:`F_1, F_2, \ldots` of integrated (projected)
 fields, which are :term:`spherical functions<spherical function>`.  *GLASS*
 then simulates the (radially) continuous field :math:`F(z)` as the (radially)
 discretised fields :math:`F_i`.
+
+
+.. _user-window-functions:
+
+Window functions
+^^^^^^^^^^^^^^^^
+
+*GLASS* supports arbitrary window functions (although the computation of
+:ref:`line-of-sight integrals <user-los-integrals>` makes some assumptions).
+The following :ref:`window functions <reference-window-functions>` are
+included:
+
+.. plot::
+
+    from glass.shells import (redshift_grid, tophat_windows, linear_windows,
+                              cubic_windows)
+
+    plot_windows = [tophat_windows, linear_windows,
+                    cubic_windows]
+    nr = (len(plot_windows)+1)//2
+
+    fig, axes = plt.subplots(nr, 2, figsize=(8, nr*3), layout="constrained",
+                             squeeze=False, sharex=False, sharey=True)
+
+    zs = redshift_grid(0., 0.5, dz=0.1)
+    zt = np.linspace(0., 0.5, 200)
+
+    for ax in axes.flat:
+        ax.axis(False)
+    for windows, ax in zip(plot_windows, axes.flat):
+        ws = windows(zs)
+        wt = np.zeros_like(zt)
+        ax.axis(True)
+        ax.set_title(windows.__name__)
+        for i, (za, wa, zeff) in enumerate(ws):
+            wt += np.interp(zt, za, wa, left=0., right=0.)
+            ax.fill_between(za, np.zeros_like(wa), wa, alpha=0.5)
+        ax.plot(zt, wt, c="k", lw=2)
+    for ax in axes.flat:
+        ax.set_xlabel("redshift $z$")
+    for ax in axes[:, 0]:
+        ax.set_ylabel("window function $W(z)$")
 
 
 Angular discretisation
@@ -88,6 +129,8 @@ field :math:`F_i` itself is sampled at the pixel centres.
 difference between the two is whether or not the pixel window function is
 applied to the spherical harmonic expansion of the fields.
 
+
+.. _user-los-integrals:
 
 Line-of-sight integrals
 -----------------------
