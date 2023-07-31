@@ -17,6 +17,12 @@ Functions
 .. autofunction:: generate_gaussian
 .. autofunction:: generate_lognormal
 
+
+Utility functions
+-----------------
+
+.. autofunction:: getcl
+
 '''
 
 import warnings
@@ -285,3 +291,32 @@ def generate_lognormal(gls: Cls, nside: int, shift: float = 1., *,
 
         # yield the lognormal map
         yield m
+
+
+def getcl(cls, i, j, lmax=None):
+    """Return a specific angular power spectrum from an array.
+
+    Return the angular power spectrum for indices *i* and *j* from an
+    array in *GLASS* ordering.
+
+    Parameters
+    ----------
+    cls : list of array_like
+        List of angular power spectra in *GLASS* ordering.
+    i, j : int
+        Combination of indices to return.
+    lmax : int, optional
+        Truncate the returned spectrum at this mode number.
+
+    Returns
+    -------
+    cl : array_like
+        The angular power spectrum for indices *i* and *j*.
+
+    """
+    if j > i:
+        i, j = j, i
+    cl = cls[i*(i+1)//2+i-j]
+    if lmax is not None:
+        cl = cl[:lmax+1]
+    return cl
