@@ -5,6 +5,24 @@ All notable changes to the project are documented in this file.  The format is
 based on [Keep a Changelog](https://keepachangelog.com).
 
 
+[2023.7]  (1 Aug 2023)
+----------------------
+
+### Added
+
+* Function `getcl()` to return angular power spectra by index from
+  a list using GLASS ordering.
+* New `linear_windows()` and `cubic_windows()` window functions for
+  shells.
+
+### Changed
+
+* The `gaussian_phz()` function now accepts bounds using `lower=`
+  and `upper=` keyword parameters.
+* The `partition()` function now returns an array of weights to
+  approximate the given function by the windows.
+
+
 [2023.6]  (30 Jun 2023)
 -----------------------
 
@@ -105,6 +123,7 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - Initial wide release for GLASS paper
 
 
+[2023.7]: https://github.com/glass-dev/glass/compare/v2023.6...v2023.7
 [2023.6]: https://github.com/glass-dev/glass/compare/v2023.5...v2023.6
 [2023.5]: https://github.com/glass-dev/glass/compare/v2023.2...v2023.5
 [2023.2]: https://github.com/glass-dev/glass/compare/v2023.1...v2023.2

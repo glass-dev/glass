@@ -5,6 +5,30 @@ Release notes
 These notes document the changes between individual *GLASS* releases.
 
 
+2023.7 (1 Aug 2023)
+-------------------
+
+* New radial window functions :func:`~glass.shells.linear_windows()` and
+  :func:`~glass.shells.cubic_windows()`, which correspond to linear and cubic
+  spline interpolation of radial functions, respectively.  These are
+  overlapping window functions, and it has been difficult to obtain accurate
+  matter power spectra so far.
+
+* The :func:`~glass.shells.partition()` function now returns an array of
+  weights to approximate a given function by the window functions.  This is
+  necessary to obtain an accurate fit of redshift distributions by overlapping
+  window functions.  For example, to get the array of galaxy densities in each
+  shells from ``dndz``, one would now do::
+
+      ngal = partition(z, dndz, shells)
+
+* A new function :func:`~glass.fields.getcl()` was added to return angular
+  power spectra by index from a list using GLASS ordering.
+
+* The :func:`~glass.galaxies.gaussian_phz()` function now accepts bounds using
+  `lower=` and `upper=` keyword parameters.
+
+
 2023.6 (30 Jun 2023)
 --------------------
 
