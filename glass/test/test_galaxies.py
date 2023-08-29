@@ -1,6 +1,26 @@
 import pytest
 
 
+def test_redshifts():
+    from unittest.mock import Mock
+    import numpy as np
+    from glass.galaxies import redshifts
+
+    # create a mock radial window function
+    w = Mock()
+    w.za = np.linspace(0., 1., 20)
+    w.wa = np.exp(-0.5*(w.za - 0.5)**2/0.1**2)
+
+    # sample redshifts (scalar)
+    z = redshifts(13, w)
+    assert z.shape == (13,)
+    assert z.min() >= 0. and z.max() <= 1.
+
+    # sample redshifts (array)
+    z = redshifts([[1, 2], [3, 4]], w)
+    assert z.shape == (10,)
+
+
 def test_redshifts_from_nz():
     import numpy as np
     from glass.galaxies import redshifts_from_nz
