@@ -50,7 +50,7 @@ def redshifts(n: int | ArrayLike, w: RadialWindow, *,
 
     Returns
     -------
-    redshifts : array_like
+    z : array_like
         Random redshifts following the radial window function.
 
     '''
