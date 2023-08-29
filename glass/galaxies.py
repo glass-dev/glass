@@ -12,6 +12,7 @@ as typically observed in a cosmological galaxy survey.
 Functions
 ---------
 
+.. autofunction:: redshifts
 .. autofunction:: redshifts_from_nz
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
@@ -26,6 +27,34 @@ import healpix
 from numpy.typing import ArrayLike
 
 from .core.array import broadcast_leading_axes, cumtrapz
+from .shells import RadialWindow
+
+
+def redshifts(count: int | ArrayLike, w: RadialWindow, *,
+              rng: np.random.Generator | None = None
+              ) -> np.ndarray:
+    '''Sample redshifts from a radial window function.
+
+    This function samples *count* redshifts from a distribution that
+    follows the given radial window function *w*.
+
+    Parameters
+    ----------
+    count : int or array_like
+        Number of redshifts to sample.  If an array is given, the
+        results are concatenated.
+    w : :class:`~glass.shells.RadialWindow`
+        Radial window function.
+    rng : :class:`~numpy.random.Generator`, optional
+        Random number generator.  If not given, a default RNG is used.
+
+    Returns
+    -------
+    redshifts : array_like
+        Random redshifts following the radial window function.
+
+    '''
+    return redshifts_from_nz(count, w.za, w.wa, rng=rng)
 
 
 def redshifts_from_nz(count: int | ArrayLike, z: ArrayLike, nz: ArrayLike, *,
