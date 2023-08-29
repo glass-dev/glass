@@ -30,17 +30,17 @@ from .core.array import broadcast_leading_axes, cumtrapz
 from .shells import RadialWindow
 
 
-def redshifts(count: int | ArrayLike, w: RadialWindow, *,
+def redshifts(n: int | ArrayLike, w: RadialWindow, *,
               rng: np.random.Generator | None = None
               ) -> np.ndarray:
     '''Sample redshifts from a radial window function.
 
-    This function samples *count* redshifts from a distribution that
-    follows the given radial window function *w*.
+    This function samples *n* redshifts from a distribution that follows
+    the given radial window function *w*.
 
     Parameters
     ----------
-    count : int or array_like
+    n : int or array_like
         Number of redshifts to sample.  If an array is given, the
         results are concatenated.
     w : :class:`~glass.shells.RadialWindow`
@@ -54,7 +54,7 @@ def redshifts(count: int | ArrayLike, w: RadialWindow, *,
         Random redshifts following the radial window function.
 
     '''
-    return redshifts_from_nz(count, w.za, w.wa, rng=rng)
+    return redshifts_from_nz(n, w.za, w.wa, rng=rng)
 
 
 def redshifts_from_nz(count: int | ArrayLike, z: ArrayLike, nz: ArrayLike, *,
