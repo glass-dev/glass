@@ -348,7 +348,7 @@ def partition(z: ArrayLike,
     and function values *fz* of shape *(..., N)*, with any number of
     leading axes allowed.
 
-    The window functions are given by the sequence *ws* of
+    The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
     Parameters
