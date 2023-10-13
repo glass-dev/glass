@@ -332,8 +332,8 @@ def restrict(z: ArrayLike1D, f: ArrayLike1D, w: RadialWindow
 
 
 def partition(z: ArrayLike,
-              f: ArrayLike,
-              ws: Sequence[RadialWindow],
+              fz: ArrayLike,
+              shells: Sequence[RadialWindow],
               *,
               method: str = "lstsq",
               ) -> ArrayLike:
@@ -345,18 +345,18 @@ def partition(z: ArrayLike,
     :math:`f(z)`.
 
     The function :math:`f(z)` is given by redshifts *z* of shape *(N,)*
-    and function values *f* of shape *(..., N)*, with any number of
+    and function values *fz* of shape *(..., N)*, with any number of
     leading axes allowed.
 
-    The window functions are given by the sequence *ws* of
+    The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
     Parameters
     ----------
-    z, f : array_like
+    z, fz : array_like
         The function to be partitioned.  If *f* is multi-dimensional,
         its last axis must agree with *z*.
-    ws : sequence of :class:`RadialWindow`
+    shells : sequence of :class:`RadialWindow`
         Ordered sequence of window functions for the partition.
     method : {"lstsq", "restrict"}
         Method for the partition.  See notes for description.
@@ -364,8 +364,8 @@ def partition(z: ArrayLike,
     Returns
     -------
     x : array_like
-        Weights of the partition.  If *f* is multi-dimensional, the
-        leading axes of *x* match those of *f*.
+        Weights of the partition, where the leading axis corresponds to
+        *shells*.
 
     Notes
     -----
@@ -403,43 +403,60 @@ def partition(z: ArrayLike,
         partition_method = globals()[f"partition_{method}"]
     except KeyError:
         raise ValueError(f"invalid method: {method}") from None
-    return partition_method(z, f, ws)
+    return partition_method(z, fz, shells)
 
 
-def partition_lstsq(z: ArrayLike, f: ArrayLike, ws: Sequence[RadialWindow]
-                    ) -> ArrayLike:
+def partition_lstsq(
+    z: ArrayLike,
+    fz: ArrayLike,
+    shells: Sequence[RadialWindow],
+) -> ArrayLike:
     """Least-squares partition."""
 
     # compute the union of all given redshift grids
     zp = z
-    for w in ws:
+    for w in shells:
         zp = np.union1d(zp, w.za)
+
+    # get extra leading axes of fz
+    *dims, _ = np.shape(fz)
 
     # compute grid spacing
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in ws]
+    a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in shells]
     a = a/np.trapz(a, zp, axis=-1)[..., None]
     a = a*dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, f, left=0., right=0.)
+    b = ndinterp(zp, z, fz, left=0., right=0.)
     b = b*dz
 
-    # return least-squares fit
-    return np.linalg.lstsq(a.T, b.T, rcond=None)[0].T
+    # now a is a matrix of shape (len(shells), len(zp))
+    # and b is a matrix of shape (*dims, len(zp))
+    # need to find weights x such that b == x @ a over all axes of b
+    # do the least-squares fit over partially flattened b, then reshape
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size).T, rcond=None)[0]
+    x = x.T.reshape(*dims, len(shells))
+    # roll the last axis of size len(shells) to the front
+    x = np.moveaxis(x, -1, 0)
+    # all done
+    return x
 
 
-def partition_restrict(z: ArrayLike, f: ArrayLike, ws: Sequence[RadialWindow]
-                       ) -> ArrayLike:
+def partition_restrict(
+    z: ArrayLike,
+    fz: ArrayLike,
+    shells: Sequence[RadialWindow],
+) -> ArrayLike:
     """Partition by restriction and integration."""
 
-    ngal = []
-    for w in ws:
-        zr, fr = restrict(z, f, w)
-        ngal.append(np.trapz(fr, zr, axis=-1))
-    return np.transpose(ngal)
+    part = np.empty((len(shells),) + np.shape(fz)[:-1])
+    for i, w in enumerate(shells):
+        zr, fr = restrict(z, fz, w)
+        part[i] = np.trapz(fr, zr, axis=-1)
+    return part
 
 
 def redshift_grid(zmin, zmax, *, dz=None, num=None):
