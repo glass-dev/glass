@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 
 def test_tophat_windows():
@@ -46,3 +47,28 @@ def test_restrict():
             i = np.searchsorted(zr, zi)
             assert zr[i] == zi
             assert fr[i] == fi*np.interp(zi, w.za, w.wa)
+
+
+@pytest.mark.parametrize("method", ["lstsq", "restrict"])
+def test_partition(method):
+    import numpy as np
+    from glass.shells import RadialWindow, partition
+
+    shells = [
+        RadialWindow(np.array([0., 1.]), np.array([1., 0.]), 0.0),
+        RadialWindow(np.array([0., 1., 2.]), np.array([0., 1., 0.]), 0.5),
+        RadialWindow(np.array([1., 2., 3.]), np.array([0., 1., 0.]), 1.5),
+        RadialWindow(np.array([2., 3., 4.]), np.array([0., 1., 0.]), 2.5),
+        RadialWindow(np.array([3., 4., 5.]), np.array([0., 1., 0.]), 3.5),
+        RadialWindow(np.array([4., 5.]), np.array([0., 1.]), 5.0),
+    ]
+
+    z = np.linspace(0., 5., 1000)
+    k = 1 + np.arange(6).reshape(3, 2, 1)
+    fz = np.exp(-z / k)
+
+    assert fz.shape == (3, 2, 1000)
+
+    part = partition(z, fz, shells, method=method)
+
+    assert part.shape == (len(shells), 3, 2)
