@@ -14,6 +14,7 @@ Sampling
 
 .. autofunction:: positions_from_delta
 .. autofunction:: uniform_positions
+.. autofunction:: position_weights
 
 
 Bias
@@ -33,7 +34,7 @@ Bias models
 import numpy as np
 import healpix
 
-from .core.array import broadcast_leading_axes, trapz_product
+from .core.array import broadcast_first, broadcast_leading_axes, trapz_product
 from .core.constants import ARCMIN2_SPHERE
 
 
@@ -291,3 +292,40 @@ def uniform_positions(ngal, *, rng=None):
             count = int(ngal[k])
 
         yield lon, lat, count
+
+
+def position_weights(densities, bias=None):
+    """Compute relative weights for angular clustering.
+
+    Takes an array *densities* of densities in arbitrary units and
+    returns the relative weight of each shell.  If *bias* is given, a
+    linear bias is applied to each shell.
+
+    This is the equivalent of computing the product of normalised
+    redshift distribution and bias factor :math:`n(z) \\, b(z)` for the
+    discretised shells.
+
+    Parameters
+    ----------
+    densities : array_like
+        Density of points in each shell.  The first axis must broadcast
+        against the number of shells, and is normalised internally.
+    bias : array_like, optional
+        Value or values of the linear bias parameter for each shell.
+
+    Returns
+    -------
+    weights : array_like
+        Relative weight of each shell for angular clustering.
+
+    """
+    # bring densities and bias into the same shape
+    if bias is not None:
+        densities, bias = broadcast_first(densities, bias)
+    # normalise densities after shape has been fixed
+    densities = densities / np.sum(densities, axis=0)
+    # apply bias after normalisation
+    if bias is not None:
+        densities = densities * bias
+    # densities now contains the relative contribution with bias applied
+    return densities
