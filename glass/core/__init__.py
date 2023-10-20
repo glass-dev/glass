@@ -10,3 +10,9 @@ The :mod:`glass.core` module contains core functionality for developing
 GLASS modules.
 
 '''
+
+__all__ = (
+    "update_metadata",
+)
+
+from .array import update_metadata

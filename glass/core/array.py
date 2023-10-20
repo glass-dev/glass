@@ -70,3 +70,16 @@ def cumtrapz(f, x, dtype=None, out=None):
     np.cumsum((f[..., 1:] + f[..., :-1])/2*np.diff(x), axis=-1, out=out[..., 1:])
     out[..., 0] = 0
     return out
+
+
+def update_metadata(array, **metadata):
+    """update dtype.metadata of an array"""
+    array = np.asanyarray(array)
+    updated = {}
+    if array.dtype.metadata is not None:
+        updated.update(array.dtype.metadata)
+    updated.update(metadata)
+    dtype = np.dtype(array.dtype.fields or array.dtype.str, metadata=updated)
+    if not np.can_cast(dtype, array.dtype, casting="no"):
+        raise ValueError("array does not support updating metadata")
+    array.dtype = dtype
