@@ -492,7 +492,7 @@ def partition_nnls(
     # the output is more conveniently shapes with len(shells) first
     x = np.empty([len(shells)] + dims)
     for i in np.ndindex(*dims):
-        x[:, *i] = nnls(a.T, b[i])[0]
+        x[(slice(None),) + i] = nnls(a.T, b[i])[0]
 
     # all done
     return x
