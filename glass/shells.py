@@ -335,7 +335,7 @@ def partition(z: ArrayLike,
               fz: ArrayLike,
               shells: Sequence[RadialWindow],
               *,
-              method: str = "lstsq",
+              method: str = "nnls",
               ) -> ArrayLike:
     """Partition a function by a sequence of windows.
 
@@ -358,7 +358,7 @@ def partition(z: ArrayLike,
         its last axis must agree with *z*.
     shells : sequence of :class:`RadialWindow`
         Ordered sequence of window functions for the partition.
-    method : {"lstsq", "restrict"}
+    method : {"lstsq", "nnls", "restrict"}
         Method for the partition.  See notes for description.
 
     Returns
@@ -389,9 +389,16 @@ def partition(z: ArrayLike,
     redshift arrays of all window functions.  Intermediate function
     values are found by linear interpolation.
 
-    If ``method="lstsq"``, obtain a partition from a least-squares
-    solution.  This will more closely match the shape of the input
-    function, but the normalisation might differ.
+    If ``method="nnls"`` (the default), obtain a partition from a
+    non-negative least-squares solution.  This will match the shape of
+    the input function well, but the overall normalisation might be
+    differerent.  The contribution from each shell is a positive number,
+    which is required to partition e.g. density distributions.
+
+    If ``method="lstsq"``, obtain a partition from an unconstrained
+    least-squares solution.  This will more closely match the shape of
+    the input function, but might lead to shells with negative
+    contributions.
 
     If ``method="restrict"``, obtain a partition by integrating the
     restriction (using :func:`restrict`) of the function :math:`f` to
@@ -441,6 +448,52 @@ def partition_lstsq(
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     x = np.moveaxis(x, -1, 0)
+    # all done
+    return x
+
+
+def partition_nnls(
+    z: ArrayLike,
+    fz: ArrayLike,
+    shells: Sequence[RadialWindow],
+) -> ArrayLike:
+    """Non-negative least-squares partition.
+
+    Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
+    requires SciPy.
+
+    """
+
+    from .core.algorithm import nnls
+
+    # compute the union of all given redshift grids
+    zp = z
+    for w in shells:
+        zp = np.union1d(zp, w.za)
+
+    # get extra leading axes of fz
+    *dims, _ = np.shape(fz)
+
+    # compute grid spacing
+    dz = np.gradient(zp)
+
+    # create the window function matrix
+    a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in shells]
+    a = a/np.trapz(a, zp, axis=-1)[..., None]
+    a = a*dz
+
+    # create the target vector of distribution values
+    b = ndinterp(zp, z, fz, left=0., right=0.)
+    b = b*dz
+
+    # now a is a matrix of shape (len(shells), len(zp))
+    # and b is a matrix of shape (*dims, len(zp))
+    # for each dim, find weights x such that b == a.T @ x
+    # the output is more conveniently shapes with len(shells) first
+    x = np.empty([len(shells)] + dims)
+    for i in np.ndindex(*dims):
+        x[(slice(None),) + i] = nnls(a.T, b[i])[0]
+
     # all done
     return x
 

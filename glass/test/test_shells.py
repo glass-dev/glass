@@ -49,7 +49,7 @@ def test_restrict():
             assert fr[i] == fi*np.interp(zi, w.za, w.wa)
 
 
-@pytest.mark.parametrize("method", ["lstsq", "restrict"])
+@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(method):
     import numpy as np
     from glass.shells import RadialWindow, partition

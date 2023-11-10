@@ -28,6 +28,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 test = [
     "pytest",
+    "scipy",
 ]
 docs = [
     "sphinx",
