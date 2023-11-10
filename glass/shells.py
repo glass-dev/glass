@@ -335,7 +335,7 @@ def partition(z: ArrayLike,
               fz: ArrayLike,
               shells: Sequence[RadialWindow],
               *,
-              method: str = "lstsq",
+              method: str = "nnls",
               ) -> ArrayLike:
     """Partition a function by a sequence of windows.
 
@@ -389,13 +389,16 @@ def partition(z: ArrayLike,
     redshift arrays of all window functions.  Intermediate function
     values are found by linear interpolation.
 
-    If ``method="lstsq"``, obtain a partition from a least-squares
-    solution.  This will more closely match the shape of the input
-    function, but the normalisation might differ.
+    If ``method="nnls"`` (the default), obtain a partition from a
+    non-negative least-squares solution.  This will match the shape of
+    the input function well, but the overall normalisation might be
+    differerent.  The contribution from each shell is a positive number,
+    which is required to partition e.g. density distributions.
 
-    If ``method="nnls"``, obtain a partition from a non-negative
-    least-squares solution.  This method should be used to partition
-    e.g. density distributions.
+    If ``method="lstsq"``, obtain a partition from an unconstrained
+    least-squares solution.  This will more closely match the shape of
+    the input function, but might lead to shells with negative
+    contributions.
 
     If ``method="restrict"``, obtain a partition by integrating the
     restriction (using :func:`restrict`) of the function :math:`f` to
@@ -461,16 +464,7 @@ def partition_nnls(
 
     """
 
-    try:
-        from scipy.optimize import nnls
-    except ImportError as e:
-        try:
-            e.addNote("Calling partition() with the 'nnls' method requires "
-                      "SciPy.  You can try another method using the `method=` "
-                      "keyword.  Example: partition(..., method='lstsq')")
-        except AttributeError:
-            pass
-        raise
+    from .core.algorithm import nnls
 
     # compute the union of all given redshift grids
     zp = z
@@ -496,7 +490,7 @@ def partition_nnls(
     # and b is a matrix of shape (*dims, len(zp))
     # for each dim, find weights x such that b == a.T @ x
     # the output is more conveniently shapes with len(shells) first
-    x = np.empty((len(shells), *dims))
+    x = np.empty([len(shells)] + dims)
     for i in np.ndindex(*dims):
         x[:, *i] = nnls(a.T, b[i])[0]
 
