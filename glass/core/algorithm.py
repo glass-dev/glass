@@ -12,7 +12,7 @@ def nnls(
     a: ArrayLike,
     b: ArrayLike,
     *,
-    tol: float = 1e-10,
+    tol: float = 0.0,
     maxiter: int | None = None,
 ) -> ArrayLike:
     """Compute a non-negative least squares solution.
@@ -39,7 +39,7 @@ def nnls(
     if a.shape[0] != b.shape[0]:
         raise ValueError("the shapes of `a` and `b` do not match")
 
-    m, n = a.shape
+    _, n = a.shape
 
     if maxiter is None:
         maxiter = 3 * n
