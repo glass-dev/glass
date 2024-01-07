@@ -72,3 +72,5 @@ def test_partition(method):
     part = partition(z, fz, shells, method=method)
 
     assert part.shape == (len(shells), 3, 2)
+
+    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))
