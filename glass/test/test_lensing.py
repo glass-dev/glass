@@ -91,19 +91,43 @@ def test_deflect_many():
 
 
 def test_multi_plane_matrix(shells, cosmo):
-    from glass.lensing import multi_plane_matrix
+    from glass.lensing import MultiPlaneConvergence, multi_plane_matrix
 
     mat = multi_plane_matrix(shells, cosmo)
 
     npt.assert_array_equal(mat, np.tril(mat))
     npt.assert_array_equal(np.triu(mat, 1), 0)
 
+    convergence = MultiPlaneConvergence(cosmo)
+
+    deltas = np.random.rand(len(shells), 10)
+    kappas = []
+    for shell, delta in zip(shells, deltas):
+        convergence.add_window(delta, shell)
+        kappas.append(convergence.kappa.copy())
+
+    npt.assert_allclose(mat @ deltas, kappas)
+
 
 def test_multi_plane_weights(shells, cosmo):
-    from glass.lensing import multi_plane_weights
+    from glass.lensing import MultiPlaneConvergence, multi_plane_weights
 
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 
     npt.assert_array_equal(w_out, np.triu(w_out, 1))
     npt.assert_array_equal(np.tril(w_out), 0)
+
+    convergence = MultiPlaneConvergence(cosmo)
+
+    deltas = np.random.rand(len(shells), 10)
+    weights = np.random.rand(len(shells), 3)
+    kappa = 0
+    for shell, delta, weight in zip(shells, deltas, weights):
+        convergence.add_window(delta, shell)
+        kappa = kappa + weight[..., None] * convergence.kappa
+    kappa /= weights.sum(axis=0)[..., None]
+
+    wmat = multi_plane_weights(weights, shells, cosmo)
+
+    npt.assert_allclose(np.einsum('ij,ik', wmat, deltas), kappa)
