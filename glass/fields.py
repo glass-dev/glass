@@ -16,6 +16,7 @@ Functions
 .. autofunction:: lognormal_gls
 .. autofunction:: generate_gaussian
 .. autofunction:: generate_lognormal
+.. autofunction:: effective_cls
 
 
 Utility functions
@@ -318,5 +319,82 @@ def getcl(cls, i, j, lmax=None):
         i, j = j, i
     cl = cls[i*(i+1)//2+i-j]
     if lmax is not None:
-        cl = cl[:lmax+1]
+        if len(cl) > lmax + 1:
+            cl = cl[:lmax+1]
+        else:
+            cl = np.pad(cl, (0, lmax + 1 - len(cl)))
     return cl
+
+
+def effective_cls(cls, weights1, weights2=None, *, lmax=None):
+    """Compute effective angular power spectra from weights.
+
+    Computes a linear combination of the angular power spectra *cls*
+    using the factors provided by *weights1* and *weights2*.  Additional
+    axes in *weights1* and *weights2* produce arrays of spectra.
+
+    Parameters
+    ----------
+    cls : (N,) list of array_like
+        Angular matter power spectra to combine, in *GLASS* ordering.
+    weights1 : (N, \\*M1) array_like
+        Weight factors for spectra.  The first axis must be equal to the
+        number of fields.
+    weights2 : (N, \\*M2) array_like, optional
+        Second set of weights.  If not given, *weights1* is used.
+    lmax : int, optional
+        Truncate the angular power spectra at this mode number.  If not
+        given, the longest input in *cls* will be used.
+
+    Returns
+    -------
+    cls : (\\*M1, \\*M2, LMAX+1) array_like
+        Dictionary of effective angular power spectra, where keys
+        correspond to the leading axes of *weights1* and *weights2*.
+
+    """
+    from itertools import combinations_with_replacement, product
+
+    # this is the number of fields
+    n = int((2*len(cls))**0.5)
+    if n*(n+1)//2 != len(cls):
+        raise ValueError("length of cls is not a triangle number")
+
+    # find lmax if not given
+    if lmax is None:
+        lmax = max(map(len, cls), default=-1)
+
+    # broadcast weights1 such that its shape ends in n
+    weights1 = np.asanyarray(weights1)
+    weights2 = np.asanyarray(weights2) if weights2 is not None else weights1
+
+    shape1, shape2 = weights1.shape, weights2.shape
+    for i, shape in enumerate((shape1, shape2)):
+        if not shape or shape[0] != n:
+            raise ValueError(f"shape mismatch between fields and weights{i+1}")
+
+    # get the iterator over leading weight axes
+    # auto-spectra do not repeat identical computations
+    if weights2 is weights1:
+        pairs = combinations_with_replacement(np.ndindex(shape1[1:]), 2)
+    else:
+        pairs = product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))
+
+    # create the output array: axes for all input axes plus lmax+1
+    out = np.empty(shape1[1:] + shape2[1:] + (lmax+1,))
+
+    # helper that will grab the entire first column (i.e. shells)
+    c = (slice(None),)
+
+    # compute all combined cls from pairs
+    # if weights2 is weights1, set the transpose elements in one pass
+    for j1, j2 in pairs:
+        w1, w2 = weights1[c + j1], weights2[c + j2]
+        cl = sum(
+            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
+            for i1, i2 in np.ndindex(n, n)
+        )
+        out[j1 + j2] = cl
+        if weights2 is weights1 and j1 != j2:
+            out[j2 + j1] = cl
+    return out

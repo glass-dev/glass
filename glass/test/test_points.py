@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.testing as npt
 
 
 def catpos(pos):
@@ -94,3 +95,25 @@ def test_uniform_positions():
 
     assert cnt.shape == (3, 2)
     assert lon.shape == lat.shape == (cnt.sum(),)
+
+
+def test_position_weights():
+    from glass.points import position_weights
+
+    for bshape in None, (), (100,), (100, 1):
+        for cshape in (100,), (100, 50), (100, 3, 2):
+
+            counts = np.random.rand(*cshape)
+            bias = None if bshape is None else np.random.rand(*bshape)
+
+            weights = position_weights(counts, bias)
+
+            expected = counts / counts.sum(axis=0, keepdims=True)
+            if bias is not None:
+                if np.ndim(bias) > np.ndim(expected):
+                    expected = np.expand_dims(expected, tuple(range(np.ndim(expected), np.ndim(bias))))
+                else:
+                    bias = np.expand_dims(bias, tuple(range(np.ndim(bias), np.ndim(expected))))
+                expected = bias * expected
+
+            npt.assert_allclose(weights, expected)

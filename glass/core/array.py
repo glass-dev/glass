@@ -6,6 +6,14 @@ import numpy as np
 from functools import partial
 
 
+def broadcast_first(*arrays):
+    """Broadcast arrays, treating the first axis as common."""
+    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
+    arrays = np.broadcast_arrays(*arrays)
+    arrays = tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
+    return arrays
+
+
 def broadcast_leading_axes(*args):
     '''Broadcast all but the last N axes.
 

@@ -14,6 +14,7 @@ Iterative lensing
 
 .. autoclass:: MultiPlaneConvergence
 .. autofunction:: multi_plane_matrix
+.. autofunction:: multi_plane_weights
 
 
 Lensing fields
@@ -350,15 +351,58 @@ class MultiPlaneConvergence:
         return self.w3
 
 
-def multi_plane_matrix(ws: Sequence['RadialWindow'], cosmo: 'Cosmology'
-                       ) -> np.ndarray:
-    '''Compute the matrix of lensing contributions from each shell.'''
+def multi_plane_matrix(
+    shells: Sequence["RadialWindow"],
+    cosmo: "Cosmology",
+) -> ArrayLike:
+    """Compute the matrix of lensing contributions from each shell."""
     mpc = MultiPlaneConvergence(cosmo)
-    wmat = np.eye(len(ws))
-    for i, w in enumerate(ws):
+    wmat = np.eye(len(shells))
+    for i, w in enumerate(shells):
         mpc.add_window(wmat[i].copy(), w)
         wmat[i, :] = mpc.kappa
     return wmat
+
+
+def multi_plane_weights(
+    weights: ArrayLike,
+    shells: Sequence["RadialWindow"],
+    cosmo: "Cosmology",
+) -> ArrayLike:
+    """Compute effective weights for multi-plane convergence.
+
+    Converts an array *weights* of relative weights for each shell
+    into the equivalent array of relative lensing weights.
+
+    This is the discretised version of the integral that turns a
+    redshift distribution :math:`n(z)` into the lensing efficiency
+    sometimes denoted :math:`g(z)` or :math:`q(z)`.
+
+    Parameters
+    ----------
+    weights : array_like
+        Relative weight of each shell.  The first axis must broadcast
+        against the number of shells, and is normalised internally.
+    shells : list of :class:`~glass.shells.RadialWindow`
+        Window functions of the shells.
+    cosmo : Cosmology
+        Cosmology instance.
+
+    Returns
+    -------
+    lensing_weights : array_like
+        Relative lensing weight of each shell.
+
+    """
+    # ensure shape of weights ends with the number of shells
+    shape = np.shape(weights)
+    if not shape or shape[0] != len(shells):
+        raise ValueError("shape mismatch between weights and shells")
+    # normalise weights
+    weights = weights / np.sum(weights, axis=0)
+    # combine weights and the matrix of lensing contributions
+    mat = multi_plane_matrix(shells, cosmo)
+    return np.matmul(mat.T, weights)
 
 
 def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
