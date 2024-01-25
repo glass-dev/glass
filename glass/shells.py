@@ -624,7 +624,7 @@ def combine(
 
     """
     return sum(
-        weight[..., None] * np.interp(
+        np.expand_dims(weight, -1) * np.interp(
             z,
             shell.za,
             shell.wa / np.trapz(shell.wa, shell.za),
