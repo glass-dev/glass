@@ -611,7 +611,7 @@ def combine(
         Weights of the linear combination, where the leading axis
         corresponds to *shells*.
     shells : sequence of :class:`RadialWindow`
-        Ordered sequence of window functions for the partition.
+        Ordered sequence of window functions to be combined.
 
     Returns
     -------
