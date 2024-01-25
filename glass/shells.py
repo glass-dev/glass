@@ -26,6 +26,7 @@ Window function tools
 
 .. autofunction:: restrict
 .. autofunction:: partition
+.. autofunction:: combine
 
 
 Redshift grids
@@ -585,3 +586,50 @@ def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
     else:
         raise ValueError('exactly one of "dx" or "num" must be given')
     return cosmo.dc_inv(x)
+
+
+def combine(
+    z: ArrayLike,
+    weights: ArrayLike,
+    shells: Sequence[RadialWindow],
+) -> ArrayLike:
+    """Evaluate a linear combination of window functions.
+
+    Takes a vector of weights :math:`x_1, x_2, \\ldots` and computes the
+    weighted sum of normalised radial window functions :math:`f(z) = x_1
+    \\, w_1(z) + x_2 \\, w_2(z) + \\ldots` in the given redshifts
+    :math:`z`.
+
+    The window functions are given by the sequence *shells* of
+    :class:`RadialWindow` or compatible entries.
+
+    Parameters
+    ----------
+    z : array_like
+        Redshifts *z* in which to evaluate the combined function.
+    weights : array_like
+        Weights of the linear combination, where the leading axis
+        corresponds to *shells*.
+    shells : sequence of :class:`RadialWindow`
+        Ordered sequence of window functions for the partition.
+
+    Returns
+    -------
+    fz : array_like
+        Linear combination of window functions, evaluated in *z*.
+
+    See Also
+    --------
+    partition : Find weights for a given function.
+
+    """
+    return sum(
+        weight[..., None] * np.interp(
+            z,
+            shell.za,
+            shell.wa / np.trapz(shell.wa, shell.za),
+            left=0.,
+            right=0.,
+        )
+        for shell, weight in zip(shells, weights)
+    )
