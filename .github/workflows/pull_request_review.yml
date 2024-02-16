@@ -12,6 +12,8 @@ jobs:
     name: Approved
     if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Add Reviewed-By
         uses: ntessore/add-reviewed-by-action@v1
