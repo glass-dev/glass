@@ -362,7 +362,7 @@ def effective_cls(cls, weights1, weights2=None, *, lmax=None):
 
     # find lmax if not given
     if lmax is None:
-        lmax = max(map(len, cls), default=-1)
+        lmax = max(map(len, cls), default=0) - 1
 
     # broadcast weights1 such that its shape ends in n
     weights1 = np.asanyarray(weights1)
