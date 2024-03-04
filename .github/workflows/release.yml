@@ -17,4 +17,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: pipx run build
-      - uses: pypa/gh-action-pypi-publish@v1.8.11
+      - uses: pypa/gh-action-pypi-publish@v1.8.12
