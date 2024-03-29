@@ -1,2 +1,2 @@
---prefer-binary
+--prefer-binary fitsio
 --only-binary numpy,scipy,healpy,healpix
