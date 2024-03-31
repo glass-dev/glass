@@ -9,17 +9,16 @@ else:
     del fitsio
     HAVE_FITSIO = True
 
-filename = "newfiles.fits"
+filename = "myFile.FITS"
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_out_filename():
     import glass.core.fitsIO as GfitsIO
     from fitsio import FITS
-    fileToWrite = "myFile.FITS"
-    fits = FITS(fileToWrite, "rw", clobber=True)
+    fits = FITS(filename, "rw", clobber=True)
     writer = GfitsIO.AsyncHduWriter(fits)
-    assert writer.fits._filename == fileToWrite
+    assert writer.fits._filename == filename
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
