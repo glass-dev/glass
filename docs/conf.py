@@ -87,7 +87,7 @@ html_css_files = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
-    'examples': ('https://glass.readthedocs.io/projects/examples/en/latest/', None),
+    'examples': ('https://glass.readthedocs.io/projects/examples/latest/', None),
 }
 
 
