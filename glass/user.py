@@ -18,9 +18,10 @@ Basic IO
 
 FITS creation
 ----------------
-.. autofunction:: swrite
-.. autoclass:: SyncHduWriter
-
+.. autoclass:: FitsWriter
+.. automethod:: write
+.. automethod:: append
+.. autofunction:: write_context
 '''
 
 import numpy as np
@@ -54,15 +55,15 @@ def load_cls(filename):
 
 
 class FitsWriter:
-    """Writer that appends rows to a HDU."""
+    '''Writer that creates a FITS file.  Initialised with the fits object and extention name.'''
 
     def __init__(self, fits, ext=None):
-        """Create a new, uninitialised writer."""
+        '''Create a new, uninitialised writer.'''
         self.fits = fits
         self.ext = ext
 
     def _append(self, data, names=None):
-        """Write routine for FITS data."""
+        '''Internal method where the FITS writing is done'''
 
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
@@ -74,11 +75,14 @@ class FitsWriter:
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
     def write(self, data=None, /, **columns):
-        """Append to FITS."""
+        '''Writes to FITS by calling the internal _append method.
+        Pass either a positional variable (data)
+        or multiple named arguments (**columns)'''
+
         # if data is given, write it as it is
         if data is not None:
             self._append(data)
-            
+
         # if keyword arguments are given, treat them as names and columns
         if columns:
             names, values = list(columns.keys()), list(columns.values())
@@ -86,8 +90,12 @@ class FitsWriter:
 
 
 @contextmanager
-def swrite(filename, *, ext=None):
-    """Context manager for a FITS catalogue writer."""
+def write_context(filename, *, ext=None):
+    '''Context manager for a FITS catalogue writer.  Calls class FitsWriter.
+
+    ext is the name of the HDU extension
+
+    '''
     import fitsio
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)
