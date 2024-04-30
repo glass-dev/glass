@@ -20,7 +20,6 @@ FITS creation
 ----------------
 .. autoclass:: FitsWriter
 .. automethod:: write
-.. automethod:: append
 .. autofunction:: write_context
 '''
 

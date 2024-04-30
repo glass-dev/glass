@@ -11,8 +11,6 @@ else:
 
 import glass.user as user
 import numpy as np
-import fitsio
-
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def _test_append(fits, data, names):
