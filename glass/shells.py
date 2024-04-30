@@ -6,7 +6,7 @@ Shells (:mod:`glass.shells`)
 
 .. currentmodule:: glass.shells
 
-The :mod:`glass.shells` module provides functions for the definition of
+The :mod:`glass.shells` super awesome module provides functions for the definition of
 matter shells, i.e. the radial discretisation of the light cone.
 
 
