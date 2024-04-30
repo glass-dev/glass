@@ -18,9 +18,9 @@ Basic IO
 
 FITS creation
 ----------------
-.. autoclass:: FitsWriter
-.. automethod:: write
+
 .. autofunction:: write_context
+
 '''
 
 import numpy as np
