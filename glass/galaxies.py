@@ -336,10 +336,10 @@ def kappa_ia_nla(delta, zeff, a_ia, cosmo, *, z0=0., eta=0., lbar=0.,
        doi:10.1103/PhysRevD.70.063526
     .. [3] Bridle S., King L., 2007, NJPh, 9, 444.
        doi:10.1088/1367-2630/9/12/444
-    .. [4] Jeffrey N., Alsing J., Lanusse F., 2021, MNRAS, 501, 954.
-       doi:10.1093/mnras/staa3594
+    .. [4] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
+        A&A, 624, A30. doi:10.1051/0004-6361/201834714
     .. [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
-       arXiv:2302.01942. doi:10.48550/arXiv.2302.01942
+       OJAp, 6, 11. doi:10.21105/astro.2302.01942
 
     '''
 
