@@ -23,6 +23,8 @@ Redshift distribution
 Visibility
 ----------
 
+.. autofunction:: vmap_full
+.. autofunction:: vmap_disc
 .. autofunction:: vmap_galactic_ecliptic
 
 
@@ -31,11 +33,53 @@ Visibility
 import numpy as np
 import healpy as hp
 import math
-
 from typing import Optional, Tuple, List
 from numpy.typing import ArrayLike
-
 from .core.array import cumtrapz
+
+
+def vmap_full(nside: int) -> np.ndarray:
+
+    '''visibility map for full sky
+
+    Parameters
+    ----------
+    nside : int
+        The NSIDE parameter of the resulting HEALPix map.
+
+    Returns
+    -------
+    vis : array_like
+        A HEALPix :term:`visibility map`.
+    '''
+
+    m = np.ones(hp.nside2npix(nside))
+    return m
+
+
+def vmap_disc(nside: int, coords: Tuple[float, float] = (60, 60),
+              radius: float = 20) -> np.ndarray:
+
+    '''visibility map for a disc on the full sky
+
+    Parameters
+    ----------
+    nside : int
+        The NSIDE parameter of the resulting HEALPix map.
+    coords : Tuple[float, float]
+        colatitude and longitude in degress
+
+    Returns
+    -------
+    vis : array_like
+        A HEALPix :term:`visibility map`.
+    '''
+
+    vec = hp.ang2vec(coords[0]/180*np.pi, coords[1]/180*np.pi)
+    ipix_disc = hp.query_disc(nside=nside, vec=vec, radius=np.radians(radius))
+    m = np.zeros(hp.nside2npix(nside))
+    m[ipix_disc] = 1
+    return m
 
 
 def vmap_galactic_ecliptic(nside: int, galactic: Tuple[float, float] = (30, 90),
