@@ -10,7 +10,7 @@ The :mod:`glass.user` module contains convenience functions for users of the
 library.
 
 
-Basic IO
+Input and Output
 ----------------
 
 .. autofunction:: save_cls
