@@ -1,13 +1,11 @@
 import pytest
 
 # check if fitsio is available for testing
-try:
-    import fitsio
-except ImportError:
-    HAVE_FITSIO = False
-else:
-    del fitsio
+import importlib.util
+if importlib.util.find_spec("fitsio") is not None:
     HAVE_FITSIO = True
+else:
+    HAVE_FITSIO = False
 
 import glass.user as user
 import numpy as np
@@ -25,8 +23,8 @@ def _test_append(fits, data, names):
 
 
 delta = 0.001  # Number of points in arrays
-myMax = 1000  # Typically number of galaxies in loop
-exceptInt = 750  # Where test exception occurs in loop
+my_max = 1000  # Typically number of galaxies in loop
+except_int = 750  # Where test exception occurs in loop
 filename = "MyFile.Fits"
 
 
@@ -39,7 +37,7 @@ def test_basic_write(tmp_path):
     filename_tfits = "tfits.fits"  # file create on the fly to test against
 
     with user.write_context(d / filename_gfits, ext="CATALOG") as out, fitsio.FITS(d / filename_tfits, "rw", clobber=True) as myFits:
-        for i in range(0, myMax):
+        for i in range(0, my_max):
             array = np.arange(i, i+1, delta)  # array of size 1/delta
             array2 = np.arange(i+1, i+2, delta)  # array of size 1/delta
             out.write(RA=array, RB=array2)
@@ -62,8 +60,8 @@ def test_write_exception(tmp_path):
 
     try:
         with user.write_context(d / filename, ext="CATALOG") as out:
-            for i in range(0, myMax):
-                if i == exceptInt:
+            for i in range(0, my_max):
+                if i == except_int:
                     raise Exception("Unhandled exception")
                 array = np.arange(i, i+1, delta)  # array of size 1/delta
                 array2 = np.arange(i+1, i+2, delta)  # array of size 1/delta
@@ -73,12 +71,12 @@ def test_write_exception(tmp_path):
         from astropy.io import fits
         with fits.open(d / filename) as hdul:
             data = hdul[1].data
-            assert data['RA'].size == exceptInt/delta
-            assert data['RB'].size == exceptInt/delta
+            assert data['RA'].size == except_int/delta
+            assert data['RB'].size == except_int/delta
 
-            fitsMat = data['RA'].reshape(exceptInt, int(1/delta))
-            fitsMat2 = data['RB'].reshape(exceptInt, int(1/delta))
-            for i in range(0, exceptInt):
+            fitsMat = data['RA'].reshape(except_int, int(1/delta))
+            fitsMat2 = data['RB'].reshape(except_int, int(1/delta))
+            for i in range(0, except_int):
                 array = np.arange(i, i+1, delta)  # re-create array to compare to read data
                 array2 = np.arange(i+1, i+2, delta)
                 assert array.tolist() == fitsMat[i].tolist()
