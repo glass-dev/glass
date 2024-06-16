@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "glass"
 description = "Generator for Large Scale Structure"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 license = {file = "LICENSE"}
 maintainers = [
     {name = "Nicolas Tessore", email = "n.tessore@ucl.ac.uk"},

@@ -49,7 +49,7 @@ def load_cls(filename):
     return np.split(values, split)
 
 
-class FitsWriter:
+class _FitsWriter:
     '''Writer that creates a FITS file.  Initialised with the fits object and extention name.'''
 
     def __init__(self, fits, ext=None):
@@ -85,7 +85,7 @@ class FitsWriter:
 
 
 @contextmanager
-def write_context(filename, *, ext=None):
+def write_catalog(filename, *, ext=None):
     '''Context manager for a FITS catalogue writer.  Calls class FitsWriter.
 
     ext is the name of the HDU extension
@@ -94,5 +94,5 @@ def write_context(filename, *, ext=None):
     import fitsio
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)
-        writer = FitsWriter(fits, ext)
+        writer = _FitsWriter(fits, ext)
         yield writer

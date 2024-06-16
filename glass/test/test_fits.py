@@ -11,9 +11,8 @@ import glass.user as user
 import numpy as np
 
 
-@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def _test_append(fits, data, names):
-    """Write routine for FITS data."""
+    '''Write routine for FITS test cases'''
     cat_name = 'CATALOG'
     if cat_name not in fits:
         fits.write_table(data, names=names, extname=cat_name)
@@ -36,7 +35,7 @@ def test_basic_write(tmp_path):
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file create on the fly to test against
 
-    with user.write_context(d / filename_gfits, ext="CATALOG") as out, fitsio.FITS(d / filename_tfits, "rw", clobber=True) as myFits:
+    with user.write_catalog(d / filename_gfits, ext="CATALOG") as out, fitsio.FITS(d / filename_tfits, "rw", clobber=True) as myFits:
         for i in range(0, my_max):
             array = np.arange(i, i+1, delta)  # array of size 1/delta
             array2 = np.arange(i+1, i+2, delta)  # array of size 1/delta
@@ -59,7 +58,7 @@ def test_write_exception(tmp_path):
     d.mkdir()
 
     try:
-        with user.write_context(d / filename, ext="CATALOG") as out:
+        with user.write_catalog(d / filename, ext="CATALOG") as out:
             for i in range(0, my_max):
                 if i == except_int:
                     raise Exception("Unhandled exception")
@@ -89,20 +88,3 @@ def test_out_filename(tmp_path):
     fits = fitsio.FITS(filename, "rw", clobber=True)
     writer = user.FitsWriter(fits)
     assert writer.fits._filename == filename
-
-
-@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_none(tmp_path):
-    d = tmp_path / "sub"
-    d.mkdir()
-    with user.write_context(d / filename, ext="CATALOG") as out:
-        out.write()
-    assert 1 == 1
-
-
-@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_yield(tmp_path):
-    d = tmp_path / "sub"
-    d.mkdir()
-    with user.write_context(d / filename, ext="CATALOG") as out:
-        assert type(out) is user.FitsWriter
