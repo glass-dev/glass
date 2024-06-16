@@ -15,10 +15,6 @@ Basic IO
 
 .. autofunction:: save_cls
 .. autofunction:: load_cls
-
-FITS creation
-----------------
-
 .. autofunction:: write_context
 
 '''
