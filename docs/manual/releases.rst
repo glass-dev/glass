@@ -35,11 +35,11 @@ These notes document the changes between individual *GLASS* releases.
   be expected from a *GLASS* simulation, including all discretisations and
   approximations.
 
-  * A new function :func:`glass.fields.effective_cls()` which combines power
+  * A new function :func:`~glass.fields.effective_cls()` which combines power
     spectra using a list of weights.  This function essentially models the
     linear combinations that happen in the simulation.
 
-  * A new function :func:`glass.points.position_weights()` that returns weights
+  * A new function :func:`~glass.points.position_weights()` that returns weights
     for ``effective_cls()`` to model the result of
     :func:`~glass.points.positions_from_delta()`.
 
