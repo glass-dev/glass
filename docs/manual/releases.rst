@@ -5,6 +5,55 @@ Release notes
 These notes document the changes between individual *GLASS* releases.
 
 
+2024.1  (16 Jul 2024)
+---------------------
+
+* Further changes to the :func:`~glass.shells.partition()` function.
+
+  * The output of ``partition()`` now has the shells axis as its first.  **This
+    means that the new output is the transpose of the previous output.**
+
+  * A new ``partition(..., method="nnls")`` method that computes a partition
+    with non-negative contributions for each shell.  **This is now the
+    default.** The ``"nnls"`` method works much better than ``"lstsq"`` since
+    it does not introduce small negative densities, and should almost always be
+    preferred.
+
+  * Both ``partition(method="nnls")`` and ``partition(method="lstsq")`` now
+    have an additional integral constraint so that the sum of the partition
+    recovers the integral of the input function.
+
+  * The ``partition()`` function now works correctly with functions having
+    extra axes.
+
+* A new function :func:`~glass.shells.combine()` that evaluates the linear
+  combination of radial window functions with given weights.  This function is
+  the inverse of :func:`~glass.shells.partition()` and can be used to obtain
+  the effect of the discretisation on, e.g., a redshift distribution.
+
+* There is now a way to compute the effective angular power spectra that can
+  be expected from a *GLASS* simulation, including all discretisations and
+  approximations.
+
+  * A new function :func:`~glass.fields.effective_cls()` which combines power
+    spectra using a list of weights.  This function essentially models the
+    linear combinations that happen in the simulation.
+
+  * A new function :func:`~glass.points.position_weights()` that returns weights
+    for ``effective_cls()`` to model the result of
+    :func:`~glass.points.positions_from_delta()`.
+
+  * A new function :func:`~glass.lensing.multi_plane_weights()` that returns
+    weights for ``effective_cls()`` to model the result of
+    :class:`~glass.lensing.MultiPlaneConvergence`.
+
+* A new function :func:`~glass.galaxies.redshifts()` to sample redshifts
+  following a radial window function.  This should always be preferred to the
+  existing :func:`~glass.galaxies.redshifts_from_nz()` function, since the
+  redshift distribution entering the two-point statistics is in fact fixed by
+  the window functions.
+
+
 2023.7 (1 Aug 2023)
 -------------------
 

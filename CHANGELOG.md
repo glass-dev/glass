@@ -5,6 +5,42 @@ All notable changes to the project are documented in this file.  The format is
 based on [Keep a Changelog](https://keepachangelog.com).
 
 
+[2024.1]  (16 Jul 2024)
+-----------------------
+
+### Added
+
+* A new function `combine()` that evaluates the linear combination
+  of radial window functions with given weights.
+* A new function `effective_cls()` which combines power spectra
+  using a list of weights, which models what happens in the simulation.
+* A new function `position_weights()` that returns weights for
+  `effective_cls()` to model the result of `positions_from_delta()`.
+* A new function `multi_plane_weights()` that returns weights for
+  `effective_cls()` to model the result of `MultiPlaneConvergence`.
+* The `glass.core.algorithm` module.
+* The new `partition(method="nnls")` function computes a partition
+  with non-negative contributions for each shell.
+* Function `redshifts()` to sample redshifts following a radial
+  window function.
+
+### Changed
+
+* The default method for `partition()` is now `"nnls"`.
+* Both `partition(method="nnls")` and `partition(method="lstsq")`
+  now have an additional integral constraint so that the sum of the
+  partition recovers the integral of the input function.
+* The output of `partition()` now has the shells axis as its first.
+
+### Fixed
+
+* Now uses the updated intersphinx URL for the GLASS examples.
+* A bug in `effective_cls()` that caused arrays to be one entry too
+  long if `lmax` was not given explicitly.
+* A bug in `partition()` with the default method.
+* `partition()` now works correctly with functions having extra axes.
+
+
 [2023.7]  (1 Aug 2023)
 ----------------------
 
@@ -123,6 +159,7 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - Initial wide release for GLASS paper
 
 
+[2024.1]: https://github.com/glass-dev/glass/compare/v2023.7...v2024.1
 [2023.7]: https://github.com/glass-dev/glass/compare/v2023.6...v2023.7
 [2023.6]: https://github.com/glass-dev/glass/compare/v2023.5...v2023.6
 [2023.5]: https://github.com/glass-dev/glass/compare/v2023.2...v2023.5
