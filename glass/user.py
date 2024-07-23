@@ -15,7 +15,7 @@ Input and Output
 
 .. autofunction:: save_cls
 .. autofunction:: load_cls
-.. autofunction:: write_context
+.. autofunction:: write_catalog
 
 '''
 

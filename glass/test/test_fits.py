@@ -33,7 +33,7 @@ def test_basic_write(tmp_path):
     d = tmp_path / "sub"
     d.mkdir()
     filename_gfits = "gfits.fits"  # what GLASS creates
-    filename_tfits = "tfits.fits"  # file create on the fly to test against
+    filename_tfits = "tfits.fits"  # file created on the fly to test against
 
     with user.write_catalog(d / filename_gfits, ext="CATALOG") as out, fitsio.FITS(d / filename_tfits, "rw", clobber=True) as myFits:
         for i in range(0, my_max):
@@ -44,10 +44,9 @@ def test_basic_write(tmp_path):
             names = ['RA', 'RB']
             _test_append(myFits, arrays, names)
 
-    from astropy.io import fits
-    with fits.open(d / filename_gfits) as g_fits, fits.open(d / filename_tfits) as t_fits:
-        glass_data = g_fits[1].data
-        test_data = t_fits[1].data
+    with fitsio.FITS(d / filename_gfits) as g_fits, fitsio.FITS(d / filename_tfits) as t_fits:
+        glass_data = g_fits[1].read()
+        test_data = t_fits[1].read()
         assert glass_data['RA'].size == test_data['RA'].size
         assert glass_data['RB'].size == test_data['RA'].size
 
@@ -67,9 +66,9 @@ def test_write_exception(tmp_path):
                 out.write(RA=array, RB=array2)
 
     except Exception:
-        from astropy.io import fits
-        with fits.open(d / filename) as hdul:
-            data = hdul[1].data
+        import fitsio
+        with fitsio.FITS(d / filename) as hdul:
+            data = hdul[1].read()
             assert data['RA'].size == except_int/delta
             assert data['RB'].size == except_int/delta
 
@@ -86,5 +85,5 @@ def test_write_exception(tmp_path):
 def test_out_filename(tmp_path):
     import fitsio
     fits = fitsio.FITS(filename, "rw", clobber=True)
-    writer = user.FitsWriter(fits)
+    writer = user._FitsWriter(fits)
     assert writer.fits._filename == filename
