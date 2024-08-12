@@ -44,17 +44,6 @@ e.g. a design decision or API change, you can use our [Discussions] page.
 
 We also have a public [Slack workspace] for discussions about the project.
 
-To keep up with new GLASS releases, you can receive GitHub release
-notifications from this repository.  Alternatively, you can subscribe to our
-announcement mailing list, which only receives 1 email/release.  To subscribe,
-use the [mailing list page], or send an email to `listserv@jiscmail.ac.uk` with
-any subject and the following message body:
-
-    subscribe glass <Your name>
-
-where `<Your name>` is your full name, or `ANONYMOUS` if you prefer. You will
-be sent a confirmation email in return.
-
 
 [documentation]: https://glass.readthedocs.io/
 [examples]: https://glass.readthedocs.io/projects/examples/
