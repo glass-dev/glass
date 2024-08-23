@@ -86,11 +86,20 @@ class _FitsWriter:
 
 @contextmanager
 def write_catalog(filename, *, ext=None):
-    '''Context manager for a FITS catalogue writer.  Calls class FitsWriter.
+    """
+    Write a catalogue into a FITS file, where *ext* is the optional
+    name of the extension.  To be used as a context manager::
 
-    ext is the name of the HDU extension
+        # create the catalogue writer
+        with write_catalog("catalog.fits") as out:
+            ...
+            # write catalogue columns RA, DEC, E1, E2, WHT with given arrays
+            out.write(RA=lon, DEC=lat, E1=eps1, E2=e2, WHT=w)
 
-    '''
+    .. note::
+       Requires the ``fitsio`` package.
+
+    """
     import fitsio
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)
