@@ -36,6 +36,7 @@ docs = [
     "furo",
     "sphinxcontrib-katex",
     "nbsphinx",
+    "ipython",
     "numpydoc",
     "matplotlib",
 ]
