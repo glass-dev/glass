@@ -21,7 +21,7 @@ Table of Contents
    :maxdepth: 2
 
    manual/index
-   Examples <https://glass.readthedocs.io/projects/examples/>
+   examples
    user/index
    reference/index
 

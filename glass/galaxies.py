@@ -220,7 +220,7 @@ def gaussian_phz(z: ArrayLike, sigma_0: float | ArrayLike, *,
 
     Examples
     --------
-    See the :doc:`examples:basic/photoz` example.
+    See the :doc:`/examples/1-basic/photoz` example.
 
     '''
 
