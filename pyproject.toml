@@ -33,6 +33,7 @@ test = [
 ]
 examples = [
     "camb",
+    "glass.ext.camb",
     "jupyter",
     "matplotlib",
 ]
