@@ -26,7 +26,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-tags: true
+        fetch-depth: 0
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
@@ -39,7 +39,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-tags: true
+        fetch-depth: 0
     - run: pipx run build
 
   docs:
@@ -48,7 +48,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-tags: true
+        fetch-depth: 0
     - run: |
         sudo apt-get update
         sudo apt-get install pandoc
@@ -60,7 +60,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-tags: true
+        fetch-depth: 0
     - uses: actions/setup-python@v5
       with:
         python-version: "3.x"
