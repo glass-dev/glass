@@ -31,6 +31,11 @@ test = [
     "scipy",
     "fitsio",
 ]
+examples = [
+    "camb",
+    "jupyter",
+    "matplotlib",
+]
 docs = [
     "sphinx",
     "furo",
