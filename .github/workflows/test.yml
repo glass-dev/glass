@@ -25,6 +25,8 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-tags: true
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
@@ -36,6 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-tags: true
     - run: pipx run build
 
   docs:
@@ -43,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-tags: true
     - run: |
         sudo apt-get update
         sudo apt-get install pandoc
@@ -53,6 +59,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-tags: true
     - uses: actions/setup-python@v5
       with:
         python-version: "3.x"
