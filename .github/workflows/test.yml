@@ -65,5 +65,4 @@ jobs:
       with:
         python-version: "3.x"
         cache: pip
-    - run: pip install '.[examples]'
-    - run: jupyter execute examples/**/*.ipynb
+    - run: pipx run --spec '.[examples]' jupyter execute examples/**/*.ipynb
