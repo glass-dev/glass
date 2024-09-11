@@ -10,12 +10,13 @@ on:
 
 jobs:
 
-  style:
-    name: Style
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: pipx run flake8 glass
+# TODO: replace with a more general pre-commit linter
+#   style:
+#     name: Style
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v4
+#     - run: pipx run flake8 glass
 
   tests:
     name: Tests
