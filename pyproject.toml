@@ -63,5 +63,5 @@ version-file = "glass/_version.py"
 fix = true
 force-exclude = true
 src = [
-    "src",
+    "glass",
 ]
