@@ -45,6 +45,7 @@ docs = [
     "ipython",
     "numpydoc",
     "matplotlib",
+    "pytz",
 ]
 
 [project.urls]
