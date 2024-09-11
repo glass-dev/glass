@@ -7,11 +7,14 @@
 
 # -- Project information -----------------------------------------------------
 
+import datetime
+import pytz
 from importlib import metadata
 
 project = 'GLASS'
-copyright = '2022-2024 Nicolas Tessore'
+year = datetime.datetime.now(tz=pytz.timezone("GMT")).year
 author = 'Nicolas Tessore'
+copyright = f'2022-{year} {author}'
 version = metadata.version("glass")
 release = version
 
