@@ -1,57 +1,57 @@
 [build-system]
-requires = [
-    "hatchling",
-    "hatch-vcs",
-]
 build-backend = "hatchling.build"
+requires = [
+    "hatch-vcs",
+    "hatchling",
+]
 
 [project]
-name = "glass"
-description = "Generator for Large Scale Structure"
-readme = "README.md"
-requires-python = ">=3.8"
-license.file = "LICENSE"
-maintainers = [
-    {name = "Nicolas Tessore", email = "n.tessore@ucl.ac.uk"},
-]
 classifiers = [
-    "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "numpy>=1.20.0",
-    "healpix>=2022.11.1",
-    "healpy>=1.15.0",
     "cosmology>=2022.10.9",
     "gaussiancl>=2022.10.21",
+    "healpix>=2022.11.1",
+    "healpy>=1.15.0",
+    "numpy>=1.20.0",
 ]
+description = "Generator for Large Scale Structure"
 dynamic = [
     "version",
 ]
-optional-dependencies = {test=[
-    "pytest",
-    "scipy",
-    "fitsio",
+maintainers = [
+    {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
+]
+name = "glass"
+optional-dependencies = {docs = [
+    "furo",
+    "ipython",
+    "matplotlib",
+    "nbsphinx",
+    "numpydoc",
+    "sphinx",
+    "sphinxcontrib-katex",
 ], examples = [
     "camb",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
-], docs = [
-    "sphinx",
-    "furo",
-    "sphinxcontrib-katex",
-    "nbsphinx",
-    "ipython",
-    "numpydoc",
-    "matplotlib",
+], test = [
+    "fitsio",
+    "pytest",
+    "scipy",
 ]}
-urls.Homepage = "https://github.com/glass-dev/glass"
-urls.Documentation = "https://glass.readthedocs.io/"
-urls.Issues = "https://github.com/glass-dev/glass/issues"
+readme = "README.md"
+requires-python = ">=3.8"
+license.file = "LICENSE"
 urls.Changelog = "https://glass.readthedocs.io/en/stable/manual/releases.html"
+urls.Documentation = "https://glass.readthedocs.io/"
+urls.Homepage = "https://github.com/glass-dev/glass"
+urls.Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.hatch]
-version.source = "vcs"
 build.hooks.vcs.version-file = "glass/_version.py"
+version.source = "vcs"
