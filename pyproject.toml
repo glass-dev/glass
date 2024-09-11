@@ -1,5 +1,8 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = [
+    "hatchling",
+    "hatch-vcs",
+]
 build-backend = "hatchling.build"
 
 [project]
@@ -7,7 +10,7 @@ name = "glass"
 description = "Generator for Large Scale Structure"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {file = "LICENSE"}
+license.file = "LICENSE"
 maintainers = [
     {name = "Nicolas Tessore", email = "n.tessore@ucl.ac.uk"},
 ]
@@ -23,21 +26,19 @@ dependencies = [
     "cosmology>=2022.10.9",
     "gaussiancl>=2022.10.21",
 ]
-dynamic = ["version"]
-
-[project.optional-dependencies]
-test = [
+dynamic = [
+    "version",
+]
+optional-dependencies = {test=[
     "pytest",
     "scipy",
     "fitsio",
-]
-examples = [
+], examples = [
     "camb",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
-]
-docs = [
+], docs = [
     "sphinx",
     "furo",
     "sphinxcontrib-katex",
@@ -45,16 +46,12 @@ docs = [
     "ipython",
     "numpydoc",
     "matplotlib",
-]
-
-[project.urls]
-Homepage = "https://github.com/glass-dev/glass"
-Documentation = "https://glass.readthedocs.io/"
-Issues = "https://github.com/glass-dev/glass/issues"
-Changelog = "https://glass.readthedocs.io/en/stable/manual/releases.html"
+]}
+urls.Homepage = "https://github.com/glass-dev/glass"
+urls.Documentation = "https://glass.readthedocs.io/"
+urls.Issues = "https://github.com/glass-dev/glass/issues"
+urls.Changelog = "https://glass.readthedocs.io/en/stable/manual/releases.html"
 
 [tool.hatch]
 version.source = "vcs"
-
-[tool.hatch.build.hooks.vcs]
-version-file = "glass/_version.py"
+build.hooks.vcs.version-file = "glass/_version.py"
