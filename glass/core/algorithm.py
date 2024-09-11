@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''core module for algorithms'''
+"""core module for algorithms"""
 
 from __future__ import annotations
 
@@ -59,10 +59,10 @@ def nnls(
             ap = a[:, p]
             xp = x[p]
             sp = np.linalg.solve(ap.T @ ap, b @ ap)
-            t = (sp <= 0)
+            t = sp <= 0
             if not np.any(t):
                 break
-            alpha = -np.min(xp[t]/(xp[t] - sp[t]))
+            alpha = -np.min(xp[t] / (xp[t] - sp[t]))
             x[p] += alpha * (sp - xp)
             p[x <= 0] = False
         x[p] = sp
