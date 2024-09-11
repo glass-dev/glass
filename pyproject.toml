@@ -55,3 +55,6 @@ urls.Issues = "https://github.com/glass-dev/glass/issues"
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
 version.source = "vcs"
+
+[tool.tomlsort]
+overrides."project.classifiers".inline_arrays = false
