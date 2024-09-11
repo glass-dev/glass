@@ -51,7 +51,7 @@ docs = [
 Homepage = "https://github.com/glass-dev/glass"
 Documentation = "https://glass.readthedocs.io/"
 Issues = "https://github.com/glass-dev/glass/issues"
-Changelog = "https://glass.readthedocs.io/en/stable/manual/releases.html"
+Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
 
 [tool.hatch]
 version.source = "vcs"
