@@ -58,3 +58,10 @@ version.source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "glass/_version.py"
+
+[tool.ruff]
+fix = true
+force-exclude = true
+src = [
+    "src",
+]
