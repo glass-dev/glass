@@ -8,7 +8,6 @@
 # -- Project information -----------------------------------------------------
 
 import datetime
-import pytz
 from importlib import metadata
 
 project = 'GLASS'
