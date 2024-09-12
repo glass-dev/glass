@@ -31,7 +31,9 @@ Citation
 --------
 
 If you use GLASS simulations or the GLASS library in your research, please [cite
-the original GLASS paper](CITATION.md) in your publications.
+the original GLASS
+paper](https://glass.readthedocs.io/stable/user/publications.html) in your
+publications.
 
 
 Getting in touch
