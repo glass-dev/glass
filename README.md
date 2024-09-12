@@ -32,7 +32,7 @@ Citation
 
 If you use GLASS simulations or the GLASS library in your research, please [cite
 the original GLASS
-paper](https://github.com/glass-dev/glass/blob/main/CITATION.md) in your
+paper](https://glass.readthedocs.io/stable/user/publications.html) in your
 publications.
 
 
