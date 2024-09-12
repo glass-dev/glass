@@ -12,9 +12,8 @@ import pytz
 from importlib import metadata
 
 project = 'GLASS'
-year = datetime.datetime.now(tz=pytz.timezone("GMT")).year
-author = 'Nicolas Tessore'
-copyright = f'2022-{year} {author}'
+author = 'GLASS developers'
+copyright = f'2022-{datetime.date.today().year} {author}'
 version = metadata.version("glass")
 release = version
 
