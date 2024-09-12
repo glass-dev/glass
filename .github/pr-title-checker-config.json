@@ -3,7 +3,7 @@
         "name": ""
     },
     "CHECKS": {
-        "regexp": "gh-(\\d+): "
+        "regexp": "gh-(\\d+):\\s"
     },
     "MESSAGES": {
         "success": "All OK",
