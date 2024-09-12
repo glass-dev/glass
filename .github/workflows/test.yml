@@ -31,7 +31,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - run: pip install -c .github/test-constraints.txt '.[test]'
-    - run: pytest --pyargs glass
+    - run: pytest -v
 
   build:
     name: Build

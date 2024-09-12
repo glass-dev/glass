@@ -12,9 +12,17 @@ maintainers = [
     {name = "Nicolas Tessore", email = "n.tessore@ucl.ac.uk"},
 ]
 classifiers = [
-    "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
     "numpy>=1.20.0",
@@ -51,10 +59,26 @@ docs = [
 Homepage = "https://github.com/glass-dev/glass"
 Documentation = "https://glass.readthedocs.io/"
 Issues = "https://github.com/glass-dev/glass/issues"
-Changelog = "https://glass.readthedocs.io/en/stable/manual/releases.html"
+Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
 
 [tool.hatch]
 version.source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "glass/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+xfail_strict = true
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+]
+testpaths = [
+  "tests",
+]
+log_cli_level = "DEBUG"
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]

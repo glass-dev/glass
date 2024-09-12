@@ -2,7 +2,7 @@
 **GLASS**: Generator for Large Scale Structure
 ==============================================
 
-[![Documentation](https://readthedocs.org/projects/glass/badge/?version=latest)](https://glass.readthedocs.io/en/latest/)
+[![Documentation](https://readthedocs.org/projects/glass/badge/?version=latest)](https://glass.readthedocs.io/latest/)
 [![PyPI](https://img.shields.io/pypi/v/glass)](https://pypi.org/project/glass)
 [![arXiv](https://img.shields.io/badge/arXiv-2302.01942-red)](https://arxiv.org/abs/2302.01942)
 [![adsabs](https://img.shields.io/badge/ads-2023OJAp....6E..11T-blueviolet)](https://ui.adsabs.harvard.edu/abs/2023OJAp....6E..11T)
@@ -31,7 +31,9 @@ Citation
 --------
 
 If you use GLASS simulations or the GLASS library in your research, please [cite
-the original GLASS paper](CITATION.md) in your publications.
+the original GLASS
+paper](https://glass.readthedocs.io/stable/user/publications.html) in your
+publications.
 
 
 Getting in touch
