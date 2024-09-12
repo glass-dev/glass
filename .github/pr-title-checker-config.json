@@ -1,0 +1,13 @@
+{
+    "LABEL": {
+        "name": ""
+    },
+    "CHECKS": {
+        "regexp": "gh-(\\d+): "
+    },
+    "MESSAGES": {
+        "success": "All OK",
+        "failure": "Failing CI test",
+        "notice": ""
+    }
+}
