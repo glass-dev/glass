@@ -68,7 +68,7 @@ def effective_bias(z, bz, w):
         \\;.
 
     '''
-    norm = np.trapz(w.wa, w.za)
+    norm = np.trapezoid(w.wa, w.za)
     return trapz_product((z, bz), (w.za, w.wa))/norm
 
 

@@ -177,7 +177,7 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
         n = max(round((zmax - zmin)/dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w*z, z)/np.trapz(w, z)
+        zeff = np.trapezoid(w*z, z)/np.trapezoid(w, z)
         ws.append(RadialWindow(z, w, zeff))
     return ws
 
@@ -465,7 +465,7 @@ def partition_lstsq(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in shells]
-    a = a/np.trapz(a, zp, axis=-1)[..., None]
+    a = a/np.trapezoid(a, zp, axis=-1)[..., None]
     a = a*dz
 
     # create the target vector of distribution values
@@ -475,7 +475,7 @@ def partition_lstsq(
     # append a constraint for the integral
     mult = 1/sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
+    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -522,7 +522,7 @@ def partition_nnls(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in shells]
-    a = a/np.trapz(a, zp, axis=-1)[..., None]
+    a = a/np.trapezoid(a, zp, axis=-1)[..., None]
     a = a*dz
 
     # create the target vector of distribution values
@@ -532,7 +532,7 @@ def partition_nnls(
     # append a constraint for the integral
     mult = 1/sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
+    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -561,7 +561,7 @@ def partition_restrict(
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        part[i] = np.trapz(fr, zr, axis=-1)
+        part[i] = np.trapezoid(fr, zr, axis=-1)
     return part
 
 
@@ -627,7 +627,7 @@ def combine(
         np.expand_dims(weight, -1) * np.interp(
             z,
             shell.za,
-            shell.wa / np.trapz(shell.wa, shell.za),
+            shell.wa / np.trapezoid(shell.wa, shell.za),
             left=0.,
             right=0.,
         )

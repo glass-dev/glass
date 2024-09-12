@@ -111,7 +111,7 @@ def gaussian_nz(z: np.ndarray, mean: ArrayLike, sigma: ArrayLike, *,
     sigma = np.reshape(sigma, np.shape(sigma) + (1,)*np.ndim(z))
 
     nz = np.exp(-((z - mean)/sigma)**2/2)
-    nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]
+    nz /= np.trapezoid(nz, z, axis=-1)[..., np.newaxis]
 
     if norm is not None:
         nz *= norm
@@ -167,7 +167,7 @@ def smail_nz(z: np.ndarray, z_mode: ArrayLike, alpha: ArrayLike,
     beta = np.asanyarray(beta)[..., np.newaxis]
 
     pz = z**alpha*np.exp(-alpha/beta*(z/z_mode)**beta)
-    pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
+    pz /= np.trapezoid(pz, z, axis=-1)[..., np.newaxis]
 
     if norm is not None:
         pz *= norm
