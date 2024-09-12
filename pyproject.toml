@@ -10,6 +10,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
     "cosmology>=2022.10.9",
@@ -26,7 +34,12 @@ maintainers = [
     {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
 ]
 name = "glass"
-optional-dependencies = {docs = [
+readme = "README.md"
+requires-python = ">=3.8"
+license.file = "LICENSE"
+
+[project.optional-dependencies]
+docs = [
     "furo",
     "ipython",
     "matplotlib",
@@ -34,27 +47,44 @@ optional-dependencies = {docs = [
     "numpydoc",
     "sphinx",
     "sphinxcontrib-katex",
-], examples = [
+]
+examples = [
     "camb",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
-], test = [
+]
+test = [
     "fitsio",
     "pytest",
     "scipy",
-]}
-readme = "README.md"
-requires-python = ">=3.8"
-license.file = "LICENSE"
-urls.Changelog = "https://glass.readthedocs.io/en/stable/manual/releases.html"
-urls.Documentation = "https://glass.readthedocs.io/"
-urls.Homepage = "https://github.com/glass-dev/glass"
-urls.Issues = "https://github.com/glass-dev/glass/issues"
+]
+
+[project.urls]
+Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
+Documentation = "https://glass.readthedocs.io/"
+Homepage = "https://github.com/glass-dev/glass"
+Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
 version.source = "vcs"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "-ra",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+log_cli_level = "DEBUG"
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+xfail_strict = true
 
 [tool.tomlsort]
 overrides."project.classifiers".inline_arrays = false
