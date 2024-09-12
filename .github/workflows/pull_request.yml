@@ -1,28 +1,18 @@
-name: Pull Request
-
+name: PR Title Checker
 on:
-  pull_request:
-    branches:
-      - main
+  pull_request_target:
     types:
       - opened
       - edited
       - synchronize
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - labeled
+      - unlabeled
 
 jobs:
-  lint-pr:
-    name: Formatting
+  check-pr-title:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: CondeNast/conventional-pull-request-action@v0.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: thehanimo/pr-title-checker@v1.4.1
         with:
-          commitlintRulesPath: ".commitlint.rules.js"
-          commitTitleMatch: false
-          ignoreCommits: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pass_on_octokit_error: false
