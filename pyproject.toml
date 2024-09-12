@@ -66,3 +66,19 @@ version.source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "glass/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+xfail_strict = true
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+]
+testpaths = [
+  "tests",
+]
+log_cli_level = "DEBUG"
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]
