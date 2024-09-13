@@ -37,7 +37,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - run: pip install -c .github/test-constraints.txt '.[test]'
-    - run: pytest -v
+    - run: pytest --cov=glass -v
+    - uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     name: Build
