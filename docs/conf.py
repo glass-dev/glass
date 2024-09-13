@@ -28,6 +28,7 @@ extensions = [
     'sphinxcontrib.katex',
     'matplotlib.sphinxext.plot_directive',
     'nbsphinx',
+    "sphinx.ext.viewcode",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
