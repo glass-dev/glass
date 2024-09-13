@@ -1,20 +1,49 @@
 name: Release
 
 on:
+  workflow_dispatch:
   release:
     types:
       - published
 
 jobs:
-  publish:
-    name: Publish on PyPI
+  dist:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build SDist and wheel
+        run: pipx run build
+
+      - name: Check metadata
+        run: pipx run twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist/*
+
+  publish:
+    needs: [dist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
     environment:
       name: publish
       url: https://pypi.org/p/glass
     permissions:
       id-token: write
+
     steps:
-      - uses: actions/checkout@v4
-      - run: pipx run build
-      - uses: pypa/gh-action-pypi-publish@v1.10.1
+      - uses: actions/download-artifact@v4
+        with:
+          name: artifact
+          path: dist
+
+      - name: List distributions to be deployed
+        run: ls -l dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
