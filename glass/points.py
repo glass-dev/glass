@@ -1,10 +1,10 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Random points (:mod:`glass.points`)
-===================================
+Random points
+=============
 
-.. currentmodule:: glass.points
+.. currentmodule:: glass
 
 The :mod:`glass.points` module provides functionality for simulating point
 processes on the sphere and sampling random positions.
@@ -34,8 +34,8 @@ Bias models
 import numpy as np
 import healpix
 
-from .core.array import broadcast_first, broadcast_leading_axes, trapz_product
-from .core.constants import ARCMIN2_SPHERE
+from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
+from glass.core.constants import ARCMIN2_SPHERE
 
 
 def effective_bias(z, bz, w):

@@ -1,10 +1,10 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Lensing (:mod:`glass.lensing`)
-==============================
+Lensing
+=======
 
-.. currentmodule:: glass.lensing
+.. currentmodule:: glass
 
 The :mod:`glass.lensing` module provides functionality for simulating
 gravitational lensing by the matter distribution in the universe.
@@ -41,7 +41,7 @@ from numpy.typing import NDArray, ArrayLike
 if TYPE_CHECKING:
     # to prevent circular dependencies, only import these for type checking
     from cosmology import Cosmology
-    from .shells import RadialWindow
+    from glass.shells import RadialWindow
 
 
 def from_convergence(

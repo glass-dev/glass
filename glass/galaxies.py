@@ -1,10 +1,10 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Galaxies (:mod:`glass.galaxies`)
-================================
+Galaxies
+========
 
-.. currentmodule:: glass.galaxies
+.. currentmodule:: glass
 
 The :mod:`glass.galaxies` module provides functionality for simulating galaxies
 as typically observed in a cosmological galaxy survey.
@@ -26,8 +26,8 @@ import healpix
 
 from numpy.typing import ArrayLike
 
-from .core.array import broadcast_leading_axes, cumtrapz
-from .shells import RadialWindow
+from glass.core.array import broadcast_leading_axes, cumtrapz
+from glass.shells import RadialWindow
 
 
 def redshifts(

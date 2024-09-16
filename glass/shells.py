@@ -1,10 +1,10 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Shells (:mod:`glass.shells`)
-============================
+Shells
+======
 
-.. currentmodule:: glass.shells
+.. currentmodule:: glass
 
 The :mod:`glass.shells` module provides functions for the definition of
 matter shells, i.e. the radial discretisation of the light cone.
@@ -49,7 +49,7 @@ import warnings
 from collections import namedtuple
 import numpy as np
 
-from .core.array import ndinterp
+from glass.core.array import ndinterp
 
 # type checking
 from typing import Union, Sequence, List, Tuple, Optional, Callable, TYPE_CHECKING
@@ -514,7 +514,7 @@ def partition_nnls(
 
     """
 
-    from .core.algorithm import nnls
+    from glass.core.algorithm import nnls
 
     # make sure nothing breaks
     if sumtol < 1e-4:
