@@ -6,3 +6,5 @@ __pycache__
 _build
 build
 dist
+.env
+.coverage*
