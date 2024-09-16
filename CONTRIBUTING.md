@@ -21,30 +21,7 @@ Pull requests
 
 Pull requests to the `main` branch should have titles of the following form:
 
-    TYPE: Subject line
-
-The title can optionally refer to the module which is being changed:
-
-    TYPE(module): Subject line
-
-The `TYPE` prefix should indicate the nature of the change and must be taken
-from the following list:
-
-    API -- an (incompatible) API change
-    BUG -- bug fix
-    DEP -- deprecate something, or remove a deprecated object
-    DEV -- development infrastructure (tools, packaging, etc.)
-    DOC -- documentation
-    ENH -- enhancement
-    MNT -- maintenance commit (refactoring, typos, etc.)
-    REV -- revert an earlier commit
-    STY -- style fix (whitespace, PEP8)
-    TST -- addition or modification of tests
-    TYP -- static typing
-    REL -- related to releasing GLASS
-
-The optional `module` tag should indicate which modules are affected by the
-change, and refer to an existing module name.
+    gh-<issue-number>: Subject line
 
 The body of the pull request should contain a description of the changes, and
 any relevant details or caveats of the implementation.
