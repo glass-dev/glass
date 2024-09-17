@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''module for array utilities'''
+"""module for array utilities"""
 
 import numpy as np
 from functools import partial
@@ -15,7 +15,7 @@ def broadcast_first(*arrays):
 
 
 def broadcast_leading_axes(*args):
-    '''Broadcast all but the last N axes.
+    """Broadcast all but the last N axes.
 
     Returns the shape of the broadcast dimensions, and all input arrays
     with leading axes matching that shape.
@@ -38,7 +38,7 @@ def broadcast_leading_axes(*args):
     >>> c.shape
     (3, 4, 5, 6)
 
-    '''
+    """
 
     shapes, trails = [], []
     for a, n in args:
@@ -52,17 +52,19 @@ def broadcast_leading_axes(*args):
 
 
 def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):
-    '''interpolate multi-dimensional array over axis'''
-    return np.apply_along_axis(partial(np.interp, x, xp), axis, fp,
-                               left=left, right=right, period=period)
+    """interpolate multi-dimensional array over axis"""
+    return np.apply_along_axis(
+        partial(np.interp, x, xp), axis, fp, left=left, right=right, period=period
+    )
 
 
 def trapz_product(f, *ff, axis=-1):
-    '''trapezoidal rule for a product of functions'''
+    """trapezoidal rule for a product of functions"""
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(x[(x >= x_[0]) & (x <= x_[-1])],
-                       x_[(x_ >= x[0]) & (x_ <= x[-1])])
+        x = np.union1d(
+            x[(x >= x_[0]) & (x <= x_[-1])], x_[(x_ >= x[0]) & (x_ <= x[-1])]
+        )
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
@@ -70,11 +72,11 @@ def trapz_product(f, *ff, axis=-1):
 
 
 def cumtrapz(f, x, dtype=None, out=None):
-    '''cumulative trapezoidal rule along last axis'''
+    """cumulative trapezoidal rule along last axis"""
 
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 
-    np.cumsum((f[..., 1:] + f[..., :-1])/2*np.diff(x), axis=-1, out=out[..., 1:])
+    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
     out[..., 0] = 0
     return out

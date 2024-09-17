@@ -3,7 +3,6 @@ import pytest
 
 
 def test_ellipticity_gaussian():
-
     from glass.shapes import ellipticity_gaussian
 
     n = 1_000_000
@@ -19,7 +18,7 @@ def test_ellipticity_gaussian():
 
     eps = ellipticity_gaussian([n, n], [0.128, 0.256])
 
-    assert eps.shape == (2*n,)
+    assert eps.shape == (2 * n,)
 
     assert np.all(np.abs(eps) < 1)
 
@@ -30,7 +29,6 @@ def test_ellipticity_gaussian():
 
 
 def test_ellipticity_intnorm():
-
     from glass.shapes import ellipticity_intnorm
 
     n = 1_000_000
@@ -46,7 +44,7 @@ def test_ellipticity_intnorm():
 
     eps = ellipticity_intnorm([n, n], [0.128, 0.256])
 
-    assert eps.shape == (2*n,)
+    assert eps.shape == (2 * n,)
 
     assert np.all(np.abs(eps) < 1)
 

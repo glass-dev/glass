@@ -8,11 +8,11 @@ def shells():
     from glass.shells import RadialWindow
 
     shells = [
-        RadialWindow([0., 1., 2.], [0., 1., 0.], 1.),
-        RadialWindow([1., 2., 3.], [0., 1., 0.], 2.),
-        RadialWindow([2., 3., 4.], [0., 1., 0.], 3.),
-        RadialWindow([3., 4., 5.], [0., 1., 0.], 4.),
-        RadialWindow([4., 5., 6.], [0., 1., 0.], 5.),
+        RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
+        RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
+        RadialWindow([2.0, 3.0, 4.0], [0.0, 1.0, 0.0], 3.0),
+        RadialWindow([3.0, 4.0, 5.0], [0.0, 1.0, 0.0], 4.0),
+        RadialWindow([4.0, 5.0, 6.0], [0.0, 1.0, 0.0], 5.0),
     ]
 
     return shells
@@ -21,13 +21,12 @@ def shells():
 @pytest.fixture
 def cosmo():
     class MockCosmology:
-
         @property
         def omega_m(self):
             return 0.3
 
         def ef(self, z):
-            return (self.omega_m * (1 + z)**3 + 1 - self.omega_m) ** 0.5
+            return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
         def xm(self, z, z2=None):
             if z2 is None:
@@ -42,31 +41,33 @@ def cosmo():
 def test_deflect_nsew(usecomplex):
     from glass.lensing import deflect
 
-    d = 5.
+    d = 5.0
     r = np.radians(d)
 
     if usecomplex:
+
         def alpha(re, im):
-            return re + 1j*im
+            return re + 1j * im
     else:
+
         def alpha(re, im):
             return [re, im]
 
     # north
-    lon, lat = deflect(0., 0., alpha(r, 0))
-    assert np.allclose([lon, lat], [0., d])
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0))
+    assert np.allclose([lon, lat], [0.0, d])
 
     # south
-    lon, lat = deflect(0., 0., alpha(-r, 0))
-    assert np.allclose([lon, lat], [0., -d])
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))
+    assert np.allclose([lon, lat], [0.0, -d])
 
     # east
-    lon, lat = deflect(0., 0., alpha(0, r))
-    assert np.allclose([lon, lat], [-d, 0.])
+    lon, lat = deflect(0.0, 0.0, alpha(0, r))
+    assert np.allclose([lon, lat], [-d, 0.0])
 
     # west
-    lon, lat = deflect(0., 0., alpha(0, -r))
-    assert np.allclose([lon, lat], [d, 0.])
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r))
+    assert np.allclose([lon, lat], [d, 0.0])
 
 
 def test_deflect_many():
@@ -74,18 +75,18 @@ def test_deflect_many():
     from glass.lensing import deflect
 
     n = 1000
-    abs_alpha = np.random.uniform(0, 2*np.pi, size=n)
+    abs_alpha = np.random.uniform(0, 2 * np.pi, size=n)
     arg_alpha = np.random.uniform(-np.pi, np.pi, size=n)
 
     lon_ = np.degrees(np.random.uniform(-np.pi, np.pi, size=n))
     lat_ = np.degrees(np.arcsin(np.random.uniform(-1, 1, size=n)))
 
-    lon, lat = deflect(lon_, lat_, abs_alpha*np.exp(1j*arg_alpha))
+    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 
     x_, y_, z_ = healpix.ang2vec(lon_, lat_, lonlat=True)
     x, y, z = healpix.ang2vec(lon, lat, lonlat=True)
 
-    dotp = x*x_ + y*y_ + z*z_
+    dotp = x * x_ + y * y_ + z * z_
 
     npt.assert_allclose(dotp, np.cos(abs_alpha))
 
@@ -130,4 +131,4 @@ def test_multi_plane_weights(shells, cosmo):
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    npt.assert_allclose(np.einsum('ij,ik', wmat, deltas), kappa)
+    npt.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)

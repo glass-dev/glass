@@ -88,5 +88,12 @@ testpaths = [
 ]
 xfail_strict = true
 
+[tool.ruff]
+fix = true
+force-exclude = true
+src = [
+    "glass",
+]
+
 [tool.tomlsort]
 overrides."project.classifiers".inline_arrays = false

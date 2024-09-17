@@ -1,16 +1,14 @@
 repos:
-- repo: https://github.com/pycqa/flake8
-  rev: 7.1.1
-  hooks:
-    - id: flake8
-      additional_dependencies:
-        - flake8-print
-- repo: https://github.com/pappasam/toml-sort
-  rev: v0.23.1
-  hooks:
-    - id: toml-sort-fix
-      args:
-        - --all
-        - --in-place
-        - --spaces-indent-inline-array=4
-        - --trailing-comma-inline-array
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.3
+    hooks:
+      - id: ruff-format
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.23.1
+    hooks:
+      - id: toml-sort-fix
+        args:
+          - --all
+          - --in-place
+          - --spaces-indent-inline-array=4
+          - --trailing-comma-inline-array

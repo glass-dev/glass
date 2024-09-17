@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-'''
+"""
 Random points (:mod:`glass.points`)
 ===================================
 
@@ -29,7 +29,7 @@ Bias models
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
-'''
+"""
 
 import numpy as np
 import healpix
@@ -39,7 +39,7 @@ from .core.constants import ARCMIN2_SPHERE
 
 
 def effective_bias(z, bz, w):
-    '''Effective bias parameter from a redshift-dependent bias function.
+    """Effective bias parameter from a redshift-dependent bias function.
 
     This function takes a redshift-dependent bias function :math:`b(z)`
     and computes an effective bias parameter :math:`\\bar{b}` for a
@@ -67,28 +67,36 @@ def effective_bias(z, bz, w):
         \\bar{b} = \\frac{\\int b(z) \\, w(z) \\, dz}{\\int w(z) \\, dz}
         \\;.
 
-    '''
+    """
     norm = np.trapz(w.wa, w.za)
-    return trapz_product((z, bz), (w.za, w.wa))/norm
+    return trapz_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(delta, b):
-    '''linear bias model :math:`\\delta_g = b \\, \\delta`'''
-    return b*delta
+    """linear bias model :math:`\\delta_g = b \\, \\delta`"""
+    return b * delta
 
 
 def loglinear_bias(delta, b):
-    '''log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`'''
+    """log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`"""
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
     return delta_g
 
 
-def positions_from_delta(ngal, delta, bias=None, vis=None, *,
-                         bias_model='linear', remove_monopole=False,
-                         batch=1_000_000, rng=None):
-    '''Generate positions tracing a density contrast.
+def positions_from_delta(
+    ngal,
+    delta,
+    bias=None,
+    vis=None,
+    *,
+    bias_model="linear",
+    remove_monopole=False,
+    batch=1_000_000,
+    rng=None,
+):
+    """Generate positions tracing a density contrast.
 
     The map of expected number counts is constructed from the number
     density, density contrast, an optional bias model, and an optional
@@ -143,7 +151,7 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
         sampled, an array of counts in the shape of the extra
         dimensions is returned.
 
-    '''
+    """
 
     # get default RNG if not given
     if rng is None:
@@ -151,9 +159,9 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
 
     # get the bias model
     if isinstance(bias_model, str):
-        bias_model = globals()[f'{bias_model}_bias']
+        bias_model = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
-        raise ValueError('bias_model must be string or callable')
+        raise ValueError("bias_model must be string or callable")
 
     # broadcast inputs to common shape of extra dimensions
     inputs = [(ngal, 0), (delta, 1)]
@@ -169,7 +177,6 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
 
     # iterate the leading dimensions
     for k in np.ndindex(dims):
-
         # compute density contrast from bias model, or copy
         if bias is None:
             n = np.copy(delta[k])
@@ -182,7 +189,7 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE/n.size*ngal[k]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]
 
         # apply visibility if given
         if vis is not None:
@@ -216,7 +223,7 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
-            q = np.cumsum(n[stop:stop+step])
+            q = np.cumsum(n[stop : stop + step])
             # does this group of pixels fill the batch?
             if size + q[-1] < min(batch, count):
                 # no, we need the next group of pixels to fill the batch
@@ -224,7 +231,7 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
                 size += q[-1]
             else:
                 # how many pixels from this group do we need?
-                stop += np.searchsorted(q, batch - size, side='right')
+                stop += np.searchsorted(q, batch - size, side="right")
                 # if the first pixel alone is too much, use it anyway
                 if stop == start:
                     stop += 1
@@ -236,14 +243,14 @@ def positions_from_delta(ngal, delta, bias=None, vis=None, *,
                 # keep track of remaining number of points
                 count -= ipix.size
                 # yield the batch
-                yield lon, lat, ipix.size*cmask
+                yield lon, lat, ipix.size * cmask
 
         # make sure that the correct number of pixels was sampled
         assert np.sum(n[stop:]) == 0
 
 
 def uniform_positions(ngal, *, rng=None):
-    '''Generate positions uniformly over the sphere.
+    """Generate positions uniformly over the sphere.
 
     The function supports array input for the ``ngal`` parameter.
 
@@ -262,7 +269,7 @@ def uniform_positions(ngal, *, rng=None):
         The number of sampled points.  For array inputs, an array of
         counts with the same shape is returned.
 
-    '''
+    """
 
     # get default RNG if not given
     if rng is None:
@@ -279,7 +286,6 @@ def uniform_positions(ngal, *, rng=None):
 
     # sample each set of points
     for k in np.ndindex(dims):
-
         # sample uniformly over the sphere
         lon = rng.uniform(-180, 180, size=ngal[k])
         lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))
