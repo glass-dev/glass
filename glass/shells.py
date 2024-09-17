@@ -92,7 +92,7 @@ RadialWindow.__doc__ = """A radial window, defined by a window function.
     immutable (however, the array entries may **not** be immutable; do
     not change them in place)::
 
-        >>> from glass.shells import RadialWindow
+        >>> from glass import RadialWindow
         >>> w1 = RadialWindow(..., ..., zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
