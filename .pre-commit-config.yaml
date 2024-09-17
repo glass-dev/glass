@@ -17,4 +17,5 @@ repos:
     hooks:
       - id: prettier
         args:
+          - --prose-wrap=always
           - --quote-props=as-needed

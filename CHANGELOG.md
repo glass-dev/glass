@@ -7,33 +7,32 @@ based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Added
 
-- A new function `combine()` that evaluates the linear combination
-  of radial window functions with given weights.
-- A new function `effective_cls()` which combines power spectra
-  using a list of weights, which models what happens in the simulation.
-- A new function `position_weights()` that returns weights for
-  `effective_cls()` to model the result of `positions_from_delta()`.
+- A new function `combine()` that evaluates the linear combination of radial
+  window functions with given weights.
+- A new function `effective_cls()` which combines power spectra using a list of
+  weights, which models what happens in the simulation.
+- A new function `position_weights()` that returns weights for `effective_cls()`
+  to model the result of `positions_from_delta()`.
 - A new function `multi_plane_weights()` that returns weights for
   `effective_cls()` to model the result of `MultiPlaneConvergence`.
 - The `glass.core.algorithm` module.
-- The new `partition(method="nnls")` function computes a partition
-  with non-negative contributions for each shell.
-- Function `redshifts()` to sample redshifts following a radial
-  window function.
+- The new `partition(method="nnls")` function computes a partition with
+  non-negative contributions for each shell.
+- Function `redshifts()` to sample redshifts following a radial window function.
 
 ### Changed
 
 - The default method for `partition()` is now `"nnls"`.
-- Both `partition(method="nnls")` and `partition(method="lstsq")`
-  now have an additional integral constraint so that the sum of the
-  partition recovers the integral of the input function.
+- Both `partition(method="nnls")` and `partition(method="lstsq")` now have an
+  additional integral constraint so that the sum of the partition recovers the
+  integral of the input function.
 - The output of `partition()` now has the shells axis as its first.
 
 ### Fixed
 
 - Now uses the updated intersphinx URL for the GLASS examples.
-- A bug in `effective_cls()` that caused arrays to be one entry too
-  long if `lmax` was not given explicitly.
+- A bug in `effective_cls()` that caused arrays to be one entry too long if
+  `lmax` was not given explicitly.
 - A bug in `partition()` with the default method.
 - `partition()` now works correctly with functions having extra axes.
 
@@ -41,17 +40,16 @@ based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Added
 
-- Function `getcl()` to return angular power spectra by index from
-  a list using GLASS ordering.
-- New `linear_windows()` and `cubic_windows()` window functions for
-  shells.
+- Function `getcl()` to return angular power spectra by index from a list using
+  GLASS ordering.
+- New `linear_windows()` and `cubic_windows()` window functions for shells.
 
 ### Changed
 
-- The `gaussian_phz()` function now accepts bounds using `lower=`
-  and `upper=` keyword parameters.
-- The `partition()` function now returns an array of weights to
-  approximate the given function by the windows.
+- The `gaussian_phz()` function now accepts bounds using `lower=` and `upper=`
+  keyword parameters.
+- The `partition()` function now returns an array of weights to approximate the
+  given function by the windows.
 
 ## [2023.6] (30 Jun 2023)
 
@@ -114,8 +112,8 @@ based on [Keep a Changelog](https://keepachangelog.com).
 
 - Instead of an array of shell boundaries and `MatterWeights`, the shells are
   entirely defined by a `RadialWindow` window function.
-- The `glass.lensing.multi_plane_matrix` function now takes a sequence of
-  window functions.
+- The `glass.lensing.multi_plane_matrix` function now takes a sequence of window
+  functions.
 - The arguments of `glass.lensing.MultiPlaneConvergence.add_plane` are called
   `zsrc` and `wlens` instead of the more ambiguous `z` and `w`. The properties
   `MultiPlaneConvergence.z` and `MultiPlaneConvergence.w` that return these

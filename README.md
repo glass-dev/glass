@@ -9,9 +9,9 @@
 [![doi](https://img.shields.io/badge/doi-10.21105/astro.2302.01942-blue)](https://dx.doi.org/10.21105/astro.2302.01942)
 [![Slack](https://img.shields.io/badge/join-Slack-4A154B)](https://glass-dev.github.io/slack)
 
-This is the core library for GLASS, the Generator for Large Scale Structure.
-For more information, see the full [documentation]. There are a number of
-[examples] to get you started.
+This is the core library for GLASS, the Generator for Large Scale Structure. For
+more information, see the full [documentation]. There are a number of [examples]
+to get you started.
 
 ## Installation
 
@@ -26,10 +26,9 @@ this repository:
 
 ## Citation
 
-If you use GLASS simulations or the GLASS library in your research, please [cite
-the original GLASS
-paper](https://glass.readthedocs.io/stable/user/publications.html) in your
-publications.
+If you use GLASS simulations or the GLASS library in your research, please
+[cite the original GLASS paper](https://glass.readthedocs.io/stable/user/publications.html)
+in your publications.
 
 ## Getting in touch
 
