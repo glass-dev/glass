@@ -6,7 +6,7 @@ Observations
 
 .. currentmodule:: glass
 
-The :mod:`glass.observations` module provides functionality for simulating
+The following functions provide functionality for simulating
 observational effects of surveys.
 
 

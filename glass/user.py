@@ -6,8 +6,8 @@ User utilities
 
 .. currentmodule:: glass
 
-The :mod:`glass.user` module contains convenience functions for users of the
-library.
+The following functions/classes provide convenience functionality for users
+of the library.
 
 
 Input and Output

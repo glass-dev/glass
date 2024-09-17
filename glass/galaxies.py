@@ -6,7 +6,7 @@ Galaxies
 
 .. currentmodule:: glass
 
-The :mod:`glass.galaxies` module provides functionality for simulating galaxies
+The following functions provide functionality for simulating galaxies
 as typically observed in a cosmological galaxy survey.
 
 Functions
@@ -43,7 +43,7 @@ def redshifts(
     n : int or array_like
         Number of redshifts to sample.  If an array is given, the
         results are concatenated.
-    w : :class:`~glass.shells.RadialWindow`
+    w : :class:`~glass.RadialWindow`
         Radial window function.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
@@ -225,7 +225,7 @@ def gaussian_phz(
 
     See Also
     --------
-    glass.observations.tomo_nz_gausserr :
+    glass.tomo_nz_gausserr :
         Create tomographic redshift distributions assuming the same
         model.
 

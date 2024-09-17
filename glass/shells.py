@@ -6,7 +6,7 @@ Shells
 
 .. currentmodule:: glass
 
-The :mod:`glass.shells` module provides functions for the definition of
+The following functions provide functionality for the definition of
 matter shells, i.e. the radial discretisation of the light cone.
 
 

@@ -6,7 +6,7 @@ Observed shapes
 
 .. currentmodule:: glass
 
-The :mod:`glass.shapes` module provides functionality for simulating the
+The following functions provide functionality for simulating the
 observed shapes of objects, such as e.g. galaxies.
 
 Ellipticity

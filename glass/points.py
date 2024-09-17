@@ -6,7 +6,7 @@ Random points
 
 .. currentmodule:: glass
 
-The :mod:`glass.points` module provides functionality for simulating point
+The following functions provide functionality for simulating point
 processes on the sphere and sampling random positions.
 
 Sampling
@@ -49,7 +49,7 @@ def effective_bias(z, bz, w):
     ----------
     z, bz : array_like
         Redshifts and values of the bias function :math:`b(z)`.
-    w : :class:`~glass.shells.RadialWindow`
+    w : :class:`~glass.RadialWindow`
         The radial window function :math:`w(z)`.
 
     Returns

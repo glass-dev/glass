@@ -6,7 +6,7 @@ Lensing
 
 .. currentmodule:: glass
 
-The :mod:`glass.lensing` module provides functionality for simulating
+The following functions/classes provide functionality for simulating
 gravitational lensing by the matter distribution in the universe.
 
 Iterative lensing
@@ -387,7 +387,7 @@ def multi_plane_weights(
     weights : array_like
         Relative weight of each shell.  The first axis must broadcast
         against the number of shells, and is normalised internally.
-    shells : list of :class:`~glass.shells.RadialWindow`
+    shells : list of :class:`~glass.RadialWindow`
         Window functions of the shells.
     cosmo : Cosmology
         Cosmology instance.
