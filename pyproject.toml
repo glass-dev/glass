@@ -94,6 +94,14 @@ force-exclude = true
 src = [
     "glass",
 ]
+lint.select = [
+    "ALL",
+]
+lint.mccabe.max-complexity = 18
+lint.pep8-naming.classmethod-decorators = [
+    "classmethod",
+    "pydantic.field_validator",
+]
 
 [tool.tomlsort]
 overrides."project.classifiers".inline_arrays = false
