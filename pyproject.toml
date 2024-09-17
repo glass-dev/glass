@@ -101,6 +101,19 @@ lint.ignore = [
     "ISC001", # clashes with formatter
     "NPY201", # TODO: remove after NumPy v2 support
 ]
+lint.isort = {known-first-party = [
+    "glass",
+], section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "cosmo",
+    "first-party",
+    "local-folder",
+], sections = {"cosmo" = [
+    "camb",
+    "cosmology",
+]}}
 lint.per-file-ignores = {"tests*" = [
     "ANN001", # missing-type-function-argument
     "ANN201", # missing-return-type-undocumented-public-function
@@ -114,3 +127,4 @@ lint.mccabe.max-complexity = 18
 
 [tool.tomlsort]
 overrides."project.classifiers".inline_arrays = false
+overrides."tool.ruff.lint.isort.section-order".inline_arrays = false

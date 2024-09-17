@@ -9,6 +9,7 @@ else:
     HAVE_FITSIO = False
 
 import numpy as np
+
 from glass import user
 
 

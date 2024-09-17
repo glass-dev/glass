@@ -5,6 +5,7 @@ def test_redshifts():
     from unittest.mock import Mock
 
     import numpy as np
+
     from glass.galaxies import redshifts
 
     # create a mock radial window function
@@ -24,6 +25,7 @@ def test_redshifts():
 
 def test_redshifts_from_nz():
     import numpy as np
+
     from glass.galaxies import redshifts_from_nz
 
     # test sampling
@@ -95,6 +97,7 @@ def test_redshifts_from_nz():
 
 def test_gaussian_phz():
     import numpy as np
+
     from glass.galaxies import gaussian_phz
 
     # test sampling

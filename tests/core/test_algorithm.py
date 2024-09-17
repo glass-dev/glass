@@ -13,8 +13,9 @@ else:
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_nnls():
     import numpy as np
-    from glass.core.algorithm import nnls as nnls_glass
     from scipy.optimize import nnls as nnls_scipy
+
+    from glass.core.algorithm import nnls as nnls_glass
 
     a = np.random.randn(100, 20)
     b = np.random.randn(100)

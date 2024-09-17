@@ -71,6 +71,7 @@ def test_deflect_nsew(usecomplex):
 
 def test_deflect_many():
     import healpix
+
     from glass.lensing import deflect
 
     n = 1000
