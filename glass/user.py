@@ -50,7 +50,7 @@ def load_cls(filename):
 
 
 class _FitsWriter:
-    """Writer that creates a FITS file.  Initialised with the fits object and extention name."""
+    """Writer that creates a FITS file.  Initialised with the fits object and extension name."""
 
     def __init__(self, fits, ext=None):
         """Create a new, uninitialised writer."""
