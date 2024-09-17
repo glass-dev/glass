@@ -1,66 +1,59 @@
-Changelog
-=========
+# Changelog
 
-All notable changes to the project are documented in this file.  The format is
+All notable changes to the project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com).
 
-
-[2024.1]  (16 Jul 2024)
------------------------
+## [2024.1] (16 Jul 2024)
 
 ### Added
 
-* A new function `combine()` that evaluates the linear combination
+- A new function `combine()` that evaluates the linear combination
   of radial window functions with given weights.
-* A new function `effective_cls()` which combines power spectra
+- A new function `effective_cls()` which combines power spectra
   using a list of weights, which models what happens in the simulation.
-* A new function `position_weights()` that returns weights for
+- A new function `position_weights()` that returns weights for
   `effective_cls()` to model the result of `positions_from_delta()`.
-* A new function `multi_plane_weights()` that returns weights for
+- A new function `multi_plane_weights()` that returns weights for
   `effective_cls()` to model the result of `MultiPlaneConvergence`.
-* The `glass.core.algorithm` module.
-* The new `partition(method="nnls")` function computes a partition
+- The `glass.core.algorithm` module.
+- The new `partition(method="nnls")` function computes a partition
   with non-negative contributions for each shell.
-* Function `redshifts()` to sample redshifts following a radial
+- Function `redshifts()` to sample redshifts following a radial
   window function.
 
 ### Changed
 
-* The default method for `partition()` is now `"nnls"`.
-* Both `partition(method="nnls")` and `partition(method="lstsq")`
+- The default method for `partition()` is now `"nnls"`.
+- Both `partition(method="nnls")` and `partition(method="lstsq")`
   now have an additional integral constraint so that the sum of the
   partition recovers the integral of the input function.
-* The output of `partition()` now has the shells axis as its first.
+- The output of `partition()` now has the shells axis as its first.
 
 ### Fixed
 
-* Now uses the updated intersphinx URL for the GLASS examples.
-* A bug in `effective_cls()` that caused arrays to be one entry too
+- Now uses the updated intersphinx URL for the GLASS examples.
+- A bug in `effective_cls()` that caused arrays to be one entry too
   long if `lmax` was not given explicitly.
-* A bug in `partition()` with the default method.
-* `partition()` now works correctly with functions having extra axes.
+- A bug in `partition()` with the default method.
+- `partition()` now works correctly with functions having extra axes.
 
-
-[2023.7]  (1 Aug 2023)
-----------------------
+## [2023.7] (1 Aug 2023)
 
 ### Added
 
-* Function `getcl()` to return angular power spectra by index from
+- Function `getcl()` to return angular power spectra by index from
   a list using GLASS ordering.
-* New `linear_windows()` and `cubic_windows()` window functions for
+- New `linear_windows()` and `cubic_windows()` window functions for
   shells.
 
 ### Changed
 
-* The `gaussian_phz()` function now accepts bounds using `lower=`
+- The `gaussian_phz()` function now accepts bounds using `lower=`
   and `upper=` keyword parameters.
-* The `partition()` function now returns an array of weights to
+- The `partition()` function now returns an array of weights to
   approximate the given function by the windows.
 
-
-[2023.6]  (30 Jun 2023)
------------------------
+## [2023.6] (30 Jun 2023)
 
 ### Added
 
@@ -89,9 +82,7 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - Incorrect extrapolation in `glass.core.array.trapz_product()`, causing a bug
   in `glass.points.effective_bias()`
 
-
-[2023.5]  (31 May 2023)
------------------------
+## [2023.5] (31 May 2023)
 
 ### Added
 
@@ -109,9 +100,7 @@ based on [Keep a Changelog](https://keepachangelog.com).
 
 - Remove profiling functions (#89)
 
-
-[2023.2] - 1 Mar 2023
----------------------
+## [2023.2] - 1 Mar 2023
 
 ### Added
 
@@ -120,7 +109,6 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - The `glass.shells` module for shell definitions.
 - User functions to save and load Cls
 - This changelog added to keep track of changes between versions
-
 
 ### Changed
 
@@ -136,7 +124,6 @@ based on [Keep a Changelog](https://keepachangelog.com).
   and computes its effective bias parameter.
 - Some type hints added to library functions
 
-
 ### Removed
 
 - The `glass.lensing.multi_plane_weights` function, replaced by the
@@ -150,14 +137,11 @@ based on [Keep a Changelog](https://keepachangelog.com).
 - The `glass.matter` module, in favour of the more appropriately-named
   `glass.shells` module.
 
-
-[2023.1] - 31 Jan 2023
-----------------------
+## [2023.1] - 31 Jan 2023
 
 ### Added
 
 - Initial wide release for GLASS paper
-
 
 [2024.1]: https://github.com/glass-dev/glass/compare/v2023.7...v2024.1
 [2023.7]: https://github.com/glass-dev/glass/compare/v2023.6...v2023.7
