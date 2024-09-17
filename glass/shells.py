@@ -421,7 +421,7 @@ def partition(
         \\end{pmatrix} \\;,
 
     where :math:`\\lambda` is a multiplier to enforce the integral
-    contraints.
+    constraints.
 
     The :func:`partition()` function implements a number of methods to
     obtain a solution:
