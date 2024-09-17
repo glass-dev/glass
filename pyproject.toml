@@ -58,6 +58,7 @@ test = [
     "fitsio",
     "pytest",
     "pytest-cov",
+    "pytest-doctestplus",
     "scipy",
 ]
 
