@@ -1,6 +1,4 @@
-
-**GLASS**: Generator for Large Scale Structure
-==============================================
+# **GLASS**: Generator for Large Scale Structure
 
 [![Test](https://github.com/glass-dev/glass/actions/workflows/test.yml/badge.svg)](https://github.com/glass-dev/glass/actions/workflows/test.yml)
 [![Documentation](https://readthedocs.org/projects/glass/badge/?version=latest)](https://glass.readthedocs.io/latest/)
@@ -11,13 +9,11 @@
 [![doi](https://img.shields.io/badge/doi-10.21105/astro.2302.01942-blue)](https://dx.doi.org/10.21105/astro.2302.01942)
 [![Slack](https://img.shields.io/badge/join-Slack-4A154B)](https://glass-dev.github.io/slack)
 
-This is the core library for GLASS, the Generator for Large Scale Structure.
-For more information, see the full [documentation].  There are a number of
-[examples] to get you started.
+This is the core library for GLASS, the Generator for Large Scale Structure. For
+more information, see the full [documentation]. There are a number of [examples]
+to get you started.
 
-
-Installation
-------------
+## Installation
 
 Releases of the code can be installed with pip as usual:
 
@@ -28,18 +24,13 @@ this repository:
 
     pip install git+https://github.com/glass-dev/glass.git
 
+## Citation
 
-Citation
---------
+If you use GLASS simulations or the GLASS library in your research, please
+[cite the original GLASS paper](https://glass.readthedocs.io/stable/user/publications.html)
+in your publications.
 
-If you use GLASS simulations or the GLASS library in your research, please [cite
-the original GLASS
-paper](https://glass.readthedocs.io/stable/user/publications.html) in your
-publications.
-
-
-Getting in touch
-----------------
+## Getting in touch
 
 The best way to get help about the code is currently to get in touch.
 
@@ -47,7 +38,6 @@ If you would like to start a discussion with the wider GLASS community about
 e.g. a design decision or API change, you can use our [Discussions] page.
 
 We also have a public [Slack workspace] for discussions about the project.
-
 
 [documentation]: https://glass.readthedocs.io/
 [examples]: https://glass.readthedocs.io/projects/examples/
