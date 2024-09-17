@@ -31,8 +31,7 @@ def cosmo():
         def xm(self, z, z2=None):
             if z2 is None:
                 return np.array(z) * 1000
-            else:
-                return (np.array(z2) - np.array(z)) * 1000
+            return (np.array(z2) - np.array(z)) * 1000
 
     return MockCosmology()
 

@@ -94,6 +94,19 @@ force-exclude = true
 src = [
     "glass",
 ]
+lint.ignore = [
+    "COM812", # clashes with formatter
+    "D203", # mutually exclusive rule
+    "D212", # mutually exclusive rule
+    "ISC001", # clashes with formatter
+    "NPY201", # TODO: remove after NumPy v2 support
+]
+lint.per-file-ignores = {"tests*" = [
+    "ANN001", # missing-type-function-argument
+    "ANN201", # missing-return-type-undocumented-public-function
+    "D103", # undocumented-public-function
+    "S101", # assert
+]}
 lint.select = [
     "ALL",
 ]

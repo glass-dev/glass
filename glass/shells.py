@@ -47,13 +47,14 @@ Weight functions
 
 import warnings
 from collections import namedtuple
-import numpy as np
-
-from .core.array import ndinterp
 
 # type checking
-from typing import Union, Sequence, List, Tuple, Optional, Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, List, Optional, Sequence, Tuple, Union
+
+import numpy as np
 from numpy.typing import ArrayLike
+
+from .core.array import ndinterp
 
 if TYPE_CHECKING:
     from cosmology import Cosmology
@@ -128,9 +129,12 @@ RadialWindow.zeff.__doc__ = """Effective redshift of the window."""
 
 
 def tophat_windows(
-    zbins: ArrayLike1D, dz: float = 1e-3, weight: Optional[WeightFunc] = None
+    zbins: ArrayLike1D,
+    dz: float = 1e-3,
+    weight: Optional[WeightFunc] = None,
 ) -> List[RadialWindow]:
-    """Tophat window functions from the given redshift bin edges.
+    """
+    Tophat window functions from the given redshift bin edges.
 
     Uses the *N+1* given redshifts as bin edges to construct *N* tophat
     window functions.  The redshifts of the windows have linear spacing
@@ -189,7 +193,8 @@ def linear_windows(
     dz: float = 1e-3,
     weight: Optional[WeightFunc] = None,
 ) -> List[RadialWindow]:
-    """Linear interpolation window functions.
+    """
+    Linear interpolation window functions.
 
     Uses the *N+2* given redshifts as nodes to construct *N* triangular
     window functions between the first and last node.  These correspond
@@ -232,10 +237,10 @@ def linear_windows(
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)]
+            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
         )
         w = np.concatenate(
-            [np.linspace(0.0, 1.0, n, endpoint=False), np.linspace(1.0, 0.0, m)]
+            [np.linspace(0.0, 1.0, n, endpoint=False), np.linspace(1.0, 0.0, m)],
         )
         if weight is not None:
             w *= weight(z)
@@ -248,7 +253,8 @@ def cubic_windows(
     dz: float = 1e-3,
     weight: Optional[WeightFunc] = None,
 ) -> List[RadialWindow]:
-    """Cubic interpolation window functions.
+    """
+    Cubic interpolation window functions.
 
     Uses the *N+2* given redshifts as nodes to construct *N* cubic
     Hermite spline window functions between the first and last node.
@@ -292,7 +298,7 @@ def cubic_windows(
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)]
+            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
         )
         u = np.linspace(0.0, 1.0, n, endpoint=False)
         v = np.linspace(1.0, 0.0, m)
@@ -304,9 +310,12 @@ def cubic_windows(
 
 
 def restrict(
-    z: ArrayLike1D, f: ArrayLike1D, w: RadialWindow
+    z: ArrayLike1D,
+    f: ArrayLike1D,
+    w: RadialWindow,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Restrict a function to a redshift window.
+    """
+    Restrict a function to a redshift window.
 
     Multiply the function :math:`f(z)` by a window function :math:`w(z)`
     to produce :math:`w(z) f(z)` over the support of :math:`w`.
@@ -335,7 +344,6 @@ def restrict(
         The restricted function.
 
     """
-
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
     fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
@@ -349,7 +357,8 @@ def partition(
     *,
     method: str = "nnls",
 ) -> ArrayLike:
-    """Partition a function by a sequence of windows.
+    """
+    Partition a function by a sequence of windows.
 
     Returns a vector of weights :math:`x_1, x_2, \\ldots` such that the
     weighted sum of normalised radial window functions :math:`x_1 \\,
@@ -458,10 +467,8 @@ def partition_lstsq(
     sumtol: float = 0.01,
 ) -> ArrayLike:
     """Least-squares partition."""
-
     # make sure nothing breaks
-    if sumtol < 1e-4:
-        sumtol = 1e-4
+    sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
@@ -507,18 +514,17 @@ def partition_nnls(
     *,
     sumtol: float = 0.01,
 ) -> ArrayLike:
-    """Non-negative least-squares partition.
+    """
+    Non-negative least-squares partition.
 
     Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
     requires SciPy.
 
     """
-
     from .core.algorithm import nnls
 
     # make sure nothing breaks
-    if sumtol < 1e-4:
-        sumtol = 1e-4
+    sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
@@ -568,7 +574,6 @@ def partition_restrict(
     shells: Sequence[RadialWindow],
 ) -> ArrayLike:
     """Partition by restriction and integration."""
-
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
@@ -604,7 +609,8 @@ def combine(
     weights: ArrayLike,
     shells: Sequence[RadialWindow],
 ) -> ArrayLike:
-    """Evaluate a linear combination of window functions.
+    """
+    Evaluate a linear combination of window functions.
 
     Takes a vector of weights :math:`x_1, x_2, \\ldots` and computes the
     weighted sum of normalised radial window functions :math:`f(z) = x_1

@@ -31,16 +31,17 @@ Applying lensing
 
 """
 
-import numpy as np
-import healpy as hp
-
 # typing support
-from typing import Optional, Sequence, Tuple, TYPE_CHECKING
-from numpy.typing import NDArray, ArrayLike
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+
+import healpy as hp
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
 if TYPE_CHECKING:
     # to prevent circular dependencies, only import these for type checking
     from cosmology import Cosmology
+
     from .shells import RadialWindow
 
 
@@ -53,7 +54,8 @@ def from_convergence(
     shear: bool = False,
     discretized: bool = True,
 ) -> Tuple[NDArray, ...]:
-    r"""Compute other weak lensing maps from the convergence.
+    r"""
+    Compute other weak lensing maps from the convergence.
 
     Takes a weak lensing convergence map and returns one or more of
     deflection potential, deflection, and shear maps.  The maps are
@@ -152,7 +154,6 @@ def from_convergence(
            doi:10.21105/astro.2302.01942
 
     """
-
     # no output means no computation, return empty tuple
     if not (potential or deflection or shear):
         return ()
@@ -221,9 +222,13 @@ def from_convergence(
 
 
 def shear_from_convergence(
-    kappa: np.ndarray, lmax: Optional[int] = None, *, discretized: bool = True
+    kappa: np.ndarray,
+    lmax: Optional[int] = None,
+    *,
+    discretized: bool = True,
 ) -> np.ndarray:
-    r"""Weak lensing shear from convergence.
+    r"""
+    Weak lensing shear from convergence.
 
     .. deprecated:: 2023.6
        Use the more general :func:`from_convergence` function instead.
@@ -232,7 +237,6 @@ def shear_from_convergence(
     transform.
 
     """
-
     nside = hp.get_nside(kappa)
     if lmax is None:
         lmax = 3 * nside - 1
@@ -279,13 +283,13 @@ class MultiPlaneConvergence:
         self.kappa3: Optional[np.ndarray] = None
 
     def add_window(self, delta: np.ndarray, w: "RadialWindow") -> None:
-        """Add a mass plane from a window function to the convergence.
+        """
+        Add a mass plane from a window function to the convergence.
 
         The lensing weight is computed from the window function, and the
         source plane redshift is the effective redshift of the window.
 
         """
-
         zsrc = w.zeff
         lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)
 
@@ -293,7 +297,6 @@ class MultiPlaneConvergence:
 
     def add_plane(self, delta: np.ndarray, zsrc: float, wlens: float = 1.0) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
-
         if zsrc <= self.z3:
             raise ValueError("source redshift must be increasing")
 
@@ -373,7 +376,8 @@ def multi_plane_weights(
     shells: Sequence["RadialWindow"],
     cosmo: "Cosmology",
 ) -> ArrayLike:
-    """Compute effective weights for multi-plane convergence.
+    """
+    Compute effective weights for multi-plane convergence.
 
     Converts an array *weights* of relative weights for each shell
     into the equivalent array of relative lensing weights.
@@ -410,7 +414,8 @@ def multi_plane_weights(
 
 
 def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
-    """Apply deflections to positions.
+    """
+    Apply deflections to positions.
 
     Takes an array of :term:`deflection` values and applies them
     to the given positions.
@@ -439,7 +444,6 @@ def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
     exponential map.
 
     """
-
     alpha = np.asanyarray(alpha)
     if np.iscomplexobj(alpha):
         alpha1, alpha2 = alpha.real, alpha.imag

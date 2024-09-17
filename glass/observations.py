@@ -28,11 +28,11 @@ Visibility
 
 """
 
-import numpy as np
-import healpy as hp
 import math
+from typing import List, Optional, Tuple
 
-from typing import Optional, Tuple, List
+import healpy as hp
+import numpy as np
 from numpy.typing import ArrayLike
 
 from .core.array import cumtrapz
@@ -43,7 +43,8 @@ def vmap_galactic_ecliptic(
     galactic: Tuple[float, float] = (30, 90),
     ecliptic: Tuple[float, float] = (20, 80),
 ) -> np.ndarray:
-    """visibility map masking galactic and ecliptic plane
+    """
+    Visibility map masking galactic and ecliptic plane
 
     This function returns a :term:`visibility map` that blocks out stripes for
     the galactic and ecliptic planes.  The location of the stripes is set with
@@ -89,7 +90,8 @@ def gaussian_nz(
     *,
     norm: Optional[ArrayLike] = None,
 ) -> np.ndarray:
-    r"""Gaussian redshift distribution.
+    r"""
+    Gaussian redshift distribution.
 
     The redshift follows a Gaussian distribution with the given mean and
     standard deviation.
@@ -134,7 +136,8 @@ def smail_nz(
     *,
     norm: Optional[ArrayLike] = None,
 ) -> np.ndarray:
-    r"""Redshift distribution following Smail et al. (1994).
+    r"""
+    Redshift distribution following Smail et al. (1994).
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
 
@@ -188,9 +191,14 @@ def smail_nz(
 
 
 def fixed_zbins(
-    zmin: float, zmax: float, *, nbins: Optional[int] = None, dz: Optional[float] = None
+    zmin: float,
+    zmax: float,
+    *,
+    nbins: Optional[int] = None,
+    dz: Optional[float] = None,
 ) -> List[Tuple[float, float]]:
-    """tomographic redshift bins of fixed size
+    """
+    Tomographic redshift bins of fixed size
 
     This function creates contiguous tomographic redshift bins of fixed size.
     It takes either the number or size of the bins.
@@ -208,8 +216,8 @@ def fixed_zbins(
     -------
     zbins : list of tuple of float
         List of redshift bin edges.
-    """
 
+    """
     if nbins is not None and dz is None:
         zbinedges = np.linspace(zmin, zmax, nbins + 1)
     if nbins is None and dz is not None:
@@ -221,9 +229,12 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: np.ndarray, nz: np.ndarray, nbins: int
+    z: np.ndarray,
+    nz: np.ndarray,
+    nbins: int,
 ) -> List[Tuple[float, float]]:
-    """equal density tomographic redshift bins
+    """
+    Equal density tomographic redshift bins
 
     This function subdivides a source redshift distribution into ``nbins``
     tomographic redshift bins with equal density.
@@ -253,9 +264,13 @@ def equal_dens_zbins(
 
 
 def tomo_nz_gausserr(
-    z: np.ndarray, nz: np.ndarray, sigma_0: float, zbins: List[Tuple[float, float]]
+    z: np.ndarray,
+    nz: np.ndarray,
+    sigma_0: float,
+    zbins: List[Tuple[float, float]],
 ) -> np.ndarray:
-    """tomographic redshift bins with a Gaussian redshift error
+    """
+    Tomographic redshift bins with a Gaussian redshift error
 
     This function takes a _true_ overall source redshift distribution ``z``,
     ``nz`` and returns tomographic source redshift distributions for the

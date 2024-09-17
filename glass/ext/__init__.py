@@ -1,4 +1,5 @@
-"""Namespace loader for GLASS extension packages.
+"""
+Namespace loader for GLASS extension packages.
 
 Uses the pkgutil namespace mechanism to find "ext" submodules of
 packages that provide a "glass" module.
@@ -13,7 +14,7 @@ def _extend_path(path, name):
     _pkg, _, _mod = name.partition(".")
 
     return list(
-        filter(os.path.isdir, (os.path.join(p, _mod) for p in extend_path(path, _pkg)))
+        filter(os.path.isdir, (os.path.join(p, _mod) for p in extend_path(path, _pkg))),
     )
 
 

@@ -19,30 +19,31 @@ Input and Output
 
 """
 
-import numpy as np
 from contextlib import contextmanager
+
+import numpy as np
 
 
 def save_cls(filename, cls):
-    """Save a list of Cls to file.
+    """
+    Save a list of Cls to file.
 
     Uses :func:`numpy.savez` internally. The filename should therefore have a
     ``.npz`` suffix, or it will be given one.
 
     """
-
     split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])
     values = np.concatenate([cl for cl in cls if cl is not None])
     np.savez(filename, values=values, split=split)
 
 
 def load_cls(filename):
-    """Load a list of Cls from file.
+    """
+    Load a list of Cls from file.
 
     Uses :func:`numpy.load` internally.
 
     """
-
     with np.load(filename) as npz:
         values = npz["values"]
         split = npz["split"]
@@ -59,7 +60,6 @@ class _FitsWriter:
 
     def _append(self, data, names=None):
         """Internal method where the FITS writing is done"""
-
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if self.ext is None:
@@ -70,10 +70,11 @@ class _FitsWriter:
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
     def write(self, data=None, /, **columns):
-        """Writes to FITS by calling the internal _append method.
+        """
+        Writes to FITS by calling the internal _append method.
         Pass either a positional variable (data)
-        or multiple named arguments (**columns)"""
-
+        or multiple named arguments (**columns)
+        """
         # if data is given, write it as it is
         if data is not None:
             self._append(data)

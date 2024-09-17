@@ -31,7 +31,8 @@ from numpy.typing import ArrayLike, NDArray
 
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
-    r"""axis ratio of a randomly projected triaxial ellipsoid
+    r"""
+    Axis ratio of a randomly projected triaxial ellipsoid
 
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
@@ -62,7 +63,6 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
 
     """
-
     # default RNG if not provided
     if rng is None:
         rng = np.random.default_rng()
@@ -91,14 +91,15 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
 
     # eq. (12)
     q = np.sqrt(
-        (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2))
+        (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
 
     return q
 
 
 def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
-    r"""ellipticity distribution following Ryden (2004)
+    r"""
+    Ellipticity distribution following Ryden (2004)
 
     The ellipticities are sampled by randomly projecting a 3D ellipsoid with
     principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -
@@ -133,7 +134,6 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
     .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
 
     """
-
     # default RNG if not provided
     if rng is None:
         rng = np.random.default_rng()
@@ -167,9 +167,13 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
 
 
 def ellipticity_gaussian(
-    count: int | ArrayLike, sigma: ArrayLike, *, rng: np.random.Generator | None = None
+    count: int | ArrayLike,
+    sigma: ArrayLike,
+    *,
+    rng: np.random.Generator | None = None,
 ) -> NDArray:
-    r"""Sample Gaussian galaxy ellipticities.
+    r"""
+    Sample Gaussian galaxy ellipticities.
 
     The ellipticities are sampled from a normal distribution with
     standard deviation ``sigma`` for each component.  Samples where the
@@ -192,7 +196,6 @@ def ellipticity_gaussian(
         Array of galaxy :term:`ellipticity`.
 
     """
-
     # default RNG if not provided
     if rng is None:
         rng = np.random.default_rng()
@@ -221,9 +224,13 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | ArrayLike, sigma: ArrayLike, *, rng: np.random.Generator | None = None
+    count: int | ArrayLike,
+    sigma: ArrayLike,
+    *,
+    rng: np.random.Generator | None = None,
 ) -> NDArray:
-    r"""Sample galaxy ellipticities with intrinsic normal distribution.
+    r"""
+    Sample galaxy ellipticities with intrinsic normal distribution.
 
     The ellipticities are sampled from an intrinsic normal distribution
     with standard deviation ``sigma`` for each component.
@@ -243,7 +250,6 @@ def ellipticity_intnorm(
         Array of galaxy :term:`ellipticity`.
 
     """
-
     # default RNG if not provided
     if rng is None:
         rng = np.random.default_rng()
@@ -252,7 +258,7 @@ def ellipticity_intnorm(
     count, sigma = np.broadcast_arrays(count, sigma)
 
     # make sure sigma is admissible
-    if not np.all((0 <= sigma) & (sigma < 0.5**0.5)):
+    if not np.all((sigma >= 0) & (sigma < 0.5**0.5)):
         raise ValueError("sigma must be between 0 and sqrt(0.5)")
 
     # convert to sigma_eta using fit

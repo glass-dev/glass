@@ -27,12 +27,13 @@ Utility functions
 """
 
 import warnings
-import numpy as np
-import healpy as hp
-from gaussiancl import gaussiancl
 
 # typing
-from typing import Any, Union, Tuple, Generator, Optional, Sequence, Callable, Iterable
+from typing import Any, Callable, Generator, Iterable, Optional, Sequence, Tuple, Union
+
+import healpy as hp
+import numpy as np
+from gaussiancl import gaussiancl
 
 # types
 Array = np.ndarray
@@ -44,10 +45,11 @@ Alms = np.ndarray
 
 
 def iternorm(
-    k: int, cov: Iterable[Array], size: Size = None
+    k: int,
+    cov: Iterable[Array],
+    size: Size = None,
 ) -> Generator[Iternorm, None, None]:
-    """return the vector a and variance sigma^2 for iterative normal sampling"""
-
+    """Return the vector a and variance sigma^2 for iterative normal sampling"""
     n: Tuple[int, ...]
     if size is None:
         n = ()
@@ -69,7 +71,7 @@ def iternorm(
                 x = np.broadcast_to(x, q)
             except ValueError:
                 raise TypeError(
-                    f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
+                    f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}",
                 ) from None
 
         # only need to update matrix A if there are correlations
@@ -124,7 +126,7 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
 
 
 def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
-    """multiply alm by bl"""
+    """Multiply alm by bl"""
     n = len(bl)
     if inplace:
         out = np.asanyarray(alm)
@@ -160,7 +162,8 @@ def gaussian_gls(
     ncorr: Optional[int] = None,
     nside: Optional[int] = None,
 ) -> Cls:
-    """Compute Gaussian Cls for a Gaussian random field.
+    """
+    Compute Gaussian Cls for a Gaussian random field.
 
     Depending on the given arguments, this truncates the angular power spectra
     to ``lmax``, removes all but ``ncorr`` correlations between fields, and
@@ -168,7 +171,6 @@ def gaussian_gls(
     arguments are given, no action is performed.
 
     """
-
     if ncorr is not None:
         n = int((2 * len(cls)) ** 0.5)
         if n * (n + 1) // 2 != len(cls):
@@ -214,7 +216,8 @@ def generate_gaussian(
     ncorr: Optional[int] = None,
     rng: Optional[np.random.Generator] = None,
 ) -> Generator[Array, None, None]:
-    """Iteratively sample Gaussian random fields from Cls.
+    """
+    Iteratively sample Gaussian random fields from Cls.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -236,7 +239,6 @@ def generate_gaussian(
     Missing entries can be set to ``None``.
 
     """
-
     # get the default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -321,7 +323,8 @@ def generate_lognormal(
 
 
 def getcl(cls, i, j, lmax=None):
-    """Return a specific angular power spectrum from an array.
+    """
+    Return a specific angular power spectrum from an array.
 
     Return the angular power spectrum for indices *i* and *j* from an
     array in *GLASS* ordering.
@@ -353,7 +356,8 @@ def getcl(cls, i, j, lmax=None):
 
 
 def effective_cls(cls, weights1, weights2=None, *, lmax=None):
-    """Compute effective angular power spectra from weights.
+    """
+    Compute effective angular power spectra from weights.
 
     Computes a linear combination of the angular power spectra *cls*
     using the factors provided by *weights1* and *weights2*.  Additional

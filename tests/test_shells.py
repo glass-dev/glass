@@ -22,7 +22,7 @@ def test_tophat_windows():
 
 
 def test_restrict():
-    from glass.shells import restrict, RadialWindow
+    from glass.shells import RadialWindow, restrict
 
     # Gaussian test function
     z = np.linspace(0.0, 5.0, 1000)
@@ -33,7 +33,8 @@ def test_restrict():
 
     zr, fr = restrict(z, f, w)
 
-    assert zr[0] == w.za[0] and zr[-1] == w.za[-1]
+    assert zr[0] == w.za[0]
+    assert zr[-1] == w.za[-1]
 
     assert fr[0] == fr[-1] == 0.0
 

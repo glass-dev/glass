@@ -31,15 +31,16 @@ Bias models
 
 """
 
-import numpy as np
 import healpix
+import numpy as np
 
 from .core.array import broadcast_first, broadcast_leading_axes, trapz_product
 from .core.constants import ARCMIN2_SPHERE
 
 
 def effective_bias(z, bz, w):
-    """Effective bias parameter from a redshift-dependent bias function.
+    """
+    Effective bias parameter from a redshift-dependent bias function.
 
     This function takes a redshift-dependent bias function :math:`b(z)`
     and computes an effective bias parameter :math:`\\bar{b}` for a
@@ -73,7 +74,7 @@ def effective_bias(z, bz, w):
 
 
 def linear_bias(delta, b):
-    """linear bias model :math:`\\delta_g = b \\, \\delta`"""
+    """Linear bias model :math:`\\delta_g = b \\, \\delta`"""
     return b * delta
 
 
@@ -96,7 +97,8 @@ def positions_from_delta(
     batch=1_000_000,
     rng=None,
 ):
-    """Generate positions tracing a density contrast.
+    """
+    Generate positions tracing a density contrast.
 
     The map of expected number counts is constructed from the number
     density, density contrast, an optional bias model, and an optional
@@ -152,7 +154,6 @@ def positions_from_delta(
         dimensions is returned.
 
     """
-
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -250,7 +251,8 @@ def positions_from_delta(
 
 
 def uniform_positions(ngal, *, rng=None):
-    """Generate positions uniformly over the sphere.
+    """
+    Generate positions uniformly over the sphere.
 
     The function supports array input for the ``ngal`` parameter.
 
@@ -270,7 +272,6 @@ def uniform_positions(ngal, *, rng=None):
         counts with the same shape is returned.
 
     """
-
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -301,7 +302,8 @@ def uniform_positions(ngal, *, rng=None):
 
 
 def position_weights(densities, bias=None):
-    """Compute relative weights for angular clustering.
+    """
+    Compute relative weights for angular clustering.
 
     Takes an array *densities* of densities in arbitrary units and
     returns the relative weight of each shell.  If *bias* is given, a

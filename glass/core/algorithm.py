@@ -15,7 +15,8 @@ def nnls(
     tol: float = 0.0,
     maxiter: int | None = None,
 ) -> ArrayLike:
-    """Compute a non-negative least squares solution.
+    """
+    Compute a non-negative least squares solution.
 
     Implementation of the algorithm due to [1]_ as described in [2]_.
 
@@ -28,7 +29,6 @@ def nnls(
         Chemometrics, 11, 393-401.
 
     """
-
     a = np.asanyarray(a)
     b = np.asanyarray(b)
 
