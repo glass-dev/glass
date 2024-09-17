@@ -7,11 +7,12 @@
 
 # -- Project information -----------------------------------------------------
 
+import datetime
 from importlib import metadata
 
 project = "GLASS"
-copyright = "2022-2024 Nicolas Tessore"
-author = "Nicolas Tessore"
+author = "GLASS developers"
+copyright = f"2022-{datetime.date.today().year} {author}"
 version = metadata.version("glass")
 release = version
 
@@ -27,6 +28,7 @@ extensions = [
     "sphinxcontrib.katex",
     "matplotlib.sphinxext.plot_directive",
     "nbsphinx",
+    "sphinx.ext.viewcode",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

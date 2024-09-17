@@ -8,6 +8,12 @@ on:
     branches:
     - main
 
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
 
 # TODO: replace with a more general pre-commit linter
@@ -31,8 +37,11 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - run: pip install -c .github/test-constraints.txt '.[test]'
-    - run: pytest --pyargs glass
+    - run: pip install -c .github/test-constraints.txt -e '.[test]'
+    - run: pytest --cov=glass --doctest-plus -v
+    - uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     name: Build
