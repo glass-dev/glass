@@ -12,7 +12,7 @@ from importlib import metadata
 
 project = "GLASS"
 author = "GLASS developers"
-copyright = f"2022-{datetime.date.today().year} {author}"
+copyright = f"2022-{datetime.date.today().year} {author}"  # noqa: A001, DTZ011
 version = metadata.version("glass")
 release = version
 

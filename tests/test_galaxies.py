@@ -16,7 +16,8 @@ def test_redshifts():
     # sample redshifts (scalar)
     z = redshifts(13, w)
     assert z.shape == (13,)
-    assert z.min() >= 0.0 and z.max() <= 1.0
+    assert z.min() >= 0.0
+    assert z.max() <= 1.0
 
     # sample redshifts (array)
     z = redshifts([[1, 2], [3, 4]], w)

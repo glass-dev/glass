@@ -49,7 +49,7 @@ import warnings
 from collections import namedtuple
 
 # type checking
-from typing import TYPE_CHECKING, Callable, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Callable, Sequence, Union
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -133,7 +133,7 @@ RadialWindow.zeff.__doc__ = """Effective redshift of the window."""
 def tophat_windows(
     zbins: ArrayLike1D,
     dz: float = 1e-3,
-    weight: Optional[WeightFunc] = None,
+    weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.

@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Random points (:mod:`glass.points`)
+Random points (:mod:`glass.points`).
 ===================================
 
 .. currentmodule:: glass.points

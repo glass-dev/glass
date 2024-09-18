@@ -115,12 +115,19 @@ lint.isort = {known-first-party = [
     "camb",
     "cosmology",
 ]}}
-lint.per-file-ignores = {"glass" = [
+lint.per-file-ignores = {"docs*" = [
+    "D100", # undocumented-public-module
+    "INP001", # implicit-namespace-package
+], "glass" = [
 ], "tests*" = [
     "ANN001", # TODO: missing-type-function-argument
     "ANN201", # TODO: issing-return-type-undocumented-public-function
+    "ANN202", # TODO: missing-return-type-private-function
+    "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
     "INP001", # implicit-namespace-package
+    "PLR2004", # magic-value-comparison
+    "PT011", # TODO: pytest-raises-too-broad
     "S101", # assert
 ]}
 lint.select = [

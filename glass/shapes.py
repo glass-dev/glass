@@ -26,8 +26,12 @@ Utilities
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):

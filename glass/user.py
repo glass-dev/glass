@@ -51,7 +51,11 @@ def load_cls(filename):
 
 
 class _FitsWriter:
-    """Writer that creates a FITS file.  Initialised with the fits object and extension name."""
+    """
+    Writer that creates a FITS file.
+
+    Initialised with the fits object and extension name.
+    """
 
     def __init__(self, fits, ext=None) -> None:
         """Create a new, uninitialised writer."""
@@ -72,6 +76,7 @@ class _FitsWriter:
     def write(self, data=None, /, **columns) -> None:
         """
         Writes to FITS by calling the internal _append method.
+
         Pass either a positional variable (data)
         or multiple named arguments (**columns)
         """

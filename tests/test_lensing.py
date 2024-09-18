@@ -7,15 +7,13 @@ import pytest
 def shells():
     from glass.shells import RadialWindow
 
-    shells = [
+    return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
         RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
         RadialWindow([2.0, 3.0, 4.0], [0.0, 1.0, 0.0], 3.0),
         RadialWindow([3.0, 4.0, 5.0], [0.0, 1.0, 0.0], 4.0),
         RadialWindow([4.0, 5.0, 6.0], [0.0, 1.0, 0.0], 5.0),
     ]
-
-    return shells
 
 
 @pytest.fixture

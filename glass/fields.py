@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Random fields (:mod:`glass.fields`)
+Random fields (:mod:`glass.fields`).
 ===================================
 
 .. currentmodule:: glass.fields
@@ -67,7 +67,7 @@ def iternorm(
     j = 0 if k > 0 else None
 
     for i, x in enumerate(cov):
-        x = np.asanyarray(x)
+        x = np.asanyarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
                 x = np.broadcast_to(x, q)  # noqa: PLW2901
@@ -186,10 +186,10 @@ def gaussian_gls(
     for cl in cls:
         if cl is not None and len(cl) > 0:
             if lmax is not None:
-                cl = cl[: lmax + 1]
+                cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
                 n = min(len(cl), len(pw))
-                cl = cl[:n] * pw[:n] ** 2
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
 
@@ -215,7 +215,7 @@ def generate_gaussian(
     rng: np.random.Generator | None = None,
 ) -> Generator[Array, None, None]:
     """
-    Iteratively sample Gaussian random fields from Cls.
+    Sample Gaussian random fields from Cls iteratively.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -300,7 +300,7 @@ def generate_lognormal(
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
 ) -> Generator[Array, None, None]:
-    """Iterative sample lognormal random fields from Gaussian Cls."""
+    """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         gl = gls[i * (i + 1) // 2]
@@ -315,7 +315,7 @@ def generate_lognormal(
 
         # lognormal shift, unless unity
         if shift != 1:
-            m *= shift
+            m *= shift  # noqa: PLW2901
 
         # yield the lognormal map
         yield m
