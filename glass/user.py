@@ -53,13 +53,13 @@ def load_cls(filename):
 class _FitsWriter:
     """Writer that creates a FITS file.  Initialised with the fits object and extension name."""
 
-    def __init__(self, fits, ext=None):
+    def __init__(self, fits, ext=None) -> None:
         """Create a new, uninitialised writer."""
         self.fits = fits
         self.ext = ext
 
-    def _append(self, data, names=None):
-        """Internal method where the FITS writing is done"""
+    def _append(self, data, names=None) -> None:
+        """Internal method where the FITS writing is done."""
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if self.ext is None:
@@ -69,7 +69,7 @@ class _FitsWriter:
             # not using hdu.append here because of incompatibilities
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
-    def write(self, data=None, /, **columns):
+    def write(self, data=None, /, **columns) -> None:
         """
         Writes to FITS by calling the internal _append method.
         Pass either a positional variable (data)
@@ -105,5 +105,4 @@ def write_catalog(filename, *, ext=None):
 
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)
-        writer = _FitsWriter(fits, ext)
-        yield writer
+        yield _FitsWriter(fits, ext)

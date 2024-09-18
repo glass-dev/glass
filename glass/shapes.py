@@ -32,7 +32,7 @@ from numpy.typing import ArrayLike, NDArray
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     r"""
-    Axis ratio of a randomly projected triaxial ellipsoid
+    Axis ratio of a randomly projected triaxial ellipsoid.
 
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
@@ -89,12 +89,10 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     B2 = 4 * z2m1**2 * cos2_theta * sin2_phi * cos2_phi
     C = 1 + z2m1 * cos2_phi
 
-    # eq. (12)
-    q = np.sqrt(
-        (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
+    return np.sqrt(
+        (A + C - np.sqrt((A - C) ** 2 + B2))
+        / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
-
-    return q
 
 
 def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
@@ -259,7 +257,8 @@ def ellipticity_intnorm(
 
     # make sure sigma is admissible
     if not np.all((sigma >= 0) & (sigma < 0.5**0.5)):
-        raise ValueError("sigma must be between 0 and sqrt(0.5)")
+        msg = "sigma must be between 0 and sqrt(0.5)"
+        raise ValueError(msg)
 
     # convert to sigma_eta using fit
     sigma_eta = sigma * ((8 + 5 * sigma**2) / (2 - 4 * sigma**2)) ** 0.5

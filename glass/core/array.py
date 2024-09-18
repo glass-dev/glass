@@ -1,6 +1,6 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-"""module for array utilities"""
+"""Module for array utilities."""
 
 from functools import partial
 
@@ -11,8 +11,7 @@ def broadcast_first(*arrays):
     """Broadcast arrays, treating the first axis as common."""
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
-    arrays = tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
-    return arrays
+    return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
 
 
 def broadcast_leading_axes(*args):
@@ -53,7 +52,7 @@ def broadcast_leading_axes(*args):
 
 
 def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):
-    """Interpolate multi-dimensional array over axis"""
+    """Interpolate multi-dimensional array over axis."""
     return np.apply_along_axis(
         partial(np.interp, x, xp),
         axis,
@@ -65,7 +64,7 @@ def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):
 
 
 def trapz_product(f, *ff, axis=-1):
-    """Trapezoidal rule for a product of functions"""
+    """Trapezoidal rule for a product of functions."""
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
@@ -79,7 +78,7 @@ def trapz_product(f, *ff, axis=-1):
 
 
 def cumtrapz(f, x, dtype=None, out=None):
-    """Cumulative trapezoidal rule along last axis"""
+    """Cumulative trapezoidal rule along last axis."""
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 

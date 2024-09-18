@@ -114,7 +114,9 @@ lint.isort = {known-first-party = [
     "camb",
     "cosmology",
 ]}}
-lint.per-file-ignores = {"tests*" = [
+lint.per-file-ignores = {"glass" = [
+    "",
+], "tests*" = [
     "ANN001", # TODO: missing-type-function-argument
     "ANN201", # TODO: issing-return-type-undocumented-public-function
     "D103", # TODO: undocumented-public-function

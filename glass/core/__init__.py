@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Core functions (:mod:`glass.core`)
+Core functions (:mod:`glass.core`).
 ==================================
 
 .. currentmodule:: glass.core

@@ -173,11 +173,7 @@ def tophat_windows(
         warnings.warn("first tophat window does not start at redshift zero")
 
     wht: WeightFunc
-    if weight is not None:
-        wht = weight
-    else:
-        wht = np.ones_like
-
+    wht = weight if weight is not None else np.ones_like
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
         n = max(round((zmax - zmin) / dz), 2)
@@ -483,7 +479,7 @@ def partition_lstsq(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a = a / np.trapz(a, zp, axis=-1)[..., None]
+    a /= np.trapz(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -539,7 +535,7 @@ def partition_nnls(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a = a / np.trapz(a, zp, axis=-1)[..., None]
+    a /= np.trapz(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values

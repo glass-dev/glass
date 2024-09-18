@@ -128,10 +128,7 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
 def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
     """Multiply alm by bl"""
     n = len(bl)
-    if inplace:
-        out = np.asanyarray(alm)
-    else:
-        out = np.copy(alm)
+    out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
         out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
     return out
@@ -142,11 +139,8 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: Tuple[Any, ...] = ()) -> Cls
     gls = []
     for cl in cls:
         if cl is not None and len(cl) > 0:
-            if cl[0] == 0:
-                monopole = 0.0
-            else:
-                monopole = None
-            gl, info, err, niter = gaussiancl(cl, tfm, pars, monopole=monopole)
+            monopole = 0.0 if cl[0] == 0 else None
+            gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
                 warnings.warn("Gaussian cl did not converge, inexact transform")
         else:

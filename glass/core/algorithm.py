@@ -1,11 +1,14 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
-"""core module for algorithms"""
+"""Core module for algorithms."""
 
 from __future__ import annotations
 
 import numpy as np
-from numpy.typing import ArrayLike
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
 
 
 def nnls(
@@ -33,11 +36,14 @@ def nnls(
     b = np.asanyarray(b)
 
     if a.ndim != 2:
-        raise ValueError("input `a` is not a matrix")
+        msg = "input `a` is not a matrix"
+        raise ValueError(msg)
     if b.ndim != 1:
-        raise ValueError("input `b` is not a vector")
+        msg = "input `b` is not a vector"
+        raise ValueError(msg)
     if a.shape[0] != b.shape[0]:
-        raise ValueError("the shapes of `a` and `b` do not match")
+        msg = "the shapes of `a` and `b` do not match"
+        raise ValueError(msg)
 
     _, n = a.shape
 
@@ -47,7 +53,7 @@ def nnls(
     index = np.arange(n)
     p = np.full(n, False)
     x = np.zeros(n)
-    for i in range(maxiter):
+    for _ in range(maxiter):
         if np.all(p):
             break
         w = np.dot(b - a @ x, a)
