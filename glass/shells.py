@@ -42,7 +42,6 @@ Weight functions
 .. autofunction:: distance_weight
 .. autofunction:: volume_weight
 .. autofunction:: density_weight
-
 """  # noqa: D205
 
 from __future__ import annotations
@@ -82,8 +81,9 @@ def density_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-RadialWindow = NamedTuple("RadialWindow", "za, wa, zeff")
-RadialWindow.__doc__ = """A radial window, defined by a window function.
+class RadialWindow(NamedTuple):
+    """
+    A radial window, defined by a window function.
 
     The radial window is defined by a window function in redshift, which
     is given by a pair of arrays ``za``, ``wa``.
@@ -112,9 +112,9 @@ RadialWindow.__doc__ = """A radial window, defined by a window function.
 
     Attributes
     ----------
-    za : (N,) array_like
+    za : Sequence[float]
         Redshift array; the abscissae of the window function.
-    wa : (N,) array_like
+    wa : Sequence[float]
         Weight array; the values (ordinates) of the window function.
     zeff : float
         Effective redshift of the window.
@@ -124,11 +124,15 @@ RadialWindow.__doc__ = """A radial window, defined by a window function.
     _replace
 
     """
-RadialWindow.za.__doc__ = """Redshift array; the abscissae of the window function."""
-RadialWindow.wa.__doc__ = (
-    """Weight array; the values (ordinates) of the window function."""
-)
-RadialWindow.zeff.__doc__ = """Effective redshift of the window."""
+
+    za: Sequence[float]
+    wa: Sequence[float]
+    zeff: float
+
+
+RadialWindow.za.__doc__ = "Redshift array; the abscissae of the window function."
+RadialWindow.wa.__doc__ = "Weight array; the values (ordinates) of the window function."
+RadialWindow.zeff.__doc__ = "Effective redshift of the window."
 
 
 def tophat_windows(
