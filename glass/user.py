@@ -24,7 +24,7 @@ from contextlib import contextmanager
 import numpy as np
 
 
-def save_cls(filename, cls):
+def save_cls(filename, cls) -> None:
     """
     Save a list of Cls to file.
 

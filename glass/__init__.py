@@ -1,4 +1,4 @@
-try:
+import contextlib
+
+with contextlib.suppress(ModuleNotFoundError):
     from ._version import __version__, __version_tuple__  # noqa: F401
-except ModuleNotFoundError:
-    pass

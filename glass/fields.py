@@ -35,6 +35,7 @@ from typing import Any, Callable, Generator, Iterable, Optional, Sequence, Tuple
 
 import healpy as hp
 import numpy as np
+import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
@@ -128,7 +129,7 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
         yield cov
 
 
-def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
+def multalm(alm: Alms, bl: Array, *, inplace: bool = False) -> Alms:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
@@ -145,7 +146,9 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls
             monopole = 0.0 if cl[0] == 0 else None
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
-                warnings.warn("Gaussian cl did not converge, inexact transform")
+                warnings.warn(
+                    "Gaussian cl did not converge, inexact transform", stacklevel=2
+                )
         else:
             gl = []
         gls.append(gl)
@@ -354,7 +357,9 @@ def getcl(cls, i, j, lmax=None):
     return cl
 
 
-def effective_cls(cls, weights1, weights2=None, *, lmax=None):
+def effective_cls(
+    cls, weights1, weights2=None, *, lmax=None
+) -> npt.NDArray[np.float64]:
     r"""
     Compute effective angular power spectra from weights.
 

@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Observed shapes (:mod:`glass.shapes`)
+Observed shapes (:mod:`glass.shapes`).
 =====================================
 
 .. currentmodule:: glass.shapes
@@ -89,18 +89,18 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     x2 = np.square(xi)
 
     # eq. (11) multiplied by xi^2 zeta^2
-    A = (1 + z2m1 * sin2_phi) * cos2_theta + x2 * sin2_theta
-    B2 = 4 * z2m1**2 * cos2_theta * sin2_phi * cos2_phi
-    C = 1 + z2m1 * cos2_phi
+    A = (1 + z2m1 * sin2_phi) * cos2_theta + x2 * sin2_theta  # noqa: N806
+    B2 = 4 * z2m1**2 * cos2_theta * sin2_phi * cos2_phi  # noqa: N806
+    C = 1 + z2m1 * cos2_phi  # noqa: N806
 
     return np.sqrt(
         (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
 
 
-def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):
+def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):  # noqa: PLR0913
     r"""
-    Ellipticity distribution following Ryden (2004)
+    Ellipticity distribution following Ryden (2004).
 
     The ellipticities are sampled by randomly projecting a 3D ellipsoid with
     principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -

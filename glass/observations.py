@@ -107,7 +107,7 @@ def gaussian_nz(
     ----------
     z : array_like
         Redshift values of the distribution.
-    mode : float or array_like
+    mean : float or array_like
         Mean(s) of the redshift distribution.
     sigma : float or array_like
         Standard deviation(s) of the redshift distribution.

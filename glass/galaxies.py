@@ -133,7 +133,7 @@ def redshifts_from_nz(
     return redshifts
 
 
-def galaxy_shear(
+def galaxy_shear(  # noqa: PLR0913
     lon: np.ndarray,
     lat: np.ndarray,
     eps: np.ndarray,

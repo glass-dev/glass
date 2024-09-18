@@ -31,6 +31,8 @@ Applying lensing
 
 """
 
+from __future__ import annotations
+
 # typing support
 from typing import TYPE_CHECKING, Sequence
 
@@ -45,10 +47,8 @@ if TYPE_CHECKING:
 
     from .shells import RadialWindow
 
-from __future__ import annotations
 
-
-def from_convergence(
+def from_convergence(  # noqa: PLR0913
     kappa: NDArray,
     lmax: int | None = None,
     *,
@@ -72,6 +72,8 @@ def from_convergence(
         Maximum angular mode number to use in the transform.
     potential, deflection, shear : bool, optional
         Which lensing maps to return.
+    discretized : bool
+        Whether to apply a pixel window function to the shear.
 
     Returns
     -------
@@ -170,7 +172,7 @@ def from_convergence(
     alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
     # mode number; all conversions are factors of this
-    l = np.arange(lmax + 1)
+    l = np.arange(lmax + 1)  # noqa: E741
 
     # this tuple will be returned
     results = ()

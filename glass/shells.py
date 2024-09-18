@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Shells (:mod:`glass.shells`)
+Shells (:mod:`glass.shells`).
 ============================
 
 .. currentmodule:: glass.shells
@@ -45,21 +45,22 @@ Weight functions
 
 """
 
+from __future__ import annotations
+
 import warnings
-from collections import namedtuple
 
 # type checking
-from typing import TYPE_CHECKING, Callable, Sequence, Union
+from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence, Union
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from .core.array import ndinterp
 
 if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+
     from cosmology import Cosmology
 
-from __future__ import annotations
 
 # types
 ArrayLike1D = Union[Sequence[float], np.ndarray]
@@ -81,7 +82,7 @@ def density_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-RadialWindow = namedtuple("RadialWindow", "za, wa, zeff")
+RadialWindow = NamedTuple("RadialWindow", "za, wa, zeff")
 RadialWindow.__doc__ = """A radial window, defined by a window function.
 
     The radial window is defined by a window function in redshift, which
@@ -173,7 +174,9 @@ def tophat_windows(
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
     if zbins[0] != 0:
-        warnings.warn("first tophat window does not start at redshift zero")
+        warnings.warn(
+            "first tophat window does not start at redshift zero", stacklevel=2
+        )
 
     wht: WeightFunc
     wht = weight if weight is not None else np.ones_like
@@ -230,7 +233,7 @@ def linear_windows(
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
-        warnings.warn("first triangular window does not start at z=0")
+        warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
@@ -292,7 +295,7 @@ def cubic_windows(
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
-        warnings.warn("first cubic spline window does not start at z=0")
+        warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
@@ -560,9 +563,9 @@ def partition_nnls(
     y = np.einsum("ji,...j", q, b)
 
     # for each dim, find non-negative weights x such that y == r @ x
-    x = np.empty([len(shells)] + dims)
+    x = np.empty([len(shells), *dims])
     for i in np.ndindex(*dims):
-        x[(...,) + i] = nnls(r, y[i])
+        x[(..., *i)] = nnls(r, y[i])
 
     # all done
     return x
