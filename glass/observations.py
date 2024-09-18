@@ -26,7 +26,7 @@ Visibility
 .. autofunction:: vmap_galactic_ecliptic
 
 
-"""
+"""  # noqa: D205
 
 from __future__ import annotations
 

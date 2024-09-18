@@ -22,7 +22,7 @@ Utilities
 
 .. autofunction:: triaxial_axis_ratio
 
-"""
+"""  # noqa: D205
 
 from __future__ import annotations
 

@@ -17,7 +17,7 @@ Input and Output
 .. autofunction:: load_cls
 .. autofunction:: write_catalog
 
-"""
+"""  # noqa: D205
 
 from contextlib import contextmanager
 

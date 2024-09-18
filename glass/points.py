@@ -29,7 +29,7 @@ Bias models
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
-"""
+"""  # noqa: D205
 
 import healpix
 import numpy as np
