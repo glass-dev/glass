@@ -75,7 +75,7 @@ These notes document the changes between individual *GLASS* releases.
   power spectra by index from a list using GLASS ordering.
 
 * The :func:`~glass.galaxies.gaussian_phz()` function now accepts bounds using
-  `lower=` and `upper=` keyword parameters.
+  ``lower=`` and ``upper=`` keyword parameters.
 
 
 2023.6 (30 Jun 2023)
@@ -157,7 +157,7 @@ These notes document the changes between individual *GLASS* releases.
     by window functions using :func:`glass.shells.restrict` and
     :func:`glass.shells.partition`.
 
-  - The ``zmin`` and ``zmax`` parameters of `glass.galaxies.redshifts_from_nz`
+  - The ``zmin`` and ``zmax`` parameters of ``glass.galaxies.redshifts_from_nz``
     have been removed for the same reason.
 
   - The ``glass.lensing.multi_plane_weights`` function, which computed all
