@@ -144,7 +144,7 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls
     for cl in cls:
         if cl is not None and len(cl) > 0:
             monopole = 0.0 if cl[0] == 0 else None
-            gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
+            gl, info, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
                 warnings.warn(
                     "Gaussian cl did not converge, inexact transform", stacklevel=2
