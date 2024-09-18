@@ -95,10 +95,10 @@ src = [
     "glass",
 ]
 lint.ignore = [
-    "ANN001", # TEMPORARY
-    "ANN002", # TEMPORARY
-    "ANN003", # TEMPORARY
-    "ANN201", # TEMPORARY
+    "ANN001", # TODO: missing-type-function-argument
+    "ANN002", # TODO: missing-type-args
+    "ANN003", # TODO: missing-type-kwargs
+    "ANN201", # TODO: missing-return-type-undocumented-public-function
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
     "D212", # blank-line-before-class
@@ -121,7 +121,9 @@ lint.isort = {known-first-party = [
     "camb",
     "cosmology",
 ]}}
-lint.per-file-ignores = {"docs*" = [
+lint.per-file-ignores = {"__init__.py" = [
+    "F401", # unused-import
+], "docs*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package,
 ], "examples*" = [

@@ -1,13 +1,13 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-User utilities (:mod:`glass.user`).
-==================================
+User utilities.
+==============
 
-.. currentmodule:: glass.user
+.. currentmodule:: glass
 
-The :mod:`glass.user` module contains convenience functions for users of the
-library.
+The following functions/classes provide convenience functionality for users
+of the library.
 
 
 Input and Output

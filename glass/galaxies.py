@@ -1,12 +1,12 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Galaxies (:mod:`glass.galaxies`).
-================================
+Galaxies.
+========
 
-.. currentmodule:: glass.galaxies
+.. currentmodule:: glass
 
-The :mod:`glass.galaxies` module provides functionality for simulating galaxies
+The following functions provide functionality for simulating galaxies
 as typically observed in a cosmological galaxy survey.
 
 Functions
@@ -23,15 +23,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import healpix
-import numpy as np
-
-from .core.array import broadcast_leading_axes, cumtrapz
-
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from .shells import RadialWindow
+    from glass.shells import RadialWindow
+
+import healpix
+import numpy as np
+
+from glass.core.array import broadcast_leading_axes, cumtrapz
 
 
 def redshifts(
@@ -51,7 +51,7 @@ def redshifts(
     n : int or array_like
         Number of redshifts to sample.  If an array is given, the
         results are concatenated.
-    w : :class:`~glass.shells.RadialWindow`
+    w : :class:`~glass.RadialWindow`
         Radial window function.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
@@ -236,7 +236,7 @@ def gaussian_phz(
 
     See Also
     --------
-    glass.observations.tomo_nz_gausserr :
+    glass.tomo_nz_gausserr :
         Create tomographic redshift distributions assuming the same
         model.
 

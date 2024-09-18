@@ -1,12 +1,12 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Observations (:mod:`glass.observations`).
-========================================
+Observations.
+============
 
-.. currentmodule:: glass.observations
+.. currentmodule:: glass
 
-The :mod:`glass.observations` module provides functionality for simulating
+The following functions provide functionality for simulating
 observational effects of surveys.
 
 
@@ -36,7 +36,7 @@ from typing import TYPE_CHECKING
 import healpy as hp
 import numpy as np
 
-from .core.array import cumtrapz
+from glass.core.array import cumtrapz
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

@@ -1,12 +1,12 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Lensing (:mod:`glass.lensing`).
-==============================
+Lensing.
+========
 
-.. currentmodule:: glass.lensing
+.. currentmodule:: glass
 
-The :mod:`glass.lensing` module provides functionality for simulating
+The following functions/classes provide functionality for simulating
 gravitational lensing by the matter distribution in the universe.
 
 Iterative lensing
@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 
     from cosmology import Cosmology
 
-    from .shells import RadialWindow
+    from glass.shells import RadialWindow
 
 
 def from_convergence(  # noqa: PLR0913
@@ -398,7 +398,7 @@ def multi_plane_weights(
     weights : array_like
         Relative weight of each shell.  The first axis must broadcast
         against the number of shells, and is normalised internally.
-    shells : list of :class:`~glass.shells.RadialWindow`
+    shells : list of :class:`~glass.RadialWindow`
         Window functions of the shells.
     cosmo : Cosmology
         Cosmology instance.
