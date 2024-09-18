@@ -95,11 +95,11 @@ src = [
     "glass",
 ]
 lint.ignore = [
-    "COM812", # clashes with formatter
-    "D203", # mutually exclusive rule
-    "D212", # mutually exclusive rule
-    "ISC001", # clashes with formatter
-    "NPY201", # TODO: remove after NumPy v2 support
+    "COM812", # missing-trailing-comma (ruff-format recommended)
+    "D203", # one-blank-line-before-class
+    "D212", # blank-line-before-class
+    "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
+    "NPY201", # TODO: numpy2-deprecation
 ]
 lint.isort = {known-first-party = [
     "glass",
@@ -115,9 +115,10 @@ lint.isort = {known-first-party = [
     "cosmology",
 ]}}
 lint.per-file-ignores = {"tests*" = [
-    "ANN001", # missing-type-function-argument
-    "ANN201", # missing-return-type-undocumented-public-function
-    "D103", # undocumented-public-function
+    "ANN001", # TODO: missing-type-function-argument
+    "ANN201", # TODO: issing-return-type-undocumented-public-function
+    "D103", # TODO: undocumented-public-function
+    "INP001", # implicit-namespace-package
     "S101", # assert
 ]}
 lint.select = [
