@@ -73,7 +73,7 @@ def from_convergence(  # noqa: PLR0913
     potential, deflection, shear : bool, optional
         Which lensing maps to return.
     discretized : bool
-        Whether to apply a pixel window function to the shear.
+        Correct the pixel window function in output maps.
 
     Returns
     -------
