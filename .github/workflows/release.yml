@@ -2,6 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'Deployment target. Can be "pypi" or "testpypi"'
+        default: "testpypi"
   release:
     types:
       - published
@@ -28,7 +32,6 @@ jobs:
   publish:
     needs: [dist]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
     environment:
       name: publish
       url: https://pypi.org/p/glass
@@ -44,4 +47,10 @@ jobs:
       - name: List distributions to be deployed
         run: ls -l dist/
 
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - if: github.event.inputs.target == 'pypi' || (github.event_name == 'release' && github.event.action == 'published')
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - if: github.event.inputs.target == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
