@@ -1,12 +1,12 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Random fields (:mod:`glass.fields`)
-===================================
+Random fields
+=============
 
-.. currentmodule:: glass.fields
+.. currentmodule:: glass
 
-The :mod:`glass.fields` module provides functionality for simulating random
+The following functions provide functionality for simulating random
 fields on the sphere.  This is done in the form of HEALPix maps.
 
 Functions

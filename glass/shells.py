@@ -1,12 +1,12 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Shells (:mod:`glass.shells`)
-============================
+Shells
+======
 
-.. currentmodule:: glass.shells
+.. currentmodule:: glass
 
-The :mod:`glass.shells` module provides functions for the definition of
+The following functions provide functionality for the definition of
 matter shells, i.e. the radial discretisation of the light cone.
 
 
@@ -49,7 +49,7 @@ import warnings
 from collections import namedtuple
 import numpy as np
 
-from .core.array import ndinterp
+from glass.core.array import ndinterp
 
 # type checking
 from typing import Union, Sequence, List, Tuple, Optional, Callable, TYPE_CHECKING
@@ -92,7 +92,7 @@ RadialWindow.__doc__ = """A radial window, defined by a window function.
     immutable (however, the array entries may **not** be immutable; do
     not change them in place)::
 
-        >>> from glass.shells import RadialWindow
+        >>> from glass import RadialWindow
         >>> w1 = RadialWindow(..., ..., zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
@@ -514,7 +514,7 @@ def partition_nnls(
 
     """
 
-    from .core.algorithm import nnls
+    from glass.core.algorithm import nnls
 
     # make sure nothing breaks
     if sumtol < 1e-4:

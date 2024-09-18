@@ -1,12 +1,12 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Observed shapes (:mod:`glass.shapes`)
-=====================================
+Observed shapes
+===============
 
-.. currentmodule:: glass.shapes
+.. currentmodule:: glass
 
-The :mod:`glass.shapes` module provides functionality for simulating the
+The following functions provide functionality for simulating the
 observed shapes of objects, such as e.g. galaxies.
 
 Ellipticity
