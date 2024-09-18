@@ -2,7 +2,7 @@
 # license: MIT
 """
 Random fields (:mod:`glass.fields`).
-===================================
+====================================
 
 .. currentmodule:: glass.fields
 
