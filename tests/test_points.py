@@ -102,8 +102,9 @@ def test_position_weights():
 
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
-            counts = np.random.rand(*cshape)
-            bias = None if bshape is None else np.random.rand(*bshape)
+            rng = np.random.default_rng(seed=42)
+            counts = rng.random(cshape)
+            bias = None if bshape is None else rng.random(bshape)
 
             weights = position_weights(counts, bias)
 

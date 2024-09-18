@@ -17,8 +17,9 @@ def test_nnls():
 
     from glass.core.algorithm import nnls as nnls_glass
 
-    a = np.random.randn(100, 20)
-    b = np.random.randn(100)
+    rng = np.random.default_rng(seed=42)
+    a = rng.standard_normal((100, 20))
+    b = rng.standard_normal((100,))
 
     x_glass = nnls_glass(a, b)
     x_scipy, _ = nnls_scipy(a, b)

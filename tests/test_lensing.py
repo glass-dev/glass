@@ -73,11 +73,12 @@ def test_deflect_many():
     from glass.lensing import deflect
 
     n = 1000
-    abs_alpha = np.random.uniform(0, 2 * np.pi, size=n)
-    arg_alpha = np.random.uniform(-np.pi, np.pi, size=n)
+    rng = np.random.default_rng(seed=42)
+    abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
+    arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
 
-    lon_ = np.degrees(np.random.uniform(-np.pi, np.pi, size=n))
-    lat_ = np.degrees(np.arcsin(np.random.uniform(-1, 1, size=n)))
+    lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
+    lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
 
     lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 
@@ -99,7 +100,8 @@ def test_multi_plane_matrix(shells, cosmo):
 
     convergence = MultiPlaneConvergence(cosmo)
 
-    deltas = np.random.rand(len(shells), 10)
+    rng = np.random.default_rng(seed=42)
+    deltas = rng.random((len(shells), 10))
     kappas = []
     for shell, delta in zip(shells, deltas):
         convergence.add_window(delta, shell)
@@ -119,8 +121,9 @@ def test_multi_plane_weights(shells, cosmo):
 
     convergence = MultiPlaneConvergence(cosmo)
 
-    deltas = np.random.rand(len(shells), 10)
-    weights = np.random.rand(len(shells), 3)
+    rng = np.random.default_rng(seed=42)
+    deltas = rng.random((len(shells), 10))
+    weights = rng.random((len(shells), 3))
     kappa = 0
     for shell, delta, weight in zip(shells, deltas, weights):
         convergence.add_window(delta, shell)
