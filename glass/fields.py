@@ -2,7 +2,7 @@
 # license: MIT
 """
 Random fields.
-=============
+==============
 
 .. currentmodule:: glass
 
