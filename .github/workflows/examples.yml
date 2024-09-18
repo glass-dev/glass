@@ -4,9 +4,13 @@ on:
   push:
     paths:
       - "glass/**"
+    branches:
+      - main
   pull_request:
     paths:
       - "glass/**"
+    branches:
+      - main
 
 concurrency:
   # Skip intermediate builds: always.
