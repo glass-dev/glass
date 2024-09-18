@@ -2,7 +2,7 @@
 # license: MIT
 """
 Galaxies.
-========
+=========
 
 .. currentmodule:: glass
 
