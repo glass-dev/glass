@@ -99,6 +99,7 @@ lint.ignore = [
     "D203", # one-blank-line-before-class
     "D212", # blank-line-before-class
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
+    "NPY002", # TODO: numpy-legacy-random
     "NPY201", # TODO: numpy2-deprecation
 ]
 lint.isort = {known-first-party = [
@@ -115,7 +116,6 @@ lint.isort = {known-first-party = [
     "cosmology",
 ]}}
 lint.per-file-ignores = {"glass" = [
-    "",
 ], "tests*" = [
     "ANN001", # TODO: missing-type-function-argument
     "ANN201", # TODO: issing-return-type-undocumented-public-function

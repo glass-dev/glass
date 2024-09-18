@@ -26,6 +26,8 @@ Utility functions
 
 """
 
+from __future__ import annotations
+
 import warnings
 
 # typing
@@ -49,8 +51,8 @@ def iternorm(
     cov: Iterable[Array],
     size: Size = None,
 ) -> Generator[Iternorm, None, None]:
-    """Return the vector a and variance sigma^2 for iterative normal sampling"""
-    n: Tuple[int, ...]
+    """Return the vector a and variance sigma^2 for iterative normal sampling."""
+    n: tuple[int, ...]
     if size is None:
         n = ()
     elif isinstance(size, int):
@@ -68,11 +70,10 @@ def iternorm(
         x = np.asanyarray(x)
         if x.shape != q:
             try:
-                x = np.broadcast_to(x, q)
+                x = np.broadcast_to(x, q)  # noqa: PLW2901
             except ValueError:
-                raise TypeError(
-                    f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}",
-                ) from None
+                msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
+                raise TypeError(msg) from None
 
         # only need to update matrix A if there are correlations
         if j is not None:
@@ -99,7 +100,8 @@ def iternorm(
         # compute new standard deviation
         s = x[..., 0] - np.einsum("...i,...i", a, a)
         if np.any(s < 0):
-            raise ValueError("covariance matrix is not positive definite")
+            msg = "covariance matrix is not positive definite"
+            raise ValueError(msg)
         s = np.sqrt(s)
 
         # yield the next index, vector a, and standard deviation s
@@ -117,7 +119,8 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
                 cov[:, i] = 0
             else:
                 if i == 0 and np.any(np.less(cl, 0)):
-                    raise ValueError("negative values in cl")
+                    msg = "negative values in cl"
+                    raise ValueError(msg)
                 n = len(cl)
                 cov[:n, i] = cl
                 cov[n:, i] = 0
@@ -126,7 +129,7 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
 
 
 def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
-    """Multiply alm by bl"""
+    """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
@@ -134,7 +137,7 @@ def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
     return out
 
 
-def transform_cls(cls: Cls, tfm: ClTransform, pars: Tuple[Any, ...] = ()) -> Cls:
+def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls:
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
@@ -152,9 +155,9 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: Tuple[Any, ...] = ()) -> Cls
 def gaussian_gls(
     cls: Cls,
     *,
-    lmax: Optional[int] = None,
-    ncorr: Optional[int] = None,
-    nside: Optional[int] = None,
+    lmax: int | None = None,
+    ncorr: int | None = None,
+    nside: int | None = None,
 ) -> Cls:
     """
     Compute Gaussian Cls for a Gaussian random field.
@@ -168,7 +171,8 @@ def gaussian_gls(
     if ncorr is not None:
         n = int((2 * len(cls)) ** 0.5)
         if n * (n + 1) // 2 != len(cls):
-            raise ValueError("length of cls array is not a triangle number")
+            msg = "length of cls array is not a triangle number"
+            raise ValueError(msg)
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else []
             for i in range(n)
@@ -194,9 +198,9 @@ def lognormal_gls(
     cls: Cls,
     shift: float = 1.0,
     *,
-    lmax: Optional[int] = None,
-    ncorr: Optional[int] = None,
-    nside: Optional[int] = None,
+    lmax: int | None = None,
+    ncorr: int | None = None,
+    nside: int | None = None,
 ) -> Cls:
     """Compute Gaussian Cls for a lognormal random field."""
     gls = gaussian_gls(cls, lmax=lmax, ncorr=ncorr, nside=nside)
@@ -207,8 +211,8 @@ def generate_gaussian(
     gls: Cls,
     nside: int,
     *,
-    ncorr: Optional[int] = None,
-    rng: Optional[np.random.Generator] = None,
+    ncorr: int | None = None,
+    rng: np.random.Generator | None = None,
 ) -> Generator[Array, None, None]:
     """
     Iteratively sample Gaussian random fields from Cls.
@@ -248,7 +252,8 @@ def generate_gaussian(
     # number of modes
     n = max((len(gl) for gl in gls if gl is not None), default=0)
     if n == 0:
-        raise ValueError("all gls are empty")
+        msg = "all gls are empty"
+        raise ValueError(msg)
 
     # generates the covariance matrix for the iterative sampler
     cov = cls2cov(gls, n, ngrf, ncorr)
@@ -292,8 +297,8 @@ def generate_lognormal(
     nside: int,
     shift: float = 1.0,
     *,
-    ncorr: Optional[int] = None,
-    rng: Optional[np.random.Generator] = None,
+    ncorr: int | None = None,
+    rng: np.random.Generator | None = None,
 ) -> Generator[Array, None, None]:
     """Iterative sample lognormal random fields from Gaussian Cls."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
@@ -303,7 +308,7 @@ def generate_lognormal(
         var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
 
         # fix mean of the Gaussian random field for lognormal transformation
-        m -= var / 2
+        m -= var / 2  # noqa: PLW2901
 
         # exponentiate values in place and subtract 1 in one operation
         np.expm1(m, out=m)
@@ -350,7 +355,7 @@ def getcl(cls, i, j, lmax=None):
 
 
 def effective_cls(cls, weights1, weights2=None, *, lmax=None):
-    """
+    r"""
     Compute effective angular power spectra from weights.
 
     Computes a linear combination of the angular power spectra *cls*
@@ -382,7 +387,8 @@ def effective_cls(cls, weights1, weights2=None, *, lmax=None):
     # this is the number of fields
     n = int((2 * len(cls)) ** 0.5)
     if n * (n + 1) // 2 != len(cls):
-        raise ValueError("length of cls is not a triangle number")
+        msg = "length of cls is not a triangle number"
+        raise ValueError(msg)
 
     # find lmax if not given
     if lmax is None:
@@ -395,7 +401,8 @@ def effective_cls(cls, weights1, weights2=None, *, lmax=None):
     shape1, shape2 = weights1.shape, weights2.shape
     for i, shape in enumerate((shape1, shape2)):
         if not shape or shape[0] != n:
-            raise ValueError(f"shape mismatch between fields and weights{i+1}")
+            msg = f"shape mismatch between fields and weights{i+1}"
+            raise ValueError(msg)
 
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations

@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Observations (:mod:`glass.observations`)
+Observations (:mod:`glass.observations`).
 ========================================
 
 .. currentmodule:: glass.observations
@@ -28,23 +28,27 @@ Visibility
 
 """
 
+from __future__ import annotations
+
 import math
-from typing import List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
-from numpy.typing import ArrayLike
 
 from .core.array import cumtrapz
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
 
 
 def vmap_galactic_ecliptic(
     nside: int,
-    galactic: Tuple[float, float] = (30, 90),
-    ecliptic: Tuple[float, float] = (20, 80),
+    galactic: tuple[float, float] = (30, 90),
+    ecliptic: tuple[float, float] = (20, 80),
 ) -> np.ndarray:
     """
-    Visibility map masking galactic and ecliptic plane
+    Visibility map masking galactic and ecliptic plane.
 
     This function returns a :term:`visibility map` that blocks out stripes for
     the galactic and ecliptic planes.  The location of the stripes is set with
@@ -70,17 +74,17 @@ def vmap_galactic_ecliptic(
 
     """
     if np.ndim(galactic) != 1 or len(galactic) != 2:
-        raise TypeError("galactic stripe must be a pair of numbers")
+        msg = "galactic stripe must be a pair of numbers"
+        raise TypeError(msg)
     if np.ndim(ecliptic) != 1 or len(ecliptic) != 2:
-        raise TypeError("ecliptic stripe must be a pair of numbers")
+        msg = "ecliptic stripe must be a pair of numbers"
+        raise TypeError(msg)
 
     m = np.ones(hp.nside2npix(nside))
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    m = hp.Rotator(coord="CE").rotate_map_pixel(m)
-
-    return m
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)
 
 
 def gaussian_nz(
@@ -88,7 +92,7 @@ def gaussian_nz(
     mean: ArrayLike,
     sigma: ArrayLike,
     *,
-    norm: Optional[ArrayLike] = None,
+    norm: ArrayLike | None = None,
 ) -> np.ndarray:
     r"""
     Gaussian redshift distribution.
@@ -134,7 +138,7 @@ def smail_nz(
     alpha: ArrayLike,
     beta: ArrayLike,
     *,
-    norm: Optional[ArrayLike] = None,
+    norm: ArrayLike | None = None,
 ) -> np.ndarray:
     r"""
     Redshift distribution following Smail et al. (1994).
@@ -194,11 +198,11 @@ def fixed_zbins(
     zmin: float,
     zmax: float,
     *,
-    nbins: Optional[int] = None,
-    dz: Optional[float] = None,
-) -> List[Tuple[float, float]]:
+    nbins: int | None = None,
+    dz: float | None = None,
+) -> list[tuple[float, float]]:
     """
-    Tomographic redshift bins of fixed size
+    Tomographic redshift bins of fixed size.
 
     This function creates contiguous tomographic redshift bins of fixed size.
     It takes either the number or size of the bins.
@@ -223,7 +227,8 @@ def fixed_zbins(
     if nbins is None and dz is not None:
         zbinedges = np.arange(zmin, zmax, dz)
     else:
-        raise ValueError("exactly one of nbins and dz must be given")
+        msg = "exactly one of nbins and dz must be given"
+        raise ValueError(msg)
 
     return list(zip(zbinedges, zbinedges[1:]))
 
@@ -232,9 +237,9 @@ def equal_dens_zbins(
     z: np.ndarray,
     nz: np.ndarray,
     nbins: int,
-) -> List[Tuple[float, float]]:
+) -> list[tuple[float, float]]:
     """
-    Equal density tomographic redshift bins
+    Equal density tomographic redshift bins.
 
     This function subdivides a source redshift distribution into ``nbins``
     tomographic redshift bins with equal density.
@@ -267,10 +272,10 @@ def tomo_nz_gausserr(
     z: np.ndarray,
     nz: np.ndarray,
     sigma_0: float,
-    zbins: List[Tuple[float, float]],
+    zbins: list[tuple[float, float]],
 ) -> np.ndarray:
     """
-    Tomographic redshift bins with a Gaussian redshift error
+    Tomographic redshift bins with a Gaussian redshift error.
 
     This function takes a _true_ overall source redshift distribution ``z``,
     ``nz`` and returns tomographic source redshift distributions for the

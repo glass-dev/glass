@@ -90,8 +90,7 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     C = 1 + z2m1 * cos2_phi
 
     return np.sqrt(
-        (A + C - np.sqrt((A - C) ** 2 + B2))
-        / (A + C + np.sqrt((A - C) ** 2 + B2)),
+        (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
 
 

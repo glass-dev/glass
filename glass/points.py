@@ -39,7 +39,7 @@ from .core.constants import ARCMIN2_SPHERE
 
 
 def effective_bias(z, bz, w):
-    """
+    r"""
     Effective bias parameter from a redshift-dependent bias function.
 
     This function takes a redshift-dependent bias function :math:`b(z)`
@@ -74,12 +74,12 @@ def effective_bias(z, bz, w):
 
 
 def linear_bias(delta, b):
-    """Linear bias model :math:`\\delta_g = b \\, \\delta`"""
+    r"""Linear bias model :math:`\\delta_g = b \\, \\delta`."""
     return b * delta
 
 
 def loglinear_bias(delta, b):
-    """log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`"""
+    r"""log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
@@ -162,7 +162,8 @@ def positions_from_delta(
     if isinstance(bias_model, str):
         bias_model = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
-        raise ValueError("bias_model must be string or callable")
+        msg = "bias_model must be string or callable"
+        raise ValueError(msg)
 
     # broadcast inputs to common shape of extra dimensions
     inputs = [(ngal, 0), (delta, 1)]
@@ -179,10 +180,7 @@ def positions_from_delta(
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        if bias is None:
-            n = np.copy(delta[k])
-        else:
-            n = bias_model(delta[k], bias[k])
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
 
         # remove monopole if asked to
         if remove_monopole:
@@ -247,7 +245,7 @@ def positions_from_delta(
                 yield lon, lat, ipix.size * cmask
 
         # make sure that the correct number of pixels was sampled
-        assert np.sum(n[stop:]) == 0
+        assert np.sum(n[stop:]) == 0  # noqa: S101
 
 
 def uniform_positions(ngal, *, rng=None):
@@ -302,7 +300,7 @@ def uniform_positions(ngal, *, rng=None):
 
 
 def position_weights(densities, bias=None):
-    """
+    r"""
     Compute relative weights for angular clustering.
 
     Takes an array *densities* of densities in arbitrary units and

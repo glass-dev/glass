@@ -49,7 +49,7 @@ import warnings
 from collections import namedtuple
 
 # type checking
-from typing import TYPE_CHECKING, Callable, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Optional, Sequence, Union
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -59,22 +59,24 @@ from .core.array import ndinterp
 if TYPE_CHECKING:
     from cosmology import Cosmology
 
+from __future__ import annotations
+
 # types
 ArrayLike1D = Union[Sequence[float], np.ndarray]
 WeightFunc = Callable[[ArrayLike1D], np.ndarray]
 
 
-def distance_weight(z: ArrayLike, cosmo: "Cosmology") -> np.ndarray:
+def distance_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)
 
 
-def volume_weight(z: ArrayLike, cosmo: "Cosmology") -> np.ndarray:
+def volume_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-def density_weight(z: ArrayLike, cosmo: "Cosmology") -> np.ndarray:
+def density_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
@@ -132,7 +134,7 @@ def tophat_windows(
     zbins: ArrayLike1D,
     dz: float = 1e-3,
     weight: Optional[WeightFunc] = None,
-) -> List[RadialWindow]:
+) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.
 
@@ -168,7 +170,8 @@ def tophat_windows(
 
     """
     if len(zbins) < 2:
-        raise ValueError("zbins must have at least two entries")
+        msg = "zbins must have at least two entries"
+        raise ValueError(msg)
     if zbins[0] != 0:
         warnings.warn("first tophat window does not start at redshift zero")
 
@@ -187,8 +190,8 @@ def tophat_windows(
 def linear_windows(
     zgrid: ArrayLike1D,
     dz: float = 1e-3,
-    weight: Optional[WeightFunc] = None,
-) -> List[RadialWindow]:
+    weight: WeightFunc | None = None,
+) -> list[RadialWindow]:
     """
     Linear interpolation window functions.
 
@@ -224,7 +227,8 @@ def linear_windows(
 
     """
     if len(zgrid) < 3:
-        raise ValueError("nodes must have at least 3 entries")
+        msg = "nodes must have at least 3 entries"
+        raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0")
 
@@ -247,8 +251,8 @@ def linear_windows(
 def cubic_windows(
     zgrid: ArrayLike1D,
     dz: float = 1e-3,
-    weight: Optional[WeightFunc] = None,
-) -> List[RadialWindow]:
+    weight: WeightFunc | None = None,
+) -> list[RadialWindow]:
     """
     Cubic interpolation window functions.
 
@@ -285,7 +289,8 @@ def cubic_windows(
 
     """
     if len(zgrid) < 3:
-        raise ValueError("nodes must have at least 3 entries")
+        msg = "nodes must have at least 3 entries"
+        raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0")
 
@@ -309,7 +314,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Restrict a function to a redshift window.
 
@@ -353,7 +358,7 @@ def partition(
     *,
     method: str = "nnls",
 ) -> ArrayLike:
-    """
+    r"""
     Partition a function by a sequence of windows.
 
     Returns a vector of weights :math:`x_1, x_2, \\ldots` such that the
@@ -451,7 +456,8 @@ def partition(
     try:
         partition_method = globals()[f"partition_{method}"]
     except KeyError:
-        raise ValueError(f"invalid method: {method}") from None
+        msg = f"invalid method: {method}"
+        raise ValueError(msg) from None
     return partition_method(z, fz, shells)
 
 
@@ -498,9 +504,7 @@ def partition_lstsq(
     x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
-    x = np.moveaxis(x, -1, 0)
-    # all done
-    return x
+    return np.moveaxis(x, -1, 0)
 
 
 def partition_nnls(
@@ -584,7 +588,8 @@ def redshift_grid(zmin, zmax, *, dz=None, num=None):
     elif dz is None and num is not None:
         z = np.linspace(zmin, zmax, num + 1)
     else:
-        raise ValueError('exactly one of "dz" or "num" must be given')
+        msg = 'exactly one of "dz" or "num" must be given'
+        raise ValueError(msg)
     return z
 
 
@@ -596,7 +601,8 @@ def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
     elif dx is None and num is not None:
         x = np.linspace(xmin, xmax, num + 1)
     else:
-        raise ValueError('exactly one of "dx" or "num" must be given')
+        msg = 'exactly one of "dx" or "num" must be given'
+        raise ValueError(msg)
     return cosmo.dc_inv(x)
 
 
@@ -605,7 +611,7 @@ def combine(
     weights: ArrayLike,
     shells: Sequence[RadialWindow],
 ) -> ArrayLike:
-    """
+    r"""
     Evaluate a linear combination of window functions.
 
     Takes a vector of weights :math:`x_1, x_2, \\ldots` and computes the

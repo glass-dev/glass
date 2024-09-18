@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-User utilities (:mod:`glass.user`)
+User utilities (:mod:`glass.user`).
 ==================================
 
 .. currentmodule:: glass.user

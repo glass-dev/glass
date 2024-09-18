@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Lensing (:mod:`glass.lensing`)
+Lensing (:mod:`glass.lensing`).
 ==============================
 
 .. currentmodule:: glass.lensing
@@ -32,28 +32,31 @@ Applying lensing
 """
 
 # typing support
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Sequence
 
 import healpy as hp
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 if TYPE_CHECKING:
     # to prevent circular dependencies, only import these for type checking
+    from numpy.typing import ArrayLike, NDArray
+
     from cosmology import Cosmology
 
     from .shells import RadialWindow
 
+from __future__ import annotations
+
 
 def from_convergence(
     kappa: NDArray,
-    lmax: Optional[int] = None,
+    lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> Tuple[NDArray, ...]:
+) -> tuple[NDArray, ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
@@ -223,7 +226,7 @@ def from_convergence(
 
 def shear_from_convergence(
     kappa: np.ndarray,
-    lmax: Optional[int] = None,
+    lmax: int | None = None,
     *,
     discretized: bool = True,
 ) -> np.ndarray:
@@ -268,7 +271,7 @@ def shear_from_convergence(
 class MultiPlaneConvergence:
     """Compute convergence fields iteratively from multiple matter planes."""
 
-    def __init__(self, cosmo: "Cosmology") -> None:
+    def __init__(self, cosmo: Cosmology) -> None:
         """Create a new instance to iteratively compute the convergence."""
         self.cosmo = cosmo
 
@@ -279,10 +282,10 @@ class MultiPlaneConvergence:
         self.w3: float = 0.0
         self.r23: float = 1.0
         self.delta3: np.ndarray = np.array(0.0)
-        self.kappa2: Optional[np.ndarray] = None
-        self.kappa3: Optional[np.ndarray] = None
+        self.kappa2: np.ndarray | None = None
+        self.kappa3: np.ndarray | None = None
 
-    def add_window(self, delta: np.ndarray, w: "RadialWindow") -> None:
+    def add_window(self, delta: np.ndarray, w: RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -298,7 +301,8 @@ class MultiPlaneConvergence:
     def add_plane(self, delta: np.ndarray, zsrc: float, wlens: float = 1.0) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
         if zsrc <= self.z3:
-            raise ValueError("source redshift must be increasing")
+            msg = "source redshift must be increasing"
+            raise ValueError(msg)
 
         # cycle mass plane, ...
         delta2, self.delta3 = self.delta3, delta
@@ -343,7 +347,7 @@ class MultiPlaneConvergence:
         return self.z3
 
     @property
-    def kappa(self) -> Optional[np.ndarray]:
+    def kappa(self) -> np.ndarray | None:
         """The current convergence plane."""
         return self.kappa3
 
@@ -359,8 +363,8 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: Sequence["RadialWindow"],
-    cosmo: "Cosmology",
+    shells: Sequence[RadialWindow],
+    cosmo: Cosmology,
 ) -> ArrayLike:
     """Compute the matrix of lensing contributions from each shell."""
     mpc = MultiPlaneConvergence(cosmo)
@@ -373,8 +377,8 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: ArrayLike,
-    shells: Sequence["RadialWindow"],
-    cosmo: "Cosmology",
+    shells: Sequence[RadialWindow],
+    cosmo: Cosmology,
 ) -> ArrayLike:
     """
     Compute effective weights for multi-plane convergence.
@@ -405,7 +409,8 @@ def multi_plane_weights(
     # ensure shape of weights ends with the number of shells
     shape = np.shape(weights)
     if not shape or shape[0] != len(shells):
-        raise ValueError("shape mismatch between weights and shells")
+        msg = "shape mismatch between weights and shells"
+        raise ValueError(msg)
     # normalise weights
     weights = weights / np.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
@@ -414,7 +419,7 @@ def multi_plane_weights(
 
 
 def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
-    """
+    r"""
     Apply deflections to positions.
 
     Takes an array of :term:`deflection` values and applies them
@@ -445,10 +450,7 @@ def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
 
     """
     alpha = np.asanyarray(alpha)
-    if np.iscomplexobj(alpha):
-        alpha1, alpha2 = alpha.real, alpha.imag
-    else:
-        alpha1, alpha2 = alpha
+    alpha1, alpha2 = (alpha.real, alpha.imag) if np.iscomplexobj(alpha) else alpha
 
     # we know great-circle navigation:
     # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],

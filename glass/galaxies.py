@@ -1,7 +1,7 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Galaxies (:mod:`glass.galaxies`)
+Galaxies (:mod:`glass.galaxies`).
 ================================
 
 .. currentmodule:: glass.galaxies
@@ -21,12 +21,17 @@ Functions
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import healpix
 import numpy as np
-from numpy.typing import ArrayLike
 
 from .core.array import broadcast_leading_axes, cumtrapz
-from .shells import RadialWindow
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+
+    from .shells import RadialWindow
 
 
 def redshifts(
@@ -123,7 +128,7 @@ def redshifts_from_nz(
         )
         total += count[k]
 
-    assert total == redshifts.size
+    assert total == redshifts.size  # noqa: S101
 
     return redshifts
 
@@ -260,7 +265,8 @@ def gaussian_phz(
         upper = np.inf
 
     if not np.all(lower < upper):
-        raise ValueError("requires lower < upper")
+        msg = "requires lower < upper"
+        raise ValueError(msg)
 
     if not dims:
         while zphot < lower or zphot > upper:
