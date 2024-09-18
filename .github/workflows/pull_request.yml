@@ -10,6 +10,7 @@ on:
 
 jobs:
   check-pr-title:
+    if: ${{ github.actor != 'pre-commit-ci[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - uses: thehanimo/pr-title-checker@v1.4.2
