@@ -1,6 +1,8 @@
+from importlib.metadata import PackageNotFoundError
+
 try:
-    from glass._version import __version__, __version_tuple__
-except ModuleNotFoundError:
+    from ._version import __version__, __version_tuple__
+except PackageNotFoundError:
     pass
 
 from glass.fields import (
