@@ -51,7 +51,7 @@ def broadcast_leading_axes(*args):
     return (dims, *arrs)
 
 
-def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):
+def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):  # noqa: PLR0913
     """Interpolate multi-dimensional array over axis."""
     return np.apply_along_axis(
         partial(np.interp, x, xp),

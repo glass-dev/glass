@@ -86,7 +86,7 @@ def loglinear_bias(delta, b):
     return delta_g
 
 
-def positions_from_delta(
+def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     ngal,
     delta,
     bias=None,
@@ -163,7 +163,7 @@ def positions_from_delta(
         bias_model = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
         msg = "bias_model must be string or callable"
-        raise ValueError(msg)
+        raise TypeError(msg)
 
     # broadcast inputs to common shape of extra dimensions
     inputs = [(ngal, 0), (delta, 1)]

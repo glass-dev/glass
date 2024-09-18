@@ -52,7 +52,7 @@ def nnls(
         maxiter = 3 * n
 
     index = np.arange(n)
-    p = np.full(n, False)
+    p = np.full(n, fill_value=False)
     x = np.zeros(n)
     for _ in range(maxiter):
         if np.all(p):

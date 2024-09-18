@@ -66,12 +66,12 @@ def test_write_exception(tmp_path):
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"
-                    raise Exception(msg)
+                    raise Exception(msg)  # noqa: TRY002, TRY301
                 array = np.arange(i, i + 1, delta)  # array of size 1/delta
                 array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
                 out.write(RA=array, RB=array2)
 
-    except Exception:
+    except Exception:  # noqa: BLE001
         import fitsio
 
         with fitsio.FITS(d / filename) as hdul:

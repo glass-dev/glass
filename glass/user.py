@@ -63,7 +63,7 @@ class _FitsWriter:
         self.ext = ext
 
     def _append(self, data, names=None) -> None:
-        """Internal method where the FITS writing is done."""
+        """Write the FITS file."""
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if self.ext is None:
@@ -75,7 +75,7 @@ class _FitsWriter:
 
     def write(self, data=None, /, **columns) -> None:
         """
-        Writes to FITS by calling the internal _append method.
+        Write to FITS by calling the internal _append method.
 
         Pass either a positional variable (data)
         or multiple named arguments (**columns)
@@ -93,8 +93,10 @@ class _FitsWriter:
 @contextmanager
 def write_catalog(filename, *, ext=None):
     """
-    Write a catalogue into a FITS file, where *ext* is the optional
-    name of the extension.  To be used as a context manager::
+    Write a catalogue into a FITS file.
+
+    Where *ext* is the optional name of the extension.
+    To be used as a context manager::
 
         # create the catalogue writer
         with write_catalog("catalog.fits") as out:

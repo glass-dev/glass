@@ -195,7 +195,8 @@ def from_convergence(  # noqa: PLR0913
 
     # compute deflection alms in place
     fl = np.sqrt(l * (l + 1))
-    # TODO: missing spin-1 pixel window function here
+    # TODO(ntessore): missing spin-1 pixel window function here # noqa: FIX002
+    # https://github.com/glass-dev/glass/issues/243
     hp.almxfl(alm, fl, inplace=True)
 
     # if deflection is requested, compute spin-1 maps and add to output
@@ -253,7 +254,7 @@ def shear_from_convergence(
     blm = np.zeros_like(alm)
 
     # factor to convert convergence alm to shear alm
-    l = np.arange(lmax + 1)
+    l = np.arange(lmax + 1)  # noqa: E741
     fl = np.sqrt((l + 2) * (l + 1) * l * (l - 1))
     fl /= np.clip(l * (l + 1), 1, None)
     fl *= -1

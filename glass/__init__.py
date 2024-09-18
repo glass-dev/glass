@@ -1,3 +1,5 @@
+"""GLASS package."""
+
 import contextlib
 
 with contextlib.suppress(ModuleNotFoundError):

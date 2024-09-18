@@ -101,6 +101,7 @@ lint.ignore = [
     "ANN201", # TEMPORARY
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
+    "D205", # TEMPORARY
     "D212", # blank-line-before-class
     "ERA001", # TODO: commented-out-code
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
