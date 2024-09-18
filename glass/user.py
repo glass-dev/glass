@@ -2,7 +2,7 @@
 # license: MIT
 """
 User utilities.
-==============
+===============
 
 .. currentmodule:: glass
 

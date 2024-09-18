@@ -2,7 +2,7 @@
 # license: MIT
 """
 Observed shapes.
-===============
+================
 
 .. currentmodule:: glass
 

@@ -2,7 +2,7 @@
 # license: MIT
 """
 Random points.
-=============
+==============
 
 .. currentmodule:: glass
 

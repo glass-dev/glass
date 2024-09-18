@@ -2,7 +2,7 @@
 # license: MIT
 """
 Shells.
-======
+=======
 
 .. currentmodule:: glass
 

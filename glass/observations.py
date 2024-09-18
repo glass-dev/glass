@@ -2,7 +2,7 @@
 # license: MIT
 """
 Observations.
-============
+=============
 
 .. currentmodule:: glass
 
