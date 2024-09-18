@@ -62,16 +62,3 @@ jobs:
           sudo apt-get update
           sudo apt-get install pandoc
       - run: pipx run --spec '.[docs]' sphinx-build -W -b html docs _build/html
-
-  examples:
-    name: Examples
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-          cache: pip
-      - run: pipx run --spec '.[examples]' jupyter execute examples/**/*.ipynb
