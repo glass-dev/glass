@@ -3,7 +3,9 @@ import pytest
 
 def test_redshifts():
     from unittest.mock import Mock
+
     import numpy as np
+
     from glass.galaxies import redshifts
 
     # create a mock radial window function
@@ -14,7 +16,8 @@ def test_redshifts():
     # sample redshifts (scalar)
     z = redshifts(13, w)
     assert z.shape == (13,)
-    assert z.min() >= 0.0 and z.max() <= 1.0
+    assert z.min() >= 0.0
+    assert z.max() <= 1.0
 
     # sample redshifts (array)
     z = redshifts([[1, 2], [3, 4]], w)
@@ -23,18 +26,19 @@ def test_redshifts():
 
 def test_redshifts_from_nz():
     import numpy as np
+
     from glass.galaxies import redshifts_from_nz
 
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
-    assert np.all((0 <= redshifts) & (redshifts <= 1))
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0])
-    assert np.all((1 <= redshifts) & (redshifts <= 3))
+    assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1])
-    assert np.all((3 <= redshifts) & (redshifts <= 4))
+    assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1])
     assert not np.any(redshifts <= 1)
@@ -50,7 +54,7 @@ def test_redshifts_from_nz():
     redshifts = redshifts_from_nz(count, z, nz)
 
     assert redshifts.shape == (count,)
-    assert np.all((0 <= redshifts) & (redshifts <= 1))
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     # case: extra dimensions from count
 
@@ -94,6 +98,7 @@ def test_redshifts_from_nz():
 
 def test_gaussian_phz():
     import numpy as np
+
     from glass.galaxies import gaussian_phz
 
     # test sampling

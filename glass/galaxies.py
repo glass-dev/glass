@@ -17,23 +17,31 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-"""
+"""  # noqa: D205, D400, D415
 
 from __future__ import annotations
 
-import numpy as np
-import healpix
+from typing import TYPE_CHECKING
 
-from numpy.typing import ArrayLike
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+
+    from glass.shells import RadialWindow
+
+import healpix
+import numpy as np
 
 from glass.core.array import broadcast_leading_axes, cumtrapz
-from glass.shells import RadialWindow
 
 
 def redshifts(
-    n: int | ArrayLike, w: RadialWindow, *, rng: np.random.Generator | None = None
+    n: int | ArrayLike,
+    w: RadialWindow,
+    *,
+    rng: np.random.Generator | None = None,
 ) -> np.ndarray:
-    """Sample redshifts from a radial window function.
+    """
+    Sample redshifts from a radial window function.
 
     This function samples *n* redshifts from a distribution that follows
     the given radial window function *w*.
@@ -64,7 +72,8 @@ def redshifts_from_nz(
     *,
     rng: np.random.Generator | None = None,
 ) -> np.ndarray:
-    """Generate galaxy redshifts from a source distribution.
+    """
+    Generate galaxy redshifts from a source distribution.
 
     The function supports sampling from multiple populations of
     redshifts if *count* is an array or if there are additional axes in
@@ -92,7 +101,6 @@ def redshifts_from_nz(
         samples from all populations.
 
     """
-
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -114,16 +122,18 @@ def redshifts_from_nz(
 
         # sample redshifts and store result
         redshifts[total : total + count[k]] = np.interp(
-            rng.uniform(0, 1, size=count[k]), cdf, z[k]
+            rng.uniform(0, 1, size=count[k]),
+            cdf,
+            z[k],
         )
         total += count[k]
 
-    assert total == redshifts.size
+    assert total == redshifts.size  # noqa: S101
 
     return redshifts
 
 
-def galaxy_shear(
+def galaxy_shear(  # noqa: PLR0913
     lon: np.ndarray,
     lat: np.ndarray,
     eps: np.ndarray,
@@ -133,7 +143,8 @@ def galaxy_shear(
     *,
     reduced_shear: bool = True,
 ) -> np.ndarray:
-    """Observed galaxy shears from weak lensing.
+    """
+    Observed galaxy shears from weak lensing.
 
     Takes lensing maps for convergence and shear and produces a lensed
     ellipticity (shear) for each intrinsic galaxy ellipticity.
@@ -156,7 +167,6 @@ def galaxy_shear(
         Array of complex-valued observed galaxy shears (lensed ellipticities).
 
     """
-
     nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
 
     size = np.broadcast(lon, lat, eps).size
@@ -194,7 +204,8 @@ def gaussian_phz(
     upper: ArrayLike | None = None,
     rng: np.random.Generator | None = None,
 ) -> np.ndarray:
-    r"""Photometric redshifts assuming a Gaussian error.
+    r"""
+    Photometric redshifts assuming a Gaussian error.
 
     A simple toy model of photometric redshift errors that assumes a
     Gaussian error with redshift-dependent standard deviation
@@ -239,7 +250,6 @@ def gaussian_phz(
     See the :doc:`/examples/1-basic/photoz` example.
 
     """
-
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -255,7 +265,8 @@ def gaussian_phz(
         upper = np.inf
 
     if not np.all(lower < upper):
-        raise ValueError("requires lower < upper")
+        msg = "requires lower < upper"
+        raise ValueError(msg)
 
     if not dims:
         while zphot < lower or zphot > upper:

@@ -111,11 +111,13 @@ def test_position_weights():
             if bias is not None:
                 if np.ndim(bias) > np.ndim(expected):
                     expected = np.expand_dims(
-                        expected, tuple(range(np.ndim(expected), np.ndim(bias)))
+                        expected,
+                        tuple(range(np.ndim(expected), np.ndim(bias))),
                     )
                 else:
                     bias = np.expand_dims(
-                        bias, tuple(range(np.ndim(bias), np.ndim(expected)))
+                        bias,
+                        tuple(range(np.ndim(bias), np.ndim(expected))),
                     )
                 expected = bias * expected
 

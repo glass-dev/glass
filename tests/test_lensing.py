@@ -7,15 +7,13 @@ import pytest
 def shells():
     from glass.shells import RadialWindow
 
-    shells = [
+    return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
         RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
         RadialWindow([2.0, 3.0, 4.0], [0.0, 1.0, 0.0], 3.0),
         RadialWindow([3.0, 4.0, 5.0], [0.0, 1.0, 0.0], 4.0),
         RadialWindow([4.0, 5.0, 6.0], [0.0, 1.0, 0.0], 5.0),
     ]
-
-    return shells
 
 
 @pytest.fixture
@@ -31,8 +29,7 @@ def cosmo():
         def xm(self, z, z2=None):
             if z2 is None:
                 return np.array(z) * 1000
-            else:
-                return (np.array(z2) - np.array(z)) * 1000
+            return (np.array(z2) - np.array(z)) * 1000
 
     return MockCosmology()
 
@@ -72,6 +69,7 @@ def test_deflect_nsew(usecomplex):
 
 def test_deflect_many():
     import healpix
+
     from glass.lensing import deflect
 
     n = 1000

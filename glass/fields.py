@@ -24,15 +24,19 @@ Utility functions
 
 .. autofunction:: getcl
 
-"""
+"""  # noqa: D205, D400, D415
+
+from __future__ import annotations
 
 import warnings
-import numpy as np
-import healpy as hp
-from gaussiancl import gaussiancl
 
 # typing
-from typing import Any, Union, Tuple, Generator, Optional, Sequence, Callable, Iterable
+from typing import Any, Callable, Generator, Iterable, Optional, Sequence, Tuple, Union
+
+import healpy as hp
+import numpy as np
+import numpy.typing as npt
+from gaussiancl import gaussiancl
 
 # types
 Array = np.ndarray
@@ -44,11 +48,12 @@ Alms = np.ndarray
 
 
 def iternorm(
-    k: int, cov: Iterable[Array], size: Size = None
+    k: int,
+    cov: Iterable[Array],
+    size: Size = None,
 ) -> Generator[Iternorm, None, None]:
-    """return the vector a and variance sigma^2 for iterative normal sampling"""
-
-    n: Tuple[int, ...]
+    """Return the vector a and variance sigma^2 for iterative normal sampling."""
+    n: tuple[int, ...]
     if size is None:
         n = ()
     elif isinstance(size, int):
@@ -63,14 +68,13 @@ def iternorm(
     j = 0 if k > 0 else None
 
     for i, x in enumerate(cov):
-        x = np.asanyarray(x)
+        x = np.asanyarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
-                x = np.broadcast_to(x, q)
+                x = np.broadcast_to(x, q)  # noqa: PLW2901
             except ValueError:
-                raise TypeError(
-                    f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
-                ) from None
+                msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
+                raise TypeError(msg) from None
 
         # only need to update matrix A if there are correlations
         if j is not None:
@@ -97,7 +101,8 @@ def iternorm(
         # compute new standard deviation
         s = x[..., 0] - np.einsum("...i,...i", a, a)
         if np.any(s < 0):
-            raise ValueError("covariance matrix is not positive definite")
+            msg = "covariance matrix is not positive definite"
+            raise ValueError(msg)
         s = np.sqrt(s)
 
         # yield the next index, vector a, and standard deviation s
@@ -115,7 +120,8 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
                 cov[:, i] = 0
             else:
                 if i == 0 and np.any(np.less(cl, 0)):
-                    raise ValueError("negative values in cl")
+                    msg = "negative values in cl"
+                    raise ValueError(msg)
                 n = len(cl)
                 cov[:n, i] = cl
                 cov[n:, i] = 0
@@ -123,30 +129,26 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
         yield cov
 
 
-def multalm(alm: Alms, bl: Array, inplace: bool = False) -> Alms:
-    """multiply alm by bl"""
+def multalm(alm: Alms, bl: Array, *, inplace: bool = False) -> Alms:
+    """Multiply alm by bl."""
     n = len(bl)
-    if inplace:
-        out = np.asanyarray(alm)
-    else:
-        out = np.copy(alm)
+    out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
         out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
     return out
 
 
-def transform_cls(cls: Cls, tfm: ClTransform, pars: Tuple[Any, ...] = ()) -> Cls:
+def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls:
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
         if cl is not None and len(cl) > 0:
-            if cl[0] == 0:
-                monopole = 0.0
-            else:
-                monopole = None
-            gl, info, err, niter = gaussiancl(cl, tfm, pars, monopole=monopole)
+            monopole = 0.0 if cl[0] == 0 else None
+            gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
-                warnings.warn("Gaussian cl did not converge, inexact transform")
+                warnings.warn(
+                    "Gaussian cl did not converge, inexact transform", stacklevel=2
+                )
         else:
             gl = []
         gls.append(gl)
@@ -156,11 +158,12 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: Tuple[Any, ...] = ()) -> Cls
 def gaussian_gls(
     cls: Cls,
     *,
-    lmax: Optional[int] = None,
-    ncorr: Optional[int] = None,
-    nside: Optional[int] = None,
+    lmax: int | None = None,
+    ncorr: int | None = None,
+    nside: int | None = None,
 ) -> Cls:
-    """Compute Gaussian Cls for a Gaussian random field.
+    """
+    Compute Gaussian Cls for a Gaussian random field.
 
     Depending on the given arguments, this truncates the angular power spectra
     to ``lmax``, removes all but ``ncorr`` correlations between fields, and
@@ -168,11 +171,11 @@ def gaussian_gls(
     arguments are given, no action is performed.
 
     """
-
     if ncorr is not None:
         n = int((2 * len(cls)) ** 0.5)
         if n * (n + 1) // 2 != len(cls):
-            raise ValueError("length of cls array is not a triangle number")
+            msg = "length of cls array is not a triangle number"
+            raise ValueError(msg)
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else []
             for i in range(n)
@@ -186,10 +189,10 @@ def gaussian_gls(
     for cl in cls:
         if cl is not None and len(cl) > 0:
             if lmax is not None:
-                cl = cl[: lmax + 1]
+                cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
                 n = min(len(cl), len(pw))
-                cl = cl[:n] * pw[:n] ** 2
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
 
@@ -198,9 +201,9 @@ def lognormal_gls(
     cls: Cls,
     shift: float = 1.0,
     *,
-    lmax: Optional[int] = None,
-    ncorr: Optional[int] = None,
-    nside: Optional[int] = None,
+    lmax: int | None = None,
+    ncorr: int | None = None,
+    nside: int | None = None,
 ) -> Cls:
     """Compute Gaussian Cls for a lognormal random field."""
     gls = gaussian_gls(cls, lmax=lmax, ncorr=ncorr, nside=nside)
@@ -211,10 +214,11 @@ def generate_gaussian(
     gls: Cls,
     nside: int,
     *,
-    ncorr: Optional[int] = None,
-    rng: Optional[np.random.Generator] = None,
+    ncorr: int | None = None,
+    rng: np.random.Generator | None = None,
 ) -> Generator[Array, None, None]:
-    """Iteratively sample Gaussian random fields from Cls.
+    """
+    Sample Gaussian random fields from Cls iteratively.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -236,7 +240,6 @@ def generate_gaussian(
     Missing entries can be set to ``None``.
 
     """
-
     # get the default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -252,7 +255,8 @@ def generate_gaussian(
     # number of modes
     n = max((len(gl) for gl in gls if gl is not None), default=0)
     if n == 0:
-        raise ValueError("all gls are empty")
+        msg = "all gls are empty"
+        raise ValueError(msg)
 
     # generates the covariance matrix for the iterative sampler
     cov = cls2cov(gls, n, ngrf, ncorr)
@@ -296,10 +300,10 @@ def generate_lognormal(
     nside: int,
     shift: float = 1.0,
     *,
-    ncorr: Optional[int] = None,
-    rng: Optional[np.random.Generator] = None,
+    ncorr: int | None = None,
+    rng: np.random.Generator | None = None,
 ) -> Generator[Array, None, None]:
-    """Iterative sample lognormal random fields from Gaussian Cls."""
+    """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         gl = gls[i * (i + 1) // 2]
@@ -307,21 +311,22 @@ def generate_lognormal(
         var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
 
         # fix mean of the Gaussian random field for lognormal transformation
-        m -= var / 2
+        m -= var / 2  # noqa: PLW2901
 
         # exponentiate values in place and subtract 1 in one operation
         np.expm1(m, out=m)
 
         # lognormal shift, unless unity
         if shift != 1:
-            m *= shift
+            m *= shift  # noqa: PLW2901
 
         # yield the lognormal map
         yield m
 
 
 def getcl(cls, i, j, lmax=None):
-    """Return a specific angular power spectrum from an array.
+    """
+    Return a specific angular power spectrum from an array.
 
     Return the angular power spectrum for indices *i* and *j* from an
     array in *GLASS* ordering.
@@ -352,8 +357,11 @@ def getcl(cls, i, j, lmax=None):
     return cl
 
 
-def effective_cls(cls, weights1, weights2=None, *, lmax=None):
-    """Compute effective angular power spectra from weights.
+def effective_cls(
+    cls, weights1, weights2=None, *, lmax=None
+) -> npt.NDArray[np.float64]:
+    r"""
+    Compute effective angular power spectra from weights.
 
     Computes a linear combination of the angular power spectra *cls*
     using the factors provided by *weights1* and *weights2*.  Additional
@@ -384,7 +392,8 @@ def effective_cls(cls, weights1, weights2=None, *, lmax=None):
     # this is the number of fields
     n = int((2 * len(cls)) ** 0.5)
     if n * (n + 1) // 2 != len(cls):
-        raise ValueError("length of cls is not a triangle number")
+        msg = "length of cls is not a triangle number"
+        raise ValueError(msg)
 
     # find lmax if not given
     if lmax is None:
@@ -397,7 +406,8 @@ def effective_cls(cls, weights1, weights2=None, *, lmax=None):
     shape1, shape2 = weights1.shape, weights2.shape
     for i, shape in enumerate((shape1, shape2)):
         if not shape or shape[0] != n:
-            raise ValueError(f"shape mismatch between fields and weights{i+1}")
+            msg = f"shape mismatch between fields and weights{i+1}"
+            raise ValueError(msg)
 
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations
