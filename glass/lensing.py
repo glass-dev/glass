@@ -453,7 +453,10 @@ def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
 
     """
     alpha = np.asanyarray(alpha)
-    alpha1, alpha2 = (alpha.real, alpha.imag) if np.iscomplexobj(alpha) else alpha
+    if np.iscomplexobj(alpha):
+        alpha1, alpha2 = alpha.real, alpha.imag
+    else:
+        alpha1, alpha2 = alpha
 
     # we know great-circle navigation:
     # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
