@@ -1,8 +1,8 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-Galaxies.
-=========
+Galaxies
+========
 
 .. currentmodule:: glass
 

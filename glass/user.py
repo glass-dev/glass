@@ -1,8 +1,8 @@
 # author: Nicolas Tessore <n.tessore@ucl.ac.uk>
 # license: MIT
 """
-User utilities.
-===============
+User utilities
+==============
 
 .. currentmodule:: glass
 
@@ -95,7 +95,7 @@ def write_catalog(filename, *, ext=None):
     """
     Write a catalogue into a FITS file.
 
-    Where *ext* is the optional name of the extension.
+    *ext* is the optional name of the extension.
     To be used as a context manager::
 
         # create the catalogue writer
