@@ -17,6 +17,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
+  if: github.event.pull_request.draft == false
   test-examples:
     name: Test examples
     runs-on: ubuntu-latest
