@@ -130,11 +130,6 @@ class RadialWindow(NamedTuple):
     zeff: float
 
 
-RadialWindow.za.__doc__ = "Redshift array; the abscissae of the window function."
-RadialWindow.wa.__doc__ = "Weight array; the values (ordinates) of the window function."
-RadialWindow.zeff.__doc__ = "Effective redshift of the window."
-
-
 def tophat_windows(
     zbins: ArrayLike1D,
     dz: float = 1e-3,

@@ -32,13 +32,13 @@ def test_redshifts_from_nz():
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
-    assert np.all((redshifts >= 0) & (redshifts <= 1))
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0])
-    assert np.all((redshifts >= 1) & (redshifts <= 3))
+    assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1])
-    assert np.all((redshifts >= 3) & (redshifts <= 4))
+    assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1])
     assert not np.any(redshifts <= 1)
@@ -54,7 +54,7 @@ def test_redshifts_from_nz():
     redshifts = redshifts_from_nz(count, z, nz)
 
     assert redshifts.shape == (count,)
-    assert np.all((redshifts >= 0) & (redshifts <= 1))
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     # case: extra dimensions from count
 
