@@ -14,6 +14,7 @@ else:
 def test_nnls():
     import numpy as np
     from scipy.optimize import nnls as nnls_scipy
+
     from glass.core.algorithm import nnls as nnls_glass
 
     a = np.random.randn(100, 20)

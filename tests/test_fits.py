@@ -1,19 +1,16 @@
-import pytest
-
 # check if fitsio is available for testing
 import importlib.util
 
-if importlib.util.find_spec("fitsio") is not None:
-    HAVE_FITSIO = True
-else:
-    HAVE_FITSIO = False
-
-import glass.user as user
 import numpy as np
+import pytest
+
+from glass import user
+
+HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
 
 def _test_append(fits, data, names):
-    """Write routine for FITS test cases"""
+    """Write routine for FITS test cases."""
     cat_name = "CATALOG"
     if cat_name not in fits:
         fits.write_table(data, names=names, extname=cat_name)
@@ -38,9 +35,11 @@ def test_basic_write(tmp_path):
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
     with user.write_catalog(d / filename_gfits, ext="CATALOG") as out, fitsio.FITS(
-        d / filename_tfits, "rw", clobber=True
-    ) as myFits:
-        for i in range(0, my_max):
+        d / filename_tfits,
+        "rw",
+        clobber=True,
+    ) as myFits:  # noqa: N806
+        for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
             array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
             out.write(RA=array, RB=array2)
@@ -49,7 +48,7 @@ def test_basic_write(tmp_path):
             _test_append(myFits, arrays, names)
 
     with fitsio.FITS(d / filename_gfits) as g_fits, fitsio.FITS(
-        d / filename_tfits
+        d / filename_tfits,
     ) as t_fits:
         glass_data = g_fits[1].read()
         test_data = t_fits[1].read()
@@ -64,14 +63,15 @@ def test_write_exception(tmp_path):
 
     try:
         with user.write_catalog(d / filename, ext="CATALOG") as out:
-            for i in range(0, my_max):
+            for i in range(my_max):
                 if i == except_int:
-                    raise Exception("Unhandled exception")
+                    msg = "Unhandled exception"
+                    raise Exception(msg)  # noqa: TRY002, TRY301
                 array = np.arange(i, i + 1, delta)  # array of size 1/delta
                 array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
                 out.write(RA=array, RB=array2)
 
-    except Exception:
+    except Exception:  # noqa: BLE001
         import fitsio
 
         with fitsio.FITS(d / filename) as hdul:
@@ -79,11 +79,13 @@ def test_write_exception(tmp_path):
             assert data["RA"].size == except_int / delta
             assert data["RB"].size == except_int / delta
 
-            fitsMat = data["RA"].reshape(except_int, int(1 / delta))
-            fitsMat2 = data["RB"].reshape(except_int, int(1 / delta))
-            for i in range(0, except_int):
+            fitsMat = data["RA"].reshape(except_int, int(1 / delta))  # noqa: N806
+            fitsMat2 = data["RB"].reshape(except_int, int(1 / delta))  # noqa: N806
+            for i in range(except_int):
                 array = np.arange(
-                    i, i + 1, delta
+                    i,
+                    i + 1,
+                    delta,
                 )  # re-create array to compare to read data
                 array2 = np.arange(i + 1, i + 2, delta)
                 assert array.tolist() == fitsMat[i].tolist()
@@ -91,9 +93,9 @@ def test_write_exception(tmp_path):
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_out_filename(tmp_path):
+def test_out_filename():
     import fitsio
 
     fits = fitsio.FITS(filename, "rw", clobber=True)
-    writer = user._FitsWriter(fits)
-    assert writer.fits._filename == filename
+    writer = user._FitsWriter(fits)  # noqa: SLF001
+    assert writer.fits._filename == filename  # noqa: SLF001

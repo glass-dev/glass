@@ -1,4 +1,4 @@
-"""module for constants"""
+"""Module for constants."""
 
 PI = 3.1415926535897932384626433832795028841971693993751
 

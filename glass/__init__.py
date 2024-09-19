@@ -1,70 +1,71 @@
+"""GLASS package."""
+
+import contextlib
 from importlib.metadata import PackageNotFoundError
 
-try:
+with contextlib.suppress(PackageNotFoundError):
     from ._version import __version__, __version_tuple__
-except PackageNotFoundError:
-    pass
 
 from glass.fields import (
-    iternorm,
     cls2cov,
-    multalm,
-    transform_cls,
+    effective_cls,
     gaussian_gls,
-    lognormal_gls,
     generate_gaussian,
     generate_lognormal,
     getcl,
-    effective_cls,
+    iternorm,
+    lognormal_gls,
+    multalm,
+    transform_cls,
 )
 from glass.galaxies import (
-    redshifts,
-    redshifts_from_nz,
     galaxy_shear,
     gaussian_phz,
+    redshifts,
+    redshifts_from_nz,
 )
 from glass.lensing import (
-    from_convergence,
-    shear_from_convergence,
     MultiPlaneConvergence,
+    deflect,
+    from_convergence,
     multi_plane_matrix,
     multi_plane_weights,
-    deflect,
+    shear_from_convergence,
 )
 from glass.observations import (
-    vmap_galactic_ecliptic,
+    equal_dens_zbins,
+    fixed_zbins,
     gaussian_nz,
     smail_nz,
-    fixed_zbins,
-    equal_dens_zbins,
     tomo_nz_gausserr,
+    vmap_galactic_ecliptic,
 )
 from glass.points import (
     effective_bias,
     linear_bias,
     loglinear_bias,
+    position_weights,
     positions_from_delta,
     uniform_positions,
-    position_weights,
 )
 from glass.shapes import (
-    triaxial_axis_ratio,
-    ellipticity_ryden04,
     ellipticity_gaussian,
     ellipticity_intnorm,
+    ellipticity_ryden04,
+    triaxial_axis_ratio,
 )
 from glass.shells import (
-    distance_weight,
-    volume_weight,
-    density_weight,
-    tophat_windows,
-    linear_windows,
+    RadialWindow,
+    combine,
     cubic_windows,
-    restrict,
+    density_weight,
+    distance_grid,
+    distance_weight,
+    linear_windows,
     partition,
     redshift_grid,
-    distance_grid,
-    combine,
-    RadialWindow,
+    restrict,
+    tophat_windows,
+    volume_weight,
 )
-from glass.user import save_cls, load_cls, write_catalog
+from glass.user import load_cls, save_cls, write_catalog

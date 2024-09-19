@@ -58,7 +58,9 @@ def test_ndinterp():
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 2, 2)
     npt.assert_allclose(
-        y, [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]], atol=1e-15
+        y,
+        [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]],
+        atol=1e-15,
     )
 
     # test nd interpolation in middle axis
@@ -74,7 +76,9 @@ def test_ndinterp():
     y = ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 3, 1)
     npt.assert_allclose(
-        y, [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]], atol=1e-15
+        y,
+        [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]],
+        atol=1e-15,
     )
 
     x = [[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]]
