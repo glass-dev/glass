@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "glass/**"
+    branches:
+      - main
   pull_request:
     paths:
       - "glass/**"
