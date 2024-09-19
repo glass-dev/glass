@@ -1,5 +1,3 @@
-# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-# license: MIT
 """core module for algorithms"""
 
 from __future__ import annotations

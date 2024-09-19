@@ -1,5 +1,3 @@
-# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-# license: MIT
 """module for array utilities"""
 
 import numpy as np
