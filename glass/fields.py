@@ -24,7 +24,7 @@ Utility functions
 
 .. autofunction:: getcl
 
-"""  # noqa: D205
+"""  # noqa: D205, D400, D415
 
 from __future__ import annotations
 
