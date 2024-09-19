@@ -4,6 +4,11 @@ import pytest
 
 
 @pytest.fixture
+def rng():
+    return np.random.default_rng(seed=42)
+
+
+@pytest.fixture
 def shells():
     from glass.shells import RadialWindow
 
@@ -67,13 +72,12 @@ def test_deflect_nsew(usecomplex):
     assert np.allclose([lon, lat], [d, 0.0])
 
 
-def test_deflect_many():
+def test_deflect_many(rng):
     import healpix
 
     from glass.lensing import deflect
 
     n = 1000
-    rng = np.random.default_rng(seed=42)
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
 
@@ -90,7 +94,7 @@ def test_deflect_many():
     npt.assert_allclose(dotp, np.cos(abs_alpha))
 
 
-def test_multi_plane_matrix(shells, cosmo):
+def test_multi_plane_matrix(shells, cosmo, rng):
     from glass.lensing import MultiPlaneConvergence, multi_plane_matrix
 
     mat = multi_plane_matrix(shells, cosmo)
@@ -100,7 +104,6 @@ def test_multi_plane_matrix(shells, cosmo):
 
     convergence = MultiPlaneConvergence(cosmo)
 
-    rng = np.random.default_rng(seed=42)
     deltas = rng.random((len(shells), 10))
     kappas = []
     for shell, delta in zip(shells, deltas):
@@ -110,7 +113,7 @@ def test_multi_plane_matrix(shells, cosmo):
     npt.assert_allclose(mat @ deltas, kappas)
 
 
-def test_multi_plane_weights(shells, cosmo):
+def test_multi_plane_weights(shells, cosmo, rng):
     from glass.lensing import MultiPlaneConvergence, multi_plane_weights
 
     w_in = np.eye(len(shells))
@@ -121,7 +124,6 @@ def test_multi_plane_weights(shells, cosmo):
 
     convergence = MultiPlaneConvergence(cosmo)
 
-    rng = np.random.default_rng(seed=42)
     deltas = rng.random((len(shells), 10))
     weights = rng.random((len(shells), 3))
     kappa = 0

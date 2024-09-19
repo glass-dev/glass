@@ -10,14 +10,20 @@ else:
     HAVE_SCIPY = True
 
 
+@pytest.fixture
+def rng():
+    import numpy as np
+
+    return np.random.default_rng(seed=42)
+
+
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_nnls():
+def test_nnls(rng):
     import numpy as np
     from scipy.optimize import nnls as nnls_scipy
 
     from glass.core.algorithm import nnls as nnls_glass
 
-    rng = np.random.default_rng(seed=42)
     a = rng.standard_normal((100, 20))
     b = rng.standard_normal((100,))
 

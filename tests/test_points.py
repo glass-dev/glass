@@ -1,5 +1,11 @@
 import numpy as np
 import numpy.testing as npt
+import pytest
+
+
+@pytest.fixture
+def rng():
+    return np.random.default_rng(seed=42)
 
 
 def catpos(pos):
@@ -97,12 +103,11 @@ def test_uniform_positions():
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights():
+def test_position_weights(rng):
     from glass.points import position_weights
 
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
-            rng = np.random.default_rng(seed=42)
             counts = rng.random(cshape)
             bias = None if bshape is None else rng.random(bshape)
 
