@@ -34,7 +34,7 @@ def test_basic_write(tmp_path):
 
     with user.write_catalog(
         tmp_path / filename_gfits, ext="CATALOG"
-    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as myFits:
+    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as myFits:  # noqa: N806
         for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
             array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
