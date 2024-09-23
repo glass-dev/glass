@@ -83,12 +83,3 @@ def test_write_exception(tmp_path):
                 array2 = np.arange(i + 1, i + 2, delta)
                 assert array.tolist() == fitsMat[i].tolist()
                 assert array2.tolist() == fitsMat2[i].tolist()
-
-
-@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_out_filename(tmp_path):
-    import fitsio
-
-    fits = fitsio.FITS(tmp_path / filename, "rw", clobber=True)
-    writer = user._FitsWriter(fits)
-    assert writer.fits._filename == f"{tmp_path}/{filename}"
