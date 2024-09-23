@@ -2,6 +2,26 @@ import numpy as np
 import numpy.testing as npt
 
 
+def broadcast_first():
+    from glass.core.array import broadcast_first
+
+    a = np.ones((2, 3, 4))
+    b = np.ones((2, 1, 4))
+
+    a_b, b_b = broadcast_first(a, b)
+
+    assert a_b.shape == (2, 3, 4)
+    assert b_b.shape == (2, 3, 4)
+
+    a = np.ones((2, 2, 2))
+    b = np.ones((2, 1))
+
+    a_b, b_b = broadcast_first(a, b)
+
+    assert a_b.shape == (2, 2, 2)
+    assert b_b.shape == (2, 2, 2)
+
+
 def test_broadcast_leading_axes():
     from glass.core.array import broadcast_leading_axes
 
@@ -114,3 +134,37 @@ def test_trapz_product():
     s = trapz_product((x1, f1), (x2, f2))
 
     assert np.allclose(s, 1.0)
+
+
+def test_cumtrapz():
+    import numpy as np
+
+    from glass.core.array import cumtrapz
+
+    f = np.array([1, 2, 3, 4])
+    x = np.array([0, 1, 2, 3])
+
+    result = cumtrapz(f, x)
+    assert np.allclose(result, np.array([0, 1, 4, 7]))
+
+    result = cumtrapz(f, x, dtype=float)
+    assert np.allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
+
+    result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
+    assert np.allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
+
+    f = np.array([[1, 4, 9, 16], [2, 3, 5, 7]])
+    x = np.array([0, 1, 2.5, 4])
+
+    result = cumtrapz(f, x)
+    assert np.allclose(result, np.array([[[0, 2, 12, 31], [0, 2, 8, 17]]]))
+
+    result = cumtrapz(f, x, dtype=float)
+    assert np.allclose(
+        result, np.array([[[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]])
+    )
+
+    result = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
+    assert np.allclose(
+        result, np.array([[[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]])
+    )
