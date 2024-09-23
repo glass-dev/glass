@@ -1,11 +1,5 @@
 import numpy as np
 import numpy.testing as npt
-import pytest
-
-
-@pytest.fixture
-def rng():
-    return np.random.default_rng(seed=42)
 
 
 def catpos(pos):

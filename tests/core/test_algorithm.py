@@ -10,13 +10,6 @@ else:
     HAVE_SCIPY = True
 
 
-@pytest.fixture
-def rng():
-    import numpy as np
-
-    return np.random.default_rng(seed=42)
-
-
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_nnls(rng):
     import numpy as np
