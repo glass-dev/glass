@@ -1,3 +1,4 @@
+---
 ci:
   autoupdate_commit_msg: "MNT: update pre-commit hooks"
   autofix_commit_msg: "STY: pre-commit fixes"
@@ -24,11 +25,59 @@ repos:
       - id: rst-backticks
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args:
+          - >-
+            --config-data={
+              extends: default,
+              rules: {
+                anchors: enable,
+                braces: {
+                  forbid: non-empty
+                },
+                brackets: {
+                  forbid: non-empty
+                },
+                colons: enable,
+                commas: enable,
+                comments: {
+                  min-spaces-from-content: 1
+                },
+                comments-indentation: enable,
+                document-end: disable,
+                document-start: enable,
+                empty-lines: enable,
+                empty-values: disable,
+                float-values: enable,
+                hyphens: enable,
+                indentation: enable,
+                key-duplicates: enable,
+                key-ordering: disable,
+                line-length: enable,
+                new-line-at-end-of-file: enable,
+                new-lines: enable,
+                octal-values: enable,
+                quoted-strings: {
+                  quote-type: double,
+                  required: only-when-needed
+                },
+                trailing-spaces: enable,
+                truthy: {
+                  check-keys: false
+                }
+              }
+            }
+          - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.3
     hooks:
       - id: ruff
-        args: ["--fix", "--show-fixes"]
+        args:
+          - --fix
+          - --show-fixes
       - id: ruff-format
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.23.1
