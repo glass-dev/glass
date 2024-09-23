@@ -75,7 +75,9 @@ repos:
     rev: v0.6.3
     hooks:
       - id: ruff
-        args: ["--fix", "--show-fixes"]
+        args:
+          - --fix
+          - --show-fixes
       - id: ruff-format
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.23.1

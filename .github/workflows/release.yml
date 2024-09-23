@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: 'Deployment target. Can be "pypi" or "testpypi"'
-        default: "testpypi"
+        description: Deployment target. Can be pypi or testpypi.
+        default: testpypi
   release:
     types:
       - published
@@ -31,7 +31,8 @@ jobs:
           path: dist/*
 
   publish:
-    needs: [dist]
+    needs:
+      - dist
     runs-on: ubuntu-latest
     environment:
       name: publish
