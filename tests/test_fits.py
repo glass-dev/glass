@@ -34,14 +34,14 @@ def test_basic_write(tmp_path):
 
     with user.write_catalog(
         tmp_path / filename_gfits, ext="CATALOG"
-    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as myFits:  # noqa: N806
+    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits:
         for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
             array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
             out.write(RA=array, RB=array2)
             arrays = [array, array2]
             names = ["RA", "RB"]
-            _test_append(myFits, arrays, names)
+            _test_append(my_fits, arrays, names)
 
     with fitsio.FITS(tmp_path / filename_gfits) as g_fits, fitsio.FITS(
         tmp_path / filename_tfits
