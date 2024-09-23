@@ -13,16 +13,9 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  # TODO: replace with a more general pre-commit linter
-  #   style:
-  #     name: Style
-  #     runs-on: ubuntu-latest
-  #     steps:
-  #     - uses: actions/checkout@v4
-  #     - run: pipx run flake8 glass
-
   tests:
     name: Tests
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,6 +35,7 @@ jobs:
 
   build:
     name: Build
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,6 +45,7 @@ jobs:
 
   docs:
     name: Docs
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
