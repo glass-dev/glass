@@ -36,7 +36,7 @@ import numpy as np
 
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
 
-ARCMIN2_SPHERE = 60**6 // 100 / 3.1415926535897932384626433832795028841971693993751
+ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
 def effective_bias(z, bz, w):
