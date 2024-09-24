@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_nnls(rng):
     import numpy as np
     from scipy.optimize import nnls as nnls_scipy
@@ -11,3 +14,10 @@ def test_nnls(rng):
     x_scipy, _ = nnls_scipy(a, b)
 
     assert np.allclose(x_glass, x_scipy)
+
+    with pytest.raises(ValueError, match="input `a` is not a matrix"):
+        nnls_glass(b, a)
+    with pytest.raises(ValueError, match="input `b` is not a vector"):
+        nnls_glass(a, a)
+    with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
+        nnls_glass(a.T, b)
