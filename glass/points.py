@@ -33,7 +33,8 @@ import healpix
 import numpy as np
 
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
-from glass.core.constants import ARCMIN2_SPHERE
+
+ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
 def effective_bias(z, bz, w):

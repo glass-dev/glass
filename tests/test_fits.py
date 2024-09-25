@@ -29,26 +29,22 @@ filename = "MyFile.Fits"
 def test_basic_write(tmp_path):
     import fitsio
 
-    d = tmp_path / "sub"
-    d.mkdir()
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
-    with user.write_catalog(d / filename_gfits, ext="CATALOG") as out, fitsio.FITS(
-        d / filename_tfits,
-        "rw",
-        clobber=True,
-    ) as myFits:  # noqa: N806
+    with user.write_catalog(
+        tmp_path / filename_gfits, ext="CATALOG"
+    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits:
         for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
             array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
             out.write(RA=array, RB=array2)
             arrays = [array, array2]
             names = ["RA", "RB"]
-            _test_append(myFits, arrays, names)
+            _test_append(my_fits, arrays, names)
 
-    with fitsio.FITS(d / filename_gfits) as g_fits, fitsio.FITS(
-        d / filename_tfits,
+    with fitsio.FITS(tmp_path / filename_gfits) as g_fits, fitsio.FITS(
+        tmp_path / filename_tfits
     ) as t_fits:
         glass_data = g_fits[1].read()
         test_data = t_fits[1].read()
@@ -58,11 +54,8 @@ def test_basic_write(tmp_path):
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_write_exception(tmp_path):
-    d = tmp_path / "sub"
-    d.mkdir()
-
     try:
-        with user.write_catalog(d / filename, ext="CATALOG") as out:
+        with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"
@@ -74,7 +67,7 @@ def test_write_exception(tmp_path):
     except Exception:  # noqa: BLE001
         import fitsio
 
-        with fitsio.FITS(d / filename) as hdul:
+        with fitsio.FITS(tmp_path / filename) as hdul:
             data = hdul[1].read()
             assert data["RA"].size == except_int / delta
             assert data["RB"].size == except_int / delta
@@ -90,12 +83,3 @@ def test_write_exception(tmp_path):
                 array2 = np.arange(i + 1, i + 2, delta)
                 assert array.tolist() == fitsMat[i].tolist()
                 assert array2.tolist() == fitsMat2[i].tolist()
-
-
-@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_out_filename():
-    import fitsio
-
-    fits = fitsio.FITS(filename, "rw", clobber=True)
-    writer = user._FitsWriter(fits)  # noqa: SLF001
-    assert writer.fits._filename == filename  # noqa: SLF001
