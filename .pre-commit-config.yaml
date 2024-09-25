@@ -75,9 +75,6 @@ repos:
     rev: v0.6.7
     hooks:
       - id: ruff
-        args:
-          - --fix
-          - --show-fixes
       - id: ruff-format
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.18.0
