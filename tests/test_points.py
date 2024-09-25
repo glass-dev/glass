@@ -97,13 +97,13 @@ def test_uniform_positions():
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights():
+def test_position_weights(rng):
     from glass.points import position_weights
 
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
-            counts = np.random.rand(*cshape)
-            bias = None if bshape is None else np.random.rand(*bshape)
+            counts = rng.random(cshape)
+            bias = None if bshape is None else rng.random(bshape)
 
             weights = position_weights(counts, bias)
 
