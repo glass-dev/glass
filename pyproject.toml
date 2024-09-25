@@ -69,12 +69,11 @@ Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
-report.exclude_also = [
+report = {exclude_also = [
     "if TYPE_CHECKING:",
-]
-report.omit = [
+], omit = [
     "glass/_version.py",
-]
+]}
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
