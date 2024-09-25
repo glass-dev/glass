@@ -1,6 +1,16 @@
 import pytest
 
+# check if scipy is available for testing
+try:
+    import scipy
+except ImportError:
+    HAVE_SCIPY = False
+else:
+    del scipy
+    HAVE_SCIPY = True
 
+
+@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_nnls(rng):
     import numpy as np
     from scipy.optimize import nnls as nnls_scipy
@@ -13,7 +23,7 @@ def test_nnls(rng):
     x_glass = nnls_glass(a, b)
     x_scipy, _ = nnls_scipy(a, b)
 
-    assert np.allclose(x_glass, x_scipy)
+    np.testing.assert_allclose(x_glass, x_scipy)
 
     with pytest.raises(ValueError, match="input `a` is not a matrix"):
         nnls_glass(b, a)

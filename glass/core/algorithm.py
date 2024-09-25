@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike  # pragma: no cover
+    from numpy.typing import ArrayLike
 
 
 def nnls(
