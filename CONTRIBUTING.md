@@ -20,7 +20,7 @@ These options can be used with `pip` with the editable (`-e`) mode of
 installation in the following way -
 
 ```bash
-pip install -e .[docs,test]
+pip install -e ".[docs,test]"
 ```
 
 ## Tooling
@@ -77,7 +77,7 @@ _GLASS_ primarily uses [Sphinx](https://www.sphinx-doc.org/en/master/) for
 rendering documentation on its website. The configuration file (`conf.py`) for
 `sphinx` can be found
 [under the `docs` folder](https://github.com/glass-dev/glass/blob/main/docs/conf.py).
-The documentation is deployed on [https://readthedocs.io]()
+The documentation is deployed on <https://readthedocs.io>
 [here](https://glass.readthedocs.io/en/latest/).
 
 Ideally, with the addition of every new feature to _GLASS_, documentation should
