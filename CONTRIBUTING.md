@@ -10,10 +10,10 @@ _GLASS_.
 
 The developer installation of _GLASS_ comes with several optional dependencies -
 
-- `test`: installs `scipy`, `fitsio`, and the relevant `pytest` dependencies
-- `docs`: installs `sphinx`, `nbsphinx`, and a few other docs related
-  dependencies
-- `examples`: installs `camb`, `glass.ext.camb`, and a few notebook related
+- `test`: installs extra packages used in tests and the relevant testing
+  framework/plugins
+- `docs`: installs documentation related dependencies
+- `examples`: installs libraries used in the examples and a few notebook related
   dependencies
 
 These options can be used with `pip` with the editable (`-e`) mode of
@@ -61,7 +61,7 @@ The tests can be executed using the `test` dependencies of _GLASS_ in the
 following way -
 
 ```bash
-python -m pytest --cov=glass --doctest-plus -v
+python -m pytest --cov=glass --doctest-plus
 ```
 
 ## Documenting
@@ -129,7 +129,8 @@ PyPI.
 _GLASS_ follows [CalVer](https://calver.org). There is no difference between
 releases that increment the year and releases that increment the month; in
 particular, releases that increment the month may introduce breaking changes.
-The version is generate dynamically through VCS using `hatch-vcs`.
+The version is generate dynamically through VCS using
+[`hatch-vcs`](https://github.com/ofek/hatch-vcs).
 
 The target is to have a new _GLASS_ release at the beginning of each month, as
 long as there have been changes.
