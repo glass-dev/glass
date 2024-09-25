@@ -68,11 +68,11 @@ Documentation = "https://glass.readthedocs.io/"
 Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
 
-[tool.coverage.report]
-exclude_also = [
+[tool.coverage]
+report.exclude_also = [
     "if TYPE_CHECKING:",
 ]
-omit = [
+report.omit = [
     "glass/_version.py",
 ]
 
