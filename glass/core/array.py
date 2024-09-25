@@ -1,5 +1,3 @@
-# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-# license: MIT
 """Module for array utilities."""
 
 from functools import partial

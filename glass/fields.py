@@ -1,5 +1,3 @@
-# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-# license: MIT
 """
 Random fields
 =============
