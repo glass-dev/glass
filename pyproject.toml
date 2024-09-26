@@ -159,5 +159,9 @@ lint.select = [
 lint.mccabe.max-complexity = 18
 
 [tool.tomlsort]
+all = true
+in_place = true
+spaces_indent_inline_array = 4
+trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false

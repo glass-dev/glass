@@ -86,11 +86,6 @@ repos:
     rev: v0.23.1
     hooks:
       - id: toml-sort-fix
-        args:
-          - --all
-          - --in-place
-          - --spaces-indent-inline-array=4
-          - --trailing-comma-inline-array
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.3.3
     hooks:
