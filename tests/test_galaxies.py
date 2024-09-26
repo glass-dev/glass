@@ -1,15 +1,13 @@
 import pytest
 
 
-def test_redshifts():
-    from unittest.mock import Mock
-
+def test_redshifts(mocker):
     import numpy as np
 
     from glass.galaxies import redshifts
 
     # create a mock radial window function
-    w = Mock()
+    w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
     w.wa = np.exp(-0.5 * (w.za - 0.5) ** 2 / 0.1**2)
 
