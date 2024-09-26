@@ -145,26 +145,27 @@ def test_cumtrapz():
     x = np.array([0, 1, 2, 3])
 
     result = cumtrapz(f, x)
-    assert np.allclose(result, np.array([0, 1, 4, 7]))
+    npt.assert_allclose(result, np.array([0, 1, 4, 7]))
 
     result = cumtrapz(f, x, dtype=float)
-    assert np.allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
+    npt.assert_allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
 
     result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
-    assert np.allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
+    npt.assert_allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
 
     f = np.array([[1, 4, 9, 16], [2, 3, 5, 7]])
     x = np.array([0, 1, 2.5, 4])
 
     result = cumtrapz(f, x)
-    assert np.allclose(result, np.array([[[0, 2, 12, 31], [0, 2, 8, 17]]]))
+    npt.assert_allclose(result, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     result = cumtrapz(f, x, dtype=float)
-    assert np.allclose(
-        result, np.array([[[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]])
+    npt.assert_allclose(
+        result,
+        np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]),
     )
 
     result = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
-    assert np.allclose(
-        result, np.array([[[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]])
+    npt.assert_allclose(
+        result, np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]])
     )
