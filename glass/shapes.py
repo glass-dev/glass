@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray  # pragma: no cover
+    from numpy.typing import ArrayLike, NDArray
 
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
