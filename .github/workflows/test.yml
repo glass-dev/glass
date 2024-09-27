@@ -73,6 +73,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install pando
+          sudo apt-get install pandoc
       - name: Build docs
         run: pipx run nox -s docs --verbose
