@@ -1,5 +1,15 @@
 import numpy as np
 import numpy.testing as npt
+import pytest
+
+# check if scipy is available for testing
+try:
+    import scipy
+except ImportError:
+    HAVE_SCIPY = False
+else:
+    del scipy
+    HAVE_SCIPY = True
 
 
 def broadcast_first():
@@ -136,36 +146,34 @@ def test_trapz_product():
     assert np.allclose(s, 1.0)
 
 
+@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_cumtrapz():
-    import numpy as np
+    from scipy.integrate import cumulative_trapezoid
 
     from glass.core.array import cumtrapz
 
     f = np.array([1, 2, 3, 4])
     x = np.array([0, 1, 2, 3])
 
-    result = cumtrapz(f, x)
-    npt.assert_allclose(result, np.array([0, 1, 4, 7]))
+    glass_ct = cumtrapz(f, x)
+    npt.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
 
-    result = cumtrapz(f, x, dtype=float)
-    npt.assert_allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
+    glass_ct = cumtrapz(f, x, dtype=float)
+    scipy_ct = cumulative_trapezoid(f, x, initial=0)
+    npt.assert_allclose(glass_ct, scipy_ct)
 
     result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
-    npt.assert_allclose(result, np.array([0.0, 1.5, 4.0, 7.5]))
+    npt.assert_allclose(result, scipy_ct)
 
     f = np.array([[1, 4, 9, 16], [2, 3, 5, 7]])
     x = np.array([0, 1, 2.5, 4])
 
-    result = cumtrapz(f, x)
-    npt.assert_allclose(result, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
+    glass_ct = cumtrapz(f, x)
+    npt.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
-    result = cumtrapz(f, x, dtype=float)
-    npt.assert_allclose(
-        result,
-        np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]),
-    )
+    glass_ct = cumtrapz(f, x, dtype=float)
+    scipy_ct = cumulative_trapezoid(f, x, initial=0)
+    npt.assert_allclose(glass_ct, scipy_ct)
 
-    result = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
-    npt.assert_allclose(
-        result, np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]])
-    )
+    glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
+    npt.assert_allclose(glass_ct, scipy_ct)

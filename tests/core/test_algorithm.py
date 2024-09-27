@@ -17,6 +17,8 @@ def test_nnls(rng):
 
     from glass.core.algorithm import nnls as nnls_glass
 
+    # cross-check output with scipy's nnls
+
     a = rng.standard_normal((100, 20))
     b = rng.standard_normal((100,))
 
@@ -24,6 +26,8 @@ def test_nnls(rng):
     x_scipy, _ = nnls_scipy(a, b)
 
     np.testing.assert_allclose(x_glass, x_scipy)
+
+    # check matrix and vector's shape
 
     with pytest.raises(ValueError, match="input `a` is not a matrix"):
         nnls_glass(b, a)
