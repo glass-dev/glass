@@ -6,6 +6,12 @@ on:
     branches:
       - main
   pull_request:
+    # ensure the draft PRs are tested when ready
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
 
 concurrency:
   # Skip intermediate builds: always.

@@ -10,6 +10,12 @@ on:
   pull_request:
     paths:
       - glass/**
+    # ensure the draft PRs are tested when ready
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
 
 concurrency:
   # Skip intermediate builds: always.
