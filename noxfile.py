@@ -21,8 +21,8 @@ def lint(session: nox.Session) -> None:
 
 @nox.session(python=ALL_PYTHON)
 def tests(session: nox.Session) -> None:
-    """Run the unit and regular tests."""
-    session.install("-c", ".github/test-constraints.txt", "-e", ".[tests]")
+    """Run the unit tests."""
+    session.install("-c", ".github/test-constraints.txt", "-e", ".[test]")
     session.run(
         "pytest",
         *session.posargs,

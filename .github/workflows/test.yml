@@ -60,9 +60,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build SDist and wheel
-        run:
-          pipx run nox -s build-${{ matrix.python-version.key ||
-          matrix.python-version }} --verbose
+        run: pipx run nox -s build --verbose
 
   docs:
     name: Docs
@@ -77,6 +75,4 @@ jobs:
           sudo apt-get update
           sudo apt-get install pando
       - name: Build docs
-        run:
-          pipx run nox -s docs-${{ matrix.python-version.key ||
-          matrix.python-version }} --verbose
+        run: pipx run nox -s docs --verbose
