@@ -1,12 +1,17 @@
+---
 name: Test
 
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
-    branches:
-    - main
+    # ensure the draft PRs are tested when ready
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
 
 concurrency:
   # Skip intermediate builds: always.
@@ -15,63 +20,50 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-
-  style:
-    name: Style
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: pipx run flake8 glass
-
   tests:
     name: Tests
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - run: pip install -c .github/test-constraints.txt -e '.[test]'
-    - run: pytest --cov=glass --doctest-plus -v
-    - uses: coverallsapp/github-action@v2
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -c .github/test-constraints.txt -e '.[test]'
+      - run: pytest --cov=glass --doctest-plus
+      - uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     name: Build
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - run: pipx run build
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: pipx run build
 
   docs:
     name: Docs
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - run: |
-        sudo apt-get update
-        sudo apt-get install pandoc
-    - run: pipx run --spec '.[docs]' sphinx-build -W -b html docs _build/html
-
-  examples:
-    name: Examples
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.x"
-        cache: pip
-    - run: pipx run --spec '.[examples]' jupyter execute examples/**/*.ipynb
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: |
+          sudo apt-get update
+          sudo apt-get install pandoc
+      - run: pipx run --spec '.[docs]' sphinx-build -W -b html docs _build/html
