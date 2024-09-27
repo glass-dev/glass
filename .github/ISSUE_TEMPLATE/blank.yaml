@@ -1,6 +1,7 @@
 ---
 name: Anything Else
-description: Create a blank issue for anything that does not fit into the other categories
+description:
+  Create a blank issue for anything that does not fit into the other categories
 body:
   - id: anything_else
     type: textarea
