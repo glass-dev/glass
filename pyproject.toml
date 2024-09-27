@@ -55,6 +55,9 @@ examples = [
 test = [
     "fitsio",
     "pytest",
+    "pytest-cov",
+    "pytest-doctestplus",
+    "pytest-mock",
     "scipy",
 ]
 
@@ -63,6 +66,13 @@ Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
 Documentation = "https://glass.readthedocs.io/"
 Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
+
+[tool.coverage]
+report = {exclude_also = [
+    "if TYPE_CHECKING:",
+], omit = [
+    "glass/_version.py",
+]}
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
@@ -73,6 +83,7 @@ addopts = [
     "--strict-config",
     "--strict-markers",
     "-ra",
+    "-v",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
@@ -84,5 +95,67 @@ testpaths = [
 ]
 xfail_strict = true
 
+[tool.ruff]
+fix = true
+force-exclude = true
+show-fixes = true
+src = [
+    "glass",
+]
+lint.ignore = [
+    "ANN001", # TODO: missing-type-function-argument
+    "ANN002", # TODO: missing-type-args
+    "ANN003", # TODO: missing-type-kwargs
+    "ANN201", # TODO: missing-return-type-undocumented-public-function
+    "COM812", # missing-trailing-comma (ruff-format recommended)
+    "D203", # one-blank-line-before-class
+    "D212", # blank-line-before-class
+    "ERA001", # TODO: commented-out-code
+    "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
+    "NPY002", # TODO: numpy-legacy-random
+    "NPY201", # TODO: numpy2-deprecation
+    "RUF003", # ambiguous-unicode-character-comment
+]
+lint.isort = {known-first-party = [
+    "glass",
+], section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "cosmo",
+    "first-party",
+    "local-folder",
+], sections = {"cosmo" = [
+    "camb",
+    "cosmology",
+]}}
+lint.per-file-ignores = {"__init__.py" = [
+    "F401", # unused-import
+], "docs*" = [
+    "D100", # undocumented-public-module
+    "INP001", # implicit-namespace-package,
+], "examples*" = [
+    "PLR2004", # magic-value-comparison
+    "T201", # print
+], "glass*" = [
+    "PLR2004", # TODO: magic-value-comparison
+], "tests*" = [
+    "ANN001", # TODO: missing-type-function-argument
+    "ANN201", # TODO: issing-return-type-undocumented-public-function
+    "ANN202", # TODO: missing-return-type-private-function
+    "D100", # undocumented-public-module
+    "D103", # TODO: undocumented-public-function
+    "D104", # undocumented-public-package
+    "INP001", # implicit-namespace-package
+    "PLR2004", # magic-value-comparison
+    "PT011", # TODO: pytest-raises-too-broad
+    "S101", # assert
+]}
+lint.select = [
+    "ALL",
+]
+lint.mccabe.max-complexity = 18
+
 [tool.tomlsort]
 overrides."project.classifiers".inline_arrays = false
+overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
