@@ -55,7 +55,6 @@ examples = [
     "matplotlib",
 ]
 test = [
-    "coverage",
     "fitsio",
     "pytest",
     "pytest-cov",
@@ -143,7 +142,7 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "glass*" = [
     "PLR2004", # TODO: magic-value-comparison
 ], "noxfile.py" = [
-    "T201",
+    "T201", # print
 ], "tests*" = [
     "ANN001", # TODO: missing-type-function-argument
     "ANN201", # TODO: issing-return-type-undocumented-public-function

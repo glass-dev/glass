@@ -9,7 +9,13 @@ nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.reuse_existing_virtualenvs = True
 nox.options.sessions = ["lint", "tests"]
 
-ALL_PYTHON = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+ALL_PYTHON = [
+	"3.8",
+	"3.9",
+	"3.10",
+	"3.11",
+	"3.12"
+]
 
 
 @nox.session
