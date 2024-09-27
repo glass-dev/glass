@@ -264,7 +264,7 @@ def equal_dens_zbins(
     cuml_nz /= cuml_nz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 
-    return list(iterools.pairwise(zbinedges))
+    return list(itertools.pairwise(zbinedges))
 
 
 def tomo_nz_gausserr(
