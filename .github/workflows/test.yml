@@ -54,7 +54,7 @@ jobs:
           matrix.python-version }} --verbose
       - name: Coveralls requires coverage.py
         run: |
-          pip install coverage
+          pip install coverage[toml]
           coverage xml
       - uses: coverallsapp/github-action@v2
         with:
