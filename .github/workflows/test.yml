@@ -39,8 +39,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install -c .github/test-constraints.txt -e '.[test]'
-      - run: pytest --cov=glass --doctest-plus
+      - name: Run doctests
+        run:
+          pipx run nox -s doctests-${{ matrix.python-version.key ||
+          matrix.python-version }} --verbose
+      - name: Run tests and generate coverage report
+        run:
+          pipx run nox -s coverage-${{ matrix.python-version.key ||
+          matrix.python-version }} --verbose
       - uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +59,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: pipx run build
+      - name: Build SDist and wheel
+        run:
+          pipx run nox -s build-${{ matrix.python-version.key ||
+          matrix.python-version }} --verbose
 
   docs:
     name: Docs
@@ -63,7 +72,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: |
+      - name: Install dependencies
+        run: |
           sudo apt-get update
-          sudo apt-get install pandoc
-      - run: pipx run --spec '.[docs]' sphinx-build -W -b html docs _build/html
+          sudo apt-get install pando
+      - name: Build docs
+        run:
+          pipx run nox -s docs-${{ matrix.python-version.key ||
+          matrix.python-version }} --verbose

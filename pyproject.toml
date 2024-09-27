@@ -141,6 +141,8 @@ lint.per-file-ignores = {"__init__.py" = [
     "T201", # print
 ], "glass*" = [
     "PLR2004", # TODO: magic-value-comparison
+], "noxfile.py" = [
+    "T201",
 ], "tests*" = [
     "ANN001", # TODO: missing-type-function-argument
     "ANN201", # TODO: issing-return-type-undocumented-public-function
