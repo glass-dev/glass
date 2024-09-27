@@ -5,21 +5,34 @@ import pytest
 def test_triaxial_axis_ratio():
     from glass.shapes import triaxial_axis_ratio
 
+    # single axis ratio
+
     q = triaxial_axis_ratio(0.8, 0.4)
     assert np.isscalar(q)
+
+    # many axis ratios
 
     q = triaxial_axis_ratio(0.8, 0.4, size=1000)
     assert np.shape(q) == (1000,)
 
+    # explicit shape
+
     q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))
     assert np.shape(q) == (10, 10)
+
+    # implicit size
 
     q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)
     q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])
     assert np.shape(q1) == np.shape(q2) == (2,)
 
+    # broadcasting rule
+
     q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])
     assert np.shape(q) == (2, 2)
+
+    # random parameters and check that projection is
+    # between largest and smallest possible value
 
     zeta, xi = np.sort(np.random.uniform(0, 1, size=(2, 1000)), axis=0)
     qmin = np.min([zeta, xi, xi / zeta], axis=0)
@@ -31,19 +44,29 @@ def test_triaxial_axis_ratio():
 def test_ellipticity_ryden04():
     from glass.shapes import ellipticity_ryden04
 
+    # single ellipticity
+
     e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
     assert np.isscalar(e)
+
+    # many ellipticities
 
     e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)
     assert np.shape(e) == (1000,)
 
+    # explicit shape
+
     e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))
     assert np.shape(e) == (10, 10)
+
+    # implicit size
 
     e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)
     e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])
     e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == (2,)
+
+    # check that result is in the specified range
 
     e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
