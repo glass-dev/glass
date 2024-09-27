@@ -50,6 +50,3 @@ repos:
     rev: v3.3.3
     hooks:
       - id: prettier
-        args:
-          - --prose-wrap=always
-          - --quote-props=as-needed
