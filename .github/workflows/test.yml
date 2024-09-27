@@ -50,10 +50,12 @@ jobs:
           matrix.python-version }} --verbose
       - name: Run tests and generate coverage report
         run:
-          pipx run nox -s coverage-${{ matrix.python-version.key ||
+          pipx run nox -s tests-${{ matrix.python-version.key ||
           matrix.python-version }} --verbose
       - name: Coveralls requires coverage.py
-        run: pip install coverage
+        run: |
+          pip install coverage
+          coverage xml
       - uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
