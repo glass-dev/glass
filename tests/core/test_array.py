@@ -16,20 +16,31 @@ def broadcast_first():
     from glass.core.array import broadcast_first
 
     a = np.ones((2, 3, 4))
-    b = np.ones((2, 1, 4))
-
-    a_b, b_b = broadcast_first(a, b)
-
-    assert a_b.shape == (2, 3, 4)
-    assert b_b.shape == (2, 3, 4)
-
-    a = np.ones((2, 2, 2))
     b = np.ones((2, 1))
 
-    a_b, b_b = broadcast_first(a, b)
+    # arrays with shape ((3, 4, 2)) and ((1, 2)) are passed
+    # to np.broadcast_arrays; hence it works
+    a_a, b_a = broadcast_first(a, b)
+    assert a_a.shape == (2, 3, 4)
+    assert b_a.shape == (2, 3, 4)
 
-    assert a_b.shape == (2, 2, 2)
-    assert b_b.shape == (2, 2, 2)
+    # plain np.broadcast_arrays will not work
+    with pytest.raises(ValueError, match="shape mismatch"):
+        np.broadcast_arrays(a, b)
+
+    # arrays with shape ((5, 6, 4)) and ((6, 5)) are passed
+    # to np.broadcast_arrays; hence it will not work
+    a = np.ones((4, 5, 6))
+    b = np.ones((5, 6))
+
+    with pytest.raises(ValueError, match="shape mismatch"):
+        broadcast_first(a, b)
+
+    # plain np.broadcast_arrays will work
+    a_a, b_a = broadcast_first(a, b)
+
+    assert a_a.shape == (4, 5, 6)
+    assert b_a.shape == (4, 5, 6)
 
 
 def test_broadcast_leading_axes():
@@ -152,28 +163,46 @@ def test_cumtrapz():
 
     from glass.core.array import cumtrapz
 
+    # 1D f and x
+
     f = np.array([1, 2, 3, 4])
     x = np.array([0, 1, 2, 3])
+
+    # default dtype (int - not supported by scipy)
 
     glass_ct = cumtrapz(f, x)
     npt.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
 
+    # explicit dtype (float)
+
     glass_ct = cumtrapz(f, x, dtype=float)
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
     npt.assert_allclose(glass_ct, scipy_ct)
 
+    # explicit return array
+
     result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
+    scipy_ct = cumulative_trapezoid(f, x, initial=0)
     npt.assert_allclose(result, scipy_ct)
+
+    # 2D f and 1D x
 
     f = np.array([[1, 4, 9, 16], [2, 3, 5, 7]])
     x = np.array([0, 1, 2.5, 4])
 
+    # default dtype (int - not supported by scipy)
+
     glass_ct = cumtrapz(f, x)
     npt.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
+
+    # explicit dtype (float)
 
     glass_ct = cumtrapz(f, x, dtype=float)
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
     npt.assert_allclose(glass_ct, scipy_ct)
 
+    # explicit return array
+
     glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
+    scipy_ct = cumulative_trapezoid(f, x, initial=0)
     npt.assert_allclose(glass_ct, scipy_ct)
