@@ -28,6 +28,7 @@ Visibility
 
 from __future__ import annotations
 
+import itertools
 import math
 from typing import TYPE_CHECKING
 
@@ -228,7 +229,7 @@ def fixed_zbins(
         msg = "exactly one of nbins and dz must be given"
         raise ValueError(msg)
 
-    return list(zip(zbinedges, zbinedges[1:], strict=False))  # noqa: RUF007
+    return list(itertools.pairwise(zbinedges))
 
 
 def equal_dens_zbins(
@@ -263,7 +264,7 @@ def equal_dens_zbins(
     cuml_nz /= cuml_nz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 
-    return list(zip(zbinedges, zbinedges[1:], strict=False))  # noqa: RUF007
+    return list(iterools.pairwise(zbinedges))
 
 
 def tomo_nz_gausserr(
