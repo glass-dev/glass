@@ -39,7 +39,7 @@ def coverage(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
-    session.posargs.append("--doctest-plus=glass")
+    session.posargs.append("--doctest-plus", "glass")
     tests(session)
 
 
