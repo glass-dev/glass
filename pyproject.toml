@@ -55,6 +55,7 @@ examples = [
     "matplotlib",
 ]
 test = [
+    "coverage",
     "fitsio",
     "pytest",
     "pytest-cov",
