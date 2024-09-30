@@ -155,7 +155,9 @@ to which the pull request refers.
 
 Pull requests to the `main` branch should have titles of the following form:
 
-    gh-<issue-number>: Subject line
+```markdown
+gh-<issue-number>: Subject line
+```
 
 The body of the pull request should contain a description of the changes, and
 any relevant details or caveats of the implementation.
@@ -168,25 +170,33 @@ request description, separated from the message body by a blank line.
 To generically refer to an issue without any further action, use `Refs` and one
 or more GitHub issue numbers:
 
-    Refs: #12
-    Refs: #25, #65
+```markdown
+Refs: #12
+Refs: #25, #65
+```
 
 To indicate that the pull request shall close an open issue, use `Closes` and a
 single GitHub issue number:
 
-    Closes: #17
+```markdown
+Closes: #17
+```
 
 Changelog entries are collected using the following trailers, and later parsed
 into the [changelog](CHANGELOG.md) for the next release:
 
-    Added: Some new feature
-    Changed: Some change in existing functionality
-    Deprecated: Some soon-to-be removed feature
-    Removed: Some now removed feature
-    Fixed: Some bug fix
-    Security: Some vulnerability was fixed
+```markdown
+Added: Some new feature
+Changed: Some change in existing functionality
+Deprecated: Some soon-to-be removed feature
+Removed: Some now removed feature
+Fixed: Some bug fix
+Security: Some vulnerability was fixed
+```
 
 You can use any of the other common git trailers. In particular, you can use
 `Cc` to notify others of your pull request via their GitHub user names:
 
-    Cc: @octocat
+```markdown
+Cc: @octocat
+```
