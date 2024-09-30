@@ -171,8 +171,7 @@ To generically refer to an issue without any further action, use `Refs` and one
 or more GitHub issue numbers:
 
 ```markdown
-Refs: #12
-Refs: #25, #65
+Refs: #12 Refs: #25, #65
 ```
 
 To indicate that the pull request shall close an open issue, use `Closes` and a
@@ -186,12 +185,9 @@ Changelog entries are collected using the following trailers, and later parsed
 into the [changelog](CHANGELOG.md) for the next release:
 
 ```markdown
-Added: Some new feature
-Changed: Some change in existing functionality
-Deprecated: Some soon-to-be removed feature
-Removed: Some now removed feature
-Fixed: Some bug fix
-Security: Some vulnerability was fixed
+Added: Some new feature Changed: Some change in existing functionality
+Deprecated: Some soon-to-be removed feature Removed: Some now removed feature
+Fixed: Some bug fix Security: Some vulnerability was fixed
 ```
 
 You can use any of the other common git trailers. In particular, you can use

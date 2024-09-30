@@ -47,4 +47,3 @@ We also have a public [Slack workspace] for discussions about the project.
 [examples]: https://glass.readthedocs.io/projects/examples/
 [Discussions]: https://github.com/orgs/glass-dev/discussions
 [Slack workspace]: https://glass-dev.github.io/slack
-[mailing list page]: https://jiscmail.ac.uk/lists/GLASS.html
