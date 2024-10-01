@@ -58,10 +58,12 @@ def docs(session: nox.Session) -> None:
     session.chdir("docs")
     session.run("sphinx-build", "-M", "html", ".", "_build")
 
+    port = 8001
+
     if session.posargs:
         if "serve" in session.posargs:
-            print("Launching docs at http://localhost:8001/ - use Ctrl-C to quit")
-            session.run("python", "-m", "http.server", "8001", "-d", "_build/html")
+            print(f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit")
+            session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
             print("Unsupported argument to docs")
 
