@@ -1,5 +1,6 @@
 ---
 ci:
+  autofix_prs: false
   autoupdate_commit_msg: "MNT: update pre-commit hooks"
   autofix_commit_msg: "STY: pre-commit fixes"
 
