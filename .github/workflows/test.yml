@@ -44,18 +44,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install nox and coverage.py
+        run: pip install coverage[toml] nox
       - name: Run doctests
         run:
-          pipx run nox -s doctests-${{ matrix.python-version.key ||
-          matrix.python-version }} --verbose
+          nox -s doctests-${{ matrix.python-version.key || matrix.python-version
+          }} --verbose
       - name: Run tests and generate coverage report
         run:
-          pipx run nox -s coverage-${{ matrix.python-version.key ||
-          matrix.python-version }} --verbose
-      - name: Coveralls requires coverage.py
-        run: |
-          pip install coverage[toml]
-          coverage xml
+          nox -s coverage-${{ matrix.python-version.key || matrix.python-version
+          }} --verbose
+      - name: Coveralls requires XML report
+        run: coverage xml
       - uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -68,8 +68,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Install nox
+        run: pip install nox
       - name: Build SDist and wheel
-        run: pipx run nox -s build --verbose
+        run: nox -s build --verbose
 
   docs:
     name: Docs
@@ -83,5 +85,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install pandoc
+          pip install nox
       - name: Build docs
-        run: pipx run nox -s docs --verbose
+        run: nox -s docs --verbose
