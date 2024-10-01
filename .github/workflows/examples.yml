@@ -41,4 +41,7 @@ jobs:
         with:
           python-version: 3.x
           cache: pip
-      - run: pipx run --spec '.[examples]' jupyter execute examples/**/*.ipynb
+      - name: Install nox
+        run: pip install nox
+      - name: Run examples
+        run: nox -s examples
