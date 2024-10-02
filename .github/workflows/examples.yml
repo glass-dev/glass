@@ -23,6 +23,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
+env:
+  # The "FORCE_COLOR" variable, when set to 1,
+  # tells Nox to colorize itself.
+  FORCE_COLOR: "1"
+
 jobs:
   test-examples:
     name: Test examples
@@ -36,4 +41,7 @@ jobs:
         with:
           python-version: 3.x
           cache: pip
-      - run: pipx run --spec '.[examples]' jupyter execute examples/**/*.ipynb
+      - name: Install nox
+        run: pip install nox
+      - name: Run examples
+        run: nox -s examples

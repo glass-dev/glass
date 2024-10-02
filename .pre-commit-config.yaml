@@ -1,5 +1,6 @@
 ---
 ci:
+  autofix_prs: false
   autoupdate_commit_msg: "MNT: update pre-commit hooks"
   autofix_commit_msg: "STY: pre-commit fixes"
 
@@ -30,49 +31,9 @@ repos:
     hooks:
       - id: yamllint
         args:
-          - >-
-            --config-data={
-              extends: default,
-              rules: {
-                anchors: enable,
-                braces: {
-                  forbid: non-empty
-                },
-                brackets: {
-                  forbid: non-empty
-                },
-                colons: enable,
-                commas: enable,
-                comments: {
-                  min-spaces-from-content: 1
-                },
-                comments-indentation: enable,
-                document-end: disable,
-                document-start: enable,
-                empty-lines: enable,
-                empty-values: disable,
-                float-values: enable,
-                hyphens: enable,
-                indentation: enable,
-                key-duplicates: enable,
-                key-ordering: disable,
-                line-length: enable,
-                new-line-at-end-of-file: enable,
-                new-lines: enable,
-                octal-values: enable,
-                quoted-strings: {
-                  quote-type: double,
-                  required: only-when-needed
-                },
-                trailing-spaces: enable,
-                truthy: {
-                  check-keys: false
-                }
-              }
-            }
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.7
+    rev: v0.6.8
     hooks:
       - id: ruff
       - id: ruff-format
@@ -86,18 +47,10 @@ repos:
     rev: v0.23.1
     hooks:
       - id: toml-sort-fix
-        args:
-          - --all
-          - --in-place
-          - --spaces-indent-inline-array=4
-          - --trailing-comma-inline-array
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.3.3
     hooks:
       - id: prettier
-        args:
-          - --prose-wrap=always
-          - --quote-props=as-needed
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.41.0
     hooks:

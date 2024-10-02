@@ -138,6 +138,52 @@ long as there have been changes.
 The current version number is automatically inferred from the last release (i.e.
 git tag), subsequent unreleased commits, and local changes, if any.
 
+## Nox
+
+`GLASS` supports running various critical commands using
+[nox](https://github.com/wntrblm/nox) to make them less intimidating for new
+developers. All of these commands (or sessions in the language of `nox`) -
+`lint`, `tests`, `coverage`, `doctests`, `docs`, and `build` - are defined in
+[noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
+
+`nox` can be installed via `pip` using -
+
+```bash
+pip install nox
+```
+
+The default sessions (`lint` and `tests`) can be executed using -
+
+```bash
+nox
+```
+
+A particular session (for example `tests`) can be run with `nox` on all
+supported Python versions using -
+
+```bash
+nox -s tests
+```
+
+Only `tests`, `coverage`, and the `doctests` session run on all supported Python
+versions by default.
+
+To specify a particular Python version (for example `3.11`), use the following
+syntax -
+
+```bash
+nox -s tests-3.11
+```
+
+The following command can be used to deploy the docs on `localhost` -
+
+```bash
+nox -s docs -- serve
+```
+
+The `nox` environments created for each type of session on the first run is
+saved under `.nox/` and reused by default.
+
 ## Contributing workflow
 
 Every change to the repository should come out of an issue where the change is
