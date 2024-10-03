@@ -16,10 +16,6 @@ HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
 def test_broadcast_first():
-    pass
-
-
-def test_broadcast_first():
     a = np.ones((2, 3, 4))
     b = np.ones((2, 1))
 
