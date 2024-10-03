@@ -34,7 +34,7 @@ def tests(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage."""
-    session.posargs.append("--cov=glass")
+    session.posargs.append("--cov")
     tests(session)
 
 
