@@ -52,9 +52,22 @@ jobs:
         run: nox -s coverage-${{ matrix.python-version }} --verbose
       - name: Coveralls requires XML report
         run: coverage xml
-      - uses: coverallsapp/github-action@v2
+      - name: Run Coveralls in parallel
+        uses: coverallsapp/github-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          flag-name: run-${{ matrix.python-version }}
+          parallel: true
+
+  aggregate-tests:
+    needs: tests
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: run-3.8,run-3.9,run-3.10,run-3.11,run-3.12
 
   build:
     name: Build
