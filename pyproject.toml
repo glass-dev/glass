@@ -80,6 +80,11 @@ report = {exclude_also = [
 build.hooks.vcs.version-file = "glass/_version.py"
 version.source = "vcs"
 
+[tool.mypy]
+plugins = [
+    "numpy.typing.mypy_plugin",
+]
+
 [tool.pytest.ini_options]
 addopts = [
     "--strict-config",
