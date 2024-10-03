@@ -14,6 +14,8 @@ from glass.core.array import (
 # check if scipy is available for testing
 HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
+def test_broadcast_first():
+    from glass.core.array import broadcast_first
 
 def test_broadcast_first():
     a = np.ones((2, 3, 4))
@@ -38,7 +40,7 @@ def test_broadcast_first():
         broadcast_first(a, b)
 
     # plain np.broadcast_arrays will work
-    a_a, b_a = broadcast_first(a, b)
+    a_a, b_a = np.broadcast_arrays(a, b)
 
     assert a_a.shape == (4, 5, 6)
     assert b_a.shape == (4, 5, 6)
