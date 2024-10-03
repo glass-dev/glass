@@ -78,6 +78,13 @@ report = {exclude_also = [
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
+build.targets.sdist.exclude = [
+    ".*",
+    "docs/*",
+    "examples/*",
+    "noxfile.py",
+    "tests/*",
+]
 version.source = "vcs"
 
 [tool.pytest.ini_options]
