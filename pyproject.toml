@@ -74,7 +74,14 @@ report = {exclude_also = [
     "if TYPE_CHECKING:",
 ], omit = [
     "glass/_version.py",
+], skip_covered = true, sort = "cover"}
+run = {branch = true, parallel = true, source = [
+    "glass",
 ]}
+paths.source = [
+    ".tox*/*/lib/python*/site-packages",
+    "src",
+]
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
