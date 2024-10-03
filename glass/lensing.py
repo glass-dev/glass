@@ -47,7 +47,7 @@ if TYPE_CHECKING:
 
 
 def from_convergence(  # noqa: PLR0913
-    kappa: npt.NDArray,
+    kappa: npt.NDArray,  # type: ignore[type-arg]
     lmax: int | None = None,
     *,
     potential: bool = False,
@@ -226,7 +226,7 @@ def from_convergence(  # noqa: PLR0913
 
 
 def shear_from_convergence(
-    kappa: npt.NDArray,
+    kappa: npt.NDArray,  # type: ignore[type-arg]
     lmax: int | None = None,
     *,
     discretized: bool = True,

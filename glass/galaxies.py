@@ -132,12 +132,12 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray,
-    lat: npt.NDArray,
-    eps: npt.NDArray,
-    kappa: npt.NDArray,
-    gamma1: npt.NDArray,
-    gamma2: npt.NDArray,
+    lon: npt.NDArray,  # type: ignore[type-arg]
+    lat: npt.NDArray,  # type: ignore[type-arg]
+    eps: npt.NDArray,  # type: ignore[type-arg]
+    kappa: npt.NDArray,  # type: ignore[type-arg]
+    gamma1: npt.NDArray,  # type: ignore[type-arg]
+    gamma2: npt.NDArray,  # type: ignore[type-arg]
     *,
     reduced_shear: bool = True,
 ) -> npt.NDArray:

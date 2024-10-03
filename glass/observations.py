@@ -86,7 +86,7 @@ def vmap_galactic_ecliptic(
 
 
 def gaussian_nz(
-    z: npt.NDArray,
+    z: npt.NDArray,  # type: ignore[type-arg]
     mean: npt.ArrayLike,
     sigma: npt.ArrayLike,
     *,
@@ -131,7 +131,7 @@ def gaussian_nz(
 
 
 def smail_nz(
-    z: npt.NDArray,
+    z: npt.NDArray,  # type: ignore[type-arg]
     z_mode: npt.ArrayLike,
     alpha: npt.ArrayLike,
     beta: npt.ArrayLike,
@@ -232,8 +232,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: npt.NDArray,
-    nz: npt.NDArray,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    nz: npt.NDArray,  # type: ignore[type-arg]
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -267,8 +267,8 @@ def equal_dens_zbins(
 
 
 def tomo_nz_gausserr(
-    z: npt.NDArray,
-    nz: npt.NDArray,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    nz: npt.NDArray,  # type: ignore[type-arg]
     sigma_0: float,
     zbins: list[tuple[float, float]],
 ) -> npt.NDArray:
