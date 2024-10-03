@@ -29,7 +29,7 @@ from __future__ import annotations
 import warnings
 
 # typing
-from typing import Any, Callable, Generator, Iterable, Sequence
+from typing import Any, Callable, Generator, Iterable, Optional, Sequence, Tuple, Union
 
 import healpy as hp
 import numpy as np
@@ -37,8 +37,8 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
-Size = int | tuple[int, ...] | None
-Iternorm = tuple[int | None, npt.NDArray, npt.NDArray]
+Size = Optional[Union[int | Tuple[int, ...]]]
+Iternorm = Tuple[Optional[int], npt.NDArray, npt.NDArray]
 ClTransform = str | Callable[[npt.NDArray], npt.NDArray]
 Cls = Sequence[npt.NDArray | Sequence[float]]
 Alms = npt.NDArray
