@@ -40,7 +40,7 @@ from gaussiancl import gaussiancl
 Size = Optional[Union[int | Tuple[int, ...]]]
 Iternorm = Tuple[Optional[int], npt.NDArray, npt.NDArray]
 ClTransform = str | Callable[[npt.NDArray], npt.NDArray]
-Cls = Sequence[npt.NDArray | Sequence[float]]
+Cls = Sequence[Union[npt.NDArray, Sequence[float]]]
 Alms = npt.NDArray
 
 
