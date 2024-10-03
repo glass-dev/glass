@@ -138,6 +138,10 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     if rng is None:
         rng = np.random.default_rng()
 
+    # default size if not given
+    if size is None:
+        size = np.broadcast(gamma, sigma_gamma, mu, sigma).shape
+
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
