@@ -1,3 +1,5 @@
+import importlib.util
+
 import numpy as np
 import pytest
 
@@ -10,13 +12,7 @@ from glass.core.array import (
 )
 
 # check if scipy is available for testing
-try:
-    import scipy
-except ImportError:
-    HAVE_SCIPY = False
-else:
-    del scipy
-    HAVE_SCIPY = True
+HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
 def test_broadcast_first():
