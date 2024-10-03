@@ -284,12 +284,11 @@ def gaussian_phz(
     return zphot
 
 
-def kappa_ia_nla(
+def kappa_ia_nla(  # noqa: PLR0913
     delta, zeff, a_ia, cosmo, *, z0=0.0, eta=0.0, lbar=0.0, l0=1e-9, beta=0.0
 ):
     r"""
-    Effective convergence from intrinsic alignments using the NLA
-    model.
+    Effective convergence from intrinsic alignments using the NLA model.
 
     Parameters
     ----------
@@ -301,14 +300,6 @@ def kappa_ia_nla(
         Intrinsic alignments amplitude.
     cosmo : Cosmology
         Cosmology instance.
-
-    Returns
-    -------
-    kappa_ia : array_like
-        Effective convergence due to intrinsic alignments.
-
-    Other Parameters
-    ----------------
     z0 : float, optional
         Reference redshift for the redshift dependence (default: 0).
     eta : float, optional
@@ -320,6 +311,11 @@ def kappa_ia_nla(
         ``1e-09``).
     beta : float, optional
         Power of the luminosity dependence (default: 0).
+
+    Returns
+    -------
+    kappa_ia : array_like
+        Effective convergence due to intrinsic alignments.
 
     Notes
     -----
