@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.testing as npt
 import pytest
 
 # check if scipy is available for testing
@@ -69,17 +68,17 @@ def test_ndinterp():
     x = 0.5
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == ()
-    npt.assert_allclose(y, 1.15, atol=1e-15)
+    np.testing.assert_allclose(y, 1.15, atol=1e-15)
 
     x = [0.5, 1.5, 2.5]
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == (3,)
-    npt.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
+    np.testing.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
 
     x = [[0.5, 1.5], [2.5, 3.5]]
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 2)
-    npt.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
+    np.testing.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
     # test nd interpolation in final axis
 
@@ -88,17 +87,17 @@ def test_ndinterp():
     x = 0.5
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == (2,)
-    npt.assert_allclose(y, [1.15, 2.15], atol=1e-15)
+    np.testing.assert_allclose(y, [1.15, 2.15], atol=1e-15)
 
     x = [0.5, 1.5, 2.5]
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 3)
-    npt.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
+    np.testing.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
 
     x = [[0.5, 1.5], [2.5, 3.5]]
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 2, 2)
-    npt.assert_allclose(
+    np.testing.assert_allclose(
         y,
         [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]],
         atol=1e-15,
@@ -111,12 +110,12 @@ def test_ndinterp():
     x = 0.5
     y = ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 1)
-    npt.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
+    np.testing.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
 
     x = [0.5, 1.5, 2.5]
     y = ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 3, 1)
-    npt.assert_allclose(
+    np.testing.assert_allclose(
         y,
         [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]],
         atol=1e-15,
@@ -125,7 +124,7 @@ def test_ndinterp():
     x = [[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]]
     y = ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 3, 4, 1)
-    npt.assert_allclose(
+    np.testing.assert_allclose(
         y,
         [
             [
@@ -171,19 +170,19 @@ def test_cumtrapz():
     # default dtype (int - not supported by scipy)
 
     glass_ct = cumtrapz(f, x)
-    npt.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
+    np.testing.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
 
     # explicit dtype (float)
 
     glass_ct = cumtrapz(f, x, dtype=float)
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    npt.assert_allclose(glass_ct, scipy_ct)
+    np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
     result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    npt.assert_allclose(result, scipy_ct)
+    np.testing.assert_allclose(result, scipy_ct)
 
     # 2D f and 1D x
 
@@ -193,16 +192,16 @@ def test_cumtrapz():
     # default dtype (int - not supported by scipy)
 
     glass_ct = cumtrapz(f, x)
-    npt.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
+    np.testing.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     # explicit dtype (float)
 
     glass_ct = cumtrapz(f, x, dtype=float)
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    npt.assert_allclose(glass_ct, scipy_ct)
+    np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
     glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    npt.assert_allclose(glass_ct, scipy_ct)
+    np.testing.assert_allclose(glass_ct, scipy_ct)

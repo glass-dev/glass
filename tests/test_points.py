@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.testing as npt
 
 
 def catpos(pos):
@@ -121,4 +120,4 @@ def test_position_weights(rng):
                     )
                 expected = bias * expected
 
-            npt.assert_allclose(weights, expected)
+            np.testing.assert_allclose(weights, expected)
