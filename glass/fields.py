@@ -37,12 +37,12 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
-Array = np.ndarray
+Array = npt.NDArray
 Size = Union[None, int, Tuple[int, ...]]
 Iternorm = Tuple[Optional[int], Array, Array]
 ClTransform = Union[str, Callable[[Array], Array]]
 Cls = Sequence[Union[Array, Sequence[float]]]
-Alms = np.ndarray
+Alms = npt.NDArray
 
 
 def iternorm(

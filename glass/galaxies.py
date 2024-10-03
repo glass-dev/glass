@@ -22,7 +22,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+    import numpy.typing as npt
 
     from glass.shells import RadialWindow
 
@@ -33,11 +33,11 @@ from glass.core.array import broadcast_leading_axes, cumtrapz
 
 
 def redshifts(
-    n: int | ArrayLike,
+    n: int | npt.ArrayLike,
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> np.ndarray:
+) -> npt.NDArray:
     """
     Sample redshifts from a radial window function.
 
@@ -64,12 +64,12 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | ArrayLike,
-    z: ArrayLike,
-    nz: ArrayLike,
+    count: int | npt.ArrayLike,
+    z: npt.ArrayLike,
+    nz: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> np.ndarray:
+) -> npt.NDArray:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -132,15 +132,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: np.ndarray,
-    lat: np.ndarray,
-    eps: np.ndarray,
-    kappa: np.ndarray,
-    gamma1: np.ndarray,
-    gamma2: np.ndarray,
+    lon: npt.NDArray,
+    lat: npt.NDArray,
+    eps: npt.NDArray,
+    kappa: npt.NDArray,
+    gamma1: npt.NDArray,
+    gamma2: npt.NDArray,
     *,
     reduced_shear: bool = True,
-) -> np.ndarray:
+) -> npt.NDArray:
     """
     Observed galaxy shears from weak lensing.
 
@@ -195,13 +195,13 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: ArrayLike,
-    sigma_0: float | ArrayLike,
+    z: npt.ArrayLike,
+    sigma_0: float | npt.ArrayLike,
     *,
-    lower: ArrayLike | None = None,
-    upper: ArrayLike | None = None,
+    lower: npt.ArrayLike | None = None,
+    upper: npt.ArrayLike | None = None,
     rng: np.random.Generator | None = None,
-) -> np.ndarray:
+) -> npt.NDArray:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
