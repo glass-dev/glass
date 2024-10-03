@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import nox
 
 # Options to modify nox behaviour
@@ -48,7 +50,9 @@ def doctests(session: nox.Session) -> None:
 def examples(session: nox.Session) -> None:
     """Run the example notebooks."""
     session.install("-e", ".[examples]")
-    session.run("jupyter", "execute", "examples/**/*.ipynb", *session.posargs)
+    session.run(
+        "jupyter", "execute", *Path().glob("examples/**/*.ipynb"), *session.posargs
+    )
 
 
 @nox.session
