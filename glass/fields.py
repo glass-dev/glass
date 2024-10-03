@@ -37,7 +37,7 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
-Size = Optional[Union[int | Tuple[int, ...]]]
+Size = Optional[Union[int, Tuple[int, ...]]]
 Iternorm = Tuple[Optional[int], npt.NDArray, npt.NDArray]
 ClTransform = Union[str, Callable[[npt.NDArray], npt.NDArray]]
 Cls = Sequence[Union[npt.NDArray, Sequence[float]]]
