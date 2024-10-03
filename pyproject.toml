@@ -78,10 +78,6 @@ report = {exclude_also = [
 run = {branch = true, parallel = true, source = [
     "glass",
 ]}
-paths.source = [
-    ".tox*/*/lib/python*/site-packages",
-    "src",
-]
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
