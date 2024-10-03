@@ -1,6 +1,14 @@
 import numpy as np
 import pytest
 
+from glass.core.array import (
+    broadcast_first,
+    broadcast_leading_axes,
+    cumtrapz,
+    ndinterp,
+    trapz_product,
+)
+
 # check if scipy is available for testing
 try:
     import scipy
@@ -11,9 +19,7 @@ else:
     HAVE_SCIPY = True
 
 
-def broadcast_first():
-    from glass.core.array import broadcast_first
-
+def test_broadcast_first():
     a = np.ones((2, 3, 4))
     b = np.ones((2, 1))
 
@@ -43,8 +49,6 @@ def broadcast_first():
 
 
 def test_broadcast_leading_axes():
-    from glass.core.array import broadcast_leading_axes
-
     a = 0
     b = np.zeros((4, 10))
     c = np.zeros((3, 1, 5, 6))
@@ -58,8 +62,6 @@ def test_broadcast_leading_axes():
 
 
 def test_ndinterp():
-    from glass.core.array import ndinterp
-
     # test 1d interpolation
 
     xp = [0, 1, 2, 3, 4]
@@ -143,8 +145,6 @@ def test_ndinterp():
 
 
 def test_trapz_product():
-    from glass.core.array import trapz_product
-
     x1 = np.linspace(0, 2, 100)
     f1 = np.full_like(x1, 2.0)
 
@@ -159,8 +159,6 @@ def test_trapz_product():
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_cumtrapz():
     from scipy.integrate import cumulative_trapezoid
-
-    from glass.core.array import cumtrapz
 
     # 1D f and x
 

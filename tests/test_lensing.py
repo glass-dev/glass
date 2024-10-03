@@ -1,11 +1,18 @@
+import healpix
 import numpy as np
 import pytest
+
+from glass.lensing import (
+    MultiPlaneConvergence,
+    deflect,
+    multi_plane_matrix,
+    multi_plane_weights,
+)
+from glass.shells import RadialWindow
 
 
 @pytest.fixture
 def shells():
-    from glass.shells import RadialWindow
-
     return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
         RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
@@ -35,8 +42,6 @@ def cosmo():
 
 @pytest.mark.parametrize("usecomplex", [True, False])
 def test_deflect_nsew(usecomplex):
-    from glass.lensing import deflect
-
     d = 5.0
     r = np.radians(d)
 
@@ -67,10 +72,6 @@ def test_deflect_nsew(usecomplex):
 
 
 def test_deflect_many(rng):
-    import healpix
-
-    from glass.lensing import deflect
-
     n = 1000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
@@ -89,8 +90,6 @@ def test_deflect_many(rng):
 
 
 def test_multi_plane_matrix(shells, cosmo, rng):
-    from glass.lensing import MultiPlaneConvergence, multi_plane_matrix
-
     mat = multi_plane_matrix(shells, cosmo)
 
     np.testing.assert_array_equal(mat, np.tril(mat))
@@ -108,8 +107,6 @@ def test_multi_plane_matrix(shells, cosmo, rng):
 
 
 def test_multi_plane_weights(shells, cosmo, rng):
-    from glass.lensing import MultiPlaneConvergence, multi_plane_weights
-
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 

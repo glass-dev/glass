@@ -1,4 +1,7 @@
+import numpy as np
 import pytest
+
+from glass.core.algorithm import nnls as nnls_glass
 
 # check if scipy is available for testing
 try:
@@ -12,10 +15,7 @@ else:
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_nnls(rng):
-    import numpy as np
     from scipy.optimize import nnls as nnls_scipy
-
-    from glass.core.algorithm import nnls as nnls_glass
 
     # cross-check output with scipy's nnls
 

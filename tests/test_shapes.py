@@ -1,10 +1,15 @@
 import numpy as np
 import pytest
 
+from glass.shapes import (
+    ellipticity_gaussian,
+    ellipticity_intnorm,
+    ellipticity_ryden04,
+    triaxial_axis_ratio,
+)
+
 
 def test_triaxial_axis_ratio():
-    from glass.shapes import triaxial_axis_ratio
-
     # single axis ratio
 
     q = triaxial_axis_ratio(0.8, 0.4)
@@ -42,8 +47,6 @@ def test_triaxial_axis_ratio():
 
 
 def test_ellipticity_ryden04():
-    from glass.shapes import ellipticity_ryden04
-
     # single ellipticity
 
     e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
@@ -76,8 +79,6 @@ def test_ellipticity_ryden04():
 
 
 def test_ellipticity_gaussian():
-    from glass.shapes import ellipticity_gaussian
-
     n = 1_000_000
 
     eps = ellipticity_gaussian(n, 0.256)
@@ -102,8 +103,6 @@ def test_ellipticity_gaussian():
 
 
 def test_ellipticity_intnorm():
-    from glass.shapes import ellipticity_intnorm
-
     n = 1_000_000
 
     eps = ellipticity_intnorm(n, 0.256)

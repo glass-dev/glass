@@ -1,11 +1,10 @@
+import numpy as np
 import pytest
+
+from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
 
 
 def test_redshifts(mocker):
-    import numpy as np
-
-    from glass.galaxies import redshifts
-
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
@@ -23,10 +22,6 @@ def test_redshifts(mocker):
 
 
 def test_redshifts_from_nz():
-    import numpy as np
-
-    from glass.galaxies import redshifts_from_nz
-
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
@@ -95,10 +90,6 @@ def test_redshifts_from_nz():
 
 
 def test_gaussian_phz():
-    import numpy as np
-
-    from glass.galaxies import gaussian_phz
-
     # test sampling
 
     # case: zero variance
