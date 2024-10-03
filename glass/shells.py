@@ -50,31 +50,30 @@ import warnings
 from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence, Union
 
 import numpy as np
+import numpy.typing as npt
 
 from glass.core.array import ndinterp
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
-
     from cosmology import Cosmology
 
 
 # types
-ArrayLike1D = Union[Sequence[float], np.ndarray]
-WeightFunc = Callable[[ArrayLike1D], np.ndarray]
+ArrayLike1D = Union[Sequence[float], npt.NDArray]
+WeightFunc = Callable[[ArrayLike1D], npt.NDArray]
 
 
-def distance_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
+def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)
 
 
-def volume_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
+def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-def density_weight(z: ArrayLike, cosmo: Cosmology) -> np.ndarray:
+def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
@@ -314,7 +313,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[npt.NDArray, npt.NDArray]:
     """
     Restrict a function to a redshift window.
 
@@ -352,12 +351,12 @@ def restrict(
 
 
 def partition(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> ArrayLike:
+) -> npt.ArrayLike:
     r"""
     Partition a function by a sequence of windows.
 
@@ -462,12 +461,12 @@ def partition(
 
 
 def partition_lstsq(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """Least-squares partition."""
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -508,12 +507,12 @@ def partition_lstsq(
 
 
 def partition_nnls(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """
     Non-negative least-squares partition.
 
@@ -569,10 +568,10 @@ def partition_nnls(
 
 
 def partition_restrict(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
@@ -607,10 +606,10 @@ def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
 
 
 def combine(
-    z: ArrayLike,
-    weights: ArrayLike,
+    z: npt.ArrayLike,
+    weights: npt.ArrayLike,
     shells: Sequence[RadialWindow],
-) -> ArrayLike:
+) -> npt.ArrayLike:
     r"""
     Evaluate a linear combination of window functions.
 

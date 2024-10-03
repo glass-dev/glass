@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.testing as npt
 import pytest
 
 
@@ -86,7 +85,7 @@ def test_deflect_many(rng):
 
     dotp = x * x_ + y * y_ + z * z_
 
-    npt.assert_allclose(dotp, np.cos(abs_alpha))
+    np.testing.assert_allclose(dotp, np.cos(abs_alpha))
 
 
 def test_multi_plane_matrix(shells, cosmo, rng):
@@ -94,8 +93,8 @@ def test_multi_plane_matrix(shells, cosmo, rng):
 
     mat = multi_plane_matrix(shells, cosmo)
 
-    npt.assert_array_equal(mat, np.tril(mat))
-    npt.assert_array_equal(np.triu(mat, 1), 0)
+    np.testing.assert_array_equal(mat, np.tril(mat))
+    np.testing.assert_array_equal(np.triu(mat, 1), 0)
 
     convergence = MultiPlaneConvergence(cosmo)
 
@@ -105,7 +104,7 @@ def test_multi_plane_matrix(shells, cosmo, rng):
         convergence.add_window(delta, shell)
         kappas.append(convergence.kappa.copy())
 
-    npt.assert_allclose(mat @ deltas, kappas)
+    np.testing.assert_allclose(mat @ deltas, kappas)
 
 
 def test_multi_plane_weights(shells, cosmo, rng):
@@ -114,8 +113,8 @@ def test_multi_plane_weights(shells, cosmo, rng):
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 
-    npt.assert_array_equal(w_out, np.triu(w_out, 1))
-    npt.assert_array_equal(np.tril(w_out), 0)
+    np.testing.assert_array_equal(w_out, np.triu(w_out, 1))
+    np.testing.assert_array_equal(np.tril(w_out), 0)
 
     convergence = MultiPlaneConvergence(cosmo)
 
@@ -129,4 +128,4 @@ def test_multi_plane_weights(shells, cosmo, rng):
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    npt.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)

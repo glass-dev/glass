@@ -7,16 +7,16 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+    import numpy.typing as npt
 
 
 def nnls(
-    a: ArrayLike,
-    b: ArrayLike,
+    a: npt.ArrayLike,
+    b: npt.ArrayLike,
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """
     Compute a non-negative least squares solution.
 

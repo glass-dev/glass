@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    import numpy.typing as npt
 
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
@@ -167,11 +167,11 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
 
 
 def ellipticity_gaussian(
-    count: int | ArrayLike,
-    sigma: ArrayLike,
+    count: int | npt.ArrayLike,
+    sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> NDArray:
+) -> npt.NDArray:
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -224,11 +224,11 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | ArrayLike,
-    sigma: ArrayLike,
+    count: int | npt.ArrayLike,
+    sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> NDArray:
+) -> npt.NDArray:
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 

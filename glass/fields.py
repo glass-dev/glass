@@ -37,17 +37,16 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
-Array = np.ndarray
-Size = Union[None, int, Tuple[int, ...]]
-Iternorm = Tuple[Optional[int], Array, Array]
-ClTransform = Union[str, Callable[[Array], Array]]
-Cls = Sequence[Union[Array, Sequence[float]]]
-Alms = np.ndarray
+Size = Optional[Union[int, Tuple[int, ...]]]
+Iternorm = Tuple[Optional[int], npt.NDArray, npt.NDArray]
+ClTransform = Union[str, Callable[[npt.NDArray], npt.NDArray]]
+Cls = Sequence[Union[npt.NDArray, Sequence[float]]]
+Alms = npt.NDArray
 
 
 def iternorm(
     k: int,
-    cov: Iterable[Array],
+    cov: Iterable[npt.NDArray],
     size: Size = None,
 ) -> Generator[Iternorm, None, None]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
@@ -107,7 +106,7 @@ def iternorm(
         yield j, a, s
 
 
-def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]:
+def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[npt.NDArray, None, None]:
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
     end = 0
@@ -127,7 +126,7 @@ def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[Array, None, None]
         yield cov
 
 
-def multalm(alm: Alms, bl: Array, *, inplace: bool = False) -> Alms:
+def multalm(alm: Alms, bl: npt.NDArray, *, inplace: bool = False) -> Alms:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
@@ -214,7 +213,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[Array, None, None]:
+) -> Generator[npt.NDArray, None, None]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -300,7 +299,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[Array, None, None]:
+) -> Generator[npt.NDArray, None, None]:
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation

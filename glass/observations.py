@@ -37,14 +37,14 @@ import numpy as np
 from glass.core.array import cumtrapz
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+    import numpy.typing as npt
 
 
 def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
-) -> np.ndarray:
+) -> npt.NDArray:
     """
     Visibility map masking galactic and ecliptic plane.
 
@@ -86,12 +86,12 @@ def vmap_galactic_ecliptic(
 
 
 def gaussian_nz(
-    z: np.ndarray,
-    mean: ArrayLike,
-    sigma: ArrayLike,
+    z: npt.NDArray,
+    mean: npt.ArrayLike,
+    sigma: npt.ArrayLike,
     *,
-    norm: ArrayLike | None = None,
-) -> np.ndarray:
+    norm: npt.ArrayLike | None = None,
+) -> npt.NDArray:
     r"""
     Gaussian redshift distribution.
 
@@ -131,13 +131,13 @@ def gaussian_nz(
 
 
 def smail_nz(
-    z: np.ndarray,
-    z_mode: ArrayLike,
-    alpha: ArrayLike,
-    beta: ArrayLike,
+    z: npt.NDArray,
+    z_mode: npt.ArrayLike,
+    alpha: npt.ArrayLike,
+    beta: npt.ArrayLike,
     *,
-    norm: ArrayLike | None = None,
-) -> np.ndarray:
+    norm: npt.ArrayLike | None = None,
+) -> npt.NDArray:
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -232,8 +232,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: np.ndarray,
-    nz: np.ndarray,
+    z: npt.NDArray,
+    nz: npt.NDArray,
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -267,11 +267,11 @@ def equal_dens_zbins(
 
 
 def tomo_nz_gausserr(
-    z: np.ndarray,
-    nz: np.ndarray,
+    z: npt.NDArray,
+    nz: npt.NDArray,
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> np.ndarray:
+) -> npt.NDArray:
     """
     Tomographic redshift bins with a Gaussian redshift error.
 

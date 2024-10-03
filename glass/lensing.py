@@ -39,7 +39,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     # to prevent circular dependencies, only import these for type checking
-    from numpy.typing import ArrayLike, NDArray
+    import numpy.typing as npt
 
     from cosmology import Cosmology
 
@@ -47,14 +47,14 @@ if TYPE_CHECKING:
 
 
 def from_convergence(  # noqa: PLR0913
-    kappa: NDArray,
+    kappa: npt.NDArray,
     lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> tuple[NDArray, ...]:
+) -> tuple[npt.NDArray, ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
@@ -226,11 +226,11 @@ def from_convergence(  # noqa: PLR0913
 
 
 def shear_from_convergence(
-    kappa: np.ndarray,
+    kappa: npt.NDArray,
     lmax: int | None = None,
     *,
     discretized: bool = True,
-) -> np.ndarray:
+) -> npt.NDArray:
     r"""
     Weak lensing shear from convergence.
 
@@ -282,11 +282,11 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: np.ndarray = np.array(0.0)
-        self.kappa2: np.ndarray | None = None
-        self.kappa3: np.ndarray | None = None
+        self.delta3: npt.NDArray = np.array(0.0)
+        self.kappa2: npt.NDArray | None = None
+        self.kappa3: npt.NDArray | None = None
 
-    def add_window(self, delta: np.ndarray, w: RadialWindow) -> None:
+    def add_window(self, delta: npt.NDArray, w: RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -299,7 +299,7 @@ class MultiPlaneConvergence:
 
         self.add_plane(delta, zsrc, lens_weight)
 
-    def add_plane(self, delta: np.ndarray, zsrc: float, wlens: float = 1.0) -> None:
+    def add_plane(self, delta: npt.NDArray, zsrc: float, wlens: float = 1.0) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
@@ -348,12 +348,12 @@ class MultiPlaneConvergence:
         return self.z3
 
     @property
-    def kappa(self) -> np.ndarray | None:
+    def kappa(self) -> npt.NDArray | None:
         """The current convergence plane."""
         return self.kappa3
 
     @property
-    def delta(self) -> np.ndarray:
+    def delta(self) -> npt.NDArray:
         """The current matter plane."""
         return self.delta3
 
@@ -366,7 +366,7 @@ class MultiPlaneConvergence:
 def multi_plane_matrix(
     shells: Sequence[RadialWindow],
     cosmo: Cosmology,
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """Compute the matrix of lensing contributions from each shell."""
     mpc = MultiPlaneConvergence(cosmo)
     wmat = np.eye(len(shells))
@@ -377,10 +377,10 @@ def multi_plane_matrix(
 
 
 def multi_plane_weights(
-    weights: ArrayLike,
+    weights: npt.ArrayLike,
     shells: Sequence[RadialWindow],
     cosmo: Cosmology,
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """
     Compute effective weights for multi-plane convergence.
 
@@ -419,7 +419,9 @@ def multi_plane_weights(
     return np.matmul(mat.T, weights)
 
 
-def deflect(lon: ArrayLike, lat: ArrayLike, alpha: ArrayLike) -> NDArray:
+def deflect(
+    lon: npt.ArrayLike, lat: npt.ArrayLike, alpha: npt.ArrayLike
+) -> npt.NDArray:
     r"""
     Apply deflections to positions.
 
