@@ -1,5 +1,7 @@
 import numpy as np
 
+from glass.points import position_weights, positions_from_delta, uniform_positions
+
 
 def catpos(pos):
     lon, lat, cnt = [], [], 0
@@ -11,8 +13,6 @@ def catpos(pos):
 
 
 def test_positions_from_delta():
-    from glass.points import positions_from_delta
-
     # case: single-dimensional input
 
     ngal = 1e-3
@@ -66,8 +66,6 @@ def test_positions_from_delta():
 
 
 def test_uniform_positions():
-    from glass.points import uniform_positions
-
     # case: scalar input
 
     ngal = 1e-3
@@ -97,8 +95,6 @@ def test_uniform_positions():
 
 
 def test_position_weights(rng):
-    from glass.points import position_weights
-
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
             counts = rng.random(cshape)
