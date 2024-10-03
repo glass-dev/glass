@@ -70,7 +70,6 @@ Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
-relative_files = true
 report = {exclude_also = [
     "if TYPE_CHECKING:",
 ], omit = [
@@ -79,6 +78,10 @@ report = {exclude_also = [
 run = {branch = true, parallel = true, source = [
     "glass",
 ]}
+paths.source = [
+    "src",
+    ".nox*/*/lib/python*/site-packages",
+]
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
