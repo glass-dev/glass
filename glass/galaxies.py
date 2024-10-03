@@ -284,9 +284,11 @@ def gaussian_phz(
     return zphot
 
 
-def kappa_ia_nla(delta, zeff, a_ia, cosmo, *, z0=0., eta=0., lbar=0.,
-                 l0=1e-9, beta=0.):
-    r'''Effective convergence from intrinsic alignments using the NLA
+def kappa_ia_nla(
+    delta, zeff, a_ia, cosmo, *, z0=0.0, eta=0.0, lbar=0.0, l0=1e-9, beta=0.0
+):
+    r"""
+    Effective convergence from intrinsic alignments using the NLA
     model.
 
     Parameters
@@ -365,17 +367,17 @@ def kappa_ia_nla(delta, zeff, a_ia, cosmo, *, z0=0., eta=0., lbar=0.,
     .. [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
        OJAp, 6, 11. doi:10.21105/astro.2302.01942
 
-    '''
+    """
+    c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
+    rho_c1 = c1 * cosmo.rho_c0
 
-    c1 = 5e-14/cosmo.h**2  # Solar masses per cubic Mpc
-    rho_c1 = c1*cosmo.rho_c0
+    prefactor = -a_ia * rho_c1 * cosmo.Om
+    inverse_linear_growth = 1.0 / cosmo.gf(zeff)
+    redshift_dependence = ((1 + zeff) / (1 + z0)) ** eta
+    luminosity_dependence = (lbar / l0) ** beta
 
-    prefactor = - a_ia * rho_c1 * cosmo.Om
-    inverse_linear_growth = 1./cosmo.gf(zeff)
-    redshift_dependence = ((1+zeff)/(1+z0))**eta
-    luminosity_dependence = (lbar/l0)**beta
-
-    f_nla = prefactor * inverse_linear_growth * redshift_dependence \
-        * luminosity_dependence
+    f_nla = (
+        prefactor * inverse_linear_growth * redshift_dependence * luminosity_dependence
+    )
 
     return delta * f_nla
