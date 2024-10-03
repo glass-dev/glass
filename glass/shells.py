@@ -47,7 +47,7 @@ from __future__ import annotations
 import warnings
 
 # type checking
-from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence
+from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
 
 
 # types
-ArrayLike1D = Sequence[float] | npt.NDArray
+ArrayLike1D = Union[Sequence[float], npt.NDArray]
 WeightFunc = Callable[[ArrayLike1D], npt.NDArray]
 
 
