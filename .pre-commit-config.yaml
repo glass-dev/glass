@@ -61,3 +61,7 @@ repos:
     rev: v1.5.5
     hooks:
       - id: forbid-tabs
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.3
+    hooks:
+      - id: actionlint

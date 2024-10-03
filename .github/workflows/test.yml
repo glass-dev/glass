@@ -47,13 +47,9 @@ jobs:
       - name: Install nox and coverage.py
         run: pip install coverage[toml] nox
       - name: Run doctests
-        run:
-          nox -s doctests-${{ matrix.python-version.key || matrix.python-version
-          }} --verbose
+        run: nox -s doctests-${{ matrix.python-version }} --verbose
       - name: Run tests and generate coverage report
-        run:
-          nox -s coverage-${{ matrix.python-version.key || matrix.python-version
-          }} --verbose
+        run: nox -s coverage-${{ matrix.python-version }} --verbose
       - name: Coveralls requires XML report
         run: coverage xml
       - uses: coverallsapp/github-action@v2
