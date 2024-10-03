@@ -1,20 +1,20 @@
+import numpy as np
 import pytest
 
+from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
 
-def test_redshifts():
-    from unittest.mock import Mock
-    import numpy as np
-    from glass.galaxies import redshifts
 
+def test_redshifts(mocker):
     # create a mock radial window function
-    w = Mock()
-    w.za = np.linspace(0., 1., 20)
-    w.wa = np.exp(-0.5*(w.za - 0.5)**2/0.1**2)
+    w = mocker.Mock()
+    w.za = np.linspace(0.0, 1.0, 20)
+    w.wa = np.exp(-0.5 * (w.za - 0.5) ** 2 / 0.1**2)
 
     # sample redshifts (scalar)
     z = redshifts(13, w)
     assert z.shape == (13,)
-    assert z.min() >= 0. and z.max() <= 1.
+    assert z.min() >= 0.0
+    assert z.max() <= 1.0
 
     # sample redshifts (array)
     z = redshifts([[1, 2], [3, 4]], w)
@@ -22,19 +22,16 @@ def test_redshifts():
 
 
 def test_redshifts_from_nz():
-    import numpy as np
-    from glass.galaxies import redshifts_from_nz
-
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
-    assert np.all((0 <= redshifts) & (redshifts <= 1))
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0])
-    assert np.all((1 <= redshifts) & (redshifts <= 3))
+    assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1])
-    assert np.all((3 <= redshifts) & (redshifts <= 4))
+    assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1])
     assert not np.any(redshifts <= 1)
@@ -45,18 +42,18 @@ def test_redshifts_from_nz():
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = z*(1-z)
+    nz = z * (1 - z)
 
     redshifts = redshifts_from_nz(count, z, nz)
 
     assert redshifts.shape == (count,)
-    assert np.all((0 <= redshifts) & (redshifts <= 1))
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     # case: extra dimensions from count
 
     count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
-    nz = z*(1-z)
+    nz = z * (1 - z)
 
     redshifts = redshifts_from_nz(count, z, nz)
 
@@ -66,7 +63,7 @@ def test_redshifts_from_nz():
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z*(1-z), (z-0.5)**2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     redshifts = redshifts_from_nz(count, z, nz)
 
@@ -76,7 +73,7 @@ def test_redshifts_from_nz():
 
     count = [[10], [20], [30]]
     z = np.linspace(0, 1, 100)
-    nz = [z*(1-z), (z-0.5)**2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     redshifts = redshifts_from_nz(count, z, nz)
 
@@ -86,22 +83,19 @@ def test_redshifts_from_nz():
 
     count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
-    nz = [z*(1-z), (z-0.5)**2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     with pytest.raises(ValueError):
         redshifts_from_nz(count, z, nz)
 
 
 def test_gaussian_phz():
-    import numpy as np
-    from glass.galaxies import gaussian_phz
-
     # test sampling
 
     # case: zero variance
 
     z = np.linspace(0, 1, 100)
-    sigma_0 = 0.
+    sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -109,7 +103,7 @@ def test_gaussian_phz():
 
     # case: truncated normal
 
-    z = 0.
+    z = 0.0
     sigma_0 = np.ones(100)
 
     phz = gaussian_phz(z, sigma_0)
@@ -119,7 +113,7 @@ def test_gaussian_phz():
 
     # case: upper and lower bound
 
-    z = 1.
+    z = 1.0
     sigma_0 = np.ones(100)
 
     phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
@@ -132,8 +126,8 @@ def test_gaussian_phz():
 
     # case: scalar redshift, scalar sigma_0
 
-    z = 1.
-    sigma_0 = 0.
+    z = 1.0
+    sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -143,7 +137,7 @@ def test_gaussian_phz():
     # case: array redshift, scalar sigma_0
 
     z = np.linspace(0, 1, 10)
-    sigma_0 = 0.
+    sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -152,7 +146,7 @@ def test_gaussian_phz():
 
     # case: scalar redshift, array sigma_0
 
-    z = 1.
+    z = 1.0
     sigma_0 = np.zeros(10)
 
     phz = gaussian_phz(z, sigma_0)

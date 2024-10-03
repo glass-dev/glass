@@ -1,12 +1,10 @@
-# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-# license: MIT
-'''
-Observations (:mod:`glass.observations`)
-========================================
+"""
+Observations
+============
 
-.. currentmodule:: glass.observations
+.. currentmodule:: glass
 
-The :mod:`glass.observations` module provides functionality for simulating
+The following functions provide functionality for simulating
 observational effects of surveys.
 
 
@@ -26,22 +24,29 @@ Visibility
 .. autofunction:: vmap_galactic_ecliptic
 
 
-'''
+"""  # noqa: D205, D400, D415
 
-import numpy as np
-import healpy as hp
+from __future__ import annotations
+
 import math
+from typing import TYPE_CHECKING
 
-from typing import Optional, Tuple, List
-from numpy.typing import ArrayLike
+import healpy as hp
+import numpy as np
 
-from .core.array import cumtrapz
+from glass.core.array import cumtrapz
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 
-def vmap_galactic_ecliptic(nside: int, galactic: Tuple[float, float] = (30, 90),
-                           ecliptic: Tuple[float, float] = (20, 80)
-                           ) -> np.ndarray:
-    '''visibility map masking galactic and ecliptic plane
+def vmap_galactic_ecliptic(
+    nside: int,
+    galactic: tuple[float, float] = (30, 90),
+    ecliptic: tuple[float, float] = (20, 80),
+) -> npt.NDArray:
+    """
+    Visibility map masking galactic and ecliptic plane.
 
     This function returns a :term:`visibility map` that blocks out stripes for
     the galactic and ecliptic planes.  The location of the stripes is set with
@@ -65,24 +70,30 @@ def vmap_galactic_ecliptic(nside: int, galactic: Tuple[float, float] = (30, 90),
     TypeError
         If the ``galactic`` or ``ecliptic`` arguments are not pairs of numbers.
 
-    '''
+    """
     if np.ndim(galactic) != 1 or len(galactic) != 2:
-        raise TypeError('galactic stripe must be a pair of numbers')
+        msg = "galactic stripe must be a pair of numbers"
+        raise TypeError(msg)
     if np.ndim(ecliptic) != 1 or len(ecliptic) != 2:
-        raise TypeError('ecliptic stripe must be a pair of numbers')
+        msg = "ecliptic stripe must be a pair of numbers"
+        raise TypeError(msg)
 
     m = np.ones(hp.nside2npix(nside))
     m[hp.query_strip(nside, *galactic)] = 0
-    m = hp.Rotator(coord='GC').rotate_map_pixel(m)
+    m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    m = hp.Rotator(coord='CE').rotate_map_pixel(m)
-
-    return m
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)
 
 
-def gaussian_nz(z: np.ndarray, mean: ArrayLike, sigma: ArrayLike, *,
-                norm: Optional[ArrayLike] = None) -> np.ndarray:
-    r'''Gaussian redshift distribution.
+def gaussian_nz(
+    z: npt.NDArray,
+    mean: npt.ArrayLike,
+    sigma: npt.ArrayLike,
+    *,
+    norm: npt.ArrayLike | None = None,
+) -> npt.NDArray:
+    r"""
+    Gaussian redshift distribution.
 
     The redshift follows a Gaussian distribution with the given mean and
     standard deviation.
@@ -94,7 +105,7 @@ def gaussian_nz(z: np.ndarray, mean: ArrayLike, sigma: ArrayLike, *,
     ----------
     z : array_like
         Redshift values of the distribution.
-    mode : float or array_like
+    mean : float or array_like
         Mean(s) of the redshift distribution.
     sigma : float or array_like
         Standard deviation(s) of the redshift distribution.
@@ -106,11 +117,11 @@ def gaussian_nz(z: np.ndarray, mean: ArrayLike, sigma: ArrayLike, *,
     nz : array_like
         Redshift distribution at the given ``z`` values.
 
-    '''
-    mean = np.reshape(mean, np.shape(mean) + (1,)*np.ndim(z))
-    sigma = np.reshape(sigma, np.shape(sigma) + (1,)*np.ndim(z))
+    """
+    mean = np.reshape(mean, np.shape(mean) + (1,) * np.ndim(z))
+    sigma = np.reshape(sigma, np.shape(sigma) + (1,) * np.ndim(z))
 
-    nz = np.exp(-((z - mean)/sigma)**2/2)
+    nz = np.exp(-(((z - mean) / sigma) ** 2) / 2)
     nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]
 
     if norm is not None:
@@ -119,10 +130,16 @@ def gaussian_nz(z: np.ndarray, mean: ArrayLike, sigma: ArrayLike, *,
     return nz
 
 
-def smail_nz(z: np.ndarray, z_mode: ArrayLike, alpha: ArrayLike,
-             beta: ArrayLike, *, norm: Optional[ArrayLike] = None
-             ) -> np.ndarray:
-    r'''Redshift distribution following Smail et al. (1994).
+def smail_nz(
+    z: npt.NDArray,
+    z_mode: npt.ArrayLike,
+    alpha: npt.ArrayLike,
+    beta: npt.ArrayLike,
+    *,
+    norm: npt.ArrayLike | None = None,
+) -> npt.NDArray:
+    r"""
+    Redshift distribution following Smail et al. (1994).
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
 
@@ -161,12 +178,12 @@ def smail_nz(z: np.ndarray, z_mode: ArrayLike, alpha: ArrayLike,
     .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
 
-    '''
+    """
     z_mode = np.asanyarray(z_mode)[..., np.newaxis]
     alpha = np.asanyarray(alpha)[..., np.newaxis]
     beta = np.asanyarray(beta)[..., np.newaxis]
 
-    pz = z**alpha*np.exp(-alpha/beta*(z/z_mode)**beta)
+    pz = z**alpha * np.exp(-alpha / beta * (z / z_mode) ** beta)
     pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
 
     if norm is not None:
@@ -175,10 +192,15 @@ def smail_nz(z: np.ndarray, z_mode: ArrayLike, alpha: ArrayLike,
     return pz
 
 
-def fixed_zbins(zmin: float, zmax: float, *,
-                nbins: Optional[int] = None, dz: Optional[float] = None
-                ) -> List[Tuple[float, float]]:
-    '''tomographic redshift bins of fixed size
+def fixed_zbins(
+    zmin: float,
+    zmax: float,
+    *,
+    nbins: int | None = None,
+    dz: float | None = None,
+) -> list[tuple[float, float]]:
+    """
+    Tomographic redshift bins of fixed size.
 
     This function creates contiguous tomographic redshift bins of fixed size.
     It takes either the number or size of the bins.
@@ -196,21 +218,26 @@ def fixed_zbins(zmin: float, zmax: float, *,
     -------
     zbins : list of tuple of float
         List of redshift bin edges.
-    '''
 
+    """
     if nbins is not None and dz is None:
-        zbinedges = np.linspace(zmin, zmax, nbins+1)
+        zbinedges = np.linspace(zmin, zmax, nbins + 1)
     if nbins is None and dz is not None:
         zbinedges = np.arange(zmin, zmax, dz)
     else:
-        raise ValueError('exactly one of nbins and dz must be given')
+        msg = "exactly one of nbins and dz must be given"
+        raise ValueError(msg)
 
     return list(zip(zbinedges, zbinedges[1:]))
 
 
-def equal_dens_zbins(z: np.ndarray, nz: np.ndarray, nbins: int
-                     ) -> List[Tuple[float, float]]:
-    '''equal density tomographic redshift bins
+def equal_dens_zbins(
+    z: npt.NDArray,
+    nz: npt.NDArray,
+    nbins: int,
+) -> list[tuple[float, float]]:
+    """
+    Equal density tomographic redshift bins.
 
     This function subdivides a source redshift distribution into ``nbins``
     tomographic redshift bins with equal density.
@@ -227,21 +254,26 @@ def equal_dens_zbins(z: np.ndarray, nz: np.ndarray, nbins: int
     zbins : list of tuple of float
         List of redshift bin edges.
 
-    '''
+    """
     # compute the normalised cumulative distribution function
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
     cuml_nz = cumtrapz(nz, z)
     cuml_nz /= cuml_nz[[-1]]
-    zbinedges = np.interp(np.linspace(0, 1, nbins+1), cuml_nz, z)
+    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 
     return list(zip(zbinedges, zbinedges[1:]))
 
 
-def tomo_nz_gausserr(z: np.ndarray, nz: np.ndarray, sigma_0: float,
-                     zbins: List[Tuple[float, float]]) -> np.ndarray:
-    '''tomographic redshift bins with a Gaussian redshift error
+def tomo_nz_gausserr(
+    z: npt.NDArray,
+    nz: npt.NDArray,
+    sigma_0: float,
+    zbins: list[tuple[float, float]],
+) -> npt.NDArray:
+    """
+    Tomographic redshift bins with a Gaussian redshift error.
 
     This function takes a _true_ overall source redshift distribution ``z``,
     ``nz`` and returns tomographic source redshift distributions for the
@@ -277,7 +309,7 @@ def tomo_nz_gausserr(z: np.ndarray, nz: np.ndarray, sigma_0: float,
     .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
            doi:10.1111/j.1365-2966.2007.12271.x
 
-    '''
+    """
     # converting zbins into an array:
     zbins_arr = np.asanyarray(zbins)  # type: ignore[no-redef]
 
@@ -291,10 +323,10 @@ def tomo_nz_gausserr(z: np.ndarray, nz: np.ndarray, sigma_0: float,
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz
     # leading axis corresponds to the different bins
-    sz = 2**0.5*sigma_0*(1 + z)
-    binned_nz = erf((z - z_lower)/sz)
-    binned_nz -= erf((z - z_upper)/sz)
-    binned_nz /= 1 + erf(z/sz)
+    sz = 2**0.5 * sigma_0 * (1 + z)
+    binned_nz = erf((z - z_lower) / sz)
+    binned_nz -= erf((z - z_upper) / sz)
+    binned_nz /= 1 + erf(z / sz)
     binned_nz *= nz
 
     return binned_nz

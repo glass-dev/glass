@@ -1,5 +1,6 @@
 import numpy as np
-import numpy.testing as npt
+
+from glass.points import position_weights, positions_from_delta, uniform_positions
 
 
 def catpos(pos):
@@ -12,8 +13,6 @@ def catpos(pos):
 
 
 def test_positions_from_delta():
-    from glass.points import positions_from_delta
-
     # case: single-dimensional input
 
     ngal = 1e-3
@@ -67,8 +66,6 @@ def test_positions_from_delta():
 
 
 def test_uniform_positions():
-    from glass.points import uniform_positions
-
     # case: scalar input
 
     ngal = 1e-3
@@ -97,23 +94,26 @@ def test_uniform_positions():
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights():
-    from glass.points import position_weights
-
+def test_position_weights(rng):
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
-
-            counts = np.random.rand(*cshape)
-            bias = None if bshape is None else np.random.rand(*bshape)
+            counts = rng.random(cshape)
+            bias = None if bshape is None else rng.random(bshape)
 
             weights = position_weights(counts, bias)
 
             expected = counts / counts.sum(axis=0, keepdims=True)
             if bias is not None:
                 if np.ndim(bias) > np.ndim(expected):
-                    expected = np.expand_dims(expected, tuple(range(np.ndim(expected), np.ndim(bias))))
+                    expected = np.expand_dims(
+                        expected,
+                        tuple(range(np.ndim(expected), np.ndim(bias))),
+                    )
                 else:
-                    bias = np.expand_dims(bias, tuple(range(np.ndim(bias), np.ndim(expected))))
+                    bias = np.expand_dims(
+                        bias,
+                        tuple(range(np.ndim(bias), np.ndim(expected))),
+                    )
                 expected = bias * expected
 
-            npt.assert_allclose(weights, expected)
+            np.testing.assert_allclose(weights, expected)

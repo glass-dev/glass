@@ -1,0 +1,47 @@
+---
+name: Test examples
+
+on:
+  push:
+    paths:
+      - glass/**
+    branches:
+      - main
+  pull_request:
+    paths:
+      - glass/**
+    # ensure the draft PRs are tested when ready
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+env:
+  # The "FORCE_COLOR" variable, when set to 1,
+  # tells Nox to colorize itself.
+  FORCE_COLOR: "1"
+
+jobs:
+  test-examples:
+    name: Test examples
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+          cache: pip
+      - name: Install nox
+        run: pip install nox
+      - name: Run examples
+        run: nox -s examples

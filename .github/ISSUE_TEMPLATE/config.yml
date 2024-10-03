@@ -1,0 +1,12 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: Raise a GLASS Discussion
+    url: https://github.com/orgs/glass-dev/discussions
+    about:
+      If you would like to start a discussion with the wider GLASS community
+      about e.g. a design decision or API change, you can use our Discussions
+      page.
+  - name: Join the GLASS Slack
+    url: https://glass-dev.github.io/slack
+    about: We have a public Slack workspace for discussions about the project.

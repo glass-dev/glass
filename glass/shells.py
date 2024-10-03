@@ -1,12 +1,10 @@
-# author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-# license: MIT
-'''
-Shells (:mod:`glass.shells`)
-============================
+"""
+Shells
+======
 
-.. currentmodule:: glass.shells
+.. currentmodule:: glass
 
-The :mod:`glass.shells` module provides functions for the definition of
+The following functions provide functionality for the definition of
 matter shells, i.e. the radial discretisation of the light cone.
 
 
@@ -42,44 +40,47 @@ Weight functions
 .. autofunction:: distance_weight
 .. autofunction:: volume_weight
 .. autofunction:: density_weight
+"""  # noqa: D205, D400, D415
 
-'''
+from __future__ import annotations
 
 import warnings
-from collections import namedtuple
-import numpy as np
-
-from .core.array import ndinterp
 
 # type checking
-from typing import (Union, Sequence, List, Tuple, Optional, Callable,
-                    TYPE_CHECKING)
-from numpy.typing import ArrayLike
+from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence, Union
+
+import numpy as np
+import numpy.typing as npt
+
+from glass.core.array import ndinterp
+
 if TYPE_CHECKING:
     from cosmology import Cosmology
 
+
 # types
-ArrayLike1D = Union[Sequence[float], np.ndarray]
-WeightFunc = Callable[[ArrayLike1D], np.ndarray]
+ArrayLike1D = Union[Sequence[float], npt.NDArray]
+WeightFunc = Callable[[ArrayLike1D], npt.NDArray]
 
 
-def distance_weight(z: ArrayLike, cosmo: 'Cosmology') -> np.ndarray:
-    '''Uniform weight in comoving distance.'''
-    return 1/cosmo.ef(z)
+def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+    """Uniform weight in comoving distance."""
+    return 1 / cosmo.ef(z)
 
 
-def volume_weight(z: ArrayLike, cosmo: 'Cosmology') -> np.ndarray:
-    '''Uniform weight in comoving volume.'''
-    return cosmo.xm(z)**2/cosmo.ef(z)
+def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+    """Uniform weight in comoving volume."""
+    return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-def density_weight(z: ArrayLike, cosmo: 'Cosmology') -> np.ndarray:
-    '''Uniform weight in matter density.'''
-    return cosmo.rho_m_z(z)*cosmo.xm(z)**2/cosmo.ef(z)
+def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+    """Uniform weight in matter density."""
+    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-RadialWindow = namedtuple('RadialWindow', 'za, wa, zeff')
-RadialWindow.__doc__ = '''A radial window, defined by a window function.
+class RadialWindow(NamedTuple):
+    """
+    A radial window, defined by a window function.
 
     The radial window is defined by a window function in redshift, which
     is given by a pair of arrays ``za``, ``wa``.
@@ -92,7 +93,7 @@ RadialWindow.__doc__ = '''A radial window, defined by a window function.
     immutable (however, the array entries may **not** be immutable; do
     not change them in place)::
 
-        >>> from glass.shells import RadialWindow
+        >>> from glass import RadialWindow
         >>> w1 = RadialWindow(..., ..., zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
@@ -108,9 +109,9 @@ RadialWindow.__doc__ = '''A radial window, defined by a window function.
 
     Attributes
     ----------
-    za : (N,) array_like
+    za : Sequence[float]
         Redshift array; the abscissae of the window function.
-    wa : (N,) array_like
+    wa : Sequence[float]
         Weight array; the values (ordinates) of the window function.
     zeff : float
         Effective redshift of the window.
@@ -119,16 +120,20 @@ RadialWindow.__doc__ = '''A radial window, defined by a window function.
     -------
     _replace
 
-    '''
-RadialWindow.za.__doc__ = '''Redshift array; the abscissae of the window function.'''
-RadialWindow.wa.__doc__ = '''Weight array; the values (ordinates) of the window function.'''
-RadialWindow.zeff.__doc__ = '''Effective redshift of the window.'''
+    """
+
+    za: Sequence[float]
+    wa: Sequence[float]
+    zeff: float
 
 
-def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
-                   weight: Optional[WeightFunc] = None
-                   ) -> List[RadialWindow]:
-    '''Tophat window functions from the given redshift bin edges.
+def tophat_windows(
+    zbins: ArrayLike1D,
+    dz: float = 1e-3,
+    weight: WeightFunc | None = None,
+) -> list[RadialWindow]:
+    """
+    Tophat window functions from the given redshift bin edges.
 
     Uses the *N+1* given redshifts as bin edges to construct *N* tophat
     window functions.  The redshifts of the windows have linear spacing
@@ -160,32 +165,34 @@ def tophat_windows(zbins: ArrayLike1D, dz: float = 1e-3,
     --------
     :ref:`user-window-functions`
 
-    '''
+    """
     if len(zbins) < 2:
-        raise ValueError('zbins must have at least two entries')
+        msg = "zbins must have at least two entries"
+        raise ValueError(msg)
     if zbins[0] != 0:
-        warnings.warn('first tophat window does not start at redshift zero')
+        warnings.warn(
+            "first tophat window does not start at redshift zero", stacklevel=2
+        )
 
     wht: WeightFunc
-    if weight is not None:
-        wht = weight
-    else:
-        wht = np.ones_like
-
+    wht = weight if weight is not None else np.ones_like
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
-        n = max(round((zmax - zmin)/dz), 2)
+        n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w*z, z)/np.trapz(w, z)
+        zeff = np.trapz(w * z, z) / np.trapz(w, z)
         ws.append(RadialWindow(z, w, zeff))
     return ws
 
 
-def linear_windows(zgrid: ArrayLike1D, dz: float = 1e-3,
-                   weight: Optional[WeightFunc] = None,
-                   ) -> List[RadialWindow]:
-    '''Linear interpolation window functions.
+def linear_windows(
+    zgrid: ArrayLike1D,
+    dz: float = 1e-3,
+    weight: WeightFunc | None = None,
+) -> list[RadialWindow]:
+    """
+    Linear interpolation window functions.
 
     Uses the *N+2* given redshifts as nodes to construct *N* triangular
     window functions between the first and last node.  These correspond
@@ -217,30 +224,36 @@ def linear_windows(zgrid: ArrayLike1D, dz: float = 1e-3,
     --------
     :ref:`user-window-functions`
 
-    '''
+    """
     if len(zgrid) < 3:
-        raise ValueError('nodes must have at least 3 entries')
+        msg = "nodes must have at least 3 entries"
+        raise ValueError(msg)
     if zgrid[0] != 0:
-        warnings.warn('first triangular window does not start at z=0')
+        warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
-        n = max(round((zmid - zmin)/dz), 2) - 1
-        m = max(round((zmax - zmid)/dz), 2)
-        z = np.concatenate([np.linspace(zmin, zmid, n, endpoint=False),
-                            np.linspace(zmid, zmax, m)])
-        w = np.concatenate([np.linspace(0., 1., n, endpoint=False),
-                            np.linspace(1., 0., m)])
+        n = max(round((zmid - zmin) / dz), 2) - 1
+        m = max(round((zmax - zmid) / dz), 2)
+        z = np.concatenate(
+            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
+        )
+        w = np.concatenate(
+            [np.linspace(0.0, 1.0, n, endpoint=False), np.linspace(1.0, 0.0, m)],
+        )
         if weight is not None:
             w *= weight(z)
         ws.append(RadialWindow(z, w, zmid))
     return ws
 
 
-def cubic_windows(zgrid: ArrayLike1D, dz: float = 1e-3,
-                  weight: Optional[WeightFunc] = None,
-                  ) -> List[RadialWindow]:
-    '''Cubic interpolation window functions.
+def cubic_windows(
+    zgrid: ArrayLike1D,
+    dz: float = 1e-3,
+    weight: WeightFunc | None = None,
+) -> list[RadialWindow]:
+    """
+    Cubic interpolation window functions.
 
     Uses the *N+2* given redshifts as nodes to construct *N* cubic
     Hermite spline window functions between the first and last node.
@@ -273,30 +286,36 @@ def cubic_windows(zgrid: ArrayLike1D, dz: float = 1e-3,
     --------
     :ref:`user-window-functions`
 
-    '''
+    """
     if len(zgrid) < 3:
-        raise ValueError('nodes must have at least 3 entries')
+        msg = "nodes must have at least 3 entries"
+        raise ValueError(msg)
     if zgrid[0] != 0:
-        warnings.warn('first cubic spline window does not start at z=0')
+        warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
-        n = max(round((zmid - zmin)/dz), 2) - 1
-        m = max(round((zmax - zmid)/dz), 2)
-        z = np.concatenate([np.linspace(zmin, zmid, n, endpoint=False),
-                            np.linspace(zmid, zmax, m)])
-        u = np.linspace(0., 1., n, endpoint=False)
-        v = np.linspace(1., 0., m)
-        w = np.concatenate([u**2*(3-2*u), v**2*(3-2*v)])
+        n = max(round((zmid - zmin) / dz), 2) - 1
+        m = max(round((zmax - zmid) / dz), 2)
+        z = np.concatenate(
+            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
+        )
+        u = np.linspace(0.0, 1.0, n, endpoint=False)
+        v = np.linspace(1.0, 0.0, m)
+        w = np.concatenate([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
         if weight is not None:
             w *= weight(z)
         ws.append(RadialWindow(z, w, zmid))
     return ws
 
 
-def restrict(z: ArrayLike1D, f: ArrayLike1D, w: RadialWindow
-             ) -> Tuple[np.ndarray, np.ndarray]:
-    '''Restrict a function to a redshift window.
+def restrict(
+    z: ArrayLike1D,
+    f: ArrayLike1D,
+    w: RadialWindow,
+) -> tuple[npt.NDArray, npt.NDArray]:
+    """
+    Restrict a function to a redshift window.
 
     Multiply the function :math:`f(z)` by a window function :math:`w(z)`
     to produce :math:`w(z) f(z)` over the support of :math:`w`.
@@ -324,21 +343,22 @@ def restrict(z: ArrayLike1D, f: ArrayLike1D, w: RadialWindow
     zr, fr : array
         The restricted function.
 
-    '''
-
+    """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
-    fr = ndinterp(zr, z, f, left=0., right=0.) * ndinterp(zr, w.za, w.wa)
+    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
     return zr, fr
 
 
-def partition(z: ArrayLike,
-              fz: ArrayLike,
-              shells: Sequence[RadialWindow],
-              *,
-              method: str = "nnls",
-              ) -> ArrayLike:
-    """Partition a function by a sequence of windows.
+def partition(
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
+    shells: Sequence[RadialWindow],
+    *,
+    method: str = "nnls",
+) -> npt.ArrayLike:
+    r"""
+    Partition a function by a sequence of windows.
 
     Returns a vector of weights :math:`x_1, x_2, \\ldots` such that the
     weighted sum of normalised radial window functions :math:`x_1 \\,
@@ -410,7 +430,7 @@ def partition(z: ArrayLike,
         \\end{pmatrix} \\;,
 
     where :math:`\\lambda` is a multiplier to enforce the integral
-    contraints.
+    constraints.
 
     The :func:`partition()` function implements a number of methods to
     obtain a solution:
@@ -435,22 +455,21 @@ def partition(z: ArrayLike,
     try:
         partition_method = globals()[f"partition_{method}"]
     except KeyError:
-        raise ValueError(f"invalid method: {method}") from None
+        msg = f"invalid method: {method}"
+        raise ValueError(msg) from None
     return partition_method(z, fz, shells)
 
 
 def partition_lstsq(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """Least-squares partition."""
-
     # make sure nothing breaks
-    if sumtol < 1e-4:
-        sumtol = 1e-4
+    sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
@@ -464,16 +483,16 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in shells]
-    a = a/np.trapz(a, zp, axis=-1)[..., None]
-    a = a*dz
+    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
+    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0., right=0.)
-    b = b*dz
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = b * dz
 
     # append a constraint for the integral
-    mult = 1/sumtol
+    mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
     b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
 
@@ -484,30 +503,27 @@ def partition_lstsq(
     x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
-    x = np.moveaxis(x, -1, 0)
-    # all done
-    return x
+    return np.moveaxis(x, -1, 0)
 
 
 def partition_nnls(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> ArrayLike:
-    """Non-negative least-squares partition.
+) -> npt.ArrayLike:
+    """
+    Non-negative least-squares partition.
 
     Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
     requires SciPy.
 
     """
-
-    from .core.algorithm import nnls
+    from glass.core.algorithm import nnls
 
     # make sure nothing breaks
-    if sumtol < 1e-4:
-        sumtol = 1e-4
+    sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
@@ -521,16 +537,16 @@ def partition_nnls(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0., right=0.) for za, wa, _ in shells]
-    a = a/np.trapz(a, zp, axis=-1)[..., None]
-    a = a*dz
+    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
+    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0., right=0.)
-    b = b*dz
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = b * dz
 
     # append a constraint for the integral
-    mult = 1/sumtol
+    mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
     b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
 
@@ -540,24 +556,23 @@ def partition_nnls(
 
     # reduce the dimensionality of the problem using a thin QR decomposition
     q, r = np.linalg.qr(a.T)
-    y = np.einsum('ji,...j', q, b)
+    y = np.einsum("ji,...j", q, b)
 
     # for each dim, find non-negative weights x such that y == r @ x
-    x = np.empty([len(shells)] + dims)
+    x = np.empty([len(shells), *dims])
     for i in np.ndindex(*dims):
-        x[(...,) + i] = nnls(r, y[i])
+        x[(..., *i)] = nnls(r, y[i])
 
     # all done
     return x
 
 
 def partition_restrict(
-    z: ArrayLike,
-    fz: ArrayLike,
+    z: npt.ArrayLike,
+    fz: npt.ArrayLike,
     shells: Sequence[RadialWindow],
-) -> ArrayLike:
+) -> npt.ArrayLike:
     """Partition by restriction and integration."""
-
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
@@ -566,34 +581,37 @@ def partition_restrict(
 
 
 def redshift_grid(zmin, zmax, *, dz=None, num=None):
-    '''Redshift grid with uniform spacing in redshift.'''
+    """Redshift grid with uniform spacing in redshift."""
     if dz is not None and num is None:
-        z = np.arange(zmin, np.nextafter(zmax+dz, zmax), dz)
+        z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
     elif dz is None and num is not None:
-        z = np.linspace(zmin, zmax, num+1)
+        z = np.linspace(zmin, zmax, num + 1)
     else:
-        raise ValueError('exactly one of "dz" or "num" must be given')
+        msg = 'exactly one of "dz" or "num" must be given'
+        raise ValueError(msg)
     return z
 
 
 def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
-    '''Redshift grid with uniform spacing in comoving distance.'''
+    """Redshift grid with uniform spacing in comoving distance."""
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
     if dx is not None and num is None:
-        x = np.arange(xmin, np.nextafter(xmax+dx, xmax), dx)
+        x = np.arange(xmin, np.nextafter(xmax + dx, xmax), dx)
     elif dx is None and num is not None:
-        x = np.linspace(xmin, xmax, num+1)
+        x = np.linspace(xmin, xmax, num + 1)
     else:
-        raise ValueError('exactly one of "dx" or "num" must be given')
+        msg = 'exactly one of "dx" or "num" must be given'
+        raise ValueError(msg)
     return cosmo.dc_inv(x)
 
 
 def combine(
-    z: ArrayLike,
-    weights: ArrayLike,
+    z: npt.ArrayLike,
+    weights: npt.ArrayLike,
     shells: Sequence[RadialWindow],
-) -> ArrayLike:
-    """Evaluate a linear combination of window functions.
+) -> npt.ArrayLike:
+    r"""
+    Evaluate a linear combination of window functions.
 
     Takes a vector of weights :math:`x_1, x_2, \\ldots` and computes the
     weighted sum of normalised radial window functions :math:`f(z) = x_1
@@ -624,12 +642,13 @@ def combine(
 
     """
     return sum(
-        np.expand_dims(weight, -1) * np.interp(
+        np.expand_dims(weight, -1)
+        * np.interp(
             z,
             shell.za,
             shell.wa / np.trapz(shell.wa, shell.za),
-            left=0.,
-            right=0.,
+            left=0.0,
+            right=0.0,
         )
         for shell, weight in zip(shells, weights)
     )

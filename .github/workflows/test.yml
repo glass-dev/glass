@@ -1,42 +1,86 @@
+---
 name: Test
 
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
-    branches:
-    - main
+    # ensure the draft PRs are tested when ready
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+env:
+  # The "FORCE_COLOR" variable, when set to 1,
+  # tells Nox to colorize itself.
+  FORCE_COLOR: "1"
 
 jobs:
-  style:
-    name: Style
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: pipx run flake8 glass
   tests:
     name: Tests
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - run: pip install -c .github/test-constraints.txt '.[test]'
-    - run: pytest --pyargs glass
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install nox and coverage.py
+        run: pip install coverage[toml] nox
+      - name: Run doctests
+        run: nox -s doctests-${{ matrix.python-version }} --verbose
+      - name: Run tests and generate coverage report
+        run: nox -s coverage-${{ matrix.python-version }} --verbose
+      - name: Coveralls requires XML report
+        run: coverage xml
+      - uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: Build
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - run: pipx run build
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install nox
+        run: pip install nox
+      - name: Build SDist and wheel
+        run: nox -s build --verbose
+
   docs:
     name: Docs
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - run: pipx run --spec '.[docs]' sphinx-build -W -b html docs _build/html
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install pandoc
+          pip install nox
+      - name: Build docs
+        run: nox -s docs --verbose

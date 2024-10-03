@@ -3,6 +3,9 @@ glass/_version.py
 .*.swp
 .DS_Store
 __pycache__
-docs/_build
+_build
 build
 dist
+.env
+.coverage*
+coverage*
