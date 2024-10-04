@@ -67,7 +67,13 @@ def test_ellipticity_ryden04():
     e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)
     e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])
     e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)
-    assert np.shape(e1) == np.shape(e2) == np.shape(e3) == (2,)
+    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)
+    assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
+
+    # broadcasting rule
+
+    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)
+    assert np.shape(e) == (2, 2)
 
     # check that result is in the specified range
 
