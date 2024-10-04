@@ -230,7 +230,7 @@ def shear_from_convergence(
     lmax: int | None = None,
     *,
     discretized: bool = True,
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Weak lensing shear from convergence.
 
@@ -353,7 +353,7 @@ class MultiPlaneConvergence:
         return self.kappa3
 
     @property
-    def delta(self) -> npt.NDArray:
+    def delta(self) -> npt.NDArray:  # type: ignore[type-arg]
         """The current matter plane."""
         return self.delta3
 

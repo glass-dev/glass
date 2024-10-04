@@ -171,7 +171,7 @@ def ellipticity_gaussian(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -228,7 +228,7 @@ def ellipticity_intnorm(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 

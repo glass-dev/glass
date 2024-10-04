@@ -37,15 +37,15 @@ from gaussiancl import gaussiancl
 
 # types
 Size = Optional[Union[int, tuple[int, ...]]]
-Iternorm = tuple[Optional[int], npt.NDArray, npt.NDArray]
-ClTransform = Union[str, Callable[[npt.NDArray], npt.NDArray]]
-Cls = Sequence[Union[npt.NDArray, Sequence[float]]]
-Alms = npt.NDArray
+Iternorm = tuple[Optional[int], npt.NDArray, npt.NDArray]  # type: ignore[type-arg]
+ClTransform = Union[str, Callable[[npt.NDArray], npt.NDArray]]  # type: ignore[type-arg]
+Cls = Sequence[Union[npt.NDArray, Sequence[float]]]  # type: ignore[type-arg]
+Alms = npt.NDArray  # type: ignore[type-arg]
 
 
 def iternorm(
     k: int,
-    cov: Iterable[npt.NDArray],
+    cov: Iterable[npt.NDArray],  # type: ignore[type-arg]
     size: Size = None,
 ) -> Generator[Iternorm, None, None]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""

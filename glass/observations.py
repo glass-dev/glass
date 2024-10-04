@@ -44,7 +44,7 @@ def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Visibility map masking galactic and ecliptic plane.
 
@@ -91,7 +91,7 @@ def gaussian_nz(
     sigma: npt.ArrayLike,
     *,
     norm: npt.ArrayLike | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Gaussian redshift distribution.
 
@@ -137,7 +137,7 @@ def smail_nz(
     beta: npt.ArrayLike,
     *,
     norm: npt.ArrayLike | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -271,7 +271,7 @@ def tomo_nz_gausserr(
     nz: npt.NDArray,  # type: ignore[type-arg]
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> npt.NDArray:
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Tomographic redshift bins with a Gaussian redshift error.
 
