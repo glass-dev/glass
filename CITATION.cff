@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 title: "GLASS: Generator for Large Scale Structure"
 message: >-
-  If you use this software, please cite it using the metadata from this file.
+  If you use this software, please cite the associated paper instead.
 preferred-citation:
   authors:
     - family-names: Nicolas
