@@ -7,7 +7,6 @@ from pathlib import Path
 import nox
 
 # Options to modify nox behaviour
-nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.reuse_existing_virtualenvs = True
 nox.options.sessions = ["lint", "tests"]
 
