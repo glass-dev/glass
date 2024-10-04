@@ -32,9 +32,10 @@ def test_basic_write(tmp_path):
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
-    with user.write_catalog(
-        tmp_path / filename_gfits, ext="CATALOG"
-    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits:
+    with (
+        user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
+        fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits,
+    ):
         for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
             array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
@@ -43,9 +44,10 @@ def test_basic_write(tmp_path):
             names = ["RA", "RB"]
             _test_append(my_fits, arrays, names)
 
-    with fitsio.FITS(tmp_path / filename_gfits) as g_fits, fitsio.FITS(
-        tmp_path / filename_tfits
-    ) as t_fits:
+    with (
+        fitsio.FITS(tmp_path / filename_gfits) as g_fits,
+        fitsio.FITS(tmp_path / filename_tfits) as t_fits,
+    ):
         glass_data = g_fits[1].read()
         test_data = t_fits[1].read()
         assert glass_data["RA"].size == test_data["RA"].size
