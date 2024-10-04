@@ -136,7 +136,7 @@ def smail_nz(
     alpha: npt.ArrayLike,
     beta: npt.ArrayLike,
     *,
-    norm: npt.ArrayLike | None = None,
+    norm: float | npt.ArrayLike | None = None,
 ) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Redshift distribution following Smail et al. (1994).

@@ -29,8 +29,11 @@ Bias models
 
 """  # noqa: D205, D400, D415
 
+from __future__ import annotations
+
 import healpix
 import numpy as np
+import numpy.typing as npt
 
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
 
@@ -86,14 +89,14 @@ def loglinear_bias(delta, b):
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal,
-    delta,
-    bias=None,
-    vis=None,
+    ngal: float | npt.ArrayLike,
+    delta: npt.ArrayLike,
+    bias: float | npt.ArrayLike | None = None,
+    vis: npt.ArrayLike | None = None,
     *,
     bias_model="linear",
-    remove_monopole=False,
-    batch=1_000_000,
+    remove_monopole: bool = False,
+    batch: int | None = 1_000_000,
     rng=None,
 ):
     """
@@ -247,7 +250,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         assert np.sum(n[stop:]) == 0  # noqa: S101
 
 
-def uniform_positions(ngal, *, rng=None):
+def uniform_positions(ngal: float | npt.ArrayLike, *, rng=None):
     """
     Generate positions uniformly over the sphere.
 
@@ -298,7 +301,7 @@ def uniform_positions(ngal, *, rng=None):
         yield lon, lat, count
 
 
-def position_weights(densities, bias=None):
+def position_weights(densities: npt.ArrayLike, bias: npt.ArrayLike | None = None):
     r"""
     Compute relative weights for angular clustering.
 

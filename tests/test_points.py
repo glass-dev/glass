@@ -94,7 +94,7 @@ def test_uniform_positions() -> None:
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights(rng)  -> None:
+def test_position_weights(rng) -> None:
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
             counts = rng.random(cshape)

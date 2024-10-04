@@ -320,7 +320,9 @@ def generate_lognormal(
         yield m
 
 
-def getcl(cls, i, j, lmax=None):
+def getcl(
+    cls: list[npt.ArrayLike], i: int, j: int, lmax: int | None = None
+) -> npt.ArrayLike:
     """
     Return a specific angular power spectrum from an array.
 
@@ -354,7 +356,11 @@ def getcl(cls, i, j, lmax=None):
 
 
 def effective_cls(
-    cls, weights1, weights2=None, *, lmax=None
+    cls: list[npt.ArrayLike],
+    weights1: npt.ArrayLike,
+    weights2: npt.ArrayLike | None = None,
+    *,
+    lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Compute effective angular power spectra from weights.
