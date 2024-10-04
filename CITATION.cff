@@ -11,7 +11,7 @@ preferred-citation:
   issn: 2475-9066
   issue: 84
   journal: The Open Journal of Astrophysics
-  title: "SLEPLET: Slepian Scale-Discretised Wavelets in Python"
+  title: "GLASS: Generator for Large Scale Structure"
   type: article
   doi: 10.21105/astro.2302.01942
   volume: 6
