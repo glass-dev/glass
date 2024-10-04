@@ -45,9 +45,8 @@ Weight functions
 from __future__ import annotations
 
 import warnings
-
-# type checking
-from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Callable, NamedTuple, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -56,7 +55,6 @@ from glass.core.array import ndinterp
 
 if TYPE_CHECKING:
     from cosmology import Cosmology
-
 
 # types
 ArrayLike1D = Union[Sequence[float], npt.NDArray]
