@@ -1,2 +1,13 @@
---only-binary numpy,scipy,healpy,healpix
+numpy
+--only-binary numpy
+
+scipy
+--only-binary scipy
+
+healpy
+--only-binary healpy
+
+healpix
+--only-binary healpix
+
 --prefer-binary
