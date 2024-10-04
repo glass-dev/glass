@@ -12,7 +12,7 @@ def catpos(pos):
     return lon, lat, cnt
 
 
-def test_positions_from_delta():
+def test_positions_from_delta() -> None:
     # case: single-dimensional input
 
     ngal = 1e-3
@@ -65,7 +65,7 @@ def test_positions_from_delta():
     assert lat.shape == (cnt.sum(),)
 
 
-def test_uniform_positions():
+def test_uniform_positions() -> None:
     # case: scalar input
 
     ngal = 1e-3
@@ -94,7 +94,7 @@ def test_uniform_positions():
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights(rng):
+def test_position_weights(rng)  -> None:
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
             counts = rng.random(cshape)

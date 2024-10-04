@@ -4,7 +4,7 @@ import pytest
 from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
 
 
-def test_redshifts(mocker):
+def test_redshifts(mocker) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
@@ -21,7 +21,7 @@ def test_redshifts(mocker):
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz():
+def test_redshifts_from_nz() -> None:
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
@@ -89,7 +89,7 @@ def test_redshifts_from_nz():
         redshifts_from_nz(count, z, nz)
 
 
-def test_gaussian_phz():
+def test_gaussian_phz() -> None:
     # test sampling
 
     # case: zero variance

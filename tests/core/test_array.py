@@ -15,7 +15,7 @@ from glass.core.array import (
 HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
-def test_broadcast_first():
+def test_broadcast_first() -> None:
     a = np.ones((2, 3, 4))
     b = np.ones((2, 1))
 
@@ -44,7 +44,7 @@ def test_broadcast_first():
     assert b_a.shape == (4, 5, 6)
 
 
-def test_broadcast_leading_axes():
+def test_broadcast_leading_axes() -> None:
     a = 0
     b = np.zeros((4, 10))
     c = np.zeros((3, 1, 5, 6))
@@ -57,7 +57,7 @@ def test_broadcast_leading_axes():
     assert c.shape == (3, 4, 5, 6)
 
 
-def test_ndinterp():
+def test_ndinterp() -> None:
     # test 1d interpolation
 
     xp = [0, 1, 2, 3, 4]
@@ -140,7 +140,7 @@ def test_ndinterp():
     )
 
 
-def test_trapz_product():
+def test_trapz_product() -> None:
     x1 = np.linspace(0, 2, 100)
     f1 = np.full_like(x1, 2.0)
 
@@ -153,7 +153,7 @@ def test_trapz_product():
 
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_cumtrapz():
+def test_cumtrapz() -> None:
     from scipy.integrate import cumulative_trapezoid
 
     # 1D f and x

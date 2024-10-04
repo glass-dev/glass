@@ -9,7 +9,7 @@ from glass.shapes import (
 )
 
 
-def test_triaxial_axis_ratio():
+def test_triaxial_axis_ratio() -> None:
     # single axis ratio
 
     q = triaxial_axis_ratio(0.8, 0.4)
@@ -46,7 +46,7 @@ def test_triaxial_axis_ratio():
     assert np.all((qmax >= q) & (q >= qmin))
 
 
-def test_ellipticity_ryden04():
+def test_ellipticity_ryden04() -> None:
     # single ellipticity
 
     e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
@@ -78,7 +78,7 @@ def test_ellipticity_ryden04():
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
 
-def test_ellipticity_gaussian():
+def test_ellipticity_gaussian() -> None:
     n = 1_000_000
 
     eps = ellipticity_gaussian(n, 0.256)
@@ -102,7 +102,7 @@ def test_ellipticity_gaussian():
     assert np.isclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
 
 
-def test_ellipticity_intnorm():
+def test_ellipticity_intnorm() -> None:
     n = 1_000_000
 
     eps = ellipticity_intnorm(n, 0.256)

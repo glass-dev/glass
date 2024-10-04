@@ -4,7 +4,7 @@ import pytest
 from glass.shells import RadialWindow, partition, restrict, tophat_windows
 
 
-def test_tophat_windows():
+def test_tophat_windows() -> None:
     zb = [0.0, 0.1, 0.2, 0.5, 1.0, 2.0]
     dz = 0.005
 
@@ -21,7 +21,7 @@ def test_tophat_windows():
     assert all(np.all(w.wa == 1) for w in ws)
 
 
-def test_restrict():
+def test_restrict() -> None:
     # Gaussian test function
     z = np.linspace(0.0, 5.0, 1000)
     f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
@@ -49,7 +49,7 @@ def test_restrict():
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(method):
+def test_partition(method) -> None:
     shells = [
         RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
         RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),

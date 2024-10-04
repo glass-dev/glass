@@ -41,7 +41,7 @@ def cosmo():
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(usecomplex):
+def test_deflect_nsew(usecomplex) -> None:
     d = 5.0
     r = np.radians(d)
 
@@ -71,7 +71,7 @@ def test_deflect_nsew(usecomplex):
     assert np.allclose([lon, lat], [d, 0.0])
 
 
-def test_deflect_many(rng):
+def test_deflect_many(rng) -> None:
     n = 1000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
@@ -89,7 +89,7 @@ def test_deflect_many(rng):
     np.testing.assert_allclose(dotp, np.cos(abs_alpha))
 
 
-def test_multi_plane_matrix(shells, cosmo, rng):
+def test_multi_plane_matrix(shells, cosmo, rng) -> None:
     mat = multi_plane_matrix(shells, cosmo)
 
     np.testing.assert_array_equal(mat, np.tril(mat))
@@ -106,7 +106,7 @@ def test_multi_plane_matrix(shells, cosmo, rng):
     np.testing.assert_allclose(mat @ deltas, kappas)
 
 
-def test_multi_plane_weights(shells, cosmo, rng):
+def test_multi_plane_weights(shells, cosmo, rng) -> None:
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 
