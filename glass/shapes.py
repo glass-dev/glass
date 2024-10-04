@@ -33,7 +33,11 @@ if TYPE_CHECKING:
 
 
 def triaxial_axis_ratio(
-    zeta: npt.ArrayLike, xi: npt.ArrayLike, size: tuple[int] | None = None, *, rng=None
+    zeta: npt.ArrayLike,
+    xi: npt.ArrayLike,
+    size: tuple[int] | None = None,
+    *,
+    rng: np.random.Generator | None = None,
 ):
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
@@ -106,7 +110,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma_gamma: npt.ArrayLike,
     size: int | tuple[int] | None = None,
     *,
-    rng=None,
+    rng: np.random.Generator | None = None,
 ):
     r"""
     Ellipticity distribution following Ryden (2004).

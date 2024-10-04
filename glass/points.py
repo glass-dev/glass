@@ -250,7 +250,9 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         assert np.sum(n[stop:]) == 0  # noqa: S101
 
 
-def uniform_positions(ngal: float | npt.ArrayLike, *, rng=None):
+def uniform_positions(
+    ngal: float | npt.ArrayLike, *, rng: np.random.Generator | None = None
+):
     """
     Generate positions uniformly over the sphere.
 
