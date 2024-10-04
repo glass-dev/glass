@@ -1,11 +1,24 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 title: "GLASS: Generator for Large Scale Structure"
 message: >-
   If you use this software, please cite it using the metadata from this file.
-type: software
+preferred-citation:
+  authors:
+    - family-names: Nicolas
+      given-names: Tessore
+      orcid: https://orcid.org/0000-0002-9696-7931
+  date-published: 2023-03
+  issn: 2475-9066
+  issue: 84
+  journal: The Open Journal of Astrophysics
+  title: "SLEPLET: Slepian Scale-Discretised Wavelets in Python"
+  type: article
+  doi: 10.21105/astro.2302.01942
+  volume: 6
+  eid: 11
+  pages: 11
+  eprint: 2302.01942
+  primaryClass: astro-ph.CO
 authors:
   - given-names: Nicolas
     family-names: Tessore
@@ -25,9 +38,6 @@ authors:
 identifiers:
   - type: doi
     value: 10.21105/astro.2302.01942
-  - type: other
-    value: "https://ui.adsabs.harvard.edu/abs/2023OJAp....6E..11T"
-    description: Provided by the SAO/NASA Astrophysics Data System
 repository-code: "https://github.com/glass-dev/glass"
 url: "https://glass.readthedocs.io"
 keywords:
