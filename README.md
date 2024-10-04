@@ -45,11 +45,11 @@ If you use GLASS simulations or the GLASS library in your research, please
 [cite the original GLASS paper](https://glass.readthedocs.io/stable/user/publications.html)
 in your publications.
 
+<!-- markdownlint-disable MD046 MD013 -->
+
 ```bibtex
 @article{2023OJAp....6E..11T,
-    author = {{Tessore}, Nicolas and {Loureiro}, Arthur and
-    {Joachimi}, Benjamin and {von Wietersheim-Kramsta}, Maximilian
-    and {Jeffrey}, Niall},
+    author = {{Tessore}, Nicolas and {Loureiro}, Arthur and {Joachimi}, Benjamin and {von Wietersheim-Kramsta}, Maximilian and {Jeffrey}, Niall},
     title = {{GLASS: Generator for Large Scale Structure}},
     journal = {The Open Journal of Astrophysics},
     keywords = {Astrophysics - Cosmology and Nongalactic Astrophysics},
@@ -65,6 +65,7 @@ in your publications.
     adsurl = {https://ui.adsabs.harvard.edu/abs/2023OJAp....6E..11T},
     adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+```
 
 ## Getting in touch
 
