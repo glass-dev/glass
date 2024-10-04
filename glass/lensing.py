@@ -31,14 +31,14 @@ Applying lensing
 
 from __future__ import annotations
 
-# typing support
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
 
 if TYPE_CHECKING:
-    # to prevent circular dependencies, only import these for type checking
+    from collections.abc import Sequence
+
     import numpy.typing as npt
 
     from cosmology import Cosmology
