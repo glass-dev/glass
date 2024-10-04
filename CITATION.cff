@@ -8,40 +8,14 @@ preferred-citation:
       given-names: Tessore
       orcid: https://orcid.org/0000-0002-9696-7931
   date-published: 2023-03
+  doi: 10.21105/astro.2302.01942
+  eid: 11
+  eprint: 2302.01942
+  journal: The Open Journal of Astrophysics
   issn: 2475-9066
   issue: 84
-  journal: The Open Journal of Astrophysics
+  pages: 11
+  primaryClass: astro-ph.CO
   title: "GLASS: Generator for Large Scale Structure"
   type: article
-  doi: 10.21105/astro.2302.01942
   volume: 6
-  eid: 11
-  pages: 11
-  eprint: 2302.01942
-  primaryClass: astro-ph.CO
-authors:
-  - given-names: Nicolas
-    family-names: Tessore
-    orcid: https://orcid.org/0000-0002-9696-7931
-  - given-names: Arthur
-    family-names: Loureiro
-    orcid: https://orcid.org/0000-0002-4371-0876
-  - given-names: Benjamin
-    family-names: Joachimi
-    orcid: https://orcid.org/0000-0001-7494-1303
-  - given-names: Maximilian
-    family-names: von Wietersheim-Kramsta
-    orcid: https://orcid.org/0000-0003-4986-5091
-  - given-names: Niall
-    family-names: Jeffrey
-    orcid: https://orcid.org/0000-0003-2927-1800
-identifiers:
-  - type: doi
-    value: 10.21105/astro.2302.01942
-repository-code: "https://github.com/glass-dev/glass"
-url: "https://glass.readthedocs.io"
-keywords:
-  - Astrophysics
-  - Cosmology
-  - Nongalactic Astrophysics
-license: MIT
