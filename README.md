@@ -32,12 +32,16 @@ to get you started.
 
 Releases of the code can be installed with pip as usual:
 
-    pip install glass
+```sh
+pip install glass
+```
 
 If you are interested in the latest version of the code, you can pip-install
 this repository:
 
-    pip install git+https://github.com/glass-dev/glass.git
+```sh
+pip install git+https://github.com/glass-dev/glass.git
+```
 
 ## Citation
 
@@ -45,7 +49,7 @@ If you use GLASS simulations or the GLASS library in your research, please
 [cite the original GLASS paper](https://glass.readthedocs.io/stable/user/publications.html)
 in your publications.
 
-<!-- markdownlint-disable MD046 MD013 -->
+<!-- markdownlint-disable MD013 -->
 
 ```bibtex
 @article{2023OJAp....6E..11T,
