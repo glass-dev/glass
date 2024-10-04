@@ -97,7 +97,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias_model="linear",
     remove_monopole: bool = False,
     batch: int | None = 1_000_000,
-    rng=None,
+    rng: np.random.Generator | None = None,
 ):
     """
     Generate positions tracing a density contrast.
