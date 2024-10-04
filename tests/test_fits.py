@@ -1,4 +1,3 @@
-# check if fitsio is available for testing
 import importlib.util
 
 import numpy as np
@@ -6,6 +5,7 @@ import pytest
 
 from glass import user
 
+# check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
 

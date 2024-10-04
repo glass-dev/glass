@@ -74,10 +74,24 @@ report = {exclude_also = [
     "if TYPE_CHECKING:",
 ], omit = [
     "glass/_version.py",
+], skip_covered = true, sort = "cover"}
+run = {branch = true, parallel = true, source = [
+    "glass",
 ]}
+paths.source = [
+    "src",
+    ".nox*/*/lib/python*/site-packages",
+]
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
+build.targets.sdist.exclude = [
+    ".*",
+    "docs/*",
+    "examples/*",
+    "noxfile.py",
+    "tests/*",
+]
 version.source = "vcs"
 
 [tool.mypy]
@@ -178,4 +192,5 @@ in_place = true
 spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
+overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
