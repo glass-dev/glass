@@ -11,7 +11,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -24,7 +23,7 @@ dependencies = [
     "gaussiancl>=2022.10.21",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "numpy>=1.20.0",
+    "numpy>=1.22.0",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -35,7 +34,7 @@ maintainers = [
 ]
 name = "glass"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license.file = "LICENSE"
 
 [project.optional-dependencies]
@@ -74,7 +73,14 @@ report = {exclude_also = [
     "if TYPE_CHECKING:",
 ], omit = [
     "glass/_version.py",
+], skip_covered = true, sort = "cover"}
+run = {branch = true, parallel = true, source = [
+    "glass",
 ]}
+paths.source = [
+    "src",
+    ".nox*/*/lib/python*/site-packages",
+]
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
@@ -173,4 +179,5 @@ in_place = true
 spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
+overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false

@@ -11,7 +11,7 @@ nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.reuse_existing_virtualenvs = True
 nox.options.sessions = ["lint", "tests"]
 
-ALL_PYTHON = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+ALL_PYTHON = ["3.9", "3.10", "3.11", "3.12"]
 
 
 @nox.session
@@ -34,7 +34,7 @@ def tests(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage."""
-    session.posargs.append("--cov=glass")
+    session.posargs.append("--cov")
     tests(session)
 
 

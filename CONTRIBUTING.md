@@ -61,7 +61,7 @@ The tests can be executed using the `test` dependencies of _GLASS_ in the
 following way -
 
 ```bash
-python -m pytest --cov=glass --doctest-plus
+python -m pytest --cov --doctest-plus
 ```
 
 ## Documenting
