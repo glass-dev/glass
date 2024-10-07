@@ -57,21 +57,21 @@ if TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = Union[Sequence[float], npt.NDArray]  # type: ignore[type-arg]
-WeightFunc = Callable[[ArrayLike1D], npt.NDArray]  # type: ignore[type-arg]
+ArrayLike1D = Union[Sequence[float], npt.ArrayLike]
+WeightFunc = Callable[[ArrayLike1D], npt.ArrayLike]
 
 
-def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
+def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.ArrayLike:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)
 
 
-def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
+def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.ArrayLike:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
+def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.ArrayLike:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
@@ -311,7 +311,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.NDArray, npt.NDArray]:  # type: ignore[type-arg]
+) -> tuple[npt.ArrayLike, npt.ArrayLike]:
     """
     Restrict a function to a redshift window.
 

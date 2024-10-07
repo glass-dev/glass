@@ -37,7 +37,7 @@ def redshifts(
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.ArrayLike:
     """
     Sample redshifts from a radial window function.
 
@@ -69,7 +69,7 @@ def redshifts_from_nz(
     nz: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.ArrayLike:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -132,15 +132,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray,  # type: ignore[type-arg]
-    lat: npt.NDArray,  # type: ignore[type-arg]
-    eps: npt.NDArray,  # type: ignore[type-arg]
-    kappa: npt.NDArray,  # type: ignore[type-arg]
-    gamma1: npt.NDArray,  # type: ignore[type-arg]
-    gamma2: npt.NDArray,  # type: ignore[type-arg]
+    lon: npt.ArrayLike,
+    lat: npt.ArrayLike,
+    eps: npt.ArrayLike,
+    kappa: npt.ArrayLike,
+    gamma1: npt.ArrayLike,
+    gamma2: npt.ArrayLike,
     *,
     reduced_shear: bool = True,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.ArrayLike:
     """
     Observed galaxy shears from weak lensing.
 
@@ -201,7 +201,7 @@ def gaussian_phz(
     lower: npt.ArrayLike | None = None,
     upper: npt.ArrayLike | None = None,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.ArrayLike:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
