@@ -38,7 +38,7 @@ def triaxial_axis_ratio(
     size: tuple[int] | None = None,
     *,
     rng: np.random.Generator | None = None,
-):
+) -> npt.ArrayLike:
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -111,7 +111,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     size: int | tuple[int] | None = None,
     *,
     rng: np.random.Generator | None = None,
-):
+) -> npt.ArrayLike:
     r"""
     Ellipticity distribution following Ryden (2004).
 
