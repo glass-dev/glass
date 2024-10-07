@@ -140,19 +140,19 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
 
     # default size if not given
     if size is None:
-        size = np.broadcast(gamma, sigma_gamma, mu, sigma).shape
+        size = np.broadcast(mu, sigma, gamma, sigma_gamma).shape
 
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
     bad = eps > 0
     while np.any(bad):
-        eps[bad] = rng.normal(mu, sigma, size=eps[bad].shape)
+        eps[bad] = rng.normal(mu, sigma, size=size)[bad]
         bad = eps > 0
     gam = rng.normal(gamma, sigma_gamma, size=size)
     bad = (gam < 0) | (gam > 1)
     while np.any(bad):
-        gam[bad] = rng.normal(gamma, sigma_gamma, size=gam[bad].shape)
+        gam[bad] = rng.normal(gamma, sigma_gamma, size=size)[bad]
         bad = (gam < 0) | (gam > 1)
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
