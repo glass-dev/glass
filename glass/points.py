@@ -31,16 +31,23 @@ Bias models
 
 from __future__ import annotations
 
+import typing
+
 import healpix
 import numpy as np
 import numpy.typing as npt
 
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
 
+if typing.TYPE_CHECKING:
+    from glass.shells import RadialWindow
+
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
-def effective_bias(z, bz, w):
+def effective_bias(
+    z: npt.ArrayLike, bz: npt.ArrayLike, w: RadialWindow
+) -> npt.ArrayLike:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
