@@ -69,4 +69,4 @@ def test_partition(method) -> None:
 
     assert part.shape == (len(shells), 3, 2)
 
-    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))
+    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[attr-defined]

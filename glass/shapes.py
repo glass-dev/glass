@@ -108,7 +108,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma: npt.ArrayLike,
     gamma: npt.ArrayLike,
     sigma_gamma: npt.ArrayLike,
-    size: int | tuple[int] | None = None,
+    size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.ArrayLike:

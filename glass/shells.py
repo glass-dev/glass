@@ -179,7 +179,7 @@ def tophat_windows(
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w * z, z) / np.trapz(w, z)
+        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[attr-defined]
         ws.append(RadialWindow(z, w, zeff))
     return ws
 
@@ -482,7 +482,7 @@ def partition_lstsq(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
     # create the target vector of distribution values
@@ -536,7 +536,7 @@ def partition_nnls(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
     # create the target vector of distribution values
@@ -574,7 +574,7 @@ def partition_restrict(
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        part[i] = np.trapz(fr, zr, axis=-1)
+        part[i] = np.trapz(fr, zr, axis=-1)  # type: ignore[attr-defined]
     return part
 
 
@@ -653,7 +653,7 @@ def combine(
         * np.interp(
             z,
             shell.za,
-            shell.wa / np.trapz(shell.wa, shell.za),
+            shell.wa / np.trapz(shell.wa, shell.za),  # type: ignore[attr-defined]
             left=0.0,
             right=0.0,
         )
