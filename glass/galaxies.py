@@ -19,6 +19,7 @@ Functions
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -99,6 +100,10 @@ def redshifts_from_nz(
         samples from all populations.
 
     """
+    warnings.warn(
+        "redshifts_from_nz is deprecated; use redshifts instead", stacklevel=2
+    )
+
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
