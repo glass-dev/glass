@@ -1,18 +1,23 @@
 """Module for array utilities."""
 
+from __future__ import annotations
+
 from functools import partial
 
 import numpy as np
+import numpy.typing as npt
 
 
-def broadcast_first(*arrays):
+def broadcast_first(*arrays: npt.ArrayLike) -> tuple[npt.ArrayLike, ...]:
     """Broadcast arrays, treating the first axis as common."""
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
     return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
 
 
-def broadcast_leading_axes(*args):
+def broadcast_leading_axes(
+    *args: tuple[npt.ArrayLike, int],
+) -> tuple[tuple[int, ...], ...]:
     """
     Broadcast all but the last N axes.
 
@@ -49,7 +54,15 @@ def broadcast_leading_axes(*args):
     return (dims, *arrs)
 
 
-def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):  # noqa: PLR0913
+def ndinterp( # noqa: PLR0913
+    x: npt.ArrayLike,
+    xp: npt.ArrayLike,
+    fp: npt.ArrayLike,
+    axis: int = -1,
+    left: float | None = None,
+    right: float | None = None,
+    period: float | None = None,
+) -> npt.ArrayLike:
     """Interpolate multi-dimensional array over axis."""
     return np.apply_along_axis(
         partial(np.interp, x, xp),
@@ -61,7 +74,11 @@ def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):  # noqa: P
     )
 
 
-def trapz_product(f, *ff, axis=-1):
+def trapz_product(
+    f: tuple[npt.ArrayLike, npt.ArrayLike],
+    *ff: tuple[npt.ArrayLike, npt.ArrayLike],
+    axis: int = -1,
+) -> npt.ArrayLike:
     """Trapezoidal rule for a product of functions."""
     x, _ = f
     for x_, _ in ff:
@@ -75,7 +92,12 @@ def trapz_product(f, *ff, axis=-1):
     return np.trapz(y, x, axis=axis)
 
 
-def cumtrapz(f, x, dtype=None, out=None):
+def cumtrapz(
+    f: npt.ArrayLike,
+    x: npt.ArrayLike,
+    dtype: np.dtype | None = None,
+    out: npt.ArrayLike | None = None,
+) -> npt.NDArray:
     """Cumulative trapezoidal rule along last axis."""
     if out is None:
         out = np.empty_like(f, dtype=dtype)
