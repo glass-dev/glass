@@ -56,19 +56,19 @@ def test_deflect_nsew(usecomplex):
 
     # north
     lon, lat = deflect(0.0, 0.0, alpha(r, 0))
-    assert np.allclose([lon, lat], [0.0, d])
+    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
     lon, lat = deflect(0.0, 0.0, alpha(-r, 0))
-    assert np.allclose([lon, lat], [0.0, -d])
+    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
     lon, lat = deflect(0.0, 0.0, alpha(0, r))
-    assert np.allclose([lon, lat], [-d, 0.0])
+    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
     lon, lat = deflect(0.0, 0.0, alpha(0, -r))
-    assert np.allclose([lon, lat], [d, 0.0])
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
 def test_deflect_many(rng):
