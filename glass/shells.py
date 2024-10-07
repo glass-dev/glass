@@ -593,7 +593,12 @@ def redshift_grid(
 
 
 def distance_grid(
-    cosmo, zmin: float, zmax: float, *, dx: float | None = None, num: int | None = None
+    cosmo: Cosmology,
+    zmin: float,
+    zmax: float,
+    *,
+    dx: float | None = None,
+    num: int | None = None,
 ) -> npt.NDArray[float]:
     """Redshift grid with uniform spacing in comoving distance."""
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)

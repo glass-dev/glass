@@ -82,12 +82,14 @@ def effective_bias(
     return trapz_product((z, bz), (w.za, w.wa)) / norm
 
 
-def linear_bias(delta, b):
+def linear_bias(delta: npt.ArrayLike, b: float | npt.ArrayLike) -> npt.NDArray[float]:
     r"""Linear bias model :math:`\\delta_g = b \\, \\delta`."""
     return b * delta
 
 
-def loglinear_bias(delta, b):
+def loglinear_bias(
+    delta: npt.ArrayLike, b: float | npt.ArrayLike
+) -> npt.NDArray[float]:
     r"""log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
