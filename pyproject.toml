@@ -94,6 +94,7 @@ build.targets.sdist.exclude = [
 version.source = "vcs"
 
 [tool.mypy]
+disallow_untyped_decorators = false
 enable_error_code = [
     "ignore-without-code",
     "redundant-expr",

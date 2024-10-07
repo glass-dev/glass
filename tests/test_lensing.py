@@ -12,7 +12,7 @@ from glass.shells import RadialWindow
 
 
 @pytest.fixture
-def shells():
+def shells() -> list[RadialWindow]:
     return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
         RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),

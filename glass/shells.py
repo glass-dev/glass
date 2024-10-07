@@ -122,7 +122,7 @@ class RadialWindow(NamedTuple):
 
     za: Sequence[float]
     wa: Sequence[float]
-    zeff: float
+    zeff: float | None
 
 
 def tophat_windows(
