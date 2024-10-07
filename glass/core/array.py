@@ -54,7 +54,7 @@ def broadcast_leading_axes(
     return (dims, *arrs)
 
 
-def ndinterp( # noqa: PLR0913
+def ndinterp(  # noqa: PLR0913
     x: npt.ArrayLike,
     xp: npt.ArrayLike,
     fp: npt.ArrayLike,

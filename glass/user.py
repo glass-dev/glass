@@ -17,12 +17,16 @@ Input and Output
 
 """  # noqa: D205, D400, D415
 
+from __future__ import annotations
+
+import typing
 from contextlib import contextmanager
 
 import numpy as np
+import numpy.typing as npt
 
 
-def save_cls(filename, cls) -> None:
+def save_cls(filename: str, cls: list[npt.ArrayLike | None]) -> None:
     """
     Save a list of Cls to file.
 
@@ -35,7 +39,7 @@ def save_cls(filename, cls) -> None:
     np.savez(filename, values=values, split=split)
 
 
-def load_cls(filename):
+def load_cls(filename: str) -> list[npt.ArrayLike]:
     """
     Load a list of Cls from file.
 
@@ -55,12 +59,12 @@ class _FitsWriter:
     Initialised with the fits object and extension name.
     """
 
-    def __init__(self, fits, ext=None) -> None:
+    def __init__(self, fits, ext: str | None = None) -> None:
         """Create a new, uninitialised writer."""
         self.fits = fits
         self.ext = ext
 
-    def _append(self, data, names=None) -> None:
+    def _append(self, data: npt.ArrayLike, names: list[str] | None = None) -> None:
         """Write the FITS file."""
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
@@ -71,7 +75,9 @@ class _FitsWriter:
             # not using hdu.append here because of incompatibilities
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
-    def write(self, data=None, /, **columns) -> None:
+    def write(
+        self, data: npt.ArrayLike | None = None, /, **columns: npt.ArrayLike
+    ) -> None:
         """
         Write to FITS by calling the internal _append method.
 
@@ -89,7 +95,9 @@ class _FitsWriter:
 
 
 @contextmanager
-def write_catalog(filename, *, ext=None):
+def write_catalog(
+    filename: str, *, ext: str | None = None
+) -> typing.Iterator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.
 
