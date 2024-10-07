@@ -578,7 +578,9 @@ def partition_restrict(
     return part
 
 
-def redshift_grid(zmin, zmax, *, dz=None, num=None):
+def redshift_grid(
+    zmin: float, zmax: float, *, dz: float | None = None, num: int | None = None
+) -> npt.NDArray[float]:
     """Redshift grid with uniform spacing in redshift."""
     if dz is not None and num is None:
         z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
@@ -590,7 +592,9 @@ def redshift_grid(zmin, zmax, *, dz=None, num=None):
     return z
 
 
-def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
+def distance_grid(
+    cosmo, zmin: float, zmax: float, *, dx: float | None = None, num: int | None = None
+) -> npt.NDArray[float]:
     """Redshift grid with uniform spacing in comoving distance."""
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
     if dx is not None and num is None:
