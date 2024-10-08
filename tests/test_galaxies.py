@@ -24,16 +24,16 @@ def test_redshifts(mocker):
 def test_redshifts_from_nz():
     # test sampling
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0])
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0], warn=False)
     assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1])
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1], warn=False)
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1])
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)
     assert not np.any(redshifts <= 1)
 
     # test interface
@@ -44,7 +44,7 @@ def test_redshifts_from_nz():
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
-    redshifts = redshifts_from_nz(count, z, nz)
+    redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (count,)
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
@@ -55,7 +55,7 @@ def test_redshifts_from_nz():
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
-    redshifts = redshifts_from_nz(count, z, nz)
+    redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
     assert np.shape(redshifts) == (60,)
 
@@ -65,7 +65,7 @@ def test_redshifts_from_nz():
     z = np.linspace(0, 1, 100)
     nz = [z * (1 - z), (z - 0.5) ** 2]
 
-    redshifts = redshifts_from_nz(count, z, nz)
+    redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (20,)
 
@@ -75,7 +75,7 @@ def test_redshifts_from_nz():
     z = np.linspace(0, 1, 100)
     nz = [z * (1 - z), (z - 0.5) ** 2]
 
-    redshifts = redshifts_from_nz(count, z, nz)
+    redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (120,)
 
@@ -86,7 +86,10 @@ def test_redshifts_from_nz():
     nz = [z * (1 - z), (z - 0.5) ** 2]
 
     with pytest.raises(ValueError):
-        redshifts_from_nz(count, z, nz)
+        redshifts_from_nz(count, z, nz, warn=False)
+
+    with pytest.warns(UserWarning, match="when sampling galaxies"):
+        redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
 
 
 def test_gaussian_phz():
