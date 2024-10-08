@@ -179,7 +179,7 @@ def tophat_windows(
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)  # type: ignore[arg-type]
         w = wht(z)
-        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[operator] # type: ignore[attr-defined]
+        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[attr-defined,operator]
         ws.append(RadialWindow(z, w, zeff))  # type: ignore[arg-type]
     return ws
 

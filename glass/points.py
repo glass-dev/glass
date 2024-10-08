@@ -97,17 +97,17 @@ def loglinear_bias(
     return delta_g
 
 
-def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915  # type: ignore[no-untyped-def]
+def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     ngal: float | npt.ArrayLike,
     delta: npt.ArrayLike,
     bias: float | npt.ArrayLike | None = None,
     vis: npt.ArrayLike | None = None,
     *,
-    bias_model="linear",
+    bias_model: str | typing.Callable[..., typing.Any] = "linear",
     remove_monopole: bool = False,
     batch: int | None = 1_000_000,
     rng: np.random.Generator | None = None,
-):
+) -> typing.Iterator[tuple[npt.ArrayLike, npt.ArrayLike, npt.ArrayLike]]:
     """
     Generate positions tracing a density contrast.
 
@@ -173,8 +173,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915  # type: ignore[no-
     if isinstance(bias_model, str):
         bias_model = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
-        msg = "bias_model must be string or callable"
-        raise TypeError(msg)
+        raise TypeError("bias_model must be string or callable")  # noqa: EM101,TRY003
 
     # broadcast inputs to common shape of extra dimensions
     inputs = [(ngal, 0), (delta, 1)]
@@ -191,7 +190,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915  # type: ignore[no-
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[call-overload]
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[call-overload,operator]
 
         # remove monopole if asked to
         if remove_monopole:

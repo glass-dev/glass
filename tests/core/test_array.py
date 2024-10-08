@@ -152,7 +152,7 @@ def test_trapz_product() -> None:
     assert np.allclose(s, 1.0)
 
 
-@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")  # type: ignore[misc]
+@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_cumtrapz() -> None:
     from scipy.integrate import cumulative_trapezoid
 

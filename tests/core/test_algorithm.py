@@ -9,7 +9,7 @@ from glass.core.algorithm import nnls as nnls_glass
 HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
-@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")  # type: ignore[misc]
+@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_nnls(rng) -> None:  # type: ignore[no-untyped-def]
     from scipy.optimize import nnls as nnls_scipy
 

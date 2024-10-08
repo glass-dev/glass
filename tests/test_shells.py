@@ -48,7 +48,7 @@ def test_restrict() -> None:
             assert fr[i] == fi * np.interp(zi, w.za, w.wa)  # type: ignore[index]
 
 
-@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])  # type: ignore[misc]
+@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(method) -> None:  # type: ignore[no-untyped-def]
     shells = [
         RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),  # type: ignore[arg-type]
@@ -69,4 +69,4 @@ def test_partition(method) -> None:  # type: ignore[no-untyped-def]
 
     assert part.shape == (len(shells), 3, 2)  # type: ignore[union-attr]
 
-    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[union-attr] # type: ignore[attr-defined]
+    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[attr-defined,union-attr]

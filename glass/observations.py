@@ -311,7 +311,7 @@ def tomo_nz_gausserr(
 
     """
     # converting zbins into an array:
-    zbins_arr = np.asanyarray(zbins)  # type: ignore[no-redef]
+    zbins_arr = np.asanyarray(zbins)
 
     # bin edges and adds a new axis
     z_lower = zbins_arr[:, 0, np.newaxis]

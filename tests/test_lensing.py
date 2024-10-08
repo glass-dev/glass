@@ -11,7 +11,7 @@ from glass.lensing import (
 from glass.shells import RadialWindow
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def shells() -> list[RadialWindow]:
     return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
@@ -40,7 +40,7 @@ def cosmo():  # type: ignore[no-untyped-def]
     return MockCosmology()
 
 
-@pytest.mark.parametrize("usecomplex", [True, False])  # type: ignore[misc]
+@pytest.mark.parametrize("usecomplex", [True, False])
 def test_deflect_nsew(*, usecomplex: bool) -> None:
     d = 5.0
     r = np.radians(d)
