@@ -1,8 +1,8 @@
 ---
 ci:
   autofix_prs: false
-  autoupdate_commit_msg: "MNT: update pre-commit hooks"
-  autofix_commit_msg: "STY: pre-commit fixes"
+  autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
+  autofix_commit_msg: "pre-commit.ci: style fixes"
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
