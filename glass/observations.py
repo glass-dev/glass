@@ -31,7 +31,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import healpy as hp
+import healpy as hp  # type: ignore[import-untyped]
 import numpy as np
 
 from glass.core.array import cumtrapz
@@ -82,7 +82,7 @@ def vmap_galactic_ecliptic(
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    return hp.Rotator(coord="CE").rotate_map_pixel(m)
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)  # type: ignore[no-any-return]
 
 
 def gaussian_nz(
@@ -127,7 +127,7 @@ def gaussian_nz(
     if norm is not None:
         nz *= norm
 
-    return nz
+    return nz  # type: ignore[no-any-return]
 
 
 def smail_nz(
@@ -189,7 +189,7 @@ def smail_nz(
     if norm is not None:
         pz *= norm
 
-    return pz
+    return pz  # type: ignore[no-any-return]
 
 
 def fixed_zbins(
@@ -260,8 +260,8 @@ def equal_dens_zbins(
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
     cuml_nz = cumtrapz(nz, z)
-    cuml_nz /= cuml_nz[[-1]]
-    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
+    cuml_nz /= cuml_nz[[-1]]  # type: ignore[index, operator]
+    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)  # type: ignore[arg-type]
 
     return list(zip(zbinedges, zbinedges[1:]))
 
@@ -323,10 +323,10 @@ def tomo_nz_gausserr(
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz
     # leading axis corresponds to the different bins
-    sz = 2**0.5 * sigma_0 * (1 + z)
+    sz = 2**0.5 * sigma_0 * (1 + z)  # type: ignore[operator]
     binned_nz = erf((z - z_lower) / sz)
     binned_nz -= erf((z - z_upper) / sz)
-    binned_nz /= 1 + erf(z / sz)
+    binned_nz /= 1 + erf(z / sz)  # type: ignore[operator]
     binned_nz *= nz
 
-    return binned_nz
+    return binned_nz  # type: ignore[no-any-return]

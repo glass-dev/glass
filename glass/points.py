@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import typing
 
-import healpix
+import healpix  # type: ignore[import-untyped]
 import numpy as np
 import numpy.typing as npt
 
@@ -79,12 +79,12 @@ def effective_bias(
 
     """
     norm = np.trapz(w.wa, w.za)  # type: ignore[attr-defined]
-    return trapz_product((z, bz), (w.za, w.wa)) / norm
+    return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[no-any-return]
 
 
-def linear_bias(delta: npt.ArrayLike, b: float | npt.ArrayLike) -> npt.NDArray[float]:
+def linear_bias(delta: npt.ArrayLike, b: float | npt.ArrayLike) -> npt.NDArray[float]:  # type: ignore[type-var]
     r"""Linear bias model :math:`\\delta_g = b \\, \\delta`."""
-    return b * delta
+    return b * delta  # type: ignore[operator, return-value]
 
 
 def loglinear_bias(
@@ -97,7 +97,7 @@ def loglinear_bias(
     return delta_g
 
 
-def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
+def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915  # type: ignore[no-untyped-def]
     ngal: float | npt.ArrayLike,
     delta: npt.ArrayLike,
     bias: float | npt.ArrayLike | None = None,
@@ -191,7 +191,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[call-overload]
 
         # remove monopole if asked to
         if remove_monopole:
@@ -199,11 +199,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[call-overload]
 
         # apply visibility if given
         if vis is not None:
-            n *= vis[k]
+            n *= vis[k]  # type: ignore[call-overload]
 
         # clip number density at zero
         np.clip(n, 0, None, out=n)
@@ -226,7 +226,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
             cmask = np.zeros(dims, dtype=int)
             cmask[k] = 1
         else:
-            cmask = 1
+            cmask = 1  # type: ignore[assignment]
 
         # sample the map in batches
         step = 1000
@@ -241,7 +241,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 size += q[-1]
             else:
                 # how many pixels from this group do we need?
-                stop += np.searchsorted(q, batch - size, side="right")
+                stop += np.searchsorted(q, batch - size, side="right")  # type: ignore[call-overload, operator]
                 # if the first pixel alone is too much, use it anyway
                 if stop == start:
                     stop += 1
@@ -261,7 +261,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 def uniform_positions(
     ngal: float | npt.ArrayLike, *, rng: np.random.Generator | None = None
-):
+) -> typing.Iterator[  # type: ignore[type-arg]
+    npt.ArrayLike | list[npt.ArrayLike],
+    npt.ArrayLike | list[npt.ArrayLike],
+    int | list[int],
+]:
     """
     Generate positions uniformly over the sphere.
 
@@ -307,12 +311,12 @@ def uniform_positions(
             count = np.zeros(dims, dtype=int)
             count[k] = ngal[k]
         else:
-            count = int(ngal[k])
+            count = int(ngal[k])  # type: ignore[assignment]
 
         yield lon, lat, count
 
 
-def position_weights(densities: npt.ArrayLike, bias: npt.ArrayLike | None = None):
+def position_weights(densities: npt.ArrayLike, bias: npt.ArrayLike | None = None):  # type: ignore[no-untyped-def]
     r"""
     Compute relative weights for angular clustering.
 
@@ -345,6 +349,6 @@ def position_weights(densities: npt.ArrayLike, bias: npt.ArrayLike | None = None
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
-        densities = densities * bias
+        densities = densities * bias  # type: ignore[operator]
     # densities now contains the relative contribution with bias applied
     return densities

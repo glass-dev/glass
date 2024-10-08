@@ -33,7 +33,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import healpy as hp
+import healpy as hp  # type: ignore[import-untyped]
 import numpy as np
 
 if TYPE_CHECKING:
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 
     import numpy.typing as npt
 
-    from cosmology import Cosmology
+    from cosmology import Cosmology  # type: ignore[import-untyped]
 
     from glass.shells import RadialWindow
 
@@ -182,7 +182,7 @@ def from_convergence(  # noqa: PLR0913
     # if potential is requested, compute map and add to output
     if potential:
         psi = hp.alm2map(alm, nside, lmax=lmax)
-        results += (psi,)
+        results += (psi,)  # type: ignore[assignment]
 
     # if no spin-weighted maps are requested, stop here
     if not (deflection or shear):
@@ -201,7 +201,7 @@ def from_convergence(  # noqa: PLR0913
     if deflection:
         alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
         alpha = alpha[0] + 1j * alpha[1]
-        results += (alpha,)
+        results += (alpha,)  # type: ignore[assignment]
 
     # if no shear is requested, stop here
     if not shear:
@@ -219,7 +219,7 @@ def from_convergence(  # noqa: PLR0913
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
     gamma = gamma[0] + 1j * gamma[1]
-    results += (gamma,)
+    results += (gamma,)  # type: ignore[assignment]
 
     # all done
     return results
@@ -266,7 +266,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return hp.alm2map_spin([alm, blm], nside, 2, lmax)  # type: ignore[no-any-return]
 
 
 class MultiPlaneConvergence:
@@ -295,9 +295,9 @@ class MultiPlaneConvergence:
 
         """
         zsrc = w.zeff
-        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[attr-defined]
+        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[arg-type] # type: ignore[attr-defined]
 
-        self.add_plane(delta, zsrc, lens_weight)
+        self.add_plane(delta, zsrc, lens_weight)  # type: ignore[arg-type]
 
     def add_plane(self, delta: npt.ArrayLike, zsrc: float, wlens: float = 1.0) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
@@ -416,7 +416,7 @@ def multi_plane_weights(
     weights = weights / np.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
-    return np.matmul(mat.T, weights)
+    return np.matmul(mat.T, weights)  # type: ignore[no-any-return, union-attr]
 
 
 def deflect(

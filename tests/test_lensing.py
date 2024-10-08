@@ -1,6 +1,6 @@
-import healpix
+import healpix  # type: ignore[import-untyped]
 import numpy as np
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from glass.lensing import (
     MultiPlaneConvergence,
@@ -11,7 +11,7 @@ from glass.lensing import (
 from glass.shells import RadialWindow
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def shells() -> list[RadialWindow]:
     return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
@@ -23,16 +23,16 @@ def shells() -> list[RadialWindow]:
 
 
 @pytest.fixture
-def cosmo():
+def cosmo():  # type: ignore[no-untyped-def]
     class MockCosmology:
         @property
-        def omega_m(self):
+        def omega_m(self):  # type: ignore[no-untyped-def]
             return 0.3
 
-        def ef(self, z):
+        def ef(self, z):  # type: ignore[no-untyped-def]
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
-        def xm(self, z, z2=None):
+        def xm(self, z, z2=None):  # type: ignore[no-untyped-def]
             if z2 is None:
                 return np.array(z) * 1000
             return (np.array(z2) - np.array(z)) * 1000
@@ -40,38 +40,38 @@ def cosmo():
     return MockCosmology()
 
 
-@pytest.mark.parametrize("usecomplex", [True, False])
+@pytest.mark.parametrize("usecomplex", [True, False])  # type: ignore[misc]
 def test_deflect_nsew(usecomplex: bool) -> None:
     d = 5.0
     r = np.radians(d)
 
     if usecomplex:
 
-        def alpha(re, im):
+        def alpha(re, im):  # type: ignore[no-untyped-def]
             return re + 1j * im
     else:
 
-        def alpha(re, im):
+        def alpha(re, im):  # type: ignore[no-untyped-def]
             return [re, im]
 
     # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0))
-    assert np.allclose([lon, lat], [0.0, d])
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[misc, no-untyped-call]
+    assert np.allclose([lon, lat], [0.0, d])  # type: ignore[arg-type]
 
     # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))
-    assert np.allclose([lon, lat], [0.0, -d])
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[misc, no-untyped-call]
+    assert np.allclose([lon, lat], [0.0, -d])  # type: ignore[arg-type]
 
     # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r))
-    assert np.allclose([lon, lat], [-d, 0.0])
+    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[misc, no-untyped-call]
+    assert np.allclose([lon, lat], [-d, 0.0])  # type: ignore[arg-type]
 
     # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r))
-    assert np.allclose([lon, lat], [d, 0.0])
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[misc, no-untyped-call]
+    assert np.allclose([lon, lat], [d, 0.0])  # type: ignore[arg-type]
 
 
-def test_deflect_many(rng) -> None:
+def test_deflect_many(rng: np.random.Generator) -> None:
     n = 1000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
@@ -79,7 +79,7 @@ def test_deflect_many(rng) -> None:
     lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
     lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
 
-    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
+    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))  # type: ignore[misc]
 
     x_, y_, z_ = healpix.ang2vec(lon_, lat_, lonlat=True)
     x, y, z = healpix.ang2vec(lon, lat, lonlat=True)
@@ -89,7 +89,7 @@ def test_deflect_many(rng) -> None:
     np.testing.assert_allclose(dotp, np.cos(abs_alpha))
 
 
-def test_multi_plane_matrix(shells, cosmo, rng) -> None:
+def test_multi_plane_matrix(shells, cosmo, rng) -> None:  # type: ignore[no-untyped-def]
     mat = multi_plane_matrix(shells, cosmo)
 
     np.testing.assert_array_equal(mat, np.tril(mat))
@@ -101,12 +101,12 @@ def test_multi_plane_matrix(shells, cosmo, rng) -> None:
     kappas = []
     for shell, delta in zip(shells, deltas):
         convergence.add_window(delta, shell)
-        kappas.append(convergence.kappa.copy())
+        kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
 
     np.testing.assert_allclose(mat @ deltas, kappas)
 
 
-def test_multi_plane_weights(shells, cosmo, rng) -> None:
+def test_multi_plane_weights(shells, cosmo, rng) -> None:  # type: ignore[no-untyped-def]
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 
@@ -125,4 +125,4 @@ def test_multi_plane_weights(shells, cosmo, rng) -> None:
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)  # type: ignore[arg-type]

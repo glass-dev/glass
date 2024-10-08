@@ -1,5 +1,5 @@
 import numpy as np
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from glass.shapes import (
     ellipticity_gaussian,
@@ -17,12 +17,12 @@ def test_triaxial_axis_ratio() -> None:
 
     # many axis ratios
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=1000)
+    q = triaxial_axis_ratio(0.8, 0.4, size=1000)  # type: ignore[arg-type]
     assert np.shape(q) == (1000,)
 
     # explicit shape
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))
+    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))  # type: ignore[arg-type]
     assert np.shape(q) == (10, 10)
 
     # implicit size
@@ -78,10 +78,10 @@ def test_ellipticity_ryden04() -> None:
     # check that result is in the specified range
 
     e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
-    assert np.all((e.real >= -1.0) & (e.real <= 1.0))
+    assert np.all((e.real >= -1.0) & (e.real <= 1.0))  # type: ignore[union-attr]
 
     e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)
-    assert np.all((e.real >= -1.0) & (e.real <= 1.0))
+    assert np.all((e.real >= -1.0) & (e.real <= 1.0))  # type: ignore[union-attr]
 
 
 def test_ellipticity_gaussian() -> None:
@@ -89,23 +89,23 @@ def test_ellipticity_gaussian() -> None:
 
     eps = ellipticity_gaussian(n, 0.256)
 
-    assert eps.shape == (n,)
+    assert eps.shape == (n,)  # type: ignore[union-attr]
 
     assert np.all(np.abs(eps) < 1)
 
-    assert np.isclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
+    assert np.isclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
+    assert np.isclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
 
     eps = ellipticity_gaussian([n, n], [0.128, 0.256])
 
-    assert eps.shape == (2 * n,)
+    assert eps.shape == (2 * n,)  # type: ignore[union-attr]
 
     assert np.all(np.abs(eps) < 1)
 
-    assert np.isclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
+    assert np.isclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    assert np.isclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    assert np.isclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    assert np.isclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
 
 
 def test_ellipticity_intnorm() -> None:
@@ -113,23 +113,23 @@ def test_ellipticity_intnorm() -> None:
 
     eps = ellipticity_intnorm(n, 0.256)
 
-    assert eps.shape == (n,)
+    assert eps.shape == (n,)  # type: ignore[union-attr]
 
     assert np.all(np.abs(eps) < 1)
 
-    assert np.isclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
+    assert np.isclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
+    assert np.isclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
 
     eps = ellipticity_intnorm([n, n], [0.128, 0.256])
 
-    assert eps.shape == (2 * n,)
+    assert eps.shape == (2 * n,)  # type: ignore[union-attr]
 
     assert np.all(np.abs(eps) < 1)
 
-    assert np.isclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
-    assert np.isclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
+    assert np.isclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    assert np.isclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    assert np.isclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    assert np.isclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
 
     with pytest.raises(ValueError):
         ellipticity_intnorm(1, 0.71)

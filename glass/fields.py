@@ -30,10 +30,10 @@ import warnings
 from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Callable, Optional, Union
 
-import healpy as hp
+import healpy as hp  # type: ignore[import-untyped]
 import numpy as np
 import numpy.typing as npt
-from gaussiancl import gaussiancl
+from gaussiancl import gaussiancl  # type: ignore[import-untyped]
 
 # types
 Size = Optional[Union[int, tuple[int, ...]]]
@@ -115,12 +115,12 @@ def cls2cov(
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
             if cl is None:
-                cov[:, i] = 0
+                cov[:, i] = 0  # type: ignore[unreachable]
             else:
                 if i == 0 and np.any(np.less(cl, 0)):
                     msg = "negative values in cl"
                     raise ValueError(msg)
-                n = len(cl)
+                n = len(cl)  # type: ignore[arg-type]
                 cov[:n, i] = cl
                 cov[n:, i] = 0
         cov /= 2
@@ -129,10 +129,10 @@ def cls2cov(
 
 def multalm(alm: Alms, bl: npt.ArrayLike, *, inplace: bool = False) -> Alms:
     """Multiply alm by bl."""
-    n = len(bl)
+    n = len(bl)  # type: ignore[arg-type]
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
-        out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
+        out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]  # type: ignore[index]
     return out
 
 
@@ -140,8 +140,8 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:
-            monopole = 0.0 if cl[0] == 0 else None
+        if cl is not None and len(cl) > 0:  # type: ignore[arg-type, redundant-expr]
+            monopole = 0.0 if cl[0] == 0 else None  # type: ignore[index]
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
                 warnings.warn(
@@ -185,12 +185,12 @@ def gaussian_gls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:
+        if cl is not None and len(cl) > 0:  # type: ignore[arg-type, redundant-expr]
             if lmax is not None:
-                cl = cl[: lmax + 1]  # noqa: PLW2901
+                cl = cl[: lmax + 1]  # type: ignore[index] # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl), len(pw))
-                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
+                n = min(len(cl), len(pw))  # type: ignore[arg-type]
+                cl = cl[:n] * pw[:n] ** 2  # type: ignore[index] # noqa: PLW2901
         gls.append(cl)
     return gls
 
@@ -251,7 +251,7 @@ def generate_gaussian(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls if gl is not None), default=0)
+    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[arg-type, redundant-expr]
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -278,15 +278,15 @@ def generate_gaussian(
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += multalm(y[:, i], a[:, i])
+            alm += multalm(y[:, i], a[:, i])  # type: ignore[call-overload, index, operator]
 
         # store the standard normal in y array at the indicated index
         if j is not None:
             y[:, j] = z
 
         # modes with m = 0 are real-valued and come first in array
-        alm[:n].real += alm[:n].imag
-        alm[:n].imag[:] = 0
+        alm[:n].real += alm[:n].imag  # type: ignore[index, misc, union-attr]
+        alm[:n].imag[:] = 0  # type: ignore[index, union-attr]
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -305,18 +305,18 @@ def generate_lognormal(
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         gl = gls[i * (i + 1) // 2]
-        ell = np.arange(len(gl))
-        var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
+        ell = np.arange(len(gl))  # type: ignore[arg-type]
+        var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)  # type: ignore[operator]
 
         # fix mean of the Gaussian random field for lognormal transformation
         m -= var / 2  # noqa: PLW2901
 
         # exponentiate values in place and subtract 1 in one operation
-        np.expm1(m, out=m)
+        np.expm1(m, out=m)  # type: ignore[call-overload]
 
         # lognormal shift, unless unity
         if shift != 1:
-            m *= shift  # noqa: PLW2901
+            m *= shift  # type: ignore[operator] # noqa: PLW2901
 
         # yield the lognormal map
         yield m
@@ -350,10 +350,10 @@ def getcl(
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
     if lmax is not None:
-        if len(cl) > lmax + 1:
-            cl = cl[: lmax + 1]
+        if len(cl) > lmax + 1:  # type: ignore[arg-type]
+            cl = cl[: lmax + 1]  # type: ignore[index]
         else:
-            cl = np.pad(cl, (0, lmax + 1 - len(cl)))
+            cl = np.pad(cl, (0, lmax + 1 - len(cl)))  # type: ignore[arg-type]
     return cl
 
 
@@ -401,7 +401,7 @@ def effective_cls(
 
     # find lmax if not given
     if lmax is None:
-        lmax = max(map(len, cls), default=0) - 1
+        lmax = max(map(len, cls), default=0) - 1  # type: ignore[arg-type]
 
     # broadcast weights1 such that its shape ends in n
     weights1 = np.asanyarray(weights1)
@@ -418,7 +418,7 @@ def effective_cls(
     if weights2 is weights1:
         pairs = combinations_with_replacement(np.ndindex(shape1[1:]), 2)
     else:
-        pairs = product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))
+        pairs = product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))  # type: ignore[assignment]
 
     # create the output array: axes for all input axes plus lmax+1
     out = np.empty(shape1[1:] + shape2[1:] + (lmax + 1,))

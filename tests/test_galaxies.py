@@ -1,10 +1,10 @@
 import numpy as np
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
 
 
-def test_redshifts(mocker) -> None:
+def test_redshifts(mocker) -> None:  # type: ignore[no-untyped-def]
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
@@ -12,29 +12,29 @@ def test_redshifts(mocker) -> None:
 
     # sample redshifts (scalar)
     z = redshifts(13, w)
-    assert z.shape == (13,)
-    assert z.min() >= 0.0
-    assert z.max() <= 1.0
+    assert z.shape == (13,)  # type: ignore[union-attr]
+    assert z.min() >= 0.0  # type: ignore[union-attr]
+    assert z.max() <= 1.0  # type: ignore[union-attr]
 
     # sample redshifts (array)
     z = redshifts([[1, 2], [3, 4]], w)
-    assert z.shape == (10,)
+    assert z.shape == (10,)  # type: ignore[union-attr]
 
 
 def test_redshifts_from_nz() -> None:
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
-    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # type: ignore[operator] # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0])
-    assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
+    assert np.all((1 <= redshifts) & (redshifts <= 3))  # type: ignore[operator] # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1])
-    assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
+    assert np.all((3 <= redshifts) & (redshifts <= 4))  # type: ignore[operator] # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1])
-    assert not np.any(redshifts <= 1)
+    assert not np.any(redshifts <= 1)  # type: ignore[operator]
 
     # test interface
 
@@ -46,12 +46,12 @@ def test_redshifts_from_nz() -> None:
 
     redshifts = redshifts_from_nz(count, z, nz)
 
-    assert redshifts.shape == (count,)
-    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert redshifts.shape == (count,)  # type: ignore[union-attr]
+    assert np.all((0 <= redshifts) & (redshifts <= 1))  # type: ignore[operator] # noqa: SIM300
 
     # case: extra dimensions from count
 
-    count = [10, 20, 30]
+    count = [10, 20, 30]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -63,27 +63,27 @@ def test_redshifts_from_nz() -> None:
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     redshifts = redshifts_from_nz(count, z, nz)
 
-    assert redshifts.shape == (20,)
+    assert redshifts.shape == (20,)  # type: ignore[union-attr]
 
     # case: extra dimensions from count and nz
 
-    count = [[10], [20], [30]]
+    count = [[10], [20], [30]]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     redshifts = redshifts_from_nz(count, z, nz)
 
-    assert redshifts.shape == (120,)
+    assert redshifts.shape == (120,)  # type: ignore[union-attr]
 
     # case: incompatible input shapes
 
-    count = [10, 20, 30]
+    count = [10, 20, 30]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     with pytest.raises(ValueError):
         redshifts_from_nz(count, z, nz)
@@ -103,30 +103,30 @@ def test_gaussian_phz() -> None:
 
     # case: truncated normal
 
-    z = 0.0
-    sigma_0 = np.ones(100)
+    z = 0.0  # type: ignore[assignment]
+    sigma_0 = np.ones(100)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
-    assert phz.shape == (100,)
-    assert np.all(phz >= 0)
+    assert phz.shape == (100,)  # type: ignore[union-attr]
+    assert np.all(phz >= 0)  # type: ignore[operator]
 
     # case: upper and lower bound
 
-    z = 1.0
-    sigma_0 = np.ones(100)
+    z = 1.0  # type: ignore[assignment]
+    sigma_0 = np.ones(100)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
 
-    assert phz.shape == (100,)
-    assert np.all(phz >= 0.5)
-    assert np.all(phz <= 1.5)
+    assert phz.shape == (100,)  # type: ignore[union-attr]
+    assert np.all(phz >= 0.5)  # type: ignore[operator]
+    assert np.all(phz <= 1.5)  # type: ignore[operator]
 
     # test interface
 
     # case: scalar redshift, scalar sigma_0
 
-    z = 1.0
+    z = 1.0  # type: ignore[assignment]
     sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
@@ -141,25 +141,25 @@ def test_gaussian_phz() -> None:
 
     phz = gaussian_phz(z, sigma_0)
 
-    assert phz.shape == (10,)
+    assert phz.shape == (10,)  # type: ignore[union-attr]
     np.testing.assert_array_equal(z, phz)
 
     # case: scalar redshift, array sigma_0
 
-    z = 1.0
-    sigma_0 = np.zeros(10)
+    z = 1.0  # type: ignore[assignment]
+    sigma_0 = np.zeros(10)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
-    assert phz.shape == (10,)
+    assert phz.shape == (10,)  # type: ignore[union-attr]
     np.testing.assert_array_equal(z, phz)
 
     # case: array redshift, array sigma_0
 
     z = np.linspace(0, 1, 10)
-    sigma_0 = np.zeros((11, 1))
+    sigma_0 = np.zeros((11, 1))  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
-    assert phz.shape == (11, 10)
+    assert phz.shape == (11, 10)  # type: ignore[union-attr]
     np.testing.assert_array_equal(np.broadcast_to(z, (11, 10)), phz)

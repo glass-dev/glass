@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
     from glass.shells import RadialWindow
 
-import healpix
+import healpix  # type: ignore[import-untyped]
 import numpy as np
 
 from glass.core.array import broadcast_leading_axes, cumtrapz
@@ -107,7 +107,7 @@ def redshifts_from_nz(
     dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
 
     # list of results for all dimensions
-    redshifts = np.empty(count.sum())
+    redshifts = np.empty(count.sum())  # type: ignore[attr-defined]
 
     # keep track of the number of sampled redshifts
     total = 0
@@ -115,16 +115,16 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)
-        cdf /= cdf[-1]
+        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[arg-type, call-overload]
+        cdf /= cdf[-1]  # type: ignore[index, operator]
 
         # sample redshifts and store result
-        redshifts[total : total + count[k]] = np.interp(
-            rng.uniform(0, 1, size=count[k]),
-            cdf,
-            z[k],
+        redshifts[total : total + count[k]] = np.interp(  # type: ignore[call-overload]
+            rng.uniform(0, 1, size=count[k]),  # type: ignore[call-overload]
+            cdf,  # type: ignore[arg-type]
+            z[k],  # type: ignore[call-overload]
         )
-        total += count[k]
+        total += count[k]  # type: ignore[call-overload]
 
     assert total == redshifts.size  # noqa: S101
 
@@ -176,17 +176,17 @@ def galaxy_shear(  # noqa: PLR0913
     # get the lensing maps at galaxy position
     for i in range(0, size, 10000):
         s = slice(i, i + 10000)
-        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
-        k[s] = kappa[ipix]
-        g.real[s] = gamma1[ipix]
-        g.imag[s] = gamma2[ipix]
+        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)  # type: ignore[index]
+        k[s] = kappa[ipix]  # type: ignore[index]
+        g.real[s] = gamma1[ipix]  # type: ignore[index]
+        g.imag[s] = gamma2[ipix]  # type: ignore[index]
 
     if reduced_shear:
         # compute reduced shear in place
         g /= 1 - k
 
         # compute lensed ellipticities
-        g = (eps + g) / (1 + g.conj() * eps)
+        g = (eps + g) / (1 + g.conj() * eps)  # type: ignore[operator]
     else:
         # simple sum of shears
         g += eps
@@ -255,26 +255,26 @@ def gaussian_phz(
     sigma = np.add(1, z) * sigma_0
     dims = np.shape(sigma)
 
-    zphot = rng.normal(z, sigma)
+    zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
 
     if lower is None:
         lower = 0.0
     if upper is None:
         upper = np.inf
 
-    if not np.all(lower < upper):
+    if not np.all(lower < upper):  # type: ignore[operator]
         msg = "requires lower < upper"
         raise ValueError(msg)
 
     if not dims:
-        while zphot < lower or zphot > upper:
-            zphot = rng.normal(z, sigma)
+        while zphot < lower or zphot > upper:  # type: ignore[operator]
+            zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
     else:
         z = np.broadcast_to(z, dims)
-        trunc = np.where((zphot < lower) | (zphot > upper))[0]
+        trunc = np.where((zphot < lower) | (zphot > upper))[0]  # type: ignore[operator]
         while trunc.size:
-            znew = rng.normal(z[trunc], sigma[trunc])
-            zphot[trunc] = znew
-            trunc = trunc[(znew < lower) | (znew > upper)]
+            znew = rng.normal(z[trunc], sigma[trunc])  # type: ignore[arg-type]
+            zphot[trunc] = znew  # type: ignore[index]
+            trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
 
     return zphot

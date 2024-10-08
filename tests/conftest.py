@@ -1,8 +1,8 @@
 import numpy as np
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session")  # type: ignore[misc]
 def rng() -> np.random.Generator:
     import numpy as np
 

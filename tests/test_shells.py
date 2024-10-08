@@ -1,5 +1,5 @@
 import numpy as np
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from glass.shells import RadialWindow, partition, restrict, tophat_windows
 
@@ -18,7 +18,7 @@ def test_tophat_windows() -> None:
         zn <= z0 + len(w.za) * dz <= zn + dz for w, z0, zn in zip(ws, zb, zb[1:])
     )
 
-    assert all(np.all(w.wa == 1) for w in ws)
+    assert all(np.all(w.wa == 1) for w in ws)  # type: ignore[comparison-overlap]
 
 
 def test_restrict() -> None:
@@ -31,32 +31,32 @@ def test_restrict() -> None:
 
     zr, fr = restrict(z, f, w)
 
-    assert zr[0] == w.za[0]
-    assert zr[-1] == w.za[-1]
+    assert zr[0] == w.za[0]  # type: ignore[index]
+    assert zr[-1] == w.za[-1]  # type: ignore[index]
 
-    assert fr[0] == fr[-1] == 0.0
+    assert fr[0] == fr[-1] == 0.0  # type: ignore[index]
 
     for zi, wi in zip(w.za, w.wa):
         i = np.searchsorted(zr, zi)
-        assert zr[i] == zi
-        assert fr[i] == wi * np.interp(zi, z, f)
+        assert zr[i] == zi  # type: ignore[index]
+        assert fr[i] == wi * np.interp(zi, z, f)  # type: ignore[index]
 
     for zi, fi in zip(z, f):
         if w.za[0] <= zi <= w.za[-1]:
             i = np.searchsorted(zr, zi)
-            assert zr[i] == zi
-            assert fr[i] == fi * np.interp(zi, w.za, w.wa)
+            assert zr[i] == zi  # type: ignore[index]
+            assert fr[i] == fi * np.interp(zi, w.za, w.wa)  # type: ignore[index]
 
 
-@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(method) -> None:
+@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])  # type: ignore[misc]
+def test_partition(method) -> None:  # type: ignore[no-untyped-def]
     shells = [
-        RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
-        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
-        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),
-        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),
-        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),
-        RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),
+        RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),  # type: ignore[arg-type]
+        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),  # type: ignore[arg-type]
+        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),  # type: ignore[arg-type]
+        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),  # type: ignore[arg-type]
+        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),  # type: ignore[arg-type]
+        RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),  # type: ignore[arg-type]
     ]
 
     z = np.linspace(0.0, 5.0, 1000)
@@ -67,6 +67,6 @@ def test_partition(method) -> None:
 
     part = partition(z, fz, shells, method=method)
 
-    assert part.shape == (len(shells), 3, 2)
+    assert part.shape == (len(shells), 3, 2)  # type: ignore[union-attr]
 
-    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[attr-defined]
+    assert np.allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[union-attr] # type: ignore[attr-defined]

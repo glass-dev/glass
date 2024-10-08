@@ -1,7 +1,7 @@
 import importlib.util
 
 import numpy as np
-import pytest
+import pytest  # type: ignore[import-not-found]
 
 from glass.core.algorithm import nnls as nnls_glass
 
@@ -9,9 +9,9 @@ from glass.core.algorithm import nnls as nnls_glass
 HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
-@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_nnls(rng) -> None:
-    from scipy.optimize import nnls as nnls_scipy
+@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")  # type: ignore[misc]
+def test_nnls(rng) -> None:  # type: ignore[no-untyped-def]
+    from scipy.optimize import nnls as nnls_scipy  # type: ignore[import-untyped]
 
     # cross-check output with scipy's nnls
 
@@ -21,7 +21,7 @@ def test_nnls(rng) -> None:
     x_glass = nnls_glass(a, b)
     x_scipy, _ = nnls_scipy(a, b)
 
-    np.testing.assert_allclose(x_glass, x_scipy)
+    np.testing.assert_allclose(x_glass, x_scipy)  # type: ignore[arg-type]
 
     # check matrix and vector's shape
 

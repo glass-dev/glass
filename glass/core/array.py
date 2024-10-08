@@ -10,7 +10,7 @@ import numpy.typing as npt
 
 def broadcast_first(*arrays: npt.ArrayLike) -> tuple[npt.ArrayLike, ...]:
     """Broadcast arrays, treating the first axis as common."""
-    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
+    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)  # type: ignore[arg-type]
     arrays = np.broadcast_arrays(*arrays)
     return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
 
@@ -51,7 +51,7 @@ def broadcast_leading_axes(
         trails.append(s[i:])
     dims = np.broadcast_shapes(*shapes)
     arrs = (np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails))
-    return (dims, *arrs)
+    return (dims, *arrs)  # type: ignore[arg-type]
 
 
 def ndinterp(  # noqa: PLR0913
@@ -83,25 +83,25 @@ def trapz_product(
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
-            x[(x >= x_[0]) & (x <= x_[-1])],
-            x_[(x_ >= x[0]) & (x_ <= x[-1])],
+            x[(x >= x_[0]) & (x <= x_[-1])],  # type: ignore[index, operator]
+            x_[(x_ >= x[0]) & (x_ <= x[-1])],  # type: ignore[index, operator]
         )
-    y = np.interp(x, *f)
+    y = np.interp(x, *f)  # type: ignore[arg-type]
     for f_ in ff:
-        y *= np.interp(x, *f_)
-    return np.trapz(y, x, axis=axis)  # type: ignore[attr-defined]
+        y *= np.interp(x, *f_)  # type: ignore[arg-type]
+    return np.trapz(y, x, axis=axis)  # type: ignore[no-any-return] # type: ignore[attr-defined]
 
 
 def cumtrapz(
     f: npt.ArrayLike,
     x: npt.ArrayLike,
-    dtype: np.dtype | None = None,
+    dtype: np.dtype | None = None,  # type: ignore[type-arg]
     out: npt.ArrayLike | None = None,
-) -> npt.NDArray:
+) -> npt.ArrayLike:
     """Cumulative trapezoidal rule along last axis."""
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 
-    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
-    out[..., 0] = 0
+    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])  # type: ignore[arg-type, call-overload, index, operator]
+    out[..., 0] = 0  # type: ignore[index]
     return out

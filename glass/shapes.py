@@ -77,7 +77,7 @@ def triaxial_axis_ratio(
 
     # get size from inputs if not explicitly provided
     if size is None:
-        size = np.broadcast(zeta, xi).shape
+        size = np.broadcast(zeta, xi).shape  # type: ignore[assignment]
 
     # draw random viewing angle (theta, phi)
     cos2_theta = rng.uniform(low=-1.0, high=1.0, size=size)
@@ -98,7 +98,7 @@ def triaxial_axis_ratio(
     C = 1 + z2m1 * cos2_phi  # noqa: N806
 
     # eq. (12)
-    return np.sqrt(
+    return np.sqrt(  # type: ignore[no-any-return]
         (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
 
@@ -158,15 +158,15 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
-    eps = rng.normal(mu, sigma, size=size)
+    eps = rng.normal(mu, sigma, size=size)  # type: ignore[arg-type]
     bad = eps > 0
     while np.any(bad):
-        eps[bad] = rng.normal(mu, sigma, size=eps[bad].shape)
+        eps[bad] = rng.normal(mu, sigma, size=eps[bad].shape)  # type: ignore[arg-type]
         bad = eps > 0
-    gam = rng.normal(gamma, sigma_gamma, size=size)
+    gam = rng.normal(gamma, sigma_gamma, size=size)  # type: ignore[arg-type]
     bad = (gam < 0) | (gam > 1)
     while np.any(bad):
-        gam[bad] = rng.normal(gamma, sigma_gamma, size=gam[bad].shape)
+        gam[bad] = rng.normal(gamma, sigma_gamma, size=gam[bad].shape)  # type: ignore[arg-type]
         bad = (gam < 0) | (gam > 1)
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
@@ -178,10 +178,10 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # assemble ellipticity with random complex phase
     e = np.exp(1j * rng.uniform(0, 2 * np.pi, size=np.shape(q)))
-    e *= (1 - q) / (1 + q)
+    e *= (1 - q) / (1 + q)  # type: ignore[operator]
 
     # return the ellipticity
-    return e
+    return e  # type: ignore[no-any-return]
 
 
 def ellipticity_gaussian(

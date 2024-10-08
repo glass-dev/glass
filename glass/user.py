@@ -34,7 +34,7 @@ def save_cls(filename: str, cls: list[npt.ArrayLike | None]) -> None:
     ``.npz`` suffix, or it will be given one.
 
     """
-    split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])
+    split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])  # type: ignore[arg-type]
     values = np.concatenate([cl for cl in cls if cl is not None])
     np.savez(filename, values=values, split=split)
 
@@ -49,7 +49,7 @@ def load_cls(filename: str) -> list[npt.ArrayLike]:
     with np.load(filename) as npz:
         values = npz["values"]
         split = npz["split"]
-    return np.split(values, split)
+    return np.split(values, split)  # type: ignore[return-value]
 
 
 class _FitsWriter:
@@ -59,7 +59,7 @@ class _FitsWriter:
     Initialised with the fits object and extension name.
     """
 
-    def __init__(self, fits, ext: str | None = None) -> None:
+    def __init__(self, fits, ext: str | None = None) -> None:  # type: ignore[no-untyped-def]
         """Create a new, uninitialised writer."""
         self.fits = fits
         self.ext = ext
@@ -91,7 +91,7 @@ class _FitsWriter:
         # if keyword arguments are given, treat them as names and columns
         if columns:
             names, values = list(columns.keys()), list(columns.values())
-            self._append(values, names)
+            self._append(values, names)  # type: ignore[arg-type]
 
 
 @contextmanager
@@ -114,7 +114,7 @@ def write_catalog(
        Requires the ``fitsio`` package.
 
     """
-    import fitsio
+    import fitsio  # type: ignore[import-not-found]
 
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)
