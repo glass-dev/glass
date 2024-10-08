@@ -1,5 +1,5 @@
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from glass.shapes import (
     ellipticity_gaussian,

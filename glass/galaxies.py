@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
     from glass.shells import RadialWindow
 
-import healpix  # type: ignore[import-untyped]
+import healpix
 import numpy as np
 
 from glass.core.array import broadcast_leading_axes, cumtrapz

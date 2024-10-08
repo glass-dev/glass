@@ -1,5 +1,5 @@
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
 

@@ -1,7 +1,7 @@
 import importlib.util
 
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from glass.core.array import (
     broadcast_first,
@@ -154,7 +154,7 @@ def test_trapz_product() -> None:
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")  # type: ignore[misc]
 def test_cumtrapz() -> None:
-    from scipy.integrate import cumulative_trapezoid  # type: ignore[import-untyped]
+    from scipy.integrate import cumulative_trapezoid
 
     # 1D f and x
 

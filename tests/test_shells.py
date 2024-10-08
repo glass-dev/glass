@@ -1,5 +1,5 @@
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from glass.shells import RadialWindow, partition, restrict, tophat_windows
 

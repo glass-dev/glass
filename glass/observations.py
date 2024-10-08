@@ -31,7 +31,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import healpy as hp  # type: ignore[import-untyped]
+import healpy as hp
 import numpy as np
 
 from glass.core.array import cumtrapz

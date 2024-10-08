@@ -54,7 +54,7 @@ import numpy.typing as npt
 from glass.core.array import ndinterp
 
 if TYPE_CHECKING:
-    from cosmology import Cosmology  # type: ignore[import-untyped]
+    from cosmology import Cosmology
 
 # types
 ArrayLike1D = Union[Sequence[float], npt.ArrayLike]

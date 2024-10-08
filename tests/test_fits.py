@@ -3,7 +3,7 @@ import os
 import pathlib
 
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from glass import user
 
@@ -27,9 +27,9 @@ except_int = 750  # Where test exception occurs in loop
 filename = "MyFile.Fits"
 
 
-@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")  # type: ignore[misc]
+@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_basic_write(tmp_path: os.PathLike) -> None:  # type: ignore[type-arg]
-    import fitsio  # type: ignore[import-not-found]
+    import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against

@@ -114,7 +114,7 @@ def write_catalog(
        Requires the ``fitsio`` package.
 
     """
-    import fitsio  # type: ignore[import-not-found]
+    import fitsio
 
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)

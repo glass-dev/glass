@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import typing
 
-import healpix  # type: ignore[import-untyped]
+import healpix
 import numpy as np
 import numpy.typing as npt
 

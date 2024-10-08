@@ -30,10 +30,10 @@ import warnings
 from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Callable, Optional, Union
 
-import healpy as hp  # type: ignore[import-untyped]
+import healpy as hp
 import numpy as np
 import numpy.typing as npt
-from gaussiancl import gaussiancl  # type: ignore[import-untyped]
+from gaussiancl import gaussiancl
 
 # types
 Size = Optional[Union[int, tuple[int, ...]]]

@@ -33,7 +33,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import healpy as hp  # type: ignore[import-untyped]
+import healpy as hp
 import numpy as np
 
 if TYPE_CHECKING:
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 
     import numpy.typing as npt
 
-    from cosmology import Cosmology  # type: ignore[import-untyped]
+    from cosmology import Cosmology
 
     from glass.shells import RadialWindow
 

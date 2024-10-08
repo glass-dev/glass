@@ -1,6 +1,6 @@
-import healpix  # type: ignore[import-untyped]
+import healpix
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from glass.lensing import (
     MultiPlaneConvergence,
@@ -41,7 +41,7 @@ def cosmo():  # type: ignore[no-untyped-def]
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])  # type: ignore[misc]
-def test_deflect_nsew(usecomplex: bool) -> None:
+def test_deflect_nsew(*, usecomplex: bool) -> None:
     d = 5.0
     r = np.radians(d)
 
