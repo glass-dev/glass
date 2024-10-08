@@ -61,7 +61,7 @@ def redshifts(
         Random redshifts following the radial window function.
 
     """
-    return redshifts_from_nz(n, w.za, w.wa, rng=rng)
+    return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
 
 
 def redshifts_from_nz(
@@ -70,6 +70,7 @@ def redshifts_from_nz(
     nz: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
+    warn: bool = True,
 ) -> npt.NDArray:
     """
     Generate galaxy redshifts from a source distribution.
@@ -91,6 +92,8 @@ def redshifts_from_nz(
         shape of *count*.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
+    warn : bool
+        Throw relevant warnings.
 
     Returns
     -------
@@ -100,9 +103,12 @@ def redshifts_from_nz(
         samples from all populations.
 
     """
-    warnings.warn(
-        "redshifts_from_nz is deprecated; use redshifts instead", stacklevel=2
-    )
+    if warn:
+        warnings.warn(
+            "when sampling galaxies, redshifts_from_nz() is often not the function you"
+            " want. Try redshifts() instead. Use warn=False to suppress this warning.",
+            stacklevel=2,
+        )
 
     # get default RNG if not given
     if rng is None:
