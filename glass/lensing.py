@@ -27,7 +27,7 @@ Applying lensing
 
 .. autofunction:: deflect
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D415
 
 from __future__ import annotations
 
@@ -73,7 +73,7 @@ def from_convergence(  # noqa: PLR0913
     discretized : bool
         Correct the pixel window function in output maps.
 
-    Returns
+    Returns:
     -------
     psi : array_like
         Map of the deflection potential.  Only returned if ``potential``
@@ -84,7 +84,7 @@ def from_convergence(  # noqa: PLR0913
     gamma : array_like
         Map of the shear (complex).  Only returned if ``shear`` is true.
 
-    Notes
+    Notes:
     -----
     The weak lensing fields are computed from the convergence or
     deflection potential in the following way. [1]_
@@ -151,7 +151,7 @@ def from_convergence(  # noqa: PLR0913
         2 \gamma_{lm}
         = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
 
-    References
+    References:
     ----------
     .. [1] Tessore N., et al., OJAp, 6, 11 (2023).
            doi:10.21105/astro.2302.01942
@@ -401,7 +401,7 @@ def multi_plane_weights(
     cosmo : Cosmology
         Cosmology instance.
 
-    Returns
+    Returns:
     -------
     lensing_weights : array_like
         Relative lensing weight of each shell.
@@ -436,12 +436,12 @@ def deflect(
         Deflection values.  Must be complex-valued or have a leading
         axis of size 2 for the real and imaginary component.
 
-    Returns
+    Returns:
     -------
     lon, lat : array_like
         Longitudes and latitudes after deflection.
 
-    Notes
+    Notes:
     -----
     Deflections on the sphere are :term:`defined <deflection>` as
     follows:  The complex deflection :math:`\\alpha` transports a point

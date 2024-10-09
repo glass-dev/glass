@@ -7,4 +7,4 @@ Core functions (:mod:`glass.core`)
 The :mod:`glass.core` module contains core functionality for developing
 GLASS modules.
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D415

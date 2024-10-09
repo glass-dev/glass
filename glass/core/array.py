@@ -19,7 +19,7 @@ def broadcast_leading_axes(*args):
     Returns the shape of the broadcast dimensions, and all input arrays
     with leading axes matching that shape.
 
-    Examples
+    Examples:
     --------
     Broadcast all dimensions of ``a``, all except the last dimension of
     ``b``, and all except the last two dimensions of ``c``.

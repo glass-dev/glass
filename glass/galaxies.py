@@ -15,7 +15,7 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D415
 
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ def redshifts(
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
 
-    Returns
+    Returns:
     -------
     z : array_like
         Random redshifts following the radial window function.
@@ -95,7 +95,7 @@ def redshifts_from_nz(
     warn : bool
         Throw relevant warnings.
 
-    Returns
+    Returns:
     -------
     redshifts : array_like
         Redshifts sampled from the given source distribution.  For
@@ -170,7 +170,7 @@ def galaxy_shear(  # noqa: PLR0913
         If ``False``, galaxy shears are not reduced by the convergence.
         Default is ``True``.
 
-    Returns
+    Returns:
     -------
     she : array_like
         Array of complex-valued observed galaxy shears (lensed ellipticities).
@@ -231,30 +231,30 @@ def gaussian_phz(
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
 
-    Returns
+    Returns:
     -------
     phz : array_like
         Photometric redshifts assuming Gaussian errors, of the same
         shape as *z*.
 
-    Warnings
+    Warnings:
     --------
     The *lower* and *upper* bounds are implemented using plain rejection
     sampling from the non-truncated normal distribution.  If bounds are
     used, they should always contain significant probability mass.
 
-    See Also
+    See Also:
     --------
     glass.tomo_nz_gausserr :
         Create tomographic redshift distributions assuming the same
         model.
 
-    References
+    References:
     ----------
     .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
            doi:10.1111/j.1365-2966.2007.12271.x
 
-    Examples
+    Examples:
     --------
     See the :doc:`/examples/1-basic/photoz` example.
 

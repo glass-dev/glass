@@ -24,7 +24,7 @@ Visibility
 .. autofunction:: vmap_galactic_ecliptic
 
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D415
 
 from __future__ import annotations
 
@@ -60,12 +60,12 @@ def vmap_galactic_ecliptic(
         The location of the galactic and ecliptic plane in their respective
         coordinate systems.
 
-    Returns
+    Returns:
     -------
     vis : array_like
         A HEALPix :term:`visibility map`.
 
-    Raises
+    Raises:
     ------
     TypeError
         If the ``galactic`` or ``ecliptic`` arguments are not pairs of numbers.
@@ -112,7 +112,7 @@ def gaussian_nz(
     norm : float or array_like, optional
         If given, the normalisation of the distribution.
 
-    Returns
+    Returns:
     -------
     nz : array_like
         Redshift distribution at the given ``z`` values.
@@ -156,12 +156,12 @@ def smail_nz(
     norm : float or array_like, optional
         If given, the normalisation of the distribution.
 
-    Returns
+    Returns:
     -------
     pz : array_like
         Redshift distribution at the given ``z`` values.
 
-    Notes
+    Notes:
     -----
     The probability distribution function :math:`p(z)` for redshift :math:`z`
     is given by Amara & Refregier [2]_ as
@@ -173,7 +173,7 @@ def smail_nz(
 
     where :math:`z_0` is matched to the given mode of the distribution.
 
-    References
+    References:
     ----------
     .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
@@ -214,7 +214,7 @@ def fixed_zbins(
     dz : float, optional
         Size of redshift bin.  Only one of ``nbins`` and ``dz`` can be given.
 
-    Returns
+    Returns:
     -------
     zbins : list of tuple of float
         List of redshift bin edges.
@@ -249,7 +249,7 @@ def equal_dens_zbins(
     nbins : int
         Number of redshift bins.
 
-    Returns
+    Returns:
     -------
     zbins : list of tuple of float
         List of redshift bin edges.
@@ -291,20 +291,20 @@ def tomo_nz_gausserr(
     zbins : list of tuple of float
         List of redshift bin edges.
 
-    Returns
+    Returns:
     -------
     binned_nz : array_like
         Tomographic redshift bins convolved with a gaussian error.
         Array has a shape (nbins, len(z))
 
-    See Also
+    See Also:
     --------
     equal_dens_zbins :
         produce equal density redshift bins
     fixed_zbins :
         produce redshift bins of fixed size
 
-    References
+    References:
     ----------
     .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
            doi:10.1111/j.1365-2966.2007.12271.x

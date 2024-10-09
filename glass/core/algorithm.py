@@ -22,7 +22,7 @@ def nnls(
 
     Implementation of the algorithm due to [1]_ as described in [2]_.
 
-    References
+    References:
     ----------
     .. [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
         Problems. doi: 10.1137/1.9781611971217
