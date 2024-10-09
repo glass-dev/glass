@@ -149,7 +149,7 @@ def test_trapz_product() -> None:
 
     s = trapz_product((x1, f1), (x2, f2))
 
-    assert np.allclose(s, 1.0)
+    np.testing.assert_allclose(s, 1.0)  # type: ignore[arg-type]
 
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")

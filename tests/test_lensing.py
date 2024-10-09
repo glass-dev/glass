@@ -56,19 +56,19 @@ def test_deflect_nsew(*, usecomplex: bool) -> None:
 
     # north
     lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[misc, no-untyped-call]
-    assert np.allclose([lon, lat], [0.0, d])  # type: ignore[arg-type]
+    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)  # type: ignore[arg-type]
 
     # south
     lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[misc, no-untyped-call]
-    assert np.allclose([lon, lat], [0.0, -d])  # type: ignore[arg-type]
+    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)  # type: ignore[arg-type]
 
     # east
     lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[misc, no-untyped-call]
-    assert np.allclose([lon, lat], [-d, 0.0])  # type: ignore[arg-type]
+    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)  # type: ignore[arg-type]
 
     # west
     lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[misc, no-untyped-call]
-    assert np.allclose([lon, lat], [d, 0.0])  # type: ignore[arg-type]
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)  # type: ignore[arg-type]
 
 
 def test_deflect_many(rng: np.random.Generator) -> None:

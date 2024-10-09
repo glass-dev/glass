@@ -19,6 +19,7 @@ Functions
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -60,7 +61,7 @@ def redshifts(
         Random redshifts following the radial window function.
 
     """
-    return redshifts_from_nz(n, w.za, w.wa, rng=rng)
+    return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
 
 
 def redshifts_from_nz(
@@ -69,7 +70,8 @@ def redshifts_from_nz(
     nz: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+    warn: bool = True,
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -90,6 +92,8 @@ def redshifts_from_nz(
         shape of *count*.
     rng : :class:`~numpy.random.Generator`, optional
         Random number generator.  If not given, a default RNG is used.
+    warn : bool
+        Throw relevant warnings.
 
     Returns
     -------
@@ -99,6 +103,13 @@ def redshifts_from_nz(
         samples from all populations.
 
     """
+    if warn:
+        warnings.warn(
+            "when sampling galaxies, redshifts_from_nz() is often not the function you"
+            " want. Try redshifts() instead. Use warn=False to suppress this warning.",
+            stacklevel=2,
+        )
+
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
