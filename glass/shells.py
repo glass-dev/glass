@@ -44,21 +44,20 @@ Weight functions
 
 from __future__ import annotations
 
+import typing
 import warnings
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Callable, NamedTuple, Union
 
 import numpy as np
 import numpy.typing as npt
 
 from glass.core.array import ndinterp
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = Union[Sequence[float], npt.NDArray]  # type: ignore[type-arg]
-WeightFunc = Callable[[ArrayLike1D], npt.NDArray]  # type: ignore[type-arg]
+ArrayLike1D = typing.Union[typing.Sequence[float], npt.NDArray]  # type: ignore[type-arg]
+WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray]  # type: ignore[type-arg]
 
 
 def distance_weight(z: npt.NDArray, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
@@ -76,7 +75,7 @@ def density_weight(z: npt.NDArray, cosmo: Cosmology) -> npt.NDArray:  # type: ig
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-class RadialWindow(NamedTuple):
+class RadialWindow(typing.NamedTuple):
     """
     A radial window, defined by a window function.
 
@@ -107,9 +106,9 @@ class RadialWindow(NamedTuple):
 
     Attributes
     ----------
-    za : Sequence[float]
+    za : typing.Sequence[float]
         Redshift array; the abscissae of the window function.
-    wa : Sequence[float]
+    wa : typing.Sequence[float]
         Weight array; the values (ordinates) of the window function.
     zeff : float
         Effective redshift of the window.
@@ -120,8 +119,8 @@ class RadialWindow(NamedTuple):
 
     """
 
-    za: Sequence[float]
-    wa: Sequence[float]
+    za: typing.Sequence[float]
+    wa: typing.Sequence[float]
     zeff: float | None
 
 
@@ -351,7 +350,7 @@ def restrict(
 def partition(
     z: npt.NDArray,  # type: ignore[type-arg]
     fz: npt.NDArray,  # type: ignore[type-arg]
-    shells: Sequence[RadialWindow],
+    shells: typing.Sequence[RadialWindow],
     *,
     method: str = "nnls",
 ) -> npt.NDArray:  # type: ignore[type-arg]
@@ -461,7 +460,7 @@ def partition(
 def partition_lstsq(
     z: npt.NDArray,  # type: ignore[type-arg]
     fz: npt.NDArray,  # type: ignore[type-arg]
-    shells: Sequence[RadialWindow],
+    shells: typing.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray:  # type: ignore[type-arg]
@@ -507,7 +506,7 @@ def partition_lstsq(
 def partition_nnls(
     z: npt.NDArray,  # type: ignore[type-arg]
     fz: npt.NDArray,  # type: ignore[type-arg]
-    shells: Sequence[RadialWindow],
+    shells: typing.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray:  # type: ignore[type-arg]
@@ -568,7 +567,7 @@ def partition_nnls(
 def partition_restrict(
     z: npt.NDArray,  # type: ignore[type-arg]
     fz: npt.NDArray,  # type: ignore[type-arg]
-    shells: Sequence[RadialWindow],
+    shells: typing.Sequence[RadialWindow],
 ) -> npt.NDArray:  # type: ignore[type-arg]
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
@@ -615,7 +614,7 @@ def distance_grid(
 def combine(
     z: npt.NDArray,  # type: ignore[type-arg]
     weights: npt.NDArray,  # type: ignore[type-arg]
-    shells: Sequence[RadialWindow],
+    shells: typing.Sequence[RadialWindow],
 ) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Evaluate a linear combination of window functions.

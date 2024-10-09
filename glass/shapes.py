@@ -24,11 +24,11 @@ Utilities
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
 

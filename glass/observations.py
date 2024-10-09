@@ -29,14 +29,14 @@ Visibility
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+import typing
 
 import healpy as hp
 import numpy as np
 
 from glass.core.array import cumtrapz
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
 

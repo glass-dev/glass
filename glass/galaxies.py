@@ -19,10 +19,10 @@ Functions
 
 from __future__ import annotations
 
+import typing
 import warnings
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
     from glass.shells import RadialWindow
