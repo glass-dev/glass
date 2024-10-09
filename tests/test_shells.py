@@ -31,21 +31,21 @@ def test_restrict() -> None:
 
     zr, fr = restrict(z, f, w)
 
-    assert zr[0] == w.za[0]  # type: ignore[index]
-    assert zr[-1] == w.za[-1]  # type: ignore[index]
+    assert zr[0] == w.za[0]
+    assert zr[-1] == w.za[-1]
 
-    assert fr[0] == fr[-1] == 0.0  # type: ignore[index]
+    assert fr[0] == fr[-1] == 0.0
 
     for zi, wi in zip(w.za, w.wa):
         i = np.searchsorted(zr, zi)
-        assert zr[i] == zi  # type: ignore[index]
-        assert fr[i] == wi * np.interp(zi, z, f)  # type: ignore[index]
+        assert zr[i] == zi
+        assert fr[i] == wi * np.interp(zi, z, f)
 
     for zi, fi in zip(z, f):
         if w.za[0] <= zi <= w.za[-1]:
             i = np.searchsorted(zr, zi)
-            assert zr[i] == zi  # type: ignore[index]
-            assert fr[i] == fi * np.interp(zi, w.za, w.wa)  # type: ignore[index]
+            assert zr[i] == zi
+            assert fr[i] == fi * np.interp(zi, w.za, w.wa)
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])

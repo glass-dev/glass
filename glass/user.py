@@ -26,7 +26,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-def save_cls(filename: str, cls: list[npt.ArrayLike | None]) -> None:
+def save_cls(filename: str, cls: list[npt.NDArray | None]) -> None:  # type: ignore[type-arg]
     """
     Save a list of Cls to file.
 
@@ -34,12 +34,12 @@ def save_cls(filename: str, cls: list[npt.ArrayLike | None]) -> None:
     ``.npz`` suffix, or it will be given one.
 
     """
-    split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])  # type: ignore[arg-type]
+    split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])
     values = np.concatenate([cl for cl in cls if cl is not None])
     np.savez(filename, values=values, split=split)
 
 
-def load_cls(filename: str) -> list[npt.ArrayLike]:
+def load_cls(filename: str) -> list[npt.NDArray]:  # type: ignore[type-arg]
     """
     Load a list of Cls from file.
 
@@ -49,7 +49,7 @@ def load_cls(filename: str) -> list[npt.ArrayLike]:
     with np.load(filename) as npz:
         values = npz["values"]
         split = npz["split"]
-    return np.split(values, split)  # type: ignore[return-value]
+    return np.split(values, split)
 
 
 class _FitsWriter:
@@ -64,7 +64,7 @@ class _FitsWriter:
         self.fits = fits
         self.ext = ext
 
-    def _append(self, data: npt.ArrayLike, names: list[str] | None = None) -> None:
+    def _append(self, data: npt.NDArray, names: list[str] | None = None) -> None:  # type: ignore[type-arg]
         """Write the FITS file."""
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
@@ -75,9 +75,7 @@ class _FitsWriter:
             # not using hdu.append here because of incompatibilities
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
-    def write(
-        self, data: npt.ArrayLike | None = None, /, **columns: npt.ArrayLike
-    ) -> None:
+    def write(self, data: npt.NDArray | None = None, /, **columns: npt.NDArray) -> None:  # type: ignore[type-arg]
         """
         Write to FITS by calling the internal _append method.
 

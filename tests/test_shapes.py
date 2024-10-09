@@ -113,23 +113,23 @@ def test_ellipticity_intnorm() -> None:
 
     eps = ellipticity_intnorm(n, 0.256)
 
-    assert eps.shape == (n,)  # type: ignore[union-attr]
+    assert eps.shape == (n,)
 
     np.testing.assert_array_less(np.abs(eps), 1)
 
-    np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
-    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
+    np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
     eps = ellipticity_intnorm([n, n], [0.128, 0.256])
 
-    assert eps.shape == (2 * n,)  # type: ignore[union-attr]
+    assert eps.shape == (2 * n,)
 
     np.testing.assert_array_less(np.abs(eps), 1)
 
-    np.testing.assert_allclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-    np.testing.assert_allclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-    np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-    np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
+    np.testing.assert_allclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
 
     with pytest.raises(ValueError):
         ellipticity_intnorm(1, 0.71)

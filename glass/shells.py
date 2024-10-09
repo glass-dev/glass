@@ -57,21 +57,21 @@ if TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = Union[Sequence[float], npt.ArrayLike]
-WeightFunc = Callable[[ArrayLike1D], npt.ArrayLike]
+ArrayLike1D = Union[Sequence[float], npt.NDArray]  # type: ignore[type-arg]
+WeightFunc = Callable[[ArrayLike1D], npt.NDArray]  # type: ignore[type-arg]
 
 
-def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.ArrayLike:
+def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.ArrayLike:
+def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.ArrayLike:
+def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
@@ -164,10 +164,10 @@ def tophat_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zbins) < 2:  # type: ignore[arg-type]
+    if len(zbins) < 2:
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
-    if zbins[0] != 0:  # type: ignore[index]
+    if zbins[0] != 0:
         warnings.warn(
             "first tophat window does not start at redshift zero", stacklevel=2
         )
@@ -175,11 +175,11 @@ def tophat_windows(
     wht: WeightFunc
     wht = weight if weight is not None else np.ones_like  # type: ignore[assignment]
     ws = []
-    for zmin, zmax in zip(zbins, zbins[1:]):  # type: ignore[arg-type, index]
+    for zmin, zmax in zip(zbins, zbins[1:]):
         n = max(round((zmax - zmin) / dz), 2)
-        z = np.linspace(zmin, zmax, n)  # type: ignore[arg-type]
+        z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[attr-defined, operator]
+        zeff = np.trapz(w * z, z) / np.trapz(w, z)
         ws.append(RadialWindow(z, w, zeff))  # type: ignore[arg-type]
     return ws
 
@@ -223,25 +223,25 @@ def linear_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zgrid) < 3:  # type: ignore[arg-type]
+    if len(zgrid) < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
-    if zgrid[0] != 0:  # type: ignore[index]
+    if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
     ws = []
-    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):  # type: ignore[arg-type, index]
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],  # type: ignore[arg-type]
+            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
         )
         w = np.concatenate(
             [np.linspace(0.0, 1.0, n, endpoint=False), np.linspace(1.0, 0.0, m)],
         )
         if weight is not None:
             w *= weight(z)
-        ws.append(RadialWindow(z, w, zmid))  # type: ignore[arg-type]
+        ws.append(RadialWindow(z, w, zmid))
     return ws
 
 
@@ -285,25 +285,25 @@ def cubic_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zgrid) < 3:  # type: ignore[arg-type]
+    if len(zgrid) < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
-    if zgrid[0] != 0:  # type: ignore[index]
+    if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
     ws = []
-    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):  # type: ignore[arg-type, index]
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],  # type: ignore[arg-type]
+            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
         )
         u = np.linspace(0.0, 1.0, n, endpoint=False)
         v = np.linspace(1.0, 0.0, m)
         w = np.concatenate([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
         if weight is not None:
             w *= weight(z)
-        ws.append(RadialWindow(z, w, zmid))  # type: ignore[arg-type]
+        ws.append(RadialWindow(z, w, zmid))
     return ws
 
 
@@ -311,7 +311,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.ArrayLike, npt.ArrayLike]:
+) -> tuple[npt.NDArray, npt.NDArray]:  # type: ignore[type-arg]
     """
     Restrict a function to a redshift window.
 
@@ -345,7 +345,7 @@ def restrict(
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
     fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)  # type: ignore[operator]
-    return zr, fr
+    return zr, fr  # type: ignore[return-value]
 
 
 def partition(
@@ -573,7 +573,7 @@ def partition_restrict(
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
-        zr, fr = restrict(z, fz, w)
+        zr, fr = restrict(z, fz, w)  # type: ignore[arg-type]
         part[i] = np.trapz(fr, zr, axis=-1)  # type: ignore[attr-defined]
     return part
 

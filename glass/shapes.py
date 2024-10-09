@@ -246,7 +246,7 @@ def ellipticity_intnorm(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 
