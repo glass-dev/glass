@@ -12,7 +12,7 @@ from glass.shapes import (
 def test_triaxial_axis_ratio() -> None:
     # single axis ratio
 
-    q = triaxial_axis_ratio(0.8, 0.4)
+    q = triaxial_axis_ratio(0.8, 0.4)  # type: ignore[arg-type]
     assert np.isscalar(q)
 
     # many axis ratios
@@ -27,13 +27,13 @@ def test_triaxial_axis_ratio() -> None:
 
     # implicit size
 
-    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)
-    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])
+    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)  # type: ignore[arg-type]
+    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])  # type: ignore[arg-type]
     assert np.shape(q1) == np.shape(q2) == (2,)
 
     # broadcasting rule
 
-    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])
+    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])  # type: ignore[arg-type]
     assert np.shape(q) == (2, 2)
 
     # random parameters and check that projection is
@@ -49,69 +49,45 @@ def test_triaxial_axis_ratio() -> None:
 def test_ellipticity_ryden04() -> None:
     # single ellipticity
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)  # type: ignore[arg-type]
     assert np.isscalar(e)
 
     # many ellipticities
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)  # type: ignore[arg-type]
     assert np.shape(e) == (1000,)
 
     # explicit shape
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))  # type: ignore[arg-type]
     assert np.shape(e) == (10, 10)
 
     # implicit size
 
-    e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)
-    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])
-    e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)
-    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)
+    e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)  # type: ignore[arg-type]
+    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])  # type: ignore[arg-type]
+    e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)  # type: ignore[arg-type]
+    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)  # type: ignore[arg-type]
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
 
     # broadcasting rule
 
-    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)
+    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)  # type: ignore[arg-type]
     assert np.shape(e) == (2, 2)
 
     # check that result is in the specified range
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
-    assert np.all((e.real >= -1.0) & (e.real <= 1.0))  # type: ignore[union-attr]
+    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)  # type: ignore[arg-type]
+    assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)
-    assert np.all((e.real >= -1.0) & (e.real <= 1.0))  # type: ignore[union-attr]
+    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)  # type: ignore[arg-type]
+    assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
 
 def test_ellipticity_gaussian() -> None:
     n = 1_000_000
 
-    eps = ellipticity_gaussian(n, 0.256)
-
-    assert eps.shape == (n,)  # type: ignore[union-attr]
-
-    np.testing.assert_array_less(np.abs(eps), 1)
-
-    np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
-    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)  # type: ignore[union-attr]
-
-    eps = ellipticity_gaussian([n, n], [0.128, 0.256])
-
-    assert eps.shape == (2 * n,)  # type: ignore[union-attr]
-
-    np.testing.assert_array_less(np.abs(eps), 1)
-
-    np.testing.assert_allclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-    np.testing.assert_allclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-    np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-    np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)  # type: ignore[index, union-attr]
-
-
-def test_ellipticity_intnorm() -> None:
-    n = 1_000_000
-
-    eps = ellipticity_intnorm(n, 0.256)
+    eps = ellipticity_gaussian(n, 0.256)  # type: ignore[arg-type]
 
     assert eps.shape == (n,)
 
@@ -120,7 +96,31 @@ def test_ellipticity_intnorm() -> None:
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
-    eps = ellipticity_intnorm([n, n], [0.128, 0.256])
+    eps = ellipticity_gaussian([n, n], [0.128, 0.256])  # type: ignore[arg-type]
+
+    assert eps.shape == (2 * n,)
+
+    np.testing.assert_array_less(np.abs(eps), 1)
+
+    np.testing.assert_allclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
+
+
+def test_ellipticity_intnorm() -> None:
+    n = 1_000_000
+
+    eps = ellipticity_intnorm(n, 0.256)  # type: ignore[arg-type]
+
+    assert eps.shape == (n,)
+
+    np.testing.assert_array_less(np.abs(eps), 1)
+
+    np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
+
+    eps = ellipticity_intnorm([n, n], [0.128, 0.256])  # type: ignore[arg-type]
 
     assert eps.shape == (2 * n,)
 
@@ -132,4 +132,4 @@ def test_ellipticity_intnorm() -> None:
     np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
 
     with pytest.raises(ValueError):
-        ellipticity_intnorm(1, 0.71)
+        ellipticity_intnorm(1, 0.71)  # type: ignore[arg-type]

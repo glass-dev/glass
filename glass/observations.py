@@ -44,7 +44,7 @@ def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Visibility map masking galactic and ecliptic plane.
 
@@ -86,12 +86,12 @@ def vmap_galactic_ecliptic(
 
 
 def gaussian_nz(
-    z: npt.ArrayLike,
-    mean: npt.ArrayLike,
-    sigma: npt.ArrayLike,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    mean: npt.NDArray,  # type: ignore[type-arg]
+    sigma: npt.NDArray,  # type: ignore[type-arg]
     *,
-    norm: npt.ArrayLike | None = None,
-) -> npt.ArrayLike:
+    norm: npt.NDArray | None = None,  # type: ignore[type-arg]
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Gaussian redshift distribution.
 
@@ -131,13 +131,13 @@ def gaussian_nz(
 
 
 def smail_nz(
-    z: npt.ArrayLike,
-    z_mode: npt.ArrayLike,
-    alpha: npt.ArrayLike,
-    beta: npt.ArrayLike,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    z_mode: npt.NDArray,  # type: ignore[type-arg]
+    alpha: npt.NDArray,  # type: ignore[type-arg]
+    beta: npt.NDArray,  # type: ignore[type-arg]
     *,
-    norm: float | npt.ArrayLike | None = None,
-) -> npt.ArrayLike:
+    norm: float | npt.NDArray | None = None,  # type: ignore[type-arg]
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -232,8 +232,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: npt.ArrayLike,
-    nz: npt.ArrayLike,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    nz: npt.NDArray,  # type: ignore[type-arg]
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -260,18 +260,18 @@ def equal_dens_zbins(
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
     cuml_nz = cumtrapz(nz, z)
-    cuml_nz /= cuml_nz[[-1]]  # type: ignore[index, operator]
-    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)  # type: ignore[arg-type]
+    cuml_nz /= cuml_nz[[-1]]
+    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 
     return list(zip(zbinedges, zbinedges[1:]))
 
 
 def tomo_nz_gausserr(
-    z: npt.ArrayLike,
-    nz: npt.ArrayLike,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    nz: npt.NDArray,  # type: ignore[type-arg]
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Tomographic redshift bins with a Gaussian redshift error.
 
@@ -323,10 +323,10 @@ def tomo_nz_gausserr(
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz
     # leading axis corresponds to the different bins
-    sz = 2**0.5 * sigma_0 * (1 + z)  # type: ignore[operator]
+    sz = 2**0.5 * sigma_0 * (1 + z)
     binned_nz = erf((z - z_lower) / sz)
     binned_nz -= erf((z - z_upper) / sz)
-    binned_nz /= 1 + erf(z / sz)  # type: ignore[operator]
+    binned_nz /= 1 + erf(z / sz)
     binned_nz *= nz
 
     return binned_nz  # type: ignore[no-any-return]

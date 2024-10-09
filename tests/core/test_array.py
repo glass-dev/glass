@@ -22,8 +22,8 @@ def test_broadcast_first() -> None:
     # arrays with shape ((3, 4, 2)) and ((1, 2)) are passed
     # to np.broadcast_arrays; hence it works
     a_a, b_a = broadcast_first(a, b)
-    assert a_a.shape == (2, 3, 4)  # type: ignore[union-attr]
-    assert b_a.shape == (2, 3, 4)  # type: ignore[union-attr]
+    assert a_a.shape == (2, 3, 4)
+    assert b_a.shape == (2, 3, 4)
 
     # plain np.broadcast_arrays will not work
     with pytest.raises(ValueError, match="shape mismatch"):
@@ -49,7 +49,7 @@ def test_broadcast_leading_axes() -> None:
     b = np.zeros((4, 10))
     c = np.zeros((3, 1, 5, 6))
 
-    dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[assignment]
+    dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[arg-type, assignment]
 
     assert dims == (3, 4)
     assert a.shape == (3, 4)  # type: ignore[attr-defined]
@@ -64,39 +64,39 @@ def test_ndinterp() -> None:
     yp = [1.1, 1.2, 1.3, 1.4, 1.5]
 
     x = 0.5
-    y = ndinterp(x, xp, yp)
+    y = ndinterp(x, xp, yp)  # type: ignore[arg-type]
     assert np.shape(y) == ()
-    np.testing.assert_allclose(y, 1.15, atol=1e-15)  # type: ignore[arg-type]
+    np.testing.assert_allclose(y, 1.15, atol=1e-15)
 
     x = [0.5, 1.5, 2.5]  # type: ignore[assignment]
-    y = ndinterp(x, xp, yp)
+    y = ndinterp(x, xp, yp)  # type: ignore[arg-type]
     assert np.shape(y) == (3,)
-    np.testing.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)  # type: ignore[arg-type]
+    np.testing.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
 
     x = [[0.5, 1.5], [2.5, 3.5]]  # type: ignore[assignment]
-    y = ndinterp(x, xp, yp)
+    y = ndinterp(x, xp, yp)  # type: ignore[arg-type]
     assert np.shape(y) == (2, 2)
-    np.testing.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)  # type: ignore[arg-type]
+    np.testing.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
     # test nd interpolation in final axis
 
     yp = [[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]]  # type: ignore[list-item]
 
     x = 0.5
-    y = ndinterp(x, xp, yp)
+    y = ndinterp(x, xp, yp)  # type: ignore[arg-type]
     assert np.shape(y) == (2,)
-    np.testing.assert_allclose(y, [1.15, 2.15], atol=1e-15)  # type: ignore[arg-type]
+    np.testing.assert_allclose(y, [1.15, 2.15], atol=1e-15)
 
     x = [0.5, 1.5, 2.5]  # type: ignore[assignment]
-    y = ndinterp(x, xp, yp)
+    y = ndinterp(x, xp, yp)  # type: ignore[arg-type]
     assert np.shape(y) == (2, 3)
-    np.testing.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)  # type: ignore[arg-type]
+    np.testing.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
 
     x = [[0.5, 1.5], [2.5, 3.5]]  # type: ignore[assignment]
-    y = ndinterp(x, xp, yp)
+    y = ndinterp(x, xp, yp)  # type: ignore[arg-type]
     assert np.shape(y) == (2, 2, 2)
     np.testing.assert_allclose(
-        y,  # type: ignore[arg-type]
+        y,
         [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]],
         atol=1e-15,
     )
@@ -106,24 +106,24 @@ def test_ndinterp() -> None:
     yp = [[[1.1], [1.2], [1.3], [1.4], [1.5]], [[2.1], [2.2], [2.3], [2.4], [2.5]]]  # type: ignore[list-item]
 
     x = 0.5
-    y = ndinterp(x, xp, yp, axis=1)
+    y = ndinterp(x, xp, yp, axis=1)  # type: ignore[arg-type]
     assert np.shape(y) == (2, 1)
-    np.testing.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)  # type: ignore[arg-type]
+    np.testing.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
 
     x = [0.5, 1.5, 2.5]  # type: ignore[assignment]
-    y = ndinterp(x, xp, yp, axis=1)
+    y = ndinterp(x, xp, yp, axis=1)  # type: ignore[arg-type]
     assert np.shape(y) == (2, 3, 1)
     np.testing.assert_allclose(
-        y,  # type: ignore[arg-type]
+        y,
         [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]],
         atol=1e-15,
     )
 
     x = [[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]]  # type: ignore[assignment]
-    y = ndinterp(x, xp, yp, axis=1)
+    y = ndinterp(x, xp, yp, axis=1)  # type: ignore[arg-type]
     assert np.shape(y) == (2, 3, 4, 1)
     np.testing.assert_allclose(
-        y,  # type: ignore[arg-type]
+        y,
         [
             [
                 [[1.15], [1.25], [1.35], [1.45]],
@@ -149,7 +149,7 @@ def test_trapz_product() -> None:
 
     s = trapz_product((x1, f1), (x2, f2))
 
-    np.testing.assert_allclose(s, 1.0)  # type: ignore[arg-type]
+    np.testing.assert_allclose(s, 1.0)
 
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
@@ -164,19 +164,19 @@ def test_cumtrapz() -> None:
     # default dtype (int - not supported by scipy)
 
     glass_ct = cumtrapz(f, x)
-    np.testing.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))  # type: ignore[arg-type]
+    np.testing.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
 
     # explicit dtype (float)
 
     glass_ct = cumtrapz(f, x, dtype=float)  # type: ignore[arg-type]
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    np.testing.assert_allclose(glass_ct, scipy_ct)  # type: ignore[arg-type]
+    np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
     result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))  # type: ignore[arg-type]
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    np.testing.assert_allclose(result, scipy_ct)  # type: ignore[arg-type]
+    np.testing.assert_allclose(result, scipy_ct)
 
     # 2D f and 1D x
 
@@ -186,16 +186,16 @@ def test_cumtrapz() -> None:
     # default dtype (int - not supported by scipy)
 
     glass_ct = cumtrapz(f, x)
-    np.testing.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))  # type: ignore[arg-type]
+    np.testing.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     # explicit dtype (float)
 
     glass_ct = cumtrapz(f, x, dtype=float)  # type: ignore[arg-type]
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    np.testing.assert_allclose(glass_ct, scipy_ct)  # type: ignore[arg-type]
+    np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
     glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))  # type: ignore[arg-type]
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
-    np.testing.assert_allclose(glass_ct, scipy_ct)  # type: ignore[arg-type]
+    np.testing.assert_allclose(glass_ct, scipy_ct)

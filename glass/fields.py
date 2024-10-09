@@ -37,15 +37,15 @@ from gaussiancl import gaussiancl
 
 # types
 Size = Optional[Union[int, tuple[int, ...]]]
-Iternorm = tuple[Optional[int], npt.ArrayLike, npt.ArrayLike]
-ClTransform = Union[str, Callable[[npt.ArrayLike], npt.ArrayLike]]
-Cls = Sequence[Union[npt.ArrayLike, Sequence[float]]]
-Alms = npt.ArrayLike
+Iternorm = tuple[Optional[int], npt.NDArray, npt.NDArray]  # type: ignore[type-arg]
+ClTransform = Union[str, Callable[[npt.NDArray], npt.NDArray]]  # type: ignore[type-arg]
+Cls = Sequence[Union[npt.NDArray, Sequence[float]]]  # type: ignore[type-arg]
+Alms = npt.NDArray  # type: ignore[type-arg]
 
 
 def iternorm(
     k: int,
-    cov: Iterable[npt.ArrayLike],
+    cov: Iterable[npt.NDArray],  # type: ignore[type-arg]
     size: Size = None,
 ) -> Generator[Iternorm, None, None]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
@@ -105,9 +105,7 @@ def iternorm(
         yield j, a, s
 
 
-def cls2cov(
-    cls: Cls, nl: int, nf: int, nc: int
-) -> Generator[npt.ArrayLike, None, None]:
+def cls2cov(cls: Cls, nl: int, nf: int, nc: int) -> Generator[npt.NDArray, None, None]:  # type: ignore[type-arg]
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
     end = 0
@@ -120,19 +118,19 @@ def cls2cov(
                 if i == 0 and np.any(np.less(cl, 0)):
                     msg = "negative values in cl"
                     raise ValueError(msg)
-                n = len(cl)  # type: ignore[arg-type]
+                n = len(cl)
                 cov[:n, i] = cl
                 cov[n:, i] = 0
         cov /= 2
         yield cov
 
 
-def multalm(alm: Alms, bl: npt.ArrayLike, *, inplace: bool = False) -> Alms:
+def multalm(alm: Alms, bl: npt.NDArray, *, inplace: bool = False) -> Alms:  # type: ignore[type-arg]
     """Multiply alm by bl."""
-    n = len(bl)  # type: ignore[arg-type]
+    n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
-        out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]  # type: ignore[index]
+        out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
     return out
 
 
@@ -140,8 +138,8 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[arg-type, redundant-expr]
-            monopole = 0.0 if cl[0] == 0 else None  # type: ignore[index]
+        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+            monopole = 0.0 if cl[0] == 0 else None
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
                 warnings.warn(
@@ -185,12 +183,12 @@ def gaussian_gls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[arg-type, redundant-expr]
+        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
             if lmax is not None:
-                cl = cl[: lmax + 1]  # type: ignore[index] # noqa: PLW2901
+                cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl), len(pw))  # type: ignore[arg-type]
-                cl = cl[:n] * pw[:n] ** 2  # type: ignore[index] # noqa: PLW2901
+                n = min(len(cl), len(pw))
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
 
@@ -214,7 +212,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[npt.ArrayLike, None, None]:
+) -> Generator[npt.NDArray, None, None]:  # type: ignore[type-arg]
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -251,7 +249,7 @@ def generate_gaussian(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[arg-type, redundant-expr]
+    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[redundant-expr]
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -278,15 +276,15 @@ def generate_gaussian(
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += multalm(y[:, i], a[:, i])  # type: ignore[call-overload, index, operator]
+            alm += multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
             y[:, j] = z
 
         # modes with m = 0 are real-valued and come first in array
-        alm[:n].real += alm[:n].imag  # type: ignore[index, misc, union-attr]
-        alm[:n].imag[:] = 0  # type: ignore[index, union-attr]
+        alm[:n].real += alm[:n].imag
+        alm[:n].imag[:] = 0
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -300,31 +298,34 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[npt.ArrayLike, None, None]:
+) -> Generator[npt.NDArray, None, None]:  # type: ignore[type-arg]
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         gl = gls[i * (i + 1) // 2]
-        ell = np.arange(len(gl))  # type: ignore[arg-type]
-        var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)  # type: ignore[operator]
+        ell = np.arange(len(gl))
+        var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
 
         # fix mean of the Gaussian random field for lognormal transformation
         m -= var / 2  # noqa: PLW2901
 
         # exponentiate values in place and subtract 1 in one operation
-        np.expm1(m, out=m)  # type: ignore[call-overload]
+        np.expm1(m, out=m)
 
         # lognormal shift, unless unity
         if shift != 1:
-            m *= shift  # type: ignore[operator] # noqa: PLW2901
+            m *= shift  # noqa: PLW2901
 
         # yield the lognormal map
         yield m
 
 
 def getcl(
-    cls: list[npt.ArrayLike], i: int, j: int, lmax: int | None = None
-) -> npt.ArrayLike:
+    cls: list[npt.NDArray],  # type: ignore[type-arg]
+    i: int,
+    j: int,
+    lmax: int | None = None,
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Return a specific angular power spectrum from an array.
 
@@ -350,17 +351,17 @@ def getcl(
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
     if lmax is not None:
-        if len(cl) > lmax + 1:  # type: ignore[arg-type]
-            cl = cl[: lmax + 1]  # type: ignore[index]
+        if len(cl) > lmax + 1:
+            cl = cl[: lmax + 1]
         else:
-            cl = np.pad(cl, (0, lmax + 1 - len(cl)))  # type: ignore[arg-type]
+            cl = np.pad(cl, (0, lmax + 1 - len(cl)))
     return cl
 
 
 def effective_cls(
-    cls: list[npt.ArrayLike],
-    weights1: npt.ArrayLike,
-    weights2: npt.ArrayLike | None = None,
+    cls: list[npt.NDArray],  # type: ignore[type-arg]
+    weights1: npt.NDArray,  # type: ignore[type-arg]
+    weights2: npt.NDArray | None = None,  # type: ignore[type-arg]
     *,
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
@@ -401,7 +402,7 @@ def effective_cls(
 
     # find lmax if not given
     if lmax is None:
-        lmax = max(map(len, cls), default=0) - 1  # type: ignore[arg-type]
+        lmax = max(map(len, cls), default=0) - 1
 
     # broadcast weights1 such that its shape ends in n
     weights1 = np.asanyarray(weights1)

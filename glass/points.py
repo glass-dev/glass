@@ -46,8 +46,10 @@ ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
 def effective_bias(
-    z: npt.ArrayLike, bz: npt.ArrayLike, w: RadialWindow
-) -> npt.ArrayLike:
+    z: npt.NDArray,  # type: ignore[type-arg]
+    bz: npt.NDArray,  # type: ignore[type-arg]
+    w: RadialWindow,
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -79,35 +81,36 @@ def effective_bias(
 
     """
     norm = np.trapz(w.wa, w.za)  # type: ignore[attr-defined]
-    return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[no-any-return]
+    return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[arg-type, no-any-return]
 
 
-def linear_bias(delta: npt.ArrayLike, b: float | npt.ArrayLike) -> npt.NDArray[float]:  # type: ignore[type-var]
+def linear_bias(delta: npt.NDArray, b: float | npt.NDArray) -> npt.NDArray[float]:  # type: ignore[type-arg, type-var]
     r"""Linear bias model :math:`\\delta_g = b \\, \\delta`."""
-    return b * delta  # type: ignore[operator, return-value]
+    return b * delta  # type: ignore[return-value]
 
 
 def loglinear_bias(
-    delta: npt.ArrayLike, b: float | npt.ArrayLike
+    delta: npt.NDArray,  # type: ignore[type-arg]
+    b: float | npt.NDArray,  # type: ignore[type-arg]
 ) -> npt.NDArray[float]:
     r"""log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
-    return delta_g
+    return delta_g  # type: ignore[no-any-return]
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal: float | npt.ArrayLike,
-    delta: npt.ArrayLike,
-    bias: float | npt.ArrayLike | None = None,
-    vis: npt.ArrayLike | None = None,
+    ngal: float | npt.NDArray,  # type: ignore[type-arg]
+    delta: npt.NDArray,  # type: ignore[type-arg]
+    bias: float | npt.NDArray | None = None,  # type: ignore[type-arg]
+    vis: npt.NDArray | None = None,  # type: ignore[type-arg]
     *,
     bias_model: str | typing.Callable[..., typing.Any] = "linear",
     remove_monopole: bool = False,
     batch: int | None = 1_000_000,
     rng: np.random.Generator | None = None,
-) -> typing.Iterator[tuple[npt.ArrayLike, npt.ArrayLike, npt.ArrayLike]]:
+) -> typing.Iterator[tuple[npt.NDArray, npt.NDArray, npt.NDArray]]:  # type: ignore[type-arg]
     """
     Generate positions tracing a density contrast.
 
@@ -181,16 +184,16 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs += [(bias, 0)]
     if vis is not None:
         inputs += [(vis, 1)]
-    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)
+    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type, assignment]
     if bias is not None:
-        bias, *rest = rest
+        bias, *rest = rest  # type: ignore[assignment]
     if vis is not None:
-        vis, *rest = rest
+        vis, *rest = rest  # type: ignore[assignment]
 
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[call-overload, operator]
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index, operator]
 
         # remove monopole if asked to
         if remove_monopole:
@@ -198,11 +201,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[call-overload]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
 
         # apply visibility if given
         if vis is not None:
-            n *= vis[k]  # type: ignore[call-overload]
+            n *= vis[k]
 
         # clip number density at zero
         np.clip(n, 0, None, out=n)
@@ -259,10 +262,12 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | npt.ArrayLike, *, rng: np.random.Generator | None = None
+    ngal: float | npt.NDArray,  # type: ignore[type-arg]
+    *,
+    rng: np.random.Generator | None = None,
 ) -> typing.Iterator[  # type: ignore[type-arg]
-    npt.ArrayLike | list[npt.ArrayLike],
-    npt.ArrayLike | list[npt.ArrayLike],
+    npt.NDArray | list[npt.NDArray],
+    npt.NDArray | list[npt.NDArray],
     int | list[int],
 ]:
     """
@@ -315,7 +320,7 @@ def uniform_positions(
         yield lon, lat, count
 
 
-def position_weights(densities: npt.ArrayLike, bias: npt.ArrayLike | None = None):  # type: ignore[no-untyped-def]
+def position_weights(densities: npt.NDArray, bias: npt.NDArray | None = None):  # type: ignore[no-untyped-def, type-arg]
     r"""
     Compute relative weights for angular clustering.
 
@@ -348,6 +353,6 @@ def position_weights(densities: npt.ArrayLike, bias: npt.ArrayLike | None = None
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
-        densities = densities * bias  # type: ignore[operator]
+        densities = densities * bias
     # densities now contains the relative contribution with bias applied
     return densities

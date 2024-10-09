@@ -33,12 +33,12 @@ if TYPE_CHECKING:
 
 
 def triaxial_axis_ratio(
-    zeta: npt.ArrayLike,
-    xi: npt.ArrayLike,
+    zeta: npt.NDArray,  # type: ignore[type-arg]
+    xi: npt.NDArray,  # type: ignore[type-arg]
     size: tuple[int] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -104,14 +104,14 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: npt.ArrayLike,
-    sigma: npt.ArrayLike,
-    gamma: npt.ArrayLike,
-    sigma_gamma: npt.ArrayLike,
+    mu: npt.NDArray,  # type: ignore[type-arg]
+    sigma: npt.NDArray,  # type: ignore[type-arg]
+    gamma: npt.NDArray,  # type: ignore[type-arg]
+    sigma_gamma: npt.NDArray,  # type: ignore[type-arg]
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -158,15 +158,15 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
-    eps = rng.normal(mu, sigma, size=size)  # type: ignore[arg-type]
+    eps = rng.normal(mu, sigma, size=size)
     bad = eps > 0
     while np.any(bad):
-        eps[bad] = rng.normal(mu, sigma, size=size)[bad]  # type: ignore[arg-type]
+        eps[bad] = rng.normal(mu, sigma, size=size)[bad]
         bad = eps > 0
-    gam = rng.normal(gamma, sigma_gamma, size=size)  # type: ignore[arg-type]
+    gam = rng.normal(gamma, sigma_gamma, size=size)
     bad = (gam < 0) | (gam > 1)
     while np.any(bad):
-        gam[bad] = rng.normal(gamma, sigma_gamma, size=size)[bad]  # type: ignore[arg-type]
+        gam[bad] = rng.normal(gamma, sigma_gamma, size=size)[bad]
         bad = (gam < 0) | (gam > 1)
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
@@ -178,18 +178,18 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # assemble ellipticity with random complex phase
     e = np.exp(1j * rng.uniform(0, 2 * np.pi, size=np.shape(q)))
-    e *= (1 - q) / (1 + q)  # type: ignore[operator]
+    e *= (1 - q) / (1 + q)
 
     # return the ellipticity
     return e  # type: ignore[no-any-return]
 
 
 def ellipticity_gaussian(
-    count: int | npt.ArrayLike,
-    sigma: npt.ArrayLike,
+    count: int | npt.NDArray,  # type: ignore[type-arg]
+    sigma: npt.NDArray,  # type: ignore[type-arg]
     *,
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -242,8 +242,8 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | npt.ArrayLike,
-    sigma: npt.ArrayLike,
+    count: int | npt.NDArray,  # type: ignore[type-arg]
+    sigma: npt.NDArray,  # type: ignore[type-arg]
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray:  # type: ignore[type-arg]

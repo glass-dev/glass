@@ -67,6 +67,6 @@ def test_partition(method) -> None:  # type: ignore[no-untyped-def]
 
     part = partition(z, fz, shells, method=method)
 
-    assert part.shape == (len(shells), 3, 2)  # type: ignore[union-attr]
+    assert part.shape == (len(shells), 3, 2)
 
-    np.testing.assert_allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[attr-defined, union-attr]
+    np.testing.assert_allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[attr-defined]

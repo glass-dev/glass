@@ -34,11 +34,11 @@ from glass.core.array import broadcast_leading_axes, cumtrapz
 
 
 def redshifts(
-    n: int | npt.ArrayLike,
+    n: int | npt.NDArray,  # type: ignore[type-arg]
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Sample redshifts from a radial window function.
 
@@ -61,13 +61,13 @@ def redshifts(
         Random redshifts following the radial window function.
 
     """
-    return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
+    return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)  # type: ignore[arg-type]
 
 
 def redshifts_from_nz(
-    count: int | npt.ArrayLike,
-    z: npt.ArrayLike,
-    nz: npt.ArrayLike,
+    count: int | npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray,  # type: ignore[type-arg]
+    nz: npt.NDArray,  # type: ignore[type-arg]
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
@@ -115,10 +115,10 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[arg-type, assignment]
 
     # list of results for all dimensions
-    redshifts = np.empty(count.sum())  # type: ignore[attr-defined]
+    redshifts = np.empty(count.sum())  # type: ignore[union-attr]
 
     # keep track of the number of sampled redshifts
     total = 0
@@ -126,16 +126,16 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[arg-type, call-overload]
-        cdf /= cdf[-1]  # type: ignore[index, operator]
+        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[arg-type]
+        cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count[k]] = np.interp(  # type: ignore[call-overload]
-            rng.uniform(0, 1, size=count[k]),  # type: ignore[call-overload]
-            cdf,  # type: ignore[arg-type]
-            z[k],  # type: ignore[call-overload]
+        redshifts[total : total + count[k]] = np.interp(  # type: ignore[index]
+            rng.uniform(0, 1, size=count[k]),  # type: ignore[index]
+            cdf,
+            z[k],
         )
-        total += count[k]  # type: ignore[call-overload]
+        total += count[k]  # type: ignore[index]
 
     assert total == redshifts.size  # noqa: S101
 
@@ -143,15 +143,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.ArrayLike,
-    lat: npt.ArrayLike,
-    eps: npt.ArrayLike,
-    kappa: npt.ArrayLike,
-    gamma1: npt.ArrayLike,
-    gamma2: npt.ArrayLike,
+    lon: npt.NDArray,  # type: ignore[type-arg]
+    lat: npt.NDArray,  # type: ignore[type-arg]
+    eps: npt.NDArray,  # type: ignore[type-arg]
+    kappa: npt.NDArray,  # type: ignore[type-arg]
+    gamma1: npt.NDArray,  # type: ignore[type-arg]
+    gamma2: npt.NDArray,  # type: ignore[type-arg]
     *,
     reduced_shear: bool = True,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     """
     Observed galaxy shears from weak lensing.
 
@@ -187,17 +187,17 @@ def galaxy_shear(  # noqa: PLR0913
     # get the lensing maps at galaxy position
     for i in range(0, size, 10000):
         s = slice(i, i + 10000)
-        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)  # type: ignore[index]
-        k[s] = kappa[ipix]  # type: ignore[index]
-        g.real[s] = gamma1[ipix]  # type: ignore[index]
-        g.imag[s] = gamma2[ipix]  # type: ignore[index]
+        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
+        k[s] = kappa[ipix]
+        g.real[s] = gamma1[ipix]
+        g.imag[s] = gamma2[ipix]
 
     if reduced_shear:
         # compute reduced shear in place
         g /= 1 - k
 
         # compute lensed ellipticities
-        g = (eps + g) / (1 + g.conj() * eps)  # type: ignore[operator]
+        g = (eps + g) / (1 + g.conj() * eps)
     else:
         # simple sum of shears
         g += eps
@@ -206,13 +206,13 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: npt.ArrayLike,
-    sigma_0: float | npt.ArrayLike,
+    z: npt.NDArray,  # type: ignore[type-arg]
+    sigma_0: float | npt.NDArray,  # type: ignore[type-arg]
     *,
-    lower: npt.ArrayLike | None = None,
-    upper: npt.ArrayLike | None = None,
+    lower: npt.NDArray | None = None,  # type: ignore[type-arg]
+    upper: npt.NDArray | None = None,  # type: ignore[type-arg]
     rng: np.random.Generator | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray:  # type: ignore[type-arg]
     r"""
     Photometric redshifts assuming a Gaussian error.
 
@@ -266,12 +266,12 @@ def gaussian_phz(
     sigma = np.add(1, z) * sigma_0
     dims = np.shape(sigma)
 
-    zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
+    zphot = rng.normal(z, sigma)
 
     if lower is None:
-        lower = 0.0
+        lower = 0.0  # type: ignore[assignment]
     if upper is None:
-        upper = np.inf
+        upper = np.inf  # type: ignore[assignment]
 
     if not np.all(lower < upper):  # type: ignore[operator]
         msg = "requires lower < upper"
@@ -279,13 +279,13 @@ def gaussian_phz(
 
     if not dims:
         while zphot < lower or zphot > upper:  # type: ignore[operator]
-            zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
+            zphot = rng.normal(z, sigma)
     else:
         z = np.broadcast_to(z, dims)
         trunc = np.where((zphot < lower) | (zphot > upper))[0]  # type: ignore[operator]
         while trunc.size:
-            znew = rng.normal(z[trunc], sigma[trunc])  # type: ignore[arg-type]
-            zphot[trunc] = znew  # type: ignore[index]
+            znew = rng.normal(z[trunc], sigma[trunc])
+            zphot[trunc] = znew
             trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
 
     return zphot

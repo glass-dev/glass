@@ -7,4 +7,4 @@ def test_getcl() -> None:
     # make sure indices are retrieved correctly
     for i in range(10):
         for j in range(10):
-            assert getcl(cls, i, j) == {i, j}  # type: ignore[arg-type, comparison-overlap]
+            assert getcl(cls, i, j) == {i, j}  # type: ignore[arg-type]

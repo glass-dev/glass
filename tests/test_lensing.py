@@ -55,20 +55,20 @@ def test_deflect_nsew(*, usecomplex: bool) -> None:
             return [re, im]
 
     # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[misc, no-untyped-call]
-    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)  # type: ignore[arg-type]
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[arg-type, no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[misc, no-untyped-call]
-    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)  # type: ignore[arg-type]
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[arg-type, no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[misc, no-untyped-call]
-    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)  # type: ignore[arg-type]
+    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[arg-type, no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[misc, no-untyped-call]
-    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)  # type: ignore[arg-type]
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[arg-type, no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
 def test_deflect_many(rng: np.random.Generator) -> None:
@@ -79,7 +79,7 @@ def test_deflect_many(rng: np.random.Generator) -> None:
     lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
     lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
 
-    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))  # type: ignore[misc]
+    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 
     x_, y_, z_ = healpix.ang2vec(lon_, lat_, lonlat=True)
     x, y, z = healpix.ang2vec(lon, lat, lonlat=True)
@@ -125,4 +125,4 @@ def test_multi_plane_weights(shells, cosmo, rng) -> None:  # type: ignore[no-unt
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)  # type: ignore[arg-type]
+    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
