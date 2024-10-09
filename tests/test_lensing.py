@@ -41,7 +41,7 @@ def cosmo():  # type: ignore[no-untyped-def]
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(*, usecomplex: bool) -> None:
+def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
     d = 5.0
     r = np.radians(d)
 
