@@ -5,7 +5,7 @@ Random fields
 .. currentmodule:: glass
 
 The following functions provide functionality for simulating random
-fields on the sphere.  This is done in the form of HEALPix maps.
+fields on the sphere. This is done in the form of HEALPix maps.
 
 Functions
 ---------
@@ -163,7 +163,7 @@ def gaussian_gls(
 
     Depending on the given arguments, this truncates the angular power spectra
     to ``lmax``, removes all but ``ncorr`` correlations between fields, and
-    applies the HEALPix pixel window function of the given ``nside``.  If no
+    applies the HEALPix pixel window function of the given ``nside``. If no
     arguments are given, no action is performed.
 
     """
@@ -221,7 +221,7 @@ def generate_gaussian(
     ``nside``.
 
     The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated.  This saves memory, as only `ncorr` previous
+    realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
     The ``gls`` array must contain the auto-correlation of each new field
@@ -327,19 +327,14 @@ def getcl(cls, i, j, lmax=None):
     Return the angular power spectrum for indices *i* and *j* from an
     array in *GLASS* ordering.
 
-    Parameters
-    ----------
-    cls : list of array_like
-        List of angular power spectra in *GLASS* ordering.
-    i, j : int
-        Combination of indices to return.
-    lmax : int, optional
-        Truncate the returned spectrum at this mode number.
+    Args:
+        cls: List of angular power spectra in *GLASS* ordering.
+        i: Indices to return.
+        j: Indices to return.
+        lmax: Truncate the returned spectrum at this mode number.
 
     Returns:
-    -------
-    cl : array_like
-        The angular power spectrum for indices *i* and *j*.
+        cl: The angular power spectrum for indices *i* and *j*.
 
     """
     if j > i:
@@ -360,21 +355,16 @@ def effective_cls(
     Compute effective angular power spectra from weights.
 
     Computes a linear combination of the angular power spectra *cls*
-    using the factors provided by *weights1* and *weights2*.  Additional
+    using the factors provided by *weights1* and *weights2*. Additional
     axes in *weights1* and *weights2* produce arrays of spectra.
 
-    Parameters
-    ----------
-    cls : (N,) list of array_like
-        Angular matter power spectra to combine, in *GLASS* ordering.
-    weights1 : (N, \\*M1) array_like
-        Weight factors for spectra.  The first axis must be equal to the
-        number of fields.
-    weights2 : (N, \\*M2) array_like, optional
-        Second set of weights.  If not given, *weights1* is used.
-    lmax : int, optional
-        Truncate the angular power spectra at this mode number.  If not
-        given, the longest input in *cls* will be used.
+    Args:
+        cls: Angular matter power spectra to combine, in *GLASS* ordering.
+        weights1: Weight factors for spectra. The first axis must be equal to
+            the number of fields.
+        weights2:  Second set of weights. If not given, *weights1* is used.
+        lmax: Truncate the angular power spectra at this mode number. If not
+            given, the longest input in *cls* will be used.
 
     Returns:
     -------
