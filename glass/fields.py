@@ -10,7 +10,7 @@ fields on the sphere.  This is done in the form of HEALPix maps.
 Functions
 ---------
 
-.. autofunction:: gaussian_gls
+.. autofunction:: discretized_cls
 .. autofunction:: lognormal_gls
 .. autofunction:: generate_gaussian
 .. autofunction:: generate_lognormal
@@ -151,7 +151,7 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[Any, ...] = ()) -> Cls
     return gls
 
 
-def gaussian_gls(
+def discretized_cls(
     cls: Cls,
     *,
     lmax: int | None = None,
@@ -159,7 +159,7 @@ def gaussian_gls(
     nside: int | None = None,
 ) -> Cls:
     """
-    Compute Gaussian Cls for a Gaussian random field.
+    Apply discretisation effects to angular power spectra.
 
     Depending on the given arguments, this truncates the angular power spectra
     to ``lmax``, removes all but ``ncorr`` correlations between fields, and
@@ -196,14 +196,9 @@ def gaussian_gls(
 def lognormal_gls(
     cls: Cls,
     shift: float = 1.0,
-    *,
-    lmax: int | None = None,
-    ncorr: int | None = None,
-    nside: int | None = None,
 ) -> Cls:
     """Compute Gaussian Cls for a lognormal random field."""
-    gls = gaussian_gls(cls, lmax=lmax, ncorr=ncorr, nside=nside)
-    return transform_cls(gls, "lognormal", (shift,))
+    return transform_cls(cls, "lognormal", (shift,))
 
 
 def generate_gaussian(
