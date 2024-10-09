@@ -11,12 +11,12 @@ if typing.TYPE_CHECKING:
 
 
 def nnls(
-    a: npt.NDArray,  # type: ignore[type-arg]
-    b: npt.NDArray,  # type: ignore[type-arg]
+    a: npt.NDArray[typing.Any],
+    b: npt.NDArray[typing.Any],
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """
     Compute a non-negative least squares solution.
 

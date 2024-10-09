@@ -45,14 +45,14 @@ if typing.TYPE_CHECKING:
 
 
 def from_convergence(  # noqa: PLR0913
-    kappa: npt.NDArray,  # type: ignore[type-arg]
+    kappa: npt.NDArray[typing.Any],
     lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray, ...]:  # type: ignore[type-arg]
+) -> tuple[npt.NDArray[typing.Any], ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
@@ -224,11 +224,11 @@ def from_convergence(  # noqa: PLR0913
 
 
 def shear_from_convergence(
-    kappa: npt.NDArray,  # type: ignore[type-arg]
+    kappa: npt.NDArray[typing.Any],
     lmax: int | None = None,
     *,
     discretized: bool = True,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Weak lensing shear from convergence.
 
@@ -280,11 +280,11 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: npt.NDArray = np.array(0.0)  # type: ignore[type-arg]
-        self.kappa2: npt.NDArray | None = None  # type: ignore[type-arg]
-        self.kappa3: npt.NDArray | None = None  # type: ignore[type-arg]
+        self.delta3: npt.NDArray[typing.Any] = np.array(0.0)
+        self.kappa2: npt.NDArray[typing.Any] | None = None
+        self.kappa3: npt.NDArray[typing.Any] | None = None
 
-    def add_window(self, delta: npt.NDArray, w: RadialWindow) -> None:  # type: ignore[type-arg]
+    def add_window(self, delta: npt.NDArray[typing.Any], w: RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -297,7 +297,9 @@ class MultiPlaneConvergence:
 
         self.add_plane(delta, zsrc, lens_weight)  # type: ignore[arg-type]
 
-    def add_plane(self, delta: npt.NDArray, zsrc: float, wlens: float = 1.0) -> None:  # type: ignore[type-arg]
+    def add_plane(
+        self, delta: npt.NDArray[typing.Any], zsrc: float, wlens: float = 1.0
+    ) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
@@ -346,12 +348,12 @@ class MultiPlaneConvergence:
         return self.z3
 
     @property
-    def kappa(self) -> npt.NDArray | None:  # type: ignore[type-arg]
+    def kappa(self) -> npt.NDArray[typing.Any] | None:
         """The current convergence plane."""
         return self.kappa3
 
     @property
-    def delta(self) -> npt.NDArray:  # type: ignore[type-arg]
+    def delta(self) -> npt.NDArray[typing.Any]:
         """The current matter plane."""
         return self.delta3
 
@@ -364,7 +366,7 @@ class MultiPlaneConvergence:
 def multi_plane_matrix(
     shells: typing.Sequence[RadialWindow],
     cosmo: Cosmology,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """Compute the matrix of lensing contributions from each shell."""
     mpc = MultiPlaneConvergence(cosmo)
     wmat = np.eye(len(shells))
@@ -375,10 +377,10 @@ def multi_plane_matrix(
 
 
 def multi_plane_weights(
-    weights: npt.NDArray,  # type: ignore[type-arg]
+    weights: npt.NDArray[typing.Any],
     shells: typing.Sequence[RadialWindow],
     cosmo: Cosmology,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """
     Compute effective weights for multi-plane convergence.
 
@@ -418,10 +420,10 @@ def multi_plane_weights(
 
 
 def deflect(
-    lon: npt.NDArray,  # type: ignore[type-arg]
-    lat: npt.NDArray,  # type: ignore[type-arg]
-    alpha: npt.NDArray,  # type: ignore[type-arg]
-) -> npt.NDArray:  # type: ignore[type-arg]
+    lon: npt.NDArray[typing.Any],
+    lat: npt.NDArray[typing.Any],
+    alpha: npt.NDArray[typing.Any],
+) -> npt.NDArray[typing.Any]:
     r"""
     Apply deflections to positions.
 

@@ -56,21 +56,27 @@ if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = typing.Union[typing.Sequence[float], npt.NDArray]  # type: ignore[type-arg]
-WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray]  # type: ignore[type-arg]
+ArrayLike1D = typing.Union[typing.Sequence[float], npt.NDArray[typing.Any]]
+WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
 
 
-def distance_weight(z: npt.NDArray, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
+def distance_weight(
+    z: npt.NDArray[typing.Any], cosmo: Cosmology
+) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def volume_weight(z: npt.NDArray, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
+def volume_weight(
+    z: npt.NDArray[typing.Any], cosmo: Cosmology
+) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def density_weight(z: npt.NDArray, cosmo: Cosmology) -> npt.NDArray:  # type: ignore[type-arg]
+def density_weight(
+    z: npt.NDArray[typing.Any], cosmo: Cosmology
+) -> npt.NDArray[typing.Any]:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
@@ -310,7 +316,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.NDArray, npt.NDArray]:  # type: ignore[type-arg]
+) -> tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any]]:
     """
     Restrict a function to a redshift window.
 
@@ -348,12 +354,12 @@ def restrict(
 
 
 def partition(
-    z: npt.NDArray,  # type: ignore[type-arg]
-    fz: npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray[typing.Any],
+    fz: npt.NDArray[typing.Any],
     shells: typing.Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Partition a function by a sequence of windows.
 
@@ -458,12 +464,12 @@ def partition(
 
 
 def partition_lstsq(
-    z: npt.NDArray,  # type: ignore[type-arg]
-    fz: npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray[typing.Any],
+    fz: npt.NDArray[typing.Any],
     shells: typing.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """Least-squares partition."""
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -504,12 +510,12 @@ def partition_lstsq(
 
 
 def partition_nnls(
-    z: npt.NDArray,  # type: ignore[type-arg]
-    fz: npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray[typing.Any],
+    fz: npt.NDArray[typing.Any],
     shells: typing.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """
     Non-negative least-squares partition.
 
@@ -565,10 +571,10 @@ def partition_nnls(
 
 
 def partition_restrict(
-    z: npt.NDArray,  # type: ignore[type-arg]
-    fz: npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray[typing.Any],
+    fz: npt.NDArray[typing.Any],
     shells: typing.Sequence[RadialWindow],
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
@@ -612,10 +618,10 @@ def distance_grid(
 
 
 def combine(
-    z: npt.NDArray,  # type: ignore[type-arg]
-    weights: npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray[typing.Any],
+    weights: npt.NDArray[typing.Any],
     shells: typing.Sequence[RadialWindow],
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Evaluate a linear combination of window functions.
 

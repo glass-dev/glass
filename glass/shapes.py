@@ -33,12 +33,12 @@ if typing.TYPE_CHECKING:
 
 
 def triaxial_axis_ratio(
-    zeta: npt.NDArray,  # type: ignore[type-arg]
-    xi: npt.NDArray,  # type: ignore[type-arg]
+    zeta: npt.NDArray[typing.Any],
+    xi: npt.NDArray[typing.Any],
     size: tuple[int] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -104,14 +104,14 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: npt.NDArray,  # type: ignore[type-arg]
-    sigma: npt.NDArray,  # type: ignore[type-arg]
-    gamma: npt.NDArray,  # type: ignore[type-arg]
-    sigma_gamma: npt.NDArray,  # type: ignore[type-arg]
+    mu: npt.NDArray[typing.Any],
+    sigma: npt.NDArray[typing.Any],
+    gamma: npt.NDArray[typing.Any],
+    sigma_gamma: npt.NDArray[typing.Any],
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -185,11 +185,11 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
 
 def ellipticity_gaussian(
-    count: int | npt.NDArray,  # type: ignore[type-arg]
-    sigma: npt.NDArray,  # type: ignore[type-arg]
+    count: int | npt.NDArray[typing.Any],
+    sigma: npt.NDArray[typing.Any],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -242,11 +242,11 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | npt.NDArray,  # type: ignore[type-arg]
-    sigma: npt.NDArray,  # type: ignore[type-arg]
+    count: int | npt.NDArray[typing.Any],
+    sigma: npt.NDArray[typing.Any],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 

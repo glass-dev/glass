@@ -26,7 +26,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-def save_cls(filename: str, cls: list[npt.NDArray | None]) -> None:  # type: ignore[type-arg]
+def save_cls(filename: str, cls: list[npt.NDArray[typing.Any] | None]) -> None:
     """
     Save a list of Cls to file.
 
@@ -39,7 +39,7 @@ def save_cls(filename: str, cls: list[npt.NDArray | None]) -> None:  # type: ign
     np.savez(filename, values=values, split=split)
 
 
-def load_cls(filename: str) -> list[npt.NDArray]:  # type: ignore[type-arg]
+def load_cls(filename: str) -> list[npt.NDArray[typing.Any]]:
     """
     Load a list of Cls from file.
 
@@ -64,7 +64,9 @@ class _FitsWriter:
         self.fits = fits
         self.ext = ext
 
-    def _append(self, data: npt.NDArray, names: list[str] | None = None) -> None:  # type: ignore[type-arg]
+    def _append(
+        self, data: npt.NDArray[typing.Any], names: list[str] | None = None
+    ) -> None:
         """Write the FITS file."""
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
@@ -75,7 +77,12 @@ class _FitsWriter:
             # not using hdu.append here because of incompatibilities
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
-    def write(self, data: npt.NDArray | None = None, /, **columns: npt.NDArray) -> None:  # type: ignore[type-arg]
+    def write(
+        self,
+        data: npt.NDArray[typing.Any] | None = None,
+        /,
+        **columns: npt.NDArray[typing.Any],
+    ) -> None:
         """
         Write to FITS by calling the internal _append method.
 

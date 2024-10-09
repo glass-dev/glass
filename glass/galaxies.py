@@ -34,11 +34,11 @@ from glass.core.array import broadcast_leading_axes, cumtrapz
 
 
 def redshifts(
-    n: int | npt.NDArray,  # type: ignore[type-arg]
+    n: int | npt.NDArray[typing.Any],
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """
     Sample redshifts from a radial window function.
 
@@ -65,13 +65,13 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | npt.NDArray,  # type: ignore[type-arg]
-    z: npt.NDArray,  # type: ignore[type-arg]
-    nz: npt.NDArray,  # type: ignore[type-arg]
+    count: int | npt.NDArray[typing.Any],
+    z: npt.NDArray[typing.Any],
+    nz: npt.NDArray[typing.Any],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -143,15 +143,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray,  # type: ignore[type-arg]
-    lat: npt.NDArray,  # type: ignore[type-arg]
-    eps: npt.NDArray,  # type: ignore[type-arg]
-    kappa: npt.NDArray,  # type: ignore[type-arg]
-    gamma1: npt.NDArray,  # type: ignore[type-arg]
-    gamma2: npt.NDArray,  # type: ignore[type-arg]
+    lon: npt.NDArray[typing.Any],
+    lat: npt.NDArray[typing.Any],
+    eps: npt.NDArray[typing.Any],
+    kappa: npt.NDArray[typing.Any],
+    gamma1: npt.NDArray[typing.Any],
+    gamma2: npt.NDArray[typing.Any],
     *,
     reduced_shear: bool = True,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     """
     Observed galaxy shears from weak lensing.
 
@@ -206,13 +206,13 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: npt.NDArray,  # type: ignore[type-arg]
-    sigma_0: float | npt.NDArray,  # type: ignore[type-arg]
+    z: npt.NDArray[typing.Any],
+    sigma_0: float | npt.NDArray[typing.Any],
     *,
-    lower: npt.NDArray | None = None,  # type: ignore[type-arg]
-    upper: npt.NDArray | None = None,  # type: ignore[type-arg]
+    lower: npt.NDArray[typing.Any] | None = None,
+    upper: npt.NDArray[typing.Any] | None = None,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:  # type: ignore[type-arg]
+) -> npt.NDArray[typing.Any]:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
