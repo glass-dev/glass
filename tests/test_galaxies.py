@@ -96,9 +96,9 @@ def test_galaxy_shear(rng):
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
-        rng.normal(size=(256,)),
-        rng.normal(size=(256,)),
-        rng.normal(size=(256,)),
+        rng.normal(size=(12,)),
+        rng.normal(size=(12,)),
+        rng.normal(size=(12,)),
     )
 
     shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
