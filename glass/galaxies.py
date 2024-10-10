@@ -47,10 +47,13 @@ def redshifts(
 
     Parameters
     ----------
-        n: Number of redshifts to sample. If an array is given, the
-            results are concatenated.
-        w: Radial window function.
-        rng : Random number generator. If not given, a default RNG is used.
+    n:
+        Number of redshifts to sample. If an array is given, the
+        results are concatenated.
+    w:
+        Radial window function.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
@@ -81,14 +84,19 @@ def redshifts_from_nz(
 
     Parameters
     ----------
-        count: Number of redshifts to sample. If an array is given, its shape
-            is broadcast against the leading axes of *z* and *nz*.
-        z: Source distribution. Leading axes are broadcast against the
-            shape of *count*.
-        nz: Source distribution. Leading axes are broadcast against the
-            shape of *count*.
-        rng: Random number generator. If not given, a default RNG is used.
-        warn: Throw relevant warnings.
+    count:
+        Number of redshifts to sample. If an array is given, its shape
+        is broadcast against the leading axes of *z* and *nz*.
+    z:
+        Source distribution. Leading axes are broadcast against the
+        shape of *count*.
+    nz:
+        Source distribution. Leading axes are broadcast against the
+        shape of *count*.
+    rng:
+        Random number generator. If not given, a default RNG is used.
+    warn:
+        Throw relevant warnings.
 
     Returns
     -------
@@ -155,14 +163,21 @@ def galaxy_shear(  # noqa: PLR0913
 
     Parameters
     ----------
-        lon: Array for galaxy longitudes.
-        lat: Array for galaxy latitudes.
-        eps: Array of galaxy :term:`ellipticity`.
-        kappa: HEALPix map for convergence.
-        gamma1: HEALPix maps for a component of shear.
-        gamma2: HEALPix maps for a component of shear.
-        reduced_shear: If ``False``, galaxy shears are not reduced
-            by the convergence. Default is ``True``.
+    lon:
+        Array for galaxy longitudes.
+    lat:
+        Array for galaxy latitudes.
+    eps:
+        Array of galaxy :term:`ellipticity`.
+    kappa:
+        HEALPix map for convergence.
+    gamma1:
+        HEALPix maps for a component of shear.
+    gamma2:
+        HEALPix maps for a component of shear.
+    reduced_shear:
+        If ``False``, galaxy shears are not reduced
+        by the convergence. Default is ``True``.
 
     Returns
     -------
@@ -216,11 +231,16 @@ def gaussian_phz(
 
     Parameters
     ----------
-        z: True redshifts.
-        sigma_0: Redshift error in the tomographic binning at zero redshift.
-        lower: Bounds for the returned photometric redshifts.
-        upper: Bounds for the returned photometric redshifts.
-        rng: Random number generator. If not given, a default RNG is used.
+    z:
+        True redshifts.
+    sigma_0:
+        Redshift error in the tomographic binning at zero redshift.
+    lower:
+        Bounds for the returned photometric redshifts.
+    upper:
+        Bounds for the returned photometric redshifts.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------

@@ -146,10 +146,12 @@ def tophat_windows(
 
     Parameters
     ----------
-        zbins: Redshift bin edges for the tophat window functions.
-        dz: Approximate spacing of the redshift grid.
-        weight: If given, a weight function to be applied to the window
-            functions.
+    zbins:
+        Redshift bin edges for the tophat window functions.
+    dz:
+        Approximate spacing of the redshift grid.
+    weight:
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
@@ -202,10 +204,12 @@ def linear_windows(
 
     Parameters
     ----------
-        zgrid: Redshift grid for the triangular window functions.
-        dz: Approximate spacing of the redshift grid.
-        weight: If given, a weight function to be applied to the window
-            functions.
+    zgrid:
+        Redshift grid for the triangular window functions.
+    dz:
+        Approximate spacing of the redshift grid.
+    weight:
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
@@ -261,10 +265,12 @@ def cubic_windows(
 
     Parameters
     ----------
-        zgrid: Redshift grid for the cubic spline window functions.
-        dz: Approximate spacing of the redshift grid.
-        weight: If given, a weight function to be applied to the window
-            functions.
+    zgrid:
+        Redshift grid for the cubic spline window functions.
+    dz:
+        Approximate spacing of the redshift grid.
+    weight:
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
@@ -322,9 +328,12 @@ def restrict(
 
     Parameters
     ----------
-        z: The function to be restricted.
-        f: The function to be restricted.
-        w: The window function for the restriction.
+    z:
+        The function to be restricted.
+    f:
+        The function to be restricted.
+    w:
+        The window function for the restriction.
 
     Returns
     -------
@@ -362,13 +371,17 @@ def partition(
 
     Parameters
     ----------
-        z: The function to be partitioned. If *f* is multi-dimensional,
-            its last axis must agree with *z*.
-        fz: The function to be partitioned. If *f* is multi-dimensional,
-            its last axis must agree with *z*.
-        shells: Ordered sequence of window functions for the partition.
-        method: Method for the partition. See notes for description. The
-            options are "lstsq", "nnls", "restrict".
+    z:
+        The function to be partitioned. If *f* is multi-dimensional,
+        its last axis must agree with *z*.
+    fz:
+        The function to be partitioned. If *f* is multi-dimensional,
+        its last axis must agree with *z*.
+    shells:
+        Ordered sequence of window functions for the partition.
+    method:
+        Method for the partition. See notes for description. The
+        options are "lstsq", "nnls", "restrict".
 
     Returns
     -------
@@ -611,10 +624,13 @@ def combine(
 
     Parameters
     ----------
-        z: Redshifts *z* in which to evaluate the combined function.
-        weights: Weights of the linear combination, where the leading axis
-            corresponds to *shells*.
-        shells: Ordered sequence of window functions to be combined.
+    z:
+        Redshifts *z* in which to evaluate the combined function.
+    weights:
+        Weights of the linear combination, where the leading axis
+        corresponds to *shells*.
+    shells:
+        Ordered sequence of window functions to be combined.
 
     Returns
     -------

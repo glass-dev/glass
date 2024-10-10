@@ -54,11 +54,12 @@ def vmap_galactic_ecliptic(
 
     Parameters
     ----------
-        nside: The NSIDE parameter of the resulting HEALPix map.
-        galactic: The location of the galactic plane in the
-            respective coordinate system.
-        ecliptic: The location of the ecliptic plane in the
-            respective coordinate system.
+    nside:
+        The NSIDE parameter of the resulting HEALPix map.
+    galactic:
+        The location of the galactic plane in the respective coordinate system.
+    ecliptic:
+        The location of the ecliptic plane in the respective coordinate system.
 
     Returns
     -------
@@ -103,10 +104,14 @@ def gaussian_nz(
 
     Parameters
     ----------
-        z: Redshift values of the distribution.
-        mean: Mean(s) of the redshift distribution.
-        sigma: Standard deviation(s) of the redshift distribution.
-        norm: If given, the normalisation of the distribution.
+    z:
+        Redshift values of the distribution.
+    mean:
+        Mean(s) of the redshift distribution.
+    sigma:
+        Standard deviation(s) of the redshift distribution.
+    norm:
+        If given, the normalisation of the distribution.
 
     Returns
     -------
@@ -141,11 +146,16 @@ def smail_nz(
 
     Parameters
     ----------
-        z: Redshift values of the distribution.
-        z_mode: Mode of the redshift distribution, must be positive.
-        alpha: Power law exponent (z/z0)^\alpha, must be positive.
-        beta: Log-power law exponent exp[-(z/z0)^\beta], must be positive.
-        norm: If given, the normalisation of the distribution.
+    z:
+        Redshift values of the distribution.
+    z_mode:
+        Mode of the redshift distribution, must be positive.
+    alpha:
+        Power law exponent (z/z0)^\alpha, must be positive.
+    beta:
+        Log-power law exponent exp[-(z/z0)^\beta], must be positive.
+    norm:
+        If given, the normalisation of the distribution.
 
     Returns
     -------
@@ -198,11 +208,14 @@ def fixed_zbins(
 
     Parameters
     ----------
-        zmin: Extent of the redshift binning.
-        zmax: Extent of the redshift binning.
-        nbins: Number of redshift bins. Only one of ``nbins`` and
-            ``dz`` can be given.
-        dz: Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
+    zmin:
+        Extent of the redshift binning.
+    zmax:
+        Extent of the redshift binning.
+    nbins:
+        Number of redshift bins. Only one of ``nbins`` and ``dz`` can be given.
+    dz:
+        Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
 
     Returns
     -------
@@ -234,9 +247,12 @@ def equal_dens_zbins(
 
     Parameters
     ----------
-        z: The source redshift distribution. Must be one-dimensional.
-        nz: The source redshift distribution. Must be one-dimensional.
-        nbins: Number of redshift bins.
+    z:
+        The source redshift distribution. Must be one-dimensional.
+    nz:
+        The source redshift distribution. Must be one-dimensional.
+    nbins:
+        Number of redshift bins.
 
     Returns
     -------
@@ -273,10 +289,14 @@ def tomo_nz_gausserr(
 
     Parameters
     ----------
-        z: The true source redshift distribution. Must be one-dimensional.
-        nz: The true source redshift distribution. Must be one-dimensional.
-        sigma_0: Redshift error in the tomographic binning at zero redshift.
-        zbins: List of redshift bin edges.
+    z:
+        The true source redshift distribution. Must be one-dimensional.
+    nz:
+        The true source redshift distribution. Must be one-dimensional.
+    sigma_0:
+        Redshift error in the tomographic binning at zero redshift.
+    zbins:
+        List of redshift bin edges.
 
     Returns
     -------

@@ -41,11 +41,15 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
 
     Parameters
     ----------
-        zeta: Axis ratio of intermediate and major axis.
-        xi: Axis ratio of minor and major axis.
-        size: Size of the random draw. If `None` is given, size is inferred from
-            other inputs.
-        rng: Random number generator. If not given, a default RNG will be used.
+    zeta:
+        Axis ratio of intermediate and major axis.
+    xi:
+        Axis ratio of minor and major axis.
+    size:
+        Size of the random draw. If `None` is given, size is inferred from
+        other inputs.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Returns
     -------
@@ -106,12 +110,18 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
 
     Parameters
     ----------
-        mu: Mean of the truncated normal for :math:`\log(1 - B/A)`.
-        sigma: Standard deviation for :math:`\log(1 - B/A)`.
-        gamma: Mean of the truncated normal for :math:`1 - C/B`.
-        sigma_gamma: Standard deviation for :math:`1 - C/B`.
-        size: Sample size. If ``None``, the size is inferred from the parameters.
-        rng: Random number generator. If not given, a default RNG will be used.
+    mu:
+        Mean of the truncated normal for :math:`\log(1 - B/A)`.
+    sigma:
+        Standard deviation for :math:`\log(1 - B/A)`.
+    gamma:
+        Mean of the truncated normal for :math:`1 - C/B`.
+    sigma_gamma:
+        Standard deviation for :math:`1 - C/B`.
+    size:
+        Sample size. If ``None``, the size is inferred from the parameters.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Returns
     -------
@@ -177,9 +187,12 @@ def ellipticity_gaussian(
 
     Parameters
     ----------
-        count: Number of ellipticities to be sampled.
-        sigma: Standard deviation in each component.
-        rng: Random number generator. If not given, a default RNG is used.
+    count:
+        Number of ellipticities to be sampled.
+    sigma:
+        Standard deviation in each component.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
@@ -228,9 +241,12 @@ def ellipticity_intnorm(
 
     Parameters
     ----------
-        count: Number of ellipticities to sample.
-        sigma: Standard deviation of the ellipticity in each component.
-        rng: Random number generator. If not given, a default RNG is used.
+    count:
+        Number of ellipticities to sample.
+    sigma:
+        Standard deviation of the ellipticity in each component.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------

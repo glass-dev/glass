@@ -64,12 +64,18 @@ def from_convergence(  # noqa: PLR0913
 
     Parameters
     ----------
-        kappa: HEALPix map of the convergence field.
-        lmax: Maximum angular mode number to use in the transform.
-        potential: Which lensing maps to return.
-        deflection: Which lensing maps to return.
-        shear: Which lensing maps to return.
-        discretized: Correct the pixel window function in output maps.
+    kappa:
+        HEALPix map of the convergence field.
+    lmax:
+        Maximum angular mode number to use in the transform.
+    potential:
+        Which lensing maps to return.
+    deflection:
+        Which lensing maps to return.
+    shear:
+        Which lensing maps to return.
+    discretized:
+        Correct the pixel window function in output maps.
 
     Returns
     -------
@@ -391,10 +397,13 @@ def multi_plane_weights(
 
     Parameters
     ----------
-        weights: Relative weight of each shell. The first axis must broadcast
-            against the number of shells, and is normalised internally.
-        shells: Window functions of the shells.
-        cosmo: Cosmology instance.
+    weights:
+        Relative weight of each shell. The first axis must broadcast
+        against the number of shells, and is normalised internally.
+    shells:
+        Window functions of the shells.
+    cosmo:
+        Cosmology instance.
 
     Returns
     -------
@@ -425,10 +434,13 @@ def deflect(
 
     Parameters
     ----------
-        lon: Longitudes to be deflected.
-        lat: Latitudes to be deflected.
-        alpha: Deflection values. Must be complex-valued or have a leading
-            axis of size 2 for the real and imaginary component.
+    lon:
+        Longitudes to be deflected.
+    lat:
+        Latitudes to be deflected.
+    alpha:
+        Deflection values. Must be complex-valued or have a leading
+        axis of size 2 for the real and imaginary component.
 
     Returns
     -------

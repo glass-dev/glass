@@ -47,9 +47,12 @@ def effective_bias(z, bz, w):
 
     Parameters
     ----------
-        z: Redshifts and values of the bias function :math:`b(z)`.
-        bz: Redshifts and values of the bias function :math:`b(z)`.
-        w: The radial window function :math:`w(z)`.
+    z:
+        Redshifts and values of the bias function :math:`b(z)`.
+    bz:
+        Redshifts and values of the bias function :math:`b(z)`.
+    w:
+        The radial window function :math:`w(z)`.
 
     Returns
     -------
@@ -118,20 +121,27 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     Parameters
     ----------
-        ngal: Number density, expected number of points per arcmin2.
-        delta: Map of the input density contrast. This is fed into the bias
-            model to produce the density contrast for sampling.
-        bias: Bias parameter, is passed as an argument to the bias model.
-        vis: Visibility map for the observed points. This is multiplied with
-            the full sky number count map, and must hence be of compatible
-            shape.
-        bias_model: The bias model to apply. If a string, refers to a
-            function in the :mod:`~glass.points` module, e.g. ``'linear'`` for
-            :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
-        remove_monopole: If true, the monopole of the density contrast
-            after biasing is fixed to zero.
-        batch: Maximum number of positions to yield in one batch.
-        rng: Random number generator. If not given, a default RNG is used.
+    ngal:
+        Number density, expected number of points per arcmin2.
+    delta:
+        Map of the input density contrast. This is fed into the bias
+        model to produce the density contrast for sampling.
+    bias:
+        Bias parameter, is passed as an argument to the bias model.
+    vis:
+        Visibility map for the observed points. This is multiplied with
+        the full sky number count map, and must hence be of compatible shape.
+    bias_model:
+        The bias model to apply. If a string, refers to a function in
+        the :mod:`~glass.points` module, e.g. ``'linear'`` for
+        :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
+    remove_monopole:
+        If true, the monopole of the density contrast
+        after biasing is fixed to zero.
+    batch:
+        Maximum number of positions to yield in one batch.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
@@ -245,8 +255,10 @@ def uniform_positions(ngal, *, rng=None):
 
     Parameters
     ----------
-        ngal: Number density, expected number of positions per arcmin2.
-        rng: Random number generator. If not given, a default RNG will be used.
+    ngal:
+        Number density, expected number of positions per arcmin2.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Yields
     ------
@@ -300,9 +312,11 @@ def position_weights(densities, bias=None):
 
     Parameters
     ----------
-        densities: Density of points in each shell. The first axis must
-            broadcast against the number of shells, and is normalised internally.
-        bias: Value or values of the linear bias parameter for each shell.
+    densities:
+        Density of points in each shell. The first axis must broadcast
+        against the number of shells, and is normalised internally.
+    bias:
+        Value or values of the linear bias parameter for each shell.
 
     Returns
     -------

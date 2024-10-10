@@ -329,10 +329,14 @@ def getcl(cls, i, j, lmax=None):
 
     Parameters
     ----------
-        cls: List of angular power spectra in *GLASS* ordering.
-        i: Indices to return.
-        j: Indices to return.
-        lmax: Truncate the returned spectrum at this mode number.
+    cls:
+        List of angular power spectra in *GLASS* ordering.
+    i:
+        Indices to return.
+    j:
+        Indices to return.
+    lmax:
+        Truncate the returned spectrum at this mode number.
 
     Returns
     -------
@@ -362,12 +366,16 @@ def effective_cls(
 
     Parameters
     ----------
-        cls: Angular matter power spectra to combine, in *GLASS* ordering.
-        weights1: Weight factors for spectra. The first axis must be equal to
-            the number of fields.
-        weights2:  Second set of weights. If not given, *weights1* is used.
-        lmax: Truncate the angular power spectra at this mode number. If not
-            given, the longest input in *cls* will be used.
+    cls:
+        Angular matter power spectra to combine, in *GLASS* ordering.
+    weights1:
+        Weight factors for spectra. The first axis must be equal to
+        the number of fields.
+    weights2:
+        Second set of weights. If not given, *weights1* is used.
+    lmax:
+        Truncate the angular power spectra at this mode number. If not
+        given, the longest input in *cls* will be used.
 
     Returns
     -------
