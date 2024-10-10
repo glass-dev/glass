@@ -75,7 +75,6 @@ autodoc_typehints = "description"
 # -- napoleon ----------------------------------------------------------------
 
 napoleon_google_docstring = False
-napoleon_preprocess_types = True
 
 
 # -- plot_directive ----------------------------------------------------------

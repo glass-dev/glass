@@ -43,7 +43,6 @@ docs = [
     "ipython",
     "matplotlib",
     "nbsphinx",
-    "numpydoc",
     "sphinx",
     "sphinxcontrib-katex",
 ]
