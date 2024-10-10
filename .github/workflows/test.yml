@@ -45,6 +45,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install nox and coverage.py
         run: pip install coverage[toml] nox
+      - name: Install ubuntu dependencies for fitsio
+        run: |
+          sudo apt-get update
+          sudo apt-get install libbz2-dev
       - name: Run doctests
         run: nox -s doctests-${{ matrix.python-version }} --verbose
       - name: Run tests and generate coverage report
@@ -76,6 +80,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
       - name: Install nox
         run: pip install nox
       - name: Build SDist and wheel
@@ -89,6 +96,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
       - name: Install dependencies
         run: |
           sudo apt-get update
