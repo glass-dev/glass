@@ -58,11 +58,11 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
 
     Notes
     -----
-    See equations (11) and (12) in [1]_ for details.
+    See equations (11) and (12) in [1] for details.
 
     References
     ----------
-    .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
+    * [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
 
     """
     # default RNG if not provided
@@ -102,10 +102,10 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     Ellipticity distribution following Ryden (2004).
 
     The ellipticities are sampled by randomly projecting a 3D ellipsoid with
-    principal axes :math:`A > B > C` [1]_. The distribution of :math:`\log(1 -
+    principal axes :math:`A > B > C` [1]. The distribution of :math:`\log(1 -
     B/A)` is normal with mean :math:`\mu` and standard deviation :math:`\sigma`.
     The distribution of :math:`1 - C/B` is normal with mean :math:`\gamma` and
-    standard deviation :math:`\sigma_\gamma` [2]_. Both distributions are
+    standard deviation :math:`\sigma_\gamma` [2]. Both distributions are
     truncated to produce ratios in the range 0 to 1 using rejection sampling.
 
     Parameters
@@ -130,8 +130,8 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
 
     References
     ----------
-    .. [1] Ryden B. S., 2004, ApJ, 601, 214.
-    .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
+    * [1] Ryden B. S., 2004, ApJ, 601, 214.
+    * [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
 
     """
     # default RNG if not provided

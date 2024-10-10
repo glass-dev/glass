@@ -23,12 +23,12 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "numpydoc",
-    "sphinx.ext.intersphinx",
-    "sphinxcontrib.katex",
     "matplotlib.sphinxext.plot_directive",
     "nbsphinx",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinxcontrib.katex",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,15 +69,13 @@ intersphinx_mapping = {
 
 # -- autodoc -----------------------------------------------------------------
 
-autodoc_typehints = "none"
+autodoc_typehints = "description"
 
 
-# -- numpydoc ----------------------------------------------------------------
+# -- napoleon ----------------------------------------------------------------
 
-# Whether to create a Sphinx table of contents for the lists of class methods
-# and attributes. If a table of contents is made, Sphinx expects each entry to
-# have a separate page.
-numpydoc_class_members_toctree = False
+napoleon_google_docstring = False
+napoleon_preprocess_types = True
 
 
 # -- plot_directive ----------------------------------------------------------

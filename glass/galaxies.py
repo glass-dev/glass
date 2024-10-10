@@ -227,7 +227,7 @@ def gaussian_phz(
 
     A simple toy model of photometric redshift errors that assumes a
     Gaussian error with redshift-dependent standard deviation
-    :math:`\sigma(z) = (1 + z) \sigma_0` [1]_.
+    :math:`\sigma(z) = (1 + z) \sigma_0` [1].
 
     Parameters
     ----------
@@ -261,7 +261,7 @@ def gaussian_phz(
 
     References
     ----------
-    .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+    * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
            doi:10.1111/j.1365-2966.2007.12271.x
 
     Examples
