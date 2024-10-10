@@ -20,7 +20,7 @@ Utilities
 
 .. autofunction:: triaxial_axis_ratio
 
-"""  # noqa: D205, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -46,16 +46,16 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
             other inputs.
         rng: Random number generator. If not given, a default RNG will be used.
 
-    Returns:
+    Returns
     -------
     q : array_like
         Axis ratio of the randomly projected ellipsoid.
 
-    Notes:
+    Notes
     -----
     See equations (11) and (12) in [1]_ for details.
 
-    References:
+    References
     ----------
     .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
 
@@ -111,12 +111,12 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
         size: Sample size. If ``None``, the size is inferred from the parameters.
         rng: Random number generator. If not given, a default RNG will be used.
 
-    Returns:
+    Returns
     -------
     eps : array_like
         Array of :term:`ellipticity` from projected axis ratios.
 
-    References:
+    References
     ----------
     .. [1] Ryden B. S., 2004, ApJ, 601, 214.
     .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
@@ -178,7 +178,7 @@ def ellipticity_gaussian(
         sigma: Standard deviation in each component.
         rng: Random number generator. If not given, a default RNG is used.
 
-    Returns:
+    Returns
     -------
     eps : array_like
         Array of galaxy :term:`ellipticity`.
@@ -228,7 +228,7 @@ def ellipticity_intnorm(
         sigma: Standard deviation of the ellipticity in each component.
         rng: Random number generator. If not given, a default RNG is used.
 
-    Returns:
+    Returns
     -------
     eps : array_like
         Array of galaxy :term:`ellipticity`.

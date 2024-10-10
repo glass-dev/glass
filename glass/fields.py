@@ -22,7 +22,7 @@ Utility functions
 
 .. autofunction:: getcl
 
-"""  # noqa: D205, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -333,7 +333,8 @@ def getcl(cls, i, j, lmax=None):
         j: Indices to return.
         lmax: Truncate the returned spectrum at this mode number.
 
-    Returns:
+    Returns
+    -------
         cl: The angular power spectrum for indices *i* and *j*.
 
     """
@@ -366,7 +367,7 @@ def effective_cls(
         lmax: Truncate the angular power spectra at this mode number. If not
             given, the longest input in *cls* will be used.
 
-    Returns:
+    Returns
     -------
     cls : (\\*M1, \\*M2, LMAX+1) array_like
         Dictionary of effective angular power spectra, where keys

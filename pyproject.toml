@@ -172,7 +172,7 @@ lint.select = [
     "ALL",
 ]
 lint.mccabe.max-complexity = 18
-lint.pydocstyle.convention = "google"
+lint.pydocstyle.convention = "numpy"
 
 [tool.tomlsort]
 all = true

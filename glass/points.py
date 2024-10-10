@@ -27,7 +27,7 @@ Bias models
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
-"""  # noqa: D205, D415
+"""  # noqa: D205, D400
 
 import healpix
 import numpy as np
@@ -50,12 +50,12 @@ def effective_bias(z, bz, w):
         bz: Redshifts and values of the bias function :math:`b(z)`.
         w: The radial window function :math:`w(z)`.
 
-    Returns:
+    Returns
     -------
     beff : array_like
         Effective bias parameter for the window.
 
-    Notes:
+    Notes
     -----
     The effective bias parameter :math:`\\bar{b}` is computed using the
     window function :math:`w(z)` as the weighted average
@@ -131,7 +131,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         batch: Maximum number of positions to yield in one batch.
         rng: Random number generator. If not given, a default RNG is used.
 
-    Yields:
+    Yields
     ------
     lon, lat : array_like
         Columns of longitudes and latitudes for the sampled points.
@@ -245,7 +245,7 @@ def uniform_positions(ngal, *, rng=None):
         ngal: Number density, expected number of positions per arcmin2.
         rng: Random number generator. If not given, a default RNG will be used.
 
-    Yields:
+    Yields
     ------
     lon, lat : array_like or list of array_like
         Columns of longitudes and latitudes for the sampled points.
@@ -300,7 +300,7 @@ def position_weights(densities, bias=None):
             broadcast against the number of shells, and is normalised internally.
         bias: Value or values of the linear bias parameter for each shell.
 
-    Returns:
+    Returns
     -------
     weights : array_like
         Relative weight of each shell for angular clustering.

@@ -40,7 +40,7 @@ Weight functions
 .. autofunction:: distance_weight
 .. autofunction:: volume_weight
 .. autofunction:: density_weight
-"""  # noqa: D205, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -105,7 +105,7 @@ class RadialWindow(NamedTuple):
         >>> w1
         RadialWindow(za=..., wa=..., zeff=0.15)
 
-    Attributes:
+    Attributes
     ----------
     za : Sequence[float]
         Redshift array; the abscissae of the window function.
@@ -114,7 +114,7 @@ class RadialWindow(NamedTuple):
     zeff : float
         Effective redshift of the window.
 
-    Methods:
+    Methods
     -------
     _replace
 
@@ -150,12 +150,12 @@ def tophat_windows(
         weight: If given, a weight function to be applied to the window
             functions.
 
-    Returns:
+    Returns
     -------
     ws : (N,) list of :class:`RadialWindow`
         List of window functions.
 
-    See Also:
+    See Also
     --------
     :ref:`user-window-functions`
 
@@ -205,12 +205,12 @@ def linear_windows(
         weight: If given, a weight function to be applied to the window
             functions.
 
-    Returns:
+    Returns
     -------
     ws : (N,) list of :class:`RadialWindow`
         List of window functions.
 
-    See Also:
+    See Also
     --------
     :ref:`user-window-functions`
 
@@ -263,12 +263,12 @@ def cubic_windows(
         weight: If given, a weight function to be applied to the window
             functions.
 
-    Returns:
+    Returns
     -------
     ws : (N,) list of :class:`RadialWindow`
         List of window functions.
 
-    See Also:
+    See Also
     --------
     :ref:`user-window-functions`
 
@@ -322,7 +322,7 @@ def restrict(
         f: The function to be restricted.
         w: The window function for the restriction.
 
-    Returns:
+    Returns
     -------
     zr, fr : array
         The restricted function.
@@ -365,13 +365,13 @@ def partition(
         method: Method for the partition. See notes for description. The
             options are "lstsq", "nnls", "restrict".
 
-    Returns:
+    Returns
     -------
     x : array_like
         Weights of the partition, where the leading axis corresponds to
         *shells*.
 
-    Notes:
+    Notes
     -----
     Formally, if :math:`w_i` are the normalised window functions,
     :math:`f` is the target function, and :math:`z_i` is a redshift grid
@@ -610,12 +610,12 @@ def combine(
             corresponds to *shells*.
         shells: Ordered sequence of window functions to be combined.
 
-    Returns:
+    Returns
     -------
     fz : array_like
         Linear combination of window functions, evaluated in *z*.
 
-    See Also:
+    See Also
     --------
     partition : Find weights for a given function.
 
