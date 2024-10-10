@@ -107,11 +107,11 @@ class RadialWindow(NamedTuple):
 
     Attributes
     ----------
-    za : Sequence[float]
+    za: Sequence[float]
         Redshift array; the abscissae of the window function.
-    wa : Sequence[float]
+    wa: Sequence[float]
         Weight array; the values (ordinates) of the window function.
-    zeff : float
+    zeff: float
         Effective redshift of the window.
 
     Methods
@@ -641,7 +641,8 @@ def combine(
 
     See Also
     --------
-    partition : Find weights for a given function.
+    partition:
+        Find weights for a given function.
 
     """
     return sum(

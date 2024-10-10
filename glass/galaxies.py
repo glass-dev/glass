@@ -248,7 +248,7 @@ def gaussian_phz(
         Photometric redshifts assuming Gaussian errors, of the same
         shape as *z*.
 
-    Warnings:
+    Warnings
     --------
     The *lower* and *upper* bounds are implemented using plain rejection
     sampling from the non-truncated normal distribution. If bounds are
@@ -256,9 +256,8 @@ def gaussian_phz(
 
     See Also
     --------
-    glass.tomo_nz_gausserr :
-        Create tomographic redshift distributions assuming the same
-        model.
+    glass.tomo_nz_gausserr:
+        Create tomographic redshift distributions assuming the same model.
 
     References
     ----------

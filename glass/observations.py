@@ -306,9 +306,9 @@ def tomo_nz_gausserr(
 
     See Also
     --------
-    equal_dens_zbins :
+    equal_dens_zbins:
         produce equal density redshift bins
-    fixed_zbins :
+    fixed_zbins:
         produce redshift bins of fixed size
 
     References
