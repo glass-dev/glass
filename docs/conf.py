@@ -54,7 +54,7 @@ html_static_path = ["_static"]
 
 html_logo = "_static/logo.png"
 html_favicon = "_static/favicon.ico"
-html_css_files = []
+html_css_files = []  # type: ignore[var-annotated]
 
 
 # -- Intersphinx -------------------------------------------------------------

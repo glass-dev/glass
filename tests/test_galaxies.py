@@ -4,7 +4,7 @@ import pytest
 from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
 
 
-def test_redshifts(mocker):
+def test_redshifts(mocker) -> None:  # type: ignore[no-untyped-def]
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
@@ -17,23 +17,23 @@ def test_redshifts(mocker):
     assert z.max() <= 1.0
 
     # sample redshifts (array)
-    z = redshifts([[1, 2], [3, 4]], w)
+    z = redshifts([[1, 2], [3, 4]], w)  # type: ignore[arg-type]
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz():
+def test_redshifts_from_nz() -> None:
     # test sampling
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)  # type: ignore[arg-type]
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0], warn=False)
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0], warn=False)  # type: ignore[arg-type]
     assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1], warn=False)
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1], warn=False)  # type: ignore[arg-type]
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)  # type: ignore[arg-type]
     assert not np.any(redshifts <= 1)
 
     # test interface
@@ -51,7 +51,7 @@ def test_redshifts_from_nz():
 
     # case: extra dimensions from count
 
-    count = [10, 20, 30]
+    count = [10, 20, 30]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -63,7 +63,7 @@ def test_redshifts_from_nz():
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -71,9 +71,9 @@ def test_redshifts_from_nz():
 
     # case: extra dimensions from count and nz
 
-    count = [[10], [20], [30]]
+    count = [[10], [20], [30]]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -81,18 +81,18 @@ def test_redshifts_from_nz():
 
     # case: incompatible input shapes
 
-    count = [10, 20, 30]
+    count = [10, 20, 30]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     with pytest.raises(ValueError):
         redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
-        redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
+        redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])  # type: ignore[arg-type]
 
 
-def test_gaussian_phz():
+def test_gaussian_phz() -> None:
     # test sampling
 
     # case: zero variance
@@ -106,8 +106,8 @@ def test_gaussian_phz():
 
     # case: truncated normal
 
-    z = 0.0
-    sigma_0 = np.ones(100)
+    z = 0.0  # type: ignore[assignment]
+    sigma_0 = np.ones(100)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -116,10 +116,10 @@ def test_gaussian_phz():
 
     # case: upper and lower bound
 
-    z = 1.0
-    sigma_0 = np.ones(100)
+    z = 1.0  # type: ignore[assignment]
+    sigma_0 = np.ones(100)  # type: ignore[assignment]
 
-    phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
+    phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)  # type: ignore[arg-type]
 
     assert phz.shape == (100,)
     assert np.all(phz >= 0.5)
@@ -129,7 +129,7 @@ def test_gaussian_phz():
 
     # case: scalar redshift, scalar sigma_0
 
-    z = 1.0
+    z = 1.0  # type: ignore[assignment]
     sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
@@ -149,8 +149,8 @@ def test_gaussian_phz():
 
     # case: scalar redshift, array sigma_0
 
-    z = 1.0
-    sigma_0 = np.zeros(10)
+    z = 1.0  # type: ignore[assignment]
+    sigma_0 = np.zeros(10)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -160,7 +160,7 @@ def test_gaussian_phz():
     # case: array redshift, array sigma_0
 
     z = np.linspace(0, 1, 10)
-    sigma_0 = np.zeros((11, 1))
+    sigma_0 = np.zeros((11, 1))  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 

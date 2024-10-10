@@ -29,15 +29,27 @@ Bias models
 
 """  # noqa: D205, D400, D415
 
+from __future__ import annotations
+
+import typing
+
 import healpix
 import numpy as np
+import numpy.typing as npt
 
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
+
+if typing.TYPE_CHECKING:
+    from glass.shells import RadialWindow
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
-def effective_bias(z, bz, w):
+def effective_bias(
+    z: npt.NDArray[typing.Any],
+    bz: npt.NDArray[typing.Any],
+    w: RadialWindow,
+) -> npt.NDArray[typing.Any]:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -68,34 +80,41 @@ def effective_bias(z, bz, w):
         \\;.
 
     """
-    norm = np.trapz(w.wa, w.za)
-    return trapz_product((z, bz), (w.za, w.wa)) / norm
+    norm = np.trapz(w.wa, w.za)  # type: ignore[attr-defined]
+    return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[arg-type, no-any-return]
 
 
-def linear_bias(delta, b):
+def linear_bias(
+    delta: npt.NDArray[typing.Any], b: float | npt.NDArray[typing.Any]
+) -> npt.NDArray[float]:  # type: ignore[type-var]
     r"""Linear bias model :math:`\\delta_g = b \\, \\delta`."""
-    return b * delta
+    return b * delta  # type: ignore[return-value]
 
 
-def loglinear_bias(delta, b):
+def loglinear_bias(
+    delta: npt.NDArray[typing.Any],
+    b: float | npt.NDArray[typing.Any],
+) -> npt.NDArray[float]:
     r"""log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
-    return delta_g
+    return delta_g  # type: ignore[no-any-return]
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal,
-    delta,
-    bias=None,
-    vis=None,
+    ngal: float | npt.NDArray[typing.Any],
+    delta: npt.NDArray[typing.Any],
+    bias: float | npt.NDArray[typing.Any] | None = None,
+    vis: npt.NDArray[typing.Any] | None = None,
     *,
-    bias_model="linear",
-    remove_monopole=False,
-    batch=1_000_000,
-    rng=None,
-):
+    bias_model: str | typing.Callable[..., typing.Any] = "linear",
+    remove_monopole: bool = False,
+    batch: int | None = 1_000_000,
+    rng: np.random.Generator | None = None,
+) -> typing.Iterator[
+    tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
+]:
     """
     Generate positions tracing a density contrast.
 
@@ -161,8 +180,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     if isinstance(bias_model, str):
         bias_model = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
-        msg = "bias_model must be string or callable"
-        raise TypeError(msg)
+        raise TypeError("bias_model must be string or callable")  # noqa: EM101,TRY003
 
     # broadcast inputs to common shape of extra dimensions
     inputs = [(ngal, 0), (delta, 1)]
@@ -170,16 +188,16 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs += [(bias, 0)]
     if vis is not None:
         inputs += [(vis, 1)]
-    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)
+    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type, assignment]
     if bias is not None:
-        bias, *rest = rest
+        bias, *rest = rest  # type: ignore[assignment]
     if vis is not None:
-        vis, *rest = rest
+        vis, *rest = rest  # type: ignore[assignment]
 
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index, operator]
 
         # remove monopole if asked to
         if remove_monopole:
@@ -187,7 +205,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
 
         # apply visibility if given
         if vis is not None:
@@ -214,7 +232,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
             cmask = np.zeros(dims, dtype=int)
             cmask[k] = 1
         else:
-            cmask = 1
+            cmask = 1  # type: ignore[assignment]
 
         # sample the map in batches
         step = 1000
@@ -229,7 +247,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 size += q[-1]
             else:
                 # how many pixels from this group do we need?
-                stop += np.searchsorted(q, batch - size, side="right")
+                stop += np.searchsorted(q, batch - size, side="right")  # type: ignore[call-overload, operator]
                 # if the first pixel alone is too much, use it anyway
                 if stop == start:
                     stop += 1
@@ -247,7 +265,15 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         assert np.sum(n[stop:]) == 0  # noqa: S101
 
 
-def uniform_positions(ngal, *, rng=None):
+def uniform_positions(
+    ngal: float | npt.NDArray[typing.Any],
+    *,
+    rng: np.random.Generator | None = None,
+) -> typing.Iterator[  # type: ignore[type-arg]
+    npt.NDArray[typing.Any] | list[npt.NDArray[typing.Any]],
+    npt.NDArray[typing.Any] | list[npt.NDArray[typing.Any]],
+    int | list[int],
+]:
     """
     Generate positions uniformly over the sphere.
 
@@ -293,12 +319,14 @@ def uniform_positions(ngal, *, rng=None):
             count = np.zeros(dims, dtype=int)
             count[k] = ngal[k]
         else:
-            count = int(ngal[k])
+            count = int(ngal[k])  # type: ignore[assignment]
 
         yield lon, lat, count
 
 
-def position_weights(densities, bias=None):
+def position_weights(
+    densities: npt.NDArray[typing.Any], bias: npt.NDArray[typing.Any] | None = None
+) -> npt.NDArray[typing.Any]:
     r"""
     Compute relative weights for angular clustering.
 

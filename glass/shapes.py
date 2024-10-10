@@ -24,15 +24,21 @@ Utilities
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
 
-def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
+def triaxial_axis_ratio(
+    zeta: npt.NDArray[typing.Any],
+    xi: npt.NDArray[typing.Any],
+    size: tuple[int] | None = None,
+    *,
+    rng: np.random.Generator | None = None,
+) -> npt.NDArray[typing.Any]:
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -71,7 +77,7 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
 
     # get size from inputs if not explicitly provided
     if size is None:
-        size = np.broadcast(zeta, xi).shape
+        size = np.broadcast(zeta, xi).shape  # type: ignore[assignment]
 
     # draw random viewing angle (theta, phi)
     cos2_theta = rng.uniform(low=-1.0, high=1.0, size=size)
@@ -92,12 +98,20 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     C = 1 + z2m1 * cos2_phi  # noqa: N806
 
     # eq. (12)
-    return np.sqrt(
+    return np.sqrt(  # type: ignore[no-any-return]
         (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
 
 
-def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):  # noqa: PLR0913
+def ellipticity_ryden04(  # noqa: PLR0913
+    mu: npt.NDArray[typing.Any],
+    sigma: npt.NDArray[typing.Any],
+    gamma: npt.NDArray[typing.Any],
+    sigma_gamma: npt.NDArray[typing.Any],
+    size: int | tuple[int, ...] | None = None,
+    *,
+    rng: np.random.Generator | None = None,
+) -> npt.NDArray[typing.Any]:
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -167,15 +181,15 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     e *= (1 - q) / (1 + q)
 
     # return the ellipticity
-    return e
+    return e  # type: ignore[no-any-return]
 
 
 def ellipticity_gaussian(
-    count: int | npt.ArrayLike,
-    sigma: npt.ArrayLike,
+    count: int | npt.NDArray[typing.Any],
+    sigma: npt.NDArray[typing.Any],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -228,11 +242,11 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | npt.ArrayLike,
-    sigma: npt.ArrayLike,
+    count: int | npt.NDArray[typing.Any],
+    sigma: npt.NDArray[typing.Any],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 
