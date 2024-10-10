@@ -27,7 +27,7 @@ Applying lensing
 
 .. autofunction:: deflect
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -59,35 +59,39 @@ def from_convergence(  # noqa: PLR0913
     Compute other weak lensing maps from the convergence.
 
     Takes a weak lensing convergence map and returns one or more of
-    deflection potential, deflection, and shear maps.  The maps are
+    deflection potential, deflection, and shear maps. The maps are
     computed via spherical harmonic transforms.
 
     Parameters
     ----------
-    kappa : array_like
+    kappa:
         HEALPix map of the convergence field.
-    lmax : int, optional
+    lmax:
         Maximum angular mode number to use in the transform.
-    potential, deflection, shear : bool, optional
+    potential:
         Which lensing maps to return.
-    discretized : bool
+    deflection:
+        Which lensing maps to return.
+    shear:
+        Which lensing maps to return.
+    discretized:
         Correct the pixel window function in output maps.
 
     Returns
     -------
-    psi : array_like
-        Map of the deflection potential.  Only returned if ``potential``
+    psi:
+        Map of the deflection potential. Only returned if ``potential``
         is true.
-    alpha : array_like
-        Map of the deflection (complex).  Only returned if ``deflection``
+    alpha:
+        Map of the deflection (complex). Only returned if ``deflection``
         if true.
-    gamma : array_like
-        Map of the shear (complex).  Only returned if ``shear`` is true.
+    gamma:
+        Map of the shear (complex). Only returned if ``shear`` is true.
 
     Notes
     -----
     The weak lensing fields are computed from the convergence or
-    deflection potential in the following way. [1]_
+    deflection potential in the following way. [1]
 
     Define the spin-raising and spin-lowering operators of the
     spin-weighted spherical harmonics as
@@ -117,7 +121,7 @@ def from_convergence(  # noqa: PLR0913
         = -l \, (l+1) \, \psi_{lm} \;.
 
     The :term:`deflection` :math:`\alpha` is the gradient of the
-    deflection potential :math:`\psi`.  On the sphere, this is
+    deflection potential :math:`\psi`. On the sphere, this is
 
     .. math::
 
@@ -126,7 +130,7 @@ def from_convergence(  # noqa: PLR0913
 
     The deflection field has spin weight :math:`1` in the HEALPix
     convention, in order for points to be deflected towards regions of
-    positive convergence.  The modes :math:`\alpha_{lm}` of the
+    positive convergence. The modes :math:`\alpha_{lm}` of the
     deflection field are hence
 
     .. math::
@@ -143,7 +147,7 @@ def from_convergence(  # noqa: PLR0913
         = \eth\eth \, \psi
         = \eth \, \alpha \;,
 
-    and thus has spin weight :math:`2`.  The shear modes
+    and thus has spin weight :math:`2`. The shear modes
     :math:`\gamma_{lm}` are related to the deflection potential modes as
 
     .. math::
@@ -153,7 +157,7 @@ def from_convergence(  # noqa: PLR0913
 
     References
     ----------
-    .. [1] Tessore N., et al., OJAp, 6, 11 (2023).
+    * [1] Tessore N., et al., OJAp, 6, 11 (2023).
            doi:10.21105/astro.2302.01942
 
     """
@@ -393,17 +397,17 @@ def multi_plane_weights(
 
     Parameters
     ----------
-    weights : array_like
-        Relative weight of each shell.  The first axis must broadcast
+    weights:
+        Relative weight of each shell. The first axis must broadcast
         against the number of shells, and is normalised internally.
-    shells : list of :class:`~glass.RadialWindow`
+    shells:
         Window functions of the shells.
-    cosmo : Cosmology
+    cosmo:
         Cosmology instance.
 
     Returns
     -------
-    lensing_weights : array_like
+    lensing_weights:
         Relative lensing weight of each shell.
 
     """
@@ -430,16 +434,20 @@ def deflect(
 
     Parameters
     ----------
-    lon, lat : array_like
-        Longitudes and latitudes to be deflected.
-    alpha : array_like
-        Deflection values.  Must be complex-valued or have a leading
+    lon:
+        Longitudes to be deflected.
+    lat:
+        Latitudes to be deflected.
+    alpha:
+        Deflection values. Must be complex-valued or have a leading
         axis of size 2 for the real and imaginary component.
 
     Returns
     -------
-    lon, lat : array_like
-        Longitudes and latitudes after deflection.
+    lon:
+        Longitudes after deflection.
+    lat:
+        Latitudes after deflection.
 
     Notes
     -----

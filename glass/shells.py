@@ -40,7 +40,7 @@ Weight functions
 .. autofunction:: distance_weight
 .. autofunction:: volume_weight
 .. autofunction:: density_weight
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -107,11 +107,11 @@ class RadialWindow(NamedTuple):
 
     Attributes
     ----------
-    za : Sequence[float]
+    za:
         Redshift array; the abscissae of the window function.
-    wa : Sequence[float]
+    wa:
         Weight array; the values (ordinates) of the window function.
-    zeff : float
+    zeff:
         Effective redshift of the window.
 
     Methods
@@ -134,7 +134,7 @@ def tophat_windows(
     Tophat window functions from the given redshift bin edges.
 
     Uses the *N+1* given redshifts as bin edges to construct *N* tophat
-    window functions.  The redshifts of the windows have linear spacing
+    window functions. The redshifts of the windows have linear spacing
     approximately equal to ``dz``.
 
     An optional weight function :math:`w(z)` can be given using
@@ -146,17 +146,16 @@ def tophat_windows(
 
     Parameters
     ----------
-    zbins : (N+1,) array_like
+    zbins:
         Redshift bin edges for the tophat window functions.
-    dz : float, optional
+    dz:
         Approximate spacing of the redshift grid.
-    weight : callable, optional
-        If given, a weight function to be applied to the window
-        functions.
+    weight:
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
-    ws : (N,) list of :class:`RadialWindow`
+    ws:
         List of window functions.
 
     See Also
@@ -193,8 +192,8 @@ def linear_windows(
     Linear interpolation window functions.
 
     Uses the *N+2* given redshifts as nodes to construct *N* triangular
-    window functions between the first and last node.  These correspond
-    to linear interpolation of radial functions.  The redshift spacing
+    window functions between the first and last node. These correspond
+    to linear interpolation of radial functions. The redshift spacing
     of the windows is approximately equal to ``dz``.
 
     An optional weight function :math:`w(z)` can be given using
@@ -205,17 +204,16 @@ def linear_windows(
 
     Parameters
     ----------
-    zgrid : (N+2,) array_like
+    zgrid:
         Redshift grid for the triangular window functions.
-    dz : float, optional
+    dz:
         Approximate spacing of the redshift grid.
-    weight : callable, optional
-        If given, a weight function to be applied to the window
-        functions.
+    weight:
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
-    ws : (N,) list of :class:`RadialWindow`
+    ws:
         List of window functions.
 
     See Also
@@ -267,17 +265,16 @@ def cubic_windows(
 
     Parameters
     ----------
-    zgrid : (N+2,) array_like
+    zgrid:
         Redshift grid for the cubic spline window functions.
-    dz : float, optional
+    dz:
         Approximate spacing of the redshift grid.
-    weight : callable, optional
-        If given, a weight function to be applied to the window
-        functions.
+    weight:
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
-    ws : (N,) list of :class:`RadialWindow`
+    ws:
         List of window functions.
 
     See Also
@@ -331,14 +328,18 @@ def restrict(
 
     Parameters
     ----------
-    z, f : array_like
+    z:
         The function to be restricted.
-    w : :class:`RadialWindow`
+    f:
+        The function to be restricted.
+    w:
         The window function for the restriction.
 
     Returns
     -------
-    zr, fr : array
+    zr:
+        The restricted function.
+    fr:
         The restricted function.
 
     """
@@ -372,17 +373,21 @@ def partition(
 
     Parameters
     ----------
-    z, fz : array_like
-        The function to be partitioned.  If *f* is multi-dimensional,
+    z:
+        The function to be partitioned. If *f* is multi-dimensional,
         its last axis must agree with *z*.
-    shells : sequence of :class:`RadialWindow`
+    fz:
+        The function to be partitioned. If *f* is multi-dimensional,
+        its last axis must agree with *z*.
+    shells:
         Ordered sequence of window functions for the partition.
-    method : {"lstsq", "nnls", "restrict"}
-        Method for the partition.  See notes for description.
+    method:
+        Method for the partition. See notes for description. The
+        options are "lstsq", "nnls", "restrict".
 
     Returns
     -------
-    x : array_like
+    x:
         Weights of the partition, where the leading axis corresponds to
         *shells*.
 
@@ -405,11 +410,11 @@ def partition(
         \\end{pmatrix} \\;.
 
     The redshift grid is the union of the given array *z* and the
-    redshift arrays of all window functions.  Intermediate function
+    redshift arrays of all window functions. Intermediate function
     values are found by linear interpolation.
 
     When partitioning a density function, it is usually desirable to
-    keep the normalisation fixed.  In that case, the problem can be
+    keep the normalisation fixed. In that case, the problem can be
     enhanced with the further constraint that the sum of the solution
     equals the integral of the target function,
 
@@ -434,19 +439,19 @@ def partition(
     obtain a solution:
 
     If ``method="nnls"`` (the default), obtain a partition from a
-    non-negative least-squares solution.  This will usually match the
-    shape of the input function closely.  The contribution from each
+    non-negative least-squares solution. This will usually match the
+    shape of the input function closely. The contribution from each
     shell is a positive number, which is required to partition e.g.
     density functions.
 
     If ``method="lstsq"``, obtain a partition from an unconstrained
-    least-squares solution.  This will more closely match the shape of
+    least-squares solution. This will more closely match the shape of
     the input function, but might lead to shells with negative
     contributions.
 
     If ``method="restrict"``, obtain a partition by integrating the
     restriction (using :func:`restrict`) of the function :math:`f` to
-    each window.  For overlapping shells, this method might produce
+    each window. For overlapping shells, this method might produce
     results which are far from the input function.
 
     """
@@ -621,22 +626,23 @@ def combine(
 
     Parameters
     ----------
-    z : array_like
+    z:
         Redshifts *z* in which to evaluate the combined function.
-    weights : array_like
+    weights:
         Weights of the linear combination, where the leading axis
         corresponds to *shells*.
-    shells : sequence of :class:`RadialWindow`
+    shells:
         Ordered sequence of window functions to be combined.
 
     Returns
     -------
-    fz : array_like
+    fz:
         Linear combination of window functions, evaluated in *z*.
 
     See Also
     --------
-    partition : Find weights for a given function.
+    partition:
+        Find weights for a given function.
 
     """
     return sum(

@@ -15,7 +15,7 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -47,17 +47,17 @@ def redshifts(
 
     Parameters
     ----------
-    n : int or array_like
-        Number of redshifts to sample.  If an array is given, the
+    n:
+        Number of redshifts to sample. If an array is given, the
         results are concatenated.
-    w : :class:`~glass.RadialWindow`
+    w:
         Radial window function.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
-    z : array_like
+    z:
         Random redshifts following the radial window function.
 
     """
@@ -77,28 +77,31 @@ def redshifts_from_nz(
 
     The function supports sampling from multiple populations of
     redshifts if *count* is an array or if there are additional axes in
-    the *z* or *nz* arrays.  In this case, the shape of *count* and the
+    the *z* or *nz* arrays. In this case, the shape of *count* and the
     leading dimensions of *z* and *nz* are broadcast to a common shape,
     and redshifts are sampled independently for each extra dimension.
     The results are concatenated into a flat array.
 
     Parameters
     ----------
-    count : int or array_like
-        Number of redshifts to sample.  If an array is given, its shape
+    count:
+        Number of redshifts to sample. If an array is given, its shape
         is broadcast against the leading axes of *z* and *nz*.
-    z, nz : array_like
-        Source distribution.  Leading axes are broadcast against the
+    z:
+        Source distribution. Leading axes are broadcast against the
         shape of *count*.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
-    warn : bool
+    nz:
+        Source distribution. Leading axes are broadcast against the
+        shape of *count*.
+    rng:
+        Random number generator. If not given, a default RNG is used.
+    warn:
         Throw relevant warnings.
 
     Returns
     -------
-    redshifts : array_like
-        Redshifts sampled from the given source distribution.  For
+    redshifts:
+        Redshifts sampled from the given source distribution. For
         inputs with extra dimensions, returns a flattened 1-D array of
         samples from all populations.
 
@@ -160,19 +163,25 @@ def galaxy_shear(  # noqa: PLR0913
 
     Parameters
     ----------
-    lon, lat : array_like
-        Arrays for galaxy longitudes and latitudes.
-    eps : array_like
+    lon:
+        Array for galaxy longitudes.
+    lat:
+        Array for galaxy latitudes.
+    eps:
         Array of galaxy :term:`ellipticity`.
-    kappa, gamma1, gamma2 : array_like
-        HEALPix maps for convergence and two components of shear.
-    reduced_shear : bool, optional
-        If ``False``, galaxy shears are not reduced by the convergence.
-        Default is ``True``.
+    kappa:
+        HEALPix map for convergence.
+    gamma1:
+        HEALPix maps for a component of shear.
+    gamma2:
+        HEALPix maps for a component of shear.
+    reduced_shear:
+        If ``False``, galaxy shears are not reduced
+        by the convergence. Default is ``True``.
 
     Returns
     -------
-    she : array_like
+    she:
         Array of complex-valued observed galaxy shears (lensed ellipticities).
 
     """
@@ -218,40 +227,41 @@ def gaussian_phz(
 
     A simple toy model of photometric redshift errors that assumes a
     Gaussian error with redshift-dependent standard deviation
-    :math:`\sigma(z) = (1 + z) \sigma_0` [1]_.
+    :math:`\sigma(z) = (1 + z) \sigma_0` [1].
 
     Parameters
     ----------
-    z : array_like
+    z:
         True redshifts.
-    sigma_0 : float or array_like
+    sigma_0:
         Redshift error in the tomographic binning at zero redshift.
-    lower, upper : float or array_like, optional
+    lower:
         Bounds for the returned photometric redshifts.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
+    upper:
+        Bounds for the returned photometric redshifts.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
-    phz : array_like
+    phz:
         Photometric redshifts assuming Gaussian errors, of the same
         shape as *z*.
 
     Warnings
     --------
     The *lower* and *upper* bounds are implemented using plain rejection
-    sampling from the non-truncated normal distribution.  If bounds are
+    sampling from the non-truncated normal distribution. If bounds are
     used, they should always contain significant probability mass.
 
     See Also
     --------
-    glass.tomo_nz_gausserr :
-        Create tomographic redshift distributions assuming the same
-        model.
+    glass.tomo_nz_gausserr:
+        Create tomographic redshift distributions assuming the same model.
 
     References
     ----------
-    .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+    * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
            doi:10.1111/j.1365-2966.2007.12271.x
 
     Examples

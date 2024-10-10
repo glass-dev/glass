@@ -20,13 +20,13 @@ def nnls(
     """
     Compute a non-negative least squares solution.
 
-    Implementation of the algorithm due to [1]_ as described in [2]_.
+    Implementation of the algorithm due to [1] as described in [2].
 
     References
     ----------
-    .. [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
+    * [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
         Problems. doi: 10.1137/1.9781611971217
-    .. [2] Bro, R. and De Jong, S. (1997), A fast
+    * [2] Bro, R. and De Jong, S. (1997), A fast
         non-negativity-constrained least squares algorithm. J.
         Chemometrics, 11, 393-401.
 
