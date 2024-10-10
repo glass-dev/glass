@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass.galaxies import gaussian_phz, redshifts, redshifts_from_nz
+from glass.galaxies import galaxy_shear, gaussian_phz, redshifts, redshifts_from_nz
 
 
 def test_redshifts(mocker):
@@ -90,6 +90,42 @@ def test_redshifts_from_nz():
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
         redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
+
+
+def test_galaxy_shear(rng):
+    # check shape of the output
+
+    kappa, gamma1, gamma2 = (
+        rng.normal(size=(12,)),
+        rng.normal(size=(12,)),
+        rng.normal(size=(12,)),
+    )
+
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
+    np.testing.assert_equal(shear, [])
+
+    gal_lon, gal_lat, gal_eps = (
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+    )
+    shear = galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
+    assert np.shape(shear) == (512,)
+
+    # shape with no reduced shear
+
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)
+    np.testing.assert_equal(shear, [])
+
+    gal_lon, gal_lat, gal_eps = (
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+    )
+    shear = galaxy_shear(
+        gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2, reduced_shear=False
+    )
+    assert np.shape(shear) == (512,)
 
 
 def test_gaussian_phz():
