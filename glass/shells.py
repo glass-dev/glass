@@ -155,7 +155,7 @@ def tophat_windows(
 
     Returns
     -------
-    ws : (N,) list of :class:`RadialWindow`
+    ws:
         List of window functions.
 
     See Also
@@ -213,7 +213,7 @@ def linear_windows(
 
     Returns
     -------
-    ws : (N,) list of :class:`RadialWindow`
+    ws:
         List of window functions.
 
     See Also
@@ -274,7 +274,7 @@ def cubic_windows(
 
     Returns
     -------
-    ws : (N,) list of :class:`RadialWindow`
+    ws:
         List of window functions.
 
     See Also
@@ -337,7 +337,9 @@ def restrict(
 
     Returns
     -------
-    zr, fr : array
+    zr:
+        The restricted function.
+    fr:
         The restricted function.
 
     """
@@ -385,7 +387,7 @@ def partition(
 
     Returns
     -------
-    x : array_like
+    x:
         Weights of the partition, where the leading axis corresponds to
         *shells*.
 
@@ -634,7 +636,7 @@ def combine(
 
     Returns
     -------
-    fz : array_like
+    fz:
         Linear combination of window functions, evaluated in *z*.
 
     See Also

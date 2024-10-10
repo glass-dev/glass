@@ -79,13 +79,13 @@ def from_convergence(  # noqa: PLR0913
 
     Returns
     -------
-    psi : array_like
+    psi:
         Map of the deflection potential. Only returned if ``potential``
         is true.
-    alpha : array_like
+    alpha:
         Map of the deflection (complex). Only returned if ``deflection``
         if true.
-    gamma : array_like
+    gamma:
         Map of the shear (complex). Only returned if ``shear`` is true.
 
     Notes
@@ -407,7 +407,7 @@ def multi_plane_weights(
 
     Returns
     -------
-    lensing_weights : array_like
+    lensing_weights:
         Relative lensing weight of each shell.
 
     """
@@ -444,8 +444,10 @@ def deflect(
 
     Returns
     -------
-    lon, lat : array_like
-        Longitudes and latitudes after deflection.
+    lon:
+        Longitudes after deflection.
+    lat:
+        Latitudes after deflection.
 
     Notes
     -----

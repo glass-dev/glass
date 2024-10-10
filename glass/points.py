@@ -56,7 +56,7 @@ def effective_bias(z, bz, w):
 
     Returns
     -------
-    beff : array_like
+    beff:
         Effective bias parameter for the window.
 
     Notes
@@ -320,7 +320,7 @@ def position_weights(densities, bias=None):
 
     Returns
     -------
-    weights : array_like
+    weights:
         Relative weight of each shell for angular clustering.
 
     """

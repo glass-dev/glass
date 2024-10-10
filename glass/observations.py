@@ -63,7 +63,7 @@ def vmap_galactic_ecliptic(
 
     Returns
     -------
-    vis : array_like
+    vis:
         A HEALPix :term:`visibility map`.
 
     Raises
@@ -115,7 +115,7 @@ def gaussian_nz(
 
     Returns
     -------
-    nz : array_like
+    nz:
         Redshift distribution at the given ``z`` values.
 
     """
@@ -159,7 +159,7 @@ def smail_nz(
 
     Returns
     -------
-    pz : array_like
+    pz:
         Redshift distribution at the given ``z`` values.
 
     Notes
@@ -219,7 +219,7 @@ def fixed_zbins(
 
     Returns
     -------
-    zbins : list of tuple of float
+    zbins:
         List of redshift bin edges.
 
     """
@@ -256,7 +256,7 @@ def equal_dens_zbins(
 
     Returns
     -------
-    zbins : list of tuple of float
+    zbins:
         List of redshift bin edges.
 
     """
@@ -300,7 +300,7 @@ def tomo_nz_gausserr(
 
     Returns
     -------
-    binned_nz : array_like
+    binned_nz:
         Tomographic redshift bins convolved with a gaussian error.
         Array has a shape (nbins, len(z))
 

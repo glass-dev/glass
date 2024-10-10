@@ -340,7 +340,8 @@ def getcl(cls, i, j, lmax=None):
 
     Returns
     -------
-        cl: The angular power spectrum for indices *i* and *j*.
+    cl:
+        The angular power spectrum for indices *i* and *j*.
 
     """
     if j > i:
@@ -379,7 +380,7 @@ def effective_cls(
 
     Returns
     -------
-    cls : (\\*M1, \\*M2, LMAX+1) array_like
+    cls:
         Dictionary of effective angular power spectra, where keys
         correspond to the leading axes of *weights1* and *weights2*.
 

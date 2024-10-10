@@ -53,7 +53,7 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
 
     Returns
     -------
-    q : array_like
+    q:
         Axis ratio of the randomly projected ellipsoid.
 
     Notes
@@ -125,7 +125,7 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
 
     Returns
     -------
-    eps : array_like
+    eps:
         Array of :term:`ellipticity` from projected axis ratios.
 
     References
@@ -196,7 +196,7 @@ def ellipticity_gaussian(
 
     Returns
     -------
-    eps : array_like
+    eps:
         Array of galaxy :term:`ellipticity`.
 
     """
@@ -250,7 +250,7 @@ def ellipticity_intnorm(
 
     Returns
     -------
-    eps : array_like
+    eps:
         Array of galaxy :term:`ellipticity`.
 
     """

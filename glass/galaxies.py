@@ -57,7 +57,7 @@ def redshifts(
 
     Returns
     -------
-    z : array_like
+    z:
         Random redshifts following the radial window function.
 
     """
@@ -100,7 +100,7 @@ def redshifts_from_nz(
 
     Returns
     -------
-    redshifts : array_like
+    redshifts:
         Redshifts sampled from the given source distribution. For
         inputs with extra dimensions, returns a flattened 1-D array of
         samples from all populations.
@@ -181,7 +181,7 @@ def galaxy_shear(  # noqa: PLR0913
 
     Returns
     -------
-    she : array_like
+    she:
         Array of complex-valued observed galaxy shears (lensed ellipticities).
 
     """
@@ -244,7 +244,7 @@ def gaussian_phz(
 
     Returns
     -------
-    phz : array_like
+    phz:
         Photometric redshifts assuming Gaussian errors, of the same
         shape as *z*.
 
