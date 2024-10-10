@@ -107,11 +107,11 @@ class RadialWindow(NamedTuple):
 
     Attributes
     ----------
-    za: Sequence[float]
+    za:
         Redshift array; the abscissae of the window function.
-    wa: Sequence[float]
+    wa:
         Weight array; the values (ordinates) of the window function.
-    zeff: float
+    zeff:
         Effective redshift of the window.
 
     Methods
