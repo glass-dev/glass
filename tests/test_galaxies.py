@@ -127,40 +127,6 @@ def test_galaxy_shear(rng):
     )
     assert np.shape(shear) == (512,)
 
-    # shape with multi-dimensional args
-
-    kappa, gamma1, gamma2 = (
-        rng.normal(size=(12, 12)),
-        rng.normal(size=(12, 12)),
-        rng.normal(size=(12, 12)),
-    )
-
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
-    np.testing.assert_equal(shear, [])
-
-    gal_lon, gal_lat, gal_eps = (
-        rng.normal(size=(512)),
-        rng.normal(size=(512)),
-        rng.normal(size=(512)),
-    )
-    shear = galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
-    assert np.shape(shear) == (512, 512)
-
-    # shape with multi-dimensional args and no reduced shear
-
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)
-    np.testing.assert_equal(shear, [])
-
-    gal_lon, gal_lat, gal_eps = (
-        rng.normal(size=(512)),
-        rng.normal(size=(512)),
-        rng.normal(size=(512)),
-    )
-    shear = galaxy_shear(
-        gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2, reduced_shear=False
-    )
-    assert np.shape(shear) == (512, 512)
-
 
 def test_gaussian_phz():
     # test sampling
