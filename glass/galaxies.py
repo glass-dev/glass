@@ -45,7 +45,8 @@ def redshifts(
     This function samples *n* redshifts from a distribution that follows
     the given radial window function *w*.
 
-    Args:
+    Parameters
+    ----------
         n: Number of redshifts to sample. If an array is given, the
             results are concatenated.
         w: Radial window function.
@@ -78,7 +79,8 @@ def redshifts_from_nz(
     and redshifts are sampled independently for each extra dimension.
     The results are concatenated into a flat array.
 
-    Args:
+    Parameters
+    ----------
         count: Number of redshifts to sample. If an array is given, its shape
             is broadcast against the leading axes of *z* and *nz*.
         z: Source distribution. Leading axes are broadcast against the
@@ -151,7 +153,8 @@ def galaxy_shear(  # noqa: PLR0913
     Takes lensing maps for convergence and shear and produces a lensed
     ellipticity (shear) for each intrinsic galaxy ellipticity.
 
-    Args:
+    Parameters
+    ----------
         lon: Array for galaxy longitudes.
         lat: Array for galaxy latitudes.
         eps: Array of galaxy :term:`ellipticity`.
@@ -211,7 +214,8 @@ def gaussian_phz(
     Gaussian error with redshift-dependent standard deviation
     :math:`\sigma(z) = (1 + z) \sigma_0` [1]_.
 
-    Args:
+    Parameters
+    ----------
         z: True redshifts.
         sigma_0: Redshift error in the tomographic binning at zero redshift.
         lower: Bounds for the returned photometric redshifts.

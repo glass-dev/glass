@@ -45,7 +45,8 @@ def effective_bias(z, bz, w):
     and computes an effective bias parameter :math:`\\bar{b}` for a
     given window function :math:`w(z)`.
 
-    Args:
+    Parameters
+    ----------
         z: Redshifts and values of the bias function :math:`b(z)`.
         bz: Redshifts and values of the bias function :math:`b(z)`.
         w: The radial window function :math:`w(z)`.
@@ -115,7 +116,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     number of points per population is returned in ``count`` as an array
     in the shape of the extra dimensions.
 
-    Args:
+    Parameters
+    ----------
         ngal: Number density, expected number of points per arcmin2.
         delta: Map of the input density contrast. This is fed into the bias
             model to produce the density contrast for sampling.
@@ -241,7 +243,8 @@ def uniform_positions(ngal, *, rng=None):
 
     The function supports array input for the ``ngal`` parameter.
 
-    Args:
+    Parameters
+    ----------
         ngal: Number density, expected number of positions per arcmin2.
         rng: Random number generator. If not given, a default RNG will be used.
 
@@ -295,7 +298,8 @@ def position_weights(densities, bias=None):
     redshift distribution and bias factor :math:`n(z) \\, b(z)` for the
     discretised shells.
 
-    Args:
+    Parameters
+    ----------
         densities: Density of points in each shell. The first axis must
             broadcast against the number of shells, and is normalised internally.
         bias: Value or values of the linear bias parameter for each shell.

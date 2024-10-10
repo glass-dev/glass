@@ -144,7 +144,8 @@ def tophat_windows(
     Their effective redshifts are the mean redshifts of the (weighted)
     tophat bins.
 
-    Args:
+    Parameters
+    ----------
         zbins: Redshift bin edges for the tophat window functions.
         dz: Approximate spacing of the redshift grid.
         weight: If given, a weight function to be applied to the window
@@ -199,7 +200,8 @@ def linear_windows(
     The resulting windows functions are :class:`RadialWindow` instances.
     Their effective redshifts correspond to the given nodes.
 
-    Args:
+    Parameters
+    ----------
         zgrid: Redshift grid for the triangular window functions.
         dz: Approximate spacing of the redshift grid.
         weight: If given, a weight function to be applied to the window
@@ -257,7 +259,8 @@ def cubic_windows(
     The resulting windows functions are :class:`RadialWindow` instances.
     Their effective redshifts correspond to the given nodes.
 
-    Args:
+    Parameters
+    ----------
         zgrid: Redshift grid for the cubic spline window functions.
         dz: Approximate spacing of the redshift grid.
         weight: If given, a weight function to be applied to the window
@@ -317,7 +320,8 @@ def restrict(
     the function and window over the support of the window.
     Intermediate function values are found by linear interpolation
 
-    Args:
+    Parameters
+    ----------
         z: The function to be restricted.
         f: The function to be restricted.
         w: The window function for the restriction.
@@ -356,7 +360,8 @@ def partition(
     The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
-    Args:
+    Parameters
+    ----------
         z: The function to be partitioned. If *f* is multi-dimensional,
             its last axis must agree with *z*.
         fz: The function to be partitioned. If *f* is multi-dimensional,
@@ -604,7 +609,8 @@ def combine(
     The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
-    Args:
+    Parameters
+    ----------
         z: Redshifts *z* in which to evaluate the combined function.
         weights: Weights of the linear combination, where the leading axis
             corresponds to *shells*.

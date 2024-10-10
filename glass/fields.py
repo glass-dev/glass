@@ -327,7 +327,8 @@ def getcl(cls, i, j, lmax=None):
     Return the angular power spectrum for indices *i* and *j* from an
     array in *GLASS* ordering.
 
-    Args:
+    Parameters
+    ----------
         cls: List of angular power spectra in *GLASS* ordering.
         i: Indices to return.
         j: Indices to return.
@@ -359,7 +360,8 @@ def effective_cls(
     using the factors provided by *weights1* and *weights2*. Additional
     axes in *weights1* and *weights2* produce arrays of spectra.
 
-    Args:
+    Parameters
+    ----------
         cls: Angular matter power spectra to combine, in *GLASS* ordering.
         weights1: Weight factors for spectra. The first axis must be equal to
             the number of fields.

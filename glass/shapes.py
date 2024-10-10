@@ -39,7 +39,8 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
 
-    Args:
+    Parameters
+    ----------
         zeta: Axis ratio of intermediate and major axis.
         xi: Axis ratio of minor and major axis.
         size: Size of the random draw. If `None` is given, size is inferred from
@@ -103,7 +104,8 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     standard deviation :math:`\sigma_\gamma` [2]_. Both distributions are
     truncated to produce ratios in the range 0 to 1 using rejection sampling.
 
-    Args:
+    Parameters
+    ----------
         mu: Mean of the truncated normal for :math:`\log(1 - B/A)`.
         sigma: Standard deviation for :math:`\log(1 - B/A)`.
         gamma: Mean of the truncated normal for :math:`1 - C/B`.
@@ -173,7 +175,8 @@ def ellipticity_gaussian(
     this function with too large values of ``sigma``, or the sampling
     will become inefficient.
 
-    Args:
+    Parameters
+    ----------
         count: Number of ellipticities to be sampled.
         sigma: Standard deviation in each component.
         rng: Random number generator. If not given, a default RNG is used.
@@ -223,7 +226,8 @@ def ellipticity_intnorm(
     The ellipticities are sampled from an intrinsic normal distribution
     with standard deviation ``sigma`` for each component.
 
-    Args:
+    Parameters
+    ----------
         count: Number of ellipticities to sample.
         sigma: Standard deviation of the ellipticity in each component.
         rng: Random number generator. If not given, a default RNG is used.

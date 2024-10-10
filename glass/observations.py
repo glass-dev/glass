@@ -52,7 +52,8 @@ def vmap_galactic_ecliptic(
     the galactic and ecliptic planes. The location of the stripes is set with
     optional parameters.
 
-    Args:
+    Parameters
+    ----------
         nside: The NSIDE parameter of the resulting HEALPix map.
         galactic: The location of the galactic plane in the
             respective coordinate system.
@@ -100,7 +101,8 @@ def gaussian_nz(
     If ``mean`` or ``sigma`` are array_like, their axes will be the leading
     axes of the redshift distribution.
 
-    Args:
+    Parameters
+    ----------
         z: Redshift values of the distribution.
         mean: Mean(s) of the redshift distribution.
         sigma: Standard deviation(s) of the redshift distribution.
@@ -137,7 +139,8 @@ def smail_nz(
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
 
-    Args:
+    Parameters
+    ----------
         z: Redshift values of the distribution.
         z_mode: Mode of the redshift distribution, must be positive.
         alpha: Power law exponent (z/z0)^\alpha, must be positive.
@@ -193,7 +196,8 @@ def fixed_zbins(
     This function creates contiguous tomographic redshift bins of fixed size.
     It takes either the number or size of the bins.
 
-    Args:
+    Parameters
+    ----------
         zmin: Extent of the redshift binning.
         zmax: Extent of the redshift binning.
         nbins: Number of redshift bins. Only one of ``nbins`` and
@@ -228,7 +232,8 @@ def equal_dens_zbins(
     This function subdivides a source redshift distribution into ``nbins``
     tomographic redshift bins with equal density.
 
-    Args:
+    Parameters
+    ----------
         z: The source redshift distribution. Must be one-dimensional.
         nz: The source redshift distribution. Must be one-dimensional.
         nbins: Number of redshift bins.
@@ -266,7 +271,8 @@ def tomo_nz_gausserr(
     standard deviation of the Gaussian depends on redshift and is given by
     ``sigma(z) = sigma_0*(1 + z)``.
 
-    Args:
+    Parameters
+    ----------
         z: The true source redshift distribution. Must be one-dimensional.
         nz: The true source redshift distribution. Must be one-dimensional.
         sigma_0: Redshift error in the tomographic binning at zero redshift.

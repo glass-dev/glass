@@ -62,7 +62,8 @@ def from_convergence(  # noqa: PLR0913
     deflection potential, deflection, and shear maps. The maps are
     computed via spherical harmonic transforms.
 
-    Args:
+    Parameters
+    ----------
         kappa: HEALPix map of the convergence field.
         lmax: Maximum angular mode number to use in the transform.
         potential: Which lensing maps to return.
@@ -388,7 +389,8 @@ def multi_plane_weights(
     redshift distribution :math:`n(z)` into the lensing efficiency
     sometimes denoted :math:`g(z)` or :math:`q(z)`.
 
-    Args:
+    Parameters
+    ----------
         weights: Relative weight of each shell. The first axis must broadcast
             against the number of shells, and is normalised internally.
         shells: Window functions of the shells.
@@ -421,7 +423,8 @@ def deflect(
     Takes an array of :term:`deflection` values and applies them
     to the given positions.
 
-    Args:
+    Parameters
+    ----------
         lon: Longitudes to be deflected.
         lat: Latitudes to be deflected.
         alpha: Deflection values. Must be complex-valued or have a leading
