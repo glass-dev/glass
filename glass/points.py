@@ -145,12 +145,13 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     Yields
     ------
-    lon, lat : array_like
-        Columns of longitudes and latitudes for the sampled points.
-    count : int or array_like
-        The number of sampled points  If multiple populations are
-        sampled, an array of counts in the shape of the extra
-        dimensions is returned.
+    lon:
+        Columns of longitudes for the sampled points.
+    lat:
+        Columns of latitudes for the sampled points.
+    count:
+        The number of sampled points  If multiple populations are sampled, an
+        array of counts in the shape of the extra dimensions is returned.
 
     """
     # get default RNG if not given
@@ -262,9 +263,11 @@ def uniform_positions(ngal, *, rng=None):
 
     Yields
     ------
-    lon, lat : array_like or list of array_like
-        Columns of longitudes and latitudes for the sampled points.
-    count : int or list of ints
+    lon:
+        Columns of longitudes for the sampled points.
+    lat:
+        Columns of latitudes for the sampled points.
+    count:
         The number of sampled points. For array inputs, an array of
         counts with the same shape is returned.
 
