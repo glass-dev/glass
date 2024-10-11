@@ -62,6 +62,11 @@ def from_convergence(  # noqa: PLR0913
     deflection potential, deflection, and shear maps. The maps are
     computed via spherical harmonic transforms.
 
+    Returns the maps of:
+    * deflection potential if ``potential`` is true.
+    * potential (complex) if ``deflection`` is true.
+    * shear (complex) if ``shear`` is true.
+
     Parameters
     ----------
     kappa:
@@ -76,17 +81,6 @@ def from_convergence(  # noqa: PLR0913
         Which lensing maps to return.
     discretized:
         Correct the pixel window function in output maps.
-
-    Returns
-    -------
-    psi:
-        Map of the deflection potential. Only returned if ``potential``
-        is true.
-    alpha:
-        Map of the deflection (complex). Only returned if ``deflection``
-        if true.
-    gamma:
-        Map of the shear (complex). Only returned if ``shear`` is true.
 
     Notes
     -----
@@ -395,6 +389,8 @@ def multi_plane_weights(
     redshift distribution :math:`n(z)` into the lensing efficiency
     sometimes denoted :math:`g(z)` or :math:`q(z)`.
 
+    Returns the relative lensing weight of each shell.
+
     Parameters
     ----------
     weights:
@@ -404,11 +400,6 @@ def multi_plane_weights(
         Window functions of the shells.
     cosmo:
         Cosmology instance.
-
-    Returns
-    -------
-    lensing_weights:
-        Relative lensing weight of each shell.
 
     """
     # ensure shape of weights ends with the number of shells
@@ -432,6 +423,8 @@ def deflect(
     Takes an array of :term:`deflection` values and applies them
     to the given positions.
 
+    Returns the longitudes and latitudes after deflection.
+
     Parameters
     ----------
     lon:
@@ -441,13 +434,6 @@ def deflect(
     alpha:
         Deflection values. Must be complex-valued or have a leading
         axis of size 2 for the real and imaginary component.
-
-    Returns
-    -------
-    lon:
-        Longitudes after deflection.
-    lat:
-        Latitudes after deflection.
 
     Notes
     -----

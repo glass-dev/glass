@@ -338,11 +338,6 @@ def getcl(cls, i, j, lmax=None):
     lmax:
         Truncate the returned spectrum at this mode number.
 
-    Returns
-    -------
-    cl:
-        The angular power spectrum for indices *i* and *j*.
-
     """
     if j > i:
         i, j = j, i
@@ -365,6 +360,9 @@ def effective_cls(
     using the factors provided by *weights1* and *weights2*. Additional
     axes in *weights1* and *weights2* produce arrays of spectra.
 
+    Returns a dictionary of effective angular power spectra, where keys
+    correspond to the leading axes of *weights1* and *weights2*.
+
     Parameters
     ----------
     cls:
@@ -377,12 +375,6 @@ def effective_cls(
     lmax:
         Truncate the angular power spectra at this mode number. If not
         given, the longest input in *cls* will be used.
-
-    Returns
-    -------
-    cls:
-        Dictionary of effective angular power spectra, where keys
-        correspond to the leading axes of *weights1* and *weights2*.
 
     """
     from itertools import combinations_with_replacement, product

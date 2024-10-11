@@ -45,6 +45,8 @@ def redshifts(
     This function samples *n* redshifts from a distribution that follows
     the given radial window function *w*.
 
+    Returns random redshifts following the radial window function.
+
     Parameters
     ----------
     n:
@@ -54,11 +56,6 @@ def redshifts(
         Radial window function.
     rng:
         Random number generator. If not given, a default RNG is used.
-
-    Returns
-    -------
-    z:
-        Random redshifts following the radial window function.
 
     """
     return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
@@ -82,6 +79,10 @@ def redshifts_from_nz(
     and redshifts are sampled independently for each extra dimension.
     The results are concatenated into a flat array.
 
+    Returns redshifts sampled from the given source distribution. For
+    inputs with extra dimensions, returns a flattened 1-D array of
+    samples from all populations.
+
     Parameters
     ----------
     count:
@@ -97,13 +98,6 @@ def redshifts_from_nz(
         Random number generator. If not given, a default RNG is used.
     warn:
         Throw relevant warnings.
-
-    Returns
-    -------
-    redshifts:
-        Redshifts sampled from the given source distribution. For
-        inputs with extra dimensions, returns a flattened 1-D array of
-        samples from all populations.
 
     """
     if warn:
@@ -161,6 +155,9 @@ def galaxy_shear(  # noqa: PLR0913
     Takes lensing maps for convergence and shear and produces a lensed
     ellipticity (shear) for each intrinsic galaxy ellipticity.
 
+    Returns an array of complex-valued observed galaxy shears
+    (lensed ellipticities).
+
     Parameters
     ----------
     lon:
@@ -178,11 +175,6 @@ def galaxy_shear(  # noqa: PLR0913
     reduced_shear:
         If ``False``, galaxy shears are not reduced
         by the convergence. Default is ``True``.
-
-    Returns
-    -------
-    she:
-        Array of complex-valued observed galaxy shears (lensed ellipticities).
 
     """
     nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
@@ -229,6 +221,9 @@ def gaussian_phz(
     Gaussian error with redshift-dependent standard deviation
     :math:`\sigma(z) = (1 + z) \sigma_0` [1].
 
+    Returns photometric redshifts assuming Gaussian errors, of the same
+    shape as *z*.
+
     Parameters
     ----------
     z:
@@ -241,12 +236,6 @@ def gaussian_phz(
         Bounds for the returned photometric redshifts.
     rng:
         Random number generator. If not given, a default RNG is used.
-
-    Returns
-    -------
-    phz:
-        Photometric redshifts assuming Gaussian errors, of the same
-        shape as *z*.
 
     Warnings
     --------

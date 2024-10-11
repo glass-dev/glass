@@ -144,6 +144,8 @@ def tophat_windows(
     Their effective redshifts are the mean redshifts of the (weighted)
     tophat bins.
 
+    Returns a list of window functions.
+
     Parameters
     ----------
     zbins:
@@ -152,11 +154,6 @@ def tophat_windows(
         Approximate spacing of the redshift grid.
     weight:
         If given, a weight function to be applied to the window functions.
-
-    Returns
-    -------
-    ws:
-        List of window functions.
 
     See Also
     --------
@@ -202,6 +199,8 @@ def linear_windows(
     The resulting windows functions are :class:`RadialWindow` instances.
     Their effective redshifts correspond to the given nodes.
 
+    Returns a list of window functions.
+
     Parameters
     ----------
     zgrid:
@@ -210,11 +209,6 @@ def linear_windows(
         Approximate spacing of the redshift grid.
     weight:
         If given, a weight function to be applied to the window functions.
-
-    Returns
-    -------
-    ws:
-        List of window functions.
 
     See Also
     --------
@@ -263,6 +257,8 @@ def cubic_windows(
     The resulting windows functions are :class:`RadialWindow` instances.
     Their effective redshifts correspond to the given nodes.
 
+    Returns a list of window functions.
+
     Parameters
     ----------
     zgrid:
@@ -271,11 +267,6 @@ def cubic_windows(
         Approximate spacing of the redshift grid.
     weight:
         If given, a weight function to be applied to the window functions.
-
-    Returns
-    -------
-    ws:
-        List of window functions.
 
     See Also
     --------
@@ -326,6 +317,8 @@ def restrict(
     the function and window over the support of the window.
     Intermediate function values are found by linear interpolation
 
+    Returns the restricted function
+
     Parameters
     ----------
     z:
@@ -334,13 +327,6 @@ def restrict(
         The function to be restricted.
     w:
         The window function for the restriction.
-
-    Returns
-    -------
-    zr:
-        The restricted function.
-    fr:
-        The restricted function.
 
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
@@ -371,6 +357,9 @@ def partition(
     The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
+    Returns the weights of the partition, where the leading axis corresponds to
+    *shells*.
+
     Parameters
     ----------
     z:
@@ -384,12 +373,6 @@ def partition(
     method:
         Method for the partition. See notes for description. The
         options are "lstsq", "nnls", "restrict".
-
-    Returns
-    -------
-    x:
-        Weights of the partition, where the leading axis corresponds to
-        *shells*.
 
     Notes
     -----
@@ -624,6 +607,8 @@ def combine(
     The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
+    Returns a linear combination of window functions, evaluated in *z*.
+
     Parameters
     ----------
     z:
@@ -633,11 +618,6 @@ def combine(
         corresponds to *shells*.
     shells:
         Ordered sequence of window functions to be combined.
-
-    Returns
-    -------
-    fz:
-        Linear combination of window functions, evaluated in *z*.
 
     See Also
     --------
