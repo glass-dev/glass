@@ -63,6 +63,7 @@ def from_convergence(  # noqa: PLR0913
     computed via spherical harmonic transforms.
 
     Returns the maps of:
+
     * deflection potential if ``potential`` is true.
     * potential (complex) if ``deflection`` is true.
     * shear (complex) if ``shear`` is true.
