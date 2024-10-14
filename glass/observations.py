@@ -29,16 +29,12 @@ Visibility
 from __future__ import annotations
 
 import math
-import typing
-from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
+import numpy.typing as npt
 
 from glass.core.array import cumtrapz
-
-if TYPE_CHECKING:
-    import numpy.typing as npt
 
 
 def vmap_galactic_ecliptic(

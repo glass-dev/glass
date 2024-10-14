@@ -26,10 +26,9 @@ Utility functions
 
 from __future__ import annotations
 
+import collections.abc
 import typing
 import warnings
-from collections.abc import Generator, Iterable, Sequence
-from typing import Callable, Optional, Union
 
 import healpy as hp
 import numpy as np
@@ -37,18 +36,20 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
-Size = Optional[Union[int, tuple[int, ...]]]
-Iternorm = tuple[Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
-ClTransform = Union[str, Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]]
-Cls = Sequence[Union[npt.NDArray[typing.Any], Sequence[float]]]
+Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
+Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
+ClTransform = typing.Union[str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]]
+Cls = collections.abc.Sequence[
+    typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
+]
 Alms = npt.NDArray[typing.Any]
 
 
 def iternorm(
     k: int,
-    cov: Iterable[npt.NDArray[typing.Any]],
+    cov: collections.abc.Iterable[npt.NDArray[typing.Any]],
     size: Size = None,
-) -> Generator[Iternorm, None, None]:
+) -> collections.abc.Generator[Iternorm, None, None]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
     n: tuple[int, ...]
     if size is None:
@@ -108,7 +109,7 @@ def iternorm(
 
 def cls2cov(
     cls: Cls, nl: int, nf: int, nc: int
-) -> Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
     end = 0
@@ -215,7 +216,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -301,7 +302,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation

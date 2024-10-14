@@ -69,7 +69,7 @@ Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
 report = {exclude_also = [
-    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
 ], omit = [
     "glass/_version.py",
 ], skip_covered = true, sort = "cover"}

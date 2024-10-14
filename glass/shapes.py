@@ -24,13 +24,8 @@ Utilities
 
 from __future__ import annotations
 
-import typing
-from typing import TYPE_CHECKING
-
 import numpy as np
-
-if TYPE_CHECKING:
-    import numpy.typing as npt
+import numpy.typing as npt
 
 
 def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):  # type: ignore[no-untyped-def]
@@ -143,18 +138,21 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     if size is None:
         size = np.broadcast(mu, sigma, gamma, sigma_gamma).shape
 
+    # broadcast all inputs to output shape
+    # this makes it possible to efficiently resample later
+    mu = np.broadcast_to(mu, size, subok=True)
+    sigma = np.broadcast_to(sigma, size, subok=True)
+    gamma = np.broadcast_to(gamma, size, subok=True)
+    sigma_gamma = np.broadcast_to(sigma_gamma, size, subok=True)
+
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
-    bad = eps > 0
-    while np.any(bad):
-        eps[bad] = rng.normal(mu, sigma, size=size)[bad]
-        bad = eps > 0
+    while np.any(bad := eps > 0):
+        eps[bad] = rng.normal(mu[bad], sigma[bad])
     gam = rng.normal(gamma, sigma_gamma, size=size)
-    bad = (gam < 0) | (gam > 1)
-    while np.any(bad):
-        gam[bad] = rng.normal(gamma, sigma_gamma, size=size)[bad]
-        bad = (gam < 0) | (gam > 1)
+    while np.any(bad := (gam < 0) | (gam > 1)):
+        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -np.expm1(eps)
