@@ -154,12 +154,9 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     eps = rng.normal(mu, sigma, size=size)
     while np.any(bad := eps > 0):
         eps[bad] = rng.normal(mu[bad], sigma[bad])
-        bad = eps > 0
     gam = rng.normal(gamma, sigma_gamma, size=size)
-    bad = (gam < 0) | (gam > 1)
-    while np.any(bad := eps > 0):
+    while np.any(bad := (gam < 0) | (gam > 1)):
         gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])
-        bad = (gam < 0) | (gam > 1)
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -np.expm1(eps)
