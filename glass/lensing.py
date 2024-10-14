@@ -438,9 +438,9 @@ def deflect(
     Notes
     -----
     Deflections on the sphere are :term:`defined <deflection>` as
-    follows:  The complex deflection :math:`\\alpha` transports a point
-    on the sphere an angular distance :math:`|\\alpha|` along the
-    geodesic with bearing :math:`\\arg\\alpha` in the original point.
+    follows:  The complex deflection :math:`\alpha` transports a point
+    on the sphere an angular distance :math:`|\alpha|` along the
+    geodesic with bearing :math:`\arg\alpha` in the original point.
 
     In the language of differential geometry, this function is the
     exponential map.
