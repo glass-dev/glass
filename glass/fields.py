@@ -38,7 +38,9 @@ from gaussiancl import gaussiancl
 # types
 Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
 Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
-ClTransform = typing.Union[str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]]
+ClTransform = typing.Union[
+    str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]
+]
 Cls = collections.abc.Sequence[
     typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
 ]
