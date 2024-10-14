@@ -20,7 +20,7 @@ Utilities
 
 .. autofunction:: triaxial_axis_ratio
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -41,28 +41,28 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
 
     Parameters
     ----------
-    zeta : array_like
+    zeta:
         Axis ratio of intermediate and major axis.
-    xi : array_like
+    xi:
         Axis ratio of minor and major axis.
-    size : tuple of int or None
+    size:
         Size of the random draw. If `None` is given, size is inferred from
         other inputs.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Returns
     -------
-    q : array_like
+    q:
         Axis ratio of the randomly projected ellipsoid.
 
     Notes
     -----
-    See equations (11) and (12) in [1]_ for details.
+    See equations (11) and (12) in [1] for details.
 
     References
     ----------
-    .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
+    * [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
 
     """
     # default RNG if not provided
@@ -102,36 +102,36 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     Ellipticity distribution following Ryden (2004).
 
     The ellipticities are sampled by randomly projecting a 3D ellipsoid with
-    principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -
+    principal axes :math:`A > B > C` [1]. The distribution of :math:`\log(1 -
     B/A)` is normal with mean :math:`\mu` and standard deviation :math:`\sigma`.
     The distribution of :math:`1 - C/B` is normal with mean :math:`\gamma` and
-    standard deviation :math:`\sigma_\gamma` [2]_.  Both distributions are
+    standard deviation :math:`\sigma_\gamma` [2]. Both distributions are
     truncated to produce ratios in the range 0 to 1 using rejection sampling.
 
     Parameters
     ----------
-    mu : array_like
+    mu:
         Mean of the truncated normal for :math:`\log(1 - B/A)`.
-    sigma : array_like
+    sigma:
         Standard deviation for :math:`\log(1 - B/A)`.
-    gamma : array_like
+    gamma:
         Mean of the truncated normal for :math:`1 - C/B`.
-    sigma_gamma : array_like
+    sigma_gamma:
         Standard deviation for :math:`1 - C/B`.
-    size : int or tuple of ints or None
-        Sample size.  If ``None``, the size is inferred from the parameters.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+    size:
+        Sample size. If ``None``, the size is inferred from the parameters.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Returns
     -------
-    eps : array_like
+    eps:
         Array of :term:`ellipticity` from projected axis ratios.
 
     References
     ----------
-    .. [1] Ryden B. S., 2004, ApJ, 601, 214.
-    .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
+    * [1] Ryden B. S., 2004, ApJ, 601, 214.
+    * [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
 
     """
     # default RNG if not provided
@@ -180,23 +180,23 @@ def ellipticity_gaussian(
     Sample Gaussian galaxy ellipticities.
 
     The ellipticities are sampled from a normal distribution with
-    standard deviation ``sigma`` for each component.  Samples where the
-    ellipticity is larger than unity are discarded.  Hence, do not use
+    standard deviation ``sigma`` for each component. Samples where the
+    ellipticity is larger than unity are discarded. Hence, do not use
     this function with too large values of ``sigma``, or the sampling
     will become inefficient.
 
     Parameters
     ----------
-    count : int or array_like
+    count:
         Number of ellipticities to be sampled.
-    sigma : array_like
+    sigma:
         Standard deviation in each component.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
-    eps : array_like
+    eps:
         Array of galaxy :term:`ellipticity`.
 
     """
@@ -241,16 +241,16 @@ def ellipticity_intnorm(
 
     Parameters
     ----------
-    count : int | array_like
+    count:
         Number of ellipticities to sample.
-    sigma : array_like
+    sigma:
         Standard deviation of the ellipticity in each component.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
-    eps : array_like
+    eps:
         Array of galaxy :term:`ellipticity`.
 
     """

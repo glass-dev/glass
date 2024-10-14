@@ -43,7 +43,6 @@ docs = [
     "ipython",
     "matplotlib",
     "nbsphinx",
-    "numpydoc",
     "sphinx",
     "sphinxcontrib-katex",
 ]
@@ -172,6 +171,7 @@ lint.select = [
     "ALL",
 ]
 lint.mccabe.max-complexity = 18
+lint.pydocstyle.convention = "numpy"
 
 [tool.tomlsort]
 all = true
