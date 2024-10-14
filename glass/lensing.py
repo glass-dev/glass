@@ -31,15 +31,14 @@ Applying lensing
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import healpy as hp
 import numpy as np
+import numpy.typing as npt
 
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    import numpy.typing as npt
+if typing.TYPE_CHECKING:
+    import collections.abc
 
     from cosmology import Cosmology
 
@@ -363,7 +362,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.ArrayLike:
     """Compute the matrix of lensing contributions from each shell."""
@@ -377,7 +376,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: npt.ArrayLike,
-    shells: Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.ArrayLike:
     """
