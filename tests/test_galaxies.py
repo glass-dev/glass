@@ -92,7 +92,7 @@ def test_redshifts_from_nz() -> None:
         redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])  # type: ignore[arg-type]
 
 
-def test_galaxy_shear(rng):
+def test_galaxy_shear(rng) -> None:  # type: ignore[no-untyped-def]
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
@@ -101,7 +101,7 @@ def test_galaxy_shear(rng):
         rng.normal(size=(12,)),
     )
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)  # type: ignore[arg-type]
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
@@ -114,7 +114,7 @@ def test_galaxy_shear(rng):
 
     # shape with no reduced shear
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)  # type: ignore[arg-type]
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
