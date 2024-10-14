@@ -44,6 +44,7 @@ Weight functions
 
 from __future__ import annotations
 
+import typing
 import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Callable, NamedTuple, Union
@@ -57,21 +58,21 @@ if TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = Union[Sequence[float], npt.NDArray]
-WeightFunc = Callable[[ArrayLike1D], npt.NDArray]
+ArrayLike1D = Union[Sequence[float], npt.NDArray[typing.Any]]
+WeightFunc = Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
 
 
-def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)
 
 
-def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
-def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
@@ -299,7 +300,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.NDArray, npt.NDArray]:
+) -> tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any]]:
     """
     Restrict a function to a redshift window.
 
@@ -331,7 +332,7 @@ def restrict(
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
-    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
+    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)  # type: ignore[no-untyped-call]
     return zr, fr
 
 
@@ -474,7 +475,7 @@ def partition_lstsq(
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)  # type: ignore[no-untyped-call]
     b = b * dz
 
     # append a constraint for the integral
@@ -486,7 +487,7 @@ def partition_lstsq(
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[attr-defined]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     return np.moveaxis(x, -1, 0)
@@ -528,7 +529,7 @@ def partition_nnls(
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)  # type: ignore[no-untyped-call]
     b = b * dz
 
     # append a constraint for the integral
@@ -541,7 +542,7 @@ def partition_nnls(
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
-    q, r = np.linalg.qr(a.T)
+    q, r = np.linalg.qr(a.T)  # type: ignore[attr-defined]
     y = np.einsum("ji,...j", q, b)
 
     # for each dim, find non-negative weights x such that y == r @ x
@@ -566,7 +567,7 @@ def partition_restrict(
     return part
 
 
-def redshift_grid(zmin, zmax, *, dz=None, num=None):
+def redshift_grid(zmin, zmax, *, dz=None, num=None):  # type: ignore[no-untyped-def]
     """Redshift grid with uniform spacing in redshift."""
     if dz is not None and num is None:
         z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
@@ -578,7 +579,7 @@ def redshift_grid(zmin, zmax, *, dz=None, num=None):
     return z
 
 
-def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
+def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):  # type: ignore[no-untyped-def]
     """Redshift grid with uniform spacing in comoving distance."""
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
     if dx is not None and num is None:

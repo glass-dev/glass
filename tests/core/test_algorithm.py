@@ -10,7 +10,7 @@ HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_nnls(rng):
+def test_nnls(rng):  # type: ignore[no-untyped-def]
     from scipy.optimize import nnls as nnls_scipy
 
     # cross-check output with scipy's nnls

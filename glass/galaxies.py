@@ -19,6 +19,7 @@ Functions
 
 from __future__ import annotations
 
+import typing
 import warnings
 from typing import TYPE_CHECKING
 
@@ -38,7 +39,7 @@ def redshifts(
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     """
     Sample redshifts from a radial window function.
 
@@ -68,7 +69,7 @@ def redshifts_from_nz(
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -112,7 +113,7 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[no-untyped-call]
 
     # list of results for all dimensions
     redshifts = np.empty(count.sum())
@@ -123,7 +124,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)
+        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[no-untyped-call]
         cdf /= cdf[-1]
 
         # sample redshifts and store result
@@ -140,15 +141,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray,
-    lat: npt.NDArray,
-    eps: npt.NDArray,
-    kappa: npt.NDArray,
-    gamma1: npt.NDArray,
-    gamma2: npt.NDArray,
+    lon: npt.NDArray[typing.Any],
+    lat: npt.NDArray[typing.Any],
+    eps: npt.NDArray[typing.Any],
+    kappa: npt.NDArray[typing.Any],
+    gamma1: npt.NDArray[typing.Any],
+    gamma2: npt.NDArray[typing.Any],
     *,
     reduced_shear: bool = True,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     """
     Observed galaxy shears from weak lensing.
 
@@ -213,7 +214,7 @@ def gaussian_phz(
     lower: npt.ArrayLike | None = None,
     upper: npt.ArrayLike | None = None,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
@@ -278,13 +279,13 @@ def gaussian_phz(
 
     if not dims:
         while zphot < lower or zphot > upper:
-            zphot = rng.normal(z, sigma)
+            zphot = rng.normal(z, sigma)  # type: ignore[org-type]
     else:
         z = np.broadcast_to(z, dims)
-        trunc = np.where((zphot < lower) | (zphot > upper))[0]
+        trunc = np.where((zphot < lower) | (zphot > upper))[0]  # type: ignore[operator]
         while trunc.size:
-            znew = rng.normal(z[trunc], sigma[trunc])
-            zphot[trunc] = znew
-            trunc = trunc[(znew < lower) | (znew > upper)]
+            znew = rng.normal(z[trunc], sigma[trunc])  # type: ignore[org-type]
+            zphot[trunc] = znew  # type: ignore[index]
+            trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
 
-    return zphot
+    return zphot  # type: ignore[return-value]

@@ -92,6 +92,19 @@ build.targets.sdist.exclude = [
 ]
 version.source = "vcs"
 
+[tool.mypy]
+disallow_untyped_decorators = false
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
+plugins = [
+    "numpy.typing.mypy_plugin",
+]
+strict = true
+warn_unreachable = true
+
 [tool.pytest.ini_options]
 addopts = [
     "--strict-config",
