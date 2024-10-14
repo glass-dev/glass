@@ -15,7 +15,7 @@ Input and Output
 .. autofunction:: load_cls
 .. autofunction:: write_catalog
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 

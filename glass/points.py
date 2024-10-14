@@ -27,7 +27,7 @@ Bias models
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -59,14 +59,16 @@ def effective_bias(
 
     Parameters
     ----------
-    z, bz : array_like
+    z:
         Redshifts and values of the bias function :math:`b(z)`.
-    w : :class:`~glass.RadialWindow`
+    bz:
+        Redshifts and values of the bias function :math:`b(z)`.
+    w:
         The radial window function :math:`w(z)`.
 
     Returns
     -------
-    beff : array_like
+    beff:
         Effective bias parameter for the window.
 
     Notes
@@ -123,53 +125,52 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     visibility map.
 
     If ``remove_monopole`` is set, the monopole of the computed density
-    contrast is removed.  Over the full sky, the mean number density of
-    the map will then match the given number density exactly.  This,
+    contrast is removed. Over the full sky, the mean number density of
+    the map will then match the given number density exactly. This,
     however, means that an effectively different bias model is being
     used, unless the monopole is already zero in the first place.
 
     The function supports multi-dimensional input for the ``ngal``,
-    ``delta``, ``bias``, and ``vis`` parameters.  Extra dimensions are
+    ``delta``, ``bias``, and ``vis`` parameters. Extra dimensions are
     broadcast to a common shape, and treated as separate populations of
-    points.  These are then sampled independently, and the results
-    concatenated into a flat list of longitudes and latitudes.  The
+    points. These are then sampled independently, and the results
+    concatenated into a flat list of longitudes and latitudes. The
     number of points per population is returned in ``count`` as an array
     in the shape of the extra dimensions.
 
     Parameters
     ----------
-    ngal : float or array_like
+    ngal:
         Number density, expected number of points per arcmin2.
-    delta : array_like
-        Map of the input density contrast.  This is fed into the bias
+    delta:
+        Map of the input density contrast. This is fed into the bias
         model to produce the density contrast for sampling.
-    bias : float or array_like, optional
+    bias:
         Bias parameter, is passed as an argument to the bias model.
-    vis : array_like, optional
-        Visibility map for the observed points.  This is multiplied with
-        the full sky number count map, and must hence be of compatible
-        shape.
-    bias_model : str or callable, optional
-        The bias model to apply.  If a string, refers to a function in
+    vis:
+        Visibility map for the observed points. This is multiplied with
+        the full sky number count map, and must hence be of compatible shape.
+    bias_model:
+        The bias model to apply. If a string, refers to a function in
         the :mod:`~glass.points` module, e.g. ``'linear'`` for
-        :func:`linear_bias()` or ``'loglinear'`` for
-        :func:`loglinear_bias`.
-    remove_monopole : bool, optional
-        If true, the monopole of the density contrast after biasing is
-        fixed to zero.
-    batch : int, optional
+        :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
+    remove_monopole:
+        If true, the monopole of the density contrast
+        after biasing is fixed to zero.
+    batch:
         Maximum number of positions to yield in one batch.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
-    lon, lat : array_like
-        Columns of longitudes and latitudes for the sampled points.
-    count : int or array_like
-        The number of sampled points.  If multiple populations are
-        sampled, an array of counts in the shape of the extra
-        dimensions is returned.
+    lon:
+        Columns of longitudes for the sampled points.
+    lat:
+        Columns of latitudes for the sampled points.
+    count:
+        The number of sampled points  If multiple populations are sampled, an
+        array of counts in the shape of the extra dimensions is returned.
 
     """
     # get default RNG if not given
@@ -281,17 +282,19 @@ def uniform_positions(
 
     Parameters
     ----------
-    ngal : float or array_like
+    ngal:
         Number density, expected number of positions per arcmin2.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Yields
     ------
-    lon, lat : array_like or list of array_like
-        Columns of longitudes and latitudes for the sampled points.
-    count : int or list of ints
-        The number of sampled points.  For array inputs, an array of
+    lon:
+        Columns of longitudes for the sampled points.
+    lat:
+        Columns of latitudes for the sampled points.
+    count:
+        The number of sampled points. For array inputs, an array of
         counts with the same shape is returned.
 
     """
@@ -331,7 +334,7 @@ def position_weights(
     Compute relative weights for angular clustering.
 
     Takes an array *densities* of densities in arbitrary units and
-    returns the relative weight of each shell.  If *bias* is given, a
+    returns the relative weight of each shell. If *bias* is given, a
     linear bias is applied to each shell.
 
     This is the equivalent of computing the product of normalised
@@ -340,15 +343,15 @@ def position_weights(
 
     Parameters
     ----------
-    densities : array_like
-        Density of points in each shell.  The first axis must broadcast
+    densities:
+        Density of points in each shell. The first axis must broadcast
         against the number of shells, and is normalised internally.
-    bias : array_like, optional
+    bias:
         Value or values of the linear bias parameter for each shell.
 
     Returns
     -------
-    weights : array_like
+    weights:
         Relative weight of each shell for angular clustering.
 
     """

@@ -15,7 +15,7 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -45,20 +45,17 @@ def redshifts(
     This function samples *n* redshifts from a distribution that follows
     the given radial window function *w*.
 
+    Returns random redshifts following the radial window function.
+
     Parameters
     ----------
-    n : int or array_like
-        Number of redshifts to sample.  If an array is given, the
+    n:
+        Number of redshifts to sample. If an array is given, the
         results are concatenated.
-    w : :class:`~glass.RadialWindow`
+    w:
         Radial window function.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
-
-    Returns
-    -------
-    z : array_like
-        Random redshifts following the radial window function.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     """
     return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)  # type: ignore[arg-type]
@@ -77,30 +74,30 @@ def redshifts_from_nz(
 
     The function supports sampling from multiple populations of
     redshifts if *count* is an array or if there are additional axes in
-    the *z* or *nz* arrays.  In this case, the shape of *count* and the
+    the *z* or *nz* arrays. In this case, the shape of *count* and the
     leading dimensions of *z* and *nz* are broadcast to a common shape,
     and redshifts are sampled independently for each extra dimension.
     The results are concatenated into a flat array.
 
+    Returns redshifts sampled from the given source distribution. For
+    inputs with extra dimensions, returns a flattened 1-D array of
+    samples from all populations.
+
     Parameters
     ----------
-    count : int or array_like
-        Number of redshifts to sample.  If an array is given, its shape
+    count:
+        Number of redshifts to sample. If an array is given, its shape
         is broadcast against the leading axes of *z* and *nz*.
-    z, nz : array_like
-        Source distribution.  Leading axes are broadcast against the
+    z:
+        Source distribution. Leading axes are broadcast against the
         shape of *count*.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
-    warn : bool
+    nz:
+        Source distribution. Leading axes are broadcast against the
+        shape of *count*.
+    rng:
+        Random number generator. If not given, a default RNG is used.
+    warn:
         Throw relevant warnings.
-
-    Returns
-    -------
-    redshifts : array_like
-        Redshifts sampled from the given source distribution.  For
-        inputs with extra dimensions, returns a flattened 1-D array of
-        samples from all populations.
 
     """
     if warn:
@@ -158,22 +155,26 @@ def galaxy_shear(  # noqa: PLR0913
     Takes lensing maps for convergence and shear and produces a lensed
     ellipticity (shear) for each intrinsic galaxy ellipticity.
 
+    Returns an array of complex-valued observed galaxy shears
+    (lensed ellipticities).
+
     Parameters
     ----------
-    lon, lat : array_like
-        Arrays for galaxy longitudes and latitudes.
-    eps : array_like
+    lon:
+        Array for galaxy longitudes.
+    lat:
+        Array for galaxy latitudes.
+    eps:
         Array of galaxy :term:`ellipticity`.
-    kappa, gamma1, gamma2 : array_like
-        HEALPix maps for convergence and two components of shear.
-    reduced_shear : bool, optional
-        If ``False``, galaxy shears are not reduced by the convergence.
-        Default is ``True``.
-
-    Returns
-    -------
-    she : array_like
-        Array of complex-valued observed galaxy shears (lensed ellipticities).
+    kappa:
+        HEALPix map for convergence.
+    gamma1:
+        HEALPix maps for a component of shear.
+    gamma2:
+        HEALPix maps for a component of shear.
+    reduced_shear:
+        If ``False``, galaxy shears are not reduced
+        by the convergence. Default is ``True``.
 
     """
     nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
@@ -218,40 +219,38 @@ def gaussian_phz(
 
     A simple toy model of photometric redshift errors that assumes a
     Gaussian error with redshift-dependent standard deviation
-    :math:`\sigma(z) = (1 + z) \sigma_0` [1]_.
+    :math:`\sigma(z) = (1 + z) \sigma_0` [1].
+
+    Returns photometric redshifts assuming Gaussian errors, of the same
+    shape as *z*.
 
     Parameters
     ----------
-    z : array_like
+    z:
         True redshifts.
-    sigma_0 : float or array_like
+    sigma_0:
         Redshift error in the tomographic binning at zero redshift.
-    lower, upper : float or array_like, optional
+    lower:
         Bounds for the returned photometric redshifts.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
-
-    Returns
-    -------
-    phz : array_like
-        Photometric redshifts assuming Gaussian errors, of the same
-        shape as *z*.
+    upper:
+        Bounds for the returned photometric redshifts.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     Warnings
     --------
     The *lower* and *upper* bounds are implemented using plain rejection
-    sampling from the non-truncated normal distribution.  If bounds are
+    sampling from the non-truncated normal distribution. If bounds are
     used, they should always contain significant probability mass.
 
     See Also
     --------
-    glass.tomo_nz_gausserr :
-        Create tomographic redshift distributions assuming the same
-        model.
+    glass.tomo_nz_gausserr:
+        Create tomographic redshift distributions assuming the same model.
 
     References
     ----------
-    .. [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+    * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
            doi:10.1111/j.1365-2966.2007.12271.x
 
     Examples
