@@ -345,9 +345,9 @@ def partition(
     r"""
     Partition a function by a sequence of windows.
 
-    Returns a vector of weights :math:`x_1, x_2, \\ldots` such that the
-    weighted sum of normalised radial window functions :math:`x_1 \\,
-    w_1(z) + x_2 \\, w_2(z) + \\ldots` approximates the given function
+    Returns a vector of weights :math:`x_1, x_2, \ldots` such that the
+    weighted sum of normalised radial window functions :math:`x_1 \,
+    w_1(z) + x_2 \, w_2(z) + \ldots` approximates the given function
     :math:`f(z)`.
 
     The function :math:`f(z)` is given by redshifts *z* of shape *(N,)*
@@ -378,19 +378,19 @@ def partition(
     -----
     Formally, if :math:`w_i` are the normalised window functions,
     :math:`f` is the target function, and :math:`z_i` is a redshift grid
-    with intervals :math:`\\Delta z_i`, the partition problem seeks an
+    with intervals :math:`\Delta z_i`, the partition problem seeks an
     approximate solution of
 
     .. math::
-        \\begin{pmatrix}
-        w_1(z_1) \\Delta z_1 & w_2(z_1) \\, \\Delta z_1 & \\cdots \\\\
-        w_1(z_2) \\Delta z_2 & w_2(z_2) \\, \\Delta z_2 & \\cdots \\\\
-        \\vdots & \\vdots & \\ddots
-        \\end{pmatrix} \\, \\begin{pmatrix}
-        x_1 \\\\ x_2 \\\\ \\vdots
-        \\end{pmatrix} = \\begin{pmatrix}
-        f(z_1) \\, \\Delta z_1 \\\\ f(z_2) \\, \\Delta z_2 \\\\ \\vdots
-        \\end{pmatrix} \\;.
+        \begin{pmatrix}
+        w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
+        w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
+        \vdots & \vdots & \ddots
+        \end{pmatrix} \, \begin{pmatrix}
+        x_1 \\ x_2 \\ \vdots
+        \end{pmatrix} = \begin{pmatrix}
+        f(z_1) \, \Delta z_1 \\ f(z_2) \, \Delta z_2 \\ \vdots
+        \end{pmatrix} \;.
 
     The redshift grid is the union of the given array *z* and the
     redshift arrays of all window functions. Intermediate function
@@ -402,20 +402,20 @@ def partition(
     equals the integral of the target function,
 
     .. math::
-        \\begin{pmatrix}
-        w_1(z_1) \\Delta z_1 & w_2(z_1) \\, \\Delta z_1 & \\cdots \\\\
-        w_1(z_2) \\Delta z_2 & w_2(z_2) \\, \\Delta z_2 & \\cdots \\\\
-        \\vdots & \\vdots & \\ddots \\\\
-        \\hline
-        \\lambda & \\lambda & \\cdots
-        \\end{pmatrix} \\, \\begin{pmatrix}
-        x_1 \\\\ x_2 \\\\ \\vdots
-        \\end{pmatrix} = \\begin{pmatrix}
-        f(z_1) \\, \\Delta z_1 \\\\ f(z_2) \\, \\Delta z_2 \\\\ \\vdots
-        \\\\ \\hline \\lambda \\int \\! f(z) \\, dz
-        \\end{pmatrix} \\;,
+        \begin{pmatrix}
+        w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
+        w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
+        \vdots & \vdots & \ddots \\
+        \hline
+        \lambda & \lambda & \cdots
+        \end{pmatrix} \, \begin{pmatrix}
+        x_1 \\ x_2 \\ \vdots
+        \end{pmatrix} = \begin{pmatrix}
+        f(z_1) \, \Delta z_1 \\ f(z_2) \, \Delta z_2 \\ \vdots
+        \\ \hline \lambda \int \! f(z) \, dz
+        \end{pmatrix} \;,
 
-    where :math:`\\lambda` is a multiplier to enforce the integral
+    where :math:`\lambda` is a multiplier to enforce the integral
     constraints.
 
     The :func:`partition()` function implements a number of methods to
@@ -599,9 +599,9 @@ def combine(
     r"""
     Evaluate a linear combination of window functions.
 
-    Takes a vector of weights :math:`x_1, x_2, \\ldots` and computes the
+    Takes a vector of weights :math:`x_1, x_2, \ldots` and computes the
     weighted sum of normalised radial window functions :math:`f(z) = x_1
-    \\, w_1(z) + x_2 \\, w_2(z) + \\ldots` in the given redshifts
+    \, w_1(z) + x_2 \, w_2(z) + \ldots` in the given redshifts
     :math:`z`.
 
     The window functions are given by the sequence *shells* of
