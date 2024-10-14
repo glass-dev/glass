@@ -116,7 +116,7 @@ def cls2cov(
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
             if cl is None:
-                cov[:, i] = 0
+                cov[:, i] = 0  # type: ignore[unreachable]
             else:
                 if i == 0 and np.any(np.less(cl, 0)):
                     msg = "negative values in cl"
@@ -128,20 +128,20 @@ def cls2cov(
         yield cov
 
 
-def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) -> Alms:  # type: ignore[valid-type]
+def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) -> Alms:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
         out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
-    return out  # type: ignore[no-any-return]
+    return out
 
 
 def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ()) -> Cls:
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:
+        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
             monopole = 0.0 if cl[0] == 0 else None
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
@@ -186,7 +186,7 @@ def gaussian_gls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:
+        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -252,7 +252,7 @@ def generate_gaussian(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls if gl is not None), default=0)
+    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[redundant-expr]
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -279,15 +279,15 @@ def generate_gaussian(
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += multalm(y[:, i], a[:, i])  # type: ignore[operator]
+            alm += multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
             y[:, j] = z
 
         # modes with m = 0 are real-valued and come first in array
-        alm[:n].real += alm[:n].imag  # type: ignore[index]
-        alm[:n].imag[:] = 0  # type: ignore[index]
+        alm[:n].real += alm[:n].imag
+        alm[:n].imag[:] = 0
 
         # transform alm to maps
         # can be performed in place on the temporary alm array

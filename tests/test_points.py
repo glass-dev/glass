@@ -6,8 +6,8 @@ from glass.points import position_weights, positions_from_delta, uniform_positio
 def catpos(pos):  # type: ignore[no-untyped-def]
     lon, lat, cnt = [], [], 0  # type: ignore[var-annotated]
     for lo, la, co in pos:
-        lon = np.concatenate([lon, lo])
-        lat = np.concatenate([lat, la])
+        lon = np.concatenate([lon, lo])  # type: ignore[assignment]
+        lat = np.concatenate([lat, la])  # type: ignore[assignment]
         cnt = cnt + co
     return lon, lat, cnt
 

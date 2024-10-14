@@ -64,17 +64,17 @@ WeightFunc = Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
 
 def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving distance."""
-    return 1 / cosmo.ef(z)
+    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving volume."""
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)
+    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in matter density."""
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
+    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 class RadialWindow(NamedTuple):
@@ -170,14 +170,14 @@ def tophat_windows(
         )
 
     wht: WeightFunc
-    wht = weight if weight is not None else np.ones_like
+    wht = weight if weight is not None else np.ones_like  # type: ignore[assignment]
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w * z, z) / np.trapz(w, z)
-        ws.append(RadialWindow(z, w, zeff))
+        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[attr-defined]
+        ws.append(RadialWindow(z, w, zeff))  # type: ignore[arg-type]
     return ws
 
 
@@ -444,7 +444,7 @@ def partition(
     except KeyError:
         msg = f"invalid method: {method}"
         raise ValueError(msg) from None
-    return partition_method(z, fz, shells)
+    return partition_method(z, fz, shells)  # type: ignore[no-any-return]
 
 
 def partition_lstsq(
@@ -470,8 +470,8 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]  # type: ignore[arg-type]
+    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
     # create the target vector of distribution values
@@ -480,14 +480,14 @@ def partition_lstsq(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
+    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
+    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[attr-defined]
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[attr-defined, union-attr]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     return np.moveaxis(x, -1, 0)
@@ -524,8 +524,8 @@ def partition_nnls(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]  # type: ignore[arg-type]
+    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
     # create the target vector of distribution values
@@ -534,8 +534,8 @@ def partition_nnls(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
+    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
+    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -562,8 +562,8 @@ def partition_restrict(
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
-        zr, fr = restrict(z, fz, w)
-        part[i] = np.trapz(fr, zr, axis=-1)
+        zr, fr = restrict(z, fz, w)  # type: ignore[arg-type]
+        part[i] = np.trapz(fr, zr, axis=-1)  # type: ignore[attr-defined]
     return part
 
 
@@ -629,11 +629,11 @@ def combine(
     return sum(
         np.expand_dims(weight, -1)
         * np.interp(
-            z,
+            z,  # type: ignore[arg-type]
             shell.za,
-            shell.wa / np.trapz(shell.wa, shell.za),
+            shell.wa / np.trapz(shell.wa, shell.za),  # type: ignore[attr-defined]
             left=0.0,
             right=0.0,
         )
-        for shell, weight in zip(shells, weights)
+        for shell, weight in zip(shells, weights)  # type: ignore[arg-type]
     )

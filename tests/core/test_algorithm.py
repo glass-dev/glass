@@ -21,7 +21,7 @@ def test_nnls(rng):  # type: ignore[no-untyped-def]
     x_glass = nnls_glass(a, b)
     x_scipy, _ = nnls_scipy(a, b)
 
-    np.testing.assert_allclose(x_glass, x_scipy)
+    np.testing.assert_allclose(x_glass, x_scipy)  # type: ignore[arg-type]
 
     # check matrix and vector's shape
 

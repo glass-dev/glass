@@ -70,7 +70,7 @@ def effective_bias(z, bz, w):  # type: ignore[no-untyped-def]
         \\;.
 
     """
-    norm = np.trapz(w.wa, w.za)
+    norm = np.trapz(w.wa, w.za)  # type: ignore[attr-defined]
     return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[no-untyped-call]
 
 
@@ -215,7 +215,7 @@ def positions_from_delta(  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR09
             cmask = np.zeros(dims, dtype=int)
             cmask[k] = 1
         else:
-            cmask = 1
+            cmask = 1  # type: ignore[assignment]
 
         # sample the map in batches
         step = 1000
@@ -296,7 +296,7 @@ def uniform_positions(ngal, *, rng=None):  # type: ignore[no-untyped-def]
             count = np.zeros(dims, dtype=int)
             count[k] = ngal[k]
         else:
-            count = int(ngal[k])
+            count = int(ngal[k])  # type: ignore[assignment]
 
         yield lon, lat, count
 

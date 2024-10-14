@@ -116,7 +116,7 @@ def redshifts_from_nz(
     dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[no-untyped-call]
 
     # list of results for all dimensions
-    redshifts = np.empty(count.sum())
+    redshifts = np.empty(count.sum())  # type: ignore[union-attr]
 
     # keep track of the number of sampled redshifts
     total = 0
@@ -124,16 +124,16 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[no-untyped-call]
+        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[call-overload, index, no-untyped-call]
         cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count[k]] = np.interp(
-            rng.uniform(0, 1, size=count[k]),
+        redshifts[total : total + count[k]] = np.interp(  # type: ignore[call-overload, index, misc, operator]
+            rng.uniform(0, 1, size=count[k]),  # type: ignore[arg-type, call-overload, index]
             cdf,
-            z[k],
+            z[k],  # type: ignore[arg-type, call-overload, index]
         )
-        total += count[k]
+        total += count[k]  # type: ignore[assignment, call-overload, index, operator]
 
     assert total == redshifts.size  # noqa: S101
 
@@ -266,25 +266,25 @@ def gaussian_phz(
     sigma = np.add(1, z) * sigma_0
     dims = np.shape(sigma)
 
-    zphot = rng.normal(z, sigma)
+    zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
 
     if lower is None:
         lower = 0.0
     if upper is None:
         upper = np.inf
 
-    if not np.all(lower < upper):
+    if not np.all(lower < upper):  # type: ignore[operator]
         msg = "requires lower < upper"
         raise ValueError(msg)
 
     if not dims:
-        while zphot < lower or zphot > upper:
-            zphot = rng.normal(z, sigma)  # type: ignore[org-type]
+        while zphot < lower or zphot > upper:  # type: ignore[operator]
+            zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
     else:
         z = np.broadcast_to(z, dims)
         trunc = np.where((zphot < lower) | (zphot > upper))[0]  # type: ignore[operator]
         while trunc.size:
-            znew = rng.normal(z[trunc], sigma[trunc])  # type: ignore[org-type]
+            znew = rng.normal(z[trunc], sigma[trunc])  # type: ignore[arg-type]
             zphot[trunc] = znew  # type: ignore[index]
             trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
 

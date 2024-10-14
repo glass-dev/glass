@@ -84,7 +84,7 @@ def vmap_galactic_ecliptic(
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    return hp.Rotator(coord="CE").rotate_map_pixel(m)
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)  # type: ignore[no-any-return]
 
 
 def gaussian_nz(
@@ -124,12 +124,12 @@ def gaussian_nz(
     sigma = np.reshape(sigma, np.shape(sigma) + (1,) * np.ndim(z))
 
     nz = np.exp(-(((z - mean) / sigma) ** 2) / 2)
-    nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]
+    nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]  # type: ignore[attr-defined]
 
     if norm is not None:
         nz *= norm
 
-    return nz
+    return nz  # type: ignore[no-any-return]
 
 
 def smail_nz(
@@ -186,12 +186,12 @@ def smail_nz(
     beta = np.asanyarray(beta)[..., np.newaxis]
 
     pz = z**alpha * np.exp(-alpha / beta * (z / z_mode) ** beta)
-    pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
+    pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]  # type: ignore[attr-defined]
 
     if norm is not None:
         pz *= norm
 
-    return pz
+    return pz  # type: ignore[no-any-return]
 
 
 def fixed_zbins(
@@ -337,4 +337,4 @@ def tomo_nz_gausserr(
     binned_nz /= 1 + erf(z / sz)
     binned_nz *= nz
 
-    return binned_nz
+    return binned_nz  # type: ignore[no-any-return]
