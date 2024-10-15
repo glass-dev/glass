@@ -49,6 +49,7 @@ def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
 
         def alpha(re, im):  # type: ignore[no-untyped-def]
             return re + 1j * im
+
     else:
 
         def alpha(re, im):  # type: ignore[no-untyped-def]
