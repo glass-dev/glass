@@ -4,7 +4,7 @@ import pytest
 from glass.galaxies import galaxy_shear, gaussian_phz, redshifts, redshifts_from_nz
 
 
-def test_redshifts(mocker):
+def test_redshifts(mocker):  # type: ignore[no-untyped-def]
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
@@ -21,7 +21,7 @@ def test_redshifts(mocker):
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz():
+def test_redshifts_from_nz():  # type: ignore[no-untyped-def]
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)
@@ -51,7 +51,7 @@ def test_redshifts_from_nz():
 
     # case: extra dimensions from count
 
-    count = [10, 20, 30]
+    count = [10, 20, 30]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -63,7 +63,7 @@ def test_redshifts_from_nz():
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -71,9 +71,9 @@ def test_redshifts_from_nz():
 
     # case: extra dimensions from count and nz
 
-    count = [[10], [20], [30]]
+    count = [[10], [20], [30]]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -81,9 +81,9 @@ def test_redshifts_from_nz():
 
     # case: incompatible input shapes
 
-    count = [10, 20, 30]
+    count = [10, 20, 30]  # type: ignore[assignment]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
     with pytest.raises(ValueError):
         redshifts_from_nz(count, z, nz, warn=False)
@@ -92,7 +92,7 @@ def test_redshifts_from_nz():
         redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
 
 
-def test_galaxy_shear(rng):
+def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
@@ -101,7 +101,7 @@ def test_galaxy_shear(rng):
         rng.normal(size=(12,)),
     )
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)  # type: ignore[arg-type]
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
@@ -114,7 +114,7 @@ def test_galaxy_shear(rng):
 
     # shape with no reduced shear
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)  # type: ignore[arg-type]
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
@@ -128,7 +128,7 @@ def test_galaxy_shear(rng):
     assert np.shape(shear) == (512,)
 
 
-def test_gaussian_phz():
+def test_gaussian_phz():  # type: ignore[no-untyped-def]
     # test sampling
 
     # case: zero variance
@@ -142,8 +142,8 @@ def test_gaussian_phz():
 
     # case: truncated normal
 
-    z = 0.0
-    sigma_0 = np.ones(100)
+    z = 0.0  # type: ignore[assignment]
+    sigma_0 = np.ones(100)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -152,8 +152,8 @@ def test_gaussian_phz():
 
     # case: upper and lower bound
 
-    z = 1.0
-    sigma_0 = np.ones(100)
+    z = 1.0  # type: ignore[assignment]
+    sigma_0 = np.ones(100)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
 
@@ -165,7 +165,7 @@ def test_gaussian_phz():
 
     # case: scalar redshift, scalar sigma_0
 
-    z = 1.0
+    z = 1.0  # type: ignore[assignment]
     sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
@@ -185,8 +185,8 @@ def test_gaussian_phz():
 
     # case: scalar redshift, array sigma_0
 
-    z = 1.0
-    sigma_0 = np.zeros(10)
+    z = 1.0  # type: ignore[assignment]
+    sigma_0 = np.zeros(10)  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -196,7 +196,7 @@ def test_gaussian_phz():
     # case: array redshift, array sigma_0
 
     z = np.linspace(0, 1, 10)
-    sigma_0 = np.zeros((11, 1))
+    sigma_0 = np.zeros((11, 1))  # type: ignore[assignment]
 
     phz = gaussian_phz(z, sigma_0)
 

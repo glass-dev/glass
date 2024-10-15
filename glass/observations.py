@@ -29,6 +29,7 @@ Visibility
 from __future__ import annotations
 
 import math
+import typing
 
 import healpy as hp
 import numpy as np
@@ -41,7 +42,7 @@ def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     """
     Visibility map masking galactic and ecliptic plane.
 
@@ -80,16 +81,16 @@ def vmap_galactic_ecliptic(
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    return hp.Rotator(coord="CE").rotate_map_pixel(m)
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)  # type: ignore[no-any-return]
 
 
 def gaussian_nz(
-    z: npt.NDArray,
+    z: npt.NDArray[typing.Any],
     mean: npt.ArrayLike,
     sigma: npt.ArrayLike,
     *,
     norm: npt.ArrayLike | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Gaussian redshift distribution.
 
@@ -120,22 +121,22 @@ def gaussian_nz(
     sigma = np.reshape(sigma, np.shape(sigma) + (1,) * np.ndim(z))
 
     nz = np.exp(-(((z - mean) / sigma) ** 2) / 2)
-    nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]
+    nz /= np.trapz(nz, z, axis=-1)[..., np.newaxis]  # type: ignore[attr-defined]
 
     if norm is not None:
         nz *= norm
 
-    return nz
+    return nz  # type: ignore[no-any-return]
 
 
 def smail_nz(
-    z: npt.NDArray,
+    z: npt.NDArray[typing.Any],
     z_mode: npt.ArrayLike,
     alpha: npt.ArrayLike,
     beta: npt.ArrayLike,
     *,
     norm: npt.ArrayLike | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -182,12 +183,12 @@ def smail_nz(
     beta = np.asanyarray(beta)[..., np.newaxis]
 
     pz = z**alpha * np.exp(-alpha / beta * (z / z_mode) ** beta)
-    pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]
+    pz /= np.trapz(pz, z, axis=-1)[..., np.newaxis]  # type: ignore[attr-defined]
 
     if norm is not None:
         pz *= norm
 
-    return pz
+    return pz  # type: ignore[no-any-return]
 
 
 def fixed_zbins(
@@ -232,8 +233,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: npt.NDArray,
-    nz: npt.NDArray,
+    z: npt.NDArray[typing.Any],
+    nz: npt.NDArray[typing.Any],
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -261,7 +262,7 @@ def equal_dens_zbins(
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
-    cuml_nz = cumtrapz(nz, z)
+    cuml_nz = cumtrapz(nz, z)  # type: ignore[no-untyped-call]
     cuml_nz /= cuml_nz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 
@@ -269,11 +270,11 @@ def equal_dens_zbins(
 
 
 def tomo_nz_gausserr(
-    z: npt.NDArray,
-    nz: npt.NDArray,
+    z: npt.NDArray[typing.Any],
+    nz: npt.NDArray[typing.Any],
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     """
     Tomographic redshift bins with a Gaussian redshift error.
 
@@ -315,7 +316,7 @@ def tomo_nz_gausserr(
 
     """
     # converting zbins into an array:
-    zbins_arr = np.asanyarray(zbins)  # type: ignore[no-redef]
+    zbins_arr = np.asanyarray(zbins)
 
     # bin edges and adds a new axis
     z_lower = zbins_arr[:, 0, np.newaxis]
@@ -333,4 +334,4 @@ def tomo_nz_gausserr(
     binned_nz /= 1 + erf(z / sz)
     binned_nz *= nz
 
-    return binned_nz
+    return binned_nz  # type: ignore[no-any-return]
