@@ -9,7 +9,7 @@ from glass.shapes import (
 )
 
 
-def test_triaxial_axis_ratio(rng) -> None:
+def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
     # single axis ratio
 
     q = triaxial_axis_ratio(0.8, 0.4)  # type: ignore[arg-type]
@@ -131,10 +131,5 @@ def test_ellipticity_intnorm() -> None:
     np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
 
-<<<<<<< HEAD
-    with pytest.raises(ValueError):
-        ellipticity_intnorm(1, 0.71)  # type: ignore[arg-type]
-=======
     with pytest.raises(ValueError, match="sigma must be between"):
-        ellipticity_intnorm(1, 0.71)
->>>>>>> main
+        ellipticity_intnorm(1, 0.71)  # type: ignore[arg-type]
