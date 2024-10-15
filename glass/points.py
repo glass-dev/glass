@@ -42,7 +42,7 @@ def effective_bias(z, bz, w):  # type: ignore[no-untyped-def]
     Effective bias parameter from a redshift-dependent bias function.
 
     This function takes a redshift-dependent bias function :math:`b(z)`
-    and computes an effective bias parameter :math:`\\bar{b}` for a
+    and computes an effective bias parameter :math:`\bar{b}` for a
     given window function :math:`w(z)`.
 
     Parameters
@@ -61,13 +61,13 @@ def effective_bias(z, bz, w):  # type: ignore[no-untyped-def]
 
     Notes
     -----
-    The effective bias parameter :math:`\\bar{b}` is computed using the
+    The effective bias parameter :math:`\bar{b}` is computed using the
     window function :math:`w(z)` as the weighted average
 
     .. math::
 
-        \\bar{b} = \\frac{\\int b(z) \\, w(z) \\, dz}{\\int w(z) \\, dz}
-        \\;.
+        \bar{b} = \frac{\int b(z) \, w(z) \, dz}{\int w(z) \, dz}
+        \;.
 
     """
     norm = np.trapz(w.wa, w.za)  # type: ignore[attr-defined]
@@ -75,12 +75,12 @@ def effective_bias(z, bz, w):  # type: ignore[no-untyped-def]
 
 
 def linear_bias(delta, b):  # type: ignore[no-untyped-def]
-    r"""Linear bias model :math:`\\delta_g = b \\, \\delta`."""
+    r"""Linear bias model :math:`\delta_g = b \, \delta`."""
     return b * delta
 
 
 def loglinear_bias(delta, b):  # type: ignore[no-untyped-def]
-    r"""log-linear bias model :math:`\\ln(1 + \\delta_g) = b \\ln(1 + \\delta)`."""
+    r"""log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
@@ -310,7 +310,7 @@ def position_weights(densities, bias=None):  # type: ignore[no-untyped-def]
     linear bias is applied to each shell.
 
     This is the equivalent of computing the product of normalised
-    redshift distribution and bias factor :math:`n(z) \\, b(z)` for the
+    redshift distribution and bias factor :math:`n(z) \, b(z)` for the
     discretised shells.
 
     Parameters
