@@ -85,7 +85,7 @@ def test_redshifts_from_nz():
     z = np.linspace(0, 1, 100)
     nz = [z * (1 - z), (z - 0.5) ** 2]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="shape mismatch"):
         redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
