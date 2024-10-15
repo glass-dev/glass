@@ -49,7 +49,7 @@ def test_restrict() -> None:
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(method) -> None:  # type: ignore[no-untyped-def]
+def test_partition(method: str) -> None:
     shells = [
         RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),  # type: ignore[arg-type]
         RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),  # type: ignore[arg-type]

@@ -92,7 +92,7 @@ def test_redshifts_from_nz() -> None:
         redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])  # type: ignore[arg-type]
 
 
-def test_galaxy_shear(rng) -> None:  # type: ignore[no-untyped-def]
+def test_galaxy_shear(rng: np.random.Generator) -> None:
     # check shape of the output
 
     kappa, gamma1, gamma2 = (

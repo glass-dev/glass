@@ -2,6 +2,8 @@ import healpix
 import numpy as np
 import pytest
 
+from cosmology import Cosmology
+
 from glass.lensing import (
     MultiPlaneConvergence,
     deflect,
@@ -23,7 +25,7 @@ def shells() -> list[RadialWindow]:
 
 
 @pytest.fixture
-def cosmo():  # type: ignore[no-untyped-def]
+def cosmo() -> Cosmology:
     class MockCosmology:
         @property
         def omega_m(self):  # type: ignore[no-untyped-def]
@@ -90,7 +92,11 @@ def test_deflect_many(rng: np.random.Generator) -> None:
     np.testing.assert_allclose(dotp, np.cos(abs_alpha))
 
 
-def test_multi_plane_matrix(shells, cosmo, rng) -> None:  # type: ignore[no-untyped-def]
+def test_multi_plane_matrix(
+    shells: list[RadialWindow],
+    cosmo: Cosmology,
+    rng: np.random.Generator,
+) -> None:
     mat = multi_plane_matrix(shells, cosmo)
 
     np.testing.assert_array_equal(mat, np.tril(mat))
@@ -107,7 +113,11 @@ def test_multi_plane_matrix(shells, cosmo, rng) -> None:  # type: ignore[no-unty
     np.testing.assert_allclose(mat @ deltas, kappas)
 
 
-def test_multi_plane_weights(shells, cosmo, rng) -> None:  # type: ignore[no-untyped-def]
+def test_multi_plane_weights(
+    shells: list[RadialWindow],
+    cosmo: Cosmology,
+    rng: np.random.Generator,
+) -> None:
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 

@@ -28,7 +28,7 @@ filename = "MyFile.Fits"
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_basic_write(tmp_path: os.PathLike) -> None:  # type: ignore[type-arg]
+def test_basic_write(tmp_path: os.PathLike[str]) -> None:
     import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
