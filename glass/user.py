@@ -25,8 +25,11 @@ from contextlib import contextmanager
 import numpy as np
 import numpy.typing as npt
 
+if typing.TYPE_CHECKING:
+    import collections.abc
 
-def save_cls(filename: str, cls: list[npt.NDArray[typing.Any] | None]) -> None:
+
+def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
     """
     Save a list of Cls to file.
 
@@ -39,7 +42,7 @@ def save_cls(filename: str, cls: list[npt.NDArray[typing.Any] | None]) -> None:
     np.savez(filename, values=values, split=split)
 
 
-def load_cls(filename: str) -> list[npt.NDArray[typing.Any]]:
+def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
     """
     Load a list of Cls from file.
 
@@ -66,7 +69,7 @@ class _FitsWriter:
 
     def _append(
         self,
-        data: npt.NDArray[typing.Any],
+        data: npt.NDArray[np.float64],
         names: list[str] | None = None,
     ) -> None:
         """Write the FITS file."""
@@ -81,9 +84,9 @@ class _FitsWriter:
 
     def write(
         self,
-        data: npt.NDArray[typing.Any] | None = None,
+        data: npt.NDArray[np.float64] | None = None,
         /,
-        **columns: npt.NDArray[typing.Any],
+        **columns: npt.NDArray[np.float64],
     ) -> None:
         """
         Write to FITS by calling the internal _append method.
@@ -106,7 +109,7 @@ def write_catalog(
     filename: str,
     *,
     ext: str | None = None,
-) -> typing.Iterator[_FitsWriter]:
+) -> collections.abc.Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.
 

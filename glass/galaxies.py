@@ -33,11 +33,11 @@ if typing.TYPE_CHECKING:
 
 
 def redshifts(
-    n: int | npt.NDArray[typing.Any],
+    n: int | npt.NDArray[np.float64],
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Sample redshifts from a radial window function.
 
@@ -61,13 +61,13 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | npt.NDArray[typing.Any],
-    z: npt.NDArray[typing.Any],
-    nz: npt.NDArray[typing.Any],
+    count: int | npt.NDArray[np.float64],
+    z: npt.NDArray[np.float64],
+    nz: npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -139,15 +139,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray[typing.Any],
-    lat: npt.NDArray[typing.Any],
-    eps: npt.NDArray[typing.Any],
-    kappa: npt.NDArray[typing.Any],
-    gamma1: npt.NDArray[typing.Any],
-    gamma2: npt.NDArray[typing.Any],
+    lon: npt.NDArray[np.float64],
+    lat: npt.NDArray[np.float64],
+    eps: npt.NDArray[np.float64],
+    kappa: npt.NDArray[np.float64],
+    gamma1: npt.NDArray[np.float64],
+    gamma2: npt.NDArray[np.float64],
     *,
     reduced_shear: bool = True,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Observed galaxy shears from weak lensing.
 
@@ -206,13 +206,13 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: npt.NDArray[typing.Any],
-    sigma_0: float | npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    sigma_0: float | npt.NDArray[np.float64],
     *,
-    lower: npt.NDArray[typing.Any] | None = None,
-    upper: npt.NDArray[typing.Any] | None = None,
+    lower: npt.NDArray[np.float64] | None = None,
+    upper: npt.NDArray[np.float64] | None = None,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Photometric redshifts assuming a Gaussian error.
 

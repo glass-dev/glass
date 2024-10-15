@@ -2,19 +2,17 @@
 
 from __future__ import annotations
 
-import typing
-
 import numpy as np
 import numpy.typing as npt
 
 
 def nnls(
-    a: npt.NDArray[typing.Any],
-    b: npt.NDArray[typing.Any],
+    a: npt.NDArray[np.float64],
+    b: npt.NDArray[np.float64],
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Compute a non-negative least squares solution.
 

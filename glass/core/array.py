@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import typing
 from functools import partial
 
 import numpy as np
@@ -10,8 +9,8 @@ import numpy.typing as npt
 
 
 def broadcast_first(
-    *arrays: npt.NDArray[typing.Any],
-) -> tuple[npt.NDArray[typing.Any], ...]:
+    *arrays: npt.NDArray[np.float64],
+) -> tuple[npt.NDArray[np.float64], ...]:
     """Broadcast arrays, treating the first axis as common."""
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
@@ -19,7 +18,7 @@ def broadcast_first(
 
 
 def broadcast_leading_axes(
-    *args: tuple[npt.NDArray[typing.Any], int],
+    *args: tuple[npt.NDArray[np.float64], int],
 ) -> tuple[tuple[int, ...], ...]:
     """
     Broadcast all but the last N axes.
@@ -58,14 +57,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: npt.NDArray[typing.Any],
-    xp: npt.NDArray[typing.Any],
-    fp: npt.NDArray[typing.Any],
+    x: npt.NDArray[np.float64],
+    xp: npt.NDArray[np.float64],
+    fp: npt.NDArray[np.float64],
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Interpolate multi-dimensional array over axis."""
     return np.apply_along_axis(
         partial(np.interp, x, xp),
@@ -78,10 +77,10 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapz_product(
-    f: tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any]],
-    *ff: tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any]],
+    f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
+    *ff: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     axis: int = -1,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Trapezoidal rule for a product of functions."""
     x, _ = f
     for x_, _ in ff:
@@ -96,11 +95,11 @@ def trapz_product(
 
 
 def cumtrapz(
-    f: npt.NDArray[typing.Any],
-    x: npt.NDArray[typing.Any],
+    f: npt.NDArray[np.float64],
+    x: npt.NDArray[np.float64],
     dtype: np.dtype | None = None,  # type: ignore[type-arg]
-    out: npt.NDArray[typing.Any] | None = None,
-) -> npt.NDArray[typing.Any]:
+    out: npt.NDArray[np.float64] | None = None,
+) -> npt.NDArray[np.float64]:
     """Cumulative trapezoidal rule along last axis."""
     if out is None:
         out = np.empty_like(f, dtype=dtype)

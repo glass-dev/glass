@@ -24,19 +24,17 @@ Utilities
 
 from __future__ import annotations
 
-import typing
-
 import numpy as np
 import numpy.typing as npt
 
 
 def triaxial_axis_ratio(
-    zeta: npt.NDArray[typing.Any],
-    xi: npt.NDArray[typing.Any],
+    zeta: npt.NDArray[np.float64],
+    xi: npt.NDArray[np.float64],
     size: tuple[int] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -99,14 +97,14 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: npt.NDArray[typing.Any],
-    sigma: npt.NDArray[typing.Any],
-    gamma: npt.NDArray[typing.Any],
-    sigma_gamma: npt.NDArray[typing.Any],
+    mu: npt.NDArray[np.float64],
+    sigma: npt.NDArray[np.float64],
+    gamma: npt.NDArray[np.float64],
+    sigma_gamma: npt.NDArray[np.float64],
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -180,11 +178,11 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
 
 def ellipticity_gaussian(
-    count: int | npt.NDArray[typing.Any],
-    sigma: npt.NDArray[typing.Any],
+    count: int | npt.NDArray[np.float64],
+    sigma: npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.complex128]:
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -234,11 +232,11 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | npt.NDArray[typing.Any],
-    sigma: npt.NDArray[typing.Any],
+    count: int | npt.NDArray[np.float64],
+    sigma: npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.complex128]:
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 

@@ -40,16 +40,19 @@ import numpy.typing as npt
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
 
 if typing.TYPE_CHECKING:
+    import collections.abc
+
     from glass.shells import RadialWindow
+
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
 def effective_bias(
-    z: npt.NDArray[typing.Any],
-    bz: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    bz: npt.NDArray[np.float64],
     w: RadialWindow,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -84,36 +87,36 @@ def effective_bias(
 
 
 def linear_bias(
-    delta: npt.NDArray[typing.Any],
-    b: float | npt.NDArray[typing.Any],
-) -> npt.NDArray[float]:  # type: ignore[type-var]
+    delta: npt.NDArray[np.float64],
+    b: float | npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
     r"""Linear bias model :math:`\delta_g = b \, \delta`."""
-    return b * delta  # type: ignore[return-value]
+    return b * delta
 
 
 def loglinear_bias(
-    delta: npt.NDArray[typing.Any],
-    b: float | npt.NDArray[typing.Any],
-) -> npt.NDArray[float]:
+    delta: npt.NDArray[np.float64],
+    b: float | npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
     r"""log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
-    return delta_g  # type: ignore[no-any-return]
+    return delta_g
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal: float | npt.NDArray[typing.Any],
-    delta: npt.NDArray[typing.Any],
-    bias: float | npt.NDArray[typing.Any] | None = None,
-    vis: npt.NDArray[typing.Any] | None = None,
+    ngal: float | npt.NDArray[np.float64],
+    delta: npt.NDArray[np.float64],
+    bias: float | npt.NDArray[np.float64] | None = None,
+    vis: npt.NDArray[np.float64] | None = None,
     *,
     bias_model: str | typing.Callable[..., typing.Any] = "linear",
     remove_monopole: bool = False,
     batch: int | None = 1_000_000,
     rng: np.random.Generator | None = None,
-) -> typing.Iterator[
-    tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
+) -> collections.abc.Generator[
+    tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.int_]]
 ]:
     """
     Generate positions tracing a density contrast.
@@ -265,13 +268,15 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | npt.NDArray[typing.Any],
+    ngal: float | npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
-) -> typing.Iterator[  # type: ignore[type-arg]
-    npt.NDArray[typing.Any] | list[npt.NDArray[typing.Any]],
-    npt.NDArray[typing.Any] | list[npt.NDArray[typing.Any]],
-    int | list[int],
+) -> collections.abc.Generator[
+    tuple[
+        npt.NDArray[np.float64],
+        npt.NDArray[np.float64],
+        int | npt.NDArray[np.int_],
+    ]
 ]:
     """
     Generate positions uniformly over the sphere.
@@ -301,7 +306,7 @@ def uniform_positions(
         rng = np.random.default_rng()
 
     # sample number of galaxies
-    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
+    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))  # type: ignore[assignment]
 
     # extra dimensions of the output
     dims = np.shape(ngal)
@@ -326,9 +331,9 @@ def uniform_positions(
 
 
 def position_weights(
-    densities: npt.NDArray[typing.Any],
-    bias: npt.NDArray[typing.Any] | None = None,
-) -> npt.NDArray[typing.Any]:
+    densities: npt.NDArray[np.float64],
+    bias: npt.NDArray[np.float64] | None = None,
+) -> npt.NDArray[np.float64]:
     r"""
     Compute relative weights for angular clustering.
 

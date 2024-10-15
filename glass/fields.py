@@ -36,23 +36,23 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 # types
-Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
-Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
+Size = typing.Union[int, tuple[int, ...]]
+Iternorm = tuple[typing.Optional[int], npt.NDArray[np.float64], npt.NDArray[np.float64]]
 ClTransform = typing.Union[
     str,
-    typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]],
+    typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
 ]
 Cls = collections.abc.Sequence[
-    typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
+    typing.Union[npt.NDArray[np.float64], collections.abc.Sequence[float]]
 ]
-Alms = npt.NDArray[typing.Any]
+Alms = npt.NDArray[np.complex128]
 
 
 def iternorm(
     k: int,
-    cov: collections.abc.Iterable[npt.NDArray[typing.Any]],
-    size: Size = None,
-) -> collections.abc.Generator[Iternorm, None, None]:
+    cov: collections.abc.Iterable[npt.NDArray[np.float64]],
+    size: Size | None = None,
+) -> collections.abc.Generator[Iternorm]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
     n: tuple[int, ...]
     if size is None:
@@ -115,7 +115,7 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
     end = 0
@@ -135,7 +135,7 @@ def cls2cov(
         yield cov
 
 
-def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) -> Alms:
+def multalm(alm: Alms, bl: npt.NDArray[np.float64], *, inplace: bool = False) -> Alms:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
@@ -223,7 +223,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -309,7 +309,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
@@ -332,11 +332,11 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: list[npt.NDArray[typing.Any]],
+    cls: list[npt.NDArray[np.float64]],
     i: int,
     j: int,
     lmax: int | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Return a specific angular power spectrum from an array.
 
@@ -367,9 +367,9 @@ def getcl(
 
 
 def effective_cls(
-    cls: list[npt.NDArray[typing.Any]],
-    weights1: npt.NDArray[typing.Any],
-    weights2: npt.NDArray[typing.Any] | None = None,
+    cls: list[npt.NDArray[np.float64]],
+    weights1: npt.NDArray[np.float64],
+    weights2: npt.NDArray[np.float64] | None = None,
     *,
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:

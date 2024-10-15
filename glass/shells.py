@@ -57,30 +57,30 @@ if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[typing.Any]]
-WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
+ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
+WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 
 def distance_weight(
-    z: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
     cosmo: Cosmology,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
-    z: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
     cosmo: Cosmology,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def density_weight(
-    z: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
     cosmo: Cosmology,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
@@ -309,7 +309,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any]]:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
     Restrict a function to a redshift window.
 
@@ -346,12 +346,12 @@ def restrict(
 
 
 def partition(
-    z: npt.NDArray[typing.Any],
-    fz: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    fz: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Partition a function by a sequence of windows.
 
@@ -457,12 +457,12 @@ def partition(
 
 
 def partition_lstsq(
-    z: npt.NDArray[typing.Any],
-    fz: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    fz: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Least-squares partition."""
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -496,19 +496,19 @@ def partition_lstsq(
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[attr-defined]
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[arg-type, attr-defined]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     return np.moveaxis(x, -1, 0)
 
 
 def partition_nnls(
-    z: npt.NDArray[typing.Any],
-    fz: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    fz: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Non-negative least-squares partition.
 
@@ -564,10 +564,10 @@ def partition_nnls(
 
 
 def partition_restrict(
-    z: npt.NDArray[typing.Any],
-    fz: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    fz: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
@@ -615,10 +615,10 @@ def distance_grid(
 
 
 def combine(
-    z: npt.NDArray[typing.Any],
-    weights: npt.NDArray[typing.Any],
+    z: npt.NDArray[np.float64],
+    weights: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Evaluate a linear combination of window functions.
 
