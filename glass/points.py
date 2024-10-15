@@ -57,6 +57,8 @@ def effective_bias(
     and computes an effective bias parameter :math:`\bar{b}` for a
     given window function :math:`w(z)`.
 
+    Returns the effective bias parameter for the window.
+
     Parameters
     ----------
     z:
@@ -65,11 +67,6 @@ def effective_bias(
         Redshifts and values of the bias function :math:`b(z)`.
     w:
         The radial window function :math:`w(z)`.
-
-    Returns
-    -------
-    beff:
-        Effective bias parameter for the window.
 
     Notes
     -----
@@ -343,6 +340,8 @@ def position_weights(
     redshift distribution and bias factor :math:`n(z) \, b(z)` for the
     discretised shells.
 
+    Returns the relative weight of each shell for angular clustering.
+
     Parameters
     ----------
     densities:
@@ -350,11 +349,6 @@ def position_weights(
         against the number of shells, and is normalised internally.
     bias:
         Value or values of the linear bias parameter for each shell.
-
-    Returns
-    -------
-    weights:
-        Relative weight of each shell for angular clustering.
 
     """
     # bring densities and bias into the same shape

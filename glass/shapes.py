@@ -43,6 +43,8 @@ def triaxial_axis_ratio(
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
 
+    Returns the axis ratio of the randomly projected ellipsoid.
+
     Parameters
     ----------
     zeta:
@@ -54,11 +56,6 @@ def triaxial_axis_ratio(
         other inputs.
     rng:
         Random number generator. If not given, a default RNG will be used.
-
-    Returns
-    -------
-    q:
-        Axis ratio of the randomly projected ellipsoid.
 
     Notes
     -----
@@ -120,6 +117,8 @@ def ellipticity_ryden04(  # noqa: PLR0913
     standard deviation :math:`\sigma_\gamma` [2]. Both distributions are
     truncated to produce ratios in the range 0 to 1 using rejection sampling.
 
+    Returns an array of :term:`ellipticity` from projected axis ratios.
+
     Parameters
     ----------
     mu:
@@ -134,11 +133,6 @@ def ellipticity_ryden04(  # noqa: PLR0913
         Sample size. If ``None``, the size is inferred from the parameters.
     rng:
         Random number generator. If not given, a default RNG will be used.
-
-    Returns
-    -------
-    eps:
-        Array of :term:`ellipticity` from projected axis ratios.
 
     References
     ----------
@@ -200,6 +194,8 @@ def ellipticity_gaussian(
     this function with too large values of ``sigma``, or the sampling
     will become inefficient.
 
+    Returns an array of galaxy :term:`ellipticity`.
+
     Parameters
     ----------
     count:
@@ -208,11 +204,6 @@ def ellipticity_gaussian(
         Standard deviation in each component.
     rng:
         Random number generator. If not given, a default RNG is used.
-
-    Returns
-    -------
-    eps:
-        Array of galaxy :term:`ellipticity`.
 
     """
     # default RNG if not provided
@@ -254,6 +245,8 @@ def ellipticity_intnorm(
     The ellipticities are sampled from an intrinsic normal distribution
     with standard deviation ``sigma`` for each component.
 
+    Returns an array of galaxy :term:`ellipticity`.
+
     Parameters
     ----------
     count:
@@ -262,11 +255,6 @@ def ellipticity_intnorm(
         Standard deviation of the ellipticity in each component.
     rng:
         Random number generator. If not given, a default RNG is used.
-
-    Returns
-    -------
-    eps:
-        Array of galaxy :term:`ellipticity`.
 
     """
     # default RNG if not provided
