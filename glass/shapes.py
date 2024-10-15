@@ -175,7 +175,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     xi = (1 - gam) * zeta
 
     # random projection of random triaxial ellipsoid
-    q = triaxial_axis_ratio(zeta, xi, rng=rng)
+    q = triaxial_axis_ratio(zeta, xi, rng=rng)  # type: ignore[no-untyped-call]
 
     # assemble ellipticity with random complex phase
     e = np.exp(1j * rng.uniform(0, 2 * np.pi, size=np.shape(q)))

@@ -21,7 +21,7 @@ def test_broadcast_first() -> None:
 
     # arrays with shape ((3, 4, 2)) and ((1, 2)) are passed
     # to np.broadcast_arrays; hence it works
-    a_a, b_a = broadcast_first(a, b)
+    a_a, b_a = broadcast_first(a, b)  # type: ignore[no-untyped-call]
     assert a_a.shape == (2, 3, 4)
     assert b_a.shape == (2, 3, 4)
 
@@ -35,7 +35,7 @@ def test_broadcast_first() -> None:
     b = np.ones((5, 6))
 
     with pytest.raises(ValueError, match="shape mismatch"):
-        broadcast_first(a, b)
+        broadcast_first(a, b)  # type: ignore[no-untyped-call]
 
     # plain np.broadcast_arrays will work
     a_a, b_a = np.broadcast_arrays(a, b)
@@ -147,7 +147,7 @@ def test_trapz_product() -> None:
     x2 = np.linspace(1, 2, 10)
     f2 = np.full_like(x2, 0.5)
 
-    s = trapz_product((x1, f1), (x2, f2))
+    s = trapz_product((x1, f1), (x2, f2))  # type: ignore[no-untyped-call]
 
     np.testing.assert_allclose(s, 1.0)
 
@@ -163,7 +163,7 @@ def test_cumtrapz() -> None:
 
     # default dtype (int - not supported by scipy)
 
-    glass_ct = cumtrapz(f, x)
+    glass_ct = cumtrapz(f, x)  # type: ignore[no-untyped-call]
     np.testing.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
 
     # explicit dtype (float)
@@ -185,7 +185,7 @@ def test_cumtrapz() -> None:
 
     # default dtype (int - not supported by scipy)
 
-    glass_ct = cumtrapz(f, x)
+    glass_ct = cumtrapz(f, x)  # type: ignore[no-untyped-call]
     np.testing.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     # explicit dtype (float)

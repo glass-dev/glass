@@ -42,7 +42,7 @@ def test_triaxial_axis_ratio() -> None:
     zeta, xi = np.sort(np.random.uniform(0, 1, size=(2, 1000)), axis=0)
     qmin = np.min([zeta, xi, xi / zeta], axis=0)
     qmax = np.max([zeta, xi, xi / zeta], axis=0)
-    q = triaxial_axis_ratio(zeta, xi)
+    q = triaxial_axis_ratio(zeta, xi)  # type: ignore[no-untyped-call]
     assert np.all((qmax >= q) & (q >= qmin))
 
 

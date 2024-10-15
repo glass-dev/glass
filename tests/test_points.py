@@ -100,7 +100,7 @@ def test_position_weights(rng: np.random.Generator) -> None:
             counts = rng.random(cshape)
             bias = None if bshape is None else rng.random(bshape)
 
-            weights = position_weights(counts, bias)
+            weights = position_weights(counts, bias)  # type: ignore[no-untyped-call]
 
             expected = counts / counts.sum(axis=0, keepdims=True)
             if bias is not None:

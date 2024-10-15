@@ -480,7 +480,7 @@ def partition_lstsq(
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)  # type: ignore[no-untyped-call]
     b = b * dz
 
     # append a constraint for the integral
@@ -534,7 +534,7 @@ def partition_nnls(
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)  # type: ignore[no-untyped-call]
     b = b * dz
 
     # append a constraint for the integral
@@ -643,11 +643,11 @@ def combine(
     return sum(  # type: ignore[return-value]
         np.expand_dims(weight, -1)
         * np.interp(
-            z,
+            z,  # type: ignore[arg-type]
             shell.za,
             shell.wa / np.trapz(shell.wa, shell.za),  # type: ignore[attr-defined]
             left=0.0,
             right=0.0,
         )
-        for shell, weight in zip(shells, weights)
+        for shell, weight in zip(shells, weights)  # type: ignore[arg-type]
     )

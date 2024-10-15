@@ -129,7 +129,7 @@ def redshifts_from_nz(
         redshifts[total : total + count[k]] = np.interp(  # type: ignore[index]
             rng.uniform(0, 1, size=count[k]),  # type: ignore[index]
             cdf,
-            z[k],
+            z[k],  # type: ignore[arg-type, call-overload, index]
         )
         total += count[k]  # type: ignore[index]
 
@@ -264,7 +264,7 @@ def gaussian_phz(
     sigma = np.add(1, z) * sigma_0
     dims = np.shape(sigma)
 
-    zphot = rng.normal(z, sigma)
+    zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
 
     if lower is None:
         lower = 0.0  # type: ignore[assignment]
@@ -286,4 +286,4 @@ def gaussian_phz(
             zphot[trunc] = znew
             trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
 
-    return zphot
+    return zphot  # type: ignore[return-value]
