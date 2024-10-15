@@ -9,4 +9,3 @@ dist
 .env
 .coverage*
 coverage*
-mypy_error_report.txt
