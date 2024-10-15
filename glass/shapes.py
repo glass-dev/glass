@@ -24,9 +24,11 @@ Utilities
 
 from __future__ import annotations
 
+import typing
+
 import numpy as np
 import numpy.typing as npt
-import typing
+
 
 def triaxial_axis_ratio(
     zeta: npt.NDArray[typing.Any],

@@ -29,6 +29,7 @@ Visibility
 from __future__ import annotations
 
 import math
+import typing
 
 import healpy as hp
 import numpy as np

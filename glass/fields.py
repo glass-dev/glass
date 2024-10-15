@@ -35,16 +35,15 @@ import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
 
-if typing.TYPE_CHECKING:
-    import collections.abc
-
 # types
 Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
 Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
 ClTransform = typing.Union[
     str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]
 ]
-Cls =  collections.abc.Sequence[typing.Union[npt.NDArray[typing.Any],  collections.abc.Sequence[float]]]
+Cls = collections.abc.Sequence[
+    typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
+]
 Alms = npt.NDArray[typing.Any]
 
 
