@@ -24,11 +24,13 @@ Utilities
 
 from __future__ import annotations
 
+import typing
+
 import numpy as np
 import numpy.typing as npt
 
 
-def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
+def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):  # type: ignore[no-untyped-def]
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -93,7 +95,7 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     )
 
 
-def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):  # noqa: PLR0913
+def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):  # type: ignore[no-untyped-def] # noqa: PLR0913
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -159,7 +161,7 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     xi = (1 - gam) * zeta
 
     # random projection of random triaxial ellipsoid
-    q = triaxial_axis_ratio(zeta, xi, rng=rng)
+    q = triaxial_axis_ratio(zeta, xi, rng=rng)  # type: ignore[no-untyped-call]
 
     # assemble ellipticity with random complex phase
     e = np.exp(1j * rng.uniform(0, 2 * np.pi, size=np.shape(q)))
@@ -174,7 +176,7 @@ def ellipticity_gaussian(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample Gaussian galaxy ellipticities.
 
@@ -231,7 +233,7 @@ def ellipticity_intnorm(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 

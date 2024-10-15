@@ -37,7 +37,7 @@ from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_prod
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
-def effective_bias(z, bz, w):
+def effective_bias(z, bz, w):  # type: ignore[no-untyped-def]
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -70,16 +70,16 @@ def effective_bias(z, bz, w):
         \;.
 
     """
-    norm = np.trapz(w.wa, w.za)
-    return trapz_product((z, bz), (w.za, w.wa)) / norm
+    norm = np.trapz(w.wa, w.za)  # type: ignore[attr-defined]
+    return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[no-untyped-call]
 
 
-def linear_bias(delta, b):
+def linear_bias(delta, b):  # type: ignore[no-untyped-def]
     r"""Linear bias model :math:`\delta_g = b \, \delta`."""
     return b * delta
 
 
-def loglinear_bias(delta, b):
+def loglinear_bias(delta, b):  # type: ignore[no-untyped-def]
     r"""log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`."""
     delta_g = np.log1p(delta)
     delta_g *= b
@@ -87,7 +87,7 @@ def loglinear_bias(delta, b):
     return delta_g
 
 
-def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
+def positions_from_delta(  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0913, PLR0915
     ngal,
     delta,
     bias=None,
@@ -171,7 +171,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs += [(bias, 0)]
     if vis is not None:
         inputs += [(vis, 1)]
-    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)
+    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)  # type: ignore[no-untyped-call]
     if bias is not None:
         bias, *rest = rest
     if vis is not None:
@@ -215,7 +215,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
             cmask = np.zeros(dims, dtype=int)
             cmask[k] = 1
         else:
-            cmask = 1
+            cmask = 1  # type: ignore[assignment]
 
         # sample the map in batches
         step = 1000
@@ -248,7 +248,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         assert np.sum(n[stop:]) == 0  # noqa: S101
 
 
-def uniform_positions(ngal, *, rng=None):
+def uniform_positions(ngal, *, rng=None):  # type: ignore[no-untyped-def]
     """
     Generate positions uniformly over the sphere.
 
@@ -296,12 +296,12 @@ def uniform_positions(ngal, *, rng=None):
             count = np.zeros(dims, dtype=int)
             count[k] = ngal[k]
         else:
-            count = int(ngal[k])
+            count = int(ngal[k])  # type: ignore[assignment]
 
         yield lon, lat, count
 
 
-def position_weights(densities, bias=None):
+def position_weights(densities, bias=None):  # type: ignore[no-untyped-def]
     r"""
     Compute relative weights for angular clustering.
 
@@ -329,7 +329,7 @@ def position_weights(densities, bias=None):
     """
     # bring densities and bias into the same shape
     if bias is not None:
-        densities, bias = broadcast_first(densities, bias)
+        densities, bias = broadcast_first(densities, bias)  # type: ignore[no-untyped-call]
     # normalise densities after shape has been fixed
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation

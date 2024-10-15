@@ -57,23 +57,23 @@ if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray]
-WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray]
+ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[typing.Any]]
+WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
 
 
-def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+def distance_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving distance."""
-    return 1 / cosmo.ef(z)
+    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+def volume_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving volume."""
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)
+    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray:
+def density_weight(z: npt.ArrayLike, cosmo: Cosmology) -> npt.NDArray[typing.Any]:
     """Uniform weight in matter density."""
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
+    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 class RadialWindow(typing.NamedTuple):
@@ -169,14 +169,14 @@ def tophat_windows(
         )
 
     wht: WeightFunc
-    wht = weight if weight is not None else np.ones_like
+    wht = weight if weight is not None else np.ones_like  # type: ignore[assignment]
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w * z, z) / np.trapz(w, z)
-        ws.append(RadialWindow(z, w, zeff))
+        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[attr-defined]
+        ws.append(RadialWindow(z, w, zeff))  # type: ignore[arg-type]
     return ws
 
 
@@ -299,7 +299,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.NDArray, npt.NDArray]:
+) -> tuple[npt.NDArray[typing.Any], npt.NDArray[typing.Any]]:
     """
     Restrict a function to a redshift window.
 
@@ -331,7 +331,7 @@ def restrict(
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
-    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
+    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)  # type: ignore[no-untyped-call]
     return zr, fr
 
 
@@ -443,7 +443,7 @@ def partition(
     except KeyError:
         msg = f"invalid method: {method}"
         raise ValueError(msg) from None
-    return partition_method(z, fz, shells)
+    return partition_method(z, fz, shells)  # type: ignore[no-any-return]
 
 
 def partition_lstsq(
@@ -469,24 +469,24 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]  # type: ignore[arg-type]
+    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)  # type: ignore[no-untyped-call]
     b = b * dz
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
+    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
+    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[attr-defined, union-attr]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     return np.moveaxis(x, -1, 0)
@@ -523,25 +523,25 @@ def partition_nnls(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]
+    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]  # type: ignore[arg-type]
+    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = ndinterp(zp, z, fz, left=0.0, right=0.0)  # type: ignore[no-untyped-call]
     b = b * dz
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)
+    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
+    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
-    q, r = np.linalg.qr(a.T)
+    q, r = np.linalg.qr(a.T)  # type: ignore[attr-defined]
     y = np.einsum("ji,...j", q, b)
 
     # for each dim, find non-negative weights x such that y == r @ x
@@ -561,12 +561,12 @@ def partition_restrict(
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
-        zr, fr = restrict(z, fz, w)
-        part[i] = np.trapz(fr, zr, axis=-1)
+        zr, fr = restrict(z, fz, w)  # type: ignore[arg-type]
+        part[i] = np.trapz(fr, zr, axis=-1)  # type: ignore[attr-defined]
     return part
 
 
-def redshift_grid(zmin, zmax, *, dz=None, num=None):
+def redshift_grid(zmin, zmax, *, dz=None, num=None):  # type: ignore[no-untyped-def]
     """Redshift grid with uniform spacing in redshift."""
     if dz is not None and num is None:
         z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
@@ -578,7 +578,7 @@ def redshift_grid(zmin, zmax, *, dz=None, num=None):
     return z
 
 
-def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):
+def distance_grid(cosmo, zmin, zmax, *, dx=None, num=None):  # type: ignore[no-untyped-def]
     """Redshift grid with uniform spacing in comoving distance."""
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
     if dx is not None and num is None:
@@ -628,11 +628,11 @@ def combine(
     return sum(
         np.expand_dims(weight, -1)
         * np.interp(
-            z,
+            z,  # type: ignore[arg-type]
             shell.za,
-            shell.wa / np.trapz(shell.wa, shell.za),
+            shell.wa / np.trapz(shell.wa, shell.za),  # type: ignore[attr-defined]
             left=0.0,
             right=0.0,
         )
-        for shell, weight in zip(shells, weights)
+        for shell, weight in zip(shells, weights)  # type: ignore[arg-type]
     )
