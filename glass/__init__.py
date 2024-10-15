@@ -8,8 +8,8 @@ with contextlib.suppress(PackageNotFoundError):
 
 from glass.fields import (
     cls2cov,
+    discretized_cls,
     effective_cls,
-    gaussian_gls,
     generate_gaussian,
     generate_lognormal,
     getcl,
