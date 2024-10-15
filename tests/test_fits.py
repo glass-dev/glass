@@ -44,7 +44,7 @@ def test_basic_write(tmp_path: os.PathLike) -> None:  # type: ignore[type-arg]
             out.write(RA=array, RB=array2)
             arrays = [array, array2]
             names = ["RA", "RB"]
-            _test_append(my_fits, arrays, names)  # type: ignore[no-untyped-call]
+            _test_append(my_fits, arrays, names)
 
     with (
         fitsio.FITS(tmp_path / filename_gfits) as g_fits,  # type: ignore[operator]

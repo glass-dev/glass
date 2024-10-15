@@ -125,4 +125,4 @@ def test_multi_plane_weights(shells, cosmo, rng) -> None:  # type: ignore[no-unt
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)  # type: ignore[arg-type]
+    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)

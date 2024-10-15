@@ -27,7 +27,7 @@ def test_restrict() -> None:
     f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
 
     # window for restriction
-    w = RadialWindow(za=[1.0, 2.0, 3.0, 4.0], wa=[0.0, 0.5, 0.5, 0.0], zeff=None)  # type: ignore[arg-type]
+    w = RadialWindow(za=[1.0, 2.0, 3.0, 4.0], wa=[0.0, 0.5, 0.5, 0.0], zeff=None)
 
     zr, fr = restrict(z, f, w)
 
@@ -67,6 +67,6 @@ def test_partition(method) -> None:  # type: ignore[no-untyped-def]
 
     part = partition(z, fz, shells, method=method)
 
-    assert part.shape == (len(shells), 3, 2)  # type: ignore[union-attr]
+    assert part.shape == (len(shells), 3, 2)
 
     np.testing.assert_allclose(part.sum(axis=0), np.trapz(fz, z))  # type: ignore[attr-defined]

@@ -357,7 +357,7 @@ def position_weights(
     """
     # bring densities and bias into the same shape
     if bias is not None:
-        densities, bias = broadcast_first(densities, bias)  # type: ignore[no-untyped-call]
+        densities, bias = broadcast_first(densities, bias)
     # normalise densities after shape has been fixed
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation

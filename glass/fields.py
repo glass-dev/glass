@@ -432,7 +432,7 @@ def effective_cls(
     for j1, j2 in pairs:
         w1, w2 = weights1[c + j1], weights2[c + j2]
         cl = sum(
-            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)  # type: ignore[no-untyped-call]
+            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
             for i1, i2 in np.ndindex(n, n)
         )
         out[j1 + j2] = cl
