@@ -65,7 +65,9 @@ class _FitsWriter:
         self.ext = ext
 
     def _append(
-        self, data: npt.NDArray[typing.Any], names: list[str] | None = None
+        self,
+        data: npt.NDArray[typing.Any],
+        names: list[str] | None = None,
     ) -> None:
         """Write the FITS file."""
         if self.ext is None or self.ext not in self.fits:
@@ -101,7 +103,9 @@ class _FitsWriter:
 
 @contextmanager
 def write_catalog(
-    filename: str, *, ext: str | None = None
+    filename: str,
+    *,
+    ext: str | None = None,
 ) -> typing.Iterator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.

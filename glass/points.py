@@ -87,7 +87,8 @@ def effective_bias(
 
 
 def linear_bias(
-    delta: npt.NDArray[typing.Any], b: float | npt.NDArray[typing.Any]
+    delta: npt.NDArray[typing.Any],
+    b: float | npt.NDArray[typing.Any],
 ) -> npt.NDArray[float]:  # type: ignore[type-var]
     r"""Linear bias model :math:`\delta_g = b \, \delta`."""
     return b * delta  # type: ignore[return-value]
@@ -328,7 +329,8 @@ def uniform_positions(
 
 
 def position_weights(
-    densities: npt.NDArray[typing.Any], bias: npt.NDArray[typing.Any] | None = None
+    densities: npt.NDArray[typing.Any],
+    bias: npt.NDArray[typing.Any] | None = None,
 ) -> npt.NDArray[typing.Any]:
     r"""
     Compute relative weights for angular clustering.

@@ -123,7 +123,13 @@ def test_galaxy_shear(rng) -> None:  # type: ignore[no-untyped-def]
         rng.normal(size=(512,)),
     )
     shear = galaxy_shear(
-        gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2, reduced_shear=False
+        gal_lon,
+        gal_lat,
+        gal_eps,
+        kappa,
+        gamma1,
+        gamma2,
+        reduced_shear=False,
     )
     assert np.shape(shear) == (512,)
 

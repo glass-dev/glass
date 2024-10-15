@@ -62,21 +62,24 @@ WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
 
 
 def distance_weight(
-    z: npt.NDArray[typing.Any], cosmo: Cosmology
+    z: npt.NDArray[typing.Any],
+    cosmo: Cosmology,
 ) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
-    z: npt.NDArray[typing.Any], cosmo: Cosmology
+    z: npt.NDArray[typing.Any],
+    cosmo: Cosmology,
 ) -> npt.NDArray[typing.Any]:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def density_weight(
-    z: npt.NDArray[typing.Any], cosmo: Cosmology
+    z: npt.NDArray[typing.Any],
+    cosmo: Cosmology,
 ) -> npt.NDArray[typing.Any]:
     """Uniform weight in matter density."""
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
@@ -171,7 +174,8 @@ def tophat_windows(
         raise ValueError(msg)
     if zbins[0] != 0:
         warnings.warn(
-            "first tophat window does not start at redshift zero", stacklevel=2
+            "first tophat window does not start at redshift zero",
+            stacklevel=2,
         )
 
     wht: WeightFunc
@@ -573,7 +577,11 @@ def partition_restrict(
 
 
 def redshift_grid(
-    zmin: float, zmax: float, *, dz: float | None = None, num: int | None = None
+    zmin: float,
+    zmax: float,
+    *,
+    dz: float | None = None,
+    num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """Redshift grid with uniform spacing in redshift."""
     if dz is not None and num is None:
