@@ -12,7 +12,7 @@ from glass.shells import RadialWindow
 
 
 @pytest.fixture
-def shells():
+def shells():  # type: ignore[no-untyped-def]
     return [
         RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
         RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
@@ -23,16 +23,16 @@ def shells():
 
 
 @pytest.fixture
-def cosmo():
+def cosmo():  # type: ignore[no-untyped-def]
     class MockCosmology:
         @property
-        def omega_m(self):
+        def omega_m(self):  # type: ignore[no-untyped-def]
             return 0.3
 
-        def ef(self, z):
+        def ef(self, z):  # type: ignore[no-untyped-def]
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
-        def xm(self, z, z2=None):
+        def xm(self, z, z2=None):  # type: ignore[no-untyped-def]
             if z2 is None:
                 return np.array(z) * 1000
             return (np.array(z2) - np.array(z)) * 1000
@@ -41,37 +41,37 @@ def cosmo():
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(usecomplex):
+def test_deflect_nsew(usecomplex):  # type: ignore[no-untyped-def]
     d = 5.0
     r = np.radians(d)
 
     if usecomplex:
 
-        def alpha(re, im):
+        def alpha(re, im):  # type: ignore[no-untyped-def]
             return re + 1j * im
     else:
 
-        def alpha(re, im):
+        def alpha(re, im):  # type: ignore[no-untyped-def]
             return [re, im]
 
     # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0))
-    assert np.allclose([lon, lat], [0.0, d])
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))
-    assert np.allclose([lon, lat], [0.0, -d])
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r))
-    assert np.allclose([lon, lat], [-d, 0.0])
+    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r))
-    assert np.allclose([lon, lat], [d, 0.0])
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[no-untyped-call]
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
-def test_deflect_many(rng):
+def test_deflect_many(rng):  # type: ignore[no-untyped-def]
     n = 1000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
@@ -89,7 +89,7 @@ def test_deflect_many(rng):
     np.testing.assert_allclose(dotp, np.cos(abs_alpha))
 
 
-def test_multi_plane_matrix(shells, cosmo, rng):
+def test_multi_plane_matrix(shells, cosmo, rng):  # type: ignore[no-untyped-def]
     mat = multi_plane_matrix(shells, cosmo)
 
     np.testing.assert_array_equal(mat, np.tril(mat))
@@ -101,12 +101,12 @@ def test_multi_plane_matrix(shells, cosmo, rng):
     kappas = []
     for shell, delta in zip(shells, deltas):
         convergence.add_window(delta, shell)
-        kappas.append(convergence.kappa.copy())
+        kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
 
     np.testing.assert_allclose(mat @ deltas, kappas)
 
 
-def test_multi_plane_weights(shells, cosmo, rng):
+def test_multi_plane_weights(shells, cosmo, rng):  # type: ignore[no-untyped-def]
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 
@@ -125,4 +125,4 @@ def test_multi_plane_weights(shells, cosmo, rng):
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)  # type: ignore[arg-type]

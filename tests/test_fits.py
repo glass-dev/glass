@@ -9,7 +9,7 @@ from glass import user
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
 
-def _test_append(fits, data, names):
+def _test_append(fits, data, names):  # type: ignore[no-untyped-def]
     """Write routine for FITS test cases."""
     cat_name = "CATALOG"
     if cat_name not in fits:
@@ -26,26 +26,28 @@ filename = "MyFile.Fits"
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_basic_write(tmp_path):
+def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
     import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
-    with user.write_catalog(
-        tmp_path / filename_gfits, ext="CATALOG"
-    ) as out, fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits:
+    with (
+        user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
+        fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits,
+    ):
         for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
             array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
             out.write(RA=array, RB=array2)
             arrays = [array, array2]
             names = ["RA", "RB"]
-            _test_append(my_fits, arrays, names)
+            _test_append(my_fits, arrays, names)  # type: ignore[no-untyped-call]
 
-    with fitsio.FITS(tmp_path / filename_gfits) as g_fits, fitsio.FITS(
-        tmp_path / filename_tfits
-    ) as t_fits:
+    with (
+        fitsio.FITS(tmp_path / filename_gfits) as g_fits,
+        fitsio.FITS(tmp_path / filename_tfits) as t_fits,
+    ):
         glass_data = g_fits[1].read()
         test_data = t_fits[1].read()
         assert glass_data["RA"].size == test_data["RA"].size
@@ -53,7 +55,7 @@ def test_basic_write(tmp_path):
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_exception(tmp_path):
+def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
     try:
         with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):

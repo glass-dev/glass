@@ -27,19 +27,18 @@ Applying lensing
 
 .. autofunction:: deflect
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
-# typing support
-from typing import TYPE_CHECKING, Sequence
+import typing
 
 import healpy as hp
 import numpy as np
+import numpy.typing as npt
 
-if TYPE_CHECKING:
-    # to prevent circular dependencies, only import these for type checking
-    import numpy.typing as npt
+if typing.TYPE_CHECKING:
+    import collections.abc
 
     from cosmology import Cosmology
 
@@ -47,47 +46,46 @@ if TYPE_CHECKING:
 
 
 def from_convergence(  # noqa: PLR0913
-    kappa: npt.NDArray,
+    kappa: npt.NDArray[typing.Any],
     lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray, ...]:
+) -> tuple[npt.NDArray[typing.Any], ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
     Takes a weak lensing convergence map and returns one or more of
-    deflection potential, deflection, and shear maps.  The maps are
+    deflection potential, deflection, and shear maps. The maps are
     computed via spherical harmonic transforms.
+
+    Returns the maps of:
+
+    * deflection potential if ``potential`` is true.
+    * potential (complex) if ``deflection`` is true.
+    * shear (complex) if ``shear`` is true.
 
     Parameters
     ----------
-    kappa : array_like
+    kappa:
         HEALPix map of the convergence field.
-    lmax : int, optional
+    lmax:
         Maximum angular mode number to use in the transform.
-    potential, deflection, shear : bool, optional
+    potential:
         Which lensing maps to return.
-    discretized : bool
+    deflection:
+        Which lensing maps to return.
+    shear:
+        Which lensing maps to return.
+    discretized:
         Correct the pixel window function in output maps.
-
-    Returns
-    -------
-    psi : array_like
-        Map of the deflection potential.  Only returned if ``potential``
-        is true.
-    alpha : array_like
-        Map of the deflection (complex).  Only returned if ``deflection``
-        if true.
-    gamma : array_like
-        Map of the shear (complex).  Only returned if ``shear`` is true.
 
     Notes
     -----
     The weak lensing fields are computed from the convergence or
-    deflection potential in the following way. [1]_
+    deflection potential in the following way. [1]
 
     Define the spin-raising and spin-lowering operators of the
     spin-weighted spherical harmonics as
@@ -117,7 +115,7 @@ def from_convergence(  # noqa: PLR0913
         = -l \, (l+1) \, \psi_{lm} \;.
 
     The :term:`deflection` :math:`\alpha` is the gradient of the
-    deflection potential :math:`\psi`.  On the sphere, this is
+    deflection potential :math:`\psi`. On the sphere, this is
 
     .. math::
 
@@ -126,7 +124,7 @@ def from_convergence(  # noqa: PLR0913
 
     The deflection field has spin weight :math:`1` in the HEALPix
     convention, in order for points to be deflected towards regions of
-    positive convergence.  The modes :math:`\alpha_{lm}` of the
+    positive convergence. The modes :math:`\alpha_{lm}` of the
     deflection field are hence
 
     .. math::
@@ -143,7 +141,7 @@ def from_convergence(  # noqa: PLR0913
         = \eth\eth \, \psi
         = \eth \, \alpha \;,
 
-    and thus has spin weight :math:`2`.  The shear modes
+    and thus has spin weight :math:`2`. The shear modes
     :math:`\gamma_{lm}` are related to the deflection potential modes as
 
     .. math::
@@ -153,7 +151,7 @@ def from_convergence(  # noqa: PLR0913
 
     References
     ----------
-    .. [1] Tessore N., et al., OJAp, 6, 11 (2023).
+    * [1] Tessore N., et al., OJAp, 6, 11 (2023).
            doi:10.21105/astro.2302.01942
 
     """
@@ -182,7 +180,7 @@ def from_convergence(  # noqa: PLR0913
     # if potential is requested, compute map and add to output
     if potential:
         psi = hp.alm2map(alm, nside, lmax=lmax)
-        results += (psi,)
+        results += (psi,)  # type: ignore[assignment]
 
     # if no spin-weighted maps are requested, stop here
     if not (deflection or shear):
@@ -201,7 +199,7 @@ def from_convergence(  # noqa: PLR0913
     if deflection:
         alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
         alpha = alpha[0] + 1j * alpha[1]
-        results += (alpha,)
+        results += (alpha,)  # type: ignore[assignment]
 
     # if no shear is requested, stop here
     if not shear:
@@ -219,18 +217,18 @@ def from_convergence(  # noqa: PLR0913
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
     gamma = gamma[0] + 1j * gamma[1]
-    results += (gamma,)
+    results += (gamma,)  # type: ignore[assignment]
 
     # all done
     return results
 
 
 def shear_from_convergence(
-    kappa: npt.NDArray,
+    kappa: npt.NDArray[typing.Any],
     lmax: int | None = None,
     *,
     discretized: bool = True,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Weak lensing shear from convergence.
 
@@ -266,7 +264,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return hp.alm2map_spin([alm, blm], nside, 2, lmax)  # type: ignore[no-any-return]
 
 
 class MultiPlaneConvergence:
@@ -282,11 +280,11 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: npt.NDArray = np.array(0.0)
-        self.kappa2: npt.NDArray | None = None
-        self.kappa3: npt.NDArray | None = None
+        self.delta3: npt.NDArray[typing.Any] = np.array(0.0)
+        self.kappa2: npt.NDArray[typing.Any] | None = None
+        self.kappa3: npt.NDArray[typing.Any] | None = None
 
-    def add_window(self, delta: npt.NDArray, w: RadialWindow) -> None:
+    def add_window(self, delta: npt.NDArray[typing.Any], w: RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -295,11 +293,13 @@ class MultiPlaneConvergence:
 
         """
         zsrc = w.zeff
-        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)
+        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[attr-defined]
 
         self.add_plane(delta, zsrc, lens_weight)
 
-    def add_plane(self, delta: npt.NDArray, zsrc: float, wlens: float = 1.0) -> None:
+    def add_plane(
+        self, delta: npt.NDArray[typing.Any], zsrc: float, wlens: float = 1.0
+    ) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
@@ -348,12 +348,12 @@ class MultiPlaneConvergence:
         return self.z3
 
     @property
-    def kappa(self) -> npt.NDArray | None:
+    def kappa(self) -> npt.NDArray[typing.Any] | None:
         """The current convergence plane."""
         return self.kappa3
 
     @property
-    def delta(self) -> npt.NDArray:
+    def delta(self) -> npt.NDArray[typing.Any]:
         """The current matter plane."""
         return self.delta3
 
@@ -364,7 +364,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.ArrayLike:
     """Compute the matrix of lensing contributions from each shell."""
@@ -378,7 +378,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: npt.ArrayLike,
-    shells: Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.ArrayLike:
     """
@@ -391,20 +391,17 @@ def multi_plane_weights(
     redshift distribution :math:`n(z)` into the lensing efficiency
     sometimes denoted :math:`g(z)` or :math:`q(z)`.
 
+    Returns the relative lensing weight of each shell.
+
     Parameters
     ----------
-    weights : array_like
-        Relative weight of each shell.  The first axis must broadcast
+    weights:
+        Relative weight of each shell. The first axis must broadcast
         against the number of shells, and is normalised internally.
-    shells : list of :class:`~glass.RadialWindow`
+    shells:
         Window functions of the shells.
-    cosmo : Cosmology
+    cosmo:
         Cosmology instance.
-
-    Returns
-    -------
-    lensing_weights : array_like
-        Relative lensing weight of each shell.
 
     """
     # ensure shape of weights ends with the number of shells
@@ -416,37 +413,36 @@ def multi_plane_weights(
     weights = weights / np.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
-    return np.matmul(mat.T, weights)
+    return np.matmul(mat.T, weights)  # type: ignore[no-any-return, union-attr]
 
 
 def deflect(
     lon: npt.ArrayLike, lat: npt.ArrayLike, alpha: npt.ArrayLike
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Apply deflections to positions.
 
     Takes an array of :term:`deflection` values and applies them
     to the given positions.
 
+    Returns the longitudes and latitudes after deflection.
+
     Parameters
     ----------
-    lon, lat : array_like
-        Longitudes and latitudes to be deflected.
-    alpha : array_like
-        Deflection values.  Must be complex-valued or have a leading
+    lon:
+        Longitudes to be deflected.
+    lat:
+        Latitudes to be deflected.
+    alpha:
+        Deflection values. Must be complex-valued or have a leading
         axis of size 2 for the real and imaginary component.
-
-    Returns
-    -------
-    lon, lat : array_like
-        Longitudes and latitudes after deflection.
 
     Notes
     -----
     Deflections on the sphere are :term:`defined <deflection>` as
-    follows:  The complex deflection :math:`\\alpha` transports a point
-    on the sphere an angular distance :math:`|\\alpha|` along the
-    geodesic with bearing :math:`\\arg\\alpha` in the original point.
+    follows:  The complex deflection :math:`\alpha` transports a point
+    on the sphere an angular distance :math:`|\alpha|` along the
+    geodesic with bearing :math:`\arg\alpha` in the original point.
 
     In the language of differential geometry, this function is the
     exponential map.
@@ -476,4 +472,4 @@ def deflect(
 
     d = np.arctan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - np.degrees(d), np.degrees(tp)
+    return lon - np.degrees(d), np.degrees(tp)  # type: ignore[return-value]

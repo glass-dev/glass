@@ -21,6 +21,7 @@ from glass.fields import (
 from glass.galaxies import (
     galaxy_shear,
     gaussian_phz,
+    kappa_ia_nla,
     redshifts,
     redshifts_from_nz,
 )
