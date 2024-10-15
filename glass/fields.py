@@ -26,6 +26,7 @@ Utility functions
 
 from __future__ import annotations
 
+import collections.abc
 import typing
 import warnings
 
@@ -43,7 +44,7 @@ Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typi
 ClTransform = typing.Union[
     str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]
 ]
-Cls = typing.Sequence[typing.Union[npt.NDArray[typing.Any], typing.Sequence[float]]]
+Cls =  collections.abc.Sequence[typing.Union[npt.NDArray[typing.Any],  collections.abc.Sequence[float]]]
 Alms = npt.NDArray[typing.Any]
 
 

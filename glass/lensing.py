@@ -35,9 +35,10 @@ import typing
 
 import healpy as hp
 import numpy as np
+import numpy.typing as npt
 
 if typing.TYPE_CHECKING:
-    import numpy.typing as npt
+    import collections.abc
 
     from cosmology import Cosmology
 
@@ -363,7 +364,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[typing.Any]:
     """Compute the matrix of lensing contributions from each shell."""
@@ -377,7 +378,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: npt.NDArray[typing.Any],
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[typing.Any]:
     """
@@ -441,9 +442,9 @@ def deflect(
     Notes
     -----
     Deflections on the sphere are :term:`defined <deflection>` as
-    follows:  The complex deflection :math:`\\alpha` transports a point
-    on the sphere an angular distance :math:`|\\alpha|` along the
-    geodesic with bearing :math:`\\arg\\alpha` in the original point.
+    follows:  The complex deflection :math:`\alpha` transports a point
+    on the sphere an angular distance :math:`|\alpha|` along the
+    geodesic with bearing :math:`\arg\alpha` in the original point.
 
     In the language of differential geometry, this function is the
     exponential map.

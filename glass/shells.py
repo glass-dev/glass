@@ -44,6 +44,7 @@ Weight functions
 
 from __future__ import annotations
 
+import collections.abc
 import typing
 import warnings
 
@@ -56,7 +57,7 @@ if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 # types
-ArrayLike1D = typing.Union[typing.Sequence[float], npt.NDArray[typing.Any]]
+ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[typing.Any]]
 WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[typing.Any]]
 
 
@@ -125,8 +126,8 @@ class RadialWindow(typing.NamedTuple):
 
     """
 
-    za: typing.Sequence[float]
-    wa: typing.Sequence[float]
+    za: collections.abc.Sequence[float]
+    wa: collections.abc.Sequence[float]
     zeff: float | None
 
 
@@ -343,16 +344,16 @@ def restrict(
 def partition(
     z: npt.NDArray[typing.Any],
     fz: npt.NDArray[typing.Any],
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     *,
     method: str = "nnls",
 ) -> npt.NDArray[typing.Any]:
     r"""
     Partition a function by a sequence of windows.
 
-    Returns a vector of weights :math:`x_1, x_2, \\ldots` such that the
-    weighted sum of normalised radial window functions :math:`x_1 \\,
-    w_1(z) + x_2 \\, w_2(z) + \\ldots` approximates the given function
+    Returns a vector of weights :math:`x_1, x_2, \ldots` such that the
+    weighted sum of normalised radial window functions :math:`x_1 \,
+    w_1(z) + x_2 \, w_2(z) + \ldots` approximates the given function
     :math:`f(z)`.
 
     The function :math:`f(z)` is given by redshifts *z* of shape *(N,)*
@@ -383,19 +384,19 @@ def partition(
     -----
     Formally, if :math:`w_i` are the normalised window functions,
     :math:`f` is the target function, and :math:`z_i` is a redshift grid
-    with intervals :math:`\\Delta z_i`, the partition problem seeks an
+    with intervals :math:`\Delta z_i`, the partition problem seeks an
     approximate solution of
 
     .. math::
-        \\begin{pmatrix}
-        w_1(z_1) \\Delta z_1 & w_2(z_1) \\, \\Delta z_1 & \\cdots \\\\
-        w_1(z_2) \\Delta z_2 & w_2(z_2) \\, \\Delta z_2 & \\cdots \\\\
-        \\vdots & \\vdots & \\ddots
-        \\end{pmatrix} \\, \\begin{pmatrix}
-        x_1 \\\\ x_2 \\\\ \\vdots
-        \\end{pmatrix} = \\begin{pmatrix}
-        f(z_1) \\, \\Delta z_1 \\\\ f(z_2) \\, \\Delta z_2 \\\\ \\vdots
-        \\end{pmatrix} \\;.
+        \begin{pmatrix}
+        w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
+        w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
+        \vdots & \vdots & \ddots
+        \end{pmatrix} \, \begin{pmatrix}
+        x_1 \\ x_2 \\ \vdots
+        \end{pmatrix} = \begin{pmatrix}
+        f(z_1) \, \Delta z_1 \\ f(z_2) \, \Delta z_2 \\ \vdots
+        \end{pmatrix} \;.
 
     The redshift grid is the union of the given array *z* and the
     redshift arrays of all window functions. Intermediate function
@@ -407,20 +408,20 @@ def partition(
     equals the integral of the target function,
 
     .. math::
-        \\begin{pmatrix}
-        w_1(z_1) \\Delta z_1 & w_2(z_1) \\, \\Delta z_1 & \\cdots \\\\
-        w_1(z_2) \\Delta z_2 & w_2(z_2) \\, \\Delta z_2 & \\cdots \\\\
-        \\vdots & \\vdots & \\ddots \\\\
-        \\hline
-        \\lambda & \\lambda & \\cdots
-        \\end{pmatrix} \\, \\begin{pmatrix}
-        x_1 \\\\ x_2 \\\\ \\vdots
-        \\end{pmatrix} = \\begin{pmatrix}
-        f(z_1) \\, \\Delta z_1 \\\\ f(z_2) \\, \\Delta z_2 \\\\ \\vdots
-        \\\\ \\hline \\lambda \\int \\! f(z) \\, dz
-        \\end{pmatrix} \\;,
+        \begin{pmatrix}
+        w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
+        w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
+        \vdots & \vdots & \ddots \\
+        \hline
+        \lambda & \lambda & \cdots
+        \end{pmatrix} \, \begin{pmatrix}
+        x_1 \\ x_2 \\ \vdots
+        \end{pmatrix} = \begin{pmatrix}
+        f(z_1) \, \Delta z_1 \\ f(z_2) \, \Delta z_2 \\ \vdots
+        \\ \hline \lambda \int \! f(z) \, dz
+        \end{pmatrix} \;,
 
-    where :math:`\\lambda` is a multiplier to enforce the integral
+    where :math:`\lambda` is a multiplier to enforce the integral
     constraints.
 
     The :func:`partition()` function implements a number of methods to
@@ -454,7 +455,7 @@ def partition(
 def partition_lstsq(
     z: npt.NDArray[typing.Any],
     fz: npt.NDArray[typing.Any],
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[typing.Any]:
@@ -500,7 +501,7 @@ def partition_lstsq(
 def partition_nnls(
     z: npt.NDArray[typing.Any],
     fz: npt.NDArray[typing.Any],
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[typing.Any]:
@@ -561,7 +562,7 @@ def partition_nnls(
 def partition_restrict(
     z: npt.NDArray[typing.Any],
     fz: npt.NDArray[typing.Any],
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
 ) -> npt.NDArray[typing.Any]:
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
@@ -608,14 +609,14 @@ def distance_grid(
 def combine(
     z: npt.NDArray[typing.Any],
     weights: npt.NDArray[typing.Any],
-    shells: typing.Sequence[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
 ) -> npt.NDArray[typing.Any]:
     r"""
     Evaluate a linear combination of window functions.
 
-    Takes a vector of weights :math:`x_1, x_2, \\ldots` and computes the
+    Takes a vector of weights :math:`x_1, x_2, \ldots` and computes the
     weighted sum of normalised radial window functions :math:`f(z) = x_1
-    \\, w_1(z) + x_2 \\, w_2(z) + \\ldots` in the given redshifts
+    \, w_1(z) + x_2 \, w_2(z) + \ldots` in the given redshifts
     :math:`z`.
 
     The window functions are given by the sequence *shells* of

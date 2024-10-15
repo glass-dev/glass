@@ -22,15 +22,14 @@ from __future__ import annotations
 import typing
 import warnings
 
-if typing.TYPE_CHECKING:
-    import numpy.typing as npt
-
-    from glass.shells import RadialWindow
-
 import healpix
 import numpy as np
+import numpy.typing as npt
 
 from glass.core.array import broadcast_leading_axes, cumtrapz
+
+if typing.TYPE_CHECKING:
+    from glass.shells import RadialWindow
 
 
 def redshifts(

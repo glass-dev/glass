@@ -1,13 +1,9 @@
 """Core module for algorithms."""
 
 from __future__ import annotations
-
 import typing
-
 import numpy as np
-
-if typing.TYPE_CHECKING:
-    import numpy.typing as npt
+import numpy.typing as npt
 
 
 def nnls(
