@@ -9,7 +9,7 @@ from glass.shapes import (
 )
 
 
-def test_triaxial_axis_ratio():  # type: ignore[no-untyped-def]
+def test_triaxial_axis_ratio(rng):  # type: ignore[no-untyped-def]
     # single axis ratio
 
     q = triaxial_axis_ratio(0.8, 0.4)  # type: ignore[no-untyped-call]
@@ -39,7 +39,7 @@ def test_triaxial_axis_ratio():  # type: ignore[no-untyped-def]
     # random parameters and check that projection is
     # between largest and smallest possible value
 
-    zeta, xi = np.sort(np.random.uniform(0, 1, size=(2, 1000)), axis=0)
+    zeta, xi = np.sort(rng.uniform(0, 1, size=(2, 1000)), axis=0)
     qmin = np.min([zeta, xi, xi / zeta], axis=0)
     qmax = np.max([zeta, xi, xi / zeta], axis=0)
     q = triaxial_axis_ratio(zeta, xi)  # type: ignore[no-untyped-call]
@@ -131,5 +131,5 @@ def test_ellipticity_intnorm():  # type: ignore[no-untyped-def]
     np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="sigma must be between"):
         ellipticity_intnorm(1, 0.71)
