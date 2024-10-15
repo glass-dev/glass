@@ -95,3 +95,6 @@ plot_rcparams = {
     "savefig.facecolor": (1.0, 1.0, 1.0, 0.5),
     "savefig.transparent": False,
 }
+
+# Execute notebooks to display output on readthedocs
+nbsphinx_execute = "always"
