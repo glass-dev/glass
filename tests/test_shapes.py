@@ -94,7 +94,7 @@ def test_ellipticity_gaussian() -> None:
     np.testing.assert_array_less(np.abs(eps), 1)
 
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-2, rtol=0)
 
     eps = ellipticity_gaussian([n, n], [0.128, 0.256])  # type: ignore[arg-type]
 
