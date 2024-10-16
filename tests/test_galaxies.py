@@ -21,7 +21,7 @@ def test_redshifts(mocker):  # type: ignore[no-untyped-def]
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz(rng):  # type: ignore[no-untyped-def]
+def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)
@@ -135,7 +135,7 @@ def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
     assert np.shape(shear) == (512,)
 
 
-def test_gaussian_phz(rng):  # type: ignore[no-untyped-def]
+def test_gaussian_phz(rng: np.random.Generator) -> None:
     # test sampling
 
     # case: zero variance
