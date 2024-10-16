@@ -106,9 +106,9 @@ def loglinear_bias(
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal: float | npt.NDArray[np.float64],
+    ngal: float | list[float],
     delta: npt.NDArray[np.float64],
-    bias: float | npt.NDArray[np.float64] | None = None,
+    bias: float | None = None,
     vis: npt.NDArray[np.float64] | None = None,
     *,
     bias_model: str | typing.Callable[..., typing.Any] = "linear",
@@ -207,7 +207,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[call-overload, index]
 
         # apply visibility if given
         if vis is not None:
