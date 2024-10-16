@@ -28,7 +28,7 @@ def shells() -> list[RadialWindow]:
 def cosmo() -> Cosmology:
     class MockCosmology:
         @property
-        def omega_m(self):  # type: ignore[no-untyped-def]
+        def omega_m(self) -> float:
             return 0.3
 
         def ef(self, z):  # type: ignore[no-untyped-def]
@@ -49,12 +49,12 @@ def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
 
     if usecomplex:
 
-        def alpha(re, im):  # type: ignore[no-untyped-def]
+        def alpha(re: float, im: float) -> complex:
             return re + 1j * im
 
     else:
 
-        def alpha(re, im):  # type: ignore[no-untyped-def]
+        def alpha(re: float, im: float) -> list[float]:  # type: ignore[misc]
             return [re, im]
 
     # north
