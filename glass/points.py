@@ -116,7 +116,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     batch: int | None = 1_000_000,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[
-    tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.int_]]
+    tuple[
+        npt.NDArray[np.float64],
+        npt.NDArray[np.float64],
+        int | npt.NDArray[np.int_],
+    ]
 ]:
     """
     Generate positions tracing a density contrast.
