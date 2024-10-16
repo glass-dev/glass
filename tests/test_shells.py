@@ -18,7 +18,7 @@ def test_tophat_windows() -> None:
         zn <= z0 + len(w.za) * dz <= zn + dz for w, z0, zn in zip(ws, zb, zb[1:])
     )
 
-    assert all(np.all(w.wa == 1) for w in ws)  # type: ignore[comparison-overlap]
+    assert all(np.all(w.wa == 1) for w in ws)
 
 
 def test_restrict() -> None:
@@ -51,12 +51,12 @@ def test_restrict() -> None:
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(method: str) -> None:
     shells = [
-        RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),  # type: ignore[arg-type]
-        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),  # type: ignore[arg-type]
-        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),  # type: ignore[arg-type]
-        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),  # type: ignore[arg-type]
-        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),  # type: ignore[arg-type]
-        RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),  # type: ignore[arg-type]
+        RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
+        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
+        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),
+        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),
+        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),
+        RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),
     ]
 
     z = np.linspace(0.0, 5.0, 1000)

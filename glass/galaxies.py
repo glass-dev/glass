@@ -63,13 +63,13 @@ def redshifts(
         Random number generator. If not given, a default RNG is used.
 
     """
-    return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)  # type: ignore[arg-type]
+    return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
 
 
 def redshifts_from_nz(
     count: int | npt.NDArray[np.float64],
-    z: npt.NDArray[np.float64],
-    nz: npt.NDArray[np.float64],
+    z: list[float] | npt.NDArray[np.float64],
+    nz: list[float] | npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
@@ -128,14 +128,14 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[arg-type]
+        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[arg-type, call-overload]
         cdf /= cdf[-1]
 
         # sample redshifts and store result
         redshifts[total : total + count[k]] = np.interp(  # type: ignore[index]
             rng.uniform(0, 1, size=count[k]),  # type: ignore[index]
             cdf,
-            z[k],
+            z[k],  # type: ignore[call-overload]
         )
         total += count[k]  # type: ignore[index]
 

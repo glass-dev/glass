@@ -24,24 +24,24 @@ def test_redshifts(mocker) -> None:  # type: ignore[no-untyped-def]
 def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test sampling
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)  # type: ignore[arg-type]
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0], warn=False)  # type: ignore[arg-type]
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0], warn=False)
     assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1], warn=False)  # type: ignore[arg-type]
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1], warn=False)
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)  # type: ignore[arg-type]
+    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)
     assert not np.any(redshifts <= 1)
 
     # test with rng
 
     redshifts = redshifts_from_nz(
         10,
-        [0, 1, 2, 3, 4],  # type: ignore[arg-type]
-        [0, 0, 1, 1, 1],  # type: ignore[arg-type]
+        [0, 1, 2, 3, 4],
+        [0, 0, 1, 1, 1],
         warn=False,
         rng=rng,
     )
@@ -100,7 +100,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
         redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
-        redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])  # type: ignore[arg-type]
+        redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
 
 
 def test_galaxy_shear(rng: np.random.Generator) -> None:

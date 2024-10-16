@@ -58,19 +58,19 @@ def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
             return [re, im]
 
     # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[arg-type, no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[arg-type]
     np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[arg-type, no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[arg-type]
     np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[arg-type, no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[arg-type]
     np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[arg-type, no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[arg-type]
     np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
