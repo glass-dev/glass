@@ -57,7 +57,7 @@ def examples(session: nox.Session) -> None:
 @nox.session
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
-    session.install("-e", ".[docs]")
+    session.install("-e", ".[docs,examples]")
     session.chdir("docs")
     session.run("sphinx-build", "-M", "html", ".", "_build")
 
