@@ -148,7 +148,7 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ())
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if len(cl) > 0:
             monopole = 0.0 if cl[0] == 0 else None
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
@@ -194,7 +194,7 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if cl and len(cl) > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -255,7 +255,7 @@ def generate_gaussian(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[redundant-expr]
+    n = max((len(gl) for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
