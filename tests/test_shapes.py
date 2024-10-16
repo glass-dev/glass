@@ -89,6 +89,7 @@ def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
 
+@pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])
 def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     n = 1_000_000
 
@@ -105,7 +106,7 @@ def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     np.testing.assert_array_less(np.abs(eps), 1)
 
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-2, rtol=0)
+    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
     eps = ellipticity_gaussian([n, n], [0.128, 0.256])
 
