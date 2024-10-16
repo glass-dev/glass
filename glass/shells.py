@@ -618,7 +618,7 @@ def combine(
     z: npt.NDArray[np.float64],
     weights: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
-) -> npt.NDArray[np.float64]:
+) -> int:
     r"""
     Evaluate a linear combination of window functions.
 
@@ -648,7 +648,7 @@ def combine(
         Find weights for a given function.
 
     """
-    return sum(  # type: ignore[return-value]
+    return sum(
         np.expand_dims(weight, -1)
         * np.interp(
             z,

@@ -423,7 +423,10 @@ def deflect(
     lon: npt.NDArray[np.float64],
     lat: npt.NDArray[np.float64],
     alpha: npt.NDArray[np.float64],
-) -> npt.NDArray[np.float64]:
+) -> tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+]:
     r"""
     Apply deflections to positions.
 
@@ -477,4 +480,4 @@ def deflect(
 
     d = np.arctan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - np.degrees(d), np.degrees(tp)  # type: ignore[return-value]
+    return lon - np.degrees(d), np.degrees(tp)
