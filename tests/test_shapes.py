@@ -46,10 +46,15 @@ def test_triaxial_axis_ratio(rng):  # type: ignore[no-untyped-def]
     assert np.all((qmax >= q) & (q >= qmin))
 
 
-def test_ellipticity_ryden04():  # type: ignore[no-untyped-def]
+def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
     # single ellipticity
 
     e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)  # type: ignore[no-untyped-call]
+    assert np.isscalar(e)
+
+    # test with rng
+
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=rng)  # type: ignore[no-untyped-call]
     assert np.isscalar(e)
 
     # many ellipticities
@@ -85,10 +90,16 @@ def test_ellipticity_ryden04():  # type: ignore[no-untyped-def]
 
 
 @pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])
-def test_ellipticity_gaussian():  # type: ignore[no-untyped-def]
+def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     n = 1_000_000
 
     eps = ellipticity_gaussian(n, 0.256)
+
+    assert eps.shape == (n,)
+
+    # test with rng
+
+    eps = ellipticity_gaussian(n, 0.256, rng=rng)
 
     assert eps.shape == (n,)
 
@@ -109,10 +120,16 @@ def test_ellipticity_gaussian():  # type: ignore[no-untyped-def]
     np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
 
 
-def test_ellipticity_intnorm():  # type: ignore[no-untyped-def]
+def test_ellipticity_intnorm(rng: np.random.Generator) -> None:
     n = 1_000_000
 
     eps = ellipticity_intnorm(n, 0.256)
+
+    assert eps.shape == (n,)
+
+    # test with rng
+
+    eps = ellipticity_intnorm(n, 0.256, rng=rng)
 
     assert eps.shape == (n,)
 
