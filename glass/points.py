@@ -268,7 +268,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | npt.NDArray[np.float64],
+    ngal: float | list[float],
     *,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[
@@ -312,22 +312,22 @@ def uniform_positions(
     dims = np.shape(ngal)
 
     # make sure ntot is an array even if scalar
-    ngal = np.broadcast_to(ngal, dims)
+    ngal = np.broadcast_to(ngal, dims)  # type: ignore[assignment]
 
     # sample each set of points
     for k in np.ndindex(dims):
         # sample uniformly over the sphere
-        lon = rng.uniform(-180, 180, size=ngal[k])
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))
+        lon = rng.uniform(-180, 180, size=ngal[k])  # type: ignore[call-overload, index]
+        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))  # type: ignore[call-overload, index]
 
         # report count
         if dims:
             count = np.zeros(dims, dtype=int)
-            count[k] = ngal[k]
+            count[k] = ngal[k]  # type: ignore[call-overload, index]
         else:
-            count = int(ngal[k])  # type: ignore[assignment]
+            count = int(ngal[k])  # type: ignore[assignment, call-overload, index]
 
-        yield lon, lat, count
+        yield lon, lat, count  # type: ignore[misc]
 
 
 def position_weights(
