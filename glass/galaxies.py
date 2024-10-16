@@ -15,6 +15,10 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
+Intrinsic alignments
+--------------------
+.. autofunction:: kappa_ia_nla
+
 """  # noqa: D205, D400
 
 from __future__ import annotations
@@ -29,6 +33,8 @@ import numpy.typing as npt
 from glass.core.array import broadcast_leading_axes, cumtrapz
 
 if typing.TYPE_CHECKING:
+    from cosmology import Cosmology
+
     from glass.shells import RadialWindow
 
 
@@ -287,3 +293,103 @@ def gaussian_phz(
             trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
 
     return zphot
+
+
+def kappa_ia_nla(  # noqa: PLR0913
+    delta: npt.NDArray[typing.Any],
+    zeff: float,
+    a_ia: float,
+    cosmo: Cosmology,
+    *,
+    z0: float = 0.0,
+    eta: float = 0.0,
+    lbar: float = 0.0,
+    l0: float = 1e-9,
+    beta: float = 0.0,
+) -> npt.NDArray[typing.Any]:
+    r"""
+    Effective convergence from intrinsic alignments using the NLA model.
+
+    Returns the effective convergence due to intrinsic alignments.
+
+    Parameters
+    ----------
+    delta:
+        Matter density contrast.
+    zeff:
+        Effective redshift of the matter field.
+    a_ia:
+        Intrinsic alignments amplitude.
+    cosmo:
+        Cosmology instance.
+    z0:
+        Reference redshift for the redshift dependence.
+    eta:
+        Power of the redshift dependence.
+    lbar:
+        Mean luminosity of the galaxy sample.
+    l0:
+        Reference luminosity for the luminosity dependence.
+    beta:
+        Power of the luminosity dependence.
+
+    Notes
+    -----
+    The Non-linear Alignments Model (NLA) describes an effective
+    convergence :math:`\kappa_{\rm IA}` that models the effect of
+    intrinsic alignments.  It is computed from the matter density
+    contrast :math:`\delta` as [1] [3]
+
+    .. math::
+
+        \kappa_{\rm IA} = f_{\rm NLA} \, \delta \;,
+
+    where the NLA factor :math:`f_{\rm NLA}` is defined as [4] [5]
+
+    .. math::
+
+        f_{\rm{NLA}}
+        = -A_{\rm IA} \, \frac{C_1 \, \bar{\rho}(z)}{D(z)} \,
+            \biggl(\frac{1+z}{1+z_0}\biggr)^\eta \,
+            \biggl(\frac{\bar{L}}{L_0}\biggr)^\beta \;,
+
+    with
+
+    * :math:`A_{\rm IA}` the intrinsic alignments amplitude,
+    * :math:`C_1` a normalisation constant [2],
+    * :math:`z` the effective redshift of the model,
+    * :math:`\bar{\rho}` the mean matter density,
+    * :math:`D` the growth factor,
+    * :math:`\eta` the power that describes the redshift-dependence with
+      respect to :math:`z_0`,
+    * :math:`\bar{L}` the mean luminosity of the galaxy sample, and
+    * :math:`\beta` the power that describes the luminosity-dependence
+      :math:`\bar{L}` with respect to :math:`L_0`.
+
+    References
+    ----------
+    * [1] Catelan P., Kamionkowski M., Blandford R. D., 2001, MNRAS,
+       320, L7. doi:10.1046/j.1365-8711.2001.04105.x
+    * [2] Hirata C. M., Seljak U., 2004, PhRvD, 70, 063526.
+       doi:10.1103/PhysRevD.70.063526
+    * [3] Bridle S., King L., 2007, NJPh, 9, 444.
+       doi:10.1088/1367-2630/9/12/444
+    * [4] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
+        A&A, 624, A30. doi:10.1051/0004-6361/201834714
+    * [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
+       OJAp, 6, 11. doi:10.21105/astro.2302.01942
+
+    """
+    c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
+    rho_c1 = c1 * cosmo.rho_c0
+
+    prefactor = -a_ia * rho_c1 * cosmo.Om
+    inverse_linear_growth = 1.0 / cosmo.gf(zeff)
+    redshift_dependence = ((1 + zeff) / (1 + z0)) ** eta
+    luminosity_dependence = (lbar / l0) ** beta
+
+    f_nla = (
+        prefactor * inverse_linear_growth * redshift_dependence * luminosity_dependence
+    )
+
+    return delta * f_nla  # type: ignore[no-any-return]

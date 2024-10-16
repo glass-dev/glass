@@ -8,8 +8,8 @@ with contextlib.suppress(PackageNotFoundError):
 
 from glass.fields import (
     cls2cov,
+    discretized_cls,
     effective_cls,
-    gaussian_gls,
     generate_gaussian,
     generate_lognormal,
     getcl,
@@ -21,6 +21,7 @@ from glass.fields import (
 from glass.galaxies import (
     galaxy_shear,
     gaussian_phz,
+    kappa_ia_nla,
     redshifts,
     redshifts_from_nz,
 )

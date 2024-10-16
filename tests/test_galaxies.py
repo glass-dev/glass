@@ -21,7 +21,7 @@ def test_redshifts(mocker) -> None:  # type: ignore[no-untyped-def]
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz() -> None:
+def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test sampling
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)  # type: ignore[arg-type]
@@ -34,6 +34,17 @@ def test_redshifts_from_nz() -> None:
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)  # type: ignore[arg-type]
+    assert not np.any(redshifts <= 1)
+
+    # test with rng
+
+    redshifts = redshifts_from_nz(
+        10,
+        [0, 1, 2, 3, 4],  # type: ignore[arg-type]
+        [0, 0, 1, 1, 1],  # type: ignore[arg-type]
+        warn=False,
+        rng=rng,
+    )
     assert not np.any(redshifts <= 1)
 
     # test interface
@@ -134,7 +145,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
     assert np.shape(shear) == (512,)
 
 
-def test_gaussian_phz() -> None:
+def test_gaussian_phz(rng: np.random.Generator) -> None:
     # test sampling
 
     # case: zero variance
@@ -143,6 +154,12 @@ def test_gaussian_phz() -> None:
     sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
+
+    np.testing.assert_array_equal(z, phz)
+
+    # test with rng
+
+    phz = gaussian_phz(z, sigma_0, rng=rng)
 
     np.testing.assert_array_equal(z, phz)
 
@@ -208,3 +225,16 @@ def test_gaussian_phz() -> None:
 
     assert phz.shape == (11, 10)
     np.testing.assert_array_equal(np.broadcast_to(z, (11, 10)), phz)
+
+    # test resampling
+
+    phz = gaussian_phz(np.array(0.0), np.array(1.0), lower=np.array([0]))
+    assert isinstance(phz, float)  # type: ignore[unreachable]
+
+    phz = gaussian_phz(np.array(0.0), np.array(1.0), upper=np.array([1]))  # type: ignore[unreachable]
+    assert isinstance(phz, float)
+
+    # test error
+
+    with pytest.raises(ValueError, match="requires lower < upper"):
+        phz = gaussian_phz(z, sigma_0, lower=np.array([1]), upper=np.array([0]))
