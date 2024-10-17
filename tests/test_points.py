@@ -21,8 +21,6 @@ def catpos(pos):  # type: ignore[no-untyped-def]
     return lon, lat, cnt
 
 
-# TODO(@Saransh-cpp): populate this function  # noqa: FIX002
-# https://github.com/glass-dev/glass/issues/272
 def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
     # create a mock radial window function
     w = mocker.Mock()
