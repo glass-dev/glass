@@ -130,7 +130,12 @@ class RadialWindow(typing.NamedTuple):
     """
 
     za: list[float] | npt.NDArray[np.float64]
-    wa: list[float] | npt.NDArray[np.float64]
+    wa: (
+        list[int]
+        | list[float]
+        | npt.NDArray[np.float64]
+        | list[npt.NDArray[np.float64]]
+    )
     zeff: float | None
 
 

@@ -54,7 +54,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     count: int | list[int] | list[list[int]] = 10
     z = np.linspace(0, 1, 100)
-    nz = z * (1 - z)
+    nz: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]] = z * (1 - z)
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -75,7 +75,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -85,7 +85,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     count = [[10], [20], [30]]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -95,7 +95,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     with pytest.raises(ValueError, match="shape mismatch"):
         redshifts_from_nz(count, z, nz, warn=False)

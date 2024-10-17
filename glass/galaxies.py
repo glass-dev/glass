@@ -69,7 +69,10 @@ def redshifts(
 def redshifts_from_nz(
     count: int | list[int] | list[list[int]],
     z: list[float] | npt.NDArray[np.float64],
-    nz: list[float] | npt.NDArray[np.float64],
+    nz: list[int]
+    | list[float]
+    | npt.NDArray[np.float64]
+    | list[npt.NDArray[np.float64]],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
