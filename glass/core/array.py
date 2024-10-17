@@ -57,9 +57,12 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: npt.NDArray[np.float64],
-    xp: npt.NDArray[np.float64],
-    fp: npt.NDArray[np.float64],
+    x: float | list[float] | list[list[float]] | npt.NDArray[np.float64],
+    xp: list[int] | npt.NDArray[np.float64],
+    fp: list[float]
+    | list[list[float]]
+    | list[list[list[float]]]
+    | npt.NDArray[np.float64],
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
