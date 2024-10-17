@@ -31,7 +31,7 @@ def catpos(  # type: ignore[no-untyped-def]
 def test_positions_from_delta() -> None:
     # case: single-dimensional input
 
-    ngal = 1e-3
+    ngal: float | list[float] = 1e-3
     delta = np.zeros(12)
     bias = 0.8
     vis = np.ones(12)
@@ -43,7 +43,7 @@ def test_positions_from_delta() -> None:
 
     # case: multi-dimensional ngal
 
-    ngal = [1e-3, 2e-3]  # type: ignore[assignment]
+    ngal = [1e-3, 2e-3]
     delta = np.zeros(12)
     bias = 0.8
     vis = np.ones(12)
@@ -69,7 +69,7 @@ def test_positions_from_delta() -> None:
 
     # case: multi-dimensional broadcasting
 
-    ngal = [1e-3, 2e-3]  # type: ignore[assignment]
+    ngal = [1e-3, 2e-3]
     delta = np.zeros((3, 1, 12))
     bias = 0.8
     vis = np.ones(12)

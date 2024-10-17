@@ -152,7 +152,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: zero variance
 
     z: float | npt.NDArray[np.float64] = np.linspace(0, 1, 100)
-    sigma_0 = 0.0
+    sigma_0 : float | npt.NDArray[np.float64] = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -167,7 +167,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: truncated normal
 
     z = 0.0
-    sigma_0 = np.ones(100)  # type: ignore[assignment]
+    sigma_0 = np.ones(100)
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -177,7 +177,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: upper and lower bound
 
     z = 1.0
-    sigma_0 = np.ones(100)  # type: ignore[assignment]
+    sigma_0 = np.ones(100)
 
     phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)  # type: ignore[arg-type]
 
@@ -210,7 +210,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: scalar redshift, array sigma_0
 
     z = 1.0
-    sigma_0 = np.zeros(10)  # type: ignore[assignment]
+    sigma_0 = np.zeros(10)
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -220,7 +220,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: array redshift, array sigma_0
 
     z = np.linspace(0, 1, 10)
-    sigma_0 = np.zeros((11, 1))  # type: ignore[assignment]
+    sigma_0 = np.zeros((11, 1))
 
     phz = gaussian_phz(z, sigma_0)
 
