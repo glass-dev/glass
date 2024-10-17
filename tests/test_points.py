@@ -1,6 +1,15 @@
 import numpy as np
+import pytest
+import pytest_mock
 
-from glass.points import position_weights, positions_from_delta, uniform_positions
+from glass.points import (
+    effective_bias,
+    linear_bias,
+    loglinear_bias,
+    position_weights,
+    positions_from_delta,
+    uniform_positions,
+)
 
 
 def catpos(pos):  # type: ignore[no-untyped-def]
@@ -12,7 +21,75 @@ def catpos(pos):  # type: ignore[no-untyped-def]
     return lon, lat, cnt
 
 
-def test_positions_from_delta():  # type: ignore[no-untyped-def]
+def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
+    # create a mock radial window function
+    w = mocker.Mock()
+    w.za = np.linspace(0, 2, 100)
+    w.wa = np.full_like(w.za, 2.0)
+
+    z = np.linspace(0, 1, 10)
+    bz = np.zeros((10,))
+
+    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))  # type: ignore[no-untyped-call]
+
+    z = np.zeros((10,))
+    bz = np.full_like(z, 0.5)
+
+    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))  # type: ignore[no-untyped-call]
+
+    z = np.linspace(0, 1, 10)
+    bz = np.full_like(z, 0.5)
+
+    np.testing.assert_allclose(effective_bias(z, bz, w), 0.25)  # type: ignore[no-untyped-call]
+
+
+def test_linear_bias(rng: np.random.Generator) -> None:
+    # test with 0 delta
+
+    delta = np.zeros((2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(linear_bias(delta, b), np.zeros((2, 2)))  # type: ignore[no-untyped-call]
+
+    # test with 0 b
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 0.0
+
+    np.testing.assert_allclose(linear_bias(delta, b), np.zeros((2, 2)))  # type: ignore[no-untyped-call]
+
+    # compare with original implementation
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(linear_bias(delta, b), b * delta)  # type: ignore[no-untyped-call]
+
+
+def test_loglinear_bias(rng: np.random.Generator) -> None:
+    # test with 0 delta
+
+    delta = np.zeros((2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(loglinear_bias(delta, b), np.zeros((2, 2)))  # type: ignore[no-untyped-call]
+
+    # test with 0 b
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 0.0
+
+    np.testing.assert_allclose(loglinear_bias(delta, b), np.zeros((2, 2)))  # type: ignore[no-untyped-call]
+
+    # compare with numpy implementation
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(loglinear_bias(delta, b), np.expm1(b * np.log1p(delta)))  # type: ignore[no-untyped-call]
+
+
+def test_positions_from_delta(rng):  # type: ignore[no-untyped-def]  # noqa: PLR0915
     # case: single-dimensional input
 
     ngal = 1e-3
@@ -21,6 +98,54 @@ def test_positions_from_delta():  # type: ignore[no-untyped-def]
     vis = np.ones(12)
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))  # type: ignore[no-untyped-call]
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # test with rng
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis, rng=rng))  # type: ignore[no-untyped-call]
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: Nons bias
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, None, vis))  # type: ignore[no-untyped-call]
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: None vis
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, None))  # type: ignore[no-untyped-call]
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: remove monopole
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, delta, bias, vis, remove_monopole=True)  # type: ignore[no-untyped-call]
+    )
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: negative delta
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, np.linspace(-1, -1, 12), None, vis)  # type: ignore[no-untyped-call]
+    )
+
+    assert isinstance(cnt, int)
+    assert lon == lat == []
+
+    # case: large delta
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, rng.normal(100, 1, size=(12,)), bias, vis)  # type: ignore[no-untyped-call]
+    )
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -64,13 +189,22 @@ def test_positions_from_delta():  # type: ignore[no-untyped-def]
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
 
+    # test TypeError
 
-def test_uniform_positions():  # type: ignore[no-untyped-def]
+    with pytest.raises(TypeError, match="bias_model must be string or callable"):
+        next(positions_from_delta(ngal, delta, bias, vis, bias_model=0))  # type: ignore[no-untyped-call]
+
+
+def test_uniform_positions(rng):  # type: ignore[no-untyped-def]
     # case: scalar input
 
     ngal = 1e-3
 
     lon, lat, cnt = catpos(uniform_positions(ngal))  # type: ignore[no-untyped-call]
+
+    # test with rng
+
+    lon, lat, cnt = catpos(uniform_positions(ngal, rng=rng))  # type: ignore[no-untyped-call]
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
