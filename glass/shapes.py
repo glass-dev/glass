@@ -29,9 +29,9 @@ import numpy.typing as npt
 
 
 def triaxial_axis_ratio(
-    zeta: npt.NDArray[np.float64],
-    xi: npt.NDArray[np.float64],
-    size: tuple[int] | None = None,
+    zeta: float | list[float] | list[list[float]] | npt.NDArray[np.float64],
+    xi: float | list[float],
+    size: int | tuple[int, int] | None = None,
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:

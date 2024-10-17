@@ -12,28 +12,28 @@ from glass.shapes import (
 def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
     # single axis ratio
 
-    q = triaxial_axis_ratio(0.8, 0.4)  # type: ignore[arg-type]
+    q = triaxial_axis_ratio(0.8, 0.4)
     assert np.isscalar(q)
 
     # many axis ratios
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=1000)  # type: ignore[arg-type]
+    q = triaxial_axis_ratio(0.8, 0.4, size=1000)
     assert np.shape(q) == (1000,)
 
     # explicit shape
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))  # type: ignore[arg-type]
+    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))
     assert np.shape(q) == (10, 10)
 
     # implicit size
 
-    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)  # type: ignore[arg-type]
-    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])  # type: ignore[arg-type]
+    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)
+    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])
     assert np.shape(q1) == np.shape(q2) == (2,)
 
     # broadcasting rule
 
-    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])  # type: ignore[arg-type]
+    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])
     assert np.shape(q) == (2, 2)
 
     # random parameters and check that projection is
