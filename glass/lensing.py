@@ -420,9 +420,9 @@ def multi_plane_weights(
 
 
 def deflect(
-    lon: npt.NDArray[np.float64],
-    lat: npt.NDArray[np.float64],
-    alpha: npt.NDArray[np.float64],
+    lon: float | npt.NDArray[np.float64],
+    lat: float | npt.NDArray[np.float64],
+    alpha: complex | list[float] | npt.NDArray[np.complex128] | npt.NDArray[np.float64],
 ) -> tuple[
     npt.NDArray[np.float64],
     npt.NDArray[np.float64],
