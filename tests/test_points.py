@@ -84,7 +84,7 @@ def test_positions_from_delta() -> None:
 def test_uniform_positions() -> None:
     # case: scalar input
 
-    ngal = 1e-3
+    ngal: float | list[float] | list[list[float]] = 1e-3
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
@@ -93,7 +93,7 @@ def test_uniform_positions() -> None:
 
     # case: 1-D array input
 
-    ngal = [1e-3, 2e-3, 3e-3]  # type: ignore[assignment]
+    ngal = [1e-3, 2e-3, 3e-3]
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
@@ -102,7 +102,7 @@ def test_uniform_positions() -> None:
 
     # case: 2-D array input
 
-    ngal = [[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]]  # type: ignore[assignment]
+    ngal = [[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]]
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
