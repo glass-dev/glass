@@ -179,7 +179,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = 1.0
     sigma_0 = np.ones(100)
 
-    phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)  # type: ignore[arg-type]
+    phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
 
     assert phz.shape == (100,)
     assert np.all(phz >= 0.5)

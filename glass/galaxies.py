@@ -218,8 +218,8 @@ def gaussian_phz(
     z: float | npt.NDArray[np.float64],
     sigma_0: float | npt.NDArray[np.float64],
     *,
-    lower: npt.NDArray[np.float64] | None = None,
-    upper: npt.NDArray[np.float64] | None = None,
+    lower: float | npt.NDArray[np.float64] | None = None,
+    upper: float | npt.NDArray[np.float64] | None = None,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
@@ -276,24 +276,24 @@ def gaussian_phz(
     zphot = rng.normal(z, sigma)
 
     if lower is None:
-        lower = 0.0  # type: ignore[assignment]
+        lower = 0.0
     if upper is None:
-        upper = np.inf  # type: ignore[assignment]
+        upper = np.inf
 
-    if not np.all(lower < upper):  # type: ignore[operator]
+    if not np.all(lower < upper):
         msg = "requires lower < upper"
         raise ValueError(msg)
 
     if not dims:
-        while zphot < lower or zphot > upper:  # type: ignore[operator]
+        while zphot < lower or zphot > upper:
             zphot = rng.normal(z, sigma)
     else:
         z = np.broadcast_to(z, dims)
-        trunc = np.where((zphot < lower) | (zphot > upper))[0]  # type: ignore[operator]
+        trunc = np.where((zphot < lower) | (zphot > upper))[0]
         while trunc.size:
             znew = rng.normal(z[trunc], sigma[trunc])
             zphot[trunc] = znew
-            trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
+            trunc = trunc[(znew < lower) | (znew > upper)]
 
     return zphot
 
