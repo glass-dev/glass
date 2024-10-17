@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
     import collections.abc
 
 
-def catpos(  # type: ignore[no-untyped-def]
+def catpos(
     pos: collections.abc.Generator[
         tuple[
             npt.NDArray[np.float64],
@@ -19,14 +19,18 @@ def catpos(  # type: ignore[no-untyped-def]
             int | npt.NDArray[np.int_],
         ]
     ],
-):
-    lon: list[float] = []
-    lat: list[float] = []
-    cnt: int = 0
+) -> tuple[
+    list[float] | npt.NDArray[np.float64],
+    list[float] | npt.NDArray[np.float64],
+    int | npt.NDArray[np.int_],
+]:
+    lon: list[float] | npt.NDArray[np.float64] = []
+    lat: list[float] | npt.NDArray[np.float64] = []
+    cnt: int | npt.NDArray[np.int_] = 0
     for lo, la, co in pos:
-        lon = np.concatenate([lon, lo])  # type: ignore[assignment]
-        lat = np.concatenate([lat, la])  # type: ignore[assignment]
-        cnt = cnt + co  # type: ignore[assignment]
+        lon = np.concatenate([lon, lo])
+        lat = np.concatenate([lat, la])
+        cnt = cnt + co
     return lon, lat, cnt
 
 
@@ -41,7 +45,7 @@ def test_positions_from_delta() -> None:
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert lon.shape == lat.shape == (cnt,)  # type: ignore[union-attr]
 
     # case: multi-dimensional ngal
 
@@ -52,9 +56,9 @@ def test_positions_from_delta() -> None:
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
-    assert cnt.shape == (2,)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert cnt.shape == (2,)  # type: ignore[union-attr]
+    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
 
     # case: multi-dimensional delta
 
@@ -65,9 +69,9 @@ def test_positions_from_delta() -> None:
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
-    assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert cnt.shape == (3, 2)  # type: ignore[union-attr]
+    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
 
     # case: multi-dimensional broadcasting
 
@@ -78,9 +82,9 @@ def test_positions_from_delta() -> None:
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
-    assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert cnt.shape == (3, 2)  # type: ignore[union-attr]
+    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
 
 
 def test_uniform_positions() -> None:
@@ -91,7 +95,7 @@ def test_uniform_positions() -> None:
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
     assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert lon.shape == lat.shape == (cnt,)  # type: ignore[union-attr]
 
     # case: 1-D array input
 
@@ -99,8 +103,8 @@ def test_uniform_positions() -> None:
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
-    assert cnt.shape == (3,)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert cnt.shape == (3,)  # type: ignore[union-attr]
+    assert lon.shape == lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
 
     # case: 2-D array input
 
@@ -108,8 +112,8 @@ def test_uniform_positions() -> None:
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
-    assert cnt.shape == (3, 2)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert cnt.shape == (3, 2)  # type: ignore[union-attr]
+    assert lon.shape == lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
 
 
 def test_position_weights(rng: np.random.Generator) -> None:
