@@ -272,7 +272,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | list[float],
+    ngal: float | list[float] | list[list[float]],
     *,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[

@@ -152,7 +152,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: zero variance
 
     z: float | npt.NDArray[np.float64] = np.linspace(0, 1, 100)
-    sigma_0 : float | npt.NDArray[np.float64] = 0.0
+    sigma_0: float | npt.NDArray[np.float64] = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
