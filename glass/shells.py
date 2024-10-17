@@ -484,7 +484,9 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
+    a: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64] = [
+        np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells
+    ]
     a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
     a = a * dz
 
@@ -494,14 +496,14 @@ def partition_lstsq(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
+    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
     b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[arg-type, attr-defined]
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[union-attr]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     return np.moveaxis(x, -1, 0)
