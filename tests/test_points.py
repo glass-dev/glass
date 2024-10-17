@@ -20,7 +20,9 @@ def catpos(  # type: ignore[no-untyped-def]
         ]
     ],
 ):
-    lon, lat, cnt = [], [], 0  # type: ignore[var-annotated]
+    lon: list[float] = []
+    lat: list[float] = []
+    cnt: int = 0
     for lo, la, co in pos:
         lon = np.concatenate([lon, lo])  # type: ignore[assignment]
         lat = np.concatenate([lat, la])  # type: ignore[assignment]
