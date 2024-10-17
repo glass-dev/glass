@@ -212,7 +212,7 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: npt.NDArray[np.float64],
+    z: float | npt.NDArray[np.float64],
     sigma_0: float | npt.NDArray[np.float64],
     *,
     lower: npt.NDArray[np.float64] | None = None,
