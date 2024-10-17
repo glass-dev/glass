@@ -234,11 +234,12 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         nside = healpix.npix2nside(npix)
 
         # create a mask to report the count in the right axis
+        cmask: int | npt.NDArray[np.int_]
         if dims:
             cmask = np.zeros(dims, dtype=int)
             cmask[k] = 1
         else:
-            cmask = 1  # type: ignore[assignment]
+            cmask = 1
 
         # sample the map in batches
         step = 1000
@@ -325,11 +326,12 @@ def uniform_positions(
         lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))  # type: ignore[call-overload, index]
 
         # report count
+        count: int | npt.NDArray[np.int_]
         if dims:
             count = np.zeros(dims, dtype=int)
             count[k] = ngal[k]  # type: ignore[call-overload, index]
         else:
-            count = int(ngal[k])  # type: ignore[assignment, call-overload, index]
+            count = int(ngal[k])  # type: ignore[call-overload, index]
 
         yield lon, lat, count  # type: ignore[misc]
 
