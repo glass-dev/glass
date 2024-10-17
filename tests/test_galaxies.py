@@ -17,7 +17,7 @@ def test_redshifts(mocker) -> None:  # type: ignore[no-untyped-def]
     assert z.max() <= 1.0
 
     # sample redshifts (array)
-    z = redshifts([[1, 2], [3, 4]], w)  # type: ignore[arg-type]
+    z = redshifts([[1, 2], [3, 4]], w)
     assert z.shape == (10,)
 
 
@@ -51,7 +51,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: no extra dimensions
 
-    count = 10
+    count: int | list[int] | list[list[int]] = 10
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -62,7 +62,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count
 
-    count = [10, 20, 30]  # type: ignore[assignment]
+    count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -82,7 +82,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count and nz
 
-    count = [[10], [20], [30]]  # type: ignore[assignment]
+    count = [[10], [20], [30]]
     z = np.linspace(0, 1, 100)
     nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 
@@ -92,7 +92,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: incompatible input shapes
 
-    count = [10, 20, 30]  # type: ignore[assignment]
+    count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
     nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
 

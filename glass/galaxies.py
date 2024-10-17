@@ -39,7 +39,7 @@ if typing.TYPE_CHECKING:
 
 
 def redshifts(
-    n: int | npt.NDArray[np.float64],
+    n: int | list[int] | list[list[int]],
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
@@ -67,7 +67,7 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | npt.NDArray[np.float64],
+    count: int | list[int] | list[list[int]],
     z: list[float] | npt.NDArray[np.float64],
     nz: list[float] | npt.NDArray[np.float64],
     *,
@@ -132,12 +132,12 @@ def redshifts_from_nz(
         cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count[k]] = np.interp(  # type: ignore[index]
-            rng.uniform(0, 1, size=count[k]),  # type: ignore[index]
+        redshifts[total : total + count[k]] = np.interp(  # type: ignore[call-overload, index]
+            rng.uniform(0, 1, size=count[k]),  # type: ignore[call-overload, index]
             cdf,
             z[k],  # type: ignore[call-overload]
         )
-        total += count[k]  # type: ignore[index]
+        total += count[k]  # type: ignore[call-overload, index]
 
     assert total == redshifts.size  # noqa: S101
 
