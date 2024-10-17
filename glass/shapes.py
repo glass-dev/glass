@@ -97,10 +97,10 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: npt.NDArray[np.float64],
-    sigma: npt.NDArray[np.float64],
-    gamma: npt.NDArray[np.float64],
-    sigma_gamma: npt.NDArray[np.float64],
+    mu: float | list[float] | npt.NDArray[np.float64],
+    sigma: float | list[float] | npt.NDArray[np.float64],
+    gamma: float | list[float] | list[list[float]] | npt.NDArray[np.float64],
+    sigma_gamma: float | list[float] | npt.NDArray[np.float64],
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,

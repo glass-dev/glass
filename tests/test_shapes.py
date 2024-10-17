@@ -49,43 +49,43 @@ def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
 def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
     # single ellipticity
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)  # type: ignore[arg-type]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
     assert np.isscalar(e)
 
     # test with rng
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=rng)  # type: ignore[arg-type]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=rng)
     assert np.isscalar(e)
 
     # many ellipticities
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)  # type: ignore[arg-type]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)
     assert np.shape(e) == (1000,)
 
     # explicit shape
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))  # type: ignore[arg-type]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))
     assert np.shape(e) == (10, 10)
 
     # implicit size
 
-    e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)  # type: ignore[arg-type]
-    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])  # type: ignore[arg-type]
-    e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)  # type: ignore[arg-type]
-    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)  # type: ignore[arg-type]
+    e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)
+    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])
+    e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)
+    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
 
     # broadcasting rule
 
-    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)  # type: ignore[arg-type]
+    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)
     assert np.shape(e) == (2, 2)
 
     # check that result is in the specified range
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)  # type: ignore[arg-type]
+    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)  # type: ignore[arg-type]
+    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
 
