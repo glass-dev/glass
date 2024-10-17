@@ -46,14 +46,14 @@ if typing.TYPE_CHECKING:
 
 
 def from_convergence(  # noqa: PLR0913
-    kappa: npt.NDArray[typing.Any],
+    kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray[typing.Any], ...]:
+) -> tuple[npt.NDArray[np.float64], ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
@@ -224,11 +224,11 @@ def from_convergence(  # noqa: PLR0913
 
 
 def shear_from_convergence(
-    kappa: npt.NDArray[typing.Any],
+    kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
     discretized: bool = True,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Weak lensing shear from convergence.
 
@@ -280,11 +280,11 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: npt.NDArray[typing.Any] = np.array(0.0)
-        self.kappa2: npt.NDArray[typing.Any] | None = None
-        self.kappa3: npt.NDArray[typing.Any] | None = None
+        self.delta3: npt.NDArray[np.float64] = np.array(0.0)
+        self.kappa2: npt.NDArray[np.float64] | None = None
+        self.kappa3: npt.NDArray[np.float64] | None = None
 
-    def add_window(self, delta: npt.NDArray[typing.Any], w: RadialWindow) -> None:
+    def add_window(self, delta: npt.NDArray[np.float64], w: RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -293,12 +293,15 @@ class MultiPlaneConvergence:
 
         """
         zsrc = w.zeff
-        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[attr-defined]
+        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[arg-type, attr-defined]
 
-        self.add_plane(delta, zsrc, lens_weight)
+        self.add_plane(delta, zsrc, lens_weight)  # type: ignore[arg-type]
 
     def add_plane(
-        self, delta: npt.NDArray[typing.Any], zsrc: float, wlens: float = 1.0
+        self,
+        delta: npt.NDArray[np.float64],
+        zsrc: float,
+        wlens: float = 1.0,
     ) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
         if zsrc <= self.z3:
@@ -348,12 +351,12 @@ class MultiPlaneConvergence:
         return self.z3
 
     @property
-    def kappa(self) -> npt.NDArray[typing.Any] | None:
+    def kappa(self) -> npt.NDArray[np.float64] | None:
         """The current convergence plane."""
         return self.kappa3
 
     @property
-    def delta(self) -> npt.NDArray[typing.Any]:
+    def delta(self) -> npt.NDArray[np.float64]:
         """The current matter plane."""
         return self.delta3
 
@@ -366,7 +369,7 @@ class MultiPlaneConvergence:
 def multi_plane_matrix(
     shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
-) -> npt.ArrayLike:
+) -> npt.NDArray[np.float64]:
     """Compute the matrix of lensing contributions from each shell."""
     mpc = MultiPlaneConvergence(cosmo)
     wmat = np.eye(len(shells))
@@ -377,10 +380,10 @@ def multi_plane_matrix(
 
 
 def multi_plane_weights(
-    weights: npt.ArrayLike,
+    weights: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
-) -> npt.ArrayLike:
+) -> npt.NDArray[np.float64]:
     """
     Compute effective weights for multi-plane convergence.
 
@@ -413,12 +416,17 @@ def multi_plane_weights(
     weights = weights / np.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
-    return np.matmul(mat.T, weights)  # type: ignore[no-any-return, union-attr]
+    return np.matmul(mat.T, weights)  # type: ignore[no-any-return]
 
 
 def deflect(
-    lon: npt.ArrayLike, lat: npt.ArrayLike, alpha: npt.ArrayLike
-) -> npt.NDArray[typing.Any]:
+    lon: float | npt.NDArray[np.float64],
+    lat: float | npt.NDArray[np.float64],
+    alpha: complex | list[float] | npt.NDArray[np.complex128] | npt.NDArray[np.float64],
+) -> tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+]:
     r"""
     Apply deflections to positions.
 
@@ -472,4 +480,4 @@ def deflect(
 
     d = np.arctan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - np.degrees(d), np.degrees(tp)  # type: ignore[return-value]
+    return lon - np.degrees(d), np.degrees(tp)
