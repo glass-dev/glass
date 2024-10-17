@@ -296,7 +296,7 @@ def gaussian_phz(
 
 
 def kappa_ia_nla(  # noqa: PLR0913
-    delta: npt.NDArray[typing.Any],
+    delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
     cosmo: Cosmology,
@@ -306,7 +306,7 @@ def kappa_ia_nla(  # noqa: PLR0913
     lbar: float = 0.0,
     l0: float = 1e-9,
     beta: float = 0.0,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Effective convergence from intrinsic alignments using the NLA model.
 

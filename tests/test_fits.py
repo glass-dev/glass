@@ -1,5 +1,4 @@
 import importlib.util
-import os
 import pathlib
 
 import numpy as np
@@ -28,15 +27,15 @@ filename = "MyFile.Fits"
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_basic_write(tmp_path: os.PathLike[str]) -> None:
+def test_basic_write(tmp_path: pathlib.Path) -> None:
     import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
     with (
-        user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,  # type: ignore[operator]
-        fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits,  # type: ignore[operator]
+        user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
+        fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits,
     ):
         for i in range(my_max):
             array = np.arange(i, i + 1, delta)  # array of size 1/delta
@@ -47,8 +46,8 @@ def test_basic_write(tmp_path: os.PathLike[str]) -> None:
             _test_append(my_fits, arrays, names)
 
     with (
-        fitsio.FITS(tmp_path / filename_gfits) as g_fits,  # type: ignore[operator]
-        fitsio.FITS(tmp_path / filename_tfits) as t_fits,  # type: ignore[operator]
+        fitsio.FITS(tmp_path / filename_gfits) as g_fits,
+        fitsio.FITS(tmp_path / filename_tfits) as t_fits,
     ):
         glass_data = g_fits[1].read()
         test_data = t_fits[1].read()
@@ -59,7 +58,7 @@ def test_basic_write(tmp_path: os.PathLike[str]) -> None:
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_write_exception(tmp_path: pathlib.Path) -> None:
     try:
-        with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:  # type: ignore[arg-type]
+        with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"

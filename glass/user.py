@@ -27,6 +27,7 @@ import numpy.typing as npt
 
 if typing.TYPE_CHECKING:
     import collections.abc
+    import pathlib
 
 
 def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
@@ -106,7 +107,7 @@ class _FitsWriter:
 
 @contextmanager
 def write_catalog(
-    filename: str,
+    filename: pathlib.Path,
     *,
     ext: str | None = None,
 ) -> collections.abc.Generator[_FitsWriter]:
