@@ -178,8 +178,8 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
 
 def ellipticity_gaussian(
-    count: int | npt.NDArray[np.float64],
-    sigma: npt.NDArray[np.float64],
+    count: int | list[int] | npt.NDArray[np.int_],
+    sigma: float | list[float] | npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.complex128]:

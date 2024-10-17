@@ -92,13 +92,13 @@ def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
 def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     n = 1_000_000
 
-    eps = ellipticity_gaussian(n, 0.256)  # type: ignore[arg-type]
+    eps = ellipticity_gaussian(n, 0.256)
 
     assert eps.shape == (n,)
 
     # test with rng
 
-    eps = ellipticity_gaussian(n, 0.256, rng=rng)  # type: ignore[arg-type]
+    eps = ellipticity_gaussian(n, 0.256, rng=rng)
 
     assert eps.shape == (n,)
 
@@ -107,7 +107,7 @@ def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-2, rtol=0)
 
-    eps = ellipticity_gaussian([n, n], [0.128, 0.256])  # type: ignore[arg-type]
+    eps = ellipticity_gaussian([n, n], [0.128, 0.256])
 
     assert eps.shape == (2 * n,)
 
