@@ -174,13 +174,13 @@ def test_cumtrapz() -> None:
 
     # explicit dtype (float)
 
-    glass_ct = cumtrapz(f, x, dtype=float)  # type: ignore[arg-type]
+    glass_ct = cumtrapz(f, x, dtype=float)
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
-    result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))  # type: ignore[arg-type]
+    result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(result, scipy_ct)
 
@@ -196,12 +196,12 @@ def test_cumtrapz() -> None:
 
     # explicit dtype (float)
 
-    glass_ct = cumtrapz(f, x, dtype=float)  # type: ignore[arg-type]
+    glass_ct = cumtrapz(f, x, dtype=float)
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
-    glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))  # type: ignore[arg-type]
+    glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
     scipy_ct = cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(glass_ct, scipy_ct)

@@ -131,7 +131,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[arg-type, call-overload]
+        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[call-overload]
         cdf /= cdf[-1]
 
         # sample redshifts and store result

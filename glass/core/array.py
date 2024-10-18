@@ -109,7 +109,7 @@ def trapz_product(
 def cumtrapz(
     f: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     x: npt.NDArray[np.int_] | npt.NDArray[np.float64],
-    dtype: np.dtype[np.float64] | None = None,
+    dtype: type | None = None,
     out: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     """Cumulative trapezoidal rule along last axis."""
