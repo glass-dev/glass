@@ -1,11 +1,12 @@
 import numpy as np
 import numpy.typing as npt
 import pytest
+import pytest_mock
 
 from glass.galaxies import galaxy_shear, gaussian_phz, redshifts, redshifts_from_nz
 
 
-def test_redshifts(mocker) -> None:  # type: ignore[no-untyped-def]
+def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
