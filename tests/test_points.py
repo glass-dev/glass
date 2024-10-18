@@ -90,12 +90,16 @@ def test_loglinear_bias(rng: np.random.Generator) -> None:
 
 
 def test_positions_from_delta(rng):  # type: ignore[no-untyped-def]  # noqa: PLR0915
+    # create maps that saturate the batching in the function
+    nside = 128
+    npix = 12 * nside**2
+
     # case: single-dimensional input
 
     ngal = 1e-3
-    delta = np.zeros(12)
+    delta = np.zeros(npix)
     bias = 0.8
-    vis = np.ones(12)
+    vis = np.ones(npix)
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))  # type: ignore[no-untyped-call]
 
@@ -109,9 +113,11 @@ def test_positions_from_delta(rng):  # type: ignore[no-untyped-def]  # noqa: PLR
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
 
-    # case: Nons bias
+    # case: Nons bias and callable bias model
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, None, vis))  # type: ignore[no-untyped-call]
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x)  # type: ignore[no-untyped-call]
+    )
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -135,7 +141,7 @@ def test_positions_from_delta(rng):  # type: ignore[no-untyped-def]  # noqa: PLR
     # case: negative delta
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, np.linspace(-1, -1, 12), None, vis)  # type: ignore[no-untyped-call]
+        positions_from_delta(ngal, np.linspace(-1, -1, 196608), None, vis)  # type: ignore[no-untyped-call]
     )
 
     assert isinstance(cnt, int)
@@ -144,7 +150,7 @@ def test_positions_from_delta(rng):  # type: ignore[no-untyped-def]  # noqa: PLR
     # case: large delta
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, rng.normal(100, 1, size=(12,)), bias, vis)  # type: ignore[no-untyped-call]
+        positions_from_delta(ngal, rng.normal(100, 1, size=(196608,)), bias, vis)  # type: ignore[no-untyped-call]
     )
 
     assert isinstance(cnt, int)
@@ -182,6 +188,16 @@ def test_positions_from_delta(rng):  # type: ignore[no-untyped-def]  # noqa: PLR
     delta = np.zeros((3, 1, 12))
     bias = 0.8
     vis = np.ones(12)
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))  # type: ignore[no-untyped-call]
+
+    assert cnt.shape == (3, 2)
+    assert lon.shape == (cnt.sum(),)
+    assert lat.shape == (cnt.sum(),)
+
+    # case: only the southern hemisphere is visible
+
+    vis[: vis.size // 2] = 0.0
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))  # type: ignore[no-untyped-call]
 
