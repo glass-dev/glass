@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import typing
+
 import healpix
 import numpy as np
 import numpy.typing as npt
@@ -12,6 +16,9 @@ from glass.lensing import (
     multi_plane_weights,
 )
 from glass.shells import RadialWindow
+
+if typing.TYPE_CHECKING:
+    from cosmology import Cosmology
 
 
 @pytest.fixture
@@ -35,7 +42,9 @@ def cosmo() -> Cosmology:
         def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
-        def xm(self, z, z2=None):  # type: ignore[no-untyped-def]
+        def xm(
+            self, z: npt.NDArray[np.float64], z2: npt.NDArray[np.float64] | None = None
+        ) -> npt.NDArray[np.float64]:
             if z2 is None:
                 return np.array(z) * 1000
             return (np.array(z2) - np.array(z)) * 1000
