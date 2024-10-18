@@ -65,9 +65,7 @@ def examples(session: nox.Session) -> None:
         else:
             print("Unsupported argument to examples")
     else:
-        session.run(
-            "jupyter", "execute", *Path().glob("examples/**/*.ipynb"), *session.posargs
-        )
+        session.run("jupyter", "execute", *Path().glob("examples/**/*.ipynb"))
 
 
 @nox.session
