@@ -1,10 +1,12 @@
 import numpy as np
+import numpy.typing as npt
 import pytest
+import pytest_mock
 
 from glass.galaxies import galaxy_shear, gaussian_phz, redshifts, redshifts_from_nz
 
 
-def test_redshifts(mocker):  # type: ignore[no-untyped-def]
+def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = np.linspace(0.0, 1.0, 20)
@@ -39,7 +41,11 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test with rng
 
     redshifts = redshifts_from_nz(
-        10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False, rng=rng
+        10,
+        [0, 1, 2, 3, 4],
+        [0, 0, 1, 1, 1],
+        warn=False,
+        rng=rng,
     )
     assert not np.any(redshifts <= 1)
 
@@ -47,9 +53,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: no extra dimensions
 
-    count = 10
+    count: int | list[int] | list[list[int]] = 10
     z = np.linspace(0, 1, 100)
-    nz = z * (1 - z)
+    nz: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]] = z * (1 - z)
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -58,7 +64,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count
 
-    count = [10, 20, 30]  # type: ignore[assignment]
+    count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -70,7 +76,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -78,9 +84,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count and nz
 
-    count = [[10], [20], [30]]  # type: ignore[assignment]
+    count = [[10], [20], [30]]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -88,9 +94,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: incompatible input shapes
 
-    count = [10, 20, 30]  # type: ignore[assignment]
+    count = [10, 20, 30]
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]  # type: ignore[assignment]
+    nz = [z * (1 - z), (z - 0.5) ** 2]
 
     with pytest.raises(ValueError, match="shape mismatch"):
         redshifts_from_nz(count, z, nz, warn=False)
@@ -99,7 +105,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
         redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
 
 
-def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
+def test_galaxy_shear(rng: np.random.Generator) -> None:
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
@@ -108,7 +114,7 @@ def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
         rng.normal(size=(12,)),
     )
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)  # type: ignore[arg-type]
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
@@ -121,7 +127,7 @@ def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
 
     # shape with no reduced shear
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)  # type: ignore[arg-type]
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
@@ -130,7 +136,13 @@ def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
         rng.normal(size=(512,)),
     )
     shear = galaxy_shear(
-        gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2, reduced_shear=False
+        gal_lon,
+        gal_lat,
+        gal_eps,
+        kappa,
+        gamma1,
+        gamma2,
+        reduced_shear=False,
     )
     assert np.shape(shear) == (512,)
 
@@ -140,8 +152,8 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # case: zero variance
 
-    z = np.linspace(0, 1, 100)
-    sigma_0 = 0.0
+    z: float | npt.NDArray[np.float64] = np.linspace(0, 1, 100)
+    sigma_0: float | npt.NDArray[np.float64] = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -155,8 +167,8 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # case: truncated normal
 
-    z = 0.0  # type: ignore[assignment]
-    sigma_0 = np.ones(100)  # type: ignore[assignment]
+    z = 0.0
+    sigma_0 = np.ones(100)
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -165,8 +177,8 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # case: upper and lower bound
 
-    z = 1.0  # type: ignore[assignment]
-    sigma_0 = np.ones(100)  # type: ignore[assignment]
+    z = 1.0
+    sigma_0 = np.ones(100)
 
     phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
 
@@ -178,7 +190,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # case: scalar redshift, scalar sigma_0
 
-    z = 1.0  # type: ignore[assignment]
+    z = 1.0
     sigma_0 = 0.0
 
     phz = gaussian_phz(z, sigma_0)
@@ -198,8 +210,8 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # case: scalar redshift, array sigma_0
 
-    z = 1.0  # type: ignore[assignment]
-    sigma_0 = np.zeros(10)  # type: ignore[assignment]
+    z = 1.0
+    sigma_0 = np.zeros(10)
 
     phz = gaussian_phz(z, sigma_0)
 
@@ -209,7 +221,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     # case: array redshift, array sigma_0
 
     z = np.linspace(0, 1, 10)
-    sigma_0 = np.zeros((11, 1))  # type: ignore[assignment]
+    sigma_0 = np.zeros((11, 1))
 
     phz = gaussian_phz(z, sigma_0)
 

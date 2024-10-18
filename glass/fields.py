@@ -26,7 +26,6 @@ Utility functions
 
 from __future__ import annotations
 
-import collections.abc
 import typing
 import warnings
 
@@ -35,23 +34,17 @@ import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
 
-# types
-Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
-Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
-ClTransform = typing.Union[
-    str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]
-]
-Cls = collections.abc.Sequence[
-    typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
-]
-Alms = npt.NDArray[typing.Any]
+if typing.TYPE_CHECKING:
+    import collections.abc
 
 
 def iternorm(
     k: int,
-    cov: collections.abc.Iterable[npt.NDArray[typing.Any]],
-    size: Size = None,
-) -> collections.abc.Generator[Iternorm, None, None]:
+    cov: collections.abc.Iterable[npt.NDArray[np.float64]],
+    size: int | tuple[int, ...] | None = None,
+) -> collections.abc.Generator[
+    tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
+]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
     n: tuple[int, ...]
     if size is None:
@@ -110,8 +103,11 @@ def iternorm(
 
 
 def cls2cov(
-    cls: Cls, nl: int, nf: int, nc: int
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+    cls: list[list[float] | npt.NDArray[np.float64]],
+    nl: int,
+    nf: int,
+    nc: int,
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
     end = 0
@@ -131,7 +127,12 @@ def cls2cov(
         yield cov
 
 
-def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) -> Alms:
+def multalm(
+    alm: npt.NDArray[np.complex128],
+    bl: npt.NDArray[np.float64],
+    *,
+    inplace: bool = False,
+) -> npt.NDArray[np.complex128]:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
@@ -140,16 +141,21 @@ def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) ->
     return out
 
 
-def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ()) -> Cls:
+def transform_cls(
+    cls: list[list[float] | npt.NDArray[np.float64]],
+    tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
+    pars: tuple[typing.Any, ...] = (),
+) -> list[list[float] | npt.NDArray[np.float64]]:
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if len(cl) > 0:
             monopole = 0.0 if cl[0] == 0 else None
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
                 warnings.warn(
-                    "Gaussian cl did not converge, inexact transform", stacklevel=2
+                    "Gaussian cl did not converge, inexact transform",
+                    stacklevel=2,
                 )
         else:
             gl = []
@@ -158,12 +164,12 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ())
 
 
 def discretized_cls(
-    cls: Cls,
+    cls: list[list[float] | npt.NDArray[np.float64]],
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> Cls:
+) -> list[list[float] | npt.NDArray[np.float64]]:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -189,7 +195,7 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if cl and len(cl) > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -200,20 +206,20 @@ def discretized_cls(
 
 
 def lognormal_gls(
-    cls: Cls,
+    cls: list[list[float] | npt.NDArray[np.float64]],
     shift: float = 1.0,
-) -> Cls:
+) -> list[list[float] | npt.NDArray[np.float64]]:
     """Compute Gaussian Cls for a lognormal random field."""
     return transform_cls(cls, "lognormal", (shift,))
 
 
 def generate_gaussian(
-    gls: Cls,
+    gls: list[list[float] | npt.NDArray[np.float64]],
     nside: int,
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -250,7 +256,7 @@ def generate_gaussian(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[redundant-expr]
+    n = max((len(gl) for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -293,13 +299,13 @@ def generate_gaussian(
 
 
 def generate_lognormal(
-    gls: Cls,
+    gls: list[list[float] | npt.NDArray[np.float64]],
     nside: int,
     shift: float = 1.0,
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
@@ -321,7 +327,12 @@ def generate_lognormal(
         yield m
 
 
-def getcl(cls, i, j, lmax=None):  # type: ignore[no-untyped-def]
+def getcl(
+    cls: list[npt.NDArray[np.float64]],
+    i: int,
+    j: int,
+    lmax: int | None = None,
+) -> npt.NDArray[np.float64]:
     """
     Return a specific angular power spectrum from an array.
 
@@ -351,8 +362,12 @@ def getcl(cls, i, j, lmax=None):  # type: ignore[no-untyped-def]
     return cl
 
 
-def effective_cls(  # type: ignore[no-untyped-def]
-    cls, weights1, weights2=None, *, lmax=None
+def effective_cls(
+    cls: list[npt.NDArray[np.float64]],
+    weights1: npt.NDArray[np.float64],
+    weights2: npt.NDArray[np.float64] | None = None,
+    *,
+    lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Compute effective angular power spectra from weights.
@@ -418,7 +433,7 @@ def effective_cls(  # type: ignore[no-untyped-def]
     for j1, j2 in pairs:
         w1, w2 = weights1[c + j1], weights2[c + j2]
         cl = sum(
-            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)  # type: ignore[no-untyped-call]
+            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
             for i1, i2 in np.ndindex(n, n)
         )
         out[j1 + j2] = cl
