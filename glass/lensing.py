@@ -169,7 +169,7 @@ def from_convergence(  # noqa: PLR0913
     l = np.arange(lmax + 1)  # noqa: E741
 
     # this tuple will be returned
-    results = ()
+    results: tuple[npt.NDArray[np.float64], ...] = ()
 
     # convert convergence to potential
     fl = np.divide(-2, l * (l + 1), where=(l > 0), out=np.zeros(lmax + 1))
@@ -178,7 +178,7 @@ def from_convergence(  # noqa: PLR0913
     # if potential is requested, compute map and add to output
     if potential:
         psi = hp.alm2map(alm, nside, lmax=lmax)
-        results += (psi,)  # type: ignore[assignment]
+        results += (psi,)
 
     # if no spin-weighted maps are requested, stop here
     if not (deflection or shear):
@@ -197,7 +197,7 @@ def from_convergence(  # noqa: PLR0913
     if deflection:
         alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
         alpha = alpha[0] + 1j * alpha[1]
-        results += (alpha,)  # type: ignore[assignment]
+        results += (alpha,)
 
     # if no shear is requested, stop here
     if not shear:
@@ -215,7 +215,7 @@ def from_convergence(  # noqa: PLR0913
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
     gamma = gamma[0] + 1j * gamma[1]
-    results += (gamma,)  # type: ignore[assignment]
+    results += (gamma,)
 
     # all done
     return results
