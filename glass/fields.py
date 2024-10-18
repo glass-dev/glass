@@ -26,7 +26,6 @@ Utility functions
 
 from __future__ import annotations
 
-import collections.abc
 import typing
 import warnings
 
@@ -35,24 +34,17 @@ import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
 
-# types
-Size = typing.Union[int, tuple[int, ...]]
-Iternorm = tuple[typing.Optional[int], npt.NDArray[np.float64], npt.NDArray[np.float64]]
-ClTransform = typing.Union[
-    str,
-    typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
-]
-Cls = collections.abc.Sequence[
-    typing.Union[npt.NDArray[np.float64], collections.abc.Sequence[float]]
-]
-Alms = npt.NDArray[np.complex128]
+if typing.TYPE_CHECKING:
+    import collections.abc
 
 
 def iternorm(
     k: int,
     cov: collections.abc.Iterable[npt.NDArray[np.float64]],
-    size: Size | None = None,
-) -> collections.abc.Generator[Iternorm]:
+    size: int | tuple[int, ...] | None = None,
+) -> collections.abc.Generator[
+    tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
+]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
     n: tuple[int, ...]
     if size is None:
@@ -111,7 +103,9 @@ def iternorm(
 
 
 def cls2cov(
-    cls: Cls,
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nl: int,
     nf: int,
     nc: int,
@@ -135,7 +129,12 @@ def cls2cov(
         yield cov
 
 
-def multalm(alm: Alms, bl: npt.NDArray[np.float64], *, inplace: bool = False) -> Alms:
+def multalm(
+    alm: npt.NDArray[np.complex128],
+    bl: npt.NDArray[np.float64],
+    *,
+    inplace: bool = False,
+) -> npt.NDArray[np.complex128]:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
@@ -144,7 +143,15 @@ def multalm(alm: Alms, bl: npt.NDArray[np.float64], *, inplace: bool = False) ->
     return out
 
 
-def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ()) -> Cls:
+def transform_cls(
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
+    tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
+    pars: tuple[typing.Any, ...] = (),
+) -> collections.abc.Sequence[
+    npt.NDArray[np.float64] | collections.abc.Sequence[float]
+]:
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
@@ -163,12 +170,16 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ())
 
 
 def discretized_cls(
-    cls: Cls,
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> Cls:
+) -> collections.abc.Sequence[
+    npt.NDArray[np.float64] | collections.abc.Sequence[float]
+]:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -205,15 +216,21 @@ def discretized_cls(
 
 
 def lognormal_gls(
-    cls: Cls,
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     shift: float = 1.0,
-) -> Cls:
+) -> collections.abc.Sequence[
+    npt.NDArray[np.float64] | collections.abc.Sequence[float]
+]:
     """Compute Gaussian Cls for a lognormal random field."""
     return transform_cls(cls, "lognormal", (shift,))
 
 
 def generate_gaussian(
-    gls: Cls,
+    gls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nside: int,
     *,
     ncorr: int | None = None,
@@ -298,7 +315,9 @@ def generate_gaussian(
 
 
 def generate_lognormal(
-    gls: Cls,
+    gls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nside: int,
     shift: float = 1.0,
     *,

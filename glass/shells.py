@@ -44,7 +44,6 @@ Weight functions
 
 from __future__ import annotations
 
-import collections.abc
 import typing
 import warnings
 
@@ -54,11 +53,9 @@ import numpy.typing as npt
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
-    from cosmology import Cosmology
+    import collections.abc
 
-# types
-ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
-WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
+    from cosmology import Cosmology
 
 
 def distance_weight(
@@ -140,9 +137,13 @@ class RadialWindow(typing.NamedTuple):
 
 
 def tophat_windows(
-    zbins: ArrayLike1D,
+    zbins: collections.abc.Sequence[float] | npt.NDArray[np.float64],
     dz: float = 1e-3,
-    weight: WeightFunc | None = None,
+    weight: typing.Callable[
+        [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+        npt.NDArray[np.float64],
+    ]
+    | None = None,
 ) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.
@@ -183,7 +184,13 @@ def tophat_windows(
             stacklevel=2,
         )
 
-    wht: WeightFunc | npt.NDArray[np.float64]
+    wht: (
+        typing.Callable[
+            [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+            npt.NDArray[np.float64],
+        ]
+        | npt.NDArray[np.float64]
+    )
     wht = weight if weight is not None else np.ones_like
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
@@ -196,9 +203,13 @@ def tophat_windows(
 
 
 def linear_windows(
-    zgrid: ArrayLike1D,
+    zgrid: collections.abc.Sequence[float] | npt.NDArray[np.float64],
     dz: float = 1e-3,
-    weight: WeightFunc | None = None,
+    weight: typing.Callable[
+        [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+        npt.NDArray[np.float64],
+    ]
+    | None = None,
 ) -> list[RadialWindow]:
     """
     Linear interpolation window functions.
@@ -253,9 +264,13 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: ArrayLike1D,
+    zgrid: collections.abc.Sequence[float] | npt.NDArray[np.float64],
     dz: float = 1e-3,
-    weight: WeightFunc | None = None,
+    weight: typing.Callable[
+        [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+        npt.NDArray[np.float64],
+    ]
+    | None = None,
 ) -> list[RadialWindow]:
     """
     Cubic interpolation window functions.
@@ -311,8 +326,8 @@ def cubic_windows(
 
 
 def restrict(
-    z: ArrayLike1D,
-    f: ArrayLike1D,
+    z: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    f: collections.abc.Sequence[float] | npt.NDArray[np.float64],
     w: RadialWindow,
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
