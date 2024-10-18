@@ -90,7 +90,13 @@ def ndinterp(  # noqa: PLR0913
 
 def trapz_product(
     f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
-    *ff: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
+    *ff: tuple[
+        list[float] | npt.NDArray[np.float64],
+        list[int]
+        | list[float]
+        | npt.NDArray[np.float64]
+        | list[npt.NDArray[np.float64]],
+    ],
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:
     """Trapezoidal rule for a product of functions."""
