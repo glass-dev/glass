@@ -275,8 +275,8 @@ class MultiPlaneConvergence:
         self.cosmo = cosmo
 
         # set up initial values of variables
-        self.z2: float = 0.0
-        self.z3: float = 0.0
+        self.z2: float | None = 0.0
+        self.z3: float | None = 0.0
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
@@ -295,16 +295,16 @@ class MultiPlaneConvergence:
         zsrc = w.zeff
         lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[arg-type, attr-defined]
 
-        self.add_plane(delta, zsrc, lens_weight)  # type: ignore[arg-type]
+        self.add_plane(delta, zsrc, lens_weight)
 
     def add_plane(
         self,
         delta: npt.NDArray[np.float64],
-        zsrc: float,
+        zsrc: float | None,
         wlens: float = 1.0,
     ) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
-        if zsrc <= self.z3:
+        if zsrc <= self.z3:  # type: ignore[operator]
             msg = "source redshift must be increasing"
             raise ValueError(msg)
 
@@ -326,7 +326,7 @@ class MultiPlaneConvergence:
         # lensing weight of mass plane to be added
         f = 3 * self.cosmo.omega_m / 2
         f *= x2 * self.r23
-        f *= (1 + self.z2) / self.cosmo.ef(self.z2)
+        f *= (1 + self.z2) / self.cosmo.ef(self.z2)  # type: ignore[operator]
         f *= w2
 
         # create kappa planes on first iteration
@@ -346,7 +346,7 @@ class MultiPlaneConvergence:
         self.kappa3 += f * delta2
 
     @property
-    def zsrc(self) -> float:
+    def zsrc(self) -> float | None:
         """The redshift of the current convergence plane."""
         return self.z3
 
