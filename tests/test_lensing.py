@@ -1,5 +1,6 @@
 import healpix
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from cosmology import Cosmology
@@ -31,7 +32,7 @@ def cosmo() -> Cosmology:
         def omega_m(self) -> float:
             return 0.3
 
-        def ef(self, z):  # type: ignore[no-untyped-def]
+        def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
         def xm(self, z, z2=None):  # type: ignore[no-untyped-def]
