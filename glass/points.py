@@ -194,7 +194,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs += [(bias, 0)]
     if vis is not None:
         inputs += [(vis, 1)]
-    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type, assignment]
+    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)  # type: ignore[assignment]
     if bias is not None:
         bias, *rest = rest  # type: ignore[assignment]
     if vis is not None:

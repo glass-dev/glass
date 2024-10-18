@@ -49,7 +49,7 @@ def test_broadcast_leading_axes() -> None:
     b = np.zeros((4, 10))
     c = np.zeros((3, 1, 5, 6))
 
-    dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[arg-type, assignment]
+    dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[assignment]
 
     assert dims == (3, 4)
     assert a.shape == (3, 4)  # type: ignore[attr-defined]

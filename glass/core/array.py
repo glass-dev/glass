@@ -18,7 +18,16 @@ def broadcast_first(
 
 
 def broadcast_leading_axes(
-    *args: tuple[npt.NDArray[np.float64], int],
+    *args: tuple[
+        int
+        | float
+        | npt.NDArray[np.float64]
+        | list[int]
+        | list[float]
+        | list[npt.NDArray[np.float64]]
+        | list[list[int]],
+        int,
+    ],
 ) -> tuple[tuple[int, ...], ...]:
     """
     Broadcast all but the last N axes.
