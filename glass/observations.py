@@ -50,6 +50,8 @@ def vmap_galactic_ecliptic(
     the galactic and ecliptic planes. The location of the stripes is set with
     optional parameters.
 
+    Returns a HEALPix :term:`visibility map`.
+
     Parameters
     ----------
     nside:
@@ -58,11 +60,6 @@ def vmap_galactic_ecliptic(
         The location of the galactic plane in the respective coordinate system.
     ecliptic:
         The location of the ecliptic plane in the respective coordinate system.
-
-    Returns
-    -------
-    vis:
-        A HEALPix :term:`visibility map`.
 
     Raises
     ------
@@ -100,6 +97,8 @@ def gaussian_nz(
     If ``mean`` or ``sigma`` are array_like, their axes will be the leading
     axes of the redshift distribution.
 
+    Returns the redshift distribution at the given ``z`` values.
+
     Parameters
     ----------
     z:
@@ -110,11 +109,6 @@ def gaussian_nz(
         Standard deviation(s) of the redshift distribution.
     norm:
         If given, the normalisation of the distribution.
-
-    Returns
-    -------
-    nz:
-        Redshift distribution at the given ``z`` values.
 
     """
     mean = np.reshape(mean, np.shape(mean) + (1,) * np.ndim(z))
@@ -142,6 +136,8 @@ def smail_nz(
 
     The redshift follows the Smail et al. [1] redshift distribution.
 
+    Returns the redshift distribution at the given ``z`` values.
+
     Parameters
     ----------
     z:
@@ -154,11 +150,6 @@ def smail_nz(
         Log-power law exponent exp[-(z/z0)^\beta], must be positive.
     norm:
         If given, the normalisation of the distribution.
-
-    Returns
-    -------
-    pz:
-        Redshift distribution at the given ``z`` values.
 
     Notes
     -----
@@ -204,6 +195,8 @@ def fixed_zbins(
     This function creates contiguous tomographic redshift bins of fixed size.
     It takes either the number or size of the bins.
 
+    Returns a list of redshift bin edges.
+
     Parameters
     ----------
     zmin:
@@ -214,11 +207,6 @@ def fixed_zbins(
         Number of redshift bins. Only one of ``nbins`` and ``dz`` can be given.
     dz:
         Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
-
-    Returns
-    -------
-    zbins:
-        List of redshift bin edges.
 
     """
     if nbins is not None and dz is None:
@@ -243,6 +231,8 @@ def equal_dens_zbins(
     This function subdivides a source redshift distribution into ``nbins``
     tomographic redshift bins with equal density.
 
+    Returns a list of redshift bin edges.
+
     Parameters
     ----------
     z:
@@ -251,11 +241,6 @@ def equal_dens_zbins(
         The source redshift distribution. Must be one-dimensional.
     nbins:
         Number of redshift bins.
-
-    Returns
-    -------
-    zbins:
-        List of redshift bin edges.
 
     """
     # compute the normalised cumulative distribution function
@@ -285,6 +270,9 @@ def tomo_nz_gausserr(
     standard deviation of the Gaussian depends on redshift and is given by
     ``sigma(z) = sigma_0*(1 + z)``.
 
+    Returns the tomographic redshift bins convolved with a gaussian error.
+    Array has a shape (nbins, len(z))
+
     Parameters
     ----------
     z:
@@ -295,12 +283,6 @@ def tomo_nz_gausserr(
         Redshift error in the tomographic binning at zero redshift.
     zbins:
         List of redshift bin edges.
-
-    Returns
-    -------
-    binned_nz:
-        Tomographic redshift bins convolved with a gaussian error.
-        Array has a shape (nbins, len(z))
 
     See Also
     --------
