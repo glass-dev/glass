@@ -2,6 +2,7 @@ import importlib.util
 import pathlib
 
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from glass import user
@@ -22,7 +23,9 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
-    def _test_append(fits: fitsio.FITS, data, names) -> None:  # type: ignore[no-untyped-def]
+    def _test_append(
+        fits: fitsio.FITS, data: list[npt.NDArray[np.float64]], names: list[str]
+    ) -> None:
         """Write routine for FITS test cases."""
         cat_name = "CATALOG"
         if cat_name not in fits:
