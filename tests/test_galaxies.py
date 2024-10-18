@@ -113,7 +113,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         rng.normal(size=(12,)),
     )
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)  # type: ignore[arg-type]
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2)
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
@@ -126,7 +126,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
 
     # shape with no reduced shear
 
-    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)  # type: ignore[arg-type]
+    shear = galaxy_shear([], [], [], kappa, gamma1, gamma2, reduced_shear=False)
     np.testing.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
