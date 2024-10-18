@@ -9,17 +9,6 @@ from glass import user
 # check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
-
-def _test_append(fits, data, names) -> None:  # type: ignore[no-untyped-def]
-    """Write routine for FITS test cases."""
-    cat_name = "CATALOG"
-    if cat_name not in fits:
-        fits.write_table(data, names=names, extname=cat_name)
-    else:
-        hdu = fits[cat_name]
-        hdu.write(data, names=names, firstrow=hdu.get_nrows())
-
-
 delta = 0.001  # Number of points in arrays
 my_max = 1000  # Typically number of galaxies in loop
 except_int = 750  # Where test exception occurs in loop
@@ -32,6 +21,15 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
 
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
+
+    def _test_append(fits: fitsio.FITS, data, names) -> None:  # type: ignore[no-untyped-def]
+        """Write routine for FITS test cases."""
+        cat_name = "CATALOG"
+        if cat_name not in fits:
+            fits.write_table(data, names=names, extname=cat_name)
+        else:
+            hdu = fits[cat_name]
+            hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
     with (
         user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
