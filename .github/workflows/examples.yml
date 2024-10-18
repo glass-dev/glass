@@ -45,3 +45,9 @@ jobs:
         run: pip install nox
       - name: Run examples
         run: nox -s examples
+      - name: Generate HTML
+        run: nox -s examples -- html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Examples
+          path: examples/**/*.html
