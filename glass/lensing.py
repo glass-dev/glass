@@ -38,8 +38,6 @@ import numpy as np
 import numpy.typing as npt
 
 if typing.TYPE_CHECKING:
-    import collections.abc
-
     from cosmology import Cosmology
 
     from glass.shells import RadialWindow
@@ -367,7 +365,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """Compute the matrix of lensing contributions from each shell."""
@@ -381,7 +379,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """

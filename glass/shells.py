@@ -53,8 +53,6 @@ import numpy.typing as npt
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
-    import collections.abc
-
     from cosmology import Cosmology
 
 
@@ -137,10 +135,10 @@ class RadialWindow(typing.NamedTuple):
 
 
 def tophat_windows(
-    zbins: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    zbins: list[float] | npt.NDArray[np.float64],
     dz: float = 1e-3,
     weight: typing.Callable[
-        [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+        [list[float] | npt.NDArray[np.float64]],
         npt.NDArray[np.float64],
     ]
     | None = None,
@@ -186,7 +184,7 @@ def tophat_windows(
 
     wht: (
         typing.Callable[
-            [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+            [list[float] | npt.NDArray[np.float64]],
             npt.NDArray[np.float64],
         ]
         | npt.NDArray[np.float64]
@@ -203,10 +201,10 @@ def tophat_windows(
 
 
 def linear_windows(
-    zgrid: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    zgrid: list[float] | npt.NDArray[np.float64],
     dz: float = 1e-3,
     weight: typing.Callable[
-        [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+        [list[float] | npt.NDArray[np.float64]],
         npt.NDArray[np.float64],
     ]
     | None = None,
@@ -264,10 +262,10 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    zgrid: list[float] | npt.NDArray[np.float64],
     dz: float = 1e-3,
     weight: typing.Callable[
-        [collections.abc.Sequence[float] | npt.NDArray[np.float64]],
+        [list[float] | npt.NDArray[np.float64]],
         npt.NDArray[np.float64],
     ]
     | None = None,
@@ -326,8 +324,8 @@ def cubic_windows(
 
 
 def restrict(
-    z: collections.abc.Sequence[float] | npt.NDArray[np.float64],
-    f: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    z: list[float] | npt.NDArray[np.float64],
+    f: list[float] | npt.NDArray[np.float64],
     w: RadialWindow,
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
@@ -368,7 +366,7 @@ def restrict(
 def partition(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
     *,
     method: str = "nnls",
 ) -> npt.NDArray[np.float64]:
@@ -479,7 +477,7 @@ def partition(
 def partition_lstsq(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
@@ -527,7 +525,7 @@ def partition_lstsq(
 def partition_nnls(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
@@ -588,7 +586,7 @@ def partition_nnls(
 def partition_restrict(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
 ) -> npt.NDArray[np.float64]:
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
@@ -639,7 +637,7 @@ def distance_grid(
 def combine(
     z: npt.NDArray[np.float64],
     weights: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: list[RadialWindow],
 ) -> int:
     r"""
     Evaluate a linear combination of window functions.
