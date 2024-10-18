@@ -20,12 +20,12 @@ def catpos(
         ]
     ],
 ) -> tuple[
-    list[float] | npt.NDArray[np.float64],
-    list[float] | npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
     int | npt.NDArray[np.int_],
 ]:
-    lon: list[float] | npt.NDArray[np.float64] = []
-    lat: list[float] | npt.NDArray[np.float64] = []
+    lon = np.empty(0)
+    lat = np.empty(0)
     cnt: int | npt.NDArray[np.int_] = 0
     for lo, la, co in pos:
         lon = np.concatenate([lon, lo])
@@ -45,7 +45,7 @@ def test_positions_from_delta() -> None:
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)  # type: ignore[union-attr]
+    assert lon.shape == lat.shape == (cnt,)
 
     # case: multi-dimensional ngal
 
@@ -95,7 +95,7 @@ def test_uniform_positions() -> None:
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
     assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)  # type: ignore[union-attr]
+    assert lon.shape == lat.shape == (cnt,)
 
     # case: 1-D array input
 
