@@ -58,6 +58,7 @@ test = [
     "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
+    "pytest-rerunfailures",
     "scipy",
 ]
 
