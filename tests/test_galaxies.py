@@ -172,6 +172,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     phz = gaussian_phz(z, sigma_0)
 
+    assert isinstance(phz, np.ndarray)
     assert phz.shape == (100,)
     assert np.all(phz >= 0)
 
@@ -182,6 +183,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
 
+    assert isinstance(phz, np.ndarray)
     assert phz.shape == (100,)
     assert np.all(phz >= 0.5)
     assert np.all(phz <= 1.5)
@@ -205,6 +207,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     phz = gaussian_phz(z, sigma_0)
 
+    assert isinstance(phz, np.ndarray)
     assert phz.shape == (10,)
     np.testing.assert_array_equal(z, phz)
 
@@ -215,6 +218,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     phz = gaussian_phz(z, sigma_0)
 
+    assert isinstance(phz, np.ndarray)
     assert phz.shape == (10,)
     np.testing.assert_array_equal(z, phz)
 
@@ -225,15 +229,16 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     phz = gaussian_phz(z, sigma_0)
 
+    assert isinstance(phz, np.ndarray)
     assert phz.shape == (11, 10)
     np.testing.assert_array_equal(np.broadcast_to(z, (11, 10)), phz)
 
     # test resampling
 
     phz = gaussian_phz(np.array(0.0), np.array(1.0), lower=np.array([0]))
-    assert isinstance(phz, float)  # type: ignore[unreachable]
+    assert isinstance(phz, float)
 
-    phz = gaussian_phz(np.array(0.0), np.array(1.0), upper=np.array([1]))  # type: ignore[unreachable]
+    phz = gaussian_phz(np.array(0.0), np.array(1.0), upper=np.array([1]))
     assert isinstance(phz, float)
 
     # test error

@@ -221,7 +221,7 @@ def gaussian_phz(
     lower: float | npt.NDArray[np.float64] | None = None,
     upper: float | npt.NDArray[np.float64] | None = None,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[np.float64]:
+) -> float | npt.NDArray[np.float64]:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
