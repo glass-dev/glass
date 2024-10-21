@@ -273,7 +273,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | list[float] | list[list[float]],
+    ngal: float | npt.NDArray[np.int_] | list[float] | list[list[float]],
     *,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[
@@ -311,29 +311,29 @@ def uniform_positions(
         rng = np.random.default_rng()
 
     # sample number of galaxies
-    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))  # type: ignore[assignment]
+    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
 
     # extra dimensions of the output
     dims = np.shape(ngal)
 
     # make sure ntot is an array even if scalar
-    ngal = np.broadcast_to(ngal, dims)  # type: ignore[assignment]
+    ngal = np.broadcast_to(ngal, dims)
 
     # sample each set of points
     for k in np.ndindex(dims):
         # sample uniformly over the sphere
-        lon = rng.uniform(-180, 180, size=ngal[k])  # type: ignore[call-overload, index]
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))  # type: ignore[call-overload, index]
+        lon = rng.uniform(-180, 180, size=ngal[k])
+        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))
 
         # report count
         count: int | npt.NDArray[np.int_]
         if dims:
             count = np.zeros(dims, dtype=int)
-            count[k] = ngal[k]  # type: ignore[call-overload, index]
+            count[k] = ngal[k]
         else:
-            count = int(ngal[k])  # type: ignore[call-overload, index]
+            count = int(ngal[k])
 
-        yield lon, lat, count  # type: ignore[misc]
+        yield lon, lat, count
 
 
 def position_weights(
