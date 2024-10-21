@@ -1,6 +1,7 @@
 import importlib.util
 
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from glass.core.array import (
@@ -45,13 +46,22 @@ def test_broadcast_first() -> None:
 
 
 def test_broadcast_leading_axes() -> None:
-    a = 0
+    a: (
+        float
+        | int
+        | list[float]
+        | list[int]
+        | list[list[int]]
+        | list[npt.NDArray[np.float64]]
+        | npt.NDArray[np.float64]
+    ) = 0
     b = np.zeros((4, 10))
     c = np.zeros((3, 1, 5, 6))
 
     dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[assignment]
 
     assert dims == (3, 4)
+    assert isinstance(a, np.ndarray)
     assert a.shape == (3, 4)
     assert b.shape == (3, 4, 10)
     assert c.shape == (3, 4, 5, 6)

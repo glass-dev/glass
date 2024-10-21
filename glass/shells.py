@@ -126,10 +126,10 @@ class RadialWindow(typing.NamedTuple):
 
     za: list[float] | npt.NDArray[np.float64]
     wa: (
-        list[int]
-        | list[float]
-        | npt.NDArray[np.float64]
+        list[float]
+        | list[int]
         | list[npt.NDArray[np.float64]]
+        | npt.NDArray[np.float64]
     )
     zeff: float | None
 
@@ -183,11 +183,11 @@ def tophat_windows(
         )
 
     wht: (
-        typing.Callable[
+        npt.NDArray[np.float64]
+        | typing.Callable[
             [list[float] | npt.NDArray[np.float64]],
             npt.NDArray[np.float64],
         ]
-        | npt.NDArray[np.float64]
     )
     wht = weight if weight is not None else np.ones_like
     ws = []
@@ -576,7 +576,18 @@ def partition_nnls(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
+    a = np.array(
+        [
+            np.interp(
+                zp,
+                za,
+                wa,
+                left=0.0,
+                right=0.0,
+            )
+            for za, wa, _ in shells
+        ]
+    )
     a /= np.trapz(  # type: ignore[attr-defined]
         a,
         zp,
@@ -590,7 +601,7 @@ def partition_nnls(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
+    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
     b = np.concatenate(
         [
             b,

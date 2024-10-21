@@ -19,13 +19,13 @@ def broadcast_first(
 
 def broadcast_leading_axes(
     *args: tuple[
-        int
-        | float
-        | npt.NDArray[np.float64]
-        | list[int]
+        float
+        | int
         | list[float]
+        | list[int]
+        | list[list[int]]
         | list[npt.NDArray[np.float64]]
-        | list[list[int]],
+        | npt.NDArray[np.float64],
         int,
     ],
 ) -> tuple[tuple[int, ...], ...]:
@@ -92,10 +92,10 @@ def trapz_product(
     f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     *ff: tuple[
         list[float] | npt.NDArray[np.float64],
-        list[int]
-        | list[float]
-        | npt.NDArray[np.float64]
-        | list[npt.NDArray[np.float64]],
+        list[float]
+        | list[int]
+        | list[npt.NDArray[np.float64]]
+        | npt.NDArray[np.float64],
     ],
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:
