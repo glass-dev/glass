@@ -57,30 +57,23 @@ def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
     d = 5.0
     r = np.radians(d)
 
-    if usecomplex:
-
-        def alpha(re: float, im: float) -> complex:
-            return re + 1j * im
-
-    else:
-
-        def alpha(re: float, im: float) -> list[float]:  # type: ignore[misc]
-            return [re, im]
+    def alpha(re: float, im: float, *, usecomplex: bool) -> complex | list[float]:
+        return re + 1j * im if usecomplex else [re, im]
 
     # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0))
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r))
+    lon, lat = deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r))
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
