@@ -91,7 +91,7 @@ def triaxial_axis_ratio(
     C = 1 + z2m1 * cos2_phi  # noqa: N806
 
     # eq. (12)
-    return np.sqrt(  # type: ignore[no-any-return]
+    return np.sqrt(
         (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
     )
 
@@ -174,7 +174,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     e *= (1 - q) / (1 + q)
 
     # return the ellipticity
-    return e  # type: ignore[no-any-return]
+    return e
 
 
 def ellipticity_gaussian(

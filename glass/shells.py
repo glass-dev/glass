@@ -61,7 +61,7 @@ def distance_weight(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving distance."""
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return 1 / cosmo.ef(z)
 
 
 def volume_weight(
@@ -69,7 +69,7 @@ def volume_weight(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving volume."""
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
 def density_weight(
@@ -77,7 +77,7 @@ def density_weight(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in matter density."""
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
 class RadialWindow(typing.NamedTuple):
@@ -477,7 +477,7 @@ def partition(
     except KeyError:
         msg = f"invalid method: {method}"
         raise ValueError(msg) from None
-    return partition_method(z, fz, shells)  # type: ignore[no-any-return]
+    return partition_method(z, fz, shells)
 
 
 def partition_lstsq(
@@ -686,7 +686,7 @@ def distance_grid(
     else:
         msg = 'exactly one of "dx" or "num" must be given'
         raise ValueError(msg)
-    return cosmo.dc_inv(x)  # type: ignore[no-any-return]
+    return cosmo.dc_inv(x)
 
 
 def combine(
