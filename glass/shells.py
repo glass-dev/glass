@@ -195,7 +195,13 @@ def tophat_windows(
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(w * z, z) / np.trapz(w, z)  # type: ignore[attr-defined]
+        zeff = np.trapz(  # type: ignore[attr-defined]
+            w * z,
+            z,
+        ) / np.trapz(  # type: ignore[attr-defined]
+            w,
+            z,
+        )
         ws.append(RadialWindow(z, w, zeff))
     return ws
 
@@ -500,7 +506,11 @@ def partition_lstsq(
     a: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64] = [
         np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells
     ]
-    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
+    a /= np.trapz(  # type: ignore[attr-defined]
+        a,
+        zp,
+        axis=-1,
+    )[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -510,7 +520,20 @@ def partition_lstsq(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
+    b = np.concatenate(
+        [
+            b,
+            mult
+            * np.reshape(
+                np.trapz(  # type: ignore[attr-defined]
+                    fz,
+                    z,
+                ),
+                (*dims, 1),
+            ),
+        ],
+        axis=-1,
+    )
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -554,7 +577,11 @@ def partition_nnls(
 
     # create the window function matrix
     a = [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    a /= np.trapz(a, zp, axis=-1)[..., None]  # type: ignore[attr-defined]
+    a /= np.trapz(  # type: ignore[attr-defined]
+        a,
+        zp,
+        axis=-1,
+    )[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -564,14 +591,27 @@ def partition_nnls(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)  # type: ignore[assignment]
-    b = np.concatenate([b, mult * np.reshape(np.trapz(fz, z), (*dims, 1))], axis=-1)  # type: ignore[attr-defined]
+    b = np.concatenate(
+        [
+            b,
+            mult
+            * np.reshape(
+                np.trapz(  # type: ignore[attr-defined]
+                    fz,
+                    z,
+                ),
+                (*dims, 1),
+            ),
+        ],
+        axis=-1,
+    )
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
-    q, r = np.linalg.qr(a.T)  # type: ignore[attr-defined]
+    q, r = np.linalg.qr(a.T)
     y = np.einsum("ji,...j", q, b)
 
     # for each dim, find non-negative weights x such that y == r @ x
@@ -592,7 +632,11 @@ def partition_restrict(
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        part[i] = np.trapz(fr, zr, axis=-1)  # type: ignore[attr-defined]
+        part[i] = np.trapz(  # type: ignore[attr-defined]
+            fr,
+            zr,
+            axis=-1,
+        )
     return part
 
 
@@ -673,7 +717,11 @@ def combine(
         * np.interp(
             z,
             shell.za,
-            shell.wa / np.trapz(shell.wa, shell.za),  # type: ignore[attr-defined]
+            shell.wa
+            / np.trapz(  # type: ignore[attr-defined]
+                shell.wa,
+                shell.za,
+            ),
             left=0.0,
             right=0.0,
         )

@@ -52,7 +52,7 @@ def test_broadcast_leading_axes() -> None:
     dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[assignment]
 
     assert dims == (3, 4)
-    assert a.shape == (3, 4)  # type: ignore[attr-defined]
+    assert a.shape == (3, 4)
     assert b.shape == (3, 4, 10)
     assert c.shape == (3, 4, 5, 6)
 

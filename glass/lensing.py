@@ -291,7 +291,14 @@ class MultiPlaneConvergence:
 
         """
         zsrc = w.zeff
-        lens_weight = np.trapz(w.wa, w.za) / np.interp(zsrc, w.za, w.wa)  # type: ignore[arg-type, attr-defined]
+        lens_weight = np.trapz(  # type: ignore[attr-defined]
+            w.wa,
+            w.za,
+        ) / np.interp(
+            zsrc,  # type: ignore[arg-type]
+            w.za,
+            w.wa,
+        )
 
         self.add_plane(delta, zsrc, lens_weight)
 

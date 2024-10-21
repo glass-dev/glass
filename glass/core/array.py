@@ -109,7 +109,11 @@ def trapz_product(
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.trapz(y, x, axis=axis)  # type: ignore[attr-defined, no-any-return]
+    return np.trapz(  # type: ignore[attr-defined, no-any-return]
+        y,
+        x,
+        axis=axis,
+    )
 
 
 def cumtrapz(
