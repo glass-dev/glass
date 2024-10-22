@@ -114,15 +114,12 @@ def cls2cov(
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if cl is None:
-                cov[:, i] = 0  # type: ignore[unreachable]
-            else:
-                if i == 0 and np.any(np.less(cl, 0)):
-                    msg = "negative values in cl"
-                    raise ValueError(msg)
-                n = len(cl)
-                cov[:n, i] = cl
-                cov[n:, i] = 0
+            if i == 0 and np.any(np.less(cl, 0)):
+                msg = "negative values in cl"
+                raise ValueError(msg)
+            n = len(cl)
+            cov[:n, i] = cl
+            cov[n:, i] = 0
         cov /= 2
         yield cov
 
