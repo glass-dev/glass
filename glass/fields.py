@@ -414,10 +414,11 @@ def effective_cls(
 
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations
-    if weights2 is weights1:
-        pairs = combinations_with_replacement(np.ndindex(shape1[1:]), 2)
-    else:
-        pairs = product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))  # type: ignore[assignment]
+    pairs = (
+        combinations_with_replacement(np.ndindex(shape1[1:]), 2)
+        if weights2 is weights1
+        else product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))
+    )
 
     # create the output array: axes for all input axes plus lmax+1
     out = np.empty(shape1[1:] + shape2[1:] + (lmax + 1,))
