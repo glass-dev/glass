@@ -192,7 +192,7 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if cl and len(cl) > 0:
+        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
