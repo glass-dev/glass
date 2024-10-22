@@ -19,16 +19,10 @@ def broadcast_first(
 
 def broadcast_leading_axes(
     *args: tuple[
-        float
-        | int
-        | list[float]
-        | list[int]
-        | list[list[int]]
-        | list[npt.NDArray[np.float64]]
-        | npt.NDArray[np.float64],
+        int | npt.NDArray[np.int_] | npt.NDArray[np.float64],
         int,
     ],
-) -> tuple[tuple[int, ...], ...]:
+) -> tuple[tuple[int, int], tuple[npt.NDArray[np.int_], ...]]:
     """
     Broadcast all but the last N axes.
 
@@ -62,7 +56,7 @@ def broadcast_leading_axes(
         trails.append(s[i:])
     dims = np.broadcast_shapes(*shapes)
     arrs = (np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails))
-    return (dims, *arrs)  # type: ignore[arg-type]
+    return (dims, *arrs)  # type: ignore[return-value]
 
 
 def ndinterp(  # noqa: PLR0913

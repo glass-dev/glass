@@ -46,25 +46,19 @@ def test_broadcast_first() -> None:
 
 
 def test_broadcast_leading_axes() -> None:
-    a: (
-        float
-        | int
-        | list[float]
-        | list[int]
-        | list[list[int]]
-        | list[npt.NDArray[np.float64]]
-        | npt.NDArray[np.float64]
-    ) = 0
-    b = np.zeros((4, 10))
-    c = np.zeros((3, 1, 5, 6))
+    a_in = 0
+    b_in = np.zeros((4, 10))
+    c_in = np.zeros((3, 1, 5, 6))
 
-    dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))  # type: ignore[assignment]
+    a_out: npt.NDArray[np.int_]
+    b_out: npt.NDArray[np.int_]
+    c_out: npt.NDArray[np.int_]
+    dims, a_out, b_out, c_out = broadcast_leading_axes((a_in, 0), (b_in, 1), (c_in, 2))  # type: ignore[misc]
 
     assert dims == (3, 4)
-    assert isinstance(a, np.ndarray)
-    assert a.shape == (3, 4)
-    assert b.shape == (3, 4, 10)
-    assert c.shape == (3, 4, 5, 6)
+    assert a_out.shape == (3, 4)
+    assert b_out.shape == (3, 4, 10)
+    assert c_out.shape == (3, 4, 5, 6)
 
 
 def test_ndinterp() -> None:

@@ -67,12 +67,19 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | list[int] | list[list[int]],
-    z: list[float] | npt.NDArray[np.float64],
+    count: float
+    | list[float]
+    | list[int]
+    | list[list[int]]
+    | list[npt.NDArray[np.float64]]
+    | npt.NDArray[np.float64]
+    | npt.NDArray[np.int_],
+    z: list[float] | npt.NDArray[np.float64] | npt.NDArray[np.int_],
     nz: list[int]
     | list[float]
     | npt.NDArray[np.float64]
-    | list[npt.NDArray[np.float64]],
+    | list[npt.NDArray[np.float64]]
+    | npt.NDArray[np.int_],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
@@ -120,7 +127,7 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[assignment]
+    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[arg-type, misc]
 
     # list of results for all dimensions
     redshifts = np.empty(count.sum())  # type: ignore[union-attr]
