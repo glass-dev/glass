@@ -7,8 +7,6 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from cosmology import Cosmology
-
 from glass.lensing import (
     MultiPlaneConvergence,
     deflect,
