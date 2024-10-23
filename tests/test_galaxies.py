@@ -61,7 +61,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: no extra dimensions
 
-    count: int | npt.NDArray[np.int_] = 10
+    count: int | npt.NDArray[np.float64] = 10
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 

@@ -39,7 +39,7 @@ if typing.TYPE_CHECKING:
 
 
 def redshifts(
-    n: int | npt.NDArray[np.int_],
+    n: int | npt.NDArray[np.float64],
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
@@ -67,7 +67,7 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | npt.NDArray[np.int_],
+    count: int | npt.NDArray[np.float64],
     z: npt.NDArray[np.float64],
     nz: npt.NDArray[np.float64],
     *,
@@ -117,10 +117,11 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[misc]
+    dims, *rest = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    count_out, z_out, nz_out = rest
 
     # list of results for all dimensions
-    redshifts = np.empty(count.sum())  # type: ignore[union-attr]
+    redshifts = np.empty(count_out.sum())
 
     # keep track of the number of sampled redshifts
     total = 0
@@ -128,16 +129,16 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)
+        cdf = cumtrapz(nz_out[k], z_out[k], dtype=float)
         cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count[k]] = np.interp(  # type: ignore[index]
-            rng.uniform(0, 1, size=count[k]),  # type: ignore[index]
+        redshifts[total : total + count_out[k]] = np.interp(
+            rng.uniform(0, 1, size=count_out[k]),
             cdf,
-            z[k],
+            z_out[k],
         )
-        total += count[k]  # type: ignore[index]
+        total += count_out[k]
 
     assert total == redshifts.size  # noqa: S101
 
