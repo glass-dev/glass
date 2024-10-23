@@ -60,12 +60,9 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | list[float] | list[list[float]] | npt.NDArray[np.float64],
-    xp: list[int] | npt.NDArray[np.float64],
-    fp: list[float]
-    | list[list[float]]
-    | list[list[list[float]]]
-    | npt.NDArray[np.float64],
+    x: float | npt.NDArray[np.float64],
+    xp: npt.NDArray[np.float64],
+    fp: npt.NDArray[np.float64],
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
@@ -85,11 +82,8 @@ def ndinterp(  # noqa: PLR0913
 def trapz_product(
     f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     *ff: tuple[
-        list[float] | npt.NDArray[np.float64],
-        list[float]
-        | list[int]
-        | list[npt.NDArray[np.float64]]
-        | npt.NDArray[np.float64],
+        npt.NDArray[np.float64],
+        npt.NDArray[np.float64],
     ],
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:

@@ -109,7 +109,7 @@ def loglinear_bias(
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal: float | list[float],
+    ngal: float | npt.NDArray[np.float64],
     delta: npt.NDArray[np.float64],
     bias: float | None = None,
     vis: npt.NDArray[np.float64] | None = None,
@@ -214,7 +214,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[call-overload, index]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
 
         # apply visibility if given
         if vis is not None:
@@ -276,7 +276,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | npt.NDArray[np.int_] | list[float] | list[list[float]],
+    ngal: float | npt.NDArray[np.int_] | npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[

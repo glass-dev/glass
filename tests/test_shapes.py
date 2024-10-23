@@ -27,13 +27,13 @@ def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
 
     # implicit size
 
-    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)
-    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])
+    q1 = triaxial_axis_ratio(np.array([0.8, 0.9]), 0.4)
+    q2 = triaxial_axis_ratio(0.8, np.array([0.4, 0.5]))
     assert np.shape(q1) == np.shape(q2) == (2,)
 
     # broadcasting rule
 
-    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])
+    q = triaxial_axis_ratio(np.array([[0.6, 0.7], [0.8, 0.9]]), np.array([0.4, 0.5]))
     assert np.shape(q) == (2, 2)
 
     # random parameters and check that projection is
@@ -69,15 +69,17 @@ def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
 
     # implicit size
 
-    e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)
-    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])
-    e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)
-    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)
+    e1 = ellipticity_ryden04(-1.85, 0.89, np.array([0.222, 0.333]), 0.056)
+    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, np.array([0.056, 0.067]))
+    e3 = ellipticity_ryden04(np.array([-1.85, -2.85]), 0.89, 0.222, 0.056)
+    e4 = ellipticity_ryden04(-1.85, np.array([0.89, 1.001]), 0.222, 0.056)
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
 
     # broadcasting rule
 
-    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)
+    e = ellipticity_ryden04(
+        np.array([-1.9, -2.9]), 0.9, np.array([[0.2, 0.3], [0.4, 0.5]]), 0.1
+    )
     assert np.shape(e) == (2, 2)
 
     # check that result is in the specified range
@@ -108,7 +110,7 @@ def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
-    eps = ellipticity_gaussian([n, n], [0.128, 0.256])
+    eps = ellipticity_gaussian(np.array([n, n]), np.array([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 

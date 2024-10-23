@@ -103,7 +103,7 @@ def iternorm(
 
 
 def cls2cov(
-    cls: list[list[float] | npt.NDArray[np.float64]],
+    cls: npt.NDArray[np.float64],
     nl: int,
     nf: int,
     nc: int,
@@ -139,7 +139,7 @@ def multalm(
 
 
 def transform_cls(
-    cls: list[list[float] | npt.NDArray[np.float64]],
+    cls: npt.NDArray[np.float64],
     tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
     pars: tuple[typing.Any, ...] = (),
 ) -> list[list[float] | npt.NDArray[np.float64]]:
@@ -161,7 +161,7 @@ def transform_cls(
 
 
 def discretized_cls(
-    cls: list[list[float] | npt.NDArray[np.float64]],
+    cls: npt.NDArray[np.float64],
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
@@ -181,18 +181,20 @@ def discretized_cls(
         if n * (n + 1) // 2 != len(cls):
             msg = "length of cls array is not a triangle number"
             raise ValueError(msg)
-        cls = [
-            cls[i * (i + 1) // 2 + j] if j <= ncorr else []
-            for i in range(n)
-            for j in range(i + 1)
-        ]
+        cls = np.array(
+            [
+                cls[i * (i + 1) // 2 + j] if j <= ncorr else []
+                for i in range(n)
+                for j in range(i + 1)
+            ]
+        )
 
     if nside is not None:
         pw = hp.pixwin(nside, lmax=lmax)
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if cl is not None and len(cl) > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -203,7 +205,7 @@ def discretized_cls(
 
 
 def lognormal_gls(
-    cls: list[list[float] | npt.NDArray[np.float64]],
+    cls: npt.NDArray[np.float64],
     shift: float = 1.0,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """Compute Gaussian Cls for a lognormal random field."""
@@ -211,7 +213,7 @@ def lognormal_gls(
 
 
 def generate_gaussian(
-    gls: list[list[float] | npt.NDArray[np.float64]],
+    gls: npt.NDArray[np.float64],
     nside: int,
     *,
     ncorr: int | None = None,
@@ -296,7 +298,7 @@ def generate_gaussian(
 
 
 def generate_lognormal(
-    gls: list[list[float] | npt.NDArray[np.float64]],
+    gls: npt.NDArray[np.float64],
     nside: int,
     shift: float = 1.0,
     *,
@@ -325,7 +327,7 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: list[npt.NDArray[np.float64]],
+    cls: npt.NDArray[np.float64],
     i: int,
     j: int,
     lmax: int | None = None,
@@ -360,7 +362,7 @@ def getcl(
 
 
 def effective_cls(
-    cls: list[npt.NDArray[np.float64]],
+    cls: npt.NDArray[np.float64],
     weights1: npt.NDArray[np.float64],
     weights2: npt.NDArray[np.float64] | None = None,
     *,

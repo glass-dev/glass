@@ -145,9 +145,9 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: list[float] | npt.NDArray[np.float64],
-    lat: list[float] | npt.NDArray[np.float64],
-    eps: list[float] | npt.NDArray[np.float64],
+    lon: npt.NDArray[np.float64],
+    lat: npt.NDArray[np.float64],
+    eps: npt.NDArray[np.float64],
     kappa: npt.NDArray[np.float64],
     gamma1: npt.NDArray[np.float64],
     gamma2: npt.NDArray[np.float64],

@@ -5,7 +5,7 @@ from glass.shells import RadialWindow, partition, restrict, tophat_windows
 
 
 def test_tophat_windows() -> None:
-    zb = [0.0, 0.1, 0.2, 0.5, 1.0, 2.0]
+    zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
 
     ws = tophat_windows(zb, dz)

@@ -29,8 +29,8 @@ import numpy.typing as npt
 
 
 def triaxial_axis_ratio(
-    zeta: float | list[float] | list[list[float]] | npt.NDArray[np.float64],
-    xi: float | list[float],
+    zeta: float | npt.NDArray[np.float64],
+    xi: float | npt.NDArray[np.float64],
     size: int | tuple[int, int] | None = None,
     *,
     rng: np.random.Generator | None = None,
@@ -97,10 +97,10 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: float | list[float] | npt.NDArray[np.float64],
-    sigma: float | list[float] | npt.NDArray[np.float64],
-    gamma: float | list[float] | list[list[float]] | npt.NDArray[np.float64],
-    sigma_gamma: float | list[float] | npt.NDArray[np.float64],
+    mu: float | npt.NDArray[np.float64],
+    sigma: float | npt.NDArray[np.float64],
+    gamma: float | npt.NDArray[np.float64],
+    sigma_gamma: float | npt.NDArray[np.float64],
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
@@ -178,8 +178,8 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
 
 def ellipticity_gaussian(
-    count: int | list[int] | npt.NDArray[np.int_],
-    sigma: float | list[float] | npt.NDArray[np.float64],
+    count: int | npt.NDArray[np.int_],
+    sigma: float | npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.complex128]:

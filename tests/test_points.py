@@ -37,7 +37,7 @@ def catpos(
 def test_positions_from_delta() -> None:
     # case: single-dimensional input
 
-    ngal: float | list[float] = 1e-3
+    ngal: float | npt.NDArray[np.float64] = 1e-3
     delta = np.zeros(12)
     bias = 0.8
     vis = np.ones(12)
@@ -49,7 +49,7 @@ def test_positions_from_delta() -> None:
 
     # case: multi-dimensional ngal
 
-    ngal = [1e-3, 2e-3]
+    ngal = np.array([1e-3, 2e-3])
     delta = np.zeros(12)
     bias = 0.8
     vis = np.ones(12)
@@ -77,7 +77,7 @@ def test_positions_from_delta() -> None:
 
     # case: multi-dimensional broadcasting
 
-    ngal = [1e-3, 2e-3]
+    ngal = np.array([1e-3, 2e-3])
     delta = np.zeros((3, 1, 12))
     bias = 0.8
     vis = np.ones(12)
@@ -93,7 +93,7 @@ def test_positions_from_delta() -> None:
 def test_uniform_positions() -> None:
     # case: scalar input
 
-    ngal: float | list[float] | list[list[float]] = 1e-3
+    ngal: float | npt.NDArray[np.float64] = 1e-3
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
@@ -102,7 +102,7 @@ def test_uniform_positions() -> None:
 
     # case: 1-D array input
 
-    ngal = [1e-3, 2e-3, 3e-3]
+    ngal = np.array([1e-3, 2e-3, 3e-3])
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 
@@ -112,7 +112,7 @@ def test_uniform_positions() -> None:
 
     # case: 2-D array input
 
-    ngal = [[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]]
+    ngal = np.array([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 

@@ -130,7 +130,7 @@ class RadialWindow(typing.NamedTuple):
 
 
 def tophat_windows(
-    zbins: list[float] | npt.NDArray[np.float64],
+    zbins: npt.NDArray[np.float64],
     dz: float = 1e-3,
     weight: typing.Callable[
         [list[float] | npt.NDArray[np.float64]],
@@ -202,7 +202,7 @@ def tophat_windows(
 
 
 def linear_windows(
-    zgrid: list[float] | npt.NDArray[np.float64],
+    zgrid: npt.NDArray[np.float64],
     dz: float = 1e-3,
     weight: typing.Callable[
         [list[float] | npt.NDArray[np.float64]],
@@ -263,7 +263,7 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: list[float] | npt.NDArray[np.float64],
+    zgrid: npt.NDArray[np.float64],
     dz: float = 1e-3,
     weight: typing.Callable[
         [list[float] | npt.NDArray[np.float64]],
@@ -325,8 +325,8 @@ def cubic_windows(
 
 
 def restrict(
-    z: list[float] | npt.NDArray[np.float64],
-    f: list[float] | npt.NDArray[np.float64],
+    z: npt.NDArray[np.float64],
+    f: npt.NDArray[np.float64],
     w: RadialWindow,
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
@@ -360,7 +360,7 @@ def restrict(
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
-    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)  # type: ignore[arg-type]
+    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
     return zr, fr
 
 
@@ -498,9 +498,7 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a: list[npt.NDArray[np.float64]] | npt.NDArray[np.float64] = [
-        np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells
-    ]
+    a = np.array([np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
     a /= np.trapz(  # type: ignore[attr-defined]
         a,
         zp,
@@ -534,7 +532,7 @@ def partition_lstsq(
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]  # type: ignore[union-attr]
+    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]
     x = x.T.reshape(*dims, len(shells))
     # roll the last axis of size len(shells) to the front
     return np.moveaxis(x, -1, 0)
