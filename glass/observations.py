@@ -132,7 +132,7 @@ def smail_nz(
     alpha: npt.NDArray[np.float64],
     beta: npt.NDArray[np.float64],
     *,
-    norm: float | npt.NDArray[np.float64] | None = None,
+    norm: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Redshift distribution following Smail et al. (1994).
