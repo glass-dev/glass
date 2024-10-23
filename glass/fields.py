@@ -161,7 +161,7 @@ def transform_cls(
 
 
 def discretized_cls(
-    cls: npt.NDArray[np.float64],
+    cls: list[list[float]] | npt.NDArray[np.float64],
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
@@ -181,13 +181,11 @@ def discretized_cls(
         if n * (n + 1) // 2 != len(cls):
             msg = "length of cls array is not a triangle number"
             raise ValueError(msg)
-        cls = np.array(
-            [
-                cls[i * (i + 1) // 2 + j] if j <= ncorr else []
-                for i in range(n)
-                for j in range(i + 1)
-            ]
-        )
+        cls = [
+            cls[i * (i + 1) // 2 + j] if j <= ncorr else []
+            for i in range(n)
+            for j in range(i + 1)
+        ]
 
     if nside is not None:
         pw = hp.pixwin(nside, lmax=lmax)
