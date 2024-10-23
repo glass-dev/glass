@@ -19,31 +19,39 @@ def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
     assert z.max() <= 1.0
 
     # sample redshifts (array)
-    z = redshifts([[1, 2], [3, 4]], w)
+    z = redshifts(np.array([[1, 2], [3, 4]]), w)
     assert z.shape == (10,)
 
 
 def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test sampling
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0], warn=False)
+    redshifts = redshifts_from_nz(
+        10, np.array([0, 1, 2, 3, 4]), np.array([1, 0, 0, 0, 0]), warn=False
+    )
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 0, 0], warn=False)
+    redshifts = redshifts_from_nz(
+        10, np.array([0, 1, 2, 3, 4]), np.array([0, 0, 1, 0, 0]), warn=False
+    )
     assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 0, 0, 1], warn=False)
+    redshifts = redshifts_from_nz(
+        10, np.array([0, 1, 2, 3, 4]), np.array([0, 0, 0, 0, 1]), warn=False
+    )
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False)
+    redshifts = redshifts_from_nz(
+        10, np.array([0, 1, 2, 3, 4]), np.array([0, 0, 1, 1, 1]), warn=False
+    )
     assert not np.any(redshifts <= 1)
 
     # test with rng
 
     redshifts = redshifts_from_nz(
         10,
-        [0, 1, 2, 3, 4],
-        [0, 0, 1, 1, 1],
+        np.array([0, 1, 2, 3, 4]),
+        np.array([0, 0, 1, 1, 1]),
         warn=False,
         rng=rng,
     )
@@ -53,9 +61,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: no extra dimensions
 
-    count: int | list[int] | list[list[int]] = 10
+    count: int | npt.NDArray[np.int_] = 10
     z = np.linspace(0, 1, 100)
-    nz: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]] = z * (1 - z)
+    nz = z * (1 - z)
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -64,7 +72,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count
 
-    count = [10, 20, 30]
+    count = np.array([10, 20, 30])
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -76,7 +84,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     count = 10
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = np.array([z * (1 - z), (z - 0.5) ** 2])
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -84,9 +92,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count and nz
 
-    count = [[10], [20], [30]]
+    count = np.array([[10], [20], [30]])
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = np.array([z * (1 - z), (z - 0.5) ** 2])
 
     redshifts = redshifts_from_nz(count, z, nz, warn=False)
 
@@ -94,15 +102,17 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: incompatible input shapes
 
-    count = [10, 20, 30]
+    count = np.array([10, 20, 30])
     z = np.linspace(0, 1, 100)
-    nz = [z * (1 - z), (z - 0.5) ** 2]
+    nz = np.array([z * (1 - z), (z - 0.5) ** 2])
 
     with pytest.raises(ValueError, match="shape mismatch"):
         redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
-        redshifts = redshifts_from_nz(10, [0, 1, 2, 3, 4], [1, 0, 0, 0, 0])
+        redshifts = redshifts_from_nz(
+            10, np.array([0, 1, 2, 3, 4]), np.array([1, 0, 0, 0, 0])
+        )
 
 
 def test_galaxy_shear(rng: np.random.Generator) -> None:

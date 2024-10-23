@@ -24,11 +24,11 @@ if typing.TYPE_CHECKING:
 @pytest.fixture
 def shells() -> list[RadialWindow]:
     return [
-        RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
-        RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
-        RadialWindow([2.0, 3.0, 4.0], [0.0, 1.0, 0.0], 3.0),
-        RadialWindow([3.0, 4.0, 5.0], [0.0, 1.0, 0.0], 4.0),
-        RadialWindow([4.0, 5.0, 6.0], [0.0, 1.0, 0.0], 5.0),
+        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 1.0),
+        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 2.0),
+        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 3.0),
+        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 4.0),
+        RadialWindow(np.array([4.0, 5.0, 6.0]), np.array([0.0, 1.0, 0.0]), 5.0),
     ]
 
 

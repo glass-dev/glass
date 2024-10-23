@@ -27,7 +27,9 @@ def test_restrict() -> None:
     f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
 
     # window for restriction
-    w = RadialWindow(za=[1.0, 2.0, 3.0, 4.0], wa=[0.0, 0.5, 0.5, 0.0], zeff=None)
+    w = RadialWindow(
+        za=np.array([1.0, 2.0, 3.0, 4.0]), wa=np.array([0.0, 0.5, 0.5, 0.0]), zeff=None
+    )
 
     zr, fr = restrict(z, f, w)
 
