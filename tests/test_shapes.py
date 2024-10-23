@@ -138,7 +138,7 @@ def test_ellipticity_intnorm(rng: np.random.Generator) -> None:
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
-    eps = ellipticity_intnorm([n, n], [0.128, 0.256])
+    eps = ellipticity_intnorm(np.array([n, n]), np.array([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
