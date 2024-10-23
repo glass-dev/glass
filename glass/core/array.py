@@ -20,7 +20,7 @@ def broadcast_first(
 
 def broadcast_leading_axes(
     *args: tuple[
-        int | npt.NDArray[np.int_],
+        int | npt.NDArray[np.int_] | npt.NDArray[np.float64],
         int,
     ],
 ) -> tuple[

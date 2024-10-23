@@ -117,7 +117,7 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[arg-type, misc]
+    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[misc]
 
     # list of results for all dimensions
     redshifts = np.empty(count.sum())  # type: ignore[union-attr]
