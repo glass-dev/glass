@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing
 from functools import partial
 
 import numpy as np
@@ -22,7 +23,10 @@ def broadcast_leading_axes(
         int | npt.NDArray[np.int_],
         int,
     ],
-) -> tuple[tuple[int, int], tuple[npt.NDArray[np.int_], ...]]:
+) -> tuple[
+    tuple[int, ...],
+    typing.Unpack[tuple[npt.NDArray[np.int_], ...]],
+]:
     """
     Broadcast all but the last N axes.
 
@@ -56,7 +60,7 @@ def broadcast_leading_axes(
         trails.append(s[i:])
     dims = np.broadcast_shapes(*shapes)
     arrs = (np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails))
-    return (dims, *arrs)  # type: ignore[return-value]
+    return (dims, *arrs)
 
 
 def ndinterp(  # noqa: PLR0913
