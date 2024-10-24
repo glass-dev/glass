@@ -74,7 +74,7 @@ class _FitsWriter:
 
     def _append(
         self,
-        data: npt.NDArray[np.float64],
+        data: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
         names: list[str] | None = None,
     ) -> None:
         """Write the FITS file."""
@@ -106,7 +106,7 @@ class _FitsWriter:
         # if keyword arguments are given, treat them as names and columns
         if columns:
             names, values = list(columns.keys()), list(columns.values())
-            self._append(values, names)  # type: ignore[arg-type]
+            self._append(values, names)
 
 
 @contextmanager
