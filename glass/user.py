@@ -67,7 +67,7 @@ class _FitsWriter:
     Initialised with the fits object and extension name.
     """
 
-    def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
+    def __init__(self, fits: fitsio.FITS, ext: str = "") -> None:
         """Create a new, uninitialised writer."""
         self.fits = fits
         self.ext = ext
@@ -78,9 +78,9 @@ class _FitsWriter:
         names: list[str] | None = None,
     ) -> None:
         """Write the FITS file."""
-        if self.ext is None or self.ext not in self.fits:
+        if self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
-            if self.ext is None:
+            if not self.ext:
                 self.ext = self.fits[-1].get_extnum()
         else:
             hdu = self.fits[self.ext]
