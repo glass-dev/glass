@@ -27,7 +27,11 @@ import numpy.typing as npt
 
 if typing.TYPE_CHECKING:
     import collections.abc
+    import importlib.util
     import pathlib
+
+    if importlib.util.find_spec("fitsio") is not None:
+        import fitsio
 
 
 def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
@@ -63,7 +67,7 @@ class _FitsWriter:
     Initialised with the fits object and extension name.
     """
 
-    def __init__(self, fits, ext: str | None = None) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
         """Create a new, uninitialised writer."""
         self.fits = fits
         self.ext = ext
