@@ -31,7 +31,7 @@ import numpy.typing as npt
 def triaxial_axis_ratio(
     zeta: float | npt.NDArray[np.float64],
     xi: float | npt.NDArray[np.float64],
-    size: int | tuple[int, int] | None = None,
+    size: tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
@@ -70,7 +70,7 @@ def triaxial_axis_ratio(
 
     # get size from inputs if not explicitly provided
     if size is None:
-        size = tuple(np.broadcast(zeta, xi).shape)
+        size = np.broadcast(zeta, xi).shape
 
     # draw random viewing angle (theta, phi)
     cos2_theta = rng.uniform(low=-1.0, high=1.0, size=size)

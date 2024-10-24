@@ -197,9 +197,10 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs += [(bias, 0)]
     if vis is not None:
         inputs += [(vis, 1)]
-    dims, ngal, delta, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type, misc]
+    dims, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type]
+    ngal, delta, *rest = rest
     if bias is not None:
-        bias, *rest = rest
+        bias, *rest = rest  # type: ignore[assignment]
     if vis is not None:
         vis, *rest = rest
 
@@ -214,7 +215,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # turn into number count, modifying the array in place
         n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
+        n *= ARCMIN2_SPHERE / n.size * ngal[k]
 
         # apply visibility if given
         if vis is not None:

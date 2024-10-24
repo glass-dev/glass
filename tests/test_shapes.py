@@ -17,7 +17,7 @@ def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
 
     # many axis ratios
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=1000)
+    q = triaxial_axis_ratio(0.8, 0.4, size=(1000,))
     assert np.shape(q) == (1000,)
 
     # explicit shape
