@@ -1,5 +1,10 @@
+from __future__ import annotations
+
+import typing
+
 import healpix
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from glass.lensing import (
@@ -10,29 +15,36 @@ from glass.lensing import (
 )
 from glass.shells import RadialWindow
 
+if typing.TYPE_CHECKING:
+    from cosmology import Cosmology
+
 
 @pytest.fixture
-def shells():  # type: ignore[no-untyped-def]
+def shells() -> list[RadialWindow]:
     return [
-        RadialWindow([0.0, 1.0, 2.0], [0.0, 1.0, 0.0], 1.0),
-        RadialWindow([1.0, 2.0, 3.0], [0.0, 1.0, 0.0], 2.0),
-        RadialWindow([2.0, 3.0, 4.0], [0.0, 1.0, 0.0], 3.0),
-        RadialWindow([3.0, 4.0, 5.0], [0.0, 1.0, 0.0], 4.0),
-        RadialWindow([4.0, 5.0, 6.0], [0.0, 1.0, 0.0], 5.0),
+        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 1.0),
+        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 2.0),
+        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 3.0),
+        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 4.0),
+        RadialWindow(np.array([4.0, 5.0, 6.0]), np.array([0.0, 1.0, 0.0]), 5.0),
     ]
 
 
 @pytest.fixture
-def cosmo():  # type: ignore[no-untyped-def]
+def cosmo() -> Cosmology:
     class MockCosmology:
         @property
-        def omega_m(self):  # type: ignore[no-untyped-def]
+        def omega_m(self) -> float:
             return 0.3
 
-        def ef(self, z):  # type: ignore[no-untyped-def]
+        def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
-        def xm(self, z, z2=None):  # type: ignore[no-untyped-def]
+        def xm(
+            self,
+            z: npt.NDArray[np.float64],
+            z2: npt.NDArray[np.float64] | None = None,
+        ) -> npt.NDArray[np.float64]:
             if z2 is None:
                 return np.array(z) * 1000
             return (np.array(z2) - np.array(z)) * 1000
@@ -41,37 +53,31 @@ def cosmo():  # type: ignore[no-untyped-def]
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(usecomplex):  # type: ignore[no-untyped-def]
+def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
     d = 5.0
     r = np.radians(d)
 
-    if usecomplex:
-
-        def alpha(re, im):  # type: ignore[no-untyped-def]
-            return re + 1j * im
-    else:
-
-        def alpha(re, im):  # type: ignore[no-untyped-def]
-            return [re, im]
+    def alpha(re: float, im: float, *, usecomplex: bool) -> complex | list[float]:
+        return re + 1j * im if usecomplex else [re, im]
 
     # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0))  # type: ignore[no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0))  # type: ignore[no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r))  # type: ignore[no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r))  # type: ignore[no-untyped-call]
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
     np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
-def test_deflect_many(rng):  # type: ignore[no-untyped-def]
+def test_deflect_many(rng: np.random.Generator) -> None:
     n = 1000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
@@ -89,7 +95,11 @@ def test_deflect_many(rng):  # type: ignore[no-untyped-def]
     np.testing.assert_allclose(dotp, np.cos(abs_alpha))
 
 
-def test_multi_plane_matrix(shells, cosmo, rng):  # type: ignore[no-untyped-def]
+def test_multi_plane_matrix(
+    shells: list[RadialWindow],
+    cosmo: Cosmology,
+    rng: np.random.Generator,
+) -> None:
     mat = multi_plane_matrix(shells, cosmo)
 
     np.testing.assert_array_equal(mat, np.tril(mat))
@@ -101,12 +111,17 @@ def test_multi_plane_matrix(shells, cosmo, rng):  # type: ignore[no-untyped-def]
     kappas = []
     for shell, delta in zip(shells, deltas):
         convergence.add_window(delta, shell)
-        kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
+        if convergence.kappa is not None:
+            kappas.append(convergence.kappa.copy())
 
     np.testing.assert_allclose(mat @ deltas, kappas)
 
 
-def test_multi_plane_weights(shells, cosmo, rng):  # type: ignore[no-untyped-def]
+def test_multi_plane_weights(
+    shells: list[RadialWindow],
+    cosmo: Cosmology,
+    rng: np.random.Generator,
+) -> None:
     w_in = np.eye(len(shells))
     w_out = multi_plane_weights(w_in, shells, cosmo)
 
@@ -125,4 +140,4 @@ def test_multi_plane_weights(shells, cosmo, rng):  # type: ignore[no-untyped-def
 
     wmat = multi_plane_weights(weights, shells, cosmo)
 
-    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)  # type: ignore[arg-type]
+    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)

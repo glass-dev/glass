@@ -17,12 +17,24 @@ Input and Output
 
 """  # noqa: D205, D400
 
+from __future__ import annotations
+
+import typing
 from contextlib import contextmanager
 
 import numpy as np
+import numpy.typing as npt
+
+if typing.TYPE_CHECKING:
+    import collections.abc
+    import importlib.util
+    import pathlib
+
+    if importlib.util.find_spec("fitsio") is not None:
+        import fitsio
 
 
-def save_cls(filename, cls) -> None:  # type: ignore[no-untyped-def]
+def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
     """
     Save a list of Cls to file.
 
@@ -35,7 +47,7 @@ def save_cls(filename, cls) -> None:  # type: ignore[no-untyped-def]
     np.savez(filename, values=values, split=split)
 
 
-def load_cls(filename):  # type: ignore[no-untyped-def]
+def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
     """
     Load a list of Cls from file.
 
@@ -55,23 +67,32 @@ class _FitsWriter:
     Initialised with the fits object and extension name.
     """
 
-    def __init__(self, fits, ext=None) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, fits: fitsio.FITS, ext: str = "") -> None:
         """Create a new, uninitialised writer."""
         self.fits = fits
         self.ext = ext
 
-    def _append(self, data, names=None) -> None:  # type: ignore[no-untyped-def]
+    def _append(
+        self,
+        data: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
+        names: list[str] | None = None,
+    ) -> None:
         """Write the FITS file."""
-        if self.ext is None or self.ext not in self.fits:
+        if self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
-            if self.ext is None:
+            if not self.ext:
                 self.ext = self.fits[-1].get_extnum()
         else:
             hdu = self.fits[self.ext]
             # not using hdu.append here because of incompatibilities
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
-    def write(self, data=None, /, **columns) -> None:  # type: ignore[no-untyped-def]
+    def write(
+        self,
+        data: npt.NDArray[np.float64] | None = None,
+        /,
+        **columns: npt.NDArray[np.float64],
+    ) -> None:
         """
         Write to FITS by calling the internal _append method.
 
@@ -89,7 +110,11 @@ class _FitsWriter:
 
 
 @contextmanager
-def write_catalog(filename, *, ext=None):  # type: ignore[no-untyped-def]
+def write_catalog(
+    filename: pathlib.Path,
+    *,
+    ext: str = "",
+) -> collections.abc.Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.
 
