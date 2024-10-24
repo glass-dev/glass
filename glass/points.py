@@ -194,12 +194,12 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         bias_model_callable = bias_model
 
     # broadcast inputs to common shape of extra dimensions
-    inputs = [(ngal, 0), (delta, 1)]
+    inputs: list[tuple[float | npt.NDArray[np.float64], int]] = [(ngal, 0), (delta, 1)]
     if bias is not None:
-        inputs += [(bias, 0)]
+        inputs.append((bias, 0))
     if vis is not None:
-        inputs += [(vis, 1)]
-    dims, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type]
+        inputs.append((vis, 1))
+    dims, *rest = broadcast_leading_axes(*inputs)
     ngal, delta, *rest = rest
     if bias is not None:
         bias, *rest = rest
