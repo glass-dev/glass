@@ -126,7 +126,7 @@ class RadialWindow(typing.NamedTuple):
 
     za: npt.NDArray[np.float64]
     wa: npt.NDArray[np.float64]
-    zeff: float | None
+    zeff: float = 0
 
 
 def tophat_windows(
