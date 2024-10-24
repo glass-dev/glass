@@ -78,7 +78,10 @@ def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
     # broadcasting rule
 
     e = ellipticity_ryden04(
-        np.array([-1.9, -2.9]), 0.9, np.array([[0.2, 0.3], [0.4, 0.5]]), 0.1
+        np.array([-1.9, -2.9]),
+        0.9,
+        np.array([[0.2, 0.3], [0.4, 0.5]]),
+        0.1,
     )
     assert np.shape(e) == (2, 2)
 

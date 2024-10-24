@@ -28,7 +28,8 @@ def test_restrict() -> None:
 
     # window for restriction
     w = RadialWindow(
-        za=np.array([1.0, 2.0, 3.0, 4.0]), wa=np.array([0.0, 0.5, 0.5, 0.0])
+        za=np.array([1.0, 2.0, 3.0, 4.0]),
+        wa=np.array([0.0, 0.5, 0.5, 0.0]),
     )
 
     zr, fr = restrict(z, f, w)

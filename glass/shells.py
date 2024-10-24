@@ -579,7 +579,7 @@ def partition_nnls(
                 right=0.0,
             )
             for za, wa, _ in shells
-        ]
+        ],
     )
     a /= np.trapz(  # type: ignore[attr-defined]
         a,

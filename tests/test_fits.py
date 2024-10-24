@@ -24,7 +24,9 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
     filename_tfits = "tfits.fits"  # file created on the fly to test against
 
     def _test_append(
-        fits: fitsio.FITS, data: list[npt.NDArray[np.float64]], names: list[str]
+        fits: fitsio.FITS,
+        data: list[npt.NDArray[np.float64]],
+        names: list[str],
     ) -> None:
         """Write routine for FITS test cases."""
         cat_name = "CATALOG"

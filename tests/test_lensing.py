@@ -41,7 +41,9 @@ def cosmo() -> Cosmology:
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
         def xm(
-            self, z: npt.NDArray[np.float64], z2: npt.NDArray[np.float64] | None = None
+            self,
+            z: npt.NDArray[np.float64],
+            z2: npt.NDArray[np.float64] | None = None,
         ) -> npt.NDArray[np.float64]:
             if z2 is None:
                 return np.array(z) * 1000

@@ -27,22 +27,34 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test sampling
 
     redshifts = redshifts_from_nz(
-        10, np.array([0, 1, 2, 3, 4]), np.array([1, 0, 0, 0, 0]), warn=False
+        10,
+        np.array([0, 1, 2, 3, 4]),
+        np.array([1, 0, 0, 0, 0]),
+        warn=False,
     )
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(
-        10, np.array([0, 1, 2, 3, 4]), np.array([0, 0, 1, 0, 0]), warn=False
+        10,
+        np.array([0, 1, 2, 3, 4]),
+        np.array([0, 0, 1, 0, 0]),
+        warn=False,
     )
     assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(
-        10, np.array([0, 1, 2, 3, 4]), np.array([0, 0, 0, 0, 1]), warn=False
+        10,
+        np.array([0, 1, 2, 3, 4]),
+        np.array([0, 0, 0, 0, 1]),
+        warn=False,
     )
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
     redshifts = redshifts_from_nz(
-        10, np.array([0, 1, 2, 3, 4]), np.array([0, 0, 1, 1, 1]), warn=False
+        10,
+        np.array([0, 1, 2, 3, 4]),
+        np.array([0, 0, 1, 1, 1]),
+        warn=False,
     )
     assert not np.any(redshifts <= 1)
 
@@ -111,7 +123,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
         redshifts = redshifts_from_nz(
-            10, np.array([0, 1, 2, 3, 4]), np.array([1, 0, 0, 0, 0])
+            10,
+            np.array([0, 1, 2, 3, 4]),
+            np.array([1, 0, 0, 0, 0]),
         )
 
 
@@ -125,7 +139,12 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
     )
 
     shear = galaxy_shear(
-        np.array([]), np.array([]), np.array([]), kappa, gamma1, gamma2
+        np.array([]),
+        np.array([]),
+        np.array([]),
+        kappa,
+        gamma1,
+        gamma2,
     )
     np.testing.assert_equal(shear, [])
 
