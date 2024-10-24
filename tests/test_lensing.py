@@ -109,7 +109,8 @@ def test_multi_plane_matrix(
     kappas = []
     for shell, delta in zip(shells, deltas):
         convergence.add_window(delta, shell)
-        kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
+        if convergence.kappa is not None:
+            kappas.append(convergence.kappa.copy())
 
     np.testing.assert_allclose(mat @ deltas, kappas)
 
