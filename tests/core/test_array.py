@@ -50,10 +50,8 @@ def test_broadcast_leading_axes() -> None:
     b_in = np.zeros((4, 10))
     c_in = np.zeros((3, 1, 5, 6))
 
-    a_out: npt.NDArray[np.int_]
-    b_out: npt.NDArray[np.int_]
-    c_out: npt.NDArray[np.int_]
-    dims, a_out, b_out, c_out = broadcast_leading_axes((a_in, 0), (b_in, 1), (c_in, 2))  # type: ignore[misc]
+    dims, *rest = broadcast_leading_axes((a_in, 0), (b_in, 1), (c_in, 2))
+    a_out, b_out, c_out = rest
 
     assert dims == (3, 4)
     assert a_out.shape == (3, 4)
