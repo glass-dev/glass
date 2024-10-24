@@ -169,7 +169,7 @@ def tophat_windows(
         )
 
     wht: WeightFunc
-    wht = weight if weight is not None else np.ones_like  # type: ignore[assignment]
+    wht = weight if weight is not None else np.ones_like
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
         n = max(round((zmax - zmin) / dz), 2)
