@@ -113,7 +113,7 @@ class _FitsWriter:
 def write_catalog(
     filename: pathlib.Path,
     *,
-    ext: str | None = None,
+    ext: str = "",
 ) -> collections.abc.Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.
