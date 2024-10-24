@@ -111,7 +111,7 @@ def loglinear_bias(
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     ngal: float | npt.NDArray[np.float64],
     delta: npt.NDArray[np.float64],
-    bias: float | None = None,
+    bias: float | npt.NDArray[np.float64] | None = None,
     vis: npt.NDArray[np.float64] | None = None,
     *,
     bias_model: str | typing.Callable[..., typing.Any] = "linear",
@@ -200,14 +200,14 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     dims, *rest = broadcast_leading_axes(*inputs)  # type: ignore[arg-type]
     ngal, delta, *rest = rest
     if bias is not None:
-        bias, *rest = rest  # type: ignore[assignment]
+        bias, *rest = rest
     if vis is not None:
         vis, *rest = rest
 
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index, operator]
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[operator]
 
         # remove monopole if asked to
         if remove_monopole:
