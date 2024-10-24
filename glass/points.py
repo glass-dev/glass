@@ -187,9 +187,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     # get the bias model
     if isinstance(bias_model, str):
-        bias_model = globals()[f"{bias_model}_bias"]
+        bias_model_callable = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
         raise TypeError("bias_model must be string or callable")  # noqa: EM101,TRY003
+    else:
+        bias_model_callable = bias_model
 
     # broadcast inputs to common shape of extra dimensions
     inputs = [(ngal, 0), (delta, 1)]
@@ -207,7 +209,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[operator]
+        n = (
+            np.copy(delta[k])
+            if bias is None
+            else bias_model_callable(delta[k], bias[k])
+        )
 
         # remove monopole if asked to
         if remove_monopole:
