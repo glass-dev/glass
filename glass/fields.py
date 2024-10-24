@@ -41,23 +41,15 @@ if typing.TYPE_CHECKING:
 def iternorm(
     k: int,
     cov: collections.abc.Iterable[npt.NDArray[np.float64]],
-    size: int | tuple[int, ...] | None = None,
+    size: tuple[int, ...] = (),
 ) -> collections.abc.Generator[
     tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
 ]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
-    n: tuple[int, ...]
-    if size is None:
-        n = ()
-    elif isinstance(size, int):
-        n = (size,)
-    else:
-        n = size
-
-    m = np.zeros((*n, k, k))
-    a = np.zeros((*n, k))
-    s = np.zeros((*n,))
-    q = (*n, k + 1)
+    m = np.zeros((*size, k, k))
+    a = np.zeros((*size, k))
+    s = np.zeros((*size,))
+    q = (*size, k + 1)
     j = 0 if k > 0 else None
 
     for i, x in enumerate(cov):
@@ -86,7 +78,7 @@ def iternorm(
             c = x[..., 1:, np.newaxis]
             a = np.matmul(m[..., :j], c[..., k - j :, :])
             a += np.matmul(m[..., j:], c[..., : k - j, :])
-            a = a.reshape(*n, k)
+            a = a.reshape(*size, k)
 
             # next rolling index
             j = (j - 1) % k
@@ -266,7 +258,7 @@ def generate_gaussian(
     y = np.zeros((n * (n + 1) // 2, ncorr), dtype=np.complex128)
 
     # generate the conditional normal distribution for iterative sampling
-    conditional_dist = iternorm(ncorr, cov, size=n)
+    conditional_dist = iternorm(ncorr, cov, size=(n,))
 
     # sample the fields from the conditional distribution
     for j, a, s in conditional_dist:

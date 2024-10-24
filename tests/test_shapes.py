@@ -59,7 +59,7 @@ def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
 
     # many ellipticities
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(1000,))
     assert np.shape(e) == (1000,)
 
     # explicit shape
@@ -87,10 +87,10 @@ def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
 
     # check that result is in the specified range
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
+    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=(10,))
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)
+    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=(10,))
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
 
