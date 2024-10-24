@@ -116,7 +116,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     *,
     bias_model: str | typing.Callable[..., typing.Any] = "linear",
     remove_monopole: bool = False,
-    batch: int | None = 1_000_000,
+    batch: int = 1_000_000,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[
     tuple[
@@ -258,7 +258,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 size += q[-1]
             else:
                 # how many pixels from this group do we need?
-                stop += np.searchsorted(q, batch - size, side="right")  # type: ignore[call-overload, operator]
+                stop += int(np.searchsorted(q, batch - size, side="right"))
                 # if the first pixel alone is too much, use it anyway
                 if stop == start:
                     stop += 1
