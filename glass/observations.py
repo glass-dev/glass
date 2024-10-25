@@ -98,7 +98,7 @@ def gaussian_nz(
     standard deviation.
 
     If ``mean`` or ``sigma`` are array_like, their axes will be the leading
-    axes of the redshift distribution..
+    axes of the redshift distribution.
 
     Parameters
     ----------
