@@ -61,7 +61,7 @@ def distance_weight(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Uniform weight in comoving distance.
 
     Parameters
     ----------
@@ -83,7 +83,7 @@ def volume_weight(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Uniform weight in comoving volume.
 
     Parameters
     ----------
@@ -105,7 +105,7 @@ def density_weight(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Uniform weight in matter density.
 
     Parameters
     ----------
@@ -199,6 +199,10 @@ def tophat_windows(
     ValueError
         _description_
 
+    See Also
+    --------
+    :ref:`user-window-functions`
+
     """
     if len(zbins) < 2:
         msg = "zbins must have at least two entries"
@@ -274,6 +278,10 @@ def linear_windows(
     ValueError
         _description_
 
+    See Also
+    --------
+    :ref:`user-window-functions`
+
     """
     if len(zgrid) < 3:
         msg = "nodes must have at least 3 entries"
@@ -338,6 +346,10 @@ def cubic_windows(
     ------
     ValueError
         _description_
+
+    See Also
+    --------
+    :ref:`user-window-functions`
 
     """
     if len(zgrid) < 3:
@@ -439,7 +451,8 @@ def partition(
 
     Returns
     -------
-        _description_
+        The weights of the partition, where the leading axis corresponds to
+        *shells*.
 
     Raises
     ------
@@ -607,7 +620,7 @@ def partition_nnls(
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Non-negative least-squares partition.
 
     Parameters
     ----------
@@ -706,7 +719,7 @@ def partition_restrict(
     shells: list[RadialWindow],
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Partition by restriction and integration.
 
     Parameters
     ----------
@@ -741,7 +754,7 @@ def redshift_grid(
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Redshift grid with uniform spacing in redshift.
 
     Parameters
     ----------
@@ -783,7 +796,7 @@ def distance_grid(
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Redshift grid with uniform spacing in comoving distance.
 
     Parameters
     ----------
@@ -847,6 +860,11 @@ def combine(
     Returns
     -------
         _description_
+
+    See Also
+    --------
+    partition:
+        Find weights for a given function.
 
     """
     return (
