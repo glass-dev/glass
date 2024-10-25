@@ -148,15 +148,15 @@ def smail_nz(
     Parameters
     ----------
     z
-        _description_
+        Redshift values of the distribution.
     z_mode
-        _description_
+        Mode of the redshift distribution, must be positive.
     alpha
-        _description_
+        Power law exponent (z/z0)^\alpha, must be positive.
     beta
-        _description_
+        Log-power law exponent exp[-(z/z0)^\beta], must be positive.
     norm
-        _description_
+        If given, the normalisation of the distribution.
 
     Returns
     -------
@@ -213,13 +213,13 @@ def fixed_zbins(
     Parameters
     ----------
     zmin
-        _description_
+        Extent of the redshift binning.
     zmax
-        _description_
+        Extent of the redshift binning.
     nbins
-        _description_
+        Number of redshift bins. Only one of ``nbins`` and ``dz`` can be given.
     dz
-        _description_
+        Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
 
     Returns
     -------
@@ -256,11 +256,11 @@ def equal_dens_zbins(
     Parameters
     ----------
     z
-        _description_
+        The source redshift distribution. Must be one-dimensional.
     nz
-        _description_
+        The source redshift distribution. Must be one-dimensional.
     nbins
-        _description_
+        Number of redshift bins.
 
     Returns
     -------
@@ -297,13 +297,13 @@ def tomo_nz_gausserr(
     Parameters
     ----------
     z
-        _description_
+        The true source redshift distribution. Must be one-dimensional.
     nz
-        _description_
+        The true source redshift distribution. Must be one-dimensional.
     sigma_0
-        _description_
+        Redshift error in the tomographic binning at zero redshift.
     zbins
-        _description_
+        List of redshift bin edges.
 
     Returns
     -------
