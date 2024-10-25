@@ -151,6 +151,15 @@ class RadialWindow(typing.NamedTuple):
         >>> w1
         RadialWindow(za=..., wa=..., zeff=0.15)
 
+    Attributes
+    ----------
+    za
+        Redshift array; the abscissae of the window function.
+    wa
+        Weight array; the values (ordinates) of the window function.
+    zeff
+        Effective redshift of the window.
+
     """
 
     za: npt.NDArray[np.float64]
