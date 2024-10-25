@@ -184,11 +184,11 @@ def tophat_windows(
     Parameters
     ----------
     zbins
-        _description_
+        Redshift bin edges for the tophat window functions.
     dz
-        _description_
+        Approximate spacing of the redshift grid.
     weight
-        _description_
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
@@ -263,11 +263,11 @@ def linear_windows(
     Parameters
     ----------
     zgrid
-        _description_
+        Redshift grid for the triangular window functions.
     dz
-        _description_
+        Approximate spacing of the redshift grid.
     weight
-        _description_
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
@@ -332,11 +332,11 @@ def cubic_windows(
     Parameters
     ----------
     zgrid
-        _description_
+        Redshift grid for the cubic spline window functions.
     dz
-        _description_
+        Approximate spacing of the redshift grid.
     weight
-        _description_
+        If given, a weight function to be applied to the window functions.
 
     Returns
     -------
@@ -399,11 +399,11 @@ def restrict(
     Parameters
     ----------
     z
-        _description_
+        The function to be restricted.
     f
-        _description_
+        The function to be restricted.
     w
-        _description_
+        The window function for the restriction.
 
     Returns
     -------
@@ -441,13 +441,16 @@ def partition(
     Parameters
     ----------
     z
-        _description_
+        The function to be partitioned. If *f* is multi-dimensional,
+        its last axis must agree with *z*.
     fz
-        _description_
+        The function to be partitioned. If *f* is multi-dimensional,
+        its last axis must agree with *z*.
     shells
-        _description_
+        Ordered sequence of window functions for the partition.
     method
-        _description_
+        Method for the partition. See notes for description. The
+        options are "lstsq", "nnls", "restrict".
 
     Returns
     -------
@@ -539,7 +542,7 @@ def partition_lstsq(
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Least-squares partition.
 
     Parameters
     ----------
@@ -621,6 +624,9 @@ def partition_nnls(
 ) -> npt.NDArray[np.float64]:
     """
     Non-negative least-squares partition.
+
+    Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
+    requires SciPy.
 
     Parameters
     ----------
@@ -851,15 +857,16 @@ def combine(
     Parameters
     ----------
     z
-        _description_
+        Redshifts *z* in which to evaluate the combined function.
     weights
-        _description_
+        Weights of the linear combination, where the leading axis
+        corresponds to *shells*.
     shells
-        _description_
+        Ordered sequence of window functions to be combined.
 
     Returns
     -------
-        _description_
+        A linear combination of window functions, evaluated in *z*.
 
     See Also
     --------
