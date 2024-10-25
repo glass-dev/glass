@@ -36,10 +36,14 @@ if typing.TYPE_CHECKING:
 
 def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
     """
-    Save a list of Cls to file.
+    _summary_.
 
-    Uses :func:`numpy.savez` internally. The filename should therefore have a
-    ``.npz`` suffix, or it will be given one.
+    Parameters
+    ----------
+    filename
+        _description_
+    cls
+        _description_
 
     """
     split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])
@@ -49,9 +53,16 @@ def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
 
 def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
     """
-    Load a list of Cls from file.
+    _summary_.
 
-    Uses :func:`numpy.load` internally.
+    Parameters
+    ----------
+    filename
+        _description_
+
+    Returns
+    -------
+        _description_
 
     """
     with np.load(filename) as npz:
@@ -61,14 +72,20 @@ def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
 
 
 class _FitsWriter:
-    """
-    Writer that creates a FITS file.
-
-    Initialised with the fits object and extension name.
-    """
+    """_summary_."""
 
     def __init__(self, fits: fitsio.FITS, ext: str = "") -> None:
-        """Create a new, uninitialised writer."""
+        """
+        _summary_.
+
+        Parameters
+        ----------
+        fits
+            _description_
+        ext
+            _description_
+
+        """
         self.fits = fits
         self.ext = ext
 
@@ -77,7 +94,17 @@ class _FitsWriter:
         data: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
         names: list[str] | None = None,
     ) -> None:
-        """Write the FITS file."""
+        """
+        _summary_.
+
+        Parameters
+        ----------
+        data
+            _description_
+        names
+            _description_
+
+        """
         if self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if not self.ext:
@@ -94,10 +121,13 @@ class _FitsWriter:
         **columns: npt.NDArray[np.float64],
     ) -> None:
         """
-        Write to FITS by calling the internal _append method.
+        _summary_.
 
-        Pass either a positional variable (data)
-        or multiple named arguments (**columns)
+        Parameters
+        ----------
+        data
+            _description_
+
         """
         # if data is given, write it as it is
         if data is not None:
@@ -116,19 +146,22 @@ def write_catalog(
     ext: str = "",
 ) -> collections.abc.Generator[_FitsWriter]:
     """
-    Write a catalogue into a FITS file.
+    _summary_.
 
-    *ext* is the optional name of the extension.
-    To be used as a context manager::
+    Parameters
+    ----------
+    filename
+        _description_
+    ext
+        _description_
 
-        # create the catalogue writer
-        with write_catalog("catalog.fits") as out:
-            ...
-            # write catalogue columns RA, DEC, E1, E2, WHT with given arrays
-            out.write(RA=lon, DEC=lat, E1=eps1, E2=e2, WHT=w)
+    Returns
+    -------
+        _description_
 
-    .. note::
-       Requires the ``fitsio`` package.
+    Yields
+    ------
+        _description_
 
     """
     import fitsio

@@ -53,33 +53,21 @@ def effective_bias(
     bz: npt.NDArray[np.float64],
     w: RadialWindow,
 ) -> npt.NDArray[np.float64]:
-    r"""
-    Effective bias parameter from a redshift-dependent bias function.
-
-    This function takes a redshift-dependent bias function :math:`b(z)`
-    and computes an effective bias parameter :math:`\bar{b}` for a
-    given window function :math:`w(z)`.
-
-    Returns the effective bias parameter for the window.
+    """
+    _summary_.
 
     Parameters
     ----------
-    z:
-        Redshifts and values of the bias function :math:`b(z)`.
-    bz:
-        Redshifts and values of the bias function :math:`b(z)`.
-    w:
-        The radial window function :math:`w(z)`.
+    z
+        _description_
+    bz
+        _description_
+    w
+        _description_
 
-    Notes
-    -----
-    The effective bias parameter :math:`\bar{b}` is computed using the
-    window function :math:`w(z)` as the weighted average
-
-    .. math::
-
-        \bar{b} = \frac{\int b(z) \, w(z) \, dz}{\int w(z) \, dz}
-        \;.
+    Returns
+    -------
+        _description_
 
     """
     norm = np.trapz(  # type: ignore[attr-defined]
@@ -93,7 +81,21 @@ def linear_bias(
     delta: npt.NDArray[np.float64],
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    r"""Linear bias model :math:`\delta_g = b \, \delta`."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    delta
+        _description_
+    b
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     return b * delta
 
 
@@ -101,7 +103,21 @@ def loglinear_bias(
     delta: npt.NDArray[np.float64],
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    r"""log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    delta
+        _description_
+    b
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
@@ -126,59 +142,41 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     ]
 ]:
     """
-    Generate positions tracing a density contrast.
-
-    The map of expected number counts is constructed from the number
-    density, density contrast, an optional bias model, and an optional
-    visibility map.
-
-    If ``remove_monopole`` is set, the monopole of the computed density
-    contrast is removed. Over the full sky, the mean number density of
-    the map will then match the given number density exactly. This,
-    however, means that an effectively different bias model is being
-    used, unless the monopole is already zero in the first place.
-
-    The function supports multi-dimensional input for the ``ngal``,
-    ``delta``, ``bias``, and ``vis`` parameters. Extra dimensions are
-    broadcast to a common shape, and treated as separate populations of
-    points. These are then sampled independently, and the results
-    concatenated into a flat list of longitudes and latitudes. The
-    number of points per population is returned in ``count`` as an array
-    in the shape of the extra dimensions.
+    _summary_.
 
     Parameters
     ----------
-    ngal:
-        Number density, expected number of points per arcmin2.
-    delta:
-        Map of the input density contrast. This is fed into the bias
-        model to produce the density contrast for sampling.
-    bias:
-        Bias parameter, is passed as an argument to the bias model.
-    vis:
-        Visibility map for the observed points. This is multiplied with
-        the full sky number count map, and must hence be of compatible shape.
-    bias_model:
-        The bias model to apply. If a string, refers to a function in
-        the :mod:`~glass.points` module, e.g. ``'linear'`` for
-        :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
-    remove_monopole:
-        If true, the monopole of the density contrast
-        after biasing is fixed to zero.
-    batch:
-        Maximum number of positions to yield in one batch.
-    rng:
-        Random number generator. If not given, a default RNG is used.
+    PLR0913
+        _description_
+    PLR0915ngal
+        _description_
+    delta
+        _description_
+    bias
+        _description_
+    vis
+        _description_
+    bias_model
+        _description_
+    remove_monopole
+        _description_
+    batch
+        _description_
+    rng
+        _description_
+
+    Returns
+    -------
+        _description_
 
     Yields
     ------
-    lon:
-        Columns of longitudes for the sampled points.
-    lat:
-        Columns of latitudes for the sampled points.
-    count:
-        The number of sampled points  If multiple populations are sampled, an
-        array of counts in the shape of the extra dimensions is returned.
+        _description_
+
+    Raises
+    ------
+    TypeError
+        _description_
 
     """
     # get default RNG if not given
@@ -294,26 +292,22 @@ def uniform_positions(
     ]
 ]:
     """
-    Generate positions uniformly over the sphere.
-
-    The function supports array input for the ``ngal`` parameter.
+    _summary_.
 
     Parameters
     ----------
-    ngal:
-        Number density, expected number of positions per arcmin2.
-    rng:
-        Random number generator. If not given, a default RNG will be used.
+    ngal
+        _description_
+    rng
+        _description_
+
+    Returns
+    -------
+        _description_
 
     Yields
     ------
-    lon:
-        Columns of longitudes for the sampled points.
-    lat:
-        Columns of latitudes for the sampled points.
-    count:
-        The number of sampled points. For array inputs, an array of
-        counts with the same shape is returned.
+        _description_
 
     """
     # get default RNG if not given
@@ -350,26 +344,19 @@ def position_weights(
     densities: npt.NDArray[np.float64],
     bias: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
-    r"""
-    Compute relative weights for angular clustering.
-
-    Takes an array *densities* of densities in arbitrary units and
-    returns the relative weight of each shell. If *bias* is given, a
-    linear bias is applied to each shell.
-
-    This is the equivalent of computing the product of normalised
-    redshift distribution and bias factor :math:`n(z) \, b(z)` for the
-    discretised shells.
-
-    Returns the relative weight of each shell for angular clustering.
+    """
+    _summary_.
 
     Parameters
     ----------
-    densities:
-        Density of points in each shell. The first axis must broadcast
-        against the number of shells, and is normalised internally.
-    bias:
-        Value or values of the linear bias parameter for each shell.
+    densities
+        _description_
+    bias
+        _description_
+
+    Returns
+    -------
+        _description_
 
     """
     # bring densities and bias into the same shape

@@ -52,105 +52,25 @@ def from_convergence(  # noqa: PLR0913
     shear: bool = False,
     discretized: bool = True,
 ) -> tuple[npt.NDArray[np.float64], ...]:
-    r"""
-    Compute other weak lensing maps from the convergence.
-
-    Takes a weak lensing convergence map and returns one or more of
-    deflection potential, deflection, and shear maps. The maps are
-    computed via spherical harmonic transforms.
-
-    Returns the maps of:
-
-    * deflection potential if ``potential`` is true.
-    * potential (complex) if ``deflection`` is true.
-    * shear (complex) if ``shear`` is true.
+    """
+    _summary_.
 
     Parameters
     ----------
-    kappa:
-        HEALPix map of the convergence field.
-    lmax:
-        Maximum angular mode number to use in the transform.
-    potential:
-        Which lensing maps to return.
-    deflection:
-        Which lensing maps to return.
-    shear:
-        Which lensing maps to return.
-    discretized:
-        Correct the pixel window function in output maps.
+    lmax
+        _description_
+    potential
+        _description_
+    deflection
+        _description_
+    shear
+        _description_
+    discretized
+        _description_
 
-    Notes
-    -----
-    The weak lensing fields are computed from the convergence or
-    deflection potential in the following way. [1]
-
-    Define the spin-raising and spin-lowering operators of the
-    spin-weighted spherical harmonics as
-
-    .. math::
-
-        \eth {}_sY_{lm}
-        = +\sqrt{(l-s)(l+s+1)} \, {}_{s+1}Y_{lm} \;, \\
-        \bar{\eth} {}_sY_{lm}
-        = -\sqrt{(l+s)(l-s+1)} \, {}_{s-1}Y_{lm} \;.
-
-    The convergence field :math:`\kappa` is related to the deflection
-    potential field :math:`\psi` by the Poisson equation,
-
-    .. math::
-
-        2 \kappa
-        = \eth\bar{\eth} \, \psi
-        = \bar{\eth}\eth \, \psi \;.
-
-    The convergence modes :math:`\kappa_{lm}` are hence related to the
-    deflection potential modes :math:`\psi_{lm}` as
-
-    .. math::
-
-        2 \kappa_{lm}
-        = -l \, (l+1) \, \psi_{lm} \;.
-
-    The :term:`deflection` :math:`\alpha` is the gradient of the
-    deflection potential :math:`\psi`. On the sphere, this is
-
-    .. math::
-
-        \alpha
-        = \eth \, \psi \;.
-
-    The deflection field has spin weight :math:`1` in the HEALPix
-    convention, in order for points to be deflected towards regions of
-    positive convergence. The modes :math:`\alpha_{lm}` of the
-    deflection field are hence
-
-    .. math::
-
-        \alpha_{lm}
-        = \sqrt{l \, (l+1)} \, \psi_{lm} \;.
-
-    The shear field :math:`\gamma` is related to the deflection
-    potential :math:`\psi` and deflection :math:`\alpha` as
-
-    .. math::
-
-        2 \gamma
-        = \eth\eth \, \psi
-        = \eth \, \alpha \;,
-
-    and thus has spin weight :math:`2`. The shear modes
-    :math:`\gamma_{lm}` are related to the deflection potential modes as
-
-    .. math::
-
-        2 \gamma_{lm}
-        = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
-
-    References
-    ----------
-    * [1] Tessore N., et al., OJAp, 6, 11 (2023).
-           doi:10.21105/astro.2302.01942
+    Returns
+    -------
+        _description_
 
     """
     # no output means no computation, return empty tuple
@@ -227,14 +147,21 @@ def shear_from_convergence(
     *,
     discretized: bool = True,
 ) -> npt.NDArray[np.float64]:
-    r"""
-    Weak lensing shear from convergence.
+    """
+    _summary_.
 
-    .. deprecated:: 2023.6
-       Use the more general :func:`from_convergence` function instead.
+    Parameters
+    ----------
+    kappa
+        _description_
+    lmax
+        _description_
+    discretized
+        _description_
 
-    Computes the shear from the convergence using a spherical harmonic
-    transform.
+    Returns
+    -------
+        _description_
 
     """
     nside = hp.get_nside(kappa)
@@ -266,10 +193,18 @@ def shear_from_convergence(
 
 
 class MultiPlaneConvergence:
-    """Compute convergence fields iteratively from multiple matter planes."""
+    """_summary_."""
 
     def __init__(self, cosmo: Cosmology) -> None:
-        """Create a new instance to iteratively compute the convergence."""
+        """
+        _summary_.
+
+        Parameters
+        ----------
+        cosmo
+            _description_
+
+        """
         self.cosmo = cosmo
 
         # set up initial values of variables
@@ -284,10 +219,14 @@ class MultiPlaneConvergence:
 
     def add_window(self, delta: npt.NDArray[np.float64], w: RadialWindow) -> None:
         """
-        Add a mass plane from a window function to the convergence.
+        _summary_.
 
-        The lensing weight is computed from the window function, and the
-        source plane redshift is the effective redshift of the window.
+        Parameters
+        ----------
+        delta
+            _description_
+        w
+            _description_
 
         """
         zsrc = w.zeff
@@ -308,7 +247,24 @@ class MultiPlaneConvergence:
         zsrc: float,
         wlens: float = 1.0,
     ) -> None:
-        """Add a mass plane at redshift ``zsrc`` to the convergence."""
+        """
+        _summary_.
+
+        Parameters
+        ----------
+        delta
+            _description_
+        zsrc
+            _description_
+        wlens
+            _description_
+
+        Raises
+        ------
+        ValueError
+            _description_
+
+        """
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
             raise ValueError(msg)
@@ -352,22 +308,50 @@ class MultiPlaneConvergence:
 
     @property
     def zsrc(self) -> float:
-        """The redshift of the current convergence plane."""
+        """
+        _summary_.
+
+        Returns
+        -------
+            _description_
+
+        """
         return self.z3
 
     @property
     def kappa(self) -> npt.NDArray[np.float64] | None:
-        """The current convergence plane."""
+        """
+        _summary_.
+
+        Returns
+        -------
+            _description_
+
+        """
         return self.kappa3
 
     @property
     def delta(self) -> npt.NDArray[np.float64]:
-        """The current matter plane."""
+        """
+        _summary_.
+
+        Returns
+        -------
+            _description_
+
+        """
         return self.delta3
 
     @property
     def wlens(self) -> float:
-        """The weight of the current matter plane."""
+        """
+        _summary_.
+
+        Returns
+        -------
+            _description_
+
+        """
         return self.w3
 
 
@@ -375,7 +359,21 @@ def multi_plane_matrix(
     shells: list[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
-    """Compute the matrix of lensing contributions from each shell."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    shells
+        _description_
+    cosmo
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     mpc = MultiPlaneConvergence(cosmo)
     wmat = np.eye(len(shells))
     for i, w in enumerate(shells):
@@ -390,26 +388,25 @@ def multi_plane_weights(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
-    Compute effective weights for multi-plane convergence.
-
-    Converts an array *weights* of relative weights for each shell
-    into the equivalent array of relative lensing weights.
-
-    This is the discretised version of the integral that turns a
-    redshift distribution :math:`n(z)` into the lensing efficiency
-    sometimes denoted :math:`g(z)` or :math:`q(z)`.
-
-    Returns the relative lensing weight of each shell.
+    _summary_.
 
     Parameters
     ----------
-    weights:
-        Relative weight of each shell. The first axis must broadcast
-        against the number of shells, and is normalised internally.
-    shells:
-        Window functions of the shells.
-    cosmo:
-        Cosmology instance.
+    weights
+        _description_
+    shells
+        _description_
+    cosmo
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     # ensure shape of weights ends with the number of shells
@@ -432,33 +429,21 @@ def deflect(
     npt.NDArray[np.float64],
     npt.NDArray[np.float64],
 ]:
-    r"""
-    Apply deflections to positions.
-
-    Takes an array of :term:`deflection` values and applies them
-    to the given positions.
-
-    Returns the longitudes and latitudes after deflection.
+    """
+    _summary_.
 
     Parameters
     ----------
-    lon:
-        Longitudes to be deflected.
-    lat:
-        Latitudes to be deflected.
-    alpha:
-        Deflection values. Must be complex-valued or have a leading
-        axis of size 2 for the real and imaginary component.
+    lon
+        _description_
+    lat
+        _description_
+    alpha
+        _description_
 
-    Notes
-    -----
-    Deflections on the sphere are :term:`defined <deflection>` as
-    follows:  The complex deflection :math:`\alpha` transports a point
-    on the sphere an angular distance :math:`|\alpha|` along the
-    geodesic with bearing :math:`\arg\alpha` in the original point.
-
-    In the language of differential geometry, this function is the
-    exponential map.
+    Returns
+    -------
+        _description_
 
     """
     alpha = np.asanyarray(alpha)

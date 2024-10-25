@@ -8,6 +8,21 @@ packages that provide a "glass" module.
 
 
 def _extend_path(path: list[str], name: str) -> list[str]:
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    path
+        _description_
+    name
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     import os.path
     from pkgutil import extend_path
 

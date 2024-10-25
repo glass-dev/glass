@@ -210,26 +210,31 @@ def generate_gaussian(
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """
-    Sample Gaussian random fields from Cls iteratively.
+    _summary_.
 
-    A generator that iteratively samples HEALPix maps of Gaussian random fields
-    with the given angular power spectra ``gls`` and resolution parameter
-    ``nside``.
+    Parameters
+    ----------
+    gls
+        _description_
+    nside
+        _description_
+    ncorr
+        _description_
+    rng
+        _description_
 
-    The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated. This saves memory, as only `ncorr` previous
-    fields need to be kept.
+    Returns
+    -------
+        _description_
 
-    The ``gls`` array must contain the auto-correlation of each new field
-    followed by the cross-correlations with all previous fields in reverse
-    order::
+    Yields
+    ------
+        _description_
 
-        gls = [gl_00,
-               gl_11, gl_10,
-               gl_22, gl_21, gl_20,
-               ...]
-
-    Missing entries can be set to ``None``.
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     # get the default RNG if not given
@@ -295,7 +300,31 @@ def generate_lognormal(
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
-    """Sample lognormal random fields from Gaussian Cls iteratively."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    gls
+        _description_
+    nside
+        _description_
+    shift
+        _description_
+    ncorr
+        _description_
+    rng
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    Yields
+    ------
+        _description_
+
+    """
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         gl = gls[i * (i + 1) // 2]
@@ -323,21 +352,22 @@ def getcl(
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    Return a specific angular power spectrum from an array.
-
-    Return the angular power spectrum for indices *i* and *j* from an
-    array in *GLASS* ordering.
+    _summary_.
 
     Parameters
     ----------
-    cls:
-        List of angular power spectra in *GLASS* ordering.
-    i:
-        Indices to return.
-    j:
-        Indices to return.
-    lmax:
-        Truncate the returned spectrum at this mode number.
+    cls
+        _description_
+    i
+        _description_
+    j
+        _description_
+    lmax
+        _description_
+
+    Returns
+    -------
+        _description_
 
     """
     if j > i:
@@ -358,28 +388,30 @@ def effective_cls(
     *,
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
-    r"""
-    Compute effective angular power spectra from weights.
-
-    Computes a linear combination of the angular power spectra *cls*
-    using the factors provided by *weights1* and *weights2*. Additional
-    axes in *weights1* and *weights2* produce arrays of spectra.
-
-    Returns a dictionary of effective angular power spectra, where keys
-    correspond to the leading axes of *weights1* and *weights2*.
+    """
+    _summary_.
 
     Parameters
     ----------
-    cls:
-        Angular matter power spectra to combine, in *GLASS* ordering.
-    weights1:
-        Weight factors for spectra. The first axis must be equal to
-        the number of fields.
-    weights2:
-        Second set of weights. If not given, *weights1* is used.
-    lmax:
-        Truncate the angular power spectra at this mode number. If not
-        given, the longest input in *cls* will be used.
+    cls
+        _description_
+    weights1
+        _description_
+    weights2
+        _description_
+    lmax
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+    ValueError
+        _description_
 
     """
     from itertools import combinations_with_replacement, product

@@ -12,7 +12,14 @@ import numpy.typing as npt
 def broadcast_first(
     *arrays: npt.NDArray[np.float64],
 ) -> tuple[npt.NDArray[np.float64], ...]:
-    """Broadcast arrays, treating the first axis as common."""
+    """
+    _summary_.
+
+    Returns
+    -------
+        _description_
+
+    """
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
     return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
@@ -28,28 +35,11 @@ def broadcast_leading_axes(
     typing.Unpack[tuple[npt.NDArray[np.float64], ...]],
 ]:
     """
-    Broadcast all but the last N axes.
+    _summary_.
 
-    Returns the shape of the broadcast dimensions, and all input arrays
-    with leading axes matching that shape.
-
-    Examples
-    --------
-    Broadcast all dimensions of ``a``, all except the last dimension of
-    ``b``, and all except the last two dimensions of ``c``.
-
-    >>> a = 0
-    >>> b = np.zeros((4, 10))
-    >>> c = np.zeros((3, 1, 5, 6))
-    >>> dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))
-    >>> dims
-    (3, 4)
-    >>> a.shape
-    (3, 4)
-    >>> b.shape
-    (3, 4, 10)
-    >>> c.shape
-    (3, 4, 5, 6)
+    Returns
+    -------
+        _description_
 
     """
     shapes, trails = [], []
@@ -72,7 +62,29 @@ def ndinterp(  # noqa: PLR0913
     right: float | None = None,
     period: float | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Interpolate multi-dimensional array over axis."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    xp
+        _description_
+    fp
+        _description_
+    axis
+        _description_
+    left
+        _description_
+    right
+        _description_
+    period
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     return np.apply_along_axis(
         partial(np.interp, x, xp),
         axis,
@@ -91,7 +103,21 @@ def trapz_product(
     ],
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:
-    """Trapezoidal rule for a product of functions."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    f
+        _description_
+    axis
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
@@ -114,7 +140,25 @@ def cumtrapz(
     dtype: type | None = None,
     out: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Cumulative trapezoidal rule along last axis."""
+    """
+    Cumulative trapezoidal rule along last axis.
+
+    Parameters
+    ----------
+    f
+        _description_
+    x
+        _description_
+    dtype
+        _description_
+    out
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 

@@ -60,7 +60,21 @@ def distance_weight(
     z: npt.NDArray[np.float64],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
-    """Uniform weight in comoving distance."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    z
+        _description_
+    cosmo
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     return 1 / cosmo.ef(z)
 
 
@@ -68,7 +82,21 @@ def volume_weight(
     z: npt.NDArray[np.float64],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
-    """Uniform weight in comoving volume."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    z
+        _description_
+    cosmo
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     return cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
@@ -76,51 +104,32 @@ def density_weight(
     z: npt.NDArray[np.float64],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
-    """Uniform weight in matter density."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    z
+        _description_
+    cosmo
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
 
 
 class RadialWindow(typing.NamedTuple):
     """
-    A radial window, defined by a window function.
+    _summary_.
 
-    The radial window is defined by a window function in redshift, which
-    is given by a pair of arrays ``za``, ``wa``.
-
-    The radial window also has an effective redshift, stored in the
-    ``zeff`` attribute, which should be a representative redshift for
-    the window function.
-
-    To prevent accidental inconsistencies, instances of this type are
-    immutable (however, the array entries may **not** be immutable; do
-    not change them in place)::
-
-        >>> from glass import RadialWindow
-        >>> w1 = RadialWindow(..., ..., zeff=0.1)
-        >>> w1.zeff = 0.15
-        Traceback (most recent call last):
-          File "<stdin>", line 1, in <module>
-        AttributeError: can't set attribute
-
-    To create a new instance with a changed attribute value, use the
-    ``._replace`` method::
-
-        >>> w1 = w1._replace(zeff=0.15)
-        >>> w1
-        RadialWindow(za=..., wa=..., zeff=0.15)
-
-    Attributes
+    Parameters
     ----------
-    za:
-        Redshift array; the abscissae of the window function.
-    wa:
-        Weight array; the values (ordinates) of the window function.
-    zeff:
-        Effective redshift of the window.
-
-    Methods
-    -------
-    _replace
+    typing
+        _description_
 
     """
 
@@ -139,33 +148,25 @@ def tophat_windows(
     | None = None,
 ) -> list[RadialWindow]:
     """
-    Tophat window functions from the given redshift bin edges.
-
-    Uses the *N+1* given redshifts as bin edges to construct *N* tophat
-    window functions. The redshifts of the windows have linear spacing
-    approximately equal to ``dz``.
-
-    An optional weight function :math:`w(z)` can be given using
-    ``weight``; it is applied to the tophat windows.
-
-    The resulting windows functions are :class:`RadialWindow` instances.
-    Their effective redshifts are the mean redshifts of the (weighted)
-    tophat bins.
-
-    Returns a list of window functions.
+    _summary_.
 
     Parameters
     ----------
-    zbins:
-        Redshift bin edges for the tophat window functions.
-    dz:
-        Approximate spacing of the redshift grid.
-    weight:
-        If given, a weight function to be applied to the window functions.
+    zbins
+        _description_
+    dz
+        _description_
+    weight
+        _description_
 
-    See Also
-    --------
-    :ref:`user-window-functions`
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     if len(zbins) < 2:
@@ -211,33 +212,25 @@ def linear_windows(
     | None = None,
 ) -> list[RadialWindow]:
     """
-    Linear interpolation window functions.
-
-    Uses the *N+2* given redshifts as nodes to construct *N* triangular
-    window functions between the first and last node. These correspond
-    to linear interpolation of radial functions. The redshift spacing
-    of the windows is approximately equal to ``dz``.
-
-    An optional weight function :math:`w(z)` can be given using
-    ``weight``; it is applied to the triangular windows.
-
-    The resulting windows functions are :class:`RadialWindow` instances.
-    Their effective redshifts correspond to the given nodes.
-
-    Returns a list of window functions.
+    _summary_.
 
     Parameters
     ----------
-    zgrid:
-        Redshift grid for the triangular window functions.
-    dz:
-        Approximate spacing of the redshift grid.
-    weight:
-        If given, a weight function to be applied to the window functions.
+    zgrid
+        _description_
+    dz
+        _description_
+    weight
+        _description_
 
-    See Also
-    --------
-    :ref:`user-window-functions`
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     if len(zgrid) < 3:
@@ -272,34 +265,25 @@ def cubic_windows(
     | None = None,
 ) -> list[RadialWindow]:
     """
-    Cubic interpolation window functions.
-
-    Uses the *N+2* given redshifts as nodes to construct *N* cubic
-    Hermite spline window functions between the first and last node.
-    These correspond to cubic spline interpolation of radial functions.
-    The redshift spacing of the windows is approximately equal to
-    ``dz``.
-
-    An optional weight function :math:`w(z)` can be given using
-    ``weight``; it is applied to the cubic spline windows.
-
-    The resulting windows functions are :class:`RadialWindow` instances.
-    Their effective redshifts correspond to the given nodes.
-
-    Returns a list of window functions.
+    _summary_.
 
     Parameters
     ----------
-    zgrid:
-        Redshift grid for the cubic spline window functions.
-    dz:
-        Approximate spacing of the redshift grid.
-    weight:
-        If given, a weight function to be applied to the window functions.
+    zgrid
+        _description_
+    dz
+        _description_
+    weight
+        _description_
 
-    See Also
-    --------
-    :ref:`user-window-functions`
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     if len(zgrid) < 3:
@@ -330,32 +314,20 @@ def restrict(
     w: RadialWindow,
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
-    Restrict a function to a redshift window.
-
-    Multiply the function :math:`f(z)` by a window function :math:`w(z)`
-    to produce :math:`w(z) f(z)` over the support of :math:`w`.
-
-    The function :math:`f(z)` is given by redshifts ``z`` of shape
-    *(N,)* and function values ``f`` of shape *(..., N)*, with any
-    number of leading axes allowed.
-
-    The window function :math:`w(z)` is given by ``w``, which must be a
-    :class:`RadialWindow` instance or compatible with it.
-
-    The restriction has redshifts that are the union of the redshifts of
-    the function and window over the support of the window.
-    Intermediate function values are found by linear interpolation
-
-    Returns the restricted function
+    _summary_.
 
     Parameters
     ----------
-    z:
-        The function to be restricted.
-    f:
-        The function to be restricted.
-    w:
-        The window function for the restriction.
+    z
+        _description_
+    f
+        _description_
+    w
+        _description_
+
+    Returns
+    -------
+        _description_
 
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
@@ -371,100 +343,28 @@ def partition(
     *,
     method: str = "nnls",
 ) -> npt.NDArray[np.float64]:
-    r"""
-    Partition a function by a sequence of windows.
-
-    Returns a vector of weights :math:`x_1, x_2, \ldots` such that the
-    weighted sum of normalised radial window functions :math:`x_1 \,
-    w_1(z) + x_2 \, w_2(z) + \ldots` approximates the given function
-    :math:`f(z)`.
-
-    The function :math:`f(z)` is given by redshifts *z* of shape *(N,)*
-    and function values *fz* of shape *(..., N)*, with any number of
-    leading axes allowed.
-
-    The window functions are given by the sequence *shells* of
-    :class:`RadialWindow` or compatible entries.
-
-    Returns the weights of the partition, where the leading axis corresponds to
-    *shells*.
+    """
+    _summary_.
 
     Parameters
     ----------
-    z:
-        The function to be partitioned. If *f* is multi-dimensional,
-        its last axis must agree with *z*.
-    fz:
-        The function to be partitioned. If *f* is multi-dimensional,
-        its last axis must agree with *z*.
-    shells:
-        Ordered sequence of window functions for the partition.
-    method:
-        Method for the partition. See notes for description. The
-        options are "lstsq", "nnls", "restrict".
+    z
+        _description_
+    fz
+        _description_
+    shells
+        _description_
+    method
+        _description_
 
-    Notes
-    -----
-    Formally, if :math:`w_i` are the normalised window functions,
-    :math:`f` is the target function, and :math:`z_i` is a redshift grid
-    with intervals :math:`\Delta z_i`, the partition problem seeks an
-    approximate solution of
+    Returns
+    -------
+        _description_
 
-    .. math::
-        \begin{pmatrix}
-        w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
-        w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
-        \vdots & \vdots & \ddots
-        \end{pmatrix} \, \begin{pmatrix}
-        x_1 \\ x_2 \\ \vdots
-        \end{pmatrix} = \begin{pmatrix}
-        f(z_1) \, \Delta z_1 \\ f(z_2) \, \Delta z_2 \\ \vdots
-        \end{pmatrix} \;.
-
-    The redshift grid is the union of the given array *z* and the
-    redshift arrays of all window functions. Intermediate function
-    values are found by linear interpolation.
-
-    When partitioning a density function, it is usually desirable to
-    keep the normalisation fixed. In that case, the problem can be
-    enhanced with the further constraint that the sum of the solution
-    equals the integral of the target function,
-
-    .. math::
-        \begin{pmatrix}
-        w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
-        w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
-        \vdots & \vdots & \ddots \\
-        \hline
-        \lambda & \lambda & \cdots
-        \end{pmatrix} \, \begin{pmatrix}
-        x_1 \\ x_2 \\ \vdots
-        \end{pmatrix} = \begin{pmatrix}
-        f(z_1) \, \Delta z_1 \\ f(z_2) \, \Delta z_2 \\ \vdots
-        \\ \hline \lambda \int \! f(z) \, dz
-        \end{pmatrix} \;,
-
-    where :math:`\lambda` is a multiplier to enforce the integral
-    constraints.
-
-    The :func:`partition()` function implements a number of methods to
-    obtain a solution:
-
-    If ``method="nnls"`` (the default), obtain a partition from a
-    non-negative least-squares solution. This will usually match the
-    shape of the input function closely. The contribution from each
-    shell is a positive number, which is required to partition e.g.
-    density functions.
-
-    If ``method="lstsq"``, obtain a partition from an unconstrained
-    least-squares solution. This will more closely match the shape of
-    the input function, but might lead to shells with negative
-    contributions.
-
-    If ``method="restrict"``, obtain a partition by integrating the
-    restriction (using :func:`restrict`) of the function :math:`f` to
-    each window. For overlapping shells, this method might produce
-    results which are far from the input function.
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     try:
@@ -482,7 +382,25 @@ def partition_lstsq(
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
-    """Least-squares partition."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    z
+        _description_
+    fz
+        _description_
+    shells
+        _description_
+    sumtol
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
@@ -546,10 +464,22 @@ def partition_nnls(
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
     """
-    Non-negative least-squares partition.
+    _summary_.
 
-    Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
-    requires SciPy.
+    Parameters
+    ----------
+    z
+        _description_
+    fz
+        _description_
+    shells
+        _description_
+    sumtol
+        _description_
+
+    Returns
+    -------
+        _description_
 
     """
     from glass.core.algorithm import nnls
@@ -632,7 +562,23 @@ def partition_restrict(
     fz: npt.NDArray[np.float64],
     shells: list[RadialWindow],
 ) -> npt.NDArray[np.float64]:
-    """Partition by restriction and integration."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    z
+        _description_
+    fz
+        _description_
+    shells
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
@@ -651,7 +597,30 @@ def redshift_grid(
     dz: float | None = None,
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Redshift grid with uniform spacing in redshift."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    zmin
+        _description_
+    zmax
+        _description_
+    dz
+        _description_
+    num
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+
+    """
     if dz is not None and num is None:
         z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
     elif dz is None and num is not None:
@@ -670,7 +639,32 @@ def distance_grid(
     dx: float | None = None,
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Redshift grid with uniform spacing in comoving distance."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    cosmo
+        _description_
+    zmin
+        _description_
+    zmax
+        _description_
+    dx
+        _description_
+    num
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+
+    """
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
     if dx is not None and num is None:
         x = np.arange(xmin, np.nextafter(xmax + dx, xmax), dx)
@@ -687,33 +681,21 @@ def combine(
     weights: npt.NDArray[np.float64],
     shells: list[RadialWindow],
 ) -> npt.NDArray[np.float64]:
-    r"""
-    Evaluate a linear combination of window functions.
-
-    Takes a vector of weights :math:`x_1, x_2, \ldots` and computes the
-    weighted sum of normalised radial window functions :math:`f(z) = x_1
-    \, w_1(z) + x_2 \, w_2(z) + \ldots` in the given redshifts
-    :math:`z`.
-
-    The window functions are given by the sequence *shells* of
-    :class:`RadialWindow` or compatible entries.
-
-    Returns a linear combination of window functions, evaluated in *z*.
+    """
+    _summary_.
 
     Parameters
     ----------
-    z:
-        Redshifts *z* in which to evaluate the combined function.
-    weights:
-        Weights of the linear combination, where the leading axis
-        corresponds to *shells*.
-    shells:
-        Ordered sequence of window functions to be combined.
+    z
+        _description_
+    weights
+        _description_
+    shells
+        _description_
 
-    See Also
-    --------
-    partition:
-        Find weights for a given function.
+    Returns
+    -------
+        _description_
 
     """
     return (
