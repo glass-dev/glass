@@ -45,16 +45,20 @@ def redshifts(
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Sample redshifts from a radial window function.
+
+    This function samples *n* redshifts from a distribution that follows
+    the given radial window function *w*.
 
     Parameters
     ----------
     n
-        _description_
+        Number of redshifts to sample. If an array is given, the
+        results are concatenated.
     w
-        _description_
+        Radial window function.
     rng
-        _description_
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
@@ -78,15 +82,18 @@ def redshifts_from_nz(
     Parameters
     ----------
     count
-        _description_
+        Number of redshifts to sample. If an array is given, its shape
+        is broadcast against the leading axes of *z* and *nz*.
     z
-        _description_
+        Source distribution. Leading axes are broadcast against the
+        shape of *count*.
     nz
-        _description_
+        Source distribution. Leading axes are broadcast against the
+        shape of *count*.
     rng
-        _description_
+        Random number generator. If not given, a default RNG is used.
     warn
-        _description_
+        Throw relevant warnings.
 
     Returns
     -------
@@ -151,19 +158,20 @@ def galaxy_shear(  # noqa: PLR0913
     Parameters
     ----------
     lon
-        _description_
+        Array for galaxy longitudes.
     lat
-        _description_
+        Array for galaxy latitudes.
     eps
-        _description_
+        Array of galaxy :term:`ellipticity`.
     kappa
-        _description_
+        HEALPix map for convergence.
     gamma1
-        _description_
+        HEALPix maps for a component of shear.
     gamma2
-        _description_
+        HEALPix maps for a component of shear.
     reduced_shear
-        _description_
+        If ``False``, galaxy shears are not reduced
+        by the convergence. Default is ``True``.
 
     Returns
     -------
@@ -214,15 +222,15 @@ def gaussian_phz(
     Parameters
     ----------
     z
-        _description_
+        True redshifts.
     sigma_0
-        _description_
+        Redshift error in the tomographic binning at zero redshift.
     lower
-        _description_
+        Bounds for the returned photometric redshifts.
     upper
-        _description_
+        Bounds for the returned photometric redshifts.
     rng
-        _description_
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
@@ -285,23 +293,23 @@ def kappa_ia_nla(  # noqa: PLR0913
     Parameters
     ----------
     delta
-        _description_
+        Matter density contrast.
     zeff
-        _description_
+        Effective redshift of the matter field.
     a_ia
-        _description_
+        Intrinsic alignments amplitude.
     cosmo
-        _description_
+        Cosmology instance.
     z0
-        _description_
+        Reference redshift for the redshift dependence.
     eta
-        _description_
+        Power of the redshift dependence.
     lbar
-        _description_
+        Mean luminosity of the galaxy sample.
     l0
-        _description_
+        Reference luminosity for the luminosity dependence.
     beta
-        _description_
+        Power of the luminosity dependence.
 
     Returns
     -------

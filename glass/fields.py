@@ -124,7 +124,7 @@ def cls2cov(
     nc: int,
 ) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """
-    _summary_.
+    Return array of cls as a covariance matrix for iterative sampling.
 
     Parameters
     ----------
@@ -169,7 +169,7 @@ def multalm(
     inplace: bool = False,
 ) -> npt.NDArray[np.complex128]:
     """
-    _summary_.
+    Multiply alm by bl.
 
     Parameters
     ----------
@@ -198,7 +198,7 @@ def transform_cls(
     pars: tuple[typing.Any, ...] = (),
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """
-    _summary_.
+    Transform Cls to Gaussian Cls.
 
     Parameters
     ----------
@@ -238,7 +238,12 @@ def discretized_cls(
     nside: int | None = None,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """
-    _summary_.
+    Apply discretisation effects to angular power spectra.
+
+    Depending on the given arguments, this truncates the angular power spectra
+    to ``lmax``, removes all but ``ncorr`` correlations between fields, and
+    applies the HEALPix pixel window function of the given ``nside``. If no
+    arguments are given, no action is performed.
 
     Parameters
     ----------
@@ -292,7 +297,7 @@ def lognormal_gls(
     shift: float = 1.0,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """
-    _summary_.
+    Compute Gaussian Cls for a lognormal random field.
 
     Parameters
     ----------
@@ -317,7 +322,26 @@ def generate_gaussian(
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """
-    _summary_.
+    Sample Gaussian random fields from Cls iteratively.
+
+    A generator that iteratively samples HEALPix maps of Gaussian random fields
+    with the given angular power spectra ``gls`` and resolution parameter
+    ``nside``.
+
+    The optional argument ``ncorr`` can be used to artificially limit now many
+    realised fields are correlated. This saves memory, as only `ncorr` previous
+    fields need to be kept.
+
+    The ``gls`` array must contain the auto-correlation of each new field
+    followed by the cross-correlations with all previous fields in reverse
+    order::
+
+        gls = [gl_00,
+               gl_11, gl_10,
+               gl_22, gl_21, gl_20,
+               ...]
+
+    Missing entries can be set to ``None``.
 
     Parameters
     ----------
@@ -404,7 +428,7 @@ def generate_lognormal(
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
     """
-    _summary_.
+    Sample lognormal random fields from Gaussian Cls iteratively.
 
     Parameters
     ----------
@@ -451,22 +475,23 @@ def getcl(
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Return a specific angular power spectrum from an array.
 
     Parameters
     ----------
     cls
-        _description_
+        List of angular power spectra in *GLASS* ordering.
     i
-        _description_
+        Indices to return.
     j
-        _description_
+        Indices to return.
     lmax
-        _description_
+        Truncate the returned spectrum at this mode number.
 
     Returns
     -------
-        _description_
+        The angular power spectrum for indices *i* and *j* from an
+        array in *GLASS* ordering.
 
     """
     if j > i:
@@ -488,18 +513,24 @@ def effective_cls(
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Compute effective angular power spectra from weights.
+
+    Computes a linear combination of the angular power spectra *cls*
+    using the factors provided by *weights1* and *weights2*. Additional
+    axes in *weights1* and *weights2* produce arrays of spectra.
 
     Parameters
     ----------
     cls
-        _description_
+        Angular matter power spectra to combine, in *GLASS* ordering.
     weights1
-        _description_
+        Weight factors for spectra. The first axis must be equal to
+        the number of fields.
     weights2
-        _description_
+        Second set of weights. If not given, *weights1* is used.
     lmax
-        _description_
+        Truncate the angular power spectra at this mode number. If not
+        given, the longest input in *cls* will be used.
 
     Returns
     -------
