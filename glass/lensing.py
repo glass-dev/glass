@@ -532,7 +532,7 @@ def deflect(
     Apply deflections to positions.
 
     Takes an array of :term:`deflection` values and applies them
-    to the given positions..
+    to the given positions.
 
     Parameters
     ----------
