@@ -52,7 +52,7 @@ def from_convergence(  # noqa: PLR0913
     shear: bool = False,
     discretized: bool = True,
 ) -> tuple[npt.NDArray[np.float64], ...]:
-    """
+    r"""
     _summary_.
 
     Parameters
@@ -77,6 +77,75 @@ def from_convergence(  # noqa: PLR0913
         * deflection potential if ``potential`` is true.
         * potential (complex) if ``deflection`` is true.
         * shear (complex) if ``shear`` is true.
+
+    Notes
+    -----
+    The weak lensing fields are computed from the convergence or
+    deflection potential in the following way. [1]
+
+    Define the spin-raising and spin-lowering operators of the
+    spin-weighted spherical harmonics as
+
+    .. math::
+
+        \eth {}_sY_{lm}
+        = +\sqrt{(l-s)(l+s+1)} \, {}_{s+1}Y_{lm} \;, \\
+        \bar{\eth} {}_sY_{lm}
+        = -\sqrt{(l+s)(l-s+1)} \, {}_{s-1}Y_{lm} \;.
+
+    The convergence field :math:`\kappa` is related to the deflection
+    potential field :math:`\psi` by the Poisson equation,
+
+    .. math::
+
+        2 \kappa
+        = \eth\bar{\eth} \, \psi
+        = \bar{\eth}\eth \, \psi \;.
+
+    The convergence modes :math:`\kappa_{lm}` are hence related to the
+    deflection potential modes :math:`\psi_{lm}` as
+
+    .. math::
+
+        2 \kappa_{lm}
+        = -l \, (l+1) \, \psi_{lm} \;.
+
+    The :term:`deflection` :math:`\alpha` is the gradient of the
+    deflection potential :math:`\psi`. On the sphere, this is
+
+    .. math::
+
+        \alpha
+        = \eth \, \psi \;.
+
+    The deflection field has spin weight :math:`1` in the HEALPix
+    convention, in order for points to be deflected towards regions of
+    positive convergence. The modes :math:`\alpha_{lm}` of the
+    deflection field are hence
+
+    .. math::
+        \alpha_{lm}
+        = \sqrt{l \, (l+1)} \, \psi_{lm} \;.
+
+    The shear field :math:`\gamma` is related to the deflection
+    potential :math:`\psi` and deflection :math:`\alpha` as
+
+    .. math::
+        2 \gamma
+        = \eth\eth \, \psi
+        = \eth \, \alpha \;,
+
+    and thus has spin weight :math:`2`. The shear modes
+    :math:`\gamma_{lm}` are related to the deflection potential modes as
+
+    .. math::
+        2 \gamma_{lm}
+        = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
+
+    References
+    ----------
+    * [1] Tessore N., et al., OJAp, 6, 11 (2023).
+          doi:10.21105/astro.2302.01942
 
     """
     # no output means no computation, return empty tuple

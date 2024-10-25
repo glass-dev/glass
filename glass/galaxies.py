@@ -270,7 +270,7 @@ def gaussian_phz(
     References
     ----------
     * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
-           doi:10.1111/j.1365-2966.2007.12271.x
+          doi:10.1111/j.1365-2966.2007.12271.x
 
     Examples
     --------
@@ -385,15 +385,15 @@ def kappa_ia_nla(  # noqa: PLR0913
     References
     ----------
     * [1] Catelan P., Kamionkowski M., Blandford R. D., 2001, MNRAS,
-       320, L7. doi:10.1046/j.1365-8711.2001.04105.x
+          320, L7. doi:10.1046/j.1365-8711.2001.04105.x
     * [2] Hirata C. M., Seljak U., 2004, PhRvD, 70, 063526.
-       doi:10.1103/PhysRevD.70.063526
+          doi:10.1103/PhysRevD.70.063526
     * [3] Bridle S., King L., 2007, NJPh, 9, 444.
-       doi:10.1088/1367-2630/9/12/444
+          doi:10.1088/1367-2630/9/12/444
     * [4] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
-        A&A, 624, A30. doi:10.1051/0004-6361/201834714
+          A&A, 624, A30. doi:10.1051/0004-6361/201834714
     * [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
-       OJAp, 6, 11. doi:10.21105/astro.2302.01942
+          OJAp, 6, 11. doi:10.21105/astro.2302.01942
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc

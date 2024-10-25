@@ -45,10 +45,10 @@ def nnls(
     References
     ----------
     * [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
-        Problems. doi: 10.1137/1.9781611971217
+          Problems. doi: 10.1137/1.9781611971217
     * [2] Bro, R. and De Jong, S. (1997), A fast
-        non-negativity-constrained least squares algorithm. J.
-        Chemometrics, 11, 393-401.
+          non-negativity-constrained least squares algorithm. J.
+          Chemometrics, 11, 393-401.
 
     """
     a = np.asanyarray(a)
