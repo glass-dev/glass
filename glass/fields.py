@@ -45,7 +45,30 @@ def iternorm(
 ) -> collections.abc.Generator[
     tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
 ]:
-    """Return the vector a and variance sigma^2 for iterative normal sampling."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    k
+        _description_
+    cov
+        _description_
+    size, optional
+        _description_
+
+    Yields
+    ------
+        _description_
+
+    Raises
+    ------
+    TypeError
+        _description_
+    ValueError
+        _description_
+
+    """
     m = np.zeros((*size, k, k))
     a = np.zeros((*size, k))
     s = np.zeros((*size,))
@@ -100,7 +123,30 @@ def cls2cov(
     nf: int,
     nc: int,
 ) -> collections.abc.Generator[npt.NDArray[np.float64]]:
-    """Return array of cls as a covariance matrix for iterative sampling."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    cls
+        _description_
+    nl
+        _description_
+    nf
+        _description_
+    nc
+        _description_
+
+    Yields
+    ------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+
+    """
     cov = np.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
@@ -122,7 +168,23 @@ def multalm(
     *,
     inplace: bool = False,
 ) -> npt.NDArray[np.complex128]:
-    """Multiply alm by bl."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    alm
+        _description_
+    bl
+        _description_
+    inplace
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
@@ -135,7 +197,23 @@ def transform_cls(
     tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
     pars: tuple[typing.Any, ...] = (),
 ) -> list[list[float] | npt.NDArray[np.float64]]:
-    """Transform Cls to Gaussian Cls."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    cls
+        _description_
+    tfm
+        _description_
+    pars
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     gls = []
     for cl in cls:
         if len(cl) > 0:
@@ -160,12 +238,27 @@ def discretized_cls(
     nside: int | None = None,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """
-    Apply discretisation effects to angular power spectra.
+    _summary_.
 
-    Depending on the given arguments, this truncates the angular power spectra
-    to ``lmax``, removes all but ``ncorr`` correlations between fields, and
-    applies the HEALPix pixel window function of the given ``nside``. If no
-    arguments are given, no action is performed.
+    Parameters
+    ----------
+    cls
+        _description_
+    lmax
+        _description_
+    ncorr
+        _description_
+    nside
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
 
     """
     if ncorr is not None:
@@ -198,7 +291,21 @@ def lognormal_gls(
     cls: npt.NDArray[np.float64],
     shift: float = 1.0,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
-    """Compute Gaussian Cls for a lognormal random field."""
+    """
+    _summary_.
+
+    Parameters
+    ----------
+    cls
+        _description_
+    shift
+        _description_
+
+    Returns
+    -------
+        _description_
+
+    """
     return transform_cls(cls, "lognormal", (shift,))
 
 
