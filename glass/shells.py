@@ -201,7 +201,7 @@ def tophat_windows(
 
     Returns
     -------
-        _description_
+        A list of window functions.
 
     Raises
     ------
@@ -280,7 +280,7 @@ def linear_windows(
 
     Returns
     -------
-        _description_
+        A list of window functions.
 
     Raises
     ------
@@ -349,7 +349,7 @@ def cubic_windows(
 
     Returns
     -------
-        _description_
+        A list of window functions.
 
     Raises
     ------
@@ -416,7 +416,7 @@ def restrict(
 
     Returns
     -------
-        _description_
+        The restricted function
 
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
