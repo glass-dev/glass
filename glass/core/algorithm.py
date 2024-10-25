@@ -14,7 +14,9 @@ def nnls(
     maxiter: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Compute a non-negative least squares solution.
+
+    Implementation of the algorithm due to [1] as described in [2].
 
     Parameters
     ----------
@@ -39,6 +41,14 @@ def nnls(
         _description_
     ValueError
         _description_
+
+    References
+    ----------
+    * [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
+        Problems. doi: 10.1137/1.9781611971217
+    * [2] Bro, R. and De Jong, S. (1997), A fast
+        non-negativity-constrained least squares algorithm. J.
+        Chemometrics, 11, 393-401.
 
     """
     a = np.asanyarray(a)
