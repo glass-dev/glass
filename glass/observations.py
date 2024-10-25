@@ -43,16 +43,20 @@ def vmap_galactic_ecliptic(
     ecliptic: tuple[float, float] = (20, 80),
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Visibility map masking galactic and ecliptic plane.
+
+    This function returns a :term:`visibility map` that blocks out stripes for
+    the galactic and ecliptic planes. The location of the stripes is set with
+    optional parameters.
 
     Parameters
     ----------
     nside
-        _description_
+        The NSIDE parameter of the resulting HEALPix map.
     galactic
-        _description_
+        The location of the galactic plane in the respective coordinate system.
     ecliptic
-        _description_
+        The location of the ecliptic plane in the respective coordinate system.
 
     Returns
     -------
@@ -61,7 +65,7 @@ def vmap_galactic_ecliptic(
     Raises
     ------
     TypeError
-        _description_
+        If the ``galactic`` or ``ecliptic`` arguments are not pairs of numbers.
     TypeError
         _description_
 
@@ -88,18 +92,24 @@ def gaussian_nz(
     norm: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Gaussian redshift distribution.
+
+    The redshift follows a Gaussian distribution with the given mean and
+    standard deviation.
+
+    If ``mean`` or ``sigma`` are array_like, their axes will be the leading
+    axes of the redshift distribution..
 
     Parameters
     ----------
     z
-        _description_
+        Redshift values of the distribution.
     mean
-        _description_
+        Mean(s) of the redshift distribution.
     sigma
-        _description_
+        Standard deviation(s) of the redshift distribution.
     norm
-        _description_
+        If given, the normalisation of the distribution.
 
     Returns
     -------
@@ -130,8 +140,10 @@ def smail_nz(
     *,
     norm: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    Redshift distribution following Smail et al. (1994).
+
+    The redshift follows the Smail et al. [1] redshift distribution.
 
     Parameters
     ----------
@@ -149,6 +161,23 @@ def smail_nz(
     Returns
     -------
         The redshift distribution at the given ``z`` values.
+
+    Notes
+    -----
+    The probability distribution function :math:`p(z)` for redshift :math:`z`
+    is given by Amara & Refregier [2] as
+
+    .. math::
+
+        p(z) \sim \left(\frac{z}{z_0}\right)^\alpha
+                    \exp\left[-\left(\frac{z}{z_0}\right)^\beta\right] \;,
+
+    where :math:`z_0` is matched to the given mode of the distribution.
+
+    References
+    ----------
+    * [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
+    * [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
 
     """
     z_mode = np.asanyarray(z_mode)[..., np.newaxis]
@@ -176,7 +205,10 @@ def fixed_zbins(
     dz: float | None = None,
 ) -> list[tuple[float, float]]:
     """
-    _summary_.
+    Tomographic redshift bins of fixed size.
+
+    This function creates contiguous tomographic redshift bins of fixed size.
+    It takes either the number or size of the bins.
 
     Parameters
     ----------
@@ -216,7 +248,10 @@ def equal_dens_zbins(
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
-    _summary_.
+    Equal density tomographic redshift bins.
+
+    This function subdivides a source redshift distribution into ``nbins``
+    tomographic redshift bins with equal density.
 
     Parameters
     ----------
@@ -250,7 +285,14 @@ def tomo_nz_gausserr(
     zbins: list[tuple[float, float]],
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Tomographic redshift bins with a Gaussian redshift error.
+
+    This function takes a _true_ overall source redshift distribution ``z``,
+    ``nz`` and returns tomographic source redshift distributions for the
+    tomographic redshift bins given by ``zbins``. It is assumed that sources
+    are assigned a tomographic redshift bin with a Gaussian error [1]. The
+    standard deviation of the Gaussian depends on redshift and is given by
+    ``sigma(z) = sigma_0*(1 + z)``.
 
     Parameters
     ----------
@@ -267,6 +309,18 @@ def tomo_nz_gausserr(
     -------
         The tomographic redshift bins convolved with a gaussian error.
         Array has a shape (nbins, len(z))
+
+    See Also
+    --------
+    equal_dens_zbins:
+        produce equal density redshift bins
+    fixed_zbins:
+        produce redshift bins of fixed size
+
+    References
+    ----------
+    * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+          doi:10.1111/j.1365-2966.2007.12271.x
 
     """
     # converting zbins into an array:
