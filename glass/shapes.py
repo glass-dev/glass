@@ -100,6 +100,8 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     Parameters
     ----------
+    mu
+        _description_
     sigma
         _description_
     gamma

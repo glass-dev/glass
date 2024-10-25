@@ -123,15 +123,7 @@ def density_weight(
 
 
 class RadialWindow(typing.NamedTuple):
-    """
-    _summary_.
-
-    Parameters
-    ----------
-    typing
-        _description_
-
-    """
+    """_summary_."""
 
     za: npt.NDArray[np.float64]
     wa: npt.NDArray[np.float64]

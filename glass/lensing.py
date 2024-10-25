@@ -57,6 +57,8 @@ def from_convergence(  # noqa: PLR0913
 
     Parameters
     ----------
+    kappa
+        _description_
     lmax
         _description_
     potential

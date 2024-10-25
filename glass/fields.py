@@ -223,10 +223,6 @@ def generate_gaussian(
     rng
         _description_
 
-    Returns
-    -------
-        _description_
-
     Yields
     ------
         _description_
@@ -314,10 +310,6 @@ def generate_lognormal(
     ncorr
         _description_
     rng
-        _description_
-
-    Returns
-    -------
         _description_
 
     Yields

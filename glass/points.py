@@ -146,9 +146,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     Parameters
     ----------
-    PLR0913
-        _description_
-    PLR0915ngal
+    ngal
         _description_
     delta
         _description_
@@ -163,10 +161,6 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     batch
         _description_
     rng
-        _description_
-
-    Returns
-    -------
         _description_
 
     Yields
@@ -299,10 +293,6 @@ def uniform_positions(
     ngal
         _description_
     rng
-        _description_
-
-    Returns
-    -------
         _description_
 
     Yields

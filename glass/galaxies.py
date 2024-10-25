@@ -148,6 +148,8 @@ def galaxy_shear(  # noqa: PLR0913
 
     Parameters
     ----------
+    lon
+        _description_
     lat
         _description_
     eps
@@ -278,6 +280,8 @@ def kappa_ia_nla(  # noqa: PLR0913
 
     Parameters
     ----------
+    delta
+        _description_
     zeff
         _description_
     a_ia

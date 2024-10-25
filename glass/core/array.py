@@ -15,6 +15,11 @@ def broadcast_first(
     """
     _summary_.
 
+    Parameters
+    ----------
+    arrays
+        _description_
+
     Returns
     -------
         _description_
@@ -36,6 +41,11 @@ def broadcast_leading_axes(
 ]:
     """
     _summary_.
+
+    Parameters
+    ----------
+    args
+        _description_
 
     Returns
     -------
@@ -67,6 +77,8 @@ def ndinterp(  # noqa: PLR0913
 
     Parameters
     ----------
+    x
+        _description_
     xp
         _description_
     fp
@@ -109,6 +121,8 @@ def trapz_product(
     Parameters
     ----------
     f
+        _description_
+    ff
         _description_
     axis
         _description_

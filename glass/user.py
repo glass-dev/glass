@@ -127,6 +127,8 @@ class _FitsWriter:
         ----------
         data
             _description_
+        columns
+            _description_
 
         """
         # if data is given, write it as it is
@@ -153,10 +155,6 @@ def write_catalog(
     filename
         _description_
     ext
-        _description_
-
-    Returns
-    -------
         _description_
 
     Yields
