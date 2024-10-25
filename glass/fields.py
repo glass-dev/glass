@@ -46,7 +46,7 @@ def iternorm(
     tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
 ]:
     """
-    _summary_.
+    Return the vector a and variance sigma^2 for iterative normal sampling.
 
     Parameters
     ----------

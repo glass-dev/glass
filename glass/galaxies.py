@@ -77,7 +77,14 @@ def redshifts_from_nz(
     warn: bool = True,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Generate galaxy redshifts from a source distribution.
+
+    The function supports sampling from multiple populations of
+    redshifts if *count* is an array or if there are additional axes in
+    the *z* or *nz* arrays. In this case, the shape of *count* and the
+    leading dimensions of *z* and *nz* are broadcast to a common shape,
+    and redshifts are sampled independently for each extra dimension.
+    The results are concatenated into a flat array.
 
     Parameters
     ----------
@@ -153,7 +160,10 @@ def galaxy_shear(  # noqa: PLR0913
     reduced_shear: bool = True,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Observed galaxy shears from weak lensing.
+
+    Takes lensing maps for convergence and shear and produces a lensed
+    ellipticity (shear) for each intrinsic galaxy ellipticity.
 
     Parameters
     ----------
@@ -216,8 +226,12 @@ def gaussian_phz(
     upper: float | npt.NDArray[np.float64] | None = None,
     rng: np.random.Generator | None = None,
 ) -> float | npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    Photometric redshifts assuming a Gaussian error.
+
+    A simple toy model of photometric redshift errors that assumes a
+    Gaussian error with redshift-dependent standard deviation
+    :math:`\sigma(z) = (1 + z) \sigma_0` [1].
 
     Parameters
     ----------
@@ -241,6 +255,27 @@ def gaussian_phz(
     ------
     ValueError
         _description_
+
+    Warnings
+    --------
+    The *lower* and *upper* bounds are implemented using plain rejection
+    sampling from the non-truncated normal distribution. If bounds are
+    used, they should always contain significant probability mass.
+
+    See Also
+    --------
+    glass.tomo_nz_gausserr:
+        Create tomographic redshift distributions assuming the same model.
+
+
+    References
+    ----------
+    * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
+           doi:10.1111/j.1365-2966.2007.12271.x
+
+    Examples
+    --------
+    See the :doc:`/examples/1-basic/photoz` example.
 
     """
     # get default RNG if not given
@@ -287,8 +322,8 @@ def kappa_ia_nla(  # noqa: PLR0913
     l0: float = 1e-9,
     beta: float = 0.0,
 ) -> npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    Effective convergence from intrinsic alignments using the NLA model.
 
     Parameters
     ----------
@@ -314,6 +349,52 @@ def kappa_ia_nla(  # noqa: PLR0913
     Returns
     -------
         The effective convergence due to intrinsic alignments.
+
+    Notes
+    -----
+    The Non-linear Alignments Model (NLA) describes an effective
+    convergence :math:`\kappa_{\rm IA}` that models the effect of
+    intrinsic alignments.  It is computed from the matter density
+    contrast :math:`\delta` as [1] [3]
+
+    .. math::
+
+        \kappa_{\rm IA} = f_{\rm NLA} \, \delta \;,
+
+    where the NLA factor :math:`f_{\rm NLA}` is defined as [4] [5]
+
+    .. math::
+
+        f_{\rm{NLA}}
+        = -A_{\rm IA} \, \frac{C_1 \, \bar{\rho}(z)}{D(z)} \,
+            \biggl(\frac{1+z}{1+z_0}\biggr)^\eta \,
+            \biggl(\frac{\bar{L}}{L_0}\biggr)^\beta \;,
+
+    with
+
+    * :math:`A_{\rm IA}` the intrinsic alignments amplitude,
+    * :math:`C_1` a normalisation constant [2],
+    * :math:`z` the effective redshift of the model,
+    * :math:`\bar{\rho}` the mean matter density,
+    * :math:`D` the growth factor,
+    * :math:`\eta` the power that describes the redshift-dependence with
+      respect to :math:`z_0`,
+    * :math:`\bar{L}` the mean luminosity of the galaxy sample, and
+    * :math:`\beta` the power that describes the luminosity-dependence
+      :math:`\bar{L}` with respect to :math:`L_0`.
+
+    References
+    ----------
+    * [1] Catelan P., Kamionkowski M., Blandford R. D., 2001, MNRAS,
+       320, L7. doi:10.1046/j.1365-8711.2001.04105.x
+    * [2] Hirata C. M., Seljak U., 2004, PhRvD, 70, 063526.
+       doi:10.1103/PhysRevD.70.063526
+    * [3] Bridle S., King L., 2007, NJPh, 9, 444.
+       doi:10.1088/1367-2630/9/12/444
+    * [4] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
+        A&A, 624, A30. doi:10.1051/0004-6361/201834714
+    * [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
+       OJAp, 6, 11. doi:10.21105/astro.2302.01942
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
