@@ -53,22 +53,26 @@ def from_convergence(  # noqa: PLR0913
     discretized: bool = True,
 ) -> tuple[npt.NDArray[np.float64], ...]:
     r"""
-    _summary_.
+    Compute other weak lensing maps from the convergence.
+
+    Takes a weak lensing convergence map and returns one or more of
+    deflection potential, deflection, and shear maps. The maps are
+    computed via spherical harmonic transforms.
 
     Parameters
     ----------
     kappa
-        _description_
+        HEALPix map of the convergence field.
     lmax
-        _description_
+        Maximum angular mode number to use in the transform.
     potential
-        _description_
+        Which lensing maps to return.
     deflection
-        _description_
+        Which lensing maps to return.
     shear
-        _description_
+        Which lensing maps to return.
     discretized
-        _description_
+        Correct the pixel window function in output maps.
 
     Returns
     -------
@@ -124,6 +128,7 @@ def from_convergence(  # noqa: PLR0913
     deflection field are hence
 
     .. math::
+
         \alpha_{lm}
         = \sqrt{l \, (l+1)} \, \psi_{lm} \;.
 
@@ -131,6 +136,7 @@ def from_convergence(  # noqa: PLR0913
     potential :math:`\psi` and deflection :math:`\alpha` as
 
     .. math::
+
         2 \gamma
         = \eth\eth \, \psi
         = \eth \, \alpha \;,
@@ -139,6 +145,7 @@ def from_convergence(  # noqa: PLR0913
     :math:`\gamma_{lm}` are related to the deflection potential modes as
 
     .. math::
+
         2 \gamma_{lm}
         = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
 
@@ -223,7 +230,13 @@ def shear_from_convergence(
     discretized: bool = True,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Weak lensing shear from convergence.
+
+    Computes the shear from the convergence using a spherical harmonic
+    transform.
+
+    .. deprecated:: 2023.6
+       Use the more general :func:`from_convergence` function instead.
 
     Parameters
     ----------
@@ -268,11 +281,11 @@ def shear_from_convergence(
 
 
 class MultiPlaneConvergence:
-    """_summary_."""
+    """Compute convergence fields iteratively from multiple matter planes."""
 
     def __init__(self, cosmo: Cosmology) -> None:
         """
-        _summary_.
+        Create a new instance to iteratively compute the convergence.
 
         Parameters
         ----------
@@ -294,7 +307,10 @@ class MultiPlaneConvergence:
 
     def add_window(self, delta: npt.NDArray[np.float64], w: RadialWindow) -> None:
         """
-        _summary_.
+        Add a mass plane from a window function to the convergence.
+
+        The lensing weight is computed from the window function, and the
+        source plane redshift is the effective redshift of the window.
 
         Parameters
         ----------
@@ -323,7 +339,7 @@ class MultiPlaneConvergence:
         wlens: float = 1.0,
     ) -> None:
         """
-        _summary_.
+        Add a mass plane at redshift ``zsrc`` to the convergence.
 
         Parameters
         ----------
@@ -384,7 +400,7 @@ class MultiPlaneConvergence:
     @property
     def zsrc(self) -> float:
         """
-        _summary_.
+        The redshift of the current convergence plane.
 
         Returns
         -------
@@ -396,7 +412,7 @@ class MultiPlaneConvergence:
     @property
     def kappa(self) -> npt.NDArray[np.float64] | None:
         """
-        _summary_.
+        The current convergence plane.
 
         Returns
         -------
@@ -408,7 +424,7 @@ class MultiPlaneConvergence:
     @property
     def delta(self) -> npt.NDArray[np.float64]:
         """
-        _summary_.
+        The current matter plane.
 
         Returns
         -------
@@ -420,7 +436,7 @@ class MultiPlaneConvergence:
     @property
     def wlens(self) -> float:
         """
-        _summary_.
+        The weight of the current matter plane.
 
         Returns
         -------
@@ -435,7 +451,7 @@ def multi_plane_matrix(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Compute the matrix of lensing contributions from each shell.
 
     Parameters
     ----------
@@ -463,16 +479,24 @@ def multi_plane_weights(
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Compute effective weights for multi-plane convergence.
+
+    Converts an array *weights* of relative weights for each shell
+    into the equivalent array of relative lensing weights.
+
+    This is the discretised version of the integral that turns a
+    redshift distribution :math:`n(z)` into the lensing efficiency
+    sometimes denoted :math:`g(z)` or :math:`q(z)`.
 
     Parameters
     ----------
     weights
-        _description_
+        Relative weight of each shell. The first axis must broadcast
+        against the number of shells, and is normalised internally.
     shells
-        _description_
+        Window functions of the shells.
     cosmo
-        _description_
+        Cosmology instance.
 
     Returns
     -------
@@ -504,21 +528,35 @@ def deflect(
     npt.NDArray[np.float64],
     npt.NDArray[np.float64],
 ]:
-    """
-    _summary_.
+    r"""
+    Apply deflections to positions.
+
+    Takes an array of :term:`deflection` values and applies them
+    to the given positions..
 
     Parameters
     ----------
     lon
-        _description_
+        Longitudes to be deflected.
     lat
-        _description_
+        Latitudes to be deflected.
     alpha
-        _description_
+        Deflection values. Must be complex-valued or have a leading
+        axis of size 2 for the real and imaginary component.
 
     Returns
     -------
         The longitudes and latitudes after deflection.
+
+    Notes
+    -----
+    Deflections on the sphere are :term:`defined <deflection>` as
+    follows:  The complex deflection :math:`\alpha` transports a point
+    on the sphere an angular distance :math:`|\alpha|` along the
+    geodesic with bearing :math:`\arg\alpha` in the original point.
+
+    In the language of differential geometry, this function is the
+    exponential map.
 
     """
     alpha = np.asanyarray(alpha)
