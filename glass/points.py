@@ -53,21 +53,35 @@ def effective_bias(
     bz: npt.NDArray[np.float64],
     w: RadialWindow,
 ) -> npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    Effective bias parameter from a redshift-dependent bias function.
+
+    This function takes a redshift-dependent bias function :math:`b(z)`
+    and computes an effective bias parameter :math:`\bar{b}` for a
+    given window function :math:`w(z)`.
 
     Parameters
     ----------
     z
-        _description_
+        Redshifts and values of the bias function :math:`b(z)`.
     bz
-        _description_
+        Redshifts and values of the bias function :math:`b(z)`.
     w
-        _description_
+        The radial window function :math:`w(z)`.
 
     Returns
     -------
         The effective bias parameter for the window.
+
+    Notes
+    -----
+    The effective bias parameter :math:`\bar{b}` is computed using the
+    window function :math:`w(z)` as the weighted average
+
+    .. math::
+
+        \bar{b} = \frac{\int b(z) \, w(z) \, dz}{\int w(z) \, dz}
+        \;.
 
     """
     norm = np.trapz(  # type: ignore[attr-defined]
@@ -81,8 +95,8 @@ def linear_bias(
     delta: npt.NDArray[np.float64],
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    Linear bias model :math:`\delta_g = b \, \delta`.
 
     Parameters
     ----------
@@ -103,8 +117,8 @@ def loglinear_bias(
     delta: npt.NDArray[np.float64],
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`.
 
     Parameters
     ----------
@@ -309,7 +323,9 @@ def uniform_positions(
     ]
 ]:
     """
-    _summary_.
+    Generate positions uniformly over the sphere.
+
+    The function supports array input for the ``ngal`` parameter.
 
     Parameters
     ----------
