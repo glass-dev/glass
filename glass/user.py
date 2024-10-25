@@ -36,7 +36,10 @@ if typing.TYPE_CHECKING:
 
 def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
     """
-    _summary_.
+    Save a list of Cls to file.
+
+    Uses :func:`numpy.savez` internally. The filename should therefore have a
+    ``.npz`` suffix, or it will be given one.
 
     Parameters
     ----------
@@ -53,7 +56,9 @@ def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
 
 def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
     """
-    _summary_.
+    Load a list of Cls from file.
+
+    Uses :func:`numpy.load` internally.
 
     Parameters
     ----------
@@ -72,11 +77,15 @@ def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
 
 
 class _FitsWriter:
-    """_summary_."""
+    """
+    Writer that creates a FITS file.
+
+    Initialised with the fits object and extension name.
+    """
 
     def __init__(self, fits: fitsio.FITS, ext: str = "") -> None:
         """
-        _summary_.
+        Create a new, uninitialised writer.
 
         Parameters
         ----------
@@ -95,7 +104,7 @@ class _FitsWriter:
         names: list[str] | None = None,
     ) -> None:
         """
-        _summary_.
+        Write the FITS file.
 
         Parameters
         ----------
@@ -121,7 +130,10 @@ class _FitsWriter:
         **columns: npt.NDArray[np.float64],
     ) -> None:
         """
-        _summary_.
+        Write to FITS by calling the internal _append method.
+
+        Pass either a positional variable (data)
+        or multiple named arguments (**columns)
 
         Parameters
         ----------
@@ -148,7 +160,19 @@ def write_catalog(
     ext: str = "",
 ) -> collections.abc.Generator[_FitsWriter]:
     """
-    _summary_.
+    Write a catalogue into a FITS file.
+
+    *ext* is the optional name of the extension.
+    To be used as a context manager::
+
+        # create the catalogue writer
+        with write_catalog("catalog.fits") as out:
+            ...
+            # write catalogue columns RA, DEC, E1, E2, WHT with given arrays
+            out.write(RA=lon, DEC=lat, E1=eps1, E2=e2, WHT=w)
+
+    .. note::
+       Requires the ``fitsio`` package.
 
     Parameters
     ----------

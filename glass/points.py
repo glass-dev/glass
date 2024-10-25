@@ -67,7 +67,7 @@ def effective_bias(
 
     Returns
     -------
-        _description_
+        The effective bias parameter for the window.
 
     """
     norm = np.trapz(  # type: ignore[attr-defined]
@@ -346,7 +346,7 @@ def position_weights(
 
     Returns
     -------
-        _description_
+        The relative weight of each shell for angular clustering.
 
     """
     # bring densities and bias into the same shape

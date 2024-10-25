@@ -13,7 +13,7 @@ def broadcast_first(
     *arrays: npt.NDArray[np.float64],
 ) -> tuple[npt.NDArray[np.float64], ...]:
     """
-    _summary_.
+    Broadcast arrays, treating the first axis as common.
 
     Parameters
     ----------
@@ -40,7 +40,7 @@ def broadcast_leading_axes(
     typing.Unpack[tuple[npt.NDArray[np.float64], ...]],
 ]:
     """
-    _summary_.
+    Broadcast all but the last N axes.
 
     Parameters
     ----------
@@ -49,7 +49,26 @@ def broadcast_leading_axes(
 
     Returns
     -------
-        _description_
+        The shape of the broadcast dimensions, and all input arrays
+        with leading axes matching that shape.
+
+    Examples
+    --------
+    Broadcast all dimensions of ``a``, all except the last dimension of
+    ``b``, and all except the last two dimensions of ``c``.
+
+    >>> a = 0
+    >>> b = np.zeros((4, 10))
+    >>> c = np.zeros((3, 1, 5, 6))
+    >>> dims, a, b, c = broadcast_leading_axes((a, 0), (b, 1), (c, 2))
+    >>> dims
+    (3, 4)
+    >>> a.shape
+    (3, 4)
+    >>> b.shape
+    (3, 4, 10)
+    >>> c.shape
+    (3, 4, 5, 6)
 
     """
     shapes, trails = [], []
@@ -73,7 +92,7 @@ def ndinterp(  # noqa: PLR0913
     period: float | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Interpolate multi-dimensional array over axis.
 
     Parameters
     ----------
@@ -116,7 +135,7 @@ def trapz_product(
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Trapezoidal rule for a product of functions.
 
     Parameters
     ----------

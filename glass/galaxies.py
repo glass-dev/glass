@@ -58,7 +58,7 @@ def redshifts(
 
     Returns
     -------
-        _description_
+        Random redshifts following the radial window function.
 
     """
     return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
@@ -90,7 +90,9 @@ def redshifts_from_nz(
 
     Returns
     -------
-        _description_
+        Redshifts sampled from the given source distribution. For
+        inputs with extra dimensions, returns a flattened 1-D array of
+        samples from all populations.
 
     """
     if warn:
@@ -165,7 +167,8 @@ def galaxy_shear(  # noqa: PLR0913
 
     Returns
     -------
-        _description_
+        An array of complex-valued observed galaxy shears
+        (lensed ellipticities).
 
     """
     nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
@@ -223,7 +226,8 @@ def gaussian_phz(
 
     Returns
     -------
-        _description_
+        Photometric redshifts assuming Gaussian errors, of the same
+        shape as *z*.
 
     Raises
     ------
@@ -301,7 +305,7 @@ def kappa_ia_nla(  # noqa: PLR0913
 
     Returns
     -------
-        _description_
+        The effective convergence due to intrinsic alignments.
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc

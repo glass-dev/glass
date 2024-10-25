@@ -56,7 +56,7 @@ def vmap_galactic_ecliptic(
 
     Returns
     -------
-        _description_
+        A HEALPix :term:`visibility map`.
 
     Raises
     ------
@@ -103,7 +103,7 @@ def gaussian_nz(
 
     Returns
     -------
-        _description_
+        The redshift distribution at the given ``z`` values.
 
     """
     mean = np.reshape(mean, np.shape(mean) + (1,) * np.ndim(z))
@@ -148,7 +148,7 @@ def smail_nz(
 
     Returns
     -------
-        _description_
+        The redshift distribution at the given ``z`` values.
 
     """
     z_mode = np.asanyarray(z_mode)[..., np.newaxis]
@@ -191,7 +191,7 @@ def fixed_zbins(
 
     Returns
     -------
-        _description_
+        A list of redshift bin edges.
 
     Raises
     ------
@@ -229,7 +229,7 @@ def equal_dens_zbins(
 
     Returns
     -------
-        _description_
+        A list of redshift bin edges.
 
     """
     # compute the normalised cumulative distribution function
@@ -265,7 +265,8 @@ def tomo_nz_gausserr(
 
     Returns
     -------
-        _description_
+        The tomographic redshift bins convolved with a gaussian error.
+        Array has a shape (nbins, len(z))
 
     """
     # converting zbins into an array:

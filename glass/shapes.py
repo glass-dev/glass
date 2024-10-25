@@ -36,22 +36,25 @@ def triaxial_axis_ratio(
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    _summary_.
+    Axis ratio of a randomly projected triaxial ellipsoid.
+
+    Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
+    ellipsoid, computes the axis ratio `q` of the projection.
 
     Parameters
     ----------
     zeta
-        _description_
+        Axis ratio of intermediate and major axis.
     xi
-        _description_
+        Axis ratio of minor and major axis.
     size
-        _description_
+        Size of the random draw.
     rng
-        _description_
+        Random number generator. If not given, a default RNG will be used.
 
     Returns
     -------
-        _description_
+        The axis ratio of the randomly projected ellipsoid.
 
     """
     # default RNG if not provided
@@ -115,7 +118,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     Returns
     -------
-        _description_
+        An array of :term:`ellipticity` from projected axis ratios.
 
     """
     # default RNG if not provided
@@ -177,7 +180,7 @@ def ellipticity_gaussian(
 
     Returns
     -------
-        _description_
+        An array of galaxy :term:`ellipticity`.
 
     """
     # default RNG if not provided
@@ -227,7 +230,7 @@ def ellipticity_intnorm(
 
     Returns
     -------
-        _description_
+        An array of galaxy :term:`ellipticity`.
 
     Raises
     ------

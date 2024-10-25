@@ -503,7 +503,8 @@ def effective_cls(
 
     Returns
     -------
-        _description_
+        A dictionary of effective angular power spectra, where keys
+        correspond to the leading axes of *weights1* and *weights2*.
 
     Raises
     ------

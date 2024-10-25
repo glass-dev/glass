@@ -72,7 +72,11 @@ def from_convergence(  # noqa: PLR0913
 
     Returns
     -------
-        _description_
+        The maps of:
+
+        * deflection potential if ``potential`` is true.
+        * potential (complex) if ``deflection`` is true.
+        * shear (complex) if ``shear`` is true.
 
     """
     # no output means no computation, return empty tuple
@@ -403,7 +407,7 @@ def multi_plane_weights(
 
     Returns
     -------
-        _description_
+        The relative lensing weight of each shell.
 
     Raises
     ------
@@ -445,7 +449,7 @@ def deflect(
 
     Returns
     -------
-        _description_
+        The longitudes and latitudes after deflection.
 
     """
     alpha = np.asanyarray(alpha)
