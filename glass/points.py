@@ -142,26 +142,49 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     ]
 ]:
     """
-    _summary_.
+    Generate positions tracing a density contrast.
+
+    The map of expected number counts is constructed from the number
+    density, density contrast, an optional bias model, and an optional
+    visibility map.
+
+    If ``remove_monopole`` is set, the monopole of the computed density
+    contrast is removed. Over the full sky, the mean number density of
+    the map will then match the given number density exactly. This,
+    however, means that an effectively different bias model is being
+    used, unless the monopole is already zero in the first place.
+
+    The function supports multi-dimensional input for the ``ngal``,
+    ``delta``, ``bias``, and ``vis`` parameters. Extra dimensions are
+    broadcast to a common shape, and treated as separate populations of
+    points. These are then sampled independently, and the results
+    concatenated into a flat list of longitudes and latitudes. The
+    number of points per population is returned in ``count`` as an array
+    in the shape of the extra dimensions.
 
     Parameters
     ----------
     ngal
-        _description_
+        Number density, expected number of points per arcmin2.
     delta
-        _description_
+        Map of the input density contrast. This is fed into the bias
+        model to produce the density contrast for sampling.
     bias
-        _description_
+        Bias parameter, is passed as an argument to the bias model.
     vis
-        _description_
+        Visibility map for the observed points. This is multiplied with
+        the full sky number count map, and must hence be of compatible shape.
     bias_model
-        _description_
+        The bias model to apply. If a string, refers to a function in
+        the :mod:`~glass.points` module, e.g. ``'linear'`` for
+        :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
     remove_monopole
-        _description_
+        If true, the monopole of the density contrast
+        after biasing is fixed to zero.
     batch
-        _description_
+        Maximum number of positions to yield in one batch.
     rng
-        _description_
+        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
@@ -291,9 +314,9 @@ def uniform_positions(
     Parameters
     ----------
     ngal
-        _description_
+        Number density, expected number of positions per arcmin2.
     rng
-        _description_
+        Random number generator. If not given, a default RNG will be used.
 
     Yields
     ------
@@ -334,15 +357,24 @@ def position_weights(
     densities: npt.NDArray[np.float64],
     bias: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
-    """
-    _summary_.
+    r"""
+    Compute relative weights for angular clustering.
+
+    Takes an array *densities* of densities in arbitrary units and
+    returns the relative weight of each shell. If *bias* is given, a
+    linear bias is applied to each shell.
+
+    This is the equivalent of computing the product of normalised
+    redshift distribution and bias factor :math:`n(z) \, b(z)` for the
+    discretised shells.
 
     Parameters
     ----------
     densities
-        _description_
+        Density of points in each shell. The first axis must broadcast
+        against the number of shells, and is normalised internally.
     bias
-        _description_
+        Value or values of the linear bias parameter for each shell.
 
     Returns
     -------
