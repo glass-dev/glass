@@ -77,13 +77,11 @@ autodoc_typehints = "description"
 # -- napoleon ----------------------------------------------------------------
 
 napoleon_google_docstring = False
-napoleon_use_rtype = False
 
 
 # -- sphinx-autodoc-typehints ------------------------------------------------
 
 always_use_bars_union = True
-typehints_use_rtype = False
 typehints_defaults = "comma"
 
 
