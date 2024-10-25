@@ -267,7 +267,6 @@ def gaussian_phz(
     glass.tomo_nz_gausserr:
         Create tomographic redshift distributions assuming the same model.
 
-
     References
     ----------
     * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
