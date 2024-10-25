@@ -54,7 +54,7 @@ def iternorm(
         _description_
     cov
         _description_
-    size, optional
+    size
         _description_
 
     Yields
