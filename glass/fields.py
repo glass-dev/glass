@@ -133,7 +133,7 @@ def cls2cov(
     Parameters
     ----------
     cls
-        _description_
+        Angular matter power spectra in *GLASS* ordering.
     nl
         _description_
     nf
@@ -209,7 +209,7 @@ def transform_cls(
     Parameters
     ----------
     cls
-        _description_
+        Angular matter power spectra in *GLASS* ordering.
     tfm
         _description_
     pars
@@ -256,7 +256,7 @@ def discretized_cls(
     Parameters
     ----------
     cls
-        _description_
+        Angular matter power spectra in *GLASS* ordering.
     lmax
         _description_
     ncorr
@@ -312,7 +312,7 @@ def lognormal_gls(
     Parameters
     ----------
     cls
-        _description_
+        Angular matter power spectra in *GLASS* ordering.
     shift
         _description_
 
@@ -496,7 +496,7 @@ def getcl(
     Parameters
     ----------
     cls
-        List of angular power spectra in *GLASS* ordering.
+        Angular matter power spectra in *GLASS* ordering.
     i
         Indices to return.
     j
@@ -540,7 +540,7 @@ def effective_cls(
     Parameters
     ----------
     cls
-        Angular matter power spectra to combine, in *GLASS* ordering.
+        Angular matter power spectra in *GLASS* ordering.
     weights1
         Weight factors for spectra. The first axis must be equal to
         the number of fields.

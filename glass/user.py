@@ -51,7 +51,7 @@ def save_cls(
     filename
         The name of the file to save to.
     cls
-        _description_
+        Angular matter power spectra in *GLASS* ordering.
 
     """
     split = np.cumsum([len(cl) for cl in cls[:-1]])

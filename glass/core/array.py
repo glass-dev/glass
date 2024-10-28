@@ -140,15 +140,15 @@ def trapz_product(
     Parameters
     ----------
     f
-        _description_
+        The first function.
     ff
-        _description_
+        The other functions.
     axis
-        _description_
+        The axis along which to integrate.
 
     Returns
     -------
-        _description_
+        The integral of the product of the functions.
 
     """
     x, _ = f
@@ -179,17 +179,17 @@ def cumtrapz(
     Parameters
     ----------
     f
-        _description_
+        The function values.
     x
-        _description_
+        The x-coordinates.
     dtype
-        _description_
+        The output data type.
     out
-        _description_
+        The output array.
 
     Returns
     -------
-        _description_
+        The cumulative integral of the function.
 
     """
     if out is None:
