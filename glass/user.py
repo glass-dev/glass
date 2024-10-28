@@ -34,7 +34,12 @@ if typing.TYPE_CHECKING:
         import fitsio
 
 
-def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
+def save_cls(
+    filename: str,
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
+) -> None:
     """
     Save a list of Cls to file.
 
@@ -42,12 +47,14 @@ def save_cls(filename: str, cls: list[npt.NDArray[np.float64] | None]) -> None:
     ``.npz`` suffix, or it will be given one.
 
     """
-    split = np.cumsum([len(cl) if cl is not None else 0 for cl in cls[:-1]])
-    values = np.concatenate([cl for cl in cls if cl is not None])
+    split = np.cumsum([len(cl) for cl in cls[:-1]])
+    values = np.concatenate(cls)
     np.savez(filename, values=values, split=split)
 
 
-def load_cls(filename: str) -> list[npt.NDArray[np.float64]]:
+def load_cls(
+    filename: str,
+) -> list[npt.NDArray[np.float64] | collections.abc.Sequence[float]]:
     """
     Load a list of Cls from file.
 
