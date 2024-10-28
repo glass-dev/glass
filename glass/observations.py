@@ -82,8 +82,8 @@ def vmap_galactic_ecliptic(
 
 def gaussian_nz(
     z: npt.NDArray[np.float64],
-    mean: npt.NDArray[np.float64],
-    sigma: npt.NDArray[np.float64],
+    mean: float | npt.NDArray[np.float64],
+    sigma: float | npt.NDArray[np.float64],
     *,
     norm: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
