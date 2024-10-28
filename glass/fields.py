@@ -41,7 +41,7 @@ if typing.TYPE_CHECKING:
 def iternorm(
     k: int,
     cov: collections.abc.Iterable[npt.NDArray[np.float64]],
-    size: tuple[int, ...] = (),
+    size: int | tuple[int, ...] = (),
 ) -> collections.abc.Generator[
     tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
 ]:
@@ -69,10 +69,12 @@ def iternorm(
         _description_
 
     """
-    m = np.zeros((*size, k, k))
-    a = np.zeros((*size, k))
-    s = np.zeros((*size,))
-    q = (*size, k + 1)
+    n = (size,) if isinstance(size, int) else size
+
+    m = np.zeros((*n, k, k))
+    a = np.zeros((*n, k))
+    s = np.zeros((*n,))
+    q = (*n, k + 1)
     j = 0 if k > 0 else None
 
     for i, x in enumerate(cov):
@@ -101,7 +103,7 @@ def iternorm(
             c = x[..., 1:, np.newaxis]
             a = np.matmul(m[..., :j], c[..., k - j :, :])
             a += np.matmul(m[..., j:], c[..., : k - j, :])
-            a = a.reshape(*size, k)
+            a = a.reshape(*n, k)
 
             # next rolling index
             j = (j - 1) % k
@@ -118,7 +120,9 @@ def iternorm(
 
 
 def cls2cov(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nl: int,
     nf: int,
     nc: int,
@@ -193,7 +197,9 @@ def multalm(
 
 
 def transform_cls(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
     pars: tuple[typing.Any, ...] = (),
 ) -> list[list[float] | npt.NDArray[np.float64]]:
@@ -231,12 +237,14 @@ def transform_cls(
 
 
 def discretized_cls(
-    cls: list[list[float]] | npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> list[list[float] | npt.NDArray[np.float64]]:
+) -> list[npt.NDArray[np.float64] | collections.abc.Sequence[float]]:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -282,7 +290,7 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:
+        if len(cl) > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -293,7 +301,9 @@ def discretized_cls(
 
 
 def lognormal_gls(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     shift: float = 1.0,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """
@@ -315,12 +325,14 @@ def lognormal_gls(
 
 
 def generate_gaussian(
-    gls: npt.NDArray[np.float64],
+    gls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nside: int,
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -390,7 +402,7 @@ def generate_gaussian(
     y = np.zeros((n * (n + 1) // 2, ncorr), dtype=np.complex128)
 
     # generate the conditional normal distribution for iterative sampling
-    conditional_dist = iternorm(ncorr, cov, size=(n,))
+    conditional_dist = iternorm(ncorr, cov, size=n)
 
     # sample the fields from the conditional distribution
     for j, a, s in conditional_dist:
@@ -420,13 +432,15 @@ def generate_gaussian(
 
 
 def generate_lognormal(
-    gls: npt.NDArray[np.float64],
+    gls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nside: int,
     shift: float = 1.0,
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
 
@@ -469,11 +483,13 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     i: int,
     j: int,
     lmax: int | None = None,
-) -> npt.NDArray[np.float64]:
+) -> npt.NDArray[np.float64] | collections.abc.Sequence[float]:
     """
     Return a specific angular power spectrum from an array.
 
@@ -506,7 +522,9 @@ def getcl(
 
 
 def effective_cls(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     weights1: npt.NDArray[np.float64],
     weights2: npt.NDArray[np.float64] | None = None,
     *,

@@ -38,6 +38,8 @@ import numpy as np
 import numpy.typing as npt
 
 if typing.TYPE_CHECKING:
+    import collections.abc
+
     from cosmology import Cosmology
 
     from glass.shells import RadialWindow
@@ -447,7 +449,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
@@ -475,7 +477,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: npt.NDArray[np.float64],
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
