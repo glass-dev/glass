@@ -208,7 +208,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -294,7 +294,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.complex128]]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
