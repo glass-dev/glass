@@ -53,6 +53,8 @@ import numpy.typing as npt
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
+    import collections.abc
+
     from cosmology import Cosmology
 
 
@@ -367,7 +369,7 @@ def restrict(
 def partition(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     *,
     method: str = "nnls",
 ) -> npt.NDArray[np.float64]:
@@ -478,7 +480,7 @@ def partition(
 def partition_lstsq(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
@@ -541,7 +543,7 @@ def partition_lstsq(
 def partition_nnls(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
@@ -630,7 +632,7 @@ def partition_nnls(
 def partition_restrict(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
 ) -> npt.NDArray[np.float64]:
     """Partition by restriction and integration."""
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
@@ -685,7 +687,7 @@ def distance_grid(
 def combine(
     z: npt.NDArray[np.float64],
     weights: npt.NDArray[np.float64],
-    shells: list[RadialWindow],
+    shells: collections.abc.Sequence[RadialWindow],
 ) -> npt.NDArray[np.float64]:
     r"""
     Evaluate a linear combination of window functions.
