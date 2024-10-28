@@ -64,9 +64,9 @@ def iternorm(
     Raises
     ------
     TypeError
-        _description_
+        If the covariance matrix is not broadcastable to the given size.
     ValueError
-        _description_
+        If the covariance matrix is not positive definite.
 
     """
     n = (size,) if isinstance(size, int) else size
@@ -128,7 +128,7 @@ def cls2cov(
     nc: int,
 ) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """
-    Return array of cls as a covariance matrix for iterative sampling.
+    Return array of Cls as a covariance matrix for iterative sampling.
 
     Parameters
     ----------
@@ -148,7 +148,7 @@ def cls2cov(
     Raises
     ------
     ValueError
-        _description_
+        If negative values are found in the Cls.
 
     """
     cov = np.zeros((nl, nc + 1))
@@ -271,13 +271,13 @@ def discretized_cls(
     Raises
     ------
     ValueError
-        _description_
+        If the length of the Cls array is not a triangle number.
 
     """
     if ncorr is not None:
         n = int((2 * len(cls)) ** 0.5)
         if n * (n + 1) // 2 != len(cls):
-            msg = "length of cls array is not a triangle number"
+            msg = "length of Cls array is not a triangle number"
             raise ValueError(msg)
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else []
@@ -341,7 +341,7 @@ def generate_gaussian(
     ``nside``.
 
     The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated. This saves memory, as only `ncorr` previous
+    realised fields are correlated. This saves memory, as only ``ncorr`` previous
     fields need to be kept.
 
     The ``gls`` array must contain the auto-correlation of each new field
@@ -373,7 +373,7 @@ def generate_gaussian(
     Raises
     ------
     ValueError
-        _description_
+        If all gls are empty.
 
     """
     # get the default RNG if not given
@@ -558,9 +558,9 @@ def effective_cls(
     Raises
     ------
     ValueError
-        _description_
+        If the length of *cls* is not a triangle number.
     ValueError
-        _description_
+        If the shapes of *weights1* and *weights2* do not match the
 
     """
     from itertools import combinations_with_replacement, product
@@ -568,7 +568,7 @@ def effective_cls(
     # this is the number of fields
     n = int((2 * len(cls)) ** 0.5)
     if n * (n + 1) // 2 != len(cls):
-        msg = "length of cls is not a triangle number"
+        msg = "length of Cls is not a triangle number"
         raise ValueError(msg)
 
     # find lmax if not given

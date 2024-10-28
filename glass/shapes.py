@@ -38,8 +38,8 @@ def triaxial_axis_ratio(
     """
     Axis ratio of a randomly projected triaxial ellipsoid.
 
-    Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
-    ellipsoid, computes the axis ratio `q` of the projection.
+    Given the two axis ratios ``1 >= zeta >= xi`` of a randomly oriented triaxial
+    ellipsoid, computes the axis ratio ``q`` of the projection.
 
     Parameters
     ----------

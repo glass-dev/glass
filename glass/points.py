@@ -207,7 +207,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     Raises
     ------
     TypeError
-        _description_
+        If the bias model is not a string or callable.
 
     """
     # get default RNG if not given

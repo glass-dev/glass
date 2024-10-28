@@ -355,7 +355,7 @@ class MultiPlaneConvergence:
         Raises
         ------
         ValueError
-            _description_
+            If the source redshift is not increasing.
 
         """
         if zsrc <= self.z3:
@@ -507,7 +507,7 @@ def multi_plane_weights(
     Raises
     ------
     ValueError
-        _description_
+        If the shape of *weights* does not match the number of shells.
 
     """
     # ensure shape of weights ends with the number of shells

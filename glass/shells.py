@@ -208,7 +208,7 @@ def tophat_windows(
     Raises
     ------
     ValueError
-        _description_
+        If the number of redshift bins is less than 2.
 
     See Also
     --------
@@ -287,7 +287,7 @@ def linear_windows(
     Raises
     ------
     ValueError
-        _description_
+        If the number of nodes is less than 3.
 
     See Also
     --------
@@ -356,7 +356,7 @@ def cubic_windows(
     Raises
     ------
     ValueError
-        _description_
+        If the number of nodes is less than 3.
 
     See Also
     --------
@@ -471,7 +471,7 @@ def partition(
     Raises
     ------
     ValueError
-        _description_
+        If the method is not recognised.
 
     Notes
     -----
@@ -791,7 +791,7 @@ def redshift_grid(
     Raises
     ------
     ValueError
-        _description_
+        If both ``dz`` and ``num`` are given.
 
     """
     if dz is not None and num is None:
@@ -835,7 +835,7 @@ def distance_grid(
     Raises
     ------
     ValueError
-        _description_
+        If both ``dx`` and ``num`` are given.
 
     """
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)

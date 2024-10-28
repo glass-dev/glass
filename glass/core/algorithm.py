@@ -36,11 +36,11 @@ def nnls(
     Raises
     ------
     ValueError
-        _description_
+        If ``a`` is not a matrix.
     ValueError
-        _description_
+        If ``b`` is not a vector.
     ValueError
-        _description_
+        If the shapes of ``a`` and ``b`` do not match.
 
     References
     ----------
@@ -55,13 +55,13 @@ def nnls(
     b = np.asanyarray(b)
 
     if a.ndim != 2:
-        msg = "input `a` is not a matrix"
+        msg = "input ``a`` is not a matrix"
         raise ValueError(msg)
     if b.ndim != 1:
-        msg = "input `b` is not a vector"
+        msg = "input ``b`` is not a vector"
         raise ValueError(msg)
     if a.shape[0] != b.shape[0]:
-        msg = "the shapes of `a` and `b` do not match"
+        msg = "the shapes of ``a`` and ``b`` do not match"
         raise ValueError(msg)
 
     _, n = a.shape
