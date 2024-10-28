@@ -31,7 +31,7 @@ import numpy.typing as npt
 def triaxial_axis_ratio(
     zeta: float | npt.NDArray[np.float64],
     xi: float | npt.NDArray[np.float64],
-    size: tuple[int, ...] = (),
+    size: int | tuple[int, ...] = (),
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
@@ -101,7 +101,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma: float | npt.NDArray[np.float64],
     gamma: float | npt.NDArray[np.float64],
     sigma_gamma: float | npt.NDArray[np.float64],
-    size: tuple[int, ...] = (),
+    size: int | tuple[int, ...] = (),
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
