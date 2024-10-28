@@ -70,7 +70,7 @@ def distance_weight(
     z
         _description_
     cosmo
-        _description_
+        Cosmology instance.
 
     Returns
     -------
@@ -92,7 +92,7 @@ def volume_weight(
     z
         _description_
     cosmo
-        _description_
+        Cosmology instance.
 
     Returns
     -------
@@ -114,7 +114,7 @@ def density_weight(
     z
         _description_
     cosmo
-        _description_
+        Cosmology instance.
 
     Returns
     -------
@@ -818,7 +818,7 @@ def distance_grid(
     Parameters
     ----------
     cosmo
-        _description_
+        Cosmology instance.
     zmin
         _description_
     zmax

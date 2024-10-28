@@ -292,7 +292,7 @@ class MultiPlaneConvergence:
         Parameters
         ----------
         cosmo
-            _description_
+            Cosmology instance.
 
         """
         self.cosmo = cosmo
@@ -460,7 +460,7 @@ def multi_plane_matrix(
     shells
         _description_
     cosmo
-        _description_
+        Cosmology instance.
 
     Returns
     -------
