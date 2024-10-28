@@ -114,7 +114,7 @@ class _FitsWriter:
             _description_
 
         """
-        if self.ext not in self.fits:
+        if not self.ext or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if not self.ext:
                 self.ext = self.fits[-1].get_extnum()
