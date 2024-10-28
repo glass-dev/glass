@@ -14,13 +14,13 @@ def _extend_path(path: list[str], name: str) -> list[str]:
     Parameters
     ----------
     path
-        _description_
+        The path to extend.
     name
-        _description_
+        The name of the package.
 
     Returns
     -------
-        _description_
+        The extended path.
 
     """
     import os.path

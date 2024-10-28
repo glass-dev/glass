@@ -254,7 +254,7 @@ def gaussian_phz(
     Raises
     ------
     ValueError
-        _description_
+        If the bounds are not consistent.
 
     Warnings
     --------

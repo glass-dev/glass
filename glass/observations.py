@@ -65,9 +65,9 @@ def vmap_galactic_ecliptic(
     Raises
     ------
     TypeError
-        If the ``galactic`` or ``ecliptic`` arguments are not pairs of numbers.
+        If the ``galactic`` argument is not a pair of numbers.
     TypeError
-        _description_
+        If the ``ecliptic`` argument is not a pair of numbers.
 
     """
     if np.ndim(galactic) != 1 or len(galactic) != 2:
@@ -228,7 +228,7 @@ def fixed_zbins(
     Raises
     ------
     ValueError
-        _description_
+        If both ``nbins`` and ``dz`` are given.
 
     """
     if nbins is not None and dz is None:

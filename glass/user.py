@@ -49,7 +49,7 @@ def save_cls(
     Parameters
     ----------
     filename
-        _description_
+        The name of the file to save to.
     cls
         _description_
 
@@ -70,7 +70,7 @@ def load_cls(
     Parameters
     ----------
     filename
-        _description_
+        The name of the file to load from.
 
     Returns
     -------
@@ -99,7 +99,7 @@ class _FitsWriter:
         fits
             _description_
         ext
-            _description_
+            The file extension.
 
         """
         self.fits = fits

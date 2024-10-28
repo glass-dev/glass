@@ -264,7 +264,7 @@ def ellipticity_intnorm(
     Raises
     ------
     ValueError
-        _description_
+        If the standard deviation is not in the range [0, sqrt(0.5)].
 
     """
     # default RNG if not provided
