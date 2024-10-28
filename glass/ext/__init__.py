@@ -9,7 +9,7 @@ packages that provide a "glass" module.
 
 def _extend_path(path: list[str], name: str) -> list[str]:
     """
-    _summary_.
+    Extend the path to include the "ext" submodules of packages.
 
     Parameters
     ----------
