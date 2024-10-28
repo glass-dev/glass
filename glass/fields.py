@@ -95,7 +95,9 @@ def iternorm(
 
 
 def cls2cov(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nl: int,
     nf: int,
     nc: int,
@@ -131,7 +133,9 @@ def multalm(
 
 
 def transform_cls(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
     pars: tuple[typing.Any, ...] = (),
 ) -> list[list[float] | npt.NDArray[np.float64]]:
@@ -153,12 +157,14 @@ def transform_cls(
 
 
 def discretized_cls(
-    cls: list[list[float]] | npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> list[list[float] | npt.NDArray[np.float64]]:
+) -> list[npt.NDArray[np.float64] | collections.abc.Sequence[float]]:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -184,7 +190,7 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:
+        if len(cl) > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -195,7 +201,9 @@ def discretized_cls(
 
 
 def lognormal_gls(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     shift: float = 1.0,
 ) -> list[list[float] | npt.NDArray[np.float64]]:
     """Compute Gaussian Cls for a lognormal random field."""
@@ -203,7 +211,9 @@ def lognormal_gls(
 
 
 def generate_gaussian(
-    gls: npt.NDArray[np.float64],
+    gls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nside: int,
     *,
     ncorr: int | None = None,
@@ -288,7 +298,9 @@ def generate_gaussian(
 
 
 def generate_lognormal(
-    gls: npt.NDArray[np.float64],
+    gls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     nside: int,
     shift: float = 1.0,
     *,
@@ -317,11 +329,13 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     i: int,
     j: int,
     lmax: int | None = None,
-) -> npt.NDArray[np.float64]:
+) -> npt.NDArray[np.float64] | collections.abc.Sequence[float]:
     """
     Return a specific angular power spectrum from an array.
 
@@ -352,7 +366,9 @@ def getcl(
 
 
 def effective_cls(
-    cls: npt.NDArray[np.float64],
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
     weights1: npt.NDArray[np.float64],
     weights2: npt.NDArray[np.float64] | None = None,
     *,
