@@ -51,11 +51,11 @@ def iternorm(
     Parameters
     ----------
     k
-        _description_
+        The number of fields.
     cov
-        _description_
+        The covariance matrix for the fields.
     size
-        _description_
+        The size of the covariance matrix.
 
     Yields
     ------
@@ -135,11 +135,11 @@ def cls2cov(
     cls
         Angular matter power spectra in *GLASS* ordering.
     nl
-        _description_
+        The number of modes.
     nf
-        _description_
+        The number of fields.
     nc
-        _description_
+        The number of correlated fields.
 
     Yields
     ------
@@ -182,7 +182,7 @@ def multalm(
     bl
         _description_
     inplace
-        _description_
+        Whether to perform the operation in place.
 
     Returns
     -------
@@ -211,9 +211,9 @@ def transform_cls(
     cls
         Angular matter power spectra in *GLASS* ordering.
     tfm
-        _description_
+        The transformation to apply.
     pars
-        _description_
+        The parameters for the transformation.
 
     Returns
     -------
@@ -258,11 +258,11 @@ def discretized_cls(
     cls
         Angular matter power spectra in *GLASS* ordering.
     lmax
-        _description_
+        The maximum mode number to truncate the spectra.
     ncorr
-        _description_
+        The number of correlated fields to keep.
     nside
-        _description_
+        The resolution parameter for the HEALPix maps.
 
     Returns
     -------
@@ -314,7 +314,7 @@ def lognormal_gls(
     cls
         Angular matter power spectra in *GLASS* ordering.
     shift
-        _description_
+        The shift parameter for the lognormal transformation.
 
     Returns
     -------
@@ -358,11 +358,11 @@ def generate_gaussian(
     Parameters
     ----------
     gls
-        _description_
+        The Gaussian angular power spectra for a random field.
     nside
-        _description_
+        The resolution parameter for the HEALPix maps.
     ncorr
-        _description_
+        The number of correlated fields. If not given, all fields are correlated.
     rng
         Random number generator. If not given, a default RNG is used.
 
@@ -447,13 +447,13 @@ def generate_lognormal(
     Parameters
     ----------
     gls
-        _description_
+        The Gaussian angular power spectra for a lognormal random field.
     nside
-        _description_
+        The resolution parameter for the HEALPix maps.
     shift
-        _description_
+        The shift parameter for the lognormal transformation.
     ncorr
-        _description_
+        The number of correlated fields. If not given, all fields are correlated.
     rng
         Random number generator. If not given, a default RNG is used.
 

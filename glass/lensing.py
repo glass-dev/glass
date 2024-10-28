@@ -243,11 +243,11 @@ def shear_from_convergence(
     Parameters
     ----------
     kappa
-        _description_
+        The convergence map.
     lmax
-        _description_
+        The maximum angular mode number to use in the transform.
     discretized
-        _description_
+        Whether to correct the pixel window function in the output map.
 
     Returns
     -------
@@ -418,7 +418,7 @@ class MultiPlaneConvergence:
 
         Returns
         -------
-            _description_
+            The current convergence plane.
 
         """
         return self.kappa3
@@ -430,7 +430,7 @@ class MultiPlaneConvergence:
 
         Returns
         -------
-            _description_
+            The current matter plane.
 
         """
         return self.delta3
@@ -442,7 +442,7 @@ class MultiPlaneConvergence:
 
         Returns
         -------
-            _description_
+            The weight of the current matter plane.
 
         """
         return self.w3
@@ -458,7 +458,7 @@ def multi_plane_matrix(
     Parameters
     ----------
     shells
-        _description_
+        The shells of the mass distribution.
     cosmo
         Cosmology instance.
 

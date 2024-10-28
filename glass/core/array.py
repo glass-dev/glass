@@ -18,7 +18,7 @@ def broadcast_first(
     Parameters
     ----------
     arrays
-        _description_
+        The arrays to broadcast.
 
     Returns
     -------
@@ -45,7 +45,7 @@ def broadcast_leading_axes(
     Parameters
     ----------
     args
-        _description_
+        The arrays and the number of axes to keep.
 
     Returns
     -------
