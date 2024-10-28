@@ -107,7 +107,7 @@ def linear_bias(
 
     Returns
     -------
-        _description_
+        The density contrast after biasing.
 
     """
     return b * delta
@@ -129,7 +129,7 @@ def loglinear_bias(
 
     Returns
     -------
-        _description_
+        The density contrast after biasing.
 
     """
     delta_g = np.log1p(delta)

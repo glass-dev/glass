@@ -74,7 +74,7 @@ def load_cls(
 
     Returns
     -------
-        _description_
+        The list of Cls.
 
     """
     with np.load(filename) as npz:

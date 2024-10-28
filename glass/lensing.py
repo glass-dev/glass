@@ -251,7 +251,7 @@ def shear_from_convergence(
 
     Returns
     -------
-        _description_
+        The shear map.
 
     """
     nside = hp.get_nside(kappa)
@@ -464,7 +464,7 @@ def multi_plane_matrix(
 
     Returns
     -------
-        _description_
+        The matrix of lensing contributions.
 
     """
     mpc = MultiPlaneConvergence(cosmo)

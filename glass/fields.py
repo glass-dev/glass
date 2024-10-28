@@ -186,7 +186,7 @@ def multalm(
 
     Returns
     -------
-        _description_
+        The product of alm and bl.
 
     """
     n = len(bl)
@@ -217,7 +217,7 @@ def transform_cls(
 
     Returns
     -------
-        _description_
+        The transformed angular power spectra.
 
     """
     gls = []
@@ -266,7 +266,7 @@ def discretized_cls(
 
     Returns
     -------
-        _description_
+        The discretised angular power spectra.
 
     Raises
     ------
@@ -318,7 +318,7 @@ def lognormal_gls(
 
     Returns
     -------
-        _description_
+        The Gaussian angular power spectra for a lognormal random field.
 
     """
     return transform_cls(cls, "lognormal", (shift,))
@@ -364,7 +364,7 @@ def generate_gaussian(
     ncorr
         _description_
     rng
-        _description_
+        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
@@ -455,7 +455,7 @@ def generate_lognormal(
     ncorr
         _description_
     rng
-        _description_
+        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------

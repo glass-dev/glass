@@ -68,13 +68,13 @@ def distance_weight(
     Parameters
     ----------
     z
-        _description_
+        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
     Returns
     -------
-        _description_
+        The weight in comoving distance.
 
     """
     return 1 / cosmo.ef(z)
@@ -90,13 +90,13 @@ def volume_weight(
     Parameters
     ----------
     z
-        _description_
+        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
     Returns
     -------
-        _description_
+        The weight in comoving volume.
 
     """
     return cosmo.xm(z) ** 2 / cosmo.ef(z)
@@ -112,13 +112,13 @@ def density_weight(
     Parameters
     ----------
     z
-        _description_
+        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
     Returns
     -------
-        _description_
+        The weight in matter density.
 
     """
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
@@ -568,7 +568,7 @@ def partition_lstsq(
 
     Returns
     -------
-        _description_
+        The partition.
 
     """
     # make sure nothing breaks
@@ -652,7 +652,7 @@ def partition_nnls(
 
     Returns
     -------
-        _description_
+        The partition.
 
     """
     from glass.core.algorithm import nnls
@@ -749,7 +749,7 @@ def partition_restrict(
 
     Returns
     -------
-        _description_
+        The partition.
 
     """
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
@@ -786,7 +786,7 @@ def redshift_grid(
 
     Returns
     -------
-        _description_
+        The redshift grid.
 
     Raises
     ------
@@ -830,7 +830,7 @@ def distance_grid(
 
     Returns
     -------
-        _description_
+        The redshift grid.
 
     Raises
     ------

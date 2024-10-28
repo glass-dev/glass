@@ -31,7 +31,7 @@ def nnls(
 
     Returns
     -------
-        _description_
+        The non-negative least squares solution.
 
     Raises
     ------

@@ -22,7 +22,7 @@ def broadcast_first(
 
     Returns
     -------
-        _description_
+        The broadcasted arrays.
 
     """
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
@@ -113,7 +113,7 @@ def ndinterp(  # noqa: PLR0913
 
     Returns
     -------
-        _description_
+        The interpolated array.
 
     """
     return np.apply_along_axis(
