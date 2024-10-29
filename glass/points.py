@@ -338,8 +338,8 @@ def uniform_positions(
 
     Yields
     ------
-        The longitudes, latitudes, and
-        number of points for each set of positions.
+        The longitudes, latitudes and the number of sampled points. For array
+        inputs, an array of counts with the same shape is returned.
 
     """
     # get default RNG if not given
