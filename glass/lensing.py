@@ -401,50 +401,22 @@ class MultiPlaneConvergence:
 
     @property
     def zsrc(self) -> float:
-        """
-        The redshift of the current convergence plane.
-
-        Returns
-        -------
-            _description_
-
-        """
+        """The redshift of the current convergence plane."""
         return self.z3
 
     @property
     def kappa(self) -> npt.NDArray[np.float64] | None:
-        """
-        The current convergence plane.
-
-        Returns
-        -------
-            The current convergence plane.
-
-        """
+        """The current convergence plane."""
         return self.kappa3
 
     @property
     def delta(self) -> npt.NDArray[np.float64]:
-        """
-        The current matter plane.
-
-        Returns
-        -------
-            The current matter plane.
-
-        """
+        """The current matter plane."""
         return self.delta3
 
     @property
     def wlens(self) -> float:
-        """
-        The weight of the current matter plane.
-
-        Returns
-        -------
-            The weight of the current matter plane.
-
-        """
+        """The weight of the current matter plane."""
         return self.w3
 
 
