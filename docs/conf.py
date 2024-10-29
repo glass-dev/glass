@@ -82,7 +82,6 @@ napoleon_google_docstring = False
 # -- sphinx-autodoc-typehints ------------------------------------------------
 
 always_use_bars_union = True
-typehints_defaults = "comma"
 
 
 # -- plot_directive ----------------------------------------------------------
