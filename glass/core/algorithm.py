@@ -21,13 +21,13 @@ def nnls(
     Parameters
     ----------
     a
-        _description_
+        The matrix.
     b
-        _description_
+        The vector.
     tol
-        _description_
+        The tolerance for convergence.
     maxiter
-        _description_
+        The maximum number of iterations.
 
     Returns
     -------

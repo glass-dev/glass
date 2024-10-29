@@ -319,7 +319,7 @@ class MultiPlaneConvergence:
         delta
             _description_
         w
-            _description_
+            The window function.
 
         """
         zsrc = w.zeff

@@ -103,7 +103,7 @@ def linear_bias(
     delta
         _description_
     b
-        _description_
+        The bias parameter.
 
     Returns
     -------
@@ -125,7 +125,7 @@ def loglinear_bias(
     delta
         _description_
     b
-        _description_
+        The bias parameter.
 
     Returns
     -------

@@ -178,9 +178,9 @@ def multalm(
     Parameters
     ----------
     alm
-        _description_
+        The alm to multiply.
     bl
-        _description_
+        The bl to multiply.
     inplace
         Whether to perform the operation in place.
 

@@ -97,7 +97,7 @@ class _FitsWriter:
         Parameters
         ----------
         fits
-            _description_
+            The fits object.
         ext
             The file extension.
 
@@ -116,9 +116,9 @@ class _FitsWriter:
         Parameters
         ----------
         data
-            _description_
+            The data to write.
         names
-            _description_
+            The names of the columns.
 
         """
         if not self.ext or self.ext not in self.fits:
@@ -145,9 +145,9 @@ class _FitsWriter:
         Parameters
         ----------
         data
-            _description_
+            The data to write.
         columns
-            _description_
+            The columns to write.
 
         """
         # if data is given, write it as it is
@@ -184,9 +184,9 @@ def write_catalog(
     Parameters
     ----------
     filename
-        _description_
+        The name of the file to write to.
     ext
-        _description_
+        The file extension.
 
     Yields
     ------
