@@ -101,7 +101,7 @@ def linear_bias(
     Parameters
     ----------
     delta
-        _description_
+        The input density contrast.
     b
         The bias parameter.
 
@@ -123,7 +123,7 @@ def loglinear_bias(
     Parameters
     ----------
     delta
-        _description_
+        The input density contrast.
     b
         The bias parameter.
 

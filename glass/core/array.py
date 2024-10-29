@@ -97,19 +97,19 @@ def ndinterp(  # noqa: PLR0913
     Parameters
     ----------
     x
-        _description_
+        The x-coordinates.
     xp
-        _description_
+        The x-coordinates of the data points.
     fp
-        _description_
+        The function values corresponding to the x-coordinates in *xp*.
     axis
-        _description_
+        The axis to interpolate over.
     left
-        _description_
+        The value to return for x < xp[0].
     right
-        _description_
+        The value to return for x > xp[-1].
     period
-        _description_
+        The period of the function, used for interpolating periodic data.
 
     Returns
     -------

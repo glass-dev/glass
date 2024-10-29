@@ -558,13 +558,13 @@ def partition_lstsq(
     Parameters
     ----------
     z
-        _description_
+        The function to be partitioned.
     fz
-        _description_
+        The function to be partitioned.
     shells
-        _description_
+        Ordered sequence of window functions.
     sumtol
-        _description_
+        Tolerance for the sum of the partition.
 
     Returns
     -------
@@ -642,13 +642,13 @@ def partition_nnls(
     Parameters
     ----------
     z
-        _description_
+        The function to be partitioned.
     fz
-        _description_
+        The function to be partitioned.
     shells
-        _description_
+        Ordered sequence of window functions.
     sumtol
-        _description_
+        Tolerance for the sum of the partition.
 
     Returns
     -------
@@ -741,11 +741,11 @@ def partition_restrict(
     Parameters
     ----------
     z
-        _description_
+        The function to be partitioned.
     fz
-        _description_
+        The function to be partitioned.
     shells
-        _description_
+        Ordered sequence of window functions.
 
     Returns
     -------
@@ -776,13 +776,13 @@ def redshift_grid(
     Parameters
     ----------
     zmin
-        _description_
+        The minimum redshift.
     zmax
-        _description_
+        The maximum redshift.
     dz
-        _description_
+        The redshift spacing.
     num
-        _description_
+        The number redshift samples.
 
     Returns
     -------
@@ -820,13 +820,13 @@ def distance_grid(
     cosmo
         Cosmology instance.
     zmin
-        _description_
+        The minimum redshift.
     zmax
-        _description_
+        The maximum redshift.
     dx
-        _description_
+        The comoving distance spacing.
     num
-        _description_
+        The number of samples.
 
     Returns
     -------

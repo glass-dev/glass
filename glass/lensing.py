@@ -317,7 +317,7 @@ class MultiPlaneConvergence:
         Parameters
         ----------
         delta
-            _description_
+            The mass plane.
         w
             The window function.
 
@@ -346,11 +346,11 @@ class MultiPlaneConvergence:
         Parameters
         ----------
         delta
-            _description_
+            The mass plane.
         zsrc
-            _description_
+            The redshift of the source plane.
         wlens
-            _description_
+            The weight of the mass plane.
 
         Raises
         ------
