@@ -341,7 +341,7 @@ def generate_gaussian(
     ``nside``.
 
     The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated. This saves memory, as only ``ncorr`` previous
+    realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
     The ``gls`` array must contain the auto-correlation of each new field
