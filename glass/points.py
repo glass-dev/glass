@@ -202,8 +202,9 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     Yields
     ------
-        The longitudes, latitudes, and
-        number of points for each set of positions.
+        The longitudes, latitudes and the number of sampled points. If
+        multiple populations are sampled, an array of counts in the shape
+        of the extra dimensions is returned.
 
     Raises
     ------
