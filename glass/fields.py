@@ -277,7 +277,7 @@ def discretized_cls(
     if ncorr is not None:
         n = int((2 * len(cls)) ** 0.5)
         if n * (n + 1) // 2 != len(cls):
-            msg = "length of Cls array is not a triangle number"
+            msg = "length of cls array is not a triangle number"
             raise ValueError(msg)
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else []
