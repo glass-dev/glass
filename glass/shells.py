@@ -481,6 +481,7 @@ def partition(
     approximate solution of
 
     .. math::
+
         \begin{pmatrix}
         w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
         w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
@@ -501,6 +502,7 @@ def partition(
     equals the integral of the target function,
 
     .. math::
+
         \begin{pmatrix}
         w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
         w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
