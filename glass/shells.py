@@ -162,6 +162,11 @@ class RadialWindow(typing.NamedTuple):
     zeff
         Effective redshift of the window.
 
+    Methods
+    -------
+    _replace
+        Create a new instance with changed attribute values.
+
     """
 
     za: npt.NDArray[np.float64]
