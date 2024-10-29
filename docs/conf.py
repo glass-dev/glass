@@ -64,8 +64,8 @@ html_css_files: list[str] = []
 # This config value contains the locations and names of other projects that
 # should be linked to in this documentation.
 intersphinx_mapping = {
+    "numpy": ("https://numpy.org/doc/stable", None),
     "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
 }
 
 
