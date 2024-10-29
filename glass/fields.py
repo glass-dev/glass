@@ -59,7 +59,7 @@ def iternorm(
 
     Yields
     ------
-        _description_
+        The index, vector, and standard deviation for iterative sampling.
 
     Raises
     ------
@@ -143,7 +143,7 @@ def cls2cov(
 
     Yields
     ------
-        _description_
+        The covariance matrix for iterative sampling.
 
     Raises
     ------
@@ -368,7 +368,7 @@ def generate_gaussian(
 
     Yields
     ------
-        _description_
+        The Gaussian random fields.
 
     Raises
     ------
@@ -459,7 +459,7 @@ def generate_lognormal(
 
     Yields
     ------
-        _description_
+        The lognormal random fields.
 
     """
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):

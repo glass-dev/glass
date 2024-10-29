@@ -190,7 +190,7 @@ def write_catalog(
 
     Yields
     ------
-        _description_
+        The writer object.
 
     """
     import fitsio

@@ -202,7 +202,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     Yields
     ------
-        _description_
+        The longitudes, latitudes, and
+        number of points for each set of positions.
 
     Raises
     ------
@@ -336,7 +337,8 @@ def uniform_positions(
 
     Yields
     ------
-        _description_
+        The longitudes, latitudes, and
+        number of points for each set of positions.
 
     """
     # get default RNG if not given
