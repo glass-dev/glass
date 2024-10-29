@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: Deployment target. Can be pypi or testpypi.
         default: testpypi
+        description: Deployment target. Can be pypi or testpypi.
   release:
     types:
       - published
@@ -15,10 +15,11 @@ jobs:
   dist:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
       - name: Build SDist and wheel
         run: pipx run build
@@ -26,22 +27,22 @@ jobs:
       - name: Check metadata
         run: pipx run twine check dist/*
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
         with:
           path: dist/*
 
   publish:
-    needs:
-      - dist
+    needs: dist
     runs-on: ubuntu-latest
     environment:
       name: publish
       url: https://pypi.org/p/glass
     permissions:
       id-token: write
-
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download distributions
+        uses: actions/download-artifact@v4
         with:
           name: artifact
           path: dist
@@ -49,12 +50,14 @@ jobs:
       - name: List distributions to be deployed
         run: ls -l dist/
 
-      - if:
+      - name: Publish to PyPI
+        if: >-
           github.event.inputs.target == 'pypi' || (github.event_name ==
           'release' && github.event.action == 'published')
         uses: pypa/gh-action-pypi-publish@release/v1
 
-      - if: github.event.inputs.target == 'testpypi'
+      - name: Publish to TestPyPI
+        if: github.event.inputs.target == 'testpypi'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/

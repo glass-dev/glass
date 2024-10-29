@@ -6,7 +6,6 @@ on:
     branches:
       - main
   pull_request:
-    # ensure the draft PRs are tested when ready
     types:
       - opened
       - ready_for_review
@@ -14,20 +13,14 @@ on:
       - synchronize
 
 concurrency:
-  # Skip intermediate builds: always.
-  # Cancel intermediate builds: only if it is a pull request build.
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
-
-env:
-  # The "FORCE_COLOR" variable, when set to 1,
-  # tells Nox to colorize itself.
-  FORCE_COLOR: "1"
+  cancel-in-progress: true
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
   tests:
-    name: Tests
     if: github.event.pull_request.draft == false
+    name: Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -37,24 +30,45 @@ jobs:
           - "3.11"
           - "3.12"
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+
+      - name: Cache nox
+        uses: actions/cache@v4
         with:
+          key: test-${{ hashFiles('pyproject.toml') }}
+          path: .nox
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          cache-dependency-path: pyproject.toml
+          cache: pip
           python-version: ${{ matrix.python-version }}
+
       - name: Install nox and coverage.py
-        run: pip install coverage[toml] nox
+        run: python -m pip install coverage[toml] nox
+
       - name: Install ubuntu dependencies for fitsio
-        run: |
+        run: |-
           sudo apt-get update
-          sudo apt-get install libbz2-dev
+          sudo apt-get install -y libbz2-dev
+
       - name: Run doctests
         run: nox -s doctests-${{ matrix.python-version }} --verbose
+        env:
+          FORCE_COLOR: 1
+
       - name: Run tests and generate coverage report
         run: nox -s coverage-${{ matrix.python-version }} --verbose
+        env:
+          FORCE_COLOR: 1
+
       - name: Coveralls requires XML report
         run: coverage xml
+
       - name: Run Coveralls in parallel
         uses: coverallsapp/github-action@v2
         with:
@@ -63,46 +77,63 @@ jobs:
 
   aggregate-tests:
     needs: tests
-    if: ${{ always() }}
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls finished
         uses: coverallsapp/github-action@v2
         with:
-          parallel-finished: true
           carryforward: run-3.9,run-3.10,run-3.11,run-3.12
+          parallel-finished: true
 
   build:
-    name: Build
     if: github.event.pull_request.draft == false
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
+          cache-dependency-path: pyproject.toml
+          cache: pip
           python-version: 3.x
+
       - name: Install nox
-        run: pip install nox
+        run: python -m pip install nox
+
       - name: Build SDist and wheel
         run: nox -s build --verbose
+        env:
+          FORCE_COLOR: 1
 
   docs:
-    name: Docs
     if: github.event.pull_request.draft == false
+    name: Docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
+          cache-dependency-path: pyproject.toml
+          cache: pip
           python-version: 3.x
+
       - name: Install dependencies
-        run: |
+        run: |-
           sudo apt-get update
-          sudo apt-get install pandoc
-          pip install nox
+          sudo apt-get install -y pandoc
+          python -m pip install nox
+
       - name: Build docs
         run: nox -s docs --verbose
+        env:
+          FORCE_COLOR: 1
