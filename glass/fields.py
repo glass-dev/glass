@@ -568,7 +568,7 @@ def effective_cls(
     # this is the number of fields
     n = int((2 * len(cls)) ** 0.5)
     if n * (n + 1) // 2 != len(cls):
-        msg = "length of Cls is not a triangle number"
+        msg = "length of cls is not a triangle number"
         raise ValueError(msg)
 
     # find lmax if not given
