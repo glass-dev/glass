@@ -25,9 +25,9 @@ def test_nnls(rng: np.random.Generator) -> None:
 
     # check matrix and vector's shape
 
-    with pytest.raises(ValueError, match="input ``a`` is not a matrix"):
+    with pytest.raises(ValueError, match="input `a` is not a matrix"):
         nnls_glass(b, a)
-    with pytest.raises(ValueError, match="input ``b`` is not a vector"):
+    with pytest.raises(ValueError, match="input `b` is not a vector"):
         nnls_glass(a, a)
-    with pytest.raises(ValueError, match="the shapes of ``a`` and ``b`` do not match"):
+    with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
         nnls_glass(a.T, b)
