@@ -127,7 +127,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma_gamma
         Standard deviation for :math:`1 - C/B`.
     size
-        Sample size. If ``None``, the size is inferred from the parameters.
+        Sample size.
     rng
         Random number generator. If not given, a default RNG will be used.
 
