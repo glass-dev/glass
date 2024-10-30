@@ -130,6 +130,10 @@ show-fixes = true
 src = [
     "glass",
 ]
+lint.allowed-confusables = [
+    "α",
+    "γ",
+]
 lint.ignore = [
     "ANN001", # TODO: missing-type-function-argument
     "ANN002", # TODO: missing-type-args
@@ -151,7 +155,6 @@ lint.ignore = [
     "Q001", # bad-quotes-multiline-string (ruff-format recommended)
     "Q002", # bad-quotes-docstring (ruff-format recommended)
     "Q003", # avoidable-escaped-quote (ruff-format recommended)
-    "RUF003", # ambiguous-unicode-character-comment
     "W191", # tab-indentation (ruff-format recommended)
 ]
 lint.isort = {known-first-party = [
