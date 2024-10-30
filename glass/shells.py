@@ -188,7 +188,7 @@ def tophat_windows(
     )
     wht = weight if weight is not None else np.ones_like
     ws = []
-    for zmin, zmax in zip(zbins, zbins[1:]):
+    for zmin, zmax in zip(zbins, zbins[1:], strict=False):
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
@@ -249,7 +249,7 @@ def linear_windows(
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
     ws = []
-    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
@@ -311,7 +311,7 @@ def cubic_windows(
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
     ws = []
-    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
@@ -731,5 +731,5 @@ def combine(
             left=0.0,
             right=0.0,
         )
-        for shell, weight in zip(shells, weights)
+        for shell, weight in zip(shells, weights, strict=False)
     ).sum(axis=0)

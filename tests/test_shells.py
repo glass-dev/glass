@@ -12,10 +12,14 @@ def test_tophat_windows() -> None:
 
     assert len(ws) == len(zb) - 1
 
-    assert all(z0 == w.za[0] and zn == w.za[-1] for w, z0, zn in zip(ws, zb, zb[1:]))
+    assert all(
+        z0 == w.za[0] and zn == w.za[-1]
+        for w, z0, zn in zip(ws, zb, zb[1:], strict=False)
+    )
 
     assert all(
-        zn <= z0 + len(w.za) * dz <= zn + dz for w, z0, zn in zip(ws, zb, zb[1:])
+        zn <= z0 + len(w.za) * dz <= zn + dz
+        for w, z0, zn in zip(ws, zb, zb[1:], strict=False)
     )
 
     assert all(np.all(w.wa == 1) for w in ws)
@@ -39,12 +43,12 @@ def test_restrict() -> None:
 
     assert fr[0] == fr[-1] == 0.0
 
-    for zi, wi in zip(w.za, w.wa):
+    for zi, wi in zip(w.za, w.wa, strict=False):
         i = np.searchsorted(zr, zi)
         assert zr[i] == zi
         assert fr[i] == wi * np.interp(zi, z, f)
 
-    for zi, fi in zip(z, f):
+    for zi, fi in zip(z, f, strict=False):
         if w.za[0] <= zi <= w.za[-1]:
             i = np.searchsorted(zr, zi)
             assert zr[i] == zi

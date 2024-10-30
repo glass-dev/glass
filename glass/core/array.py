@@ -59,7 +59,9 @@ def broadcast_leading_axes(
         shapes.append(s[:i])
         trails.append(s[i:])
     dims = np.broadcast_shapes(*shapes)
-    arrs = (np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails))
+    arrs = (
+        np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails, strict=False)
+    )
     return (dims, *arrs)
 
 
