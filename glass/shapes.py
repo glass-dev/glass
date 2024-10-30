@@ -50,7 +50,7 @@ def triaxial_axis_ratio(
     size
         Size of the random draw.
     rng
-        Random number generator. If not given, a default RNG will be used.
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
