@@ -701,11 +701,7 @@ def combine(
             * np.interp(
                 z,
                 shell.za,
-                shell.wa
-                / np.trapezoid(
-                    shell.wa,
-                    shell.za,
-                ),
+                shell.wa / np.trapezoid(shell.wa, shell.za),
                 left=0.0,
                 right=0.0,
             )
