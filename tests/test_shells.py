@@ -78,8 +78,5 @@ def test_partition(method: str) -> None:
 
     np.testing.assert_allclose(
         part.sum(axis=0),
-        np.trapz(  # type: ignore[attr-defined]
-            fz,
-            z,
-        ),
+        np.trapezoid(fz, z),
     )
