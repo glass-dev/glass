@@ -30,7 +30,7 @@ import healpix
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.array import broadcast_leading_axes, cumtrapz
+from glass.core.array import broadcast_leading_axes, cumtrapezoid
 
 if typing.TYPE_CHECKING:
     from cosmology import Cosmology
@@ -129,7 +129,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz_out[k], z_out[k], dtype=float)
+        cdf = cumtrapezoid(nz_out[k], z_out[k], dtype=float)
         cdf /= cdf[-1]
 
         # sample redshifts and store result

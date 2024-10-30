@@ -107,7 +107,7 @@ def trapezoid_product(
     return np.trapezoid(y, x, axis=axis)
 
 
-def cumtrapz(
+def cumtrapezoid(
     f: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     x: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     dtype: npt.DTypeLike | None = None,
