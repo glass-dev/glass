@@ -132,10 +132,6 @@ src = [
     "glass",
 ]
 lint.ignore = [
-    "ANN001", # TODO: missing-type-function-argument
-    "ANN002", # TODO: missing-type-args
-    "ANN003", # TODO: missing-type-kwargs
-    "ANN201", # TODO: missing-return-type-undocumented-public-function
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "COM819", # prohibited-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
@@ -147,7 +143,6 @@ lint.ignore = [
     "E117", # over-indented (ruff-format recommended)
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
     "ISC002", # multi-line-implicit-string-concatenation (ruff-format recommended)
-    "NPY201", # TODO: numpy2-deprecation
     "Q000", # bad-quotes-inline-string (ruff-format recommended)
     "Q001", # bad-quotes-multiline-string (ruff-format recommended)
     "Q002", # bad-quotes-docstring (ruff-format recommended)
@@ -181,9 +176,6 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "noxfile.py" = [
     "T201", # print
 ], "tests*" = [
-    "ANN001", # TODO: missing-type-function-argument
-    "ANN201", # TODO: issing-return-type-undocumented-public-function
-    "ANN202", # TODO: missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
     "D104", # undocumented-public-package
