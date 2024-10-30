@@ -23,7 +23,7 @@ dependencies = [
     "gaussiancl>=2022.10.21",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "numpy>=1.22.0",
+    "numpy>=2.1.1",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
