@@ -74,8 +74,8 @@ def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
             assert data["RA"].size == except_int / delta
             assert data["RB"].size == except_int / delta
 
-            fitsMat = data["RA"].reshape(except_int, int(1 / delta))  # noqa: N806
-            fitsMat2 = data["RB"].reshape(except_int, int(1 / delta))  # noqa: N806
+            fits_mat = data["RA"].reshape(except_int, int(1 / delta))
+            fits_mat2 = data["RB"].reshape(except_int, int(1 / delta))
             for i in range(except_int):
                 array = np.arange(
                     i,
@@ -83,5 +83,5 @@ def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
                     delta,
                 )  # re-create array to compare to read data
                 array2 = np.arange(i + 1, i + 2, delta)
-                assert array.tolist() == fitsMat[i].tolist()
-                assert array2.tolist() == fitsMat2[i].tolist()
+                assert array.tolist() == fits_mat[i].tolist()
+                assert array2.tolist() == fits_mat2[i].tolist()
