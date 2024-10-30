@@ -92,6 +92,7 @@ def trapz_product(
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:
     """Trapezoidal rule for a product of functions."""
+    x: npt.NDArray[np.float64]
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
