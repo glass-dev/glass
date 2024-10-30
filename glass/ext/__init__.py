@@ -17,7 +17,7 @@ def _extend_path(path, name) -> list:  # type: ignore[no-untyped-def, type-arg]
         filter(
             os.path.isdir,
             (os.path.join(p, _mod) for p in extend_path(path, _pkg)),  # noqa: PTH118
-        )
+        ),
     )
 
 
