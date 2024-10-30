@@ -44,6 +44,7 @@ Weight functions
 
 from __future__ import annotations
 
+import itertools
 import typing
 import warnings
 
@@ -188,7 +189,7 @@ def tophat_windows(
     )
     wht = weight if weight is not None else np.ones_like
     ws = []
-    for zmin, zmax in zip(zbins, zbins[1:], strict=False):
+    for zmin, zmax in itertools.pairwise(zbins):
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
