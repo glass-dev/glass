@@ -151,6 +151,7 @@ def trapz_product(
         The integral of the product of the functions.
 
     """
+    x: npt.NDArray[np.float64]
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
