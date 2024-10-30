@@ -129,7 +129,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     size
         Sample size.
     rng
-        Random number generator. If not given, a default RNG will be used.
+        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
