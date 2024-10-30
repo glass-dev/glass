@@ -9,7 +9,7 @@ from glass.core.array import (
     broadcast_leading_axes,
     cumtrapz,
     ndinterp,
-    trapz_product,
+    trapezoid_product,
 )
 
 # check if scipy is available for testing
@@ -144,14 +144,14 @@ def test_ndinterp() -> None:
     )
 
 
-def test_trapz_product() -> None:
+def test_trapezoid_product() -> None:
     x1 = np.linspace(0, 2, 100)
     f1 = np.full_like(x1, 2.0)
 
     x2 = np.linspace(1, 2, 10)
     f2 = np.full_like(x2, 0.5)
 
-    s = trapz_product((x1, f1), (x2, f2))
+    s = trapezoid_product((x1, f1), (x2, f2))
 
     np.testing.assert_allclose(s, 1.0)
 

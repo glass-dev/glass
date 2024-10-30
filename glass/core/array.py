@@ -85,7 +85,7 @@ def ndinterp(  # noqa: PLR0913
     )
 
 
-def trapz_product(
+def trapezoid_product(
     f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     *ff: tuple[
         npt.NDArray[np.float64],
