@@ -133,10 +133,6 @@ src = [
     "glass",
 ]
 lint.ignore = [
-    "ANN001", # TODO: missing-type-function-argument
-    "ANN002", # TODO: missing-type-args
-    "ANN003", # TODO: missing-type-kwargs
-    "ANN201", # TODO: missing-return-type-undocumented-public-function
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "COM819", # prohibited-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
