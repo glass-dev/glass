@@ -168,13 +168,13 @@ def from_convergence(  # noqa: PLR0913
     alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
     # mode number; all conversions are factors of this
-    l = np.arange(lmax + 1)  # noqa: E741
+    ell = np.arange(lmax + 1)
 
     # this tuple will be returned
     results = ()
 
     # convert convergence to potential
-    fl = np.divide(-2, l * (l + 1), where=(l > 0), out=np.zeros(lmax + 1))
+    fl = np.divide(-2, ell * (ell + 1), where=(ell > 0), out=np.zeros(lmax + 1))
     hp.almxfl(alm, fl, inplace=True)
 
     # if potential is requested, compute map and add to output
@@ -190,7 +190,7 @@ def from_convergence(  # noqa: PLR0913
     blm = np.zeros_like(alm)
 
     # compute deflection alms in place
-    fl = np.sqrt(l * (l + 1))
+    fl = np.sqrt(ell * (ell + 1))
     # TODO(ntessore): missing spin-1 pixel window function here # noqa: FIX002
     # https://github.com/glass-dev/glass/issues/243
     hp.almxfl(alm, fl, inplace=True)
@@ -207,7 +207,7 @@ def from_convergence(  # noqa: PLR0913
 
     # compute shear alms in place
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
-    fl = np.sqrt((l - 1) * (l + 2), where=(l > 0), out=np.zeros(lmax + 1))
+    fl = np.sqrt((ell - 1) * (ell + 2), where=(ell > 0), out=np.zeros(lmax + 1))
     fl /= 2
     if discretized:
         pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
@@ -250,9 +250,9 @@ def shear_from_convergence(
     blm = np.zeros_like(alm)
 
     # factor to convert convergence alm to shear alm
-    l = np.arange(lmax + 1)  # noqa: E741
-    fl = np.sqrt((l + 2) * (l + 1) * l * (l - 1))
-    fl /= np.clip(l * (l + 1), 1, None)
+    ell = np.arange(lmax + 1)
+    fl = np.sqrt((ell + 2) * (ell + 1) * ell * (ell - 1))
+    fl /= np.clip(ell * (ell + 1), 1, None)
     fl *= -1
 
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
