@@ -695,14 +695,21 @@ def combine(
         Find weights for a given function.
 
     """
-    return (
-        np.expand_dims(weight, -1)
-        * np.interp(
-            z,
-            shell.za,
-            shell.wa / np.trapezoid(shell.wa, shell.za),
-            left=0.0,
-            right=0.0,
-        )
-        for shell, weight in zip(shells, weights, strict=False)
-    ).sum(axis=0)
+    return np.sum(
+        [
+            np.expand_dims(weight, -1)
+            * np.interp(
+                z,
+                shell.za,
+                shell.wa
+                / np.trapezoid(
+                    shell.wa,
+                    shell.za,
+                ),
+                left=0.0,
+                right=0.0,
+            )
+            for shell, weight in zip(shells, weights, strict=False)
+        ],
+        axis=0,
+    )
