@@ -44,7 +44,6 @@ docs = [
     "ipython",
     "matplotlib",
     "nbsphinx",
-    "numpydoc",
     "sphinx",
     "sphinxcontrib-katex",
 ]
@@ -60,6 +59,7 @@ test = [
     "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
+    "pytest-rerunfailures",
     "scipy",
 ]
 
@@ -71,7 +71,7 @@ Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
 report = {exclude_also = [
-    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
 ], omit = [
     "glass/_version.py",
 ], skip_covered = true, sort = "cover"}
@@ -93,6 +93,19 @@ build.targets.sdist.exclude = [
     "tests/*",
 ]
 version.source = "vcs"
+
+[tool.mypy]
+disallow_untyped_decorators = false
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
+plugins = [
+    "numpy.typing.mypy_plugin",
+]
+strict = true
+warn_unreachable = true
 
 [tool.pytest.ini_options]
 addopts = [
@@ -124,13 +137,23 @@ lint.ignore = [
     "ANN003", # TODO: missing-type-kwargs
     "ANN201", # TODO: missing-return-type-undocumented-public-function
     "COM812", # missing-trailing-comma (ruff-format recommended)
+    "COM819", # prohibited-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
+    "D206", # indent-with-spaces (ruff-format recommended)
     "D212", # blank-line-before-class
-    "ERA001", # TODO: commented-out-code
+    "D300", # triple-single-quotes (ruff-format recommended)
+    "E111", # indentation-with-invalid-multiple (ruff-format recommended)
+    "E114", # indentation-with-invalid-multiple-comment (ruff-format recommended)
+    "E117", # over-indented (ruff-format recommended)
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
-    "NPY002", # TODO: numpy-legacy-random
+    "ISC002", # multi-line-implicit-string-concatenation (ruff-format recommended)
     "NPY201", # TODO: numpy2-deprecation
+    "Q000", # bad-quotes-inline-string (ruff-format recommended)
+    "Q001", # bad-quotes-multiline-string (ruff-format recommended)
+    "Q002", # bad-quotes-docstring (ruff-format recommended)
+    "Q003", # avoidable-escaped-quote (ruff-format recommended)
     "RUF003", # ambiguous-unicode-character-comment
+    "W191", # tab-indentation (ruff-format recommended)
 ]
 lint.isort = {known-first-party = [
     "glass",
@@ -166,13 +189,13 @@ lint.per-file-ignores = {"__init__.py" = [
     "D104", # undocumented-public-package
     "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
-    "PT011", # TODO: pytest-raises-too-broad
     "S101", # assert
 ]}
 lint.select = [
     "ALL",
 ]
 lint.mccabe.max-complexity = 18
+lint.pydocstyle.convention = "numpy"
 
 [tool.tomlsort]
 all = true

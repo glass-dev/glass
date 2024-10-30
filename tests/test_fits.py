@@ -9,7 +9,7 @@ from glass import user
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
 
-def _test_append(fits, data, names):
+def _test_append(fits, data, names):  # type: ignore[no-untyped-def]
     """Write routine for FITS test cases."""
     cat_name = "CATALOG"
     if cat_name not in fits:
@@ -26,7 +26,7 @@ filename = "MyFile.Fits"
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_basic_write(tmp_path):
+def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
     import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
@@ -42,7 +42,7 @@ def test_basic_write(tmp_path):
             out.write(RA=array, RB=array2)
             arrays = [array, array2]
             names = ["RA", "RB"]
-            _test_append(my_fits, arrays, names)
+            _test_append(my_fits, arrays, names)  # type: ignore[no-untyped-call]
 
     with (
         fitsio.FITS(tmp_path / filename_gfits) as g_fits,
@@ -55,7 +55,7 @@ def test_basic_write(tmp_path):
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_exception(tmp_path):
+def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
     try:
         with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):

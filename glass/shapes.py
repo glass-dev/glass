@@ -20,49 +20,44 @@ Utilities
 
 .. autofunction:: triaxial_axis_ratio
 
-"""  # noqa: D205, D400, D415
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
-
-if TYPE_CHECKING:
-    import numpy.typing as npt
+import numpy.typing as npt
 
 
-def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
+def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):  # type: ignore[no-untyped-def]
     r"""
     Axis ratio of a randomly projected triaxial ellipsoid.
 
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
 
+    Returns the axis ratio of the randomly projected ellipsoid.
+
     Parameters
     ----------
-    zeta : array_like
+    zeta:
         Axis ratio of intermediate and major axis.
-    xi : array_like
+    xi:
         Axis ratio of minor and major axis.
-    size : tuple of int or None
+    size:
         Size of the random draw. If `None` is given, size is inferred from
         other inputs.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
-
-    Returns
-    -------
-    q : array_like
-        Axis ratio of the randomly projected ellipsoid.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     Notes
     -----
-    See equations (11) and (12) in [1]_ for details.
+    See equations (11) and (12) in [1] for details.
 
     References
     ----------
-    .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
+    * [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
 
     """
     # default RNG if not provided
@@ -97,41 +92,38 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):
     )
 
 
-def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):  # noqa: PLR0913
+def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None):  # type: ignore[no-untyped-def] # noqa: PLR0913
     r"""
     Ellipticity distribution following Ryden (2004).
 
     The ellipticities are sampled by randomly projecting a 3D ellipsoid with
-    principal axes :math:`A > B > C` [1]_.  The distribution of :math:`\log(1 -
+    principal axes :math:`A > B > C` [1]. The distribution of :math:`\log(1 -
     B/A)` is normal with mean :math:`\mu` and standard deviation :math:`\sigma`.
     The distribution of :math:`1 - C/B` is normal with mean :math:`\gamma` and
-    standard deviation :math:`\sigma_\gamma` [2]_.  Both distributions are
+    standard deviation :math:`\sigma_\gamma` [2]. Both distributions are
     truncated to produce ratios in the range 0 to 1 using rejection sampling.
+
+    Returns an array of :term:`ellipticity` from projected axis ratios.
 
     Parameters
     ----------
-    mu : array_like
+    mu:
         Mean of the truncated normal for :math:`\log(1 - B/A)`.
-    sigma : array_like
+    sigma:
         Standard deviation for :math:`\log(1 - B/A)`.
-    gamma : array_like
+    gamma:
         Mean of the truncated normal for :math:`1 - C/B`.
-    sigma_gamma : array_like
+    sigma_gamma:
         Standard deviation for :math:`1 - C/B`.
-    size : int or tuple of ints or None
-        Sample size.  If ``None``, the size is inferred from the parameters.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG will be used.
-
-    Returns
-    -------
-    eps : array_like
-        Array of :term:`ellipticity` from projected axis ratios.
+    size:
+        Sample size. If ``None``, the size is inferred from the parameters.
+    rng:
+        Random number generator. If not given, a default RNG will be used.
 
     References
     ----------
-    .. [1] Ryden B. S., 2004, ApJ, 601, 214.
-    .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
+    * [1] Ryden B. S., 2004, ApJ, 601, 214.
+    * [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321.
 
     """
     # default RNG if not provided
@@ -142,25 +134,28 @@ def ellipticity_ryden04(mu, sigma, gamma, sigma_gamma, size=None, *, rng=None): 
     if size is None:
         size = np.broadcast(mu, sigma, gamma, sigma_gamma).shape
 
+    # broadcast all inputs to output shape
+    # this makes it possible to efficiently resample later
+    mu = np.broadcast_to(mu, size, subok=True)
+    sigma = np.broadcast_to(sigma, size, subok=True)
+    gamma = np.broadcast_to(gamma, size, subok=True)
+    sigma_gamma = np.broadcast_to(sigma_gamma, size, subok=True)
+
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
-    bad = eps > 0
-    while np.any(bad):
-        eps[bad] = rng.normal(mu, sigma, size=size)[bad]
-        bad = eps > 0
+    while np.any(bad := eps > 0):
+        eps[bad] = rng.normal(mu[bad], sigma[bad])
     gam = rng.normal(gamma, sigma_gamma, size=size)
-    bad = (gam < 0) | (gam > 1)
-    while np.any(bad):
-        gam[bad] = rng.normal(gamma, sigma_gamma, size=size)[bad]
-        bad = (gam < 0) | (gam > 1)
+    while np.any(bad := (gam < 0) | (gam > 1)):
+        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -np.expm1(eps)
     xi = (1 - gam) * zeta
 
     # random projection of random triaxial ellipsoid
-    q = triaxial_axis_ratio(zeta, xi, rng=rng)
+    q = triaxial_axis_ratio(zeta, xi, rng=rng)  # type: ignore[no-untyped-call]
 
     # assemble ellipticity with random complex phase
     e = np.exp(1j * rng.uniform(0, 2 * np.pi, size=np.shape(q)))
@@ -175,29 +170,26 @@ def ellipticity_gaussian(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample Gaussian galaxy ellipticities.
 
     The ellipticities are sampled from a normal distribution with
-    standard deviation ``sigma`` for each component.  Samples where the
-    ellipticity is larger than unity are discarded.  Hence, do not use
+    standard deviation ``sigma`` for each component. Samples where the
+    ellipticity is larger than unity are discarded. Hence, do not use
     this function with too large values of ``sigma``, or the sampling
     will become inefficient.
 
+    Returns an array of galaxy :term:`ellipticity`.
+
     Parameters
     ----------
-    count : int or array_like
+    count:
         Number of ellipticities to be sampled.
-    sigma : array_like
+    sigma:
         Standard deviation in each component.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
-
-    Returns
-    -------
-    eps : array_like
-        Array of galaxy :term:`ellipticity`.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     """
     # default RNG if not provided
@@ -232,26 +224,23 @@ def ellipticity_intnorm(
     sigma: npt.ArrayLike,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray:
+) -> npt.NDArray[typing.Any]:
     r"""
     Sample galaxy ellipticities with intrinsic normal distribution.
 
     The ellipticities are sampled from an intrinsic normal distribution
     with standard deviation ``sigma`` for each component.
 
+    Returns an array of galaxy :term:`ellipticity`.
+
     Parameters
     ----------
-    count : int | array_like
+    count:
         Number of ellipticities to sample.
-    sigma : array_like
+    sigma:
         Standard deviation of the ellipticity in each component.
-    rng : :class:`~numpy.random.Generator`, optional
-        Random number generator.  If not given, a default RNG is used.
-
-    Returns
-    -------
-    eps : array_like
-        Array of galaxy :term:`ellipticity`.
+    rng:
+        Random number generator. If not given, a default RNG is used.
 
     """
     # default RNG if not provided

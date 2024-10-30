@@ -23,12 +23,12 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "numpydoc",
-    "sphinx.ext.intersphinx",
-    "sphinxcontrib.katex",
     "matplotlib.sphinxext.plot_directive",
     "nbsphinx",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinxcontrib.katex",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -42,7 +42,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
+# The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
 #
 html_theme = "furo"
@@ -54,7 +54,7 @@ html_static_path = ["_static"]
 
 html_logo = "_static/logo.png"
 html_favicon = "_static/favicon.ico"
-html_css_files = []
+html_css_files = []  # type: ignore[var-annotated]
 
 
 # -- Intersphinx -------------------------------------------------------------
@@ -69,15 +69,12 @@ intersphinx_mapping = {
 
 # -- autodoc -----------------------------------------------------------------
 
-autodoc_typehints = "none"
+autodoc_typehints = "description"
 
 
-# -- numpydoc ----------------------------------------------------------------
+# -- napoleon ----------------------------------------------------------------
 
-# Whether to create a Sphinx table of contents for the lists of class methods
-# and attributes. If a table of contents is made, Sphinx expects each entry to
-# have a separate page.
-numpydoc_class_members_toctree = False
+napoleon_google_docstring = False
 
 
 # -- plot_directive ----------------------------------------------------------
