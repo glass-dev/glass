@@ -60,12 +60,15 @@ def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
     class TestWriteError(Exception):
         pass
 
+    def raise_error(msg: str) -> TestWriteError:
+        raise TestWriteError(msg)
+
     try:
         with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"
-                    raise TestWriteError(msg)  # noqa: TRY301
+                    raise_error(msg)
                 array = np.arange(i, i + 1, delta)  # array of size 1/delta
                 array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
                 out.write(RA=array, RB=array2)
