@@ -67,11 +67,11 @@ def iternorm(
     q = (*n, k + 1)
     j = 0 if k > 0 else None
 
-    for i, x in enumerate(cov):
-        x = np.asanyarray(x)  # noqa: PLW2901
+    for i, x_cov in enumerate(cov):
+        x = np.asanyarray(x_cov)
         if x.shape != q:
             try:
-                x = np.broadcast_to(x, q)  # noqa: PLW2901
+                x = np.broadcast_to(x, q)
             except ValueError:
                 msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
                 raise TypeError(msg) from None
@@ -190,12 +190,15 @@ def discretized_cls(
     gls = []
     for cl in cls:
         if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+            cl_mod = cl
             if lmax is not None:
-                cl = cl[: lmax + 1]  # noqa: PLW2901
+                cl_mod = cl_mod[: lmax + 1]
             if nside is not None:
-                n = min(len(cl), len(pw))
-                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
-        gls.append(cl)
+                n = min(len(cl_mod), len(pw))
+                cl_mod = cl_mod[:n] * pw[:n] ** 2
+            gls.append(cl_mod)
+        else:
+            gls.append(cl)
     return gls
 
 
@@ -308,17 +311,17 @@ def generate_lognormal(
         var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
 
         # fix mean of the Gaussian random field for lognormal transformation
-        m -= var / 2  # noqa: PLW2901
+        mean = m - var / 2
 
         # exponentiate values in place and subtract 1 in one operation
-        np.expm1(m, out=m)
+        np.expm1(mean, out=mean)
 
         # lognormal shift, unless unity
         if shift != 1:
-            m *= shift  # noqa: PLW2901
+            mean *= shift
 
         # yield the lognormal map
-        yield m
+        yield mean
 
 
 def getcl(cls, i, j, lmax=None):  # type: ignore[no-untyped-def]
