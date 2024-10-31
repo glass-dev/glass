@@ -242,7 +242,9 @@ def positions_from_delta(  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR09
                 yield lon, lat, ipix.size * cmask
 
         # make sure that the correct number of pixels was sampled
-        assert np.sum(n[stop:]) == 0  # noqa: S101
+        if np.sum(n[stop:]) != 0:
+            msg = "The number of pixels sampled does not match the expected count."
+            raise ValueError(msg)
 
 
 def uniform_positions(ngal, *, rng=None):  # type: ignore[no-untyped-def]
