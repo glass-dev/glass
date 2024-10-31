@@ -82,13 +82,13 @@ def triaxial_axis_ratio(zeta, xi, size=None, *, rng=None):  # type: ignore[no-un
     x2 = np.square(xi)
 
     # eq. (11) multiplied by xi^2 zeta^2
-    A = (1 + z2m1 * sin2_phi) * cos2_theta + x2 * sin2_theta  # noqa: N806
-    B2 = 4 * z2m1**2 * cos2_theta * sin2_phi * cos2_phi  # noqa: N806
-    C = 1 + z2m1 * cos2_phi  # noqa: N806
+    a = (1 + z2m1 * sin2_phi) * cos2_theta + x2 * sin2_theta
+    b2 = 4 * z2m1**2 * cos2_theta * sin2_phi * cos2_phi
+    c = 1 + z2m1 * cos2_phi
 
     # eq. (12)
     return np.sqrt(
-        (A + C - np.sqrt((A - C) ** 2 + B2)) / (A + C + np.sqrt((A - C) ** 2 + B2)),
+        (a + c - np.sqrt((a - c) ** 2 + b2)) / (a + c + np.sqrt((a - c) ** 2 + b2)),
     )
 
 
