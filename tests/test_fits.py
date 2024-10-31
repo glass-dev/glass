@@ -56,11 +56,24 @@ def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
-    # Custom exception for controlled testing
     class TestWriteError(Exception):
-        pass
+        """Custom exception for controlled testing."""
 
-    def raise_error(msg: str) -> TestWriteError:
+
+    def raise_error(msg: str) -> None:
+        """Raise a custom exception for controlled testing.
+
+        Parameters
+        ----------
+        msg
+            A message to be passed to the exception.
+
+        Raises
+        ------
+        TestWriteError
+            A custom exception for controlled testing.
+
+        """
         raise TestWriteError(msg)
 
     try:
