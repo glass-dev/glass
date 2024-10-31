@@ -59,7 +59,6 @@ def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
     class TestWriteError(Exception):
         """Custom exception for controlled testing."""
 
-
     def raise_error(msg: str) -> None:
         """Raise a custom exception for controlled testing.
 
