@@ -139,7 +139,9 @@ def redshifts_from_nz(
         )
         total += count[k]  # type: ignore[assignment, call-overload, index, operator]
 
-    assert total == redshifts.size  # noqa: S101
+    if total != redshifts.size:
+        msg = "Total number of sampled redshifts does not match the expected size."
+        raise ValueError(msg)
 
     return redshifts
 
