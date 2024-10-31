@@ -191,8 +191,7 @@ def from_convergence(  # noqa: PLR0913
 
     # compute deflection alms in place
     fl = np.sqrt(ell * (ell + 1))
-    # TODO(ntessore): missing spin-1 pixel window function here # noqa: FIX002
-    # https://github.com/glass-dev/glass/issues/243
+    # missing spin-1 pixel window function here
     hp.almxfl(alm, fl, inplace=True)
 
     # if deflection is requested, compute spin-1 maps and add to output
