@@ -56,17 +56,21 @@ def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
+    # Custom exception for controlled testing
+    class TestWriteError(Exception):
+        pass
+
     try:
         with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"
-                    raise Exception(msg)  # noqa: TRY002, TRY301
+                    raise TestWriteError(msg)  # noqa: TRY301
                 array = np.arange(i, i + 1, delta)  # array of size 1/delta
                 array2 = np.arange(i + 1, i + 2, delta)  # array of size 1/delta
                 out.write(RA=array, RB=array2)
 
-    except Exception:  # noqa: BLE001
+    except TestWriteError:
         import fitsio
 
         with fitsio.FITS(tmp_path / filename) as hdul:
