@@ -6,8 +6,6 @@ packages that provide a "glass" module.
 
 """
 
-import pathlib
-
 
 def _extend_path(path, name) -> list:  # type: ignore[no-untyped-def, type-arg]
     import os.path
@@ -18,7 +16,7 @@ def _extend_path(path, name) -> list:  # type: ignore[no-untyped-def, type-arg]
     return list(
         filter(
             os.path.isdir,
-            (pathlib.Path(p) / _mod for p in extend_path(path, _pkg)),
+            (os.path.join(p, _mod) for p in extend_path(path, _pkg)),  # noqa: PTH118
         )
     )
 
