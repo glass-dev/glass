@@ -298,7 +298,10 @@ class MultiPlaneConvergence:
         self.add_plane(delta, zsrc, lens_weight)
 
     def add_plane(
-        self, delta: npt.NDArray[typing.Any], zsrc: float, wlens: float = 1.0
+        self,
+        delta: npt.NDArray[typing.Any],
+        zsrc: float,
+        wlens: float = 1.0,
     ) -> None:
         """Add a mass plane at redshift ``zsrc`` to the convergence."""
         if zsrc <= self.z3:
@@ -417,7 +420,9 @@ def multi_plane_weights(
 
 
 def deflect(
-    lon: npt.ArrayLike, lat: npt.ArrayLike, alpha: npt.ArrayLike
+    lon: npt.ArrayLike,
+    lat: npt.ArrayLike,
+    alpha: npt.ArrayLike,
 ) -> npt.NDArray[typing.Any]:
     r"""
     Apply deflections to positions.
