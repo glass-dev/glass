@@ -1,20 +1,22 @@
 ---
 name: PR Title Checker
+
 on:
   pull_request_target:
     types:
-      - opened
       - edited
-      - synchronize
       - labeled
+      - opened
+      - synchronize
       - unlabeled
 
 jobs:
   check-pr-title:
-    if: ${{ github.actor != 'pre-commit-ci[bot]' }}
+    if: github.actor != 'pre-commit-ci[bot]'
     runs-on: ubuntu-latest
     steps:
-      - uses: thehanimo/pr-title-checker@v1.4.2
+      - name: Enfore PR title format
+        uses: thehanimo/pr-title-checker@v1.4.2
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pass_on_octokit_error: false
