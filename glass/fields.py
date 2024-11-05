@@ -39,7 +39,8 @@ from gaussiancl import gaussiancl
 Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
 Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
 ClTransform = typing.Union[
-    str, typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]]
+    str,
+    typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]],
 ]
 Cls = collections.abc.Sequence[
     typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
@@ -110,7 +111,10 @@ def iternorm(
 
 
 def cls2cov(
-    cls: Cls, nl: int, nf: int, nc: int
+    cls: Cls,
+    nl: int,
+    nf: int,
+    nc: int,
 ) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
@@ -149,7 +153,8 @@ def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ())
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
                 warnings.warn(
-                    "Gaussian cl did not converge, inexact transform", stacklevel=2
+                    "Gaussian cl did not converge, inexact transform",
+                    stacklevel=2,
                 )
         else:
             gl = []
@@ -355,7 +360,11 @@ def getcl(cls, i, j, lmax=None):  # type: ignore[no-untyped-def]
 
 
 def effective_cls(  # type: ignore[no-untyped-def]
-    cls, weights1, weights2=None, *, lmax=None
+    cls,
+    weights1,
+    weights2=None,
+    *,
+    lmax=None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Compute effective angular power spectra from weights.

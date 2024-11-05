@@ -39,7 +39,11 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test with rng
 
     redshifts = redshifts_from_nz(
-        10, [0, 1, 2, 3, 4], [0, 0, 1, 1, 1], warn=False, rng=rng
+        10,
+        [0, 1, 2, 3, 4],
+        [0, 0, 1, 1, 1],
+        warn=False,
+        rng=rng,
     )
     assert not np.any(redshifts <= 1)
 
@@ -130,7 +134,13 @@ def test_galaxy_shear(rng):  # type: ignore[no-untyped-def]
         rng.normal(size=(512,)),
     )
     shear = galaxy_shear(
-        gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2, reduced_shear=False
+        gal_lon,
+        gal_lat,
+        gal_eps,
+        kappa,
+        gamma1,
+        gamma2,
+        reduced_shear=False,
     )
     assert np.shape(shear) == (512,)
 
