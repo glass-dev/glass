@@ -50,7 +50,10 @@ def examples(session: nox.Session) -> None:
     """Run the example notebooks."""
     session.install("-e", ".[examples]")
     session.run(
-        "jupyter", "execute", *Path().glob("examples/**/*.ipynb"), *session.posargs
+        "jupyter",
+        "execute",
+        *Path().glob("examples/**/*.ipynb"),
+        *session.posargs,
     )
 
 

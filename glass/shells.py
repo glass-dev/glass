@@ -165,7 +165,8 @@ def tophat_windows(
         raise ValueError(msg)
     if zbins[0] != 0:
         warnings.warn(
-            "first tophat window does not start at redshift zero", stacklevel=2
+            "first tophat window does not start at redshift zero",
+            stacklevel=2,
         )
 
     wht: WeightFunc
