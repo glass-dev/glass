@@ -105,7 +105,6 @@ plugins = [
     "numpy.typing.mypy_plugin",
 ]
 strict = true
-warn_return_any = false
 warn_unreachable = true
 
 [tool.pytest.ini_options]
