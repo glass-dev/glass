@@ -26,6 +26,7 @@ Utility functions
 
 from __future__ import annotations
 
+import collections.abc
 import typing
 import warnings
 
@@ -34,8 +35,9 @@ import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+Cls = collections.abc.Sequence[
+    typing.Union[npt.NDArray[np.float64], collections.abc.Sequence[float]]
+]
 
 
 def iternorm(
@@ -120,9 +122,7 @@ def iternorm(
 
 
 def cls2cov(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Cls,
     nl: int,
     nf: int,
     nc: int,
@@ -197,12 +197,10 @@ def multalm(
 
 
 def transform_cls(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Cls,
     tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
     pars: tuple[typing.Any, ...] = (),
-) -> list[list[float] | npt.NDArray[np.float64]]:
+) -> Cls:
     """
     Transform Cls to Gaussian Cls.
 
@@ -237,14 +235,12 @@ def transform_cls(
 
 
 def discretized_cls(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Cls,
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> list[npt.NDArray[np.float64] | collections.abc.Sequence[float]]:
+) -> Cls:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -301,11 +297,9 @@ def discretized_cls(
 
 
 def lognormal_gls(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Cls,
     shift: float = 1.0,
-) -> list[list[float] | npt.NDArray[np.float64]]:
+) -> Cls:
     """
     Compute Gaussian Cls for a lognormal random field.
 
@@ -325,9 +319,7 @@ def lognormal_gls(
 
 
 def generate_gaussian(
-    gls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    gls: Cls,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -432,9 +424,7 @@ def generate_gaussian(
 
 
 def generate_lognormal(
-    gls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    gls: Cls,
     nside: int,
     shift: float = 1.0,
     *,

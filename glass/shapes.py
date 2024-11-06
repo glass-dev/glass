@@ -31,7 +31,7 @@ import numpy.typing as npt
 def triaxial_axis_ratio(
     zeta: float | npt.NDArray[np.float64],
     xi: float | npt.NDArray[np.float64],
-    size: int | tuple[int, ...] = (),
+    size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
@@ -70,7 +70,7 @@ def triaxial_axis_ratio(
         rng = np.random.default_rng()
 
     # get size from inputs if not explicitly provided
-    if not size:
+    if size is None:
         size = np.broadcast(zeta, xi).shape
 
     # draw random viewing angle (theta, phi)
@@ -102,7 +102,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma: float | npt.NDArray[np.float64],
     gamma: float | npt.NDArray[np.float64],
     sigma_gamma: float | npt.NDArray[np.float64],
-    size: int | tuple[int, ...] = (),
+    size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
@@ -146,7 +146,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
         rng = np.random.default_rng()
 
     # default size if not given
-    if not size:
+    if size is None:
         size = np.broadcast(mu, sigma, gamma, sigma_gamma).shape
 
     # broadcast all inputs to output shape

@@ -301,7 +301,7 @@ class MultiPlaneConvergence:
         self.z2: float = 0.0
         self.z3: float = 0.0
         self.x3: float = 0.0
-        self.w3: npt.NDArray[np.float64] | float = 0.0
+        self.w3: float = 0.0
         self.r23: float = 1.0
         self.delta3: npt.NDArray[np.float64] = np.array(0.0)
         self.kappa2: npt.NDArray[np.float64] | None = None
@@ -323,13 +323,16 @@ class MultiPlaneConvergence:
 
         """
         zsrc = w.zeff
-        lens_weight = np.trapz(  # type: ignore[attr-defined]
-            w.wa,
-            w.za,
-        ) / np.interp(
-            zsrc,
-            w.za,
-            w.wa,
+        lens_weight = float(
+            np.trapz(  # type: ignore[attr-defined]
+                w.wa,
+                w.za,
+            )
+            / np.interp(
+                zsrc,
+                w.za,
+                w.wa,
+            )
         )
 
         self.add_plane(delta, zsrc, lens_weight)
@@ -338,7 +341,7 @@ class MultiPlaneConvergence:
         self,
         delta: npt.NDArray[np.float64],
         zsrc: float,
-        wlens: float | npt.NDArray[np.float64] = 1.0,
+        wlens: float = 1.0,
     ) -> None:
         """
         Add a mass plane at redshift ``zsrc`` to the convergence.
@@ -415,7 +418,7 @@ class MultiPlaneConvergence:
         return self.delta3
 
     @property
-    def wlens(self) -> float | npt.NDArray[np.float64]:
+    def wlens(self) -> float:
         """The weight of the current matter plane."""
         return self.w3
 

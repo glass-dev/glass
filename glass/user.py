@@ -90,7 +90,7 @@ class _FitsWriter:
     Initialised with the fits object and extension name.
     """
 
-    def __init__(self, fits: fitsio.FITS, ext: str = "") -> None:
+    def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
         """
         Create a new, uninitialised writer.
 
@@ -121,9 +121,9 @@ class _FitsWriter:
             The names of the columns.
 
         """
-        if not self.ext or self.ext not in self.fits:
+        if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
-            if not self.ext:
+            if self.ext is None:
                 self.ext = self.fits[-1].get_extnum()
         else:
             hdu = self.fits[self.ext]
@@ -164,7 +164,7 @@ class _FitsWriter:
 def write_catalog(
     filename: pathlib.Path,
     *,
-    ext: str = "",
+    ext: str | None = None,
 ) -> collections.abc.Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.
