@@ -44,6 +44,7 @@ Weight functions
 
 from __future__ import annotations
 
+import collections.abc
 import typing
 import warnings
 
@@ -53,13 +54,10 @@ import numpy.typing as npt
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
-    import collections.abc
-
     from cosmology import Cosmology
 
-WeightFunc = typing.Callable[
-    [list[float] | npt.NDArray[np.float64]], npt.NDArray[np.float64]
-]
+ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
+WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 
 def distance_weight(
@@ -136,7 +134,7 @@ class RadialWindow(typing.NamedTuple):
 
 
 def tophat_windows(
-    zbins: npt.NDArray[np.float64],
+    zbins: ArrayLike1D,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -198,7 +196,7 @@ def tophat_windows(
 
 
 def linear_windows(
-    zgrid: npt.NDArray[np.float64],
+    zgrid: ArrayLike1D,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -255,7 +253,7 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: npt.NDArray[np.float64],
+    zgrid: ArrayLike1D,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -313,8 +311,8 @@ def cubic_windows(
 
 
 def restrict(
-    z: npt.NDArray[np.float64],
-    f: npt.NDArray[np.float64],
+    z: ArrayLike1D,
+    f: ArrayLike1D,
     w: RadialWindow,
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """

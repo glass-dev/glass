@@ -8,6 +8,9 @@ from functools import partial
 import numpy as np
 import numpy.typing as npt
 
+if typing.TYPE_CHECKING:
+    import collections.abc
+
 
 def broadcast_first(
     *arrays: npt.NDArray[np.float64],
@@ -65,8 +68,8 @@ def broadcast_leading_axes(
 
 def ndinterp(  # noqa: PLR0913
     x: float | npt.NDArray[np.float64],
-    xp: npt.NDArray[np.float64],
-    fp: npt.NDArray[np.float64],
+    xp: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    fp: collections.abc.Sequence[float] | npt.NDArray[np.float64],
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
