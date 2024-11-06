@@ -57,6 +57,10 @@ if typing.TYPE_CHECKING:
 
     from cosmology import Cosmology
 
+WeightFunc = typing.Callable[
+    [list[float] | npt.NDArray[np.float64]], npt.NDArray[np.float64]
+]
+
 
 def distance_weight(
     z: npt.NDArray[np.float64],
@@ -134,11 +138,7 @@ class RadialWindow(typing.NamedTuple):
 def tophat_windows(
     zbins: npt.NDArray[np.float64],
     dz: float = 1e-3,
-    weight: typing.Callable[
-        [list[float] | npt.NDArray[np.float64]],
-        npt.NDArray[np.float64],
-    ]
-    | None = None,
+    weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.
@@ -179,13 +179,7 @@ def tophat_windows(
             stacklevel=2,
         )
 
-    wht: (
-        npt.NDArray[np.float64]
-        | typing.Callable[
-            [list[float] | npt.NDArray[np.float64]],
-            npt.NDArray[np.float64],
-        ]
-    )
+    wht: WeightFunc
     wht = weight if weight is not None else np.ones_like
     ws = []
     for zmin, zmax in zip(zbins, zbins[1:]):
@@ -206,11 +200,7 @@ def tophat_windows(
 def linear_windows(
     zgrid: npt.NDArray[np.float64],
     dz: float = 1e-3,
-    weight: typing.Callable[
-        [list[float] | npt.NDArray[np.float64]],
-        npt.NDArray[np.float64],
-    ]
-    | None = None,
+    weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
     """
     Linear interpolation window functions.
@@ -267,11 +257,7 @@ def linear_windows(
 def cubic_windows(
     zgrid: npt.NDArray[np.float64],
     dz: float = 1e-3,
-    weight: typing.Callable[
-        [list[float] | npt.NDArray[np.float64]],
-        npt.NDArray[np.float64],
-    ]
-    | None = None,
+    weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
     """
     Cubic interpolation window functions.
