@@ -161,7 +161,7 @@ def trapz_product(
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.trapz(  # type: ignore[attr-defined]
+    return np.trapz(  # type: ignore[attr-defined, no-any-return]
         y,
         x,
         axis=axis,

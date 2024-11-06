@@ -81,7 +81,7 @@ def vmap_galactic_ecliptic(
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    return hp.Rotator(coord="CE").rotate_map_pixel(m)
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)  # type: ignore[no-any-return]
 
 
 def gaussian_nz(
@@ -129,7 +129,7 @@ def gaussian_nz(
     if norm is not None:
         nz *= norm
 
-    return nz
+    return nz  # type: ignore[no-any-return]
 
 
 def smail_nz(
@@ -194,7 +194,7 @@ def smail_nz(
     if norm is not None:
         pz *= norm
 
-    return pz
+    return pz  # type: ignore[no-any-return]
 
 
 def fixed_zbins(
@@ -342,4 +342,4 @@ def tomo_nz_gausserr(
     binned_nz /= 1 + erf(z / sz)
     binned_nz *= nz
 
-    return binned_nz
+    return binned_nz  # type: ignore[no-any-return]

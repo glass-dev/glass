@@ -408,4 +408,4 @@ def kappa_ia_nla(  # noqa: PLR0913
         prefactor * inverse_linear_growth * redshift_dependence * luminosity_dependence
     )
 
-    return delta * f_nla
+    return delta * f_nla  # type: ignore[no-any-return]

@@ -77,7 +77,7 @@ def distance_weight(
         The weight in comoving distance.
 
     """
-    return 1 / cosmo.ef(z)
+    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
@@ -99,7 +99,7 @@ def volume_weight(
         The weight in comoving volume.
 
     """
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)
+    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def density_weight(
@@ -121,7 +121,7 @@ def density_weight(
         The weight in matter density.
 
     """
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)
+    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 class RadialWindow(typing.NamedTuple):
@@ -549,7 +549,7 @@ def partition(
     except KeyError:
         msg = f"invalid method: {method}"
         raise ValueError(msg) from None
-    return partition_method(z, fz, shells)
+    return partition_method(z, fz, shells)  # type: ignore[no-any-return]
 
 
 def partition_lstsq(
@@ -853,7 +853,7 @@ def distance_grid(
     else:
         msg = 'exactly one of "dx" or "num" must be given'
         raise ValueError(msg)
-    return cosmo.dc_inv(x)
+    return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 
 
 def combine(
@@ -892,7 +892,7 @@ def combine(
         Find weights for a given function.
 
     """
-    return np.sum(
+    return np.sum(  # type: ignore[no-any-return]
         [
             np.expand_dims(weight, -1)
             * np.interp(
