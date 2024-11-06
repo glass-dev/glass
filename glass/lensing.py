@@ -264,7 +264,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return hp.alm2map_spin([alm, blm], nside, 2, lmax)  # type: ignore[no-any-return]
 
 
 class MultiPlaneConvergence:
@@ -416,7 +416,7 @@ def multi_plane_weights(
     weights = weights / np.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
-    return np.matmul(mat.T, weights)
+    return np.matmul(mat.T, weights)  # type: ignore[no-any-return]
 
 
 def deflect(
