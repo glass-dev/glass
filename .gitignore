@@ -9,4 +9,5 @@ dist
 .env
 .coverage*
 coverage*
-examples/**/*.html
+*.html
+.ipynb_checkpoints

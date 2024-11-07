@@ -9,31 +9,31 @@ from glass.shapes import (
 )
 
 
-def test_triaxial_axis_ratio(rng):  # type: ignore[no-untyped-def]
+def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
     # single axis ratio
 
-    q = triaxial_axis_ratio(0.8, 0.4)  # type: ignore[no-untyped-call]
+    q = triaxial_axis_ratio(0.8, 0.4)
     assert np.isscalar(q)
 
     # many axis ratios
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=1000)  # type: ignore[no-untyped-call]
+    q = triaxial_axis_ratio(0.8, 0.4, size=1000)
     assert np.shape(q) == (1000,)
 
     # explicit shape
 
-    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))  # type: ignore[no-untyped-call]
+    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))
     assert np.shape(q) == (10, 10)
 
     # implicit size
 
-    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)  # type: ignore[no-untyped-call]
-    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])  # type: ignore[no-untyped-call]
+    q1 = triaxial_axis_ratio(np.array([0.8, 0.9]), 0.4)
+    q2 = triaxial_axis_ratio(0.8, np.array([0.4, 0.5]))
     assert np.shape(q1) == np.shape(q2) == (2,)
 
     # broadcasting rule
 
-    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])  # type: ignore[no-untyped-call]
+    q = triaxial_axis_ratio(np.array([[0.6, 0.7], [0.8, 0.9]]), np.array([0.4, 0.5]))
     assert np.shape(q) == (2, 2)
 
     # random parameters and check that projection is
@@ -42,50 +42,55 @@ def test_triaxial_axis_ratio(rng):  # type: ignore[no-untyped-def]
     zeta, xi = np.sort(rng.uniform(0, 1, size=(2, 1000)), axis=0)
     qmin = np.min([zeta, xi, xi / zeta], axis=0)
     qmax = np.max([zeta, xi, xi / zeta], axis=0)
-    q = triaxial_axis_ratio(zeta, xi)  # type: ignore[no-untyped-call]
+    q = triaxial_axis_ratio(zeta, xi)
     assert np.all((qmax >= q) & (q >= qmin))
 
 
 def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
     # single ellipticity
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
     assert np.isscalar(e)
 
     # test with rng
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=rng)  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=rng)
     assert np.isscalar(e)
 
     # many ellipticities
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)
     assert np.shape(e) == (1000,)
 
     # explicit shape
 
-    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))
     assert np.shape(e) == (10, 10)
 
     # implicit size
 
-    e1 = ellipticity_ryden04(-1.85, 0.89, [0.222, 0.333], 0.056)  # type: ignore[no-untyped-call]
-    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, [0.056, 0.067])  # type: ignore[no-untyped-call]
-    e3 = ellipticity_ryden04([-1.85, -2.85], 0.89, 0.222, 0.056)  # type: ignore[no-untyped-call]
-    e4 = ellipticity_ryden04(-1.85, [0.89, 1.001], 0.222, 0.056)  # type: ignore[no-untyped-call]
+    e1 = ellipticity_ryden04(-1.85, 0.89, np.array([0.222, 0.333]), 0.056)
+    e2 = ellipticity_ryden04(-1.85, 0.89, 0.222, np.array([0.056, 0.067]))
+    e3 = ellipticity_ryden04(np.array([-1.85, -2.85]), 0.89, 0.222, 0.056)
+    e4 = ellipticity_ryden04(-1.85, np.array([0.89, 1.001]), 0.222, 0.056)
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
 
     # broadcasting rule
 
-    e = ellipticity_ryden04([-1.9, -2.9], 0.9, [[0.2, 0.3], [0.4, 0.5]], 0.1)  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(
+        np.array([-1.9, -2.9]),
+        0.9,
+        np.array([[0.2, 0.3], [0.4, 0.5]]),
+        0.1,
+    )
     assert np.shape(e) == (2, 2)
 
     # check that result is in the specified range
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
-    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)  # type: ignore[no-untyped-call]
+    e = ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)
     assert np.all((e.real >= -1.0) & (e.real <= 1.0))
 
 
@@ -108,7 +113,7 @@ def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
-    eps = ellipticity_gaussian([n, n], [0.128, 0.256])
+    eps = ellipticity_gaussian(np.array([n, n]), np.array([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
@@ -138,7 +143,7 @@ def test_ellipticity_intnorm(rng: np.random.Generator) -> None:
     np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
 
-    eps = ellipticity_intnorm([n, n], [0.128, 0.256])
+    eps = ellipticity_intnorm(np.array([n, n]), np.array([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 

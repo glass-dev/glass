@@ -69,6 +69,7 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+        files: ^glass/
         additional_dependencies:
           - numpy
   - repo: https://github.com/kynan/nbstripout
