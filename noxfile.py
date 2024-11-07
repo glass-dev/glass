@@ -47,14 +47,29 @@ def doctests(session: nox.Session) -> None:
 
 @nox.session
 def examples(session: nox.Session) -> None:
-    """Run the example notebooks."""
+    """Run the example notebooks. Pass "html" to build html."""
     session.install("-e", ".[examples]")
-    session.run(
-        "jupyter",
-        "execute",
-        *Path().glob("examples/**/*.ipynb"),
-        *session.posargs,
-    )
+
+    if session.posargs:
+        if "html" in session.posargs:
+            print("Generating HTML for the example notebooks")
+            session.run(
+                "jupyter",
+                "nbconvert",
+                "--to",
+                "html",
+                "--embed-images",
+                "examples/**/*.ipynb",
+            )
+        else:
+            print("Unsupported argument to examples")
+    else:
+        session.run(
+            "jupyter",
+            "execute",
+            *Path().glob("examples/**/*.ipynb"),
+            *session.posargs,
+        )
 
 
 @nox.session
