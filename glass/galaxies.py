@@ -140,9 +140,7 @@ def redshifts_from_nz(
         )
         total += count_out[k]
 
-    if total != redshifts.size:
-        msg = "Total number of sampled redshifts does not match the expected size."
-        raise ValueError(msg)
+    assert total == redshifts.size  # noqa: S101
 
     return redshifts
 
