@@ -39,11 +39,11 @@ if typing.TYPE_CHECKING:
 
 
 def redshifts(
-    n: int | npt.ArrayLike,
+    n: int | npt.NDArray[np.float64],
     w: RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Sample redshifts from a radial window function.
 
@@ -67,13 +67,13 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | npt.ArrayLike,
-    z: npt.ArrayLike,
-    nz: npt.ArrayLike,
+    count: int | npt.NDArray[np.float64],
+    z: npt.NDArray[np.float64],
+    nz: npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -117,10 +117,11 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, count, z, nz = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))  # type: ignore[no-untyped-call]
+    dims, *rest = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    count_out, z_out, nz_out = rest
 
     # list of results for all dimensions
-    redshifts = np.empty(count.sum())  # type: ignore[union-attr]
+    redshifts = np.empty(count_out.sum())
 
     # keep track of the number of sampled redshifts
     total = 0
@@ -128,16 +129,16 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumtrapz(nz[k], z[k], dtype=float)  # type: ignore[call-overload, index, no-untyped-call]
+        cdf = cumtrapz(nz_out[k], z_out[k], dtype=float)
         cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count[k]] = np.interp(  # type: ignore[call-overload, index, misc, operator]
-            rng.uniform(0, 1, size=count[k]),  # type: ignore[arg-type, call-overload, index]
+        redshifts[total : total + count_out[k]] = np.interp(
+            rng.uniform(0, 1, size=count_out[k]),
             cdf,
-            z[k],  # type: ignore[arg-type, call-overload, index]
+            z_out[k],
         )
-        total += count[k]  # type: ignore[assignment, call-overload, index, operator]
+        total += count_out[k]
 
     assert total == redshifts.size  # noqa: S101
 
@@ -145,15 +146,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray[typing.Any],
-    lat: npt.NDArray[typing.Any],
-    eps: npt.NDArray[typing.Any],
-    kappa: npt.NDArray[typing.Any],
-    gamma1: npt.NDArray[typing.Any],
-    gamma2: npt.NDArray[typing.Any],
+    lon: npt.NDArray[np.float64],
+    lat: npt.NDArray[np.float64],
+    eps: npt.NDArray[np.float64],
+    kappa: npt.NDArray[np.float64],
+    gamma1: npt.NDArray[np.float64],
+    gamma2: npt.NDArray[np.float64],
     *,
     reduced_shear: bool = True,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     """
     Observed galaxy shears from weak lensing.
 
@@ -212,13 +213,13 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: npt.ArrayLike,
-    sigma_0: float | npt.ArrayLike,
+    z: float | npt.NDArray[np.float64],
+    sigma_0: float | npt.NDArray[np.float64],
     *,
-    lower: npt.ArrayLike | None = None,
-    upper: npt.ArrayLike | None = None,
+    lower: float | npt.NDArray[np.float64] | None = None,
+    upper: float | npt.NDArray[np.float64] | None = None,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[typing.Any]:
+) -> float | npt.NDArray[np.float64]:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
@@ -270,33 +271,33 @@ def gaussian_phz(
     sigma = np.add(1, z) * sigma_0
     dims = np.shape(sigma)
 
-    zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
+    zphot = rng.normal(z, sigma)
 
     if lower is None:
         lower = 0.0
     if upper is None:
         upper = np.inf
 
-    if not np.all(lower < upper):  # type: ignore[operator]
+    if not np.all(lower < upper):
         msg = "requires lower < upper"
         raise ValueError(msg)
 
     if not dims:
-        while zphot < lower or zphot > upper:  # type: ignore[operator]
-            zphot = rng.normal(z, sigma)  # type: ignore[arg-type]
+        while zphot < lower or zphot > upper:
+            zphot = rng.normal(z, sigma)
     else:
         z = np.broadcast_to(z, dims)
-        trunc = np.where((zphot < lower) | (zphot > upper))[0]  # type: ignore[operator]
+        trunc = np.where((zphot < lower) | (zphot > upper))[0]
         while trunc.size:
-            znew = rng.normal(z[trunc], sigma[trunc])  # type: ignore[arg-type]
-            zphot[trunc] = znew  # type: ignore[index]
-            trunc = trunc[(znew < lower) | (znew > upper)]  # type: ignore[operator]
+            znew = rng.normal(z[trunc], sigma[trunc])
+            zphot[trunc] = znew
+            trunc = trunc[(znew < lower) | (znew > upper)]
 
-    return zphot  # type: ignore[return-value]
+    return zphot
 
 
 def kappa_ia_nla(  # noqa: PLR0913
-    delta: npt.NDArray[typing.Any],
+    delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
     cosmo: Cosmology,
@@ -306,7 +307,7 @@ def kappa_ia_nla(  # noqa: PLR0913
     lbar: float = 0.0,
     l0: float = 1e-9,
     beta: float = 0.0,
-) -> npt.NDArray[typing.Any]:
+) -> npt.NDArray[np.float64]:
     r"""
     Effective convergence from intrinsic alignments using the NLA model.
 

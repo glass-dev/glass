@@ -10,7 +10,7 @@ HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_nnls(rng):  # type: ignore[no-untyped-def]
+def test_nnls(rng: np.random.Generator) -> None:
     from scipy.optimize import nnls as nnls_scipy
 
     # cross-check output with scipy's nnls
@@ -21,7 +21,7 @@ def test_nnls(rng):  # type: ignore[no-untyped-def]
     x_glass = nnls_glass(a, b)
     x_scipy, _ = nnls_scipy(a, b)
 
-    np.testing.assert_allclose(x_glass, x_scipy)  # type: ignore[arg-type]
+    np.testing.assert_allclose(x_glass, x_scipy)
 
     # check matrix and vector's shape
 

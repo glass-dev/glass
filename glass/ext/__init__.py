@@ -7,7 +7,7 @@ packages that provide a "glass" module.
 """
 
 
-def _extend_path(path, name) -> list:  # type: ignore[no-untyped-def, type-arg]
+def _extend_path(path: list[str], name: str) -> list[str]:
     import os.path
     from pkgutil import extend_path
 
