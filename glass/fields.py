@@ -56,8 +56,8 @@ def iternorm(
     q = (*n, k + 1)
     j = 0 if k > 0 else None
 
-    for i, x_cov in enumerate(cov):
-        x = np.asanyarray(x_cov)
+    for i, x in enumerate(cov):
+        x = np.asanyarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
                 x = np.broadcast_to(x, q)
