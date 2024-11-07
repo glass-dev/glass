@@ -60,7 +60,7 @@ def iternorm(
         x = np.asanyarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
-                x = np.broadcast_to(x, q)
+                x = np.broadcast_to(x, q)  # noqa: PLW2901
             except ValueError:
                 msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
                 raise TypeError(msg) from None
