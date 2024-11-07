@@ -1,23 +1,14 @@
 import importlib.util
+import pathlib
 
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from glass import user
 
 # check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
-
-
-def _test_append(fits, data, names):  # type: ignore[no-untyped-def]
-    """Write routine for FITS test cases."""
-    cat_name = "CATALOG"
-    if cat_name not in fits:
-        fits.write_table(data, names=names, extname=cat_name)
-    else:
-        hdu = fits[cat_name]
-        hdu.write(data, names=names, firstrow=hdu.get_nrows())
-
 
 delta = 0.001  # Number of points in arrays
 my_max = 1000  # Typically number of galaxies in loop
@@ -26,11 +17,24 @@ filename = "MyFile.Fits"
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
+def test_basic_write(tmp_path: pathlib.Path) -> None:
     import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
+
+    def _test_append(
+        fits: fitsio.FITS,
+        data: list[npt.NDArray[np.float64]],
+        names: list[str],
+    ) -> None:
+        """Write routine for FITS test cases."""
+        cat_name = "CATALOG"
+        if cat_name not in fits:
+            fits.write_table(data, names=names, extname=cat_name)
+        else:
+            hdu = fits[cat_name]
+            hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
     with (
         user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
@@ -42,7 +46,7 @@ def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
             out.write(RA=array, RB=array2)
             arrays = [array, array2]
             names = ["RA", "RB"]
-            _test_append(my_fits, arrays, names)  # type: ignore[no-untyped-call]
+            _test_append(my_fits, arrays, names)
 
     with (
         fitsio.FITS(tmp_path / filename_gfits) as g_fits,
@@ -55,7 +59,7 @@ def test_basic_write(tmp_path):  # type: ignore[no-untyped-def]
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_exception(tmp_path):  # type: ignore[no-untyped-def]
+def test_write_exception(tmp_path: pathlib.Path) -> None:
     class TestWriteError(Exception):
         """Custom exception for controlled testing."""
 

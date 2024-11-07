@@ -35,32 +35,20 @@ import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
 
-# types
-Size = typing.Optional[typing.Union[int, tuple[int, ...]]]
-Iternorm = tuple[typing.Optional[int], npt.NDArray[typing.Any], npt.NDArray[typing.Any]]
-ClTransform = typing.Union[
-    str,
-    typing.Callable[[npt.NDArray[typing.Any]], npt.NDArray[typing.Any]],
-]
 Cls = collections.abc.Sequence[
-    typing.Union[npt.NDArray[typing.Any], collections.abc.Sequence[float]]
+    typing.Union[npt.NDArray[np.float64], collections.abc.Sequence[float]]
 ]
-Alms = npt.NDArray[typing.Any]
 
 
 def iternorm(
     k: int,
-    cov: collections.abc.Iterable[npt.NDArray[typing.Any]],
-    size: Size = None,
-) -> collections.abc.Generator[Iternorm, None, None]:
+    cov: collections.abc.Iterable[npt.NDArray[np.float64]],
+    size: int | tuple[int, ...] = (),
+) -> collections.abc.Generator[
+    tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
+]:
     """Return the vector a and variance sigma^2 for iterative normal sampling."""
-    n: tuple[int, ...]
-    if size is None:
-        n = ()
-    elif isinstance(size, int):
-        n = (size,)
-    else:
-        n = size
+    n = (size,) if isinstance(size, int) else size
 
     m = np.zeros((*n, k, k))
     a = np.zeros((*n, k))
@@ -115,27 +103,29 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """Return array of cls as a covariance matrix for iterative sampling."""
     cov = np.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if cl is None:
-                cov[:, i] = 0  # type: ignore[unreachable]
-            else:
-                if i == 0 and np.any(np.less(cl, 0)):
-                    msg = "negative values in cl"
-                    raise ValueError(msg)
-                n = len(cl)
-                cov[:n, i] = cl
-                cov[n:, i] = 0
+            if i == 0 and np.any(np.less(cl, 0)):
+                msg = "negative values in cl"
+                raise ValueError(msg)
+            n = len(cl)
+            cov[:n, i] = cl
+            cov[n:, i] = 0
         cov /= 2
         yield cov
 
 
-def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) -> Alms:
+def multalm(
+    alm: npt.NDArray[np.complex128],
+    bl: npt.NDArray[np.float64],
+    *,
+    inplace: bool = False,
+) -> npt.NDArray[np.complex128]:
     """Multiply alm by bl."""
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
@@ -144,11 +134,15 @@ def multalm(alm: Alms, bl: npt.NDArray[typing.Any], *, inplace: bool = False) ->
     return out
 
 
-def transform_cls(cls: Cls, tfm: ClTransform, pars: tuple[typing.Any, ...] = ()) -> Cls:
+def transform_cls(
+    cls: Cls,
+    tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
+    pars: tuple[typing.Any, ...] = (),
+) -> Cls:
     """Transform Cls to Gaussian Cls."""
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if len(cl) > 0:
             monopole = 0.0 if cl[0] == 0 else None
             gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
             if info == 0:
@@ -194,7 +188,7 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if cl is not None and len(cl) > 0:  # type: ignore[redundant-expr]
+        if len(cl) > 0:
             cl_mod = cl
             if lmax is not None:
                 cl_mod = cl_mod[: lmax + 1]
@@ -221,7 +215,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -258,7 +252,7 @@ def generate_gaussian(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls if gl is not None), default=0)  # type: ignore[redundant-expr]
+    n = max((len(gl) for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -307,7 +301,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[typing.Any], None, None]:
+) -> collections.abc.Generator[npt.NDArray[np.float64]]:
     """Sample lognormal random fields from Gaussian Cls iteratively."""
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
@@ -329,7 +323,14 @@ def generate_lognormal(
         yield mean
 
 
-def getcl(cls, i, j, lmax=None):  # type: ignore[no-untyped-def]
+def getcl(
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
+    i: int,
+    j: int,
+    lmax: int | None = None,
+) -> npt.NDArray[np.float64] | collections.abc.Sequence[float]:
     """
     Return a specific angular power spectrum from an array.
 
@@ -359,12 +360,14 @@ def getcl(cls, i, j, lmax=None):  # type: ignore[no-untyped-def]
     return cl
 
 
-def effective_cls(  # type: ignore[no-untyped-def]
-    cls,
-    weights1,
-    weights2=None,
+def effective_cls(
+    cls: collections.abc.Sequence[
+        npt.NDArray[np.float64] | collections.abc.Sequence[float]
+    ],
+    weights1: npt.NDArray[np.float64],
+    weights2: npt.NDArray[np.float64] | None = None,
     *,
-    lmax=None,
+    lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Compute effective angular power spectra from weights.
@@ -414,10 +417,11 @@ def effective_cls(  # type: ignore[no-untyped-def]
 
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations
-    if weights2 is weights1:
-        pairs = combinations_with_replacement(np.ndindex(shape1[1:]), 2)
-    else:
-        pairs = product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))  # type: ignore[assignment]
+    pairs = (
+        combinations_with_replacement(np.ndindex(shape1[1:]), 2)
+        if weights2 is weights1
+        else product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))
+    )
 
     # create the output array: axes for all input axes plus lmax+1
     out = np.empty(shape1[1:] + shape2[1:] + (lmax + 1,))
@@ -430,7 +434,7 @@ def effective_cls(  # type: ignore[no-untyped-def]
     for j1, j2 in pairs:
         w1, w2 = weights1[c + j1], weights2[c + j2]
         cl = sum(
-            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)  # type: ignore[no-untyped-call]
+            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
             for i1, i2 in np.ndindex(n, n)
         )
         out[j1 + j2] = cl

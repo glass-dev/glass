@@ -1,18 +1,35 @@
 """Module for array utilities."""
 
+from __future__ import annotations
+
+import typing
 from functools import partial
 
 import numpy as np
+import numpy.typing as npt
+
+if typing.TYPE_CHECKING:
+    import collections.abc
 
 
-def broadcast_first(*arrays):  # type: ignore[no-untyped-def]
+def broadcast_first(
+    *arrays: npt.NDArray[np.float64],
+) -> tuple[npt.NDArray[np.float64], ...]:
     """Broadcast arrays, treating the first axis as common."""
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
     return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
 
 
-def broadcast_leading_axes(*args):  # type: ignore[no-untyped-def]
+def broadcast_leading_axes(
+    *args: tuple[
+        float | npt.NDArray[np.float64],
+        int,
+    ],
+) -> tuple[
+    tuple[int, ...],
+    typing.Unpack[tuple[npt.NDArray[np.float64], ...]],
+]:
     """
     Broadcast all but the last N axes.
 
@@ -49,7 +66,15 @@ def broadcast_leading_axes(*args):  # type: ignore[no-untyped-def]
     return (dims, *arrs)
 
 
-def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):  # type: ignore[no-untyped-def] # noqa: PLR0913
+def ndinterp(  # noqa: PLR0913
+    x: float | npt.NDArray[np.float64],
+    xp: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    fp: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    axis: int = -1,
+    left: float | None = None,
+    right: float | None = None,
+    period: float | None = None,
+) -> npt.NDArray[np.float64]:
     """Interpolate multi-dimensional array over axis."""
     return np.apply_along_axis(
         partial(np.interp, x, xp),
@@ -61,8 +86,16 @@ def ndinterp(x, xp, fp, axis=-1, left=None, right=None, period=None):  # type: i
     )
 
 
-def trapz_product(f, *ff, axis=-1):  # type: ignore[no-untyped-def]
+def trapz_product(
+    f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
+    *ff: tuple[
+        npt.NDArray[np.float64],
+        npt.NDArray[np.float64],
+    ],
+    axis: int = -1,
+) -> npt.NDArray[np.float64]:
     """Trapezoidal rule for a product of functions."""
+    x: npt.NDArray[np.float64]
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
@@ -72,10 +105,19 @@ def trapz_product(f, *ff, axis=-1):  # type: ignore[no-untyped-def]
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.trapz(y, x, axis=axis)  # type: ignore[attr-defined]
+    return np.trapz(  # type: ignore[attr-defined, no-any-return]
+        y,
+        x,
+        axis=axis,
+    )
 
 
-def cumtrapz(f, x, dtype=None, out=None):  # type: ignore[no-untyped-def]
+def cumtrapz(
+    f: npt.NDArray[np.int_] | npt.NDArray[np.float64],
+    x: npt.NDArray[np.int_] | npt.NDArray[np.float64],
+    dtype: npt.DTypeLike | None = None,
+    out: npt.NDArray[np.float64] | None = None,
+) -> npt.NDArray[np.float64]:
     """Cumulative trapezoidal rule along last axis."""
     if out is None:
         out = np.empty_like(f, dtype=dtype)
