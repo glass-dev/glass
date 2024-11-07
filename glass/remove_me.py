@@ -1,1 +1,0 @@
-"""to test example artifacts."""
