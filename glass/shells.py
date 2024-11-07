@@ -490,17 +490,7 @@ def partition_lstsq(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate(
-        [
-            b,
-            mult
-            * np.reshape(
-                np.trapezoid(fz, z),
-                (*dims, 1),
-            ),
-        ],
-        axis=-1,
-    )
+    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -565,17 +555,7 @@ def partition_nnls(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate(
-        [
-            b,
-            mult
-            * np.reshape(
-                np.trapezoid(fz, z),
-                (*dims, 1),
-            ),
-        ],
-        axis=-1,
-    )
+    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
