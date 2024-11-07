@@ -310,17 +310,17 @@ def generate_lognormal(
         var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
 
         # fix mean of the Gaussian random field for lognormal transformation
-        mean = m - var / 2
+        m -= var / 2  # noqa: PLW2901
 
         # exponentiate values in place and subtract 1 in one operation
-        np.expm1(mean, out=mean)
+        np.expm1(m, out=m)
 
         # lognormal shift, unless unity
         if shift != 1:
-            mean *= shift
+            m *= shift  # noqa: PLW2901
 
         # yield the lognormal map
-        yield mean
+        yield m
 
 
 def getcl(
