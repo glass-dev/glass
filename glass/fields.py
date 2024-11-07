@@ -189,15 +189,12 @@ def discretized_cls(
     gls = []
     for cl in cls:
         if len(cl) > 0:
-            cl_mod = cl
             if lmax is not None:
-                cl_mod = cl_mod[: lmax + 1]
+                cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl_mod), len(pw))
-                cl_mod = cl_mod[:n] * pw[:n] ** 2
-            gls.append(cl_mod)
-        else:
-            gls.append(cl)
+                n = min(len(cl), len(pw))
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
+        gls.append(cl)
     return gls
 
 
