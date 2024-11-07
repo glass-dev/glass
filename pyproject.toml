@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Topic :: Scientific/Engineering :: Physics",
+    "Typing :: Typed",
 ]
 dependencies = [
     "cosmology>=2022.10.9",
@@ -132,10 +133,6 @@ src = [
     "glass",
 ]
 lint.ignore = [
-    "ANN001", # TODO: missing-type-function-argument
-    "ANN002", # TODO: missing-type-args
-    "ANN003", # TODO: missing-type-kwargs
-    "ANN201", # TODO: missing-return-type-undocumented-public-function
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
     "D212", # blank-line-before-class
@@ -169,9 +166,6 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "noxfile.py" = [
     "T201", # print
 ], "tests*" = [
-    "ANN001", # TODO: missing-type-function-argument
-    "ANN201", # TODO: issing-return-type-undocumented-public-function
-    "ANN202", # TODO: missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
     "D104", # undocumented-public-package
