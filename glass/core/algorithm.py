@@ -7,12 +7,12 @@ import numpy.typing as npt
 
 
 def nnls(
-    a: npt.ArrayLike,
-    b: npt.ArrayLike,
+    a: npt.NDArray[np.float64],
+    b: npt.NDArray[np.float64],
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> npt.ArrayLike:
+) -> npt.NDArray[np.float64]:
     """
     Compute a non-negative least squares solution.
 

@@ -9,3 +9,4 @@ dist
 .env
 .coverage*
 coverage*
+.ipynb_checkpoints
