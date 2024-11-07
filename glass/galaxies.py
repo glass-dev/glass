@@ -33,7 +33,7 @@ import numpy.typing as npt
 from glass.core.array import broadcast_leading_axes, cumtrapz
 
 if typing.TYPE_CHECKING:
-    from cosmology import Cosmology
+    from cosmology.api import StandardCosmology
 
     from glass.shells import RadialWindow
 
@@ -300,7 +300,7 @@ def kappa_ia_nla(  # noqa: PLR0913
     delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
     *,
     z0: float = 0.0,
     eta: float = 0.0,
@@ -322,7 +322,7 @@ def kappa_ia_nla(  # noqa: PLR0913
     a_ia:
         Intrinsic alignments amplitude.
     cosmo:
-        Cosmology instance.
+        StandardCosmology instance.
     z0:
         Reference redshift for the redshift dependence.
     eta:

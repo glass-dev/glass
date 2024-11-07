@@ -16,7 +16,7 @@ from glass.lensing import (
 from glass.shells import RadialWindow
 
 if typing.TYPE_CHECKING:
-    from cosmology import Cosmology
+    from cosmology.api import StandardCosmology
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def shells() -> list[RadialWindow]:
 
 
 @pytest.fixture
-def cosmo() -> Cosmology:
+def cosmo() -> StandardCosmology:
     class MockCosmology:
         @property
         def omega_m(self) -> float:
@@ -97,7 +97,7 @@ def test_deflect_many(rng: np.random.Generator) -> None:
 
 def test_multi_plane_matrix(
     shells: list[RadialWindow],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
     rng: np.random.Generator,
 ) -> None:
     mat = multi_plane_matrix(shells, cosmo)
@@ -119,7 +119,7 @@ def test_multi_plane_matrix(
 
 def test_multi_plane_weights(
     shells: list[RadialWindow],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
     rng: np.random.Generator,
 ) -> None:
     w_in = np.eye(len(shells))

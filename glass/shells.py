@@ -54,7 +54,7 @@ import numpy.typing as npt
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
-    from cosmology import Cosmology
+    from cosmology.api import StandardCosmology
 
 ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
 WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
@@ -62,26 +62,26 @@ WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 def distance_weight(
     z: npt.NDArray[np.float64],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving distance."""
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
     z: npt.NDArray[np.float64],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving volume."""
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return cosmo.xm(z) ** 2 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 def density_weight(
     z: npt.NDArray[np.float64],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in matter density."""
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 class RadialWindow(typing.NamedTuple):
@@ -649,7 +649,7 @@ def redshift_grid(
 
 
 def distance_grid(
-    cosmo: Cosmology,
+    cosmo: StandardCosmology,
     zmin: float,
     zmax: float,
     *,
@@ -657,7 +657,7 @@ def distance_grid(
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """Redshift grid with uniform spacing in comoving distance."""
-    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
+    xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     if dx is not None and num is None:
         x = np.arange(xmin, np.nextafter(xmax + dx, xmax), dx)
     elif dx is None and num is not None:

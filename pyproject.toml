@@ -20,7 +20,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "cosmology>=2022.10.9",
+    "cosmology.api>=0.1.0",
     "gaussiancl>=2022.10.21",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
@@ -49,6 +49,7 @@ docs = [
 ]
 examples = [
     "camb",
+    "cosmology",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
@@ -151,6 +152,7 @@ lint.isort = {known-first-party = [
 ], sections = {"cosmo" = [
     "camb",
     "cosmology",
+    "cosmology.api",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
