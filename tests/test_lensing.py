@@ -16,7 +16,7 @@ from glass.lensing import (
 from glass.shells import RadialWindow
 
 if typing.TYPE_CHECKING:
-    import cosmology.api
+    from cosmology.api import StandardCosmology
 
 
 @pytest.fixture
@@ -31,9 +31,7 @@ def shells() -> list[RadialWindow]:
 
 
 @pytest.fixture
-def cosmo() -> (
-    cosmology.api.StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]]
-):
+def cosmo() -> StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     class MockCosmology:
         @property
         def Omega_m0(self) -> float:  # noqa: N802
@@ -99,9 +97,7 @@ def test_deflect_many(rng: np.random.Generator) -> None:
 
 def test_multi_plane_matrix(
     shells: list[RadialWindow],
-    cosmo: cosmology.api.StandardCosmology[
-        npt.NDArray[np.float64], npt.NDArray[np.float64]
-    ],
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     rng: np.random.Generator,
 ) -> None:
     mat = multi_plane_matrix(shells, cosmo)
@@ -123,9 +119,7 @@ def test_multi_plane_matrix(
 
 def test_multi_plane_weights(
     shells: list[RadialWindow],
-    cosmo: cosmology.api.StandardCosmology[
-        npt.NDArray[np.float64], npt.NDArray[np.float64]
-    ],
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     rng: np.random.Generator,
 ) -> None:
     w_in = np.eye(len(shells))

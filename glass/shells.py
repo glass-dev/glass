@@ -63,9 +63,7 @@ WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 def distance_weight(
     z: npt.NDArray[np.float64],
-    cosmo: cosmology.api.StandardCosmology[
-        npt.NDArray[np.float64], npt.NDArray[np.float64]
-    ],
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving distance."""
     return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
@@ -73,9 +71,7 @@ def distance_weight(
 
 def volume_weight(
     z: npt.NDArray[np.float64],
-    cosmo: cosmology.api.StandardCosmology[
-        npt.NDArray[np.float64], npt.NDArray[np.float64]
-    ],
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving volume."""
     return cosmo.xm(z) ** 2 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
@@ -83,9 +79,7 @@ def volume_weight(
 
 def density_weight(
     z: npt.NDArray[np.float64],
-    cosmo: cosmology.api.StandardCosmology[
-        npt.NDArray[np.float64], npt.NDArray[np.float64]
-    ],
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in matter density."""
     return (  # type: ignore[no-any-return]
@@ -661,9 +655,7 @@ def redshift_grid(
 
 
 def distance_grid(
-    cosmo: cosmology.api.StandardCosmology[
-        npt.NDArray[np.float64], npt.NDArray[np.float64]
-    ],
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     zmin: float,
     zmax: float,
     *,
