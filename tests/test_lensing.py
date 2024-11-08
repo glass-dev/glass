@@ -45,6 +45,7 @@ def cosmo() -> StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64
             z: npt.NDArray[np.float64],
             z2: npt.NDArray[np.float64] | None = None,
         ) -> npt.NDArray[np.float64]:
+            """Dimensionless transverse comoving distance."""
             if z2 is None:
                 return np.array(z) * 1000
             return (np.array(z2) - np.array(z)) * 1000
