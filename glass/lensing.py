@@ -301,7 +301,7 @@ class MultiPlaneConvergence:
                 zsrc,
                 w.za,
                 w.wa,
-            )
+            ),
         )
 
         self.add_plane(delta, zsrc, lens_weight)
