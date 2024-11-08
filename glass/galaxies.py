@@ -382,7 +382,7 @@ def kappa_ia_nla(  # noqa: PLR0913
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
-    rho_c1 = c1 * cosmo.rho_c0
+    rho_c1 = c1 * cosmo.critical_density0
 
     prefactor = -a_ia * rho_c1 * cosmo.Om
     inverse_linear_growth = 1.0 / cosmo.gf(zeff)
