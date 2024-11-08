@@ -52,10 +52,9 @@ import warnings
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.array import ndinterp
+from cosmology.api import CosmologyConstantsNamespace, StandardCosmology
 
-if typing.TYPE_CHECKING:
-    import cosmology.api
+from glass.core.array import ndinterp
 
 ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
 WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
@@ -74,7 +73,10 @@ def volume_weight(
     cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in comoving volume."""
-    return cosmo.xm(z) ** 2 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
+    hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
+    return (  # type: ignore[no-any-return]
+        cosmo.transverse_comoving_distance(z) / hubble_length
+    ) ** 2 / cosmo.H_over_H0(z)
 
 
 def density_weight(
@@ -82,10 +84,11 @@ def density_weight(
     cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in matter density."""
+    hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
     return (  # type: ignore[no-any-return]
         cosmo.critical_density0
         * cosmo.Omega_m(z)
-        * cosmo.xm(z) ** 2
+        * (cosmo.transverse_comoving_distance(z) / hubble_length) ** 2
         / cosmo.H_over_H0(z)
     )
 
