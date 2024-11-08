@@ -37,7 +37,7 @@ import healpy as hp
 import numpy as np
 import numpy.typing as npt
 
-from cosmology.api import StandardCosmology, CosmologyConstantsNamespace
+from cosmology.api import CosmologyConstantsNamespace, StandardCosmology
 
 if typing.TYPE_CHECKING:
     import collections.abc
@@ -334,7 +334,9 @@ class MultiPlaneConvergence:
         x2 = self.x3
         self.x3 = self.cosmo.transverse_comoving_distance(self.z3) / hubble_length
         r12 = self.r23
-        r13, self.r23 = self.cosmo.transverse_comoving_distance([z1, self.z2], self.z3) / (hubble_length * self.x3)
+        r13, self.r23 = self.cosmo.transverse_comoving_distance(
+            [z1, self.z2], self.z3
+        ) / (hubble_length * self.x3)
         t = r13 / r12
 
         # lensing weight of mass plane to be added
