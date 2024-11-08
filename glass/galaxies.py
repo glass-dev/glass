@@ -300,7 +300,7 @@ def kappa_ia_nla(  # noqa: PLR0913
     delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
-    cosmo: StandardCosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     *,
     z0: float = 0.0,
     eta: float = 0.0,

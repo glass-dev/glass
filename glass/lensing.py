@@ -269,7 +269,9 @@ def shear_from_convergence(
 class MultiPlaneConvergence:
     """Compute convergence fields iteratively from multiple matter planes."""
 
-    def __init__(self, cosmo: StandardCosmology) -> None:
+    def __init__(
+        self, cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]]
+    ) -> None:
         """Create a new instance to iteratively compute the convergence."""
         self.cosmo = cosmo
 
@@ -377,7 +379,7 @@ class MultiPlaneConvergence:
 
 def multi_plane_matrix(
     shells: collections.abc.Sequence[RadialWindow],
-    cosmo: StandardCosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """Compute the matrix of lensing contributions from each shell."""
     mpc = MultiPlaneConvergence(cosmo)
@@ -391,7 +393,7 @@ def multi_plane_matrix(
 def multi_plane_weights(
     weights: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
-    cosmo: StandardCosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Compute effective weights for multi-plane convergence.

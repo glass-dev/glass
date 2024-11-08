@@ -97,7 +97,7 @@ def test_deflect_many(rng: np.random.Generator) -> None:
 
 def test_multi_plane_matrix(
     shells: list[RadialWindow],
-    cosmo: StandardCosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     rng: np.random.Generator,
 ) -> None:
     mat = multi_plane_matrix(shells, cosmo)
@@ -119,7 +119,7 @@ def test_multi_plane_matrix(
 
 def test_multi_plane_weights(
     shells: list[RadialWindow],
-    cosmo: StandardCosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     rng: np.random.Generator,
 ) -> None:
     w_in = np.eye(len(shells))
