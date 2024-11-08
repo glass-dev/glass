@@ -322,7 +322,7 @@ def kappa_ia_nla(  # noqa: PLR0913
     a_ia:
         Intrinsic alignments amplitude.
     cosmo:
-        StandardCosmology instance.
+        Cosmology instance.
     z0:
         Reference redshift for the redshift dependence.
     eta:

@@ -413,7 +413,7 @@ def multi_plane_weights(
     shells:
         Window functions of the shells.
     cosmo:
-        StandardCosmology instance.
+        Cosmology instance.
 
     """
     # ensure shape of weights ends with the number of shells
