@@ -34,11 +34,11 @@ def shells() -> list[RadialWindow]:
 def cosmo() -> StandardCosmology:
     class MockCosmology:
         @property
-        def omega_m(self) -> float:
+        def Omega_m0(self) -> float:  # noqa: N802
             return 0.3
 
-        def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-            return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
+        def H_over_H0(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:  # noqa: N802
+            return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
 
         def xm(
             self,
