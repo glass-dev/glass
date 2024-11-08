@@ -88,7 +88,12 @@ def density_weight(
     ],
 ) -> npt.NDArray[np.float64]:
     """Uniform weight in matter density."""
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
+    return (  # type: ignore[no-any-return]
+        cosmo.critical_density0
+        * cosmo.Omega_m(z)
+        * cosmo.xm(z) ** 2
+        / cosmo.H_over_H0(z)
+    )
 
 
 class RadialWindow(typing.NamedTuple):
