@@ -10,7 +10,12 @@ import nox
 nox.options.reuse_existing_virtualenvs = True
 nox.options.sessions = ["lint", "tests"]
 
-ALL_PYTHON = ["3.10", "3.11", "3.12"]
+ALL_PYTHON = [
+  "3.10",
+  "3.11",
+  "3.12",
+  "3.13",
+]
 
 
 @nox.session
