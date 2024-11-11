@@ -296,7 +296,7 @@ def gaussian_phz(
     return zphot
 
 
-def kappa_ia_nla(  # noqa: PLR0913
+def _kappa_ia_nla(  # noqa: PLR0913
     delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
