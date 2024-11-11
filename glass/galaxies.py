@@ -15,10 +15,6 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-Intrinsic alignments
---------------------
-.. autofunction:: kappa_ia_nla
-
 """  # noqa: D205, D400
 
 from __future__ import annotations
