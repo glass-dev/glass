@@ -15,10 +15,6 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-Intrinsic alignments
---------------------
-.. autofunction:: kappa_ia_nla
-
 """  # noqa: D205, D400
 
 from __future__ import annotations
@@ -296,7 +292,7 @@ def gaussian_phz(
     return zphot
 
 
-def kappa_ia_nla(  # noqa: PLR0913
+def _kappa_ia_nla(  # noqa: PLR0913
     delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
