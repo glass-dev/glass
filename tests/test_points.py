@@ -167,7 +167,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: negative delta
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, np.linspace(-1, -1, 196608), None, vis)
+        positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis)
     )
 
     assert isinstance(cnt, int)
@@ -177,7 +177,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: large delta
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, rng.normal(100, 1, size=(196608,)), bias, vis)
+        positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis)
     )
 
     assert isinstance(cnt, int)
