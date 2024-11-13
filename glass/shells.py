@@ -77,7 +77,7 @@ def distance_weight(
 
     Returns
     -------
-        The weight in comoving distance.
+        The weight function evaluated at redshifts *z*.
 
     """
     return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
