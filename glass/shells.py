@@ -121,7 +121,7 @@ def density_weight(
 
     Returns
     -------
-        The weight in matter density.
+        The weight function evaluated at redshifts *z*.
 
     """
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
