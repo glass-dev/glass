@@ -118,7 +118,7 @@ def loglinear_bias(
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
     r"""
-    log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`.
+    Log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`.
 
     Parameters
     ----------
