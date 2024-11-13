@@ -61,26 +61,30 @@ def from_convergence(  # noqa: PLR0913
     deflection potential, deflection, and shear maps. The maps are
     computed via spherical harmonic transforms.
 
-    Returns the maps of:
-
-    * deflection potential if ``potential`` is true.
-    * potential (complex) if ``deflection`` is true.
-    * shear (complex) if ``shear`` is true.
-
     Parameters
     ----------
-    kappa:
+    kappa
         HEALPix map of the convergence field.
-    lmax:
+    lmax
         Maximum angular mode number to use in the transform.
-    potential:
+    potential
         Which lensing maps to return.
-    deflection:
+    deflection
         Which lensing maps to return.
-    shear:
+    shear
         Which lensing maps to return.
-    discretized:
+    discretized
         Correct the pixel window function in output maps.
+
+    Returns
+    -------
+    psi
+        Map of the lensing (or deflection) potential. Only returned if
+        ``potential`` is true.
+    alpha
+        Map of the deflection (complex). Only returned if ``deflection`` if true.
+    gamma
+        Map of the shear (complex). Only returned if ``shear`` is true.
 
     Notes
     -----
@@ -152,7 +156,7 @@ def from_convergence(  # noqa: PLR0913
     References
     ----------
     * [1] Tessore N., et al., OJAp, 6, 11 (2023).
-           doi:10.21105/astro.2302.01942
+          doi:10.21105/astro.2302.01942
 
     """
     # no output means no computation, return empty tuple
@@ -228,14 +232,27 @@ def shear_from_convergence(
     *,
     discretized: bool = True,
 ) -> npt.NDArray[np.float64]:
-    r"""
+    """
     Weak lensing shear from convergence.
+
+    Computes the shear from the convergence using a spherical harmonic
+    transform.
 
     .. deprecated:: 2023.6
        Use the more general :func:`from_convergence` function instead.
 
-    Computes the shear from the convergence using a spherical harmonic
-    transform.
+    Parameters
+    ----------
+    kappa
+        The convergence map.
+    lmax
+        The maximum angular mode number to use in the transform.
+    discretized
+        Whether to correct the pixel window function in the output map.
+
+    Returns
+    -------
+        The shear map.
 
     """
     nside = hp.get_nside(kappa)
@@ -273,7 +290,15 @@ class MultiPlaneConvergence:
         self,
         cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     ) -> None:
-        """Create a new instance to iteratively compute the convergence."""
+        """
+        Create a new instance to iteratively compute the convergence.
+
+        Parameters
+        ----------
+        cosmo
+            Cosmology instance.
+
+        """
         self.cosmo = cosmo
 
         # set up initial values of variables
@@ -292,6 +317,13 @@ class MultiPlaneConvergence:
 
         The lensing weight is computed from the window function, and the
         source plane redshift is the effective redshift of the window.
+
+        Parameters
+        ----------
+        delta
+            The mass plane.
+        w
+            The window function.
 
         """
         zsrc = w.zeff
@@ -315,7 +347,24 @@ class MultiPlaneConvergence:
         zsrc: float,
         wlens: float = 1.0,
     ) -> None:
-        """Add a mass plane at redshift ``zsrc`` to the convergence."""
+        """
+        Add a mass plane at redshift ``zsrc`` to the convergence.
+
+        Parameters
+        ----------
+        delta
+            The mass plane.
+        zsrc
+            The redshift of the source plane.
+        wlens
+            The weight of the mass plane.
+
+        Raises
+        ------
+        ValueError
+            If the source redshift is not increasing.
+
+        """
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
             raise ValueError(msg)
@@ -386,7 +435,21 @@ def multi_plane_matrix(
     shells: collections.abc.Sequence[RadialWindow],
     cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
-    """Compute the matrix of lensing contributions from each shell."""
+    """
+    Compute the matrix of lensing contributions from each shell.
+
+    Parameters
+    ----------
+    shells
+        The shells of the mass distribution.
+    cosmo
+        Cosmology instance.
+
+    Returns
+    -------
+        The matrix of lensing contributions.
+
+    """
     mpc = MultiPlaneConvergence(cosmo)
     wmat = np.eye(len(shells))
     for i, w in enumerate(shells):
@@ -410,17 +473,24 @@ def multi_plane_weights(
     redshift distribution :math:`n(z)` into the lensing efficiency
     sometimes denoted :math:`g(z)` or :math:`q(z)`.
 
-    Returns the relative lensing weight of each shell.
-
     Parameters
     ----------
-    weights:
+    weights
         Relative weight of each shell. The first axis must broadcast
         against the number of shells, and is normalised internally.
-    shells:
+    shells
         Window functions of the shells.
-    cosmo:
+    cosmo
         Cosmology instance.
+
+    Returns
+    -------
+        The relative lensing weight of each shell.
+
+    Raises
+    ------
+    ValueError
+        If the shape of *weights* does not match the number of shells.
 
     """
     # ensure shape of weights ends with the number of shells
@@ -449,17 +519,19 @@ def deflect(
     Takes an array of :term:`deflection` values and applies them
     to the given positions.
 
-    Returns the longitudes and latitudes after deflection.
-
     Parameters
     ----------
-    lon:
+    lon
         Longitudes to be deflected.
-    lat:
+    lat
         Latitudes to be deflected.
-    alpha:
+    alpha
         Deflection values. Must be complex-valued or have a leading
         axis of size 2 for the real and imaginary component.
+
+    Returns
+    -------
+        The longitudes and latitudes after deflection.
 
     Notes
     -----

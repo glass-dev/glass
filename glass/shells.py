@@ -64,7 +64,21 @@ def distance_weight(
     z: npt.NDArray[np.float64],
     cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
-    """Uniform weight in comoving distance."""
+    """
+    Uniform weight in comoving distance.
+
+    Parameters
+    ----------
+    z
+        The redshifts at which to evaluate the weight.
+    cosmo
+        Cosmology instance.
+
+    Returns
+    -------
+        The weight function evaluated at redshifts *z*.
+
+    """
     return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
@@ -72,7 +86,21 @@ def volume_weight(
     z: npt.NDArray[np.float64],
     cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
-    """Uniform weight in comoving volume."""
+    """
+    Uniform weight in comoving volume.
+
+    Parameters
+    ----------
+    z
+        The redshifts at which to evaluate the weight.
+    cosmo
+        Cosmology instance.
+
+    Returns
+    -------
+        The weight function evaluated at redshifts *z*.
+
+    """
     hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
     return (  # type: ignore[no-any-return]
         cosmo.transverse_comoving_distance(z) / hubble_length
@@ -83,7 +111,21 @@ def density_weight(
     z: npt.NDArray[np.float64],
     cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
-    """Uniform weight in matter density."""
+    """
+    Uniform weight in matter density.
+
+    Parameters
+    ----------
+    z
+        The redshifts at which to evaluate the weight.
+    cosmo
+        Cosmology instance.
+
+    Returns
+    -------
+        The weight function evaluated at redshifts *z*.
+
+    """
     hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
     return (  # type: ignore[no-any-return]
         cosmo.critical_density0
@@ -124,16 +166,17 @@ class RadialWindow(typing.NamedTuple):
 
     Attributes
     ----------
-    za:
+    za
         Redshift array; the abscissae of the window function.
-    wa:
+    wa
         Weight array; the values (ordinates) of the window function.
-    zeff:
+    zeff
         Effective redshift of the window.
 
     Methods
     -------
     _replace
+        Create a new instance with changed attribute values.
 
     """
 
@@ -161,16 +204,23 @@ def tophat_windows(
     Their effective redshifts are the mean redshifts of the (weighted)
     tophat bins.
 
-    Returns a list of window functions.
-
     Parameters
     ----------
-    zbins:
+    zbins
         Redshift bin edges for the tophat window functions.
-    dz:
+    dz
         Approximate spacing of the redshift grid.
-    weight:
+    weight
         If given, a weight function to be applied to the window functions.
+
+    Returns
+    -------
+        A list of window functions.
+
+    Raises
+    ------
+    ValueError
+        If the number of redshift bins is less than 2.
 
     See Also
     --------
@@ -223,16 +273,23 @@ def linear_windows(
     The resulting windows functions are :class:`RadialWindow` instances.
     Their effective redshifts correspond to the given nodes.
 
-    Returns a list of window functions.
-
     Parameters
     ----------
-    zgrid:
+    zgrid
         Redshift grid for the triangular window functions.
-    dz:
+    dz
         Approximate spacing of the redshift grid.
-    weight:
+    weight
         If given, a weight function to be applied to the window functions.
+
+    Returns
+    -------
+        A list of window functions.
+
+    Raises
+    ------
+    ValueError
+        If the number of nodes is less than 3.
 
     See Also
     --------
@@ -281,16 +338,23 @@ def cubic_windows(
     The resulting windows functions are :class:`RadialWindow` instances.
     Their effective redshifts correspond to the given nodes.
 
-    Returns a list of window functions.
-
     Parameters
     ----------
-    zgrid:
+    zgrid
         Redshift grid for the cubic spline window functions.
-    dz:
+    dz
         Approximate spacing of the redshift grid.
-    weight:
+    weight
         If given, a weight function to be applied to the window functions.
+
+    Returns
+    -------
+        A list of window functions.
+
+    Raises
+    ------
+    ValueError
+        If the number of nodes is less than 3.
 
     See Also
     --------
@@ -341,16 +405,18 @@ def restrict(
     the function and window over the support of the window.
     Intermediate function values are found by linear interpolation
 
-    Returns the restricted function
-
     Parameters
     ----------
-    z:
+    z
         The function to be restricted.
-    f:
+    f
         The function to be restricted.
-    w:
+    w
         The window function for the restriction.
+
+    Returns
+    -------
+        The restricted function
 
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
@@ -381,22 +447,29 @@ def partition(
     The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
-    Returns the weights of the partition, where the leading axis corresponds to
-    *shells*.
-
     Parameters
     ----------
-    z:
+    z
         The function to be partitioned. If *f* is multi-dimensional,
         its last axis must agree with *z*.
-    fz:
+    fz
         The function to be partitioned. If *f* is multi-dimensional,
         its last axis must agree with *z*.
-    shells:
+    shells
         Ordered sequence of window functions for the partition.
-    method:
+    method
         Method for the partition. See notes for description. The
         options are "lstsq", "nnls", "restrict".
+
+    Returns
+    -------
+        The weights of the partition, where the leading axis corresponds to
+        *shells*.
+
+    Raises
+    ------
+    ValueError
+        If the method is not recognised.
 
     Notes
     -----
@@ -406,6 +479,7 @@ def partition(
     approximate solution of
 
     .. math::
+
         \begin{pmatrix}
         w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
         w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
@@ -426,6 +500,7 @@ def partition(
     equals the integral of the target function,
 
     .. math::
+
         \begin{pmatrix}
         w_1(z_1) \Delta z_1 & w_2(z_1) \, \Delta z_1 & \cdots \\
         w_1(z_2) \Delta z_2 & w_2(z_2) \, \Delta z_2 & \cdots \\
@@ -477,7 +552,25 @@ def partition_lstsq(
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
-    """Least-squares partition."""
+    """
+    Least-squares partition.
+
+    Parameters
+    ----------
+    z
+        The function to be partitioned.
+    fz
+        The function to be partitioned.
+    shells
+        Ordered sequence of window functions.
+    sumtol
+        Tolerance for the sum of the partition.
+
+    Returns
+    -------
+        The partition.
+
+    """
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
@@ -543,8 +636,20 @@ def partition_nnls(
     """
     Non-negative least-squares partition.
 
-    Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
-    requires SciPy.
+    Parameters
+    ----------
+    z
+        The function to be partitioned.
+    fz
+        The function to be partitioned.
+    shells
+        Ordered sequence of window functions.
+    sumtol
+        Tolerance for the sum of the partition.
+
+    Returns
+    -------
+        The partition.
 
     """
     from glass.core.algorithm import nnls
@@ -627,7 +732,23 @@ def partition_restrict(
     fz: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
 ) -> npt.NDArray[np.float64]:
-    """Partition by restriction and integration."""
+    """
+    Partition by restriction and integration.
+
+    Parameters
+    ----------
+    z
+        The function to be partitioned.
+    fz
+        The function to be partitioned.
+    shells
+        Ordered sequence of window functions.
+
+    Returns
+    -------
+        The partition.
+
+    """
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
@@ -646,7 +767,30 @@ def redshift_grid(
     dz: float | None = None,
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Redshift grid with uniform spacing in redshift."""
+    """
+    Redshift grid with uniform spacing in redshift.
+
+    Parameters
+    ----------
+    zmin
+        The minimum redshift.
+    zmax
+        The maximum redshift.
+    dz
+        The redshift spacing.
+    num
+        The number redshift samples.
+
+    Returns
+    -------
+        The redshift grid.
+
+    Raises
+    ------
+    ValueError
+        If both ``dz`` and ``num`` are given.
+
+    """
     if dz is not None and num is None:
         z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
     elif dz is None and num is not None:
@@ -665,7 +809,32 @@ def distance_grid(
     dx: float | None = None,
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Redshift grid with uniform spacing in comoving distance."""
+    """
+    Redshift grid with uniform spacing in comoving distance.
+
+    Parameters
+    ----------
+    cosmo
+        Cosmology instance.
+    zmin
+        The minimum redshift.
+    zmax
+        The maximum redshift.
+    dx
+        The comoving distance spacing.
+    num
+        The number of samples.
+
+    Returns
+    -------
+        The redshift grid.
+
+    Raises
+    ------
+    ValueError
+        If both ``dx`` and ``num`` are given.
+
+    """
     xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     if dx is not None and num is None:
         x = np.arange(xmin, np.nextafter(xmax + dx, xmax), dx)
@@ -693,17 +862,19 @@ def combine(
     The window functions are given by the sequence *shells* of
     :class:`RadialWindow` or compatible entries.
 
-    Returns a linear combination of window functions, evaluated in *z*.
-
     Parameters
     ----------
-    z:
+    z
         Redshifts *z* in which to evaluate the combined function.
-    weights:
+    weights
         Weights of the linear combination, where the leading axis
         corresponds to *shells*.
-    shells:
+    shells
         Ordered sequence of window functions to be combined.
+
+    Returns
+    -------
+        A linear combination of window functions, evaluated in *z*.
 
     See Also
     --------
