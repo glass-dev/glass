@@ -78,11 +78,12 @@ def from_convergence(  # noqa: PLR0913
 
     Returns
     -------
-        The maps of:
-
-            * potential (complex) if ``deflection`` is true.
-            * deflection potential if ``potential`` is true.
-            * shear (complex) if ``shear`` is true.
+    alpha
+        Map of the deflection (complex). Only returned if ``deflection`` if true.
+    psi
+        Map of the deflection potential. Only returned if ``potential`` is true.
+    gamma
+        Map of the shear (complex). Only returned if ``shear`` is true.
 
     Notes
     -----

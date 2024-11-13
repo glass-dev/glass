@@ -349,7 +349,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     -----
     The Non-linear Alignments Model (NLA) describes an effective
     convergence :math:`\kappa_{\rm IA}` that models the effect of
-    intrinsic alignments.  It is computed from the matter density
+    intrinsic alignments. It is computed from the matter density
     contrast :math:`\delta` as [1] [3]
 
     .. math::
