@@ -18,13 +18,37 @@ def nnls(
 
     Implementation of the algorithm due to [1] as described in [2].
 
+    Parameters
+    ----------
+    a
+        The matrix.
+    b
+        The vector.
+    tol
+        The tolerance for convergence.
+    maxiter
+        The maximum number of iterations.
+
+    Returns
+    -------
+        The non-negative least squares solution.
+
+    Raises
+    ------
+    ValueError
+        If ``a`` is not a matrix.
+    ValueError
+        If ``b`` is not a vector.
+    ValueError
+        If the shapes of ``a`` and ``b`` do not match.
+
     References
     ----------
     * [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
-        Problems. doi: 10.1137/1.9781611971217
+          Problems. doi: 10.1137/1.9781611971217
     * [2] Bro, R. and De Jong, S. (1997), A fast
-        non-negativity-constrained least squares algorithm. J.
-        Chemometrics, 11, 393-401.
+          non-negativity-constrained least squares algorithm. J.
+          Chemometrics, 11, 393-401.
 
     """
     a = np.asanyarray(a)
