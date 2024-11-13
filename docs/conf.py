@@ -76,6 +76,10 @@ autodoc_typehints = "description"
 
 # -- napoleon ----------------------------------------------------------------
 
+napoleon_custom_sections = [
+    ("Returns", "params_style"),
+    ("Yields", "params_style"),
+]
 napoleon_google_docstring = False
 
 
