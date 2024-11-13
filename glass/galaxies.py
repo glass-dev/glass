@@ -46,17 +46,19 @@ def redshifts(
     This function samples *n* redshifts from a distribution that follows
     the given radial window function *w*.
 
-    Returns random redshifts following the radial window function.
-
     Parameters
     ----------
-    n:
+    n
         Number of redshifts to sample. If an array is given, the
         results are concatenated.
-    w:
+    w
         Radial window function.
-    rng:
+    rng
         Random number generator. If not given, a default RNG is used.
+
+    Returns
+    -------
+        Random redshifts following the radial window function.
 
     """
     return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
@@ -80,25 +82,27 @@ def redshifts_from_nz(
     and redshifts are sampled independently for each extra dimension.
     The results are concatenated into a flat array.
 
-    Returns redshifts sampled from the given source distribution. For
-    inputs with extra dimensions, returns a flattened 1-D array of
-    samples from all populations.
-
     Parameters
     ----------
-    count:
+    count
         Number of redshifts to sample. If an array is given, its shape
         is broadcast against the leading axes of *z* and *nz*.
-    z:
+    z
         Source distribution. Leading axes are broadcast against the
         shape of *count*.
-    nz:
+    nz
         Source distribution. Leading axes are broadcast against the
         shape of *count*.
-    rng:
+    rng
         Random number generator. If not given, a default RNG is used.
-    warn:
+    warn
         Throw relevant warnings.
+
+    Returns
+    -------
+        Redshifts sampled from the given source distribution. For
+        inputs with extra dimensions, returns a flattened 1-D array of
+        samples from all populations.
 
     """
     if warn:
@@ -157,26 +161,28 @@ def galaxy_shear(  # noqa: PLR0913
     Takes lensing maps for convergence and shear and produces a lensed
     ellipticity (shear) for each intrinsic galaxy ellipticity.
 
-    Returns an array of complex-valued observed galaxy shears
-    (lensed ellipticities).
-
     Parameters
     ----------
-    lon:
+    lon
         Array for galaxy longitudes.
-    lat:
+    lat
         Array for galaxy latitudes.
-    eps:
+    eps
         Array of galaxy :term:`ellipticity`.
-    kappa:
+    kappa
         HEALPix map for convergence.
-    gamma1:
+    gamma1
         HEALPix maps for a component of shear.
-    gamma2:
+    gamma2
         HEALPix maps for a component of shear.
-    reduced_shear:
+    reduced_shear
         If ``False``, galaxy shears are not reduced
         by the convergence. Default is ``True``.
+
+    Returns
+    -------
+        An array of complex-valued observed galaxy shears
+        (lensed ellipticities).
 
     """
     nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
@@ -223,21 +229,28 @@ def gaussian_phz(
     Gaussian error with redshift-dependent standard deviation
     :math:`\sigma(z) = (1 + z) \sigma_0` [1].
 
-    Returns photometric redshifts assuming Gaussian errors, of the same
-    shape as *z*.
-
     Parameters
     ----------
-    z:
+    z
         True redshifts.
-    sigma_0:
+    sigma_0
         Redshift error in the tomographic binning at zero redshift.
-    lower:
+    lower
         Bounds for the returned photometric redshifts.
-    upper:
+    upper
         Bounds for the returned photometric redshifts.
-    rng:
+    rng
         Random number generator. If not given, a default RNG is used.
+
+    Returns
+    -------
+        Photometric redshifts assuming Gaussian errors, of the same
+        shape as *z*.
+
+    Raises
+    ------
+    ValueError
+        If the bounds are not consistent.
 
     Warnings
     --------
@@ -253,7 +266,7 @@ def gaussian_phz(
     References
     ----------
     * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
-           doi:10.1111/j.1365-2966.2007.12271.x
+          doi:10.1111/j.1365-2966.2007.12271.x
 
     Examples
     --------
@@ -307,34 +320,36 @@ def _kappa_ia_nla(  # noqa: PLR0913
     r"""
     Effective convergence from intrinsic alignments using the NLA model.
 
-    Returns the effective convergence due to intrinsic alignments.
-
     Parameters
     ----------
-    delta:
+    delta
         Matter density contrast.
-    zeff:
+    zeff
         Effective redshift of the matter field.
-    a_ia:
+    a_ia
         Intrinsic alignments amplitude.
-    cosmo:
+    cosmo
         Cosmology instance.
-    z0:
+    z0
         Reference redshift for the redshift dependence.
-    eta:
+    eta
         Power of the redshift dependence.
-    lbar:
+    lbar
         Mean luminosity of the galaxy sample.
-    l0:
+    l0
         Reference luminosity for the luminosity dependence.
-    beta:
+    beta
         Power of the luminosity dependence.
+
+    Returns
+    -------
+        The effective convergence due to intrinsic alignments.
 
     Notes
     -----
     The Non-linear Alignments Model (NLA) describes an effective
     convergence :math:`\kappa_{\rm IA}` that models the effect of
-    intrinsic alignments.  It is computed from the matter density
+    intrinsic alignments. It is computed from the matter density
     contrast :math:`\delta` as [1] [3]
 
     .. math::
@@ -366,15 +381,15 @@ def _kappa_ia_nla(  # noqa: PLR0913
     References
     ----------
     * [1] Catelan P., Kamionkowski M., Blandford R. D., 2001, MNRAS,
-       320, L7. doi:10.1046/j.1365-8711.2001.04105.x
+          320, L7. doi:10.1046/j.1365-8711.2001.04105.x
     * [2] Hirata C. M., Seljak U., 2004, PhRvD, 70, 063526.
-       doi:10.1103/PhysRevD.70.063526
+          doi:10.1103/PhysRevD.70.063526
     * [3] Bridle S., King L., 2007, NJPh, 9, 444.
-       doi:10.1088/1367-2630/9/12/444
+          doi:10.1088/1367-2630/9/12/444
     * [4] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
-        A&A, 624, A30. doi:10.1051/0004-6361/201834714
+          A&A, 624, A30. doi:10.1051/0004-6361/201834714
     * [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
-       OJAp, 6, 11. doi:10.21105/astro.2302.01942
+          OJAp, 6, 11. doi:10.21105/astro.2302.01942
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
