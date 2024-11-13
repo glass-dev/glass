@@ -25,9 +25,11 @@ release = version
 extensions = [
     "matplotlib.sphinxext.plot_directive",
     "nbsphinx",
+    "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinx_autodoc_typehints",
     "sphinxcontrib.katex",
 ]
 
@@ -62,8 +64,8 @@ html_css_files: list[str] = []
 # This config value contains the locations and names of other projects that
 # should be linked to in this documentation.
 intersphinx_mapping = {
+    "numpy": ("https://numpy.org/doc/stable", None),
     "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
 }
 
 
@@ -74,7 +76,16 @@ autodoc_typehints = "description"
 
 # -- napoleon ----------------------------------------------------------------
 
+napoleon_custom_sections = [
+    ("Returns", "params_style"),
+    ("Yields", "params_style"),
+]
 napoleon_google_docstring = False
+
+
+# -- sphinx-autodoc-typehints ------------------------------------------------
+
+always_use_bars_union = True
 
 
 # -- plot_directive ----------------------------------------------------------

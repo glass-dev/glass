@@ -8,6 +8,21 @@ packages that provide a "glass" module.
 
 
 def _extend_path(path: list[str], name: str) -> list[str]:
+    """
+    Extend the path to include the "ext" submodules of packages.
+
+    Parameters
+    ----------
+    path
+        The path to extend.
+    name
+        The name of the package.
+
+    Returns
+    -------
+        The extended path.
+
+    """
     import os.path
     from pkgutil import extend_path
 

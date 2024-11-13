@@ -47,7 +47,30 @@ def iternorm(
 ) -> collections.abc.Generator[
     tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
 ]:
-    """Return the vector a and variance sigma^2 for iterative normal sampling."""
+    """
+    Return the vector a and variance sigma^2 for iterative normal sampling.
+
+    Parameters
+    ----------
+    k
+        The number of fields.
+    cov
+        The covariance matrix for the fields.
+    size
+        The size of the covariance matrix.
+
+    Yields
+    ------
+        The index, vector, and standard deviation for iterative sampling.
+
+    Raises
+    ------
+    TypeError
+        If the covariance matrix is not broadcastable to the given size.
+    ValueError
+        If the covariance matrix is not positive definite.
+
+    """
     n = (size,) if isinstance(size, int) else size
 
     m = np.zeros((*n, k, k))
@@ -104,7 +127,30 @@ def cls2cov(
     nf: int,
     nc: int,
 ) -> collections.abc.Generator[npt.NDArray[np.float64]]:
-    """Return array of cls as a covariance matrix for iterative sampling."""
+    """
+    Return array of Cls as a covariance matrix for iterative sampling.
+
+    Parameters
+    ----------
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+    nl
+        The number of modes.
+    nf
+        The number of fields.
+    nc
+        The number of correlated fields.
+
+    Yields
+    ------
+        The covariance matrix for iterative sampling.
+
+    Raises
+    ------
+    ValueError
+        If negative values are found in the Cls.
+
+    """
     cov = np.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
@@ -126,7 +172,23 @@ def multalm(
     *,
     inplace: bool = False,
 ) -> npt.NDArray[np.complex128]:
-    """Multiply alm by bl."""
+    """
+    Multiply alm by bl.
+
+    Parameters
+    ----------
+    alm
+        The alm to multiply.
+    bl
+        The bl to multiply.
+    inplace
+        Whether to perform the operation in place.
+
+    Returns
+    -------
+        The product of alm and bl.
+
+    """
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     for m in range(n):
@@ -139,7 +201,23 @@ def transform_cls(
     tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
     pars: tuple[typing.Any, ...] = (),
 ) -> Cls:
-    """Transform Cls to Gaussian Cls."""
+    """
+    Transform Cls to Gaussian Cls.
+
+    Parameters
+    ----------
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+    tfm
+        The transformation to apply.
+    pars
+        The parameters for the transformation.
+
+    Returns
+    -------
+        The transformed angular power spectra.
+
+    """
     gls = []
     for cl in cls:
         if len(cl) > 0:
@@ -170,6 +248,26 @@ def discretized_cls(
     to ``lmax``, removes all but ``ncorr`` correlations between fields, and
     applies the HEALPix pixel window function of the given ``nside``. If no
     arguments are given, no action is performed.
+
+    Parameters
+    ----------
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+    lmax
+        The maximum mode number to truncate the spectra.
+    ncorr
+        The number of correlated fields to keep.
+    nside
+        The resolution parameter for the HEALPix maps.
+
+    Returns
+    -------
+        The discretised angular power spectra.
+
+    Raises
+    ------
+    ValueError
+        If the length of the Cls array is not a triangle number.
 
     """
     if ncorr is not None:
@@ -202,7 +300,21 @@ def lognormal_gls(
     cls: Cls,
     shift: float = 1.0,
 ) -> Cls:
-    """Compute Gaussian Cls for a lognormal random field."""
+    """
+    Compute Gaussian Cls for a lognormal random field.
+
+    Parameters
+    ----------
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+    shift
+        The shift parameter for the lognormal transformation.
+
+    Returns
+    -------
+        The Gaussian angular power spectra for a lognormal random field.
+
+    """
     return transform_cls(cls, "lognormal", (shift,))
 
 
@@ -234,6 +346,26 @@ def generate_gaussian(
                ...]
 
     Missing entries can be set to ``None``.
+
+    Parameters
+    ----------
+    gls
+        The Gaussian angular power spectra for a random field.
+    nside
+        The resolution parameter for the HEALPix maps.
+    ncorr
+        The number of correlated fields. If not given, all fields are correlated.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Yields
+    ------
+        The Gaussian random fields.
+
+    Raises
+    ------
+    ValueError
+        If all gls are empty.
 
     """
     # get the default RNG if not given
@@ -299,7 +431,27 @@ def generate_lognormal(
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
 ) -> collections.abc.Generator[npt.NDArray[np.float64]]:
-    """Sample lognormal random fields from Gaussian Cls iteratively."""
+    """
+    Sample lognormal random fields from Gaussian Cls iteratively.
+
+    Parameters
+    ----------
+    gls
+        The Gaussian angular power spectra for a lognormal random field.
+    nside
+        The resolution parameter for the HEALPix maps.
+    shift
+        The shift parameter for the lognormal transformation.
+    ncorr
+        The number of correlated fields. If not given, all fields are correlated.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Yields
+    ------
+        The lognormal random fields.
+
+    """
     for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
         # compute the variance of the auto-correlation
         gl = gls[i * (i + 1) // 2]
@@ -331,19 +483,21 @@ def getcl(
     """
     Return a specific angular power spectrum from an array.
 
-    Return the angular power spectrum for indices *i* and *j* from an
-    array in *GLASS* ordering.
-
     Parameters
     ----------
-    cls:
-        List of angular power spectra in *GLASS* ordering.
-    i:
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+    i
         Indices to return.
-    j:
+    j
         Indices to return.
-    lmax:
+    lmax
         Truncate the returned spectrum at this mode number.
+
+    Returns
+    -------
+        The angular power spectrum for indices *i* and *j* from an
+        array in *GLASS* ordering.
 
     """
     if j > i:
@@ -366,28 +520,37 @@ def effective_cls(
     *,
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64]:
-    r"""
+    """
     Compute effective angular power spectra from weights.
 
     Computes a linear combination of the angular power spectra *cls*
     using the factors provided by *weights1* and *weights2*. Additional
     axes in *weights1* and *weights2* produce arrays of spectra.
 
-    Returns a dictionary of effective angular power spectra, where keys
-    correspond to the leading axes of *weights1* and *weights2*.
-
     Parameters
     ----------
-    cls:
-        Angular matter power spectra to combine, in *GLASS* ordering.
-    weights1:
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+    weights1
         Weight factors for spectra. The first axis must be equal to
         the number of fields.
-    weights2:
+    weights2
         Second set of weights. If not given, *weights1* is used.
-    lmax:
+    lmax
         Truncate the angular power spectra at this mode number. If not
         given, the longest input in *cls* will be used.
+
+    Returns
+    -------
+        A dictionary of effective angular power spectra, where keys
+        correspond to the leading axes of *weights1* and *weights2*.
+
+    Raises
+    ------
+    ValueError
+        If the length of *cls* is not a triangle number.
+    ValueError
+        If the shapes of *weights1* and *weights2* are incompatible.
 
     """
     from itertools import combinations_with_replacement, product
