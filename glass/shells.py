@@ -628,9 +628,6 @@ def partition_nnls(
     """
     Non-negative least-squares partition.
 
-    Uses the ``nnls()`` algorithm from ``scipy.optimize`` and thus
-    requires SciPy.
-
     Parameters
     ----------
     z
