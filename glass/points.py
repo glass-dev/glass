@@ -342,13 +342,13 @@ def uniform_positions(
 
     Yields
     ------
-        lon:
-            Columns of longitudes for the sampled points.
-        lat:
-            Columns of latitudes for the sampled points.
-        count:
-            The number of sampled points. For array inputs, an array of
-            counts with the same shape is returned.
+    lon:
+        Columns of longitudes for the sampled points.
+    lat:
+        Columns of latitudes for the sampled points.
+    count:
+        The number of sampled points. For array inputs, an array of
+        counts with the same shape is returned.
 
     """
     # get default RNG if not given
