@@ -78,10 +78,10 @@ def from_convergence(  # noqa: PLR0913
 
     Returns
     -------
+    psi
+        Map of the lensing (or deflection) potential. Only returned if ``potential`` is true.
     alpha
         Map of the deflection (complex). Only returned if ``deflection`` if true.
-    psi
-        Map of the deflection potential. Only returned if ``potential`` is true.
     gamma
         Map of the shear (complex). Only returned if ``shear`` is true.
 
