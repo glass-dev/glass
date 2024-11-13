@@ -4,8 +4,21 @@ import typing
 
 import numpy as np
 import numpy.typing as npt
+import pytest
 
-from glass.points import position_weights, positions_from_delta, uniform_positions
+from glass.points import (
+    effective_bias,
+    linear_bias,
+    loglinear_bias,
+    position_weights,
+    positions_from_delta,
+    uniform_positions,
+)
+
+if typing.TYPE_CHECKING:
+    import collections.abc
+
+    import pytest_mock
 
 if typing.TYPE_CHECKING:
     import collections.abc
@@ -34,15 +47,138 @@ def catpos(
     return lon, lat, cnt
 
 
-def test_positions_from_delta() -> None:
+def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
+    # create a mock radial window function
+    w = mocker.Mock()
+    w.za = np.linspace(0, 2, 100)
+    w.wa = np.full_like(w.za, 2.0)
+
+    z = np.linspace(0, 1, 10)
+    bz = np.zeros((10,))
+
+    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))
+
+    z = np.zeros((10,))
+    bz = np.full_like(z, 0.5)
+
+    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))
+
+    z = np.linspace(0, 1, 10)
+    bz = np.full_like(z, 0.5)
+
+    np.testing.assert_allclose(effective_bias(z, bz, w), 0.25)
+
+
+def test_linear_bias(rng: np.random.Generator) -> None:
+    # test with 0 delta
+
+    delta = np.zeros((2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(linear_bias(delta, b), np.zeros((2, 2)))
+
+    # test with 0 b
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 0.0
+
+    np.testing.assert_allclose(linear_bias(delta, b), np.zeros((2, 2)))
+
+    # compare with original implementation
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(linear_bias(delta, b), b * delta)
+
+
+def test_loglinear_bias(rng: np.random.Generator) -> None:
+    # test with 0 delta
+
+    delta = np.zeros((2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(loglinear_bias(delta, b), np.zeros((2, 2)))
+
+    # test with 0 b
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 0.0
+
+    np.testing.assert_allclose(loglinear_bias(delta, b), np.zeros((2, 2)))
+
+    # compare with numpy implementation
+
+    delta = rng.normal(5, 1, size=(2, 2))
+    b = 2.0
+
+    np.testing.assert_allclose(loglinear_bias(delta, b), np.expm1(b * np.log1p(delta)))
+
+
+def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR0915
+    # create maps that saturate the batching in the function
+    nside = 128
+    npix = 12 * nside**2
+
     # case: single-dimensional input
 
     ngal: float | npt.NDArray[np.float64] = 1e-3
-    delta = np.zeros(12)
+    delta = np.zeros(npix)
     bias = 0.8
-    vis = np.ones(12)
+    vis = np.ones(npix)
 
     lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # test with rng
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis, rng=rng))
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: Nons bias and callable bias model
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x)
+    )
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: None vis
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, None))
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: remove monopole
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, delta, bias, vis, remove_monopole=True)
+    )
+
+    assert isinstance(cnt, int)
+    assert lon.shape == lat.shape == (cnt,)
+
+    # case: negative delta
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis)
+    )
+
+    assert isinstance(cnt, int)
+    np.testing.assert_allclose(lon, [])
+    np.testing.assert_allclose(lat, [])
+
+    # case: large delta
+
+    lon, lat, cnt = catpos(
+        positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis)
+    )
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -89,13 +225,33 @@ def test_positions_from_delta() -> None:
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
 
+    # case: only the southern hemisphere is visible
 
-def test_uniform_positions() -> None:
+    vis[: vis.size // 2] = 0.0
+
+    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+
+    assert isinstance(cnt, np.ndarray)
+    assert cnt.shape == (3, 2)
+    assert lon.shape == (cnt.sum(),)
+    assert lat.shape == (cnt.sum(),)
+
+    # test TypeError
+
+    with pytest.raises(TypeError, match="bias_model must be string or callable"):
+        next(positions_from_delta(ngal, delta, bias, vis, bias_model=0))  # type: ignore[arg-type]
+
+
+def test_uniform_positions(rng: np.random.Generator) -> None:
     # case: scalar input
 
     ngal: float | npt.NDArray[np.float64] = 1e-3
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
+
+    # test with rng
+
+    lon, lat, cnt = catpos(uniform_positions(ngal, rng=rng))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
