@@ -99,7 +99,7 @@ def volume_weight(
 
     Returns
     -------
-        The weight in comoving volume.
+        The weight function evaluated at redshifts *z*.
 
     """
     return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
