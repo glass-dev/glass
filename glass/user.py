@@ -46,6 +46,13 @@ def save_cls(
     Uses :func:`numpy.savez` internally. The filename should therefore have a
     ``.npz`` suffix, or it will be given one.
 
+    Parameters
+    ----------
+    filename
+        The name of the file to save to.
+    cls
+        Angular matter power spectra in *GLASS* ordering.
+
     """
     split = np.cumsum([len(cl) for cl in cls[:-1]])
     values = np.concatenate(cls)
@@ -59,6 +66,15 @@ def load_cls(
     Load a list of Cls from file.
 
     Uses :func:`numpy.load` internally.
+
+    Parameters
+    ----------
+    filename
+        The name of the file to load from.
+
+    Returns
+    -------
+        The list of Cls.
 
     """
     with np.load(filename) as npz:
@@ -75,7 +91,17 @@ class _FitsWriter:
     """
 
     def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
-        """Create a new, uninitialised writer."""
+        """
+        Create a new, uninitialised writer.
+
+        Parameters
+        ----------
+        fits
+            The fits object.
+        ext
+            The file extension.
+
+        """
         self.fits = fits
         self.ext = ext
 
@@ -84,7 +110,17 @@ class _FitsWriter:
         data: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
         names: list[str] | None = None,
     ) -> None:
-        """Write the FITS file."""
+        """
+        Write the FITS file.
+
+        Parameters
+        ----------
+        data
+            The data to write.
+        names
+            The names of the columns.
+
+        """
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if self.ext is None:
@@ -105,6 +141,14 @@ class _FitsWriter:
 
         Pass either a positional variable (data)
         or multiple named arguments (**columns)
+
+        Parameters
+        ----------
+        data
+            The data to write.
+        columns
+            The columns to write.
+
         """
         # if data is given, write it as it is
         if data is not None:
@@ -136,6 +180,17 @@ def write_catalog(
 
     .. note::
        Requires the ``fitsio`` package.
+
+    Parameters
+    ----------
+    filename
+        The name of the file to write to.
+    ext
+        The file extension.
+
+    Yields
+    ------
+        The writer object.
 
     """
     import fitsio

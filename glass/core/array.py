@@ -15,7 +15,19 @@ if typing.TYPE_CHECKING:
 def broadcast_first(
     *arrays: npt.NDArray[np.float64],
 ) -> tuple[npt.NDArray[np.float64], ...]:
-    """Broadcast arrays, treating the first axis as common."""
+    """
+    Broadcast arrays, treating the first axis as common.
+
+    Parameters
+    ----------
+    arrays
+        The arrays to broadcast.
+
+    Returns
+    -------
+        The broadcasted arrays.
+
+    """
     arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
     return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
@@ -33,8 +45,15 @@ def broadcast_leading_axes(
     """
     Broadcast all but the last N axes.
 
-    Returns the shape of the broadcast dimensions, and all input arrays
-    with leading axes matching that shape.
+    Parameters
+    ----------
+    args
+        The arrays and the number of axes to keep.
+
+    Returns
+    -------
+        The shape of the broadcast dimensions, and all input arrays
+        with leading axes matching that shape.
 
     Examples
     --------
@@ -77,7 +96,31 @@ def ndinterp(  # noqa: PLR0913
     right: float | None = None,
     period: float | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Interpolate multi-dimensional array over axis."""
+    """
+    Interpolate multi-dimensional array over axis.
+
+    Parameters
+    ----------
+    x
+        The x-coordinates.
+    xp
+        The x-coordinates of the data points.
+    fp
+        The function values corresponding to the x-coordinates in *xp*.
+    axis
+        The axis to interpolate over.
+    left
+        The value to return for x < xp[0].
+    right
+        The value to return for x > xp[-1].
+    period
+        The period of the function, used for interpolating periodic data.
+
+    Returns
+    -------
+        The interpolated array.
+
+    """
     return np.apply_along_axis(
         partial(np.interp, x, xp),
         axis,
@@ -96,7 +139,23 @@ def trapz_product(
     ],
     axis: int = -1,
 ) -> npt.NDArray[np.float64]:
-    """Trapezoidal rule for a product of functions."""
+    """
+    Trapezoidal rule for a product of functions.
+
+    Parameters
+    ----------
+    f
+        The first function.
+    ff
+        The other functions.
+    axis
+        The axis along which to integrate.
+
+    Returns
+    -------
+        The integral of the product of the functions.
+
+    """
     x: npt.NDArray[np.float64]
     x, _ = f
     for x_, _ in ff:
@@ -116,7 +175,25 @@ def cumtrapz(
     dtype: npt.DTypeLike | None = None,
     out: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Cumulative trapezoidal rule along last axis."""
+    """
+    Cumulative trapezoidal rule along last axis.
+
+    Parameters
+    ----------
+    f
+        The function values.
+    x
+        The x-coordinates.
+    dtype
+        The output data type.
+    out
+        The output array.
+
+    Returns
+    -------
+        The cumulative integral of the function.
+
+    """
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 

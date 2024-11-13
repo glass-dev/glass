@@ -60,16 +60,18 @@ def effective_bias(
     and computes an effective bias parameter :math:`\bar{b}` for a
     given window function :math:`w(z)`.
 
-    Returns the effective bias parameter for the window.
-
     Parameters
     ----------
-    z:
+    z
         Redshifts and values of the bias function :math:`b(z)`.
-    bz:
+    bz
         Redshifts and values of the bias function :math:`b(z)`.
-    w:
+    w
         The radial window function :math:`w(z)`.
+
+    Returns
+    -------
+        The effective bias parameter for the window.
 
     Notes
     -----
@@ -90,7 +92,21 @@ def linear_bias(
     delta: npt.NDArray[np.float64],
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    r"""Linear bias model :math:`\delta_g = b \, \delta`."""
+    r"""
+    Linear bias model :math:`\delta_g = b \, \delta`.
+
+    Parameters
+    ----------
+    delta
+        The input density contrast.
+    b
+        The bias parameter.
+
+    Returns
+    -------
+        The density contrast after biasing.
+
+    """
     return b * delta
 
 
@@ -98,7 +114,21 @@ def loglinear_bias(
     delta: npt.NDArray[np.float64],
     b: float | npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    r"""log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`."""
+    r"""
+    Log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`.
+
+    Parameters
+    ----------
+    delta
+        The input density contrast.
+    b
+        The bias parameter.
+
+    Returns
+    -------
+        The density contrast after biasing.
+
+    """
     delta_g = np.log1p(delta)
     delta_g *= b
     np.expm1(delta_g, out=delta_g)
@@ -145,37 +175,42 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     Parameters
     ----------
-    ngal:
+    ngal
         Number density, expected number of points per arcmin2.
-    delta:
+    delta
         Map of the input density contrast. This is fed into the bias
         model to produce the density contrast for sampling.
-    bias:
+    bias
         Bias parameter, is passed as an argument to the bias model.
-    vis:
+    vis
         Visibility map for the observed points. This is multiplied with
         the full sky number count map, and must hence be of compatible shape.
-    bias_model:
+    bias_model
         The bias model to apply. If a string, refers to a function in
         the :mod:`~glass.points` module, e.g. ``'linear'`` for
         :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
-    remove_monopole:
+    remove_monopole
         If true, the monopole of the density contrast
         after biasing is fixed to zero.
-    batch:
+    batch
         Maximum number of positions to yield in one batch.
-    rng:
+    rng
         Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
-    lon:
+    lon
         Columns of longitudes for the sampled points.
-    lat:
+    lat
         Columns of latitudes for the sampled points.
-    count:
+    count
         The number of sampled points  If multiple populations are sampled, an
         array of counts in the shape of the extra dimensions is returned.
+
+    Raises
+    ------
+    TypeError
+        If the bias model is not a string or callable.
 
     """
     # get default RNG if not given
@@ -297,10 +332,10 @@ def uniform_positions(
 
     Parameters
     ----------
-    ngal:
+    ngal
         Number density, expected number of positions per arcmin2.
-    rng:
-        Random number generator. If not given, a default RNG will be used.
+    rng
+        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
@@ -358,15 +393,17 @@ def position_weights(
     redshift distribution and bias factor :math:`n(z) \, b(z)` for the
     discretised shells.
 
-    Returns the relative weight of each shell for angular clustering.
-
     Parameters
     ----------
-    densities:
+    densities
         Density of points in each shell. The first axis must broadcast
         against the number of shells, and is normalised internally.
-    bias:
+    bias
         Value or values of the linear bias parameter for each shell.
+
+    Returns
+    -------
+        The relative weight of each shell for angular clustering.
 
     """
     # bring densities and bias into the same shape
