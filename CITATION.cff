@@ -3,7 +3,7 @@ title: "GLASS: Generator for Large Scale Structure"
 message: >-
   If you use GLASS in your research, please cite the associated paper.
 repository-code: "https://github.com/glass-dev/glass"
-url: "https://glass.readthedocs.io"
+url: "https://glass.readthedocs.io/stable"
 license: MIT
 preferred-citation:
   authors:

@@ -66,7 +66,7 @@ test = [
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
-Documentation = "https://glass.readthedocs.io/"
+Documentation = "https://glass.readthedocs.io/stable"
 Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
 
