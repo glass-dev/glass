@@ -550,7 +550,7 @@ def effective_cls(
     ValueError
         If the length of *cls* is not a triangle number.
     ValueError
-        If the shapes of *weights1* and *weights2* do not match the
+        If the shapes of *weights1* and *weights2* are incompatible.
 
     """
     from itertools import combinations_with_replacement, product
