@@ -24,7 +24,7 @@ jobs:
       - name: Replace stable version with the release version
         run: |-
           # store the release tag
-          tag="${{ github.event.release.tag_name }}"
+          tag="${{ github.ref_name }}"
 
           # files to search for
           md_rst_files=$(find . -type f \( -name "*.md" -o -name "*.rst" \))
