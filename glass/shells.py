@@ -52,6 +52,7 @@ import warnings
 import numpy as np
 import numpy.typing as npt
 
+from glass.core.algorithm import nnls
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
@@ -644,8 +645,6 @@ def partition_nnls(
         The partition.
 
     """
-    from glass.core.algorithm import nnls
-
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
