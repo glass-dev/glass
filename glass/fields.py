@@ -29,6 +29,7 @@ from __future__ import annotations
 import collections.abc
 import typing
 import warnings
+from itertools import combinations_with_replacement, product
 
 import healpy as hp
 import numpy as np
@@ -553,8 +554,6 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
-    from itertools import combinations_with_replacement, product
-
     # this is the number of fields
     n = int((2 * len(cls)) ** 0.5)
     if n * (n + 1) // 2 != len(cls):
