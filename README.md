@@ -3,7 +3,7 @@
 <!-- Essentials -->
 
 [![PyPI](https://img.shields.io/pypi/v/glass)](https://pypi.org/project/glass)
-[![Documentation](https://readthedocs.org/projects/glass/badge/?version=stable)](https://glass.readthedocs.io/stable)
+[![Documentation](https://readthedocs.org/projects/glass/badge/?version=latest)](https://glass.readthedocs.io/latest)
 [![LICENSE](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 <!-- Code -->
