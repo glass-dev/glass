@@ -21,6 +21,23 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Replace stable version with the release version
+        run: |-
+          # store the release tag
+          tag="${{ github.event.release.tag_name }}"
+
+          # files to search for
+          md_rst_files=$(find . -type f \( -name "*.md" -o -name "*.rst" \))
+
+          # regex patterns
+          badge_pattern="s#(readthedocs\.org/projects/glass/badge/\?version=)stable#\1${tag}#g"
+          url_pattern="s#(glass\.readthedocs\.io.*?)/stable#\1/${tag}#g"
+
+          # perform the replacements
+          for file in $md_rst_files; do
+            sed -E -i "$badge_pattern; $url_pattern" "$file"
+          done
+
       - name: Build SDist and wheel
         run: pipx run build
 
