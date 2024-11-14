@@ -14,6 +14,25 @@ delta = 0.001  # Number of points in arrays
 my_max = 1000  # Typically number of galaxies in loop
 except_int = 750  # Where test exception occurs in loop
 filename = "MyFile.Fits"
+cls_file = "Cls.npz"
+
+
+def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> None:
+    cls = rng.normal(size=(10, 10))
+    user.save_cls(tmp_path / cls_file, cls)
+
+    assert pathlib.Path.exists(tmp_path / cls_file)
+
+    with np.load(tmp_path / cls_file) as npz:
+        values = npz["values"]
+        split = npz["split"]
+
+    np.testing.assert_allclose(values, np.concatenate(cls))
+    np.testing.assert_allclose(split, np.cumsum([len(cl) for cl in cls[:-1]]))
+    np.testing.assert_allclose(cls, np.split(values, split))
+
+    npz = user.load_cls(tmp_path / cls_file)
+    np.testing.assert_allclose(npz, cls)
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
