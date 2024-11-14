@@ -6,6 +6,9 @@ packages that provide a "glass" module.
 
 """
 
+import os.path
+from pkgutil import extend_path
+
 
 def _extend_path(path: list[str], name: str) -> list[str]:
     """
@@ -23,9 +26,6 @@ def _extend_path(path: list[str], name: str) -> list[str]:
         The extended path.
 
     """
-    import os.path
-    from pkgutil import extend_path
-
     _pkg, _, _mod = name.partition(".")
 
     return list(
