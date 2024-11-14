@@ -27,12 +27,12 @@ def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> Non
         values = npz["values"]
         split = npz["split"]
 
-    np.testing.assert_allclose(values, np.concatenate(cls))
-    np.testing.assert_allclose(split, np.cumsum([len(cl) for cl in cls[:-1]]))
-    np.testing.assert_allclose(cls, np.split(values, split))
+    np.testing.assert_array_equal(values, np.concatenate(cls))
+    np.testing.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
+    np.testing.assert_array_equal(cls, np.split(values, split))
 
     npz = load_cls(tmp_path / cls_file)
-    np.testing.assert_allclose(npz, cls)
+    np.testing.assert_array_equal(npz, cls)
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
