@@ -46,6 +46,7 @@ docs = [
     "matplotlib",
     "nbsphinx",
     "sphinx",
+    "sphinx_autodoc_typehints",
     "sphinxcontrib-katex",
 ]
 examples = [
