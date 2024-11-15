@@ -20,9 +20,6 @@ if typing.TYPE_CHECKING:
 
     import pytest_mock
 
-if typing.TYPE_CHECKING:
-    import collections.abc
-
 
 def catpos(
     pos: collections.abc.Generator[
