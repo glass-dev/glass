@@ -5,8 +5,42 @@ Release notes
 These notes document the changes between individual *GLASS* releases.
 
 
-2024.1  (16 Jul 2024)
----------------------
+2024.2 (15 Nov 2024)
+--------------------
+
+* All GLASS user functionality is now available directly from the main
+  ``glass`` namespace.  No more imports!
+
+* Changes to the functions dealing with Gaussian spectra:
+
+  * ``gaussian_gls()`` was renamed to :func:`glass.discretized_cls`, which
+    better reflects what the function does.
+
+  * The implicit call to :func:`glass.discretized_cls` was removed from
+    :func:`glass.lognormal_gls`.  Call :func:`glass.discretized_cls` explicitly
+    with the desired ``ncorr=``, ``lmax=``, and ``nside=`` parameters.
+
+* ``redshifts_from_nz()`` is deprecated in favour of :func:`glass.redshifts`,
+  as the former is almost never the right choice: the two-point statistics in a
+  linear bias model are coming from the shells, so the redshift distribution is
+  implicitly the same as the radial profile of the shells.
+
+* Several fixes to :func:`glass.ellipticity_ryden04`.
+
+* Added a FITS catalogue writer tool :func:`glass.write_catalog`.
+
+* Examples now live in the main GLASS repository and documentation.
+
+* GLASS is now fully typed and passes mypy.
+
+* Python 3.13 is now supported.  Python 3.8 and NumPy 1.21 are no longer
+  supported.
+
+* The ``glass.core.constants`` module was removed.
+
+
+2024.1 (16 Jul 2024)
+--------------------
 
 * Further changes to the :func:`~glass.shells.partition()` function.
 
