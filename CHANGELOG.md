@@ -6,6 +6,7 @@ All functional changes to the project are documented in this file.
 
 ## [2024.2] (15 Nov 2024)
 
+- gh-188: add docstrings to all functions and tidy docs (#381)
 - gh-336: support Python 3.13 (#337)
 - gh-358: add static types support (#368)
 - gh-131: rename `gaussian_gls` to `discretized_cls` (#345)

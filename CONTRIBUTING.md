@@ -104,7 +104,7 @@ any browser by opening the `index.html` file.
 To release a new version of _GLASS_, there should be a commit that includes the
 following changes:
 
-- The commits since the last release are added to the [changelog](CHANGELOG.md)
+- The changes since the last release are added to the [changelog](CHANGELOG.md)
   under a section titled `[yyyy.mm] (DD Mon YYYY)`. A new link to the changeset
   is added at the bottom of the file.
 - The [release notes](docs/manual/releases.rst) are updated with the new

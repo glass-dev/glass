@@ -29,6 +29,8 @@ These notes document the changes between individual *GLASS* releases.
 
 * Added a FITS catalogue writer tool :func:`glass.write_catalog`.
 
+* Much improved documentation with docstring for all functions.
+
 * Examples now live in the main GLASS repository and documentation.
 
 * GLASS is now fully typed and passes mypy.
