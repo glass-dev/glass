@@ -54,6 +54,7 @@ import numpy.typing as npt
 
 from cosmology.api import CosmologyConstantsNamespace, StandardCosmology
 
+from glass.core.algorithm import nnls
 from glass.core.array import ndinterp
 
 ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
@@ -652,8 +653,6 @@ def partition_nnls(
         The partition.
 
     """
-    from glass.core.algorithm import nnls
-
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
