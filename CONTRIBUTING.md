@@ -78,7 +78,7 @@ rendering documentation on its website. The configuration file (`conf.py`) for
 `sphinx` can be found
 [under the `docs` folder](https://github.com/glass-dev/glass/blob/main/docs/conf.py).
 The documentation is deployed on <https://readthedocs.io>
-[here](https://glass.readthedocs.io/en/latest).
+[here](https://glass.readthedocs.io/latest/).
 
 Ideally, with the addition of every new feature to _GLASS_, documentation should
 be added using comments, docstrings, and `.rst` files.
