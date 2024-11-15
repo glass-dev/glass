@@ -190,6 +190,7 @@ def write_catalog(
 
     Yields
     ------
+    writer
         The writer object.
 
     """

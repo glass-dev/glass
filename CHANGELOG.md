@@ -2,8 +2,23 @@
 
 # Changelog
 
-All notable changes to the project are documented in this file. The format is
-based on [Keep a Changelog](https://keepachangelog.com).
+All functional changes to the project are documented in this file.
+
+## [2024.2] (15 Nov 2024)
+
+- gh-188: add docstrings to all functions and tidy docs (#381)
+- gh-336: support Python 3.13 (#337)
+- gh-358: add static types support (#368)
+- gh-131: rename `gaussian_gls` to `discretized_cls` (#345)
+- gh-328: efficient resampling in `ellipticity_ryden04` (#341)
+- gh-137: deprecate `redshifts_from_nz` in favor of `redshifts` (#333)
+- gh-328: fix shape mismatch bug in ellipticity_ryden04 (#332)
+- gh-315: add broadcasting rule in ellipticity_ryden04 + tests (#317)
+- gh-198: enforce `python>3.8` & `numpy>1.21` (#326)
+- gh-260: remove glass.core.constants (#261)
+- gh-107: add all public functions/classes under glass namespace (#221)
+- gh-168: move examples into repository (#169)
+- gh-156: add FITS catalogue writer tool (#158)
 
 ## [2024.1] (16 Jul 2024)
 
@@ -143,6 +158,7 @@ based on [Keep a Changelog](https://keepachangelog.com).
 
 - Initial wide release for GLASS paper
 
+[2024.2]: https://github.com/glass-dev/glass/compare/v2024.1...v2024.2
 [2024.1]: https://github.com/glass-dev/glass/compare/v2023.7...v2024.1
 [2023.7]: https://github.com/glass-dev/glass/compare/v2023.6...v2023.7
 [2023.6]: https://github.com/glass-dev/glass/compare/v2023.5...v2023.6
