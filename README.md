@@ -3,7 +3,7 @@
 <!-- Essentials -->
 
 [![PyPI](https://img.shields.io/pypi/v/glass)](https://pypi.org/project/glass)
-[![Documentation](https://readthedocs.org/projects/glass/badge/?version=latest)](https://glass.readthedocs.io/latest)
+[![Documentation](https://readthedocs.org/projects/glass/badge/?version=stable)](https://glass.readthedocs.io/stable)
 [![LICENSE](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 <!-- Code -->
@@ -80,7 +80,7 @@ e.g. a design decision or API change, you can use our [Discussions] page.
 
 We also have a public [Slack workspace] for discussions about the project.
 
-[documentation]: https://glass.readthedocs.io/
-[examples]: https://glass.readthedocs.io/projects/examples/
+[documentation]: https://glass.readthedocs.io/stable
+[examples]: https://glass.readthedocs.io/stable/examples.html
 [Discussions]: https://github.com/orgs/glass-dev/discussions
 [Slack workspace]: https://glass-dev.github.io/slack

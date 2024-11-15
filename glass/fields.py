@@ -29,6 +29,7 @@ from __future__ import annotations
 import collections.abc
 import typing
 import warnings
+from itertools import combinations_with_replacement, product
 
 import healpy as hp
 import numpy as np
@@ -61,7 +62,12 @@ def iternorm(
 
     Yields
     ------
-        The index, vector, and standard deviation for iterative sampling.
+    index
+        The index for iterative sampling.
+    vector
+        The vector for iterative sampling.
+    standard_deviation
+        The standard deviation for iterative sampling.
 
     Raises
     ------
@@ -143,6 +149,7 @@ def cls2cov(
 
     Yields
     ------
+    matrix
         The covariance matrix for iterative sampling.
 
     Raises
@@ -360,6 +367,7 @@ def generate_gaussian(
 
     Yields
     ------
+    fields
         The Gaussian random fields.
 
     Raises
@@ -449,6 +457,7 @@ def generate_lognormal(
 
     Yields
     ------
+    fields
         The lognormal random fields.
 
     """
@@ -553,8 +562,6 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
-    from itertools import combinations_with_replacement, product
-
     # this is the number of fields
     n = int((2 * len(cls)) ** 0.5)
     if n * (n + 1) // 2 != len(cls):

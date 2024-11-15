@@ -339,11 +339,11 @@ def uniform_positions(
 
     Yields
     ------
-    lon:
+    lon
         Columns of longitudes for the sampled points.
-    lat:
+    lat
         Columns of latitudes for the sampled points.
-    count:
+    count
         The number of sampled points. For array inputs, an array of
         counts with the same shape is returned.
 
