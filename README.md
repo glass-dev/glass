@@ -81,6 +81,6 @@ e.g. a design decision or API change, you can use our [Discussions] page.
 We also have a public [Slack workspace] for discussions about the project.
 
 [documentation]: https://glass.readthedocs.io/stable
-[examples]: https://glass.readthedocs.io/projects/examples/stable
+[examples]: https://glass.readthedocs.io/stable/examples.html
 [Discussions]: https://github.com/orgs/glass-dev/discussions
 [Slack workspace]: https://glass-dev.github.io/slack
