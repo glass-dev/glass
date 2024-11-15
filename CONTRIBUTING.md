@@ -101,12 +101,12 @@ any browser by opening the `index.html` file.
 
 ## Releases
 
-To release a new version of _GLASS_, there should be a commit titled
-`REL: glass yyyy.mm` that includes the following changes:
+To release a new version of _GLASS_, there should be a commit that includes the
+following changes:
 
-- The changelog trailers since the last release are parsed into the
-  [changelog](CHANGELOG.md) under a section titled `[yyyy.mm]  (DD Mon YYYY)`. A
-  new link to the changeset is added at the bottom of the file.
+- The changes since the last release are added to the [changelog](CHANGELOG.md)
+  under a section titled `[yyyy.mm] (DD Mon YYYY)`. A new link to the changeset
+  is added at the bottom of the file.
 - The [release notes](docs/manual/releases.rst) are updated with the new
   version. The release notes should translate the changelog entries into prose
   that can be understood by non-developer users of the code. If there are
@@ -129,14 +129,12 @@ PyPI.
 _GLASS_ follows [CalVer](https://calver.org). There is no difference between
 releases that increment the year and releases that increment the month; in
 particular, releases that increment the month may introduce breaking changes.
-The version is generate dynamically through VCS using
-[`hatch-vcs`](https://github.com/ofek/hatch-vcs).
 
-The target is to have a new _GLASS_ release at the beginning of each month, as
-long as there have been changes.
+The current version number is automatically inferred from the last release
+(i.e., git tag), subsequent unreleased commits, and local changes, if any.
 
-The current version number is automatically inferred from the last release (i.e.
-git tag), subsequent unreleased commits, and local changes, if any.
+The target is to have a new _GLASS_ release once there are significant changes
+to the code's functionality.
 
 ## Nox
 
