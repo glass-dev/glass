@@ -32,10 +32,16 @@ jobs:
     needs: dist
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event_name == 'release' && 'publish' || 'test-publish' }}
+      name: >-
+        ${{ (github.event_name == 'release' &&
+         github.event.action == 'published') &&
+         'publish' ||
+         'test-publish' }}
       url: >-
-        ${{ github.event_name == 'release' && 'https://pypi.org/project/glass'
-        || 'https://test.pypi.org/project/glass' }}
+        ${{ (github.event_name == 'release' &&
+         github.event.action == 'published') &&
+         'https://pypi.org/project/glass' ||
+         'https://test.pypi.org/project/glass' }}
     permissions:
       id-token: write
     steps:
