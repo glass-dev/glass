@@ -62,7 +62,12 @@ def iternorm(
 
     Yields
     ------
-        The index, vector, and standard deviation for iterative sampling.
+    index
+        The index for iterative sampling.
+    vector
+        The vector for iterative sampling.
+    standard_deviation
+        The standard deviation for iterative sampling.
 
     Raises
     ------
@@ -144,6 +149,7 @@ def cls2cov(
 
     Yields
     ------
+    matrix
         The covariance matrix for iterative sampling.
 
     Raises
@@ -361,6 +367,7 @@ def generate_gaussian(
 
     Yields
     ------
+    fields
         The Gaussian random fields.
 
     Raises
@@ -450,6 +457,7 @@ def generate_lognormal(
 
     Yields
     ------
+    fields
         The lognormal random fields.
 
     """
