@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Replace stable version with the release version
+        if: github.event_name == 'release' && github.event.action == 'published'
         run: |-
           # store the release tag
           tag="${{ github.ref_name }}"
@@ -35,6 +36,9 @@ jobs:
             --expression "$badge_pattern" \
             --expression "$url_pattern" \
             ${{ github.workspace }}/README.md
+
+          # store the tag since the git checkout is now dirty
+          echo "SETUPTOOLS_SCM_PRETEND_VERSION=${tag}" >> $GITHUB_ENV
 
       - name: Build SDist and wheel
         run: pipx run build

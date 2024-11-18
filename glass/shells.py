@@ -46,6 +46,7 @@ Weight functions
 from __future__ import annotations
 
 import collections.abc
+import itertools
 import typing
 import warnings
 
@@ -57,7 +58,7 @@ from cosmology.api import CosmologyConstantsNamespace, StandardCosmology
 from glass.core.algorithm import nnls
 from glass.core.array import ndinterp
 
-ArrayLike1D = typing.Union[collections.abc.Sequence[float], npt.NDArray[np.float64]]
+ArrayLike1D = collections.abc.Sequence[float] | npt.NDArray[np.float64]
 WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 
@@ -240,17 +241,11 @@ def tophat_windows(
     wht: WeightFunc
     wht = weight if weight is not None else np.ones_like
     ws = []
-    for zmin, zmax in zip(zbins, zbins[1:]):
+    for zmin, zmax in itertools.pairwise(zbins):
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
         w = wht(z)
-        zeff = np.trapz(  # type: ignore[attr-defined]
-            w * z,
-            z,
-        ) / np.trapz(  # type: ignore[attr-defined]
-            w,
-            z,
-        )
+        zeff = np.trapezoid(w * z, z) / np.trapezoid(w, z)
         ws.append(RadialWindow(z, w, zeff))
     return ws
 
@@ -304,7 +299,7 @@ def linear_windows(
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
     ws = []
-    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
@@ -369,7 +364,7 @@ def cubic_windows(
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
     ws = []
-    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:]):
+    for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
         n = max(round((zmid - zmin) / dz), 2) - 1
         m = max(round((zmax - zmid) / dz), 2)
         z = np.concatenate(
@@ -588,11 +583,7 @@ def partition_lstsq(
 
     # create the window function matrix
     a = np.array([np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
-    a /= np.trapz(  # type: ignore[attr-defined]
-        a,
-        zp,
-        axis=-1,
-    )[..., None]
+    a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -602,20 +593,7 @@ def partition_lstsq(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate(
-        [
-            b,
-            mult
-            * np.reshape(
-                np.trapz(  # type: ignore[attr-defined]
-                    fz,
-                    z,
-                ),
-                (*dims, 1),
-            ),
-        ],
-        axis=-1,
-    )
+    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -680,11 +658,7 @@ def partition_nnls(
             for za, wa, _ in shells
         ],
     )
-    a /= np.trapz(  # type: ignore[attr-defined]
-        a,
-        zp,
-        axis=-1,
-    )[..., None]
+    a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -694,20 +668,7 @@ def partition_nnls(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate(
-        [
-            b,
-            mult
-            * np.reshape(
-                np.trapz(  # type: ignore[attr-defined]
-                    fz,
-                    z,
-                ),
-                (*dims, 1),
-            ),
-        ],
-        axis=-1,
-    )
+    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -751,11 +712,7 @@ def partition_restrict(
     part = np.empty((len(shells),) + np.shape(fz)[:-1])
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        part[i] = np.trapz(  # type: ignore[attr-defined]
-            fr,
-            zr,
-            axis=-1,
-        )
+        part[i] = np.trapezoid(fr, zr, axis=-1)
     return part
 
 
@@ -887,15 +844,11 @@ def combine(
             * np.interp(
                 z,
                 shell.za,
-                shell.wa
-                / np.trapz(  # type: ignore[attr-defined]
-                    shell.wa,
-                    shell.za,
-                ),
+                shell.wa / np.trapezoid(shell.wa, shell.za),
                 left=0.0,
                 right=0.0,
             )
-            for shell, weight in zip(shells, weights)
+            for shell, weight in zip(shells, weights, strict=False)
         ],
         axis=0,
     )

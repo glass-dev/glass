@@ -110,7 +110,7 @@ def test_multi_plane_matrix(
 
     deltas = rng.random((len(shells), 10))
     kappas = []
-    for shell, delta in zip(shells, deltas):
+    for shell, delta in zip(shells, deltas, strict=False):
         convergence.add_window(delta, shell)
         if convergence.kappa is not None:
             kappas.append(convergence.kappa.copy())
@@ -134,7 +134,7 @@ def test_multi_plane_weights(
     deltas = rng.random((len(shells), 10))
     weights = rng.random((len(shells), 3))
     kappa = 0
-    for shell, delta, weight in zip(shells, deltas, weights):
+    for shell, delta, weight in zip(shells, deltas, weights, strict=False):
         convergence.add_window(delta, shell)
         kappa = kappa + weight[..., None] * convergence.kappa
     kappa /= weights.sum(axis=0)[..., None]
