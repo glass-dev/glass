@@ -37,7 +37,7 @@ maintainers = [
 name = "glass"
 readme = "README.md"
 requires-python = ">=3.9"
-license.file = "LICENSE"
+license.text = "MIT License"
 
 [project.optional-dependencies]
 docs = [
