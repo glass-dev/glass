@@ -11,7 +11,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -25,7 +24,7 @@ dependencies = [
     "gaussiancl>=2022.10.21",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "numpy>=1.22.0",
+    "numpy>=2.1.1",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -36,7 +35,7 @@ maintainers = [
 ]
 name = "glass"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license.text = "MIT License"
 
 [project.optional-dependencies]
@@ -142,7 +141,6 @@ lint.ignore = [
     "D203", # one-blank-line-before-class
     "D212", # blank-line-before-class
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
-    "NPY201", # TODO: numpy2-deprecation
     "RUF003", # ambiguous-unicode-character-comment
 ]
 lint.isort = {known-first-party = [

@@ -25,7 +25,6 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
@@ -79,7 +78,7 @@ jobs:
       - name: Coveralls finished
         uses: coverallsapp/github-action@v2
         with:
-          carryforward: run-3.9,run-3.10,run-3.11,run-3.12,run-3.13
+          carryforward: run-3.10,run-3.11,run-3.12,run-3.13
           parallel-finished: true
 
   build:
