@@ -37,7 +37,7 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 
 Cls = collections.abc.Sequence[
-    typing.Union[npt.NDArray[np.float64], collections.abc.Sequence[float]]
+    npt.NDArray[np.float64] | collections.abc.Sequence[float]
 ]
 
 
