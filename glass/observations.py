@@ -27,6 +27,7 @@ Visibility
 
 from __future__ import annotations
 
+import itertools
 import math
 
 import healpy as hp
@@ -119,11 +120,7 @@ def gaussian_nz(
     sigma = np.reshape(sigma, np.shape(sigma) + (1,) * np.ndim(z))
 
     nz = np.exp(-(((z - mean) / sigma) ** 2) / 2)
-    nz /= np.trapz(  # type: ignore[attr-defined]
-        nz,
-        z,
-        axis=-1,
-    )[..., np.newaxis]
+    nz /= np.trapezoid(nz, z, axis=-1)[..., np.newaxis]
 
     if norm is not None:
         nz *= norm
@@ -184,11 +181,7 @@ def smail_nz(
     beta = np.asanyarray(beta)[..., np.newaxis]
 
     pz = z**alpha * np.exp(-alpha / beta * (z / z_mode) ** beta)
-    pz /= np.trapz(  # type: ignore[attr-defined]
-        pz,
-        z,
-        axis=-1,
-    )[..., np.newaxis]
+    pz /= np.trapezoid(pz, z, axis=-1)[..., np.newaxis]
 
     if norm is not None:
         pz *= norm
@@ -238,7 +231,7 @@ def fixed_zbins(
         msg = "exactly one of nbins and dz must be given"
         raise ValueError(msg)
 
-    return list(zip(zbinedges, zbinedges[1:]))
+    return list(itertools.pairwise(zbinedges))
 
 
 def equal_dens_zbins(
@@ -274,7 +267,7 @@ def equal_dens_zbins(
     cuml_nz /= cuml_nz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 
-    return list(zip(zbinedges, zbinedges[1:]))
+    return list(itertools.pairwise(zbinedges))
 
 
 def tomo_nz_gausserr(
