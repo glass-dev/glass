@@ -84,11 +84,8 @@ def effective_bias(
         \;.
 
     """
-    norm = np.trapz(  # type: ignore[attr-defined]
-        w.wa,
-        w.za,
-    )
-    return trapz_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[no-any-return]
+    norm = np.trapezoid(w.wa, w.za)
+    return trapz_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(
