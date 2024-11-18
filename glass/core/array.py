@@ -81,7 +81,9 @@ def broadcast_leading_axes(
         shapes.append(s[:i])
         trails.append(s[i:])
     dims = np.broadcast_shapes(*shapes)
-    arrs = (np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails))
+    arrs = (
+        np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails, strict=False)
+    )
     return (dims, *arrs)
 
 
@@ -164,11 +166,7 @@ def trapz_product(
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.trapz(  # type: ignore[attr-defined, no-any-return]
-        y,
-        x,
-        axis=axis,
-    )
+    return np.trapezoid(y, x, axis=axis)  # type: ignore[no-any-return]
 
 
 def cumtrapz(
