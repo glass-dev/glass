@@ -6,6 +6,7 @@ from glass import fixed_zbins, vmap_galactic_ecliptic
 def test_vmap_galactic_ecliptic() -> None:
     """Add unit tests for vmap_galactic_ecliptic."""
     # test errors raised
+
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
         vmap_galactic_ecliptic(1, galactic=(1, 2, 3))  # type: ignore[arg-type]
 
@@ -24,6 +25,7 @@ def test_smail_nz() -> None:
 def test_fixed_zbins() -> None:
     """Add unit tests for fixed_zbins."""
     # test error raised
+
     with pytest.raises(ValueError, match="exactly one of nbins and dz must be given"):
         fixed_zbins(0, 1, nbins=10, dz=0.1)
 
