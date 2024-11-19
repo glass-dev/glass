@@ -1,10 +1,16 @@
 import pytest
 
-from glass import fixed_zbins
+from glass import fixed_zbins, vmap_galactic_ecliptic
 
 
 def test_vmap_galactic_ecliptic() -> None:
     """Add unit tests for vmap_galactic_ecliptic."""
+    # test errors raised
+    with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
+        vmap_galactic_ecliptic(1, galactic=(1, 2, 3))  # type: ignore[arg-type]
+
+    with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
+        vmap_galactic_ecliptic(1, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
 
 
 def test_gaussian_nz() -> None:
