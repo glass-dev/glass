@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass import fixed_zbins, gaussian_nz, vmap_galactic_ecliptic
+from glass import fixed_zbins, gaussian_nz, smail_nz, vmap_galactic_ecliptic
 
 
 def test_vmap_galactic_ecliptic() -> None:
@@ -45,6 +45,15 @@ def test_gaussian_nz(rng: np.random.Generator) -> None:
 
 def test_smail_nz() -> None:
     """Add unit tests for smail_nz."""
+    z = np.linspace(0, 1, 11)
+    mode = 1
+    alpha = 1
+    beta = 1
+
+    # check passing in the norm
+
+    pz = smail_nz(z, mode, alpha, beta, norm=0)
+    np.testing.assert_array_equal(pz, np.zeros(pz.shape))
 
 
 def test_fixed_zbins() -> None:
