@@ -29,7 +29,7 @@ def test_gaussian_nz(rng: np.random.Generator) -> None:
     # check passing in the norm
 
     nz = gaussian_nz(z, mean, sigma, norm=0)
-    np.testing.assert_array_equal(nz, np.zeros(nz.shape))
+    np.testing.assert_array_equal(nz, np.zeros_like(nz))
 
     # check the value of each entry is close to the norm
 
@@ -58,7 +58,7 @@ def test_smail_nz() -> None:
     # check passing in the norm
 
     pz = smail_nz(z, mode, alpha, beta, norm=0)
-    np.testing.assert_array_equal(pz, np.zeros(pz.shape))
+    np.testing.assert_array_equal(pz, np.zeros_like(pz))
 
 
 def test_fixed_zbins() -> None:
