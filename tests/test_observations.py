@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from glass import (  # type: ignore[attr-defined]
+    equal_dens_zbins,
     fixed_zbins,
     gaussian_nz,
     smail_nz,
@@ -72,6 +73,18 @@ def test_fixed_zbins() -> None:
 
 def test_equal_dens_zbins() -> None:
     """Add unit tests for equal_dens_zbins."""
+    z = np.linspace(0, 1, 11)
+    nbins = 5
+
+    # check expected zbins returned
+
+    zbins = equal_dens_zbins(z, np.ones_like(z), nbins)
+    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
+    # check output shape
+
+    np.testing.assert_array_equal(len(zbins), nbins)
 
 
 def test_tomo_nz_gausserr() -> None:
