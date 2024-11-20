@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass.points import (
+from glass import (  # type: ignore[attr-defined]
     effective_bias,
     linear_bias,
     loglinear_bias,

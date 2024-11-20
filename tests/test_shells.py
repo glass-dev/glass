@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from glass.shells import RadialWindow, partition, restrict, tophat_windows
+from glass import (  # type: ignore[attr-defined]
+    RadialWindow,
+    partition,
+    restrict,
+    tophat_windows,
+)
 
 
 def test_tophat_windows() -> None:

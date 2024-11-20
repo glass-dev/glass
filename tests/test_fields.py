@@ -1,6 +1,6 @@
 import numpy as np
 
-from glass.fields import getcl
+from glass import getcl  # type: ignore[attr-defined]
 
 
 def test_getcl() -> None:
