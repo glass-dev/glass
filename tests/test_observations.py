@@ -5,6 +5,7 @@ from glass import (  # type: ignore[attr-defined]
     fixed_zbins,
     gaussian_nz,
     smail_nz,
+    tomo_nz_gausserr,
     vmap_galactic_ecliptic,
 )
 
@@ -22,9 +23,9 @@ def test_vmap_galactic_ecliptic() -> None:
 
 def test_gaussian_nz(rng: np.random.Generator) -> None:
     """Add unit tests for gaussian_nz."""
-    z = np.linspace(0, 1, 11)
     mean = 0
     sigma = 1
+    z = np.linspace(0, 1, 11)
 
     # check passing in the norm
 
@@ -50,10 +51,10 @@ def test_gaussian_nz(rng: np.random.Generator) -> None:
 
 def test_smail_nz() -> None:
     """Add unit tests for smail_nz."""
-    z = np.linspace(0, 1, 11)
-    mode = 1
     alpha = 1
     beta = 1
+    mode = 1
+    z = np.linspace(0, 1, 11)
 
     # check passing in the norm
 
@@ -75,3 +76,15 @@ def test_equal_dens_zbins() -> None:
 
 def test_tomo_nz_gausserr() -> None:
     """Add unit tests for tomo_nz_gausserr."""
+    sigma_0 = 0.1
+    z = np.linspace(0, 1, 11)
+    zbins = [(0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
+
+    # check zeros returned
+
+    binned_nz = tomo_nz_gausserr(z, np.zeros_like(z), sigma_0, zbins)
+    np.testing.assert_array_equal(binned_nz, np.zeros_like(binned_nz))
+
+    # check the shape of the output
+
+    np.testing.assert_array_equal(binned_nz.shape, (len(zbins), len(z)))
