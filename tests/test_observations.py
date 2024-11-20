@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from glass import fixed_zbins, gaussian_nz, smail_nz, vmap_galactic_ecliptic
+from glass import (  # type: ignore[attr-defined]
+    fixed_zbins,
+    gaussian_nz,
+    smail_nz,
+    vmap_galactic_ecliptic,
+)
 
 
 def test_vmap_galactic_ecliptic() -> None:
