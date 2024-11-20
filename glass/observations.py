@@ -130,11 +130,11 @@ def gaussian_nz(
 
 def smail_nz(
     z: npt.NDArray[np.float64],
-    z_mode: npt.NDArray[np.float64],
-    alpha: npt.NDArray[np.float64],
-    beta: npt.NDArray[np.float64],
+    z_mode: float | npt.NDArray[np.float64],
+    alpha: float | npt.NDArray[np.float64],
+    beta: float | npt.NDArray[np.float64],
     *,
-    norm: npt.NDArray[np.float64] | None = None,
+    norm: float | npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Redshift distribution following Smail et al. (1994).
