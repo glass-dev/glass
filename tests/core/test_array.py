@@ -7,9 +7,9 @@ import pytest
 from glass.core.array import (
     broadcast_first,
     broadcast_leading_axes,
-    cumtrapz,
+    cumulative_trapezoid,
     ndinterp,
-    trapz_product,
+    trapezoid_product,
 )
 
 # check if scipy is available for testing
@@ -144,21 +144,21 @@ def test_ndinterp() -> None:
     )
 
 
-def test_trapz_product() -> None:
+def test_trapezoid_product() -> None:
     x1 = np.linspace(0, 2, 100)
     f1 = np.full_like(x1, 2.0)
 
     x2 = np.linspace(1, 2, 10)
     f2 = np.full_like(x2, 0.5)
 
-    s = trapz_product((x1, f1), (x2, f2))
+    s = trapezoid_product((x1, f1), (x2, f2))
 
     np.testing.assert_allclose(s, 1.0)
 
 
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_cumtrapz() -> None:
-    from scipy.integrate import cumulative_trapezoid
+def test_cumulative_trapezoid() -> None:
+    import scipy.integrate as spi
 
     # 1D f and x
 
@@ -167,19 +167,19 @@ def test_cumtrapz() -> None:
 
     # default dtype (int - not supported by scipy)
 
-    glass_ct = cumtrapz(f, x)
+    glass_ct = cumulative_trapezoid(f, x)
     np.testing.assert_allclose(glass_ct, np.array([0, 1, 4, 7]))
 
     # explicit dtype (float)
 
-    glass_ct = cumtrapz(f, x, dtype=float)
-    scipy_ct = cumulative_trapezoid(f, x, initial=0)
+    glass_ct = cumulative_trapezoid(f, x, dtype=float)
+    scipy_ct = spi.cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
-    result = cumtrapz(f, x, dtype=float, out=np.zeros((4,)))
-    scipy_ct = cumulative_trapezoid(f, x, initial=0)
+    result = cumulative_trapezoid(f, x, dtype=float, out=np.zeros((4,)))
+    scipy_ct = spi.cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(result, scipy_ct)
 
     # 2D f and 1D x
@@ -189,17 +189,17 @@ def test_cumtrapz() -> None:
 
     # default dtype (int - not supported by scipy)
 
-    glass_ct = cumtrapz(f, x)
+    glass_ct = cumulative_trapezoid(f, x)
     np.testing.assert_allclose(glass_ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     # explicit dtype (float)
 
-    glass_ct = cumtrapz(f, x, dtype=float)
-    scipy_ct = cumulative_trapezoid(f, x, initial=0)
+    glass_ct = cumulative_trapezoid(f, x, dtype=float)
+    scipy_ct = spi.cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(glass_ct, scipy_ct)
 
     # explicit return array
 
-    glass_ct = cumtrapz(f, x, dtype=float, out=np.zeros((2, 4)))
-    scipy_ct = cumulative_trapezoid(f, x, initial=0)
+    glass_ct = cumulative_trapezoid(f, x, dtype=float, out=np.zeros((2, 4)))
+    scipy_ct = spi.cumulative_trapezoid(f, x, initial=0)
     np.testing.assert_allclose(glass_ct, scipy_ct)

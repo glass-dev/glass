@@ -37,7 +37,7 @@ import healpix
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.array import broadcast_first, broadcast_leading_axes, trapz_product
+from glass.core.array import broadcast_first, broadcast_leading_axes, trapezoid_product
 
 if typing.TYPE_CHECKING:
     import collections.abc
@@ -85,7 +85,7 @@ def effective_bias(
 
     """
     norm = np.trapezoid(w.wa, w.za)
-    return trapz_product((z, bz), (w.za, w.wa)) / norm
+    return trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(
