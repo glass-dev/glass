@@ -89,7 +89,7 @@ def gaussian_nz(
     mean: float | npt.NDArray[np.float64],
     sigma: float | npt.NDArray[np.float64],
     *,
-    norm: npt.NDArray[np.float64] | None = None,
+    norm: float | npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     """
     Gaussian redshift distribution.
