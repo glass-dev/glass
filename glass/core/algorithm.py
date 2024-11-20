@@ -83,7 +83,7 @@ def nnls(
     for _ in range(maxiter):
         if xp.all(p):
             break
-        w = xp.linalg.vecdot(b - a @ x, a, axis=1)
+        w = xp.linalg.vecdot(b - a @ x, a, axis=0)
         m = index[~p][xp.argmax(w[~p])]
         if w[m] <= tol:
             break
