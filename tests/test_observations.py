@@ -65,6 +65,20 @@ def test_smail_nz() -> None:
 
 def test_fixed_zbins() -> None:
     """Add unit tests for fixed_zbins."""
+    zmin = 0
+    zmax = 1
+
+    # check dz input
+
+    dz = 0.2
+    zbins = fixed_zbins(zmin, zmax, dz=dz)
+    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8)]
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
+    # check shape
+
+    np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz) - 1)
+
     # check error raised
 
     with pytest.raises(ValueError, match="exactly one of nbins and dz must be given"):
