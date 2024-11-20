@@ -169,7 +169,7 @@ def trapezoid_product(
     return np.trapezoid(y, x, axis=axis)  # type: ignore[no-any-return]
 
 
-def cumtrapezoid(
+def cumulative_trapezoid(
     f: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     x: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     dtype: npt.DTypeLike | None = None,
