@@ -15,14 +15,32 @@ def test_vmap_galactic_ecliptic() -> None:
         vmap_galactic_ecliptic(1, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
 
 
-def test_gaussian_nz() -> None:
+def test_gaussian_nz(rng: np.random.Generator) -> None:
     """Add unit tests for gaussian_nz."""
     z = np.linspace(0, 1, 11)
+    mean = 0
+    sigma = 1
 
     # check passing in the norm
 
-    nz = gaussian_nz(z, 0, 1, norm=0)
+    nz = gaussian_nz(z, mean, sigma, norm=0)
     np.testing.assert_array_equal(nz, np.zeros(nz.shape))
+
+    # check the value of each entry is close to the norm
+
+    norm = 1
+    nz = gaussian_nz(z, mean, sigma, norm=norm)
+    np.testing.assert_allclose(nz.sum() / nz.shape, norm, rtol=1e-2)
+
+    # check multidimensionality size
+
+    nz = gaussian_nz(
+        z,
+        np.tile(mean, z.shape),
+        np.tile(sigma, z.shape),
+        norm=rng.normal(size=z.shape),
+    )
+    np.testing.assert_array_equal(nz.shape, (len(z), len(z)))
 
 
 def test_smail_nz() -> None:
