@@ -3,7 +3,12 @@ import numpy.typing as npt
 import pytest
 import pytest_mock
 
-from glass.galaxies import galaxy_shear, gaussian_phz, redshifts, redshifts_from_nz
+from glass import (
+    galaxy_shear,
+    gaussian_phz,
+    redshifts,
+    redshifts_from_nz,
+)
 
 
 def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
