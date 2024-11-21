@@ -18,7 +18,7 @@ def test_vmap_galactic_ecliptic() -> None:
     # check shape
 
     vmap = vmap_galactic_ecliptic(n_side)
-    np.testing.assert_array_equal(len(vmap), 12 * n_side ** 2)
+    np.testing.assert_array_equal(len(vmap), 12 * n_side**2)
 
     # no rotation
 
