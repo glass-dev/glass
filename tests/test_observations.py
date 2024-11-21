@@ -20,6 +20,11 @@ def test_vmap_galactic_ecliptic() -> None:
     vmap = vmap_galactic_ecliptic(n_side)
     np.testing.assert_array_equal(len(vmap), 12 * n_side ** 2)
 
+    # no rotation
+
+    vmap = vmap_galactic_ecliptic(n_side, galactic=(0, 0), ecliptic=(0, 0))
+    np.testing.assert_array_equal(vmap, np.zeros_like(vmap))
+
     # check errors raised
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
