@@ -13,6 +13,13 @@ from glass import (
 
 def test_vmap_galactic_ecliptic() -> None:
     """Add unit tests for vmap_galactic_ecliptic."""
+    n_side = 4
+
+    # check shape
+
+    vmap = vmap_galactic_ecliptic(n_side)
+    np.testing.assert_array_equal(len(vmap), 12 * n_side ** 2)
+
     # check errors raised
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
