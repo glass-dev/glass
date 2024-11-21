@@ -79,6 +79,12 @@ def test_fixed_zbins() -> None:
 
     np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz) - 1)
 
+    # check nbins input
+
+    nbins = 5
+    zbins = fixed_zbins(zmin, zmax, nbins=nbins)
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
     # check error raised
 
     with pytest.raises(ValueError, match="exactly one of nbins and dz must be given"):
