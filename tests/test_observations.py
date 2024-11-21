@@ -68,22 +68,26 @@ def test_fixed_zbins() -> None:
     zmin = 0
     zmax = 1
 
-    # check dz input
-
-    dz = 0.2
-    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
-    zbins = fixed_zbins(zmin, zmax, dz=dz)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
-
-    # check shape
-
-    np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz))
-
     # check nbins input
 
     nbins = 5
+    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
     zbins = fixed_zbins(zmin, zmax, nbins=nbins)
+    np.testing.assert_array_equal(len(zbins), nbins)
     np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
+    # check dz input
+
+    dz = 0.2
+    zbins = fixed_zbins(zmin, zmax, dz=dz)
+    np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz))
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
+    # check dz for spacing which results in a max value above zmax
+
+    dz = 0.3
+    zbins = fixed_zbins(zmin, zmax, dz=dz)
+    np.testing.assert_array_less(zmax, zbins[-1][1])
 
     # check error raised
 
