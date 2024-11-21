@@ -23,6 +23,7 @@ from glass.shells import (  # noqa: F401
 
 
 def test_tophat_windows() -> None:
+    """Add unit tests for :func:`tophat_windows`."""
     zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
 
@@ -44,6 +45,7 @@ def test_tophat_windows() -> None:
 
 
 def test_restrict() -> None:
+    """Add unit tests for :func:`restrict`."""
     # Gaussian test function
     z = np.linspace(0.0, 5.0, 1000)
     f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
@@ -75,6 +77,7 @@ def test_restrict() -> None:
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(method: str) -> None:
+    """Add unit tests for :func:`partition`."""
     shells = [
         RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
         RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
