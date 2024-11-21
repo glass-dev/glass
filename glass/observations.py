@@ -225,7 +225,7 @@ def fixed_zbins(
     """
     if nbins is not None and dz is None:
         zbinedges = np.linspace(zmin, zmax, nbins + 1)
-    if nbins is None and dz is not None:
+    elif nbins is None and dz is not None:
         zbinedges = np.arange(zmin, zmax, dz)
     else:
         msg = "exactly one of nbins and dz must be given"
