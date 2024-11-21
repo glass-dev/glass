@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass.shapes import (
+from glass import (
     ellipticity_gaussian,
     ellipticity_intnorm,
     ellipticity_ryden04,

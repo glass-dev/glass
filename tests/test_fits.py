@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass import user
+from glass import write_catalog
 
 # check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
@@ -37,7 +37,7 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
     with (
-        user.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
+        write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
         fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits,
     ):
         for i in range(my_max):
@@ -80,7 +80,7 @@ def test_write_exception(tmp_path: pathlib.Path) -> None:
         raise TestWriteError(msg)
 
     try:
-        with user.write_catalog(tmp_path / filename, ext="CATALOG") as out:
+        with write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"
