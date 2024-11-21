@@ -28,16 +28,16 @@ def test_vmap_galactic_ecliptic() -> None:
     # check errors raised
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
-        vmap_galactic_ecliptic(1, galactic=(1,))  # type: ignore[arg-type]
+        vmap_galactic_ecliptic(n_side, galactic=(1,))  # type: ignore[arg-type]
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
-        vmap_galactic_ecliptic(1, ecliptic=(1,))  # type: ignore[arg-type]
+        vmap_galactic_ecliptic(n_side, ecliptic=(1,))  # type: ignore[arg-type]
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
-        vmap_galactic_ecliptic(1, galactic=(1, 2, 3))  # type: ignore[arg-type]
+        vmap_galactic_ecliptic(n_side, galactic=(1, 2, 3))  # type: ignore[arg-type]
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
-        vmap_galactic_ecliptic(1, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
+        vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
 
 
 def test_gaussian_nz(rng: np.random.Generator) -> None:
@@ -110,7 +110,7 @@ def test_fixed_zbins() -> None:
     # check error raised
 
     with pytest.raises(ValueError, match="exactly one of nbins and dz must be given"):
-        fixed_zbins(0, 1, nbins=10, dz=0.1)
+        fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
 
 
 def test_equal_dens_zbins() -> None:
