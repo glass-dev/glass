@@ -71,13 +71,13 @@ def test_fixed_zbins() -> None:
     # check dz input
 
     dz = 0.2
+    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
     zbins = fixed_zbins(zmin, zmax, dz=dz)
-    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8)]
     np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check shape
 
-    np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz) - 1)
+    np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz))
 
     # check nbins input
 
@@ -98,8 +98,8 @@ def test_equal_dens_zbins() -> None:
 
     # check expected zbins returned
 
-    zbins = equal_dens_zbins(z, np.ones_like(z), nbins)
     expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
+    zbins = equal_dens_zbins(z, np.ones_like(z), nbins)
     np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check output shape
