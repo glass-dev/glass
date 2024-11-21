@@ -10,7 +10,7 @@ from glass import (
     distance_weight,  # noqa: F401
     linear_windows,  # noqa: F401
     partition,
-    redshift_grid,  # noqa: F401
+    redshift_grid,
     restrict,
     tophat_windows,
     volume_weight,  # noqa: F401
@@ -134,6 +134,13 @@ def test_partition_restrict() -> None:
 
 def test_redshift_grid() -> None:
     """Add unit tests for :func:`redshift_grid`."""
+    zmin = 0
+    zmax = 1
+
+    # check error raised
+
+    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+        redshift_grid(zmin, zmax, dz=0.2, num=5)
 
 
 def test_distance_grid() -> None:
