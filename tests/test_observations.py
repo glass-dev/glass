@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass import (  # type: ignore[attr-defined]
+from glass import (
     equal_dens_zbins,
     fixed_zbins,
     gaussian_nz,
