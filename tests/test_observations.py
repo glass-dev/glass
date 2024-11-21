@@ -28,6 +28,12 @@ def test_vmap_galactic_ecliptic() -> None:
     # check errors raised
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
+        vmap_galactic_ecliptic(1, galactic=(1,))  # type: ignore[arg-type]
+
+    with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
+        vmap_galactic_ecliptic(1, ecliptic=(1,))  # type: ignore[arg-type]
+
+    with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
         vmap_galactic_ecliptic(1, galactic=(1, 2, 3))  # type: ignore[arg-type]
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
