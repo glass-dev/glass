@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass import (  # type: ignore[attr-defined]
+from glass import (
     MultiPlaneConvergence,
     RadialWindow,
     deflect,

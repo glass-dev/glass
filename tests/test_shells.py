@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass import (  # type: ignore[attr-defined]
+from glass import (
     RadialWindow,
     partition,
     restrict,

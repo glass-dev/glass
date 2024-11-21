@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass import write_catalog  # type: ignore[attr-defined]
+from glass import write_catalog
 
 # check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None

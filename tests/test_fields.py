@@ -1,6 +1,6 @@
 import numpy as np
 
-from glass import getcl  # type: ignore[attr-defined]
+from glass import getcl
 
 
 def test_getcl() -> None:

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass import (  # type: ignore[attr-defined]
+from glass import (
     ellipticity_gaussian,
     ellipticity_intnorm,
     ellipticity_ryden04,

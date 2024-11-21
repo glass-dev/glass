@@ -3,7 +3,7 @@ import numpy.typing as npt
 import pytest
 import pytest_mock
 
-from glass import (  # type: ignore[attr-defined]
+from glass import (
     galaxy_shear,
     gaussian_phz,
     redshifts,
