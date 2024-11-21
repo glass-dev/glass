@@ -131,7 +131,7 @@ def ndinterp(  # noqa: PLR0913
     )
 
 
-def trapz_product(
+def trapezoid_product(
     f: tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     *ff: tuple[
         npt.NDArray[np.float64],
@@ -169,7 +169,7 @@ def trapz_product(
     return np.trapezoid(y, x, axis=axis)  # type: ignore[no-any-return]
 
 
-def cumtrapz(
+def cumulative_trapezoid(
     f: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     x: npt.NDArray[np.int_] | npt.NDArray[np.float64],
     dtype: npt.DTypeLike | None = None,
