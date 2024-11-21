@@ -3,9 +3,22 @@ import pytest
 
 from glass import (
     RadialWindow,
+    combine,  # noqa: F401
+    cubic_windows,  # noqa: F401
+    density_weight,  # noqa: F401
+    distance_grid,  # noqa: F401
+    distance_weight,  # noqa: F401
+    linear_windows,  # noqa: F401
     partition,
+    redshift_grid,  # noqa: F401
     restrict,
     tophat_windows,
+    volume_weight,  # noqa: F401
+)
+from glass.shells import (  # noqa: F401
+    partition_lstsq,
+    partition_nnls,
+    partition_restrict,
 )
 
 
