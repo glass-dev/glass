@@ -12,7 +12,7 @@ from glass import (
 
 
 def test_vmap_galactic_ecliptic() -> None:
-    """Add unit tests for vmap_galactic_ecliptic."""
+    """Add unit tests for :func:`vmap_galactic_ecliptic`."""
     n_side = 4
 
     # check shape
@@ -41,7 +41,7 @@ def test_vmap_galactic_ecliptic() -> None:
 
 
 def test_gaussian_nz(rng: np.random.Generator) -> None:
-    """Add unit tests for gaussian_nz."""
+    """Add unit tests for :func:`gaussian_nz`."""
     mean = 0
     sigma = 1
     z = np.linspace(0, 1, 11)
@@ -69,7 +69,7 @@ def test_gaussian_nz(rng: np.random.Generator) -> None:
 
 
 def test_smail_nz() -> None:
-    """Add unit tests for smail_nz."""
+    """Add unit tests for :func:`smail_nz`."""
     alpha = 1
     beta = 1
     mode = 1
@@ -82,7 +82,7 @@ def test_smail_nz() -> None:
 
 
 def test_fixed_zbins() -> None:
-    """Add unit tests for fixed_zbins."""
+    """Add unit tests for :func:`fixed_zbins`."""
     zmin = 0
     zmax = 1
 
@@ -114,7 +114,7 @@ def test_fixed_zbins() -> None:
 
 
 def test_equal_dens_zbins() -> None:
-    """Add unit tests for equal_dens_zbins."""
+    """Add unit tests for :func:`equal_dens_zbins`."""
     z = np.linspace(0, 1, 11)
     nbins = 5
 
@@ -130,7 +130,7 @@ def test_equal_dens_zbins() -> None:
 
 
 def test_tomo_nz_gausserr() -> None:
-    """Add unit tests for tomo_nz_gausserr."""
+    """Add unit tests for :func:`tomo_nz_gausserr`."""
     sigma_0 = 0.1
     z = np.linspace(0, 1, 11)
     zbins = [(0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
