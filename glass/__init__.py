@@ -19,7 +19,6 @@ from glass.fields import (
     transform_cls,
 )
 from glass.galaxies import (
-    _kappa_ia_nla,
     galaxy_shear,
     gaussian_phz,
     redshifts,
