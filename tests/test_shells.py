@@ -22,6 +22,18 @@ from glass.shells import (  # noqa: F401
 )
 
 
+def test_distance_weight() -> None:
+    """Add unit tests for :func:`distance_weight`."""
+
+
+def test_volume_weight() -> None:
+    """Add unit tests for :func:`volume_weight`."""
+
+
+def test_density_weight() -> None:
+    """Add unit tests for :func:`density_weight`."""
+
+
 def test_tophat_windows() -> None:
     """Add unit tests for :func:`tophat_windows`."""
     zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
@@ -42,6 +54,14 @@ def test_tophat_windows() -> None:
     )
 
     assert all(np.all(w.wa == 1) for w in ws)
+
+
+def test_linear_windows() -> None:
+    """Add unit tests for :func:`linear_windows`."""
+
+
+def test_cubic_windows() -> None:
+    """Add unit tests for :func:`cubic_windows`."""
 
 
 def test_restrict() -> None:
@@ -98,3 +118,27 @@ def test_partition(method: str) -> None:
     assert part.shape == (len(shells), 3, 2)
 
     np.testing.assert_allclose(part.sum(axis=0), np.trapezoid(fz, z))
+
+
+def test_partition_lstsq() -> None:
+    """Add unit tests for :func:`partition_lstsq`."""
+
+
+def test_partition_nnls() -> None:
+    """Add unit tests for :func:`partition_nnls`."""
+
+
+def test_partition_restrict() -> None:
+    """Add unit tests for :func:`partition_restrict`."""
+
+
+def test_redshift_grid() -> None:
+    """Add unit tests for :func:`redshift_grid`."""
+
+
+def test_distance_grid() -> None:
+    """Add unit tests for :func:`distance_grid`."""
+
+
+def test_combine() -> None:
+    """Add unit tests for :func:`combine`."""
