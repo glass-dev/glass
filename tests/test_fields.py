@@ -385,7 +385,7 @@ def test_generate_lognormal(rng: np.random.Generator) -> None:
     rng = np.random.default_rng(seed=42)
     new_lognormal_fields = list(generate_lognormal(gls, nside, shift=2.0, rng=rng))
 
-    for ms, mu in zip(new_lognormal_fields, lognormal_fields):
+    for ms, mu in zip(new_lognormal_fields, lognormal_fields, strict=False):
         np.testing.assert_allclose(ms, mu * 2.0)
 
 
