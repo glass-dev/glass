@@ -6,7 +6,7 @@ from cosmology import Cosmology
 from glass import (
     RadialWindow,
     combine,  # noqa: F401
-    cubic_windows,  # noqa: F401
+    cubic_windows,
     density_weight,  # noqa: F401
     distance_grid,  # noqa: F401
     distance_weight,
@@ -115,7 +115,7 @@ def test_linear_windows() -> None:
 
     ws = linear_windows(
         zgrid,
-        weight=lambda _: 0, # type: ignore[arg-type, return-value]
+        weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
     for w in ws:
         np.testing.assert_array_equal(w.wa, np.zeros_like(w.wa))
@@ -135,6 +135,48 @@ def test_linear_windows() -> None:
 
 def test_cubic_windows() -> None:
     """Add unit tests for :func:`cubic_windows`."""
+    dz = 1e-2
+    zgrid = [
+        0.0,
+        0.20224358,
+        0.42896272,
+        0.69026819,
+        1.0,
+    ]
+
+    # check spacing of redshift grid
+
+    ws = cubic_windows(zgrid)
+    np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
+
+    # check number of windows
+
+    np.testing.assert_array_equal(len(ws), len(zgrid) - 2)
+
+    # check values of zeff
+
+    np.testing.assert_array_equal([w.zeff for w in ws], zgrid[1:-1])
+
+    # check weight function input
+
+    ws = cubic_windows(
+        zgrid,
+        weight=lambda _: 0,  # type: ignore[arg-type, return-value]
+    )
+    for w in ws:
+        np.testing.assert_array_equal(w.wa, np.zeros_like(w.wa))
+
+    # check error raised
+
+    with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
+        cubic_windows([])
+
+    # check warning issued
+
+    with pytest.warns(
+        UserWarning, match="first cubic spline window does not start at z=0"
+    ):
+        cubic_windows([0.1, 0.2, 0.3])
 
 
 def test_restrict() -> None:
