@@ -7,13 +7,13 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass.lensing import (
+from glass import (
     MultiPlaneConvergence,
+    RadialWindow,
     deflect,
     multi_plane_matrix,
     multi_plane_weights,
 )
-from glass.shells import RadialWindow
 
 if typing.TYPE_CHECKING:
     from cosmology import Cosmology
