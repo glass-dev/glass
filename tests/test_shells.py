@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import warnings
 
 from cosmology import Cosmology
 
@@ -90,6 +89,20 @@ def test_tophat_windows() -> None:
 
 def test_linear_windows() -> None:
     """Add unit tests for :func:`linear_windows`."""
+    dz = 1e-2
+    zgrid = [
+        0.0,
+        0.20224358,
+        0.42896272,
+        0.69026819,
+        1.0,
+    ]
+
+    # check spacing of redshift grid
+
+    ws = linear_windows(zgrid)
+    np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
+
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
