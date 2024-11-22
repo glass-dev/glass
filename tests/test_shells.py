@@ -107,6 +107,10 @@ def test_linear_windows() -> None:
 
     np.testing.assert_array_equal(len(ws), len(zgrid) - 2)
 
+    # check values of zeff
+
+    np.testing.assert_array_equal([w.zeff for w in ws], zgrid[1:-1])
+
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
