@@ -2,7 +2,7 @@ import healpy as hp
 import numpy as np
 import pytest
 
-from glass.fields import (
+from glass import (
     cls2cov,
     discretized_cls,
     effective_cls,
