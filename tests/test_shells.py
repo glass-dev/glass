@@ -60,8 +60,9 @@ def test_volume_weight(cosmo: Cosmology) -> None:
     np.testing.assert_array_less(w[:-1], w[1:])
 
 
-def test_density_weight() -> None:
+def test_density_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`density_weight`."""
+    # AttributeError: 'MockCosmology' object has no attribute 'rho_m_z'
 
 
 def test_tophat_windows() -> None:
