@@ -17,11 +17,6 @@ from glass import (
     tophat_windows,
     volume_weight,
 )
-from glass.shells import (  # noqa: F401
-    partition_lstsq,
-    partition_nnls,
-    partition_restrict,
-)
 
 
 def test_distance_weight(cosmo: Cosmology) -> None:
@@ -233,18 +228,6 @@ def test_partition(method: str) -> None:
     assert part.shape == (len(shells), 3, 2)
 
     np.testing.assert_allclose(part.sum(axis=0), np.trapezoid(fz, z))
-
-
-def test_partition_lstsq() -> None:
-    """Add unit tests for :func:`partition_lstsq`."""
-
-
-def test_partition_nnls() -> None:
-    """Add unit tests for :func:`partition_nnls`."""
-
-
-def test_partition_restrict() -> None:
-    """Add unit tests for :func:`partition_restrict`."""
 
 
 def test_redshift_grid() -> None:
