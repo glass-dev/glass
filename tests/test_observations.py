@@ -103,8 +103,7 @@ def test_fixed_zbins() -> None:
 
     # check dz for spacing which results in a max value above zmax
 
-    dz = 0.3
-    zbins = fixed_zbins(zmin, zmax, dz=dz)
+    zbins = fixed_zbins(zmin, zmax, dz=0.3)
     np.testing.assert_array_less(zmax, zbins[-1][1])
 
     # check error raised
