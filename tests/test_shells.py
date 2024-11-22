@@ -15,7 +15,7 @@ from glass import (
     redshift_grid,
     restrict,
     tophat_windows,
-    volume_weight,  # noqa: F401
+    volume_weight,
 )
 from glass.shells import (  # noqa: F401
     partition_lstsq,
@@ -42,8 +42,22 @@ def test_distance_weight(cosmo: Cosmology) -> None:
     np.testing.assert_array_less(w[1:], w[:-1])
 
 
-def test_volume_weight() -> None:
+def test_volume_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`volume_weight`."""
+    z = np.linspace(0, 1, 6)
+
+    # check shape
+
+    w = volume_weight(z, cosmo)
+    np.testing.assert_array_equal(w.shape, z.shape)
+
+    # check first value is 0
+
+    np.testing.assert_array_equal(w[0], 0)
+
+    # check values are increasing
+
+    np.testing.assert_array_less(w[:-1], w[1:])
 
 
 def test_density_weight() -> None:
