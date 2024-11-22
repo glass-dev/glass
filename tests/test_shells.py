@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import warnings
 
 from cosmology import Cosmology
 
@@ -89,8 +90,17 @@ def test_tophat_windows() -> None:
 
 def test_linear_windows() -> None:
     """Add unit tests for :func:`linear_windows`."""
+    # check error raised
+
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
         linear_windows([])
+
+    # check warning issued
+
+    with pytest.warns(
+        UserWarning, match="first triangular window does not start at z=0"
+    ):
+        linear_windows([0.1, 0.2, 0.3])
 
 
 def test_cubic_windows() -> None:
