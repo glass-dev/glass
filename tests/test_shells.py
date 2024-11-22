@@ -103,6 +103,10 @@ def test_linear_windows() -> None:
     ws = linear_windows(zgrid)
     np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
 
+    # check number of windows
+
+    np.testing.assert_array_equal(len(ws), len(zgrid) - 2)
+
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
