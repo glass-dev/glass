@@ -1,13 +1,15 @@
 import numpy as np
 import pytest
 
+from cosmology import Cosmology
+
 from glass import (
     RadialWindow,
     combine,  # noqa: F401
     cubic_windows,  # noqa: F401
     density_weight,  # noqa: F401
     distance_grid,  # noqa: F401
-    distance_weight,  # noqa: F401
+    distance_weight,
     linear_windows,  # noqa: F401
     partition,
     redshift_grid,
@@ -22,8 +24,22 @@ from glass.shells import (  # noqa: F401
 )
 
 
-def test_distance_weight() -> None:
+def test_distance_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`distance_weight`."""
+    z = np.linspace(0, 1, 6)
+
+    # check shape
+
+    w = distance_weight(z, cosmo)
+    np.testing.assert_array_equal(w.shape, z.shape)
+
+    # check first value is 1
+
+    np.testing.assert_array_equal(w[0], 1)
+
+    # check values are decreasing
+
+    np.testing.assert_array_less(w[1:], w[:-1])
 
 
 def test_volume_weight() -> None:
