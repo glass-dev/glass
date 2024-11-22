@@ -10,7 +10,7 @@ from glass import (
     density_weight,  # noqa: F401
     distance_grid,  # noqa: F401
     distance_weight,
-    linear_windows,  # noqa: F401
+    linear_windows,
     partition,
     redshift_grid,
     restrict,
@@ -89,6 +89,8 @@ def test_tophat_windows() -> None:
 
 def test_linear_windows() -> None:
     """Add unit tests for :func:`linear_windows`."""
+    with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
+        linear_windows([])
 
 
 def test_cubic_windows() -> None:
