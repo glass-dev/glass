@@ -275,8 +275,9 @@ def test_redshift_grid() -> None:
         redshift_grid(zmin, zmax, dz=dz, num=num)
 
 
-def test_distance_grid() -> None:
+def test_distance_grid(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`distance_grid`."""
+    # AttributeError: 'MockCosmology' object has no attribute 'dc_inv'
 
 
 def test_combine() -> None:
