@@ -168,10 +168,27 @@ def test_redshift_grid() -> None:
     zmin = 0
     zmax = 1
 
+    # check num input
+
+    num = 5
+    z = redshift_grid(zmin, zmax, num=5)
+    np.testing.assert_array_equal(len(z), num + 1)
+
+    # check dz input
+
+    dz = 0.2
+    z = redshift_grid(zmin, zmax, dz=dz)
+    np.testing.assert_array_equal(len(z), np.ceil((zmax - zmin) / dz) + 1)
+
+    # check dz for spacing which results in a max value above zmax
+
+    z = redshift_grid(zmin, zmax, dz=0.3)
+    np.testing.assert_array_less(zmax, z[-1])
+
     # check error raised
 
     with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
-        redshift_grid(zmin, zmax, dz=0.2, num=5)
+        redshift_grid(zmin, zmax, dz=dz, num=num)
 
 
 def test_distance_grid() -> None:
