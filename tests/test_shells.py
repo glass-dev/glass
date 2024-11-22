@@ -111,11 +111,11 @@ def test_linear_windows() -> None:
 
     np.testing.assert_array_equal([w.zeff for w in ws], zgrid[1:-1])
 
-    # check weight function
+    # check weight function input
 
     ws = linear_windows(
         zgrid,
-        weight=lambda _: 0,  # type: ignore[arg-type, return-value]
+        weight=lambda _: 0, # type: ignore[arg-type, return-value]
     )
     for w in ws:
         np.testing.assert_array_equal(w.wa, np.zeros_like(w.wa))
