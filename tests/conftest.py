@@ -44,8 +44,7 @@ def cosmo() -> Cosmology:
 
         def rho_m_z(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
             """Redshift-dependent matter density in Msol Mpc-3."""
-            rho_crit_0 = 3e4
-            return rho_crit_0 * self.omega_m * (1 + z) ** 3
+            return self.rho_c * self.omega_m * (1 + z) ** 3
 
     return MockCosmology()
 
