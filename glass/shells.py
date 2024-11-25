@@ -784,13 +784,7 @@ def distance_grid(
 
     """
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
-    if dx is not None and num is None:
-        x = np.arange(xmin, np.nextafter(xmax + dx, xmax), dx)
-    elif dx is None and num is not None:
-        x = np.linspace(xmin, xmax, num + 1)
-    else:
-        msg = 'exactly one of "dx" or "num" must be given'
-        raise ValueError(msg)
+    x = redshift_grid(xmin, xmax, dz=dx, num=num)
     return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 
 
