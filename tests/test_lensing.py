@@ -10,55 +10,22 @@ from glass import (
     MultiPlaneConvergence,
     RadialWindow,
     deflect,
+    from_convergence,  # noqa: F401
     multi_plane_matrix,
     multi_plane_weights,
+    shear_from_convergence,  # noqa: F401
 )
 
 if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 
-@pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
-    d = 5.0
-    r = np.radians(d)
-
-    def alpha(re: float, im: float, *, usecomplex: bool) -> complex | list[float]:
-        return re + 1j * im if usecomplex else [re, im]
-
-    # north
-    lon, lat = deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
-
-    # south
-    lon, lat = deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
-
-    # east
-    lon, lat = deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
-
-    # west
-    lon, lat = deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+def test_from_convergence() -> None:
+    """Add unit tests for :func:`from_convergence`."""
 
 
-def test_deflect_many(rng: np.random.Generator) -> None:
-    n = 1000
-    abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
-    arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
-
-    lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
-    lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
-
-    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
-
-    x_, y_, z_ = healpix.ang2vec(lon_, lat_, lonlat=True)
-    x, y, z = healpix.ang2vec(lon, lat, lonlat=True)
-
-    dotp = x * x_ + y * y_ + z * z_
-
-    np.testing.assert_allclose(dotp, np.cos(abs_alpha))
+def test_shear_from_convergence() -> None:
+    """Add unit tests for :func:`shear_from_convergence`."""
 
 
 def test_multi_plane_matrix(
@@ -107,3 +74,46 @@ def test_multi_plane_weights(
     wmat = multi_plane_weights(weights, shells, cosmo)
 
     np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+
+
+@pytest.mark.parametrize("usecomplex", [True, False])
+def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
+    d = 5.0
+    r = np.radians(d)
+
+    def alpha(re: float, im: float, *, usecomplex: bool) -> complex | list[float]:
+        return re + 1j * im if usecomplex else [re, im]
+
+    # north
+    lon, lat = deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex))
+    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
+
+    # south
+    lon, lat = deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex))
+    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
+
+    # east
+    lon, lat = deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex))
+    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+
+    # west
+    lon, lat = deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+
+
+def test_deflect_many(rng: np.random.Generator) -> None:
+    n = 1000
+    abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
+    arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
+
+    lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
+    lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
+
+    lon, lat = deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
+
+    x_, y_, z_ = healpix.ang2vec(lon_, lat_, lonlat=True)
+    x, y, z = healpix.ang2vec(lon, lat, lonlat=True)
+
+    dotp = x * x_ + y * y_ + z * z_
+
+    np.testing.assert_allclose(dotp, np.cos(abs_alpha))
