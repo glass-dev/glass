@@ -52,7 +52,7 @@ def cosmo() -> Cosmology:
 
         def dc_inv(self, dc: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
             """Inverse function for the comoving distance in Mpc."""
-            return 1_000 * (1 / dc)
+            return 1_000 * (1 / (dc + np.finfo(float).eps))
 
     return MockCosmology()
 

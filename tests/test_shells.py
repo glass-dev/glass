@@ -8,7 +8,7 @@ from glass import (
     combine,  # noqa: F401
     cubic_windows,
     density_weight,
-    distance_grid,  # noqa: F401
+    distance_grid,
     distance_weight,
     linear_windows,
     partition,
@@ -268,12 +268,41 @@ def test_redshift_grid() -> None:
     # check error raised
 
     with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+        redshift_grid(zmin, zmax)
+
+    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
         redshift_grid(zmin, zmax, dz=dz, num=num)
 
 
 def test_distance_grid(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`distance_grid`."""
-    # AttributeError: 'MockCosmology' object has no attribute 'dc_inv'
+    zmin = 0
+    zmax = 1
+
+    # check num input
+
+    num = 5
+    x = distance_grid(cosmo, zmin, zmax, num=5)
+    np.testing.assert_array_equal(len(x), num + 1)
+
+    # check dz input
+
+    dx = 0.2
+    x = distance_grid(cosmo, zmin, zmax, dx=dx)
+    np.testing.assert_array_equal(len(x), np.ceil((zmax - zmin) / dx) + 1)
+
+    # check decrease in distance
+
+    x = distance_grid(cosmo, zmin, zmax, dx=0.3)
+    np.testing.assert_array_less(x[1:], x[:-1])
+
+    # check error raised
+
+    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+        distance_grid(cosmo, zmin, zmax)
+
+    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+        distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
 def test_combine() -> None:
