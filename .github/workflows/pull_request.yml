@@ -12,7 +12,7 @@ on:
 
 jobs:
   check-pr-title:
-    if: github.actor != 'pre-commit-ci[bot]'
+    if: github.actor != 'pre-commit-ci[bot]' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Enfore PR title format
