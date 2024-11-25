@@ -7,7 +7,7 @@ from glass import (
     RadialWindow,
     combine,  # noqa: F401
     cubic_windows,
-    density_weight,  # noqa: F401
+    density_weight,
     distance_grid,  # noqa: F401
     distance_weight,
     linear_windows,
@@ -57,7 +57,20 @@ def test_volume_weight(cosmo: Cosmology) -> None:
 
 def test_density_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`density_weight`."""
-    # AttributeError: 'MockCosmology' object has no attribute 'rho_m_z'
+    z = np.linspace(0, 1, 6)
+
+    # check shape
+
+    w = density_weight(z, cosmo)
+    np.testing.assert_array_equal(w.shape, z.shape)
+
+    # check first value is 0
+
+    np.testing.assert_array_equal(w[0], 0)
+
+    # check values are increasing
+
+    np.testing.assert_array_less(w[:-1], w[1:])
 
 
 def test_tophat_windows() -> None:
