@@ -720,11 +720,11 @@ def _uniform_grid(
 
     Parameters
     ----------
-    zmin
+    start
         The minimum redshift.
-    zmax
+    stop
         The maximum redshift.
-    dz
+    step
         The redshift spacing.
     num
         The number redshift samples.
@@ -736,17 +736,15 @@ def _uniform_grid(
     Raises
     ------
     ValueError
-        If both ``dz`` and ``num`` are given.
+        If both ``step`` and ``num`` are given.
 
     """
-    if dz is not None and num is None:
-        z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
-    elif dz is None and num is not None:
-        z = np.linspace(zmin, zmax, num + 1)
-    else:
-        msg = "exactly one of grid step size or number of steps must be given"
-        raise ValueError(msg)
-    return z
+    if step is not None and num is None:
+        return np.arange(start, np.nextafter(stop + step, stop), step)
+    if step is None and num is not None:
+        return np.linspace(start, stop, num + 1)
+    msg = "exactly one of grid step size or number of steps must be given"
+    raise ValueError(msg)
 
 
 def redshift_grid(
@@ -775,7 +773,7 @@ def redshift_grid(
         The redshift grid.
 
     """
-    return _uniform_grid(zmin, zmax, dz=dz, num=num)
+    return _uniform_grid(zmin, zmax, step=dz, num=num)
 
 
 def distance_grid(
@@ -808,7 +806,7 @@ def distance_grid(
 
     """
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
-    x = _uniform_grid(xmin, xmax, dz=dx, num=num)
+    x = _uniform_grid(xmin, xmax, step=dx, num=num)
     return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 
 
