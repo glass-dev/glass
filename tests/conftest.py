@@ -43,8 +43,6 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
 
 def _import_and_add_numpy(xp_available_backends: dict[str, types.ModuleType]) -> None:
     """Add numpy to the backends dictionary."""
-    import numpy
-
     _check_version("numpy", "2.1.0")
     xp_available_backends.update({"numpy": np})
 
