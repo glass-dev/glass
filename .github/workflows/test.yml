@@ -56,10 +56,23 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run tests and generate coverage report
+      - name: Run NumPy tests and generate coverage report
         run: nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
+          GLASS_ARRAY_BACKEND: numpy
+
+      - name: Run array API strict tests
+        run: nox -s doctests-${{ matrix.python-version }} --verbose
+        env:
+          FORCE_COLOR: 1
+          GLASS_ARRAY_BACKEND: array_api_strict
+
+      - name: Run JAX tests
+        run: nox -s doctests-${{ matrix.python-version }} --verbose
+        env:
+          FORCE_COLOR: 1
+          GLASS_ARRAY_BACKEND: jax
 
       - name: Coveralls requires XML report
         run: coverage xml
