@@ -1,6 +1,8 @@
 """GLASS package."""
 
 __all__ = [
+    "MultiPlaneConvergence",
+    "RadialWindow",
     "cls2cov",
     "combine",
     "cubic_windows",
@@ -32,11 +34,9 @@ __all__ = [
     "multalm",
     "multi_plane_matrix",
     "multi_plane_weights",
-    "MultiPlaneConvergence",
     "partition",
     "position_weights",
     "positions_from_delta",
-    "RadialWindow",
     "redshift_grid",
     "redshifts",
     "redshifts_from_nz",
