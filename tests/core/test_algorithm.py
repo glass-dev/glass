@@ -1,7 +1,9 @@
 import importlib.util
+import types
 
 import numpy as np
 import pytest
+from tests.conftest import array_api_compatible
 
 from glass.core.algorithm import nnls as nnls_glass
 
@@ -9,14 +11,15 @@ from glass.core.algorithm import nnls as nnls_glass
 HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
 
 
+@array_api_compatible
 @pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
-def test_nnls(rng: np.random.Generator) -> None:
+def test_nnls(rng: np.random.Generator, xp: types.ModuleType) -> None:
     from scipy.optimize import nnls as nnls_scipy
 
     # cross-check output with scipy's nnls
 
-    a = rng.standard_normal((100, 20))
-    b = rng.standard_normal((100,))
+    a = xp.asarray(rng.standard_normal((100, 20)))
+    b = xp.asarray(rng.standard_normal((100,)))
 
     x_glass = nnls_glass(a, b)
     x_scipy, _ = nnls_scipy(a, b)
