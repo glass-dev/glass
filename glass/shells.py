@@ -721,17 +721,17 @@ def _uniform_grid(
     Parameters
     ----------
     start
-        The minimum redshift.
+        The minimum value.
     stop
-        The maximum redshift.
+        The maximum value.
     step
-        The redshift spacing.
+        The spacing.
     num
-        The number redshift samples.
+        The number of samples.
 
     Returns
     -------
-        The redshift grid.
+        The uniform grid.
 
     Raises
     ------
