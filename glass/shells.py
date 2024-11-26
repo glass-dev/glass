@@ -716,7 +716,7 @@ def _uniform_grid(
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    Create a redshift grid.
+    Create a uniform grid.
 
     Parameters
     ----------
