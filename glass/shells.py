@@ -709,10 +709,10 @@ def partition_restrict(
 
 
 def _uniform_grid(
-    zmin: float,
-    zmax: float,
+    start: float,
+    stop: float,
     *,
-    dz: float | None = None,
+    step: float | None = None,
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
