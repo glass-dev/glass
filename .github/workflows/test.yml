@@ -63,13 +63,13 @@ jobs:
           GLASS_ARRAY_BACKEND: numpy
 
       - name: Run array API strict tests
-        run: nox -s doctests-${{ matrix.python-version }} --verbose
+        run: nox -s tests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
           GLASS_ARRAY_BACKEND: array_api_strict
 
       - name: Run JAX tests
-        run: nox -s doctests-${{ matrix.python-version }} --verbose
+        run: nox -s tests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
           GLASS_ARRAY_BACKEND: jax
