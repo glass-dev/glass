@@ -708,7 +708,7 @@ def partition_restrict(
     return part
 
 
-def redshift_grid(
+def _uniform_grid(
     zmin: float,
     zmax: float,
     *,
@@ -716,7 +716,7 @@ def redshift_grid(
     num: int | None = None,
 ) -> npt.NDArray[np.float64]:
     """
-    Redshift grid with uniform spacing in redshift.
+    Create a redshift grid.
 
     Parameters
     ----------
@@ -744,9 +744,38 @@ def redshift_grid(
     elif dz is None and num is not None:
         z = np.linspace(zmin, zmax, num + 1)
     else:
-        msg = 'exactly one of "dz" or "num" must be given'
+        msg = "exactly one of 'dz' or 'num' must be given"
         raise ValueError(msg)
     return z
+
+
+def redshift_grid(
+    zmin: float,
+    zmax: float,
+    *,
+    dz: float | None = None,
+    num: int | None = None,
+) -> npt.NDArray[np.float64]:
+    """
+    Redshift grid with uniform spacing in redshift.
+
+    Parameters
+    ----------
+    zmin
+        The minimum redshift.
+    zmax
+        The maximum redshift.
+    dz
+        The redshift spacing.
+    num
+        The number redshift samples.
+
+    Returns
+    -------
+        The redshift grid.
+
+    """
+    return _uniform_grid(zmin, zmax, dz=dz, num=num)
 
 
 def distance_grid(
@@ -777,14 +806,9 @@ def distance_grid(
     -------
         The redshift grid.
 
-    Raises
-    ------
-    ValueError
-        If both ``dx`` and ``num`` are given.
-
     """
     xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
-    x = redshift_grid(xmin, xmax, dz=dx, num=num)
+    x = _uniform_grid(xmin, xmax, dz=dx, num=num)
     return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 
 
