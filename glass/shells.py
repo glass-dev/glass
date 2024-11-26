@@ -744,7 +744,7 @@ def _uniform_grid(
     elif dz is None and num is not None:
         z = np.linspace(zmin, zmax, num + 1)
     else:
-        msg = "exactly one of 'dz' or 'num' must be given"
+        msg = "exactly one of grid step size or number of steps must be given"
         raise ValueError(msg)
     return z
 
