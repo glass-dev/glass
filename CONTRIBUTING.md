@@ -64,6 +64,42 @@ following way -
 python -m pytest --cov --doctest-plus
 ```
 
+### Array API tests
+
+One can specify a particular array backend for testing by setting the
+`GLASS_ARRAY_BACKEND` environment variable. The default array backend is NumPy.
+_GLASS_ can be tested with every supported array library available in the
+environment by setting `GLASS_ARRAY_BACKEND` to `all`. The testing framework
+only installs NumPy automatically; hence, remaining array libraries should
+either be installed manually or developers should use `Nox`.
+
+```bash
+# run tests using numpy
+python -m pytest
+GLASS_ARRAY_BACKEND=numpy python -m pytest
+# run tests using array_api_strict (should be installed manually)
+GLASS_ARRAY_BACKEND=array_api_strict python -m pytest
+# run tests using jax (should be installed manually)
+GLASS_ARRAY_BACKEND=jax python -m pytest
+# run tests using every supported array library available in the environment
+GLASS_ARRAY_BACKEND=all python -m pytest
+```
+
+Moreover, one can mark a test to be compatible with the array API standard by
+decorating it with `@array_api_compatible`. This will `parameterize` the test to
+run on every array library specified through `GLASS_ARRAY_BACKEND` -
+
+```py
+import types
+from tests.conftest import array_api_compatible
+
+
+@array_api_compatible
+def test_something(xp: types.ModuleType):
+    # use `xp.` to access the array library functionality
+    ...
+```
+
 ## Documenting
 
 _GLASS_'s documentation is mainly written in the form of
@@ -171,6 +207,23 @@ syntax -
 
 ```bash
 nox -s tests-3.11
+```
+
+One can specify a particular array backend for testing by setting the
+`GLASS_ARRAY_BACKEND` environment variable. The default array backend is NumPy.
+_GLASS_ can be tested with every supported array library by setting
+`GLASS_ARRAY_BACKEND` to `all`.
+
+```bash
+# run tests using numpy
+nox -s tests-3.11
+GLASS_ARRAY_BACKEND=numpy nox -s tests-3.11
+# run tests using array_api_strict
+GLASS_ARRAY_BACKEND=array_api_strict nox -s tests-3.11
+# run tests using jax
+GLASS_ARRAY_BACKEND=jax nox -s tests-3.11
+# run tests using every supported array library
+GLASS_ARRAY_BACKEND=all nox -s tests-3.11
 ```
 
 The following command can be used to deploy the docs on `localhost` -
