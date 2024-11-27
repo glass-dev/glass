@@ -716,6 +716,45 @@ def partition_restrict(
     return part
 
 
+def _uniform_grid(
+    start: float,
+    stop: float,
+    *,
+    step: float | None = None,
+    num: int | None = None,
+) -> npt.NDArray[np.float64]:
+    """
+    Create a uniform grid.
+
+    Parameters
+    ----------
+    start
+        The minimum value.
+    stop
+        The maximum value.
+    step
+        The spacing.
+    num
+        The number of samples.
+
+    Returns
+    -------
+        The uniform grid.
+
+    Raises
+    ------
+    ValueError
+        If both ``step`` and ``num`` are given.
+
+    """
+    if step is not None and num is None:
+        return np.arange(start, np.nextafter(stop + step, stop), step)
+    if step is None and num is not None:
+        return np.linspace(start, stop, num + 1)
+    msg = "exactly one of grid step size or number of steps must be given"
+    raise ValueError(msg)
+
+
 def redshift_grid(
     zmin: float,
     zmax: float,
@@ -741,20 +780,8 @@ def redshift_grid(
     -------
         The redshift grid.
 
-    Raises
-    ------
-    ValueError
-        If both ``dz`` and ``num`` are given.
-
     """
-    if dz is not None and num is None:
-        z = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
-    elif dz is None and num is not None:
-        z = np.linspace(zmin, zmax, num + 1)
-    else:
-        msg = 'exactly one of "dz" or "num" must be given'
-        raise ValueError(msg)
-    return z
+    return _uniform_grid(zmin, zmax, step=dz, num=num)
 
 
 def distance_grid(
@@ -785,20 +812,9 @@ def distance_grid(
     -------
         The redshift grid.
 
-    Raises
-    ------
-    ValueError
-        If both ``dx`` and ``num`` are given.
-
     """
     xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
-    if dx is not None and num is None:
-        x = np.arange(xmin, np.nextafter(xmax + dx, xmax), dx)
-    elif dx is None and num is not None:
-        x = np.linspace(xmin, xmax, num + 1)
-    else:
-        msg = 'exactly one of "dx" or "num" must be given'
-        raise ValueError(msg)
+    x = _uniform_grid(xmin, xmax, step=dx, num=num)
     return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 
 

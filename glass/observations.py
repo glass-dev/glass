@@ -34,7 +34,7 @@ import healpy as hp
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.array import cumtrapz
+from glass.core.array import cumulative_trapezoid
 
 
 def vmap_galactic_ecliptic(
@@ -89,7 +89,7 @@ def gaussian_nz(
     mean: float | npt.NDArray[np.float64],
     sigma: float | npt.NDArray[np.float64],
     *,
-    norm: npt.NDArray[np.float64] | None = None,
+    norm: float | npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     """
     Gaussian redshift distribution.
@@ -130,11 +130,11 @@ def gaussian_nz(
 
 def smail_nz(
     z: npt.NDArray[np.float64],
-    z_mode: npt.NDArray[np.float64],
-    alpha: npt.NDArray[np.float64],
-    beta: npt.NDArray[np.float64],
+    z_mode: float | npt.NDArray[np.float64],
+    alpha: float | npt.NDArray[np.float64],
+    beta: float | npt.NDArray[np.float64],
     *,
-    norm: npt.NDArray[np.float64] | None = None,
+    norm: float | npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
     r"""
     Redshift distribution following Smail et al. (1994).
@@ -225,8 +225,8 @@ def fixed_zbins(
     """
     if nbins is not None and dz is None:
         zbinedges = np.linspace(zmin, zmax, nbins + 1)
-    if nbins is None and dz is not None:
-        zbinedges = np.arange(zmin, zmax, dz)
+    elif nbins is None and dz is not None:
+        zbinedges = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
     else:
         msg = "exactly one of nbins and dz must be given"
         raise ValueError(msg)
@@ -263,7 +263,7 @@ def equal_dens_zbins(
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
-    cuml_nz = cumtrapz(nz, z)
+    cuml_nz = cumulative_trapezoid(nz, z)
     cuml_nz /= cuml_nz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 

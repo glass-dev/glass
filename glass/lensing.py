@@ -45,6 +45,117 @@ if typing.TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[True] = True,
+    deflection: typing.Literal[False] = False,
+    shear: typing.Literal[False] = False,
+    discretized: bool = True,
+) -> tuple[npt.NDArray[np.float64]]:
+    # returns psi
+    ...
+
+
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[False] = False,
+    deflection: typing.Literal[True] = True,
+    shear: typing.Literal[False] = False,
+    discretized: bool = True,
+) -> tuple[npt.NDArray[np.complex128]]:
+    # returns alpha
+    ...
+
+
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[False] = False,
+    deflection: typing.Literal[False] = False,
+    shear: typing.Literal[True] = True,
+    discretized: bool = True,
+) -> tuple[npt.NDArray[np.complex128]]:
+    # returns gamma
+    ...
+
+
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[True] = True,
+    deflection: typing.Literal[True] = True,
+    shear: typing.Literal[False] = False,
+    discretized: bool = True,
+) -> tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.complex128],
+]:
+    # returns psi, alpha
+    ...
+
+
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[True] = True,
+    deflection: typing.Literal[False] = False,
+    shear: typing.Literal[True] = True,
+    discretized: bool = True,
+) -> tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.complex128],
+]:
+    # returns psi, gamma
+    ...
+
+
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[False] = False,
+    deflection: typing.Literal[True] = True,
+    shear: typing.Literal[True] = True,
+    discretized: bool = True,
+) -> tuple[
+    npt.NDArray[np.complex128],
+    npt.NDArray[np.complex128],
+]:
+    # returns alpha, gamma
+    ...
+
+
+@typing.overload
+def from_convergence(
+    kappa: npt.NDArray[np.float64],
+    lmax: int | None = None,
+    *,
+    potential: typing.Literal[True] = True,
+    deflection: typing.Literal[True] = True,
+    shear: typing.Literal[True] = True,
+    discretized: bool = True,
+) -> tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.complex128],
+    npt.NDArray[np.complex128],
+]:
+    # returns psi, alpha, gamma
+    ...
+
+
 def from_convergence(  # noqa: PLR0913
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
@@ -53,7 +164,7 @@ def from_convergence(  # noqa: PLR0913
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray[np.float64], ...]:
+) -> tuple[npt.NDArray[np.float64] | npt.NDArray[np.complex128], ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
@@ -175,7 +286,7 @@ def from_convergence(  # noqa: PLR0913
     ell = np.arange(lmax + 1)
 
     # this tuple will be returned
-    results: tuple[npt.NDArray[np.float64], ...] = ()
+    results: tuple[npt.NDArray[np.float64] | npt.NDArray[np.complex128], ...] = ()
 
     # convert convergence to potential
     fl = np.divide(-2, ell * (ell + 1), where=(ell > 0), out=np.zeros(lmax + 1))
