@@ -12,6 +12,9 @@ from cosmology import Cosmology
 
 from glass import RadialWindow
 
+# Handling of array backends, inspired by-
+# https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
+
 # environment variable to specify array backends for testing
 # can be:
 #   a particular array library (numpy, jax, array_api_strict, ...)
@@ -96,6 +99,7 @@ else:
 array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.values())
 
 
+# Pytest fixtures
 @pytest.fixture(scope="session")
 def cosmo() -> Cosmology:
     class MockCosmology:
