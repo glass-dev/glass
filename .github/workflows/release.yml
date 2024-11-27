@@ -2,14 +2,10 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      target:
-        default: testpypi
-        description: Deployment target. Can be pypi or testpypi.
   release:
     types:
       - published
+  workflow_dispatch:
 
 jobs:
   dist:
@@ -55,8 +51,16 @@ jobs:
     needs: dist
     runs-on: ubuntu-latest
     environment:
-      name: publish
-      url: https://pypi.org/p/glass
+      name: >-
+        ${{ (github.event_name == 'release' &&
+         github.event.action == 'published') &&
+         'publish' ||
+         'test-publish' }}
+      url: >-
+        ${{ (github.event_name == 'release' &&
+         github.event.action == 'published') &&
+         'https://pypi.org/project/glass' ||
+         'https://test.pypi.org/project/glass' }}
     permissions:
       id-token: write
     steps:
@@ -71,12 +75,11 @@ jobs:
 
       - name: Publish to PyPI
         if: >-
-          github.event.inputs.target == 'pypi' || (github.event_name ==
-          'release' && github.event.action == 'published')
+          github.event_name == 'release' && github.event.action == 'published'
         uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: Publish to TestPyPI
-        if: github.event.inputs.target == 'testpypi'
+        if: github.event_name == 'workflow_dispatch'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
