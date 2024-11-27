@@ -89,7 +89,7 @@ Moreover, one can mark a test to be compatible with the array API standard by
 decorating it with `@array_api_compatible`. This will `parameterize` the test to
 run on every array library specified through `GLASS_ARRAY_BACKEND` -
 
-```py
+```python
 import types
 from tests.conftest import array_api_compatible
 
