@@ -16,7 +16,7 @@ from glass import RadialWindow
 # can be:
 #   a particular array library (numpy, jax, array_api_strict, ...)
 #   all (try finding every supported array library available in the environment)
-GLASS_ARRAY_BACKEND: str | bool = os.environ.get("GLASS_ARRAY_BACKEND", False)
+GLASS_ARRAY_BACKEND: str = os.environ.get("GLASS_ARRAY_BACKEND", "")
 
 
 def _check_version(lib: str, array_api_compliant_version: str) -> None:

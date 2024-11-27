@@ -33,11 +33,11 @@ def tests(session: nox.Session) -> None:
 
     array_backend = os.environ.get("GLASS_ARRAY_BACKEND")
     if array_backend == "array_api_strict":
-        session.install("array_api_strict>=2")
+        session.install(ARRAY_BACKENDS["array_api_strict"])
     elif array_backend == "jax":
-        session.install("jax>=0.4.32")
+        session.install(ARRAY_BACKENDS["jax"])
     elif array_backend == "all":
-        session.install("array_api_strict>=2", "jax>=0.4.32")
+        session.install(ARRAY_BACKENDS.values())
 
     session.run(
         "pytest",
