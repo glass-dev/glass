@@ -17,6 +17,10 @@ ALL_PYTHON = [
     "3.12",
     "3.13",
 ]
+ARRAY_BACKENDS = {
+    "array_api_strict": "array_api_strict>=2",
+    "jax": "jax>=0.4.32",
+}
 
 
 @nox.session
@@ -37,7 +41,7 @@ def tests(session: nox.Session) -> None:
     elif array_backend == "jax":
         session.install(ARRAY_BACKENDS["jax"])
     elif array_backend == "all":
-        session.install(ARRAY_BACKENDS.values())
+        session.install(*ARRAY_BACKENDS.values())
 
     session.run(
         "pytest",
