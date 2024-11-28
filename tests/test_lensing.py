@@ -51,11 +51,9 @@ def test_from_convergence(rng: np.random.Generator) -> None:
     np.testing.assert_array_equal(len(results), 2)
 
     results = from_convergence(kappa, deflection=True, shear=True)
-
     np.testing.assert_array_equal(len(results), 2)
 
     results = from_convergence(kappa, potential=True, deflection=True, shear=True)
-
     np.testing.assert_array_equal(len(results), 3)
 
 
