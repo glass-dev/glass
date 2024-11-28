@@ -216,7 +216,7 @@ _GLASS_ can be tested with every supported array library by setting
 
 ```bash
 # run tests using numpy
-nox -s tests-3.11
+nox -s tests-3.13
 GLASS_ARRAY_BACKEND=numpy nox -s tests-3.13
 # run tests using array_api_strict
 GLASS_ARRAY_BACKEND=array_api_strict nox -s tests-3.13
