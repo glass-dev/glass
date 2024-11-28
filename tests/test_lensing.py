@@ -22,8 +22,8 @@ if typing.TYPE_CHECKING:
 
 def test_from_convergence(rng: np.random.Generator) -> None:
     """Add unit tests for :func:`from_convergence`."""
-    # l_max = 32  # noqa: ERA001
-    n_side = 4
+    # l_max = 100  # noqa: ERA001
+    n_side = 32
 
     # create a convergence map
     kappa = rng.integers(10, size=healpix.nside2npix(n_side))
@@ -36,18 +36,27 @@ def test_from_convergence(rng: np.random.Generator) -> None:
     # check all combinations of potential, deflection, shear being True
 
     results = from_convergence(kappa, potential=True)
+    np.testing.assert_array_equal(len(results), 1)
 
     results = from_convergence(kappa, deflection=True)
+    np.testing.assert_array_equal(len(results), 1)
 
     results = from_convergence(kappa, shear=True)
+    np.testing.assert_array_equal(len(results), 1)
 
     results = from_convergence(kappa, potential=True, deflection=True)
+    np.testing.assert_array_equal(len(results), 2)
 
     results = from_convergence(kappa, potential=True, shear=True)
+    np.testing.assert_array_equal(len(results), 2)
 
     results = from_convergence(kappa, deflection=True, shear=True)
 
+    np.testing.assert_array_equal(len(results), 2)
+
     results = from_convergence(kappa, potential=True, deflection=True, shear=True)
+
+    np.testing.assert_array_equal(len(results), 3)
 
 
 def test_shear_from_convergence() -> None:
