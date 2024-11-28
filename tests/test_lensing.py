@@ -10,7 +10,7 @@ from glass import (
     MultiPlaneConvergence,
     RadialWindow,
     deflect,
-    from_convergence,  # noqa: F401
+    from_convergence,
     multi_plane_matrix,
     multi_plane_weights,
     shear_from_convergence,  # noqa: F401
@@ -20,8 +20,34 @@ if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
 
-def test_from_convergence() -> None:
+def test_from_convergence(rng: np.random.Generator) -> None:
     """Add unit tests for :func:`from_convergence`."""
+    # l_max = 32  # noqa: ERA001
+    n_side = 4
+
+    # create a convergence map
+    kappa = rng.integers(10, size=healpix.nside2npix(n_side))
+
+    # check with all False
+
+    results = from_convergence(kappa)
+    np.testing.assert_array_equal(results, ())
+
+    # check all combinations of potential, deflection, shear being True
+
+    results = from_convergence(kappa, potential=True)
+
+    results = from_convergence(kappa, deflection=True)
+
+    results = from_convergence(kappa, shear=True)
+
+    results = from_convergence(kappa, potential=True, deflection=True)
+
+    results = from_convergence(kappa, potential=True, shear=True)
+
+    results = from_convergence(kappa, deflection=True, shear=True)
+
+    results = from_convergence(kappa, potential=True, deflection=True, shear=True)
 
 
 def test_shear_from_convergence() -> None:
