@@ -72,6 +72,7 @@ def examples(session: nox.Session) -> None:
         session.run(
             "jupyter",
             "execute",
+            "--inplace",
             *Path().glob("examples/**/*.ipynb"),
             *session.posargs,
         )
