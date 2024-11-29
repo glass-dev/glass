@@ -1,33 +1,33 @@
-import importlib.util
-
 import numpy as np
 import pytest
 
-from glass.core.algorithm import nnls as nnls_glass
-
-# check if scipy is available for testing
-HAVE_SCIPY = importlib.util.find_spec("scipy") is not None
+from glass.core.algorithm import nnls
 
 
-@pytest.mark.skipif(not HAVE_SCIPY, reason="test requires SciPy")
 def test_nnls(rng: np.random.Generator) -> None:
-    from scipy.optimize import nnls as nnls_scipy
+    # check output
 
-    # cross-check output with scipy's nnls
+    a = np.arange(25.0).reshape(-1, 5)
+    b = np.arange(5.0)
+    y = a @ b
+    res = nnls(a, y)
+    assert np.linalg.norm((a @ res) - y) < 1e-7
+
+    a = rng.uniform(low=-10, high=10, size=[50, 10])
+    b = np.abs(rng.uniform(low=-2, high=2, size=[10]))
+    b[::2] = 0
+    x = a @ b
+    res = nnls(a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0))
+    np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
+
+    # check matrix and vector's shape
 
     a = rng.standard_normal((100, 20))
     b = rng.standard_normal((100,))
 
-    x_glass = nnls_glass(a, b)
-    x_scipy, _ = nnls_scipy(a, b)
-
-    np.testing.assert_allclose(x_glass, x_scipy)
-
-    # check matrix and vector's shape
-
     with pytest.raises(ValueError, match="input `a` is not a matrix"):
-        nnls_glass(b, a)
+        nnls(b, a)
     with pytest.raises(ValueError, match="input `b` is not a vector"):
-        nnls_glass(a, a)
+        nnls(a, a)
     with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
-        nnls_glass(a.T, b)
+        nnls(a.T, b)
