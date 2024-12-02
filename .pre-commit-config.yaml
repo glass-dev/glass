@@ -33,7 +33,7 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.0
+    rev: v0.8.1
     hooks:
       - id: ruff
       - id: ruff-format
@@ -48,7 +48,7 @@ repos:
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.3.3
+    rev: v3.4.1
     hooks:
       - id: prettier
   - repo: https://github.com/igorshubovych/markdownlint-cli
