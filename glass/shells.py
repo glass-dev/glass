@@ -53,11 +53,10 @@ import warnings
 import numpy as np
 import numpy.typing as npt
 
+from cosmology.api import CosmologyConstantsNamespace, StandardCosmology
+
 from glass.core.algorithm import nnls
 from glass.core.array import ndinterp
-
-if typing.TYPE_CHECKING:
-    from cosmology import Cosmology
 
 ArrayLike1D = collections.abc.Sequence[float] | npt.NDArray[np.float64]
 WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
@@ -65,7 +64,7 @@ WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 def distance_weight(
     z: npt.NDArray[np.float64],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Uniform weight in comoving distance.
@@ -82,12 +81,12 @@ def distance_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
     z: npt.NDArray[np.float64],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Uniform weight in comoving volume.
@@ -104,12 +103,15 @@ def volume_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
+    return (  # type: ignore[no-any-return]
+        cosmo.transverse_comoving_distance(z) / hubble_length
+    ) ** 2 / cosmo.H_over_H0(z)
 
 
 def density_weight(
     z: npt.NDArray[np.float64],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Uniform weight in matter density.
@@ -126,7 +128,13 @@ def density_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
+    return (  # type: ignore[no-any-return]
+        cosmo.critical_density0
+        * cosmo.Omega_m(z)
+        * (cosmo.transverse_comoving_distance(z) / hubble_length) ** 2
+        / cosmo.H_over_H0(z)
+    )
 
 
 class RadialWindow(typing.NamedTuple):
@@ -777,7 +785,7 @@ def redshift_grid(
 
 
 def distance_grid(
-    cosmo: Cosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
     zmin: float,
     zmax: float,
     *,
@@ -805,7 +813,7 @@ def distance_grid(
         The redshift grid.
 
     """
-    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
+    xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     x = _uniform_grid(xmin, xmax, step=dx, num=num)
     return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 

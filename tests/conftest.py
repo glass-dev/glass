@@ -2,26 +2,27 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from cosmology import Cosmology
+from cosmology import StandardCosmology
 
 from glass import RadialWindow
 
 
-@pytest.fixture(scope="session")
-def cosmo() -> Cosmology:
+@pytest.fixture
+def cosmo() -> StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     class MockCosmology:
         @property
-        def omega_m(self) -> float:
+        def Omega_m0(self) -> float:  # noqa: N802
             return 0.3
 
-        def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-            return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
+        def H_over_H0(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:  # noqa: N802
+            return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
 
         def xm(
             self,
             z: npt.NDArray[np.float64],
             z2: npt.NDArray[np.float64] | None = None,
         ) -> npt.NDArray[np.float64]:
+            """Dimensionless transverse comoving distance."""
             if z2 is None:
                 return np.array(z) * 1000
             return (np.array(z2) - np.array(z)) * 1000
