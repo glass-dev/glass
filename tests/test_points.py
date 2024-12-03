@@ -14,6 +14,7 @@ from glass import (
     positions_from_delta,
     uniform_positions,
 )
+import healpix
 
 if typing.TYPE_CHECKING:
     import collections.abc
@@ -115,7 +116,7 @@ def test_loglinear_bias(rng: np.random.Generator) -> None:
 def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR0915
     # create maps that saturate the batching in the function
     nside = 128
-    npix = 12 * nside**2
+    npix = healpix.nside2npix(nside)
 
     # case: single-dimensional input
 

@@ -9,6 +9,7 @@ from glass import (
     tomo_nz_gausserr,
     vmap_galactic_ecliptic,
 )
+import healpix
 
 
 def test_vmap_galactic_ecliptic() -> None:
@@ -18,7 +19,7 @@ def test_vmap_galactic_ecliptic() -> None:
     # check shape
 
     vmap = vmap_galactic_ecliptic(n_side)
-    np.testing.assert_array_equal(len(vmap), 12 * n_side**2)
+    np.testing.assert_array_equal(len(vmap), healpix.nside2npix(n_side))
 
     # no rotation
 
