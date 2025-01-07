@@ -85,7 +85,7 @@ def effective_bias(
 
     """
     norm = np.trapezoid(w.wa, w.za)
-    return trapezoid_product((z, bz), (w.za, w.wa)) / norm
+    return (trapezoid_product((z, bz), (w.za, w.wa)) / norm).astype(np.float64)
 
 
 def linear_bias(
@@ -107,7 +107,7 @@ def linear_bias(
         The density contrast after biasing.
 
     """
-    return b * delta
+    return (b * delta).astype(np.float64)
 
 
 def loglinear_bias(
@@ -413,6 +413,6 @@ def position_weights(
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
-        densities = densities * bias
+        densities = (densities * bias).astype(np.float64)
     # densities now contains the relative contribution with bias applied
     return densities
