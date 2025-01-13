@@ -12,8 +12,9 @@ on:
 
 jobs:
   check-pr-title:
-    if:
-      github.actor != 'pre-commit-ci[bot]' || github.actor != 'dependabot[bot]'
+    if: >-
+      github.event.pull_request.user.login != 'pre-commit-ci[bot]' &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Enforce PR title format
