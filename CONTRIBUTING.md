@@ -142,7 +142,7 @@ to the code's functionality.
 [tox](https://github.com/tox-dev/tox) to make them less intimidating for new
 developers. All of these commands (or sessions in the language of `tox`) -
 `lint`, `tests`, `coverage`, `doctests`, `docs`, and `build` - are defined in
-[pyproject.toml](https://github.com/glass-dev/glass/main/pyproject.toml).
+[pyproject.toml](https://github.com/glass-dev/glass/blob/main/pyproject.toml).
 
 `tox` can be installed via `pip` using -
 
