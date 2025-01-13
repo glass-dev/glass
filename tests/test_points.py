@@ -53,12 +53,12 @@ def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
     z = np.linspace(0, 1, 10)
     bz = np.zeros((10,))
 
-    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))
+    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((1,)))
 
     z = np.zeros((10,))
     bz = np.full_like(z, 0.5)
 
-    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))
+    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((1,)))
 
     z = np.linspace(0, 1, 10)
     bz = np.full_like(z, 0.5)
