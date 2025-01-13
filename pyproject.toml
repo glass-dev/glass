@@ -80,7 +80,7 @@ run = {branch = true, parallel = true, source = [
 ]}
 paths.source = [
     "src",
-    ".nox*/*/lib/python*/site-packages",
+    ".tox*/*/lib/python*/site-packages",
 ]
 
 [tool.hatch]
@@ -89,7 +89,6 @@ build.targets.sdist.exclude = [
     ".*",
     "docs/*",
     "examples/*",
-    "noxfile.py",
     "tests/*",
 ]
 version.source = "vcs"
@@ -165,8 +164,6 @@ lint.per-file-ignores = {"__init__.py" = [
     "T201", # print
 ], "glass*" = [
     "PLR2004", # TODO: magic-value-comparison
-], "noxfile.py" = [
-    "T201", # print
 ], "tests*" = [
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function

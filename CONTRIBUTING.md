@@ -136,31 +136,31 @@ The current version number is automatically inferred from the last release
 The target is to have a new _GLASS_ release once there are significant changes
 to the code's functionality.
 
-## Nox
+## Tox
 
 `GLASS` supports running various critical commands using
-[nox](https://github.com/wntrblm/nox) to make them less intimidating for new
-developers. All of these commands (or sessions in the language of `nox`) -
+[tox](https://github.com/tox-dev/tox) to make them less intimidating for new
+developers. All of these commands (or sessions in the language of `tox`) -
 `lint`, `tests`, `coverage`, `doctests`, `docs`, and `build` - are defined in
-[noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
+[pyproject.toml](https://github.com/glass-dev/glass/main/pyproject.toml).
 
-`nox` can be installed via `pip` using -
+`tox` can be installed via `pip` using -
 
 ```bash
-pip install nox
+pip install tox
 ```
 
 The default sessions (`lint` and `tests`) can be executed using -
 
 ```bash
-nox
+tox
 ```
 
-A particular session (for example `tests`) can be run with `nox` on all
+A particular session (for example `tests`) can be run with `tox` on all
 supported Python versions using -
 
 ```bash
-nox -s tests
+tox -s tests
 ```
 
 Only `tests`, `coverage`, and the `doctests` session run on all supported Python
@@ -170,17 +170,17 @@ To specify a particular Python version (for example `3.11`), use the following
 syntax -
 
 ```bash
-nox -s tests-3.11
+tox -s tests-3.11
 ```
 
 The following command can be used to deploy the docs on `localhost` -
 
 ```bash
-nox -s docs -- serve
+tox -s docs -- serve
 ```
 
-The `nox` environments created for each type of session on the first run is
-saved under `.nox/` and reused by default.
+The `tox` environments created for each type of session on the first run is
+saved under `.tox/` and reused by default.
 
 ## Contributing workflow
 

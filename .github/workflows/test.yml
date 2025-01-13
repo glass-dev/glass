@@ -35,11 +35,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache nox
+      - name: Cache tox
         uses: actions/cache@v4
         with:
           key: test-${{ hashFiles('pyproject.toml') }}
-          path: .nox
+          path: .tox
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -48,16 +48,16 @@ jobs:
           cache: pip
           python-version: ${{ matrix.python-version }}
 
-      - name: Install nox and coverage.py
-        run: python -m pip install coverage[toml] nox
+      - name: Install tox and coverage.py
+        run: python -m pip install coverage[toml] tox
 
       - name: Run doctests
-        run: nox -s doctests-${{ matrix.python-version }} --verbose
+        run: tox -s doctests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
 
       - name: Run tests and generate coverage report
-        run: nox -s coverage-${{ matrix.python-version }} --verbose
+        run: tox -s coverage-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
 
@@ -98,11 +98,11 @@ jobs:
           cache: pip
           python-version: 3.x
 
-      - name: Install nox
-        run: python -m pip install nox
+      - name: Install tox
+        run: python -m pip install tox
 
       - name: Build SDist and wheel
-        run: nox -s build --verbose
+        run: tox -s build --verbose
         env:
           FORCE_COLOR: 1
 
@@ -126,9 +126,9 @@ jobs:
         run: |-
           sudo apt-get update
           sudo apt-get install -y pandoc
-          python -m pip install nox
+          python -m pip install tox
 
       - name: Build docs
-        run: nox -s docs --verbose
+        run: tox -s docs --verbose
         env:
           FORCE_COLOR: 1
