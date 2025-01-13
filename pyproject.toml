@@ -186,3 +186,57 @@ trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
+
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+    envlist =
+        lint
+        py{310,311,312,313}-{tests,coverage,doctests}
+        examples
+        docs
+        build
+    requires =
+        pip>=20.0
+    isolated_build = True
+
+    [testenv]
+    extras = test
+    constrain_package_deps =
+        test: .github/test-constraints.txt
+
+    [testenv:lint]
+    skip_install = True
+    deps = pre-commit
+    commands = pre-commit run --all-files {posargs}
+
+    [testenv:py{310,311,312,313}-tests]
+    extras = test
+    commands = pytest {posargs}
+
+    [testenv:py{310,311,312,313}-coverage]
+    extras = test
+    commands = pytest --cov {posargs}
+
+    [testenv:py{310,311,312,313}-doctests]
+    extras = test
+    commands = pytest --doctest-plus glass {posargs}
+
+    [testenv:examples]
+    extras = examples
+    commands =
+        !html: jupyter execute --inplace examples/**/*.ipynb {posargs}
+        html: jupyter nbconvert --to html --embed-images examples/**/*.ipynb
+
+    [testenv:docs]
+    extras = docs
+    change_dir = docs
+    commands =
+        sphinx-build -M html . _build
+        serve: python -m http.server 8001 -d _build/html
+
+    [testenv:build]
+    skip_install = True
+    deps = build
+    commands = python -m build
+"""
