@@ -11,3 +11,4 @@ dist
 coverage*
 *.html
 .ipynb_checkpoints
+.tox
