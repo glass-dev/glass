@@ -16,7 +16,7 @@ jobs:
       github.actor != 'pre-commit-ci[bot]' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Enfore PR title format
+      - name: Enforce PR title format
         uses: thehanimo/pr-title-checker@v1.4.3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
