@@ -160,7 +160,7 @@ A particular session (for example `tests`) can be run with `tox` on all
 supported Python versions using -
 
 ```bash
-tox -s tests
+tox -e tests
 ```
 
 Only `tests`, `coverage`, and the `doctests` session run on all supported Python
@@ -170,13 +170,13 @@ To specify a particular Python version (for example `3.11`), use the following
 syntax -
 
 ```bash
-tox -s tests-3.11
+tox -e py311-tests
 ```
 
 The following command can be used to deploy the docs on `localhost` -
 
 ```bash
-tox -s docs -- serve
+tox -e docs -- serve
 ```
 
 The `tox` environments created for each type of session on the first run is

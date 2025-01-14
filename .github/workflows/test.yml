@@ -52,12 +52,12 @@ jobs:
         run: python -m pip install coverage[toml] tox
 
       - name: Run doctests
-        run: tox -s doctests-${{ matrix.python-version }} --verbose
+        run: tox -e doctests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
 
       - name: Run tests and generate coverage report
-        run: tox -s coverage-${{ matrix.python-version }} --verbose
+        run: tox -e coverage-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
 
@@ -102,7 +102,7 @@ jobs:
         run: python -m pip install tox
 
       - name: Build SDist and wheel
-        run: tox -s build --verbose
+        run: tox -e build --verbose
         env:
           FORCE_COLOR: 1
 
@@ -129,6 +129,6 @@ jobs:
           python -m pip install tox
 
       - name: Build docs
-        run: tox -s docs --verbose
+        run: tox -e docs --verbose
         env:
           FORCE_COLOR: 1
