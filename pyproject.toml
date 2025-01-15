@@ -210,15 +210,15 @@ legacy_tox_ini = """
     deps = pre-commit
     commands = pre-commit run --all-files {posargs}
 
-    [testenv:3.{10,11,12,13}-tests]
+    [testenv:tests-3.{10,11,12,13}]
     extras = test
     commands = pytest {posargs}
 
-    [testenv:3.{10,11,12,13}-coverage]
+    [testenv:coverage-3.{10,11,12,13}]
     extras = test
     commands = pytest --cov {posargs}
 
-    [testenv:3.{10,11,12,13}-doctests]
+    [testenv:doctests-3.{10,11,12,13}]
     extras = test
     commands = pytest --doctest-plus glass {posargs}
 
