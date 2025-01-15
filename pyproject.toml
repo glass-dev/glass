@@ -160,6 +160,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package,
 ], "examples*" = [
+    "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "T201", # print
 ], "glass*" = [
@@ -224,9 +225,8 @@ legacy_tox_ini = """
 
     [testenv:examples]
     extras = examples
-    commands =
-        !html: jupyter execute --inplace examples/**/*.ipynb {posargs}
-        html: jupyter nbconvert --to html --embed-images examples/**/*.ipynb
+    commands = python examples/run.py {posargs}
+    description = Run the example notebooks. Pass "html" to build html.
 
     [testenv:docs]
     extras = docs
