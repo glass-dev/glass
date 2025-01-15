@@ -166,11 +166,11 @@ tox -e tests
 Only `tests`, `coverage`, and the `doctests` session run on all supported Python
 versions by default.
 
-To specify a particular Python version (for example `3.11`), use the following
+To specify a particular Python version (for example `3.13`), use the following
 syntax -
 
 ```bash
-tox -e py311-tests
+tox -e py313-tests
 ```
 
 The following command can be used to deploy the docs on `localhost` -
