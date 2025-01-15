@@ -55,12 +55,12 @@ jobs:
         run: sudo apt-get install -y libbz2-dev
 
       - name: Run doctests
-        run: tox -e py${{ matrix.python-version }}-doctests --verbose
+        run: tox -e ${{ matrix.python-version }}-doctests --verbose
         env:
           FORCE_COLOR: 1
 
       - name: Run tests and generate coverage report
-        run: tox -e py${{ matrix.python-version }}-coverage --verbose
+        run: tox -e ${{ matrix.python-version }}-coverage --verbose
         env:
           FORCE_COLOR: 1
 

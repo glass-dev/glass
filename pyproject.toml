@@ -192,7 +192,7 @@ legacy_tox_ini = """
     [tox]
     envlist =
         lint
-        py{310,311,312,313}-{tests,coverage,doctests}
+        3.{10,11,12,13}-{tests,coverage,doctests}
         examples
         docs
         build
@@ -210,15 +210,15 @@ legacy_tox_ini = """
     deps = pre-commit
     commands = pre-commit run --all-files {posargs}
 
-    [testenv:py{310,311,312,313}-tests]
+    [testenv:3.{10,11,12,13}-tests]
     extras = test
     commands = pytest {posargs}
 
-    [testenv:py{310,311,312,313}-coverage]
+    [testenv:3.{10,11,12,13}-coverage]
     extras = test
     commands = pytest --cov {posargs}
 
-    [testenv:py{310,311,312,313}-doctests]
+    [testenv:3.{10,11,12,13}-doctests]
     extras = test
     commands = pytest --doctest-plus glass {posargs}
 

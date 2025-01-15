@@ -170,7 +170,7 @@ To specify a particular Python version (for example `3.13`), use the following
 syntax -
 
 ```bash
-tox -e py313-tests
+tox -e 3.13-tests
 ```
 
 The following command can be used to deploy the docs on `localhost` -
