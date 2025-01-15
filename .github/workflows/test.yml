@@ -51,6 +51,9 @@ jobs:
       - name: Install tox and coverage.py
         run: python -m pip install coverage[toml] tox
 
+      - name: Install ubuntu dependencies for fitsio
+        run: sudo apt-get install -y libbz2-dev
+
       - name: Run doctests
         run: tox -e doctests-${{ matrix.python-version }} --verbose
         env:
