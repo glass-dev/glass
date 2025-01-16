@@ -53,9 +53,7 @@ jobs:
         run: python -m pip install coverage[toml] nox
 
       - name: Install ubuntu dependencies for fitsio
-        run: |-
-          sudo apt-get update
-          sudo apt-get install -y libbz2-dev
+        run: sudo apt-get install -y libbz2-dev
 
       - name: Run doctests
         run: nox -s doctests-${{ matrix.python-version }} --verbose
