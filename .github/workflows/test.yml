@@ -39,7 +39,7 @@ jobs:
       - name: Cache nox
         uses: actions/cache@v4
         with:
-          key: test-${{ hashFiles('pyproject.toml') }}
+          key: test-${{ hashFiles('pyproject.toml') }}-${{ env.pythonLocation }}
           path: .nox
 
       - name: Set up Python
