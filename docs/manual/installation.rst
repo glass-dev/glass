@@ -17,9 +17,13 @@ and then see what is available in your package manager.
 Install the current release
 ---------------------------
 
-To install the current *GLASS* release, use the pip package::
+To install the current *GLASS* release, use pip::
 
     $ pip install glass
+
+or conda::
+
+    $ conda install -c conda-forge glass
 
 
 Install a specific release
@@ -28,6 +32,10 @@ Install a specific release
 To install the a specific *GLASS* release, pass the version number to pip::
 
     $ pip install glass==2023.1
+
+or conda::
+
+    $ conda install -c conda-forge glass==2023.1
 
 For a list of released versions and their respective changes, see the
 :doc:`releases`.
