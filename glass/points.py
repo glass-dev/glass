@@ -413,6 +413,6 @@ def position_weights(
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
-        ddensities = densities * bias
+        densities = densities * bias
     # densities now contains the relative contribution with bias applied
     return densities
