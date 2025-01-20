@@ -166,7 +166,7 @@ def trapezoid_product(
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.atleast_1d(np.trapezoid(y, x, axis=axis))
+    return np.trapezoid(y, x, axis=axis)  # type: ignore[no-any-return]
 
 
 def cumulative_trapezoid(
