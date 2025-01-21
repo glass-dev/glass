@@ -1,4 +1,4 @@
-"""Module for array utilities."""
+"""Module for array utilities."""  # noqa: A005
 
 from __future__ import annotations
 
@@ -166,7 +166,7 @@ def trapezoid_product(
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)  # type: ignore[no-any-return]
+    return np.trapezoid(y, x, axis=axis)  # type: ignore[return-value]
 
 
 def cumulative_trapezoid(

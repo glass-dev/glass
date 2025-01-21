@@ -1,9 +1,6 @@
 numpy
 --only-binary numpy
 
-scipy
---only-binary scipy
-
 healpy
 --only-binary healpy
 

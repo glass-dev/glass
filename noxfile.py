@@ -7,8 +7,12 @@ from pathlib import Path
 import nox
 
 # Options to modify nox behaviour
+nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.reuse_existing_virtualenvs = True
-nox.options.sessions = ["lint", "tests"]
+nox.options.sessions = [
+    "lint",
+    "tests",
+]
 
 ALL_PYTHON = [
     "3.10",
@@ -72,6 +76,7 @@ def examples(session: nox.Session) -> None:
         session.run(
             "jupyter",
             "execute",
+            "--inplace",
             *Path().glob("examples/**/*.ipynb"),
             *session.posargs,
         )

@@ -36,16 +36,7 @@ jobs:
           # store the tag since the git checkout is now dirty
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=${tag}" >> "$GITHUB_ENV"
 
-      - name: Build SDist and wheel
-        run: pipx run build
-
-      - name: Check metadata
-        run: pipx run twine check dist/*
-
-      - name: Upload distributions
-        uses: actions/upload-artifact@v4
-        with:
-          path: dist/*
+      - uses: hynek/build-and-inspect-python-package@v2
 
   publish:
     needs: dist
@@ -67,7 +58,7 @@ jobs:
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: Packages
           path: dist
 
       - name: List distributions to be deployed
