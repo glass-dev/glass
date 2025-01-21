@@ -244,9 +244,9 @@ def tophat_windows(
     for zmin, zmax in itertools.pairwise(zbins):
         n = max(round((zmax - zmin) / dz), 2)
         z = np.linspace(zmin, zmax, n)
-        w = wht(z)
+        w = wht(z)  # type: ignore[arg-type]
         zeff = np.trapezoid(w * z, z) / np.trapezoid(w, z)
-        ws.append(RadialWindow(z, w, zeff))
+        ws.append(RadialWindow(z, w, zeff))  # type: ignore[arg-type]
     return ws
 
 
@@ -418,7 +418,7 @@ def restrict(
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
     fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
-    return zr, fr
+    return zr, fr  # type: ignore[return-value]
 
 
 def partition(
@@ -573,7 +573,7 @@ def partition_lstsq(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)
+        zp = np.union1d(zp, w.za)  # type: ignore[assignment]
 
     # get extra leading axes of fz
     *dims, _ = np.shape(fz)
@@ -637,7 +637,7 @@ def partition_nnls(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)
+        zp = np.union1d(zp, w.za)  # type: ignore[assignment]
 
     # get extra leading axes of fz
     *dims, _ = np.shape(fz)
@@ -681,7 +681,7 @@ def partition_nnls(
     # for each dim, find non-negative weights x such that y == r @ x
     x = np.empty([len(shells), *dims])
     for i in np.ndindex(*dims):
-        x[(..., *i)] = nnls(r, y[i])
+        x[(..., *i)] = nnls(r, y[i])  # type: ignore[index]
 
     # all done
     return x
@@ -750,7 +750,7 @@ def _uniform_grid(
     if step is not None and num is None:
         return np.arange(start, np.nextafter(stop + step, stop), step)
     if step is None and num is not None:
-        return np.linspace(start, stop, num + 1)
+        return np.linspace(start, stop, num + 1)  # type: ignore[return-value]
     msg = "exactly one of grid step size or number of steps must be given"
     raise ValueError(msg)
 

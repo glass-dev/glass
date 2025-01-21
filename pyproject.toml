@@ -62,7 +62,6 @@ test = [
     "pytest-doctestplus",
     "pytest-mock",
     "pytest-rerunfailures",
-    "scipy",
 ]
 
 [project.urls]
