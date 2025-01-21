@@ -579,7 +579,7 @@ def effective_cls(
     shape1, shape2 = weights1.shape, weights2.shape
     for i, shape in enumerate((shape1, shape2)):
         if not shape or shape[0] != n:
-            msg = f"shape mismatch between fields and weights{i+1}"
+            msg = f"shape mismatch between fields and weights{i + 1}"
             raise ValueError(msg)
 
     # get the iterator over leading weight axes

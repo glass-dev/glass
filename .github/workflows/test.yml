@@ -38,7 +38,7 @@ jobs:
       - name: Cache nox
         uses: actions/cache@v4
         with:
-          key: test-${{ hashFiles('pyproject.toml') }}
+          key: test-${{ hashFiles('pyproject.toml') }}-${{ env.pythonLocation }}
           path: .nox
 
       - name: Set up Python
@@ -50,6 +50,9 @@ jobs:
 
       - name: Install nox and coverage.py
         run: python -m pip install coverage[toml] nox
+
+      - name: Install ubuntu dependencies for fitsio
+        run: sudo apt-get install -y libbz2-dev
 
       - name: Run doctests
         run: nox -s doctests-${{ matrix.python-version }} --verbose
