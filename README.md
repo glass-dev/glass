@@ -3,6 +3,7 @@
 <!-- Essentials -->
 
 [![PyPI](https://img.shields.io/pypi/v/glass)](https://pypi.org/project/glass)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/glass.svg)](https://anaconda.org/conda-forge/glass)
 [![Documentation](https://readthedocs.org/projects/glass/badge/?version=stable)](https://glass.readthedocs.io/stable)
 [![LICENSE](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -30,10 +31,16 @@ to get you started.
 
 ## Installation
 
-Releases of the code can be installed with pip as usual:
+Releases of the code can be installed with pip:
 
 ```sh
 pip install glass
+```
+
+or conda:
+
+```sh
+conda install -c conda-forge glass
 ```
 
 If you are interested in the latest version of the code, you can pip-install
