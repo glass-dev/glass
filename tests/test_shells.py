@@ -267,10 +267,16 @@ def test_redshift_grid() -> None:
 
     # check error raised
 
-    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+    with pytest.raises(
+        ValueError,
+        match="exactly one of grid step size or number of steps must be given",
+    ):
         redshift_grid(zmin, zmax)
 
-    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+    with pytest.raises(
+        ValueError,
+        match="exactly one of grid step size or number of steps must be given",
+    ):
         redshift_grid(zmin, zmax, dz=dz, num=num)
 
 
@@ -298,10 +304,16 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
     # check error raised
 
-    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+    with pytest.raises(
+        ValueError,
+        match="exactly one of grid step size or number of steps must be given",
+    ):
         distance_grid(cosmo, zmin, zmax)
 
-    with pytest.raises(ValueError, match="exactly one of 'dz' or 'num' must be given"):
+    with pytest.raises(
+        ValueError,
+        match="exactly one of grid step size or number of steps must be given",
+    ):
         distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
