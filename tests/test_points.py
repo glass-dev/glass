@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import healpix
 import numpy as np
 import numpy.typing as npt
 import pytest
@@ -14,7 +15,6 @@ from glass import (
     positions_from_delta,
     uniform_positions,
 )
-import healpix
 
 if typing.TYPE_CHECKING:
     import collections.abc

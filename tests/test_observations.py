@@ -1,3 +1,4 @@
+import healpix
 import numpy as np
 import pytest
 
@@ -9,7 +10,6 @@ from glass import (
     tomo_nz_gausserr,
     vmap_galactic_ecliptic,
 )
-import healpix
 
 
 def test_vmap_galactic_ecliptic() -> None:
