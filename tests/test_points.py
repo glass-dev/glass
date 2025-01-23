@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import healpix
 import numpy as np
 import numpy.typing as npt
 import pytest
@@ -115,7 +116,7 @@ def test_loglinear_bias(rng: np.random.Generator) -> None:
 def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR0915
     # create maps that saturate the batching in the function
     nside = 128
-    npix = 12 * nside**2
+    npix = healpix.nside2npix(nside)
 
     # case: single-dimensional input
 
