@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import nox
@@ -20,6 +21,10 @@ ALL_PYTHON = [
     "3.12",
     "3.13",
 ]
+ARRAY_BACKENDS = {
+    "array_api_strict": "array_api_strict>=2",
+    "jax": "jax>=0.4.32",
+}
 
 
 @nox.session
@@ -33,6 +38,15 @@ def lint(session: nox.Session) -> None:
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     session.install("-c", ".github/test-constraints.txt", "-e", ".[test]")
+
+    array_backend = os.environ.get("GLASS_ARRAY_BACKEND")
+    if array_backend == "array_api_strict":
+        session.install(ARRAY_BACKENDS["array_api_strict"])
+    elif array_backend == "jax":
+        session.install(ARRAY_BACKENDS["jax"])
+    elif array_backend == "all":
+        session.install(*ARRAY_BACKENDS.values())
+
     session.run(
         "pytest",
         *session.posargs,
