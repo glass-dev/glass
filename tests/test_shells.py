@@ -30,7 +30,7 @@ def test_distance_weight(cosmo: Cosmology) -> None:
 
     # check first value is 1
 
-    np.testing.assert_array_equal(w[0], 1)
+    assert w[0] == 1
 
     # check values are decreasing
 
