@@ -295,7 +295,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
     dx = 0.2
     x = distance_grid(cosmo, zmin, zmax, dx=dx)
-    np.testing.assert_array_equal(len(x), np.ceil((zmax - zmin) / dx) + 1)
+    assert len(x) == np.ceil((zmax - zmin) / dx) + 1
 
     # check decrease in distance
 
