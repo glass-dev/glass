@@ -66,7 +66,7 @@ def test_density_weight(cosmo: Cosmology) -> None:
 
     # check first value is 0
 
-    np.testing.assert_array_equal(w[0], 0)
+    assert w[0] == 0
 
     # check values are increasing
 
