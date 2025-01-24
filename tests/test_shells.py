@@ -289,7 +289,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
     num = 5
     x = distance_grid(cosmo, zmin, zmax, num=5)
-   assert len(x) == num + 1
+    assert len(x) == num + 1
 
     # check dz input
 
