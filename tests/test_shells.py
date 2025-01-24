@@ -258,7 +258,7 @@ def test_redshift_grid() -> None:
 
     dz = 0.2
     z = redshift_grid(zmin, zmax, dz=dz)
-    np.testing.assert_array_equal(len(z), np.ceil((zmax - zmin) / dz) + 1)
+    assert len(z) == np.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 
