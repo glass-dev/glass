@@ -105,9 +105,16 @@ def cosmo() -> Cosmology:
     class MockCosmology:
         @property
         def omega_m(self) -> float:
+            """Matter density parameter at redshift 0."""
             return 0.3
 
+        @property
+        def rho_c(self) -> float:
+            """Critical density at redshift 0 in Msol Mpc-3."""
+            return 3e4
+
         def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+            """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
             return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
 
         def xm(
@@ -115,9 +122,30 @@ def cosmo() -> Cosmology:
             z: npt.NDArray[np.float64],
             z2: npt.NDArray[np.float64] | None = None,
         ) -> npt.NDArray[np.float64]:
+            """
+            Dimensionless transverse comoving distance.
+
+            :math:`x_M(z) = d_M(z)/d_H`
+            """
             if z2 is None:
-                return np.array(z) * 1000
-            return (np.array(z2) - np.array(z)) * 1000
+                return np.array(z) * 1_000
+            return (np.array(z2) - np.array(z)) * 1_000
+
+        def rho_m_z(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+            """Redshift-dependent matter density in Msol Mpc-3."""
+            return self.rho_c * self.omega_m * (1 + z) ** 3
+
+        def dc(
+            self,
+            z: npt.NDArray[np.float64],
+            z2: npt.NDArray[np.float64] | None = None,
+        ) -> npt.NDArray[np.float64]:
+            """Comoving distance :math:`d_c(z)` in Mpc."""
+            return self.xm(z) / 1_000 if z2 is None else self.xm(z, z2) / 1_000
+
+        def dc_inv(self, dc: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+            """Inverse function for the comoving distance in Mpc."""
+            return 1_000 * (1 / (dc + np.finfo(float).eps))
 
     return MockCosmology()
 
