@@ -252,7 +252,7 @@ def test_redshift_grid() -> None:
 
     num = 5
     z = redshift_grid(zmin, zmax, num=5)
-    np.testing.assert_array_equal(len(z), num + 1)
+    assert len(z) == num + 1
 
     # check dz input
 
