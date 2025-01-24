@@ -113,7 +113,7 @@ def test_linear_windows() -> None:
 
     # check number of windows
 
-    np.testing.assert_array_equal(len(ws), len(zgrid) - 2)
+    assert len(ws) == len(zgrid) - 2
 
     # check values of zeff
 
