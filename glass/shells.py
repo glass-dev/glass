@@ -176,7 +176,7 @@ class RadialWindow(typing.NamedTuple):
 
     za: npt.NDArray[np.float64]
     wa: npt.NDArray[np.float64]
-    zeff: float = 0
+    zeff: float | npt.NDArray[np.float64] = 0
 
 
 def tophat_windows(
@@ -235,10 +235,10 @@ def tophat_windows(
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
         n = max(round((zmax - zmin) / dz), 2)
-        z = np.linspace(zmin, zmax, n)
-        w = wht(z)  # type: ignore[arg-type]
+        z = np.linspace(zmin, zmax, n, dtype=np.float64)
+        w = wht(z)
         zeff = np.trapezoid(w * z, z) / np.trapezoid(w, z)
-        ws.append(RadialWindow(z, w, zeff))  # type: ignore[arg-type]
+        ws.append(RadialWindow(z, w, zeff))
     return ws
 
 
@@ -410,7 +410,7 @@ def restrict(
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
     fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
-    return zr, fr  # type: ignore[return-value]
+    return zr, fr
 
 
 def partition(
@@ -742,7 +742,7 @@ def _uniform_grid(
     if step is not None and num is None:
         return np.arange(start, np.nextafter(stop + step, stop), step)
     if step is None and num is not None:
-        return np.linspace(start, stop, num + 1)  # type: ignore[return-value]
+        return np.linspace(start, stop, num + 1, dtype=np.float64)
     msg = "exactly one of grid step size or number of steps must be given"
     raise ValueError(msg)
 

@@ -410,8 +410,8 @@ class MultiPlaneConvergence:
         self.cosmo = cosmo
 
         # set up initial values of variables
-        self.z2: float = 0.0
-        self.z3: float = 0.0
+        self.z2: float | npt.NDArray[np.float64] = 0.0
+        self.z3: float | npt.NDArray[np.float64] = 0.0
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
@@ -442,7 +442,7 @@ class MultiPlaneConvergence:
     def add_plane(
         self,
         delta: npt.NDArray[np.float64],
-        zsrc: float,
+        zsrc: float | npt.NDArray[np.float64],
         wlens: float = 1.0,
     ) -> None:
         """
@@ -505,7 +505,7 @@ class MultiPlaneConvergence:
         self.kappa3 += f * delta2
 
     @property
-    def zsrc(self) -> float:
+    def zsrc(self) -> float | npt.NDArray[np.float64]:
         """The redshift of the current convergence plane."""
         return self.z3
 

@@ -52,7 +52,7 @@ def effective_bias(
     z: npt.NDArray[np.float64],
     bz: npt.NDArray[np.float64],
     w: RadialWindow,
-) -> npt.NDArray[np.float64]:
+) -> float | npt.NDArray[np.double]:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -85,7 +85,7 @@ def effective_bias(
 
     """
     norm = np.trapezoid(w.wa, w.za)
-    return trapezoid_product((z, bz), (w.za, w.wa)) / norm  # type: ignore[return-value]
+    return trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(
@@ -107,7 +107,7 @@ def linear_bias(
         The density contrast after biasing.
 
     """
-    return b * delta  # type: ignore[return-value]
+    return b * delta
 
 
 def loglinear_bias(
@@ -413,6 +413,6 @@ def position_weights(
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
-        densities = densities * bias  # type: ignore[assignment]
+        densities = densities * bias
     # densities now contains the relative contribution with bias applied
     return densities
