@@ -125,7 +125,7 @@ def gaussian_nz(
     if norm is not None:
         nz *= norm
 
-    return nz  # type: ignore[no-any-return]
+    return nz
 
 
 def smail_nz(

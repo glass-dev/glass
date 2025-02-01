@@ -138,7 +138,7 @@ def trapezoid_product(
         npt.NDArray[np.float64],
     ],
     axis: int = -1,
-) -> npt.NDArray[np.float64]:
+) -> float | npt.NDArray[np.float64]:
     """
     Trapezoidal rule for a product of functions.
 
@@ -166,7 +166,7 @@ def trapezoid_product(
     y = np.interp(x, *f)
     for f_ in ff:
         y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)  # type: ignore[return-value]
+    return np.trapezoid(y, x, axis=axis)
 
 
 def cumulative_trapezoid(
