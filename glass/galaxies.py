@@ -15,7 +15,7 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-"""  # noqa: D205, D400
+"""  # noqa: D400
 
 from __future__ import annotations
 
@@ -145,7 +145,7 @@ def redshifts_from_nz(
     return redshifts
 
 
-def galaxy_shear(  # noqa: PLR0913
+def galaxy_shear(
     lon: npt.NDArray[np.float64],
     lat: npt.NDArray[np.float64],
     eps: npt.NDArray[np.float64],
@@ -305,7 +305,7 @@ def gaussian_phz(
     return zphot
 
 
-def _kappa_ia_nla(  # noqa: PLR0913
+def _kappa_ia_nla(
     delta: npt.NDArray[np.float64],
     zeff: float,
     a_ia: float,
