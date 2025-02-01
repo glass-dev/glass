@@ -1,44 +1,44 @@
-"""
-Random fields
-=============
-
-.. currentmodule:: glass
-
-The following functions provide functionality for simulating random
-fields on the sphere. This is done in the form of HEALPix maps.
-
-Functions
----------
-
-.. autofunction:: discretized_cls
-.. autofunction:: lognormal_gls
-.. autofunction:: generate_gaussian
-.. autofunction:: generate_lognormal
-.. autofunction:: effective_cls
-
-
-Utility functions
------------------
-
-.. autofunction:: getcl
-
-"""  # noqa: D205, D400
+"""Functions for random fields."""
 
 from __future__ import annotations
 
-import collections.abc
+import math
 import typing
 import warnings
 from itertools import combinations_with_replacement, product
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
+from transformcl import cltovar
 
-Cls = collections.abc.Sequence[
-    npt.NDArray[np.float64] | collections.abc.Sequence[float]
-]
+from glass import grf
+
+if TYPE_CHECKING:
+    import collections.abc
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from typing import Any
+
+    from numpy.typing import NDArray
+
+    from glass.shells import RadialWindow
+
+    Fields = Sequence[grf.Transformation]
+    Cls = Sequence[NDArray[Any]]
+
+
+def inv_triangle_number(triangle_number: int) -> int:
+    r"""
+    The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`.  If
+    the argument is :math:`T_n`, then :math:`n` is returned.  Otherwise,
+    a :class:`ValueError` is raised.
+    """
+    n = math.floor(math.sqrt(2 * triangle_number))
+    if n * (n + 1) // 2 != triangle_number:
+        raise ValueError(f"not a triangle number: {triangle_number}")
+    return n
 
 
 def iternorm(
@@ -278,12 +278,12 @@ def discretized_cls(
 
     """
     if ncorr is not None:
-        n = int((2 * len(cls)) ** 0.5)
-        if n * (n + 1) // 2 != len(cls):
-            msg = "length of cls array is not a triangle number"
-            raise ValueError(msg)
+        try:
+            n = inv_triangle_number(len(cls))
+        except ValueError:
+            raise ValueError("length of cls array is not a triangle number") from None
         cls = [
-            cls[i * (i + 1) // 2 + j] if j <= ncorr else []
+            cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
             for j in range(i + 1)
         ]
@@ -343,16 +343,8 @@ def generate_gaussian(
     realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
-    The ``gls`` array must contain the auto-correlation of each new field
-    followed by the cross-correlations with all previous fields in reverse
-    order::
-
-        gls = [gl_00,
-               gl_11, gl_10,
-               gl_22, gl_21, gl_20,
-               ...]
-
-    Missing entries can be set to ``None``.
+    The ``gls`` array must contain the angular power power spectra of the
+    Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     Parameters
     ----------
@@ -382,7 +374,7 @@ def generate_gaussian(
 
     # number of gls and number of fields
     ngls = len(gls)
-    ngrf = int((2 * ngls) ** 0.5)
+    ngrf = inv_triangle_number(ngls)
 
     # number of correlated fields if not specified
     if ncorr is None:
@@ -490,7 +482,8 @@ def getcl(
     lmax: int | None = None,
 ) -> npt.NDArray[np.float64] | collections.abc.Sequence[float]:
     """
-    Return a specific angular power spectrum from an array.
+    Return a specific angular power spectrum from an array in
+    :ref:`standard order <twopoint_order>`.
 
     Parameters
     ----------
@@ -518,6 +511,48 @@ def getcl(
         else:
             cl = np.pad(cl, (0, lmax + 1 - len(cl)))
     return cl
+
+
+def enumerate_spectra(
+    entries: Iterable[NDArray[Any]],
+) -> Iterator[tuple[int, int, NDArray[Any]]]:
+    """
+    Iterate over a set of two-point functions in :ref:`standard order
+    <twopoint_order>`, yielding a tuple of indices and their associated
+    entry from the input.
+
+    Examples
+    --------
+    >>> spectra = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    >>> list(enumerate_spectra(spectra))
+    [(0, 0, [1, 2, 3]), (1, 1, [4, 5, 6]), (1, 0, [7, 8, 9])]
+
+    """
+    for k, cl in enumerate(entries):
+        i = int((2 * k + 0.25) ** 0.5 - 0.5)
+        j = i * (i + 3) // 2 - k
+        yield i, j, cl
+
+
+def spectra_indices(n: int) -> NDArray[np.integer]:
+    """
+    Return an array of indices in :ref:`standard order <twopoint_order>`
+    for a set of two-point functions for *n* fields.  Each row is a pair
+    of indices *i*, *j*.
+
+    Examples
+    --------
+    >>> spectra_indices(3)
+    array([[0, 0],
+           [1, 1],
+           [1, 0],
+           [2, 2],
+           [2, 1],
+           [2, 0]])
+
+    """
+    i, j = np.tril_indices(n)
+    return np.transpose([i, i - j])
 
 
 def effective_cls(
@@ -563,10 +598,10 @@ def effective_cls(
 
     """
     # this is the number of fields
-    n = int((2 * len(cls)) ** 0.5)
-    if n * (n + 1) // 2 != len(cls):
-        msg = "length of cls is not a triangle number"
-        raise ValueError(msg)
+    try:
+        n = inv_triangle_number(len(cls))
+    except ValueError:
+        raise ValueError("length of cls is not a triangle number") from None
 
     # find lmax if not given
     if lmax is None:
@@ -608,3 +643,124 @@ def effective_cls(
         if weights2 is weights1 and j1 != j2:
             out[j2 + j1] = cl
     return out
+
+
+def gaussian_fields(shells: Sequence[RadialWindow]) -> Sequence[grf.Normal]:
+    """Create Gaussian random fields for radial windows *shells*."""
+    return [grf.Normal() for _shell in shells]
+
+
+def lognormal_fields(
+    shells: Sequence[RadialWindow],
+    shift: Callable[[float], float] | None = None,
+) -> Sequence[grf.Lognormal]:
+    """
+    Create lognormal fields for radial windows *shells*.  If *shifts* is
+    given, it must be a callable that returns a lognormal shift (i.e.
+    the scale parameter) at the nominal redshift of each shell.
+    """
+    if shift is None:
+        shift = lambda _z: 1.0  # noqa: E731
+
+    return [grf.Lognormal(shift(shell.zeff)) for shell in shells]
+
+
+def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
+    """
+    Compute a sequence of Gaussian angular power spectra.  After
+    transformation by *fields*, the expected two-point statistics should
+    recover *spectra* when using a band-limited transform [Tessore23]_.
+    """
+    n = len(fields)
+    if len(spectra) != n * (n + 1) // 2:
+        raise ValueError("mismatch between number of fields and spectra")
+
+    gls = []
+    for i, j, cl in enumerate_spectra(spectra):
+        gl = grf.compute(cl, fields[i], fields[j])
+        gls.append(gl)
+    return gls
+
+
+def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
+    """
+    Solve a sequence of Gaussian angular power spectra.  After
+    transformation by *fields*, the expected two-point statistics should
+    recover *spectra* when using a non-band-limited transform
+    [Tessore23]_.
+    """
+    n = len(fields)
+    if len(spectra) != n * (n + 1) // 2:
+        raise ValueError("mismatch between number of fields and spectra")
+
+    gls = []
+    for i, j, cl in enumerate_spectra(spectra):
+        if cl.size > 0:
+            t1, t2 = fields[i], fields[j]
+            monopole = 0.0 if cl[0] == 0 else None
+            gl, _cl_out, info = grf.solve(cl, t1, t2, monopole=monopole)
+            if info == 0:
+                warnings.warn(
+                    f"Gaussian spectrum for fields ({i}, {j}) did not converge",
+                    stacklevel=2,
+                )
+        else:
+            gl = 0 * cl  # makes a copy of the empty array
+        gls.append(gl)
+    return gls
+
+
+def generate(
+    fields: Fields,
+    gls: Cls,
+    nside: int,
+    *,
+    ncorr: int | None = None,
+    rng: np.random.Generator | None = None,
+) -> Iterator[NDArray[Any]]:
+    """
+    Sample random fields from Gaussian angular power spectra.
+
+    Iteratively sample HEALPix maps of transformed Gaussian random
+    fields with the given angular power spectra *gls* and resolution
+    parameter *nside*.
+
+    The random fields are sampled from Gaussian random fields using the
+    transformations in *fields*.
+
+    The *gls* array must contain the angular power power spectra of the
+    Gaussian random fields in :ref:`standard order <twopoint_order>`.
+
+    The optional number *ncorr* limits how many realised fields are
+    correlated. This saves memory, as only *ncorr* previous fields are
+    kept.
+
+    Parameters
+    ----------
+    fields
+        Transformations for the random fields.
+    gls
+        Gaussian angular power spectra.
+    nside
+        Resolution parameter for the HEALPix maps.
+    ncorr
+        Number of correlated fields. If not given, all fields are
+        correlated.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Yields
+    ------
+    x
+        Sampled random fields.
+
+    """
+    n = len(fields)
+    if len(gls) != n * (n + 1) // 2:
+        raise ValueError("mismatch between number of fields and gls")
+
+    variances = (cltovar(getcl(gls, i, i)) for i in range(n))
+    grf = generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)
+
+    for t, x, var in zip(fields, grf, variances, strict=True):
+        yield t(x, var)

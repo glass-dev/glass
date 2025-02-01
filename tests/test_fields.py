@@ -2,6 +2,7 @@ import healpy as hp
 import numpy as np
 import pytest
 
+import glass
 from glass import (
     cls2cov,
     discretized_cls,
@@ -412,3 +413,72 @@ def test_getcl() -> None:
             expected = np.zeros((49,), dtype=np.float64)
             assert len(result) == 51
             np.testing.assert_array_equal(result[2:], expected)
+
+
+def test_inv_triangle_number():
+    from glass.fields import inv_triangle_number
+
+    for n in range(10_000):
+        assert inv_triangle_number(n * (n + 1) // 2) == n
+
+    for t in 2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20:
+        with pytest.raises(ValueError, match="not a triangle number"):
+            inv_triangle_number(t)
+
+
+def test_enumerate_spectra():
+    n = 100
+    tn = n * (n + 1) // 2
+
+    # create mock spectra with 1 element counting to tn
+    spectra = np.arange(tn).reshape(tn, 1)
+
+    # this is the expected order of indices
+    indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
+
+    # iterator that will enumerate the spectra for checking
+    it = glass.enumerate_spectra(spectra)
+
+    # go through expected indices and values and compare
+    for k, (i, j) in enumerate(indices):
+        assert next(it) == (i, j, k)
+
+    # make sure iterator is exhausted
+    with pytest.raises(StopIteration):
+        next(it)
+
+
+def test_spectra_indices():
+    np.testing.assert_array_equal(glass.spectra_indices(0), np.zeros((0, 2)))
+    np.testing.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
+    np.testing.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
+    np.testing.assert_array_equal(
+        glass.spectra_indices(3),
+        [[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]],
+    )
+
+
+def test_gaussian_fields():
+    shells = [
+        glass.RadialWindow([], [], 1.0),
+        glass.RadialWindow([], [], 2.0),
+    ]
+    fields = glass.gaussian_fields(shells)
+    assert len(fields) == len(shells)
+    assert all(isinstance(f, glass.grf.Normal) for f in fields)
+
+
+def test_lognormal_fields():
+    shells = [
+        glass.RadialWindow([], [], 1),
+        glass.RadialWindow([], [], 2),
+        glass.RadialWindow([], [], 3),
+    ]
+
+    fields = glass.lognormal_fields(shells)
+    assert len(fields) == len(shells)
+    assert all(isinstance(f, glass.grf.Lognormal) for f in fields)
+    assert [f.lamda for f in fields] == [1.0, 1.0, 1.0]
+
+    fields = glass.lognormal_fields(shells, lambda z: z**2)
+    assert [f.lamda for f in fields] == [1, 4, 9]
