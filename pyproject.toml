@@ -176,6 +176,7 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "noxfile.py" = [
     "T201", # print
 ], "tests*" = [
+    "ANN001",
     "ANN201",
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
