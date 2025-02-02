@@ -69,7 +69,7 @@ def solve(
 
     n = len(cl)
     if pad < 0:
-        raise TypeError("pad must be a positive integer")
+        raise ValueError("pad must be a positive integer")
 
     if initial is None:
         gl = corrtocl(icorr(t1, t2, cltocorr(cl)))

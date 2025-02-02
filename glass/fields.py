@@ -696,9 +696,22 @@ def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
         if cl.size > 0:
+            # transformation pair
             t1, t2 = fields[i], fields[j]
+
+            # set zero-padding of solver to 2N
+            pad = 2 * cl.size
+
+            # if the desired monopole is zero, that is most likely
+            # and artefact of the theory spectra -- the variance of the
+            # matter density in a finite shell is not zero
+            # -> set output monopole to zero, which ignores cl[0]
             monopole = 0.0 if cl[0] == 0 else None
-            gl, _cl_out, info = grf.solve(cl, t1, t2, monopole=monopole)
+
+            # call solver
+            gl, _cl_out, info = grf.solve(cl, t1, t2, pad=pad, monopole=monopole)
+
+            # warn if solver didn't converge
             if info == 0:
                 warnings.warn(
                     f"Gaussian spectrum for fields ({i}, {j}) did not converge",
