@@ -482,3 +482,51 @@ def test_lognormal_fields():
 
     fields = glass.lognormal_fields(shells, lambda z: z**2)
     assert [f.lamda for f in fields] == [1, 4, 9]
+
+
+def test_compute_gaussian_spectra(mocker):
+    mock = mocker.patch("glass.grf.compute")
+
+    fields = [glass.grf.Normal(), glass.grf.Normal()]
+    spectra = [np.zeros(10), np.zeros(10), np.zeros(10)]
+
+    gls = glass.compute_gaussian_spectra(fields, spectra)
+
+    assert mock.call_count == 3
+    assert mock.call_args_list[0] == mocker.call(spectra[0], fields[0], fields[0])
+    assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
+    assert mock.call_args_list[2] == mocker.call(spectra[2], fields[1], fields[0])
+    assert gls == [mock.return_value, mock.return_value, mock.return_value]
+
+    # spectra size mismatch
+    with pytest.raises(ValueError, match="fields and spectra"):
+        glass.compute_gaussian_spectra(fields, spectra[:2])
+
+
+def test_solve_gaussian_spectra(mocker):
+    mock = mocker.patch("glass.grf.solve")
+
+    result = mock.return_value
+
+    mock.return_value = (result, None, 3)
+
+    fields = [glass.grf.Normal(), glass.grf.Normal()]
+    spectra = [np.zeros(5), np.zeros(10), np.zeros(15)]
+
+    gls = glass.solve_gaussian_spectra(fields, spectra)
+
+    assert mock.call_count == 3
+    assert mock.call_args_list[0] == mocker.call(
+        spectra[0], fields[0], fields[0], pad=10, monopole=0.0
+    )
+    assert mock.call_args_list[1] == mocker.call(
+        spectra[1], fields[1], fields[1], pad=20, monopole=0.0
+    )
+    assert mock.call_args_list[2] == mocker.call(
+        spectra[2], fields[1], fields[0], pad=30, monopole=0.0
+    )
+    assert gls == [result, result, result]
+
+    # spectra size mismatch
+    with pytest.raises(ValueError, match="fields and spectra"):
+        glass.solve_gaussian_spectra(fields, spectra[:2])
