@@ -71,7 +71,9 @@ Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
 report = {exclude_also = [
-    "if typing.TYPE_CHECKING:",
+    "class \\w+\\(Protocol(\\[(\\w+, )*\\w+\\])?\\):", # protocol classes
+    "if TYPE_CHECKING:",
+    "if typing\\.TYPE_CHECKING:",
 ], omit = [
     "glass/_version.py",
 ], skip_covered = true, sort = "cover"}
@@ -178,12 +180,14 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "tests*" = [
     "ANN001",
     "ANN201",
+    "ANN202",
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
     "D104", # undocumented-public-package
     "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
+    "SLF001",
 ]}
 lint.select = [
     "ALL",

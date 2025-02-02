@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING, Protocol, TypeVar
 
-from transformcl import cltocorr, corrtocl
+import transformcl
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -216,4 +216,4 @@ def compute(cl: ArrayT, t1: Transformation, t2: Transformation | None = None) ->
         t2 = t1
 
     # transform C_l to C(\theta), apply transformation, and transform back
-    return corrtocl(icorr(t1, t2, cltocorr(cl)))  # type: ignore[no-any-return]
+    return transformcl.corrtocl(icorr(t1, t2, transformcl.cltocorr(cl)))  # type: ignore[no-any-return]
