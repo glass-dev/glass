@@ -20,7 +20,8 @@ def nnls(
     """
     Compute a non-negative least squares solution.
 
-    Implementation of the algorithm due to [1] as described in [2].
+    Implementation of the algorithm due to [Lawson95]_ as described by
+    [Bro97]_.
 
     Parameters
     ----------
@@ -45,14 +46,6 @@ def nnls(
         If ``b`` is not a vector.
     ValueError
         If the shapes of ``a`` and ``b`` do not match.
-
-    References
-    ----------
-    * [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
-          Problems. doi: 10.1137/1.9781611971217
-    * [2] Bro, R. and De Jong, S. (1997), A fast
-          non-negativity-constrained least squares algorithm. J.
-          Chemometrics, 11, 393-401.
 
     """
     a = np.asanyarray(a)
@@ -97,3 +90,114 @@ def nnls(
         x[p] = sp
         x[~p] = 0
     return x
+
+
+def cov_clip(
+    cov: npt.NDArray[np.float64],
+    rtol: float | None = None,
+) -> npt.NDArray[np.float64]:
+    """
+    Covariance matrix from clipping non-positive eigenvalues.
+
+    The relative tolerance *rtol* is defined as for
+    :func:`~array_api.linalg.matrix_rank`.
+
+    """
+    xp = cov.__array_namespace__()
+
+    # Hermitian eigendecomposition
+    w, v = xp.linalg.eigh(cov)
+
+    # get tolerance if not given
+    if rtol is None:
+        rtol = max(v.shape[-2], v.shape[-1]) * xp.finfo(w.dtype).eps
+
+    # clip negative diagonal values
+    w = xp.clip(w, rtol * xp.max(w, axis=-1, keepdims=True), None)
+
+    # put matrix back together
+    # enforce symmetry
+    v = xp.sqrt(w[..., None, :]) * v
+    return xp.matmul(v, xp.matrix_transpose(v))  # type: ignore[no-any-return]
+
+
+def nearcorr(
+    a: npt.NDArray[np.float64],
+    *,
+    tol: float | None = None,
+    niter: int = 100,
+) -> npt.NDArray[np.float64]:
+    """
+    Nearest correlation matrix using the alternating projections
+    algorithm of [Higham02]_.
+    """
+    xp = a.__array_namespace__()
+
+    # shorthand for Frobenius norm
+    frob = xp.linalg.matrix_norm
+
+    # get size of the covariance matrix and flatten leading dimensions
+    *dim, m, n = a.shape
+    if m != n:
+        raise ValueError("non-square matrix")
+
+    # default tolerance
+    if tol is None:
+        tol = n * xp.finfo(a.dtype).eps
+
+    # current result, flatten leading dimensions
+    y = a.reshape(-1, n, n)
+
+    # initial correction is zero
+    ds = xp.zeros_like(a)
+
+    # store identity matrix
+    diag = xp.eye(n)
+
+    # find the nearest correlation matrix
+    for _ in range(niter):
+        # apply Dykstra's correction to current result
+        r = y - ds
+
+        # project onto positive semi-definite matrices
+        x = cov_clip(r)
+
+        # compute Dykstra's correction
+        ds = x - r
+
+        # project onto matrices with unit diagonal
+        y = (1 - diag) * x + diag
+
+        # check for convergence
+        if xp.all(frob(y - x) <= tol * frob(y)):
+            break
+
+    # return result in original shape
+    return y.reshape(*dim, n, n)
+
+
+def cov_nearest(
+    cov: npt.NDArray[np.float64],
+    tol: float | None = None,
+    niter: int = 100,
+) -> npt.NDArray[np.float64]:
+    """
+    Covariance matrix from nearest correlation matrix :func:`nearcorr`.
+    The diagonal of the result is unchanged.
+    """
+    xp = cov.__array_namespace__()
+
+    # get the diagonal
+    diag = xp.linalg.diagonal(cov)
+
+    # cannot fix negative diagonal
+    if xp.any(diag < 0):
+        raise ValueError("negative values on the diagonal")
+
+    # store the normalisation of the matrix
+    norm = xp.sqrt(diag)
+    norm = norm[..., None, :] * norm[..., :, None]
+
+    # find nearest correlation matrix
+    corr = cov / xp.where(norm > 0, norm, 1.0)
+    return nearcorr(corr, niter=niter, tol=tol) * norm  # type: ignore[no-any-return]
