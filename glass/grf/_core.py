@@ -7,50 +7,17 @@ import transformcl
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Any
 
+    from numpy.typing import NDArray
 
-ArrayT = TypeVar("ArrayT", bound="Array")
-ArrayT_co = TypeVar("ArrayT_co", bound="Array", covariant=True)
 TransformationT = TypeVar("TransformationT", bound="Transformation")
-
-
-class ArrayNamespace(Protocol[ArrayT]):
-    """Protocol for array namespaces."""
-
-    pi: float
-
-    def arange(self, n: int) -> ArrayT: ...
-
-    def sqrt(self, x: ArrayT) -> ArrayT: ...
-    def exp(self, x: ArrayT) -> ArrayT: ...
-    def expm1(self, x: ArrayT) -> ArrayT: ...
-    def log1p(self, x: ArrayT) -> ArrayT: ...
-
-
-class Array(Protocol):
-    """Protocol for arrays."""
-
-    shape: tuple[int, ...]
-
-    def __array_namespace__(self: ArrayT) -> ArrayNamespace[ArrayT]: ...
-
-    def __add__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __sub__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __mul__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __truediv__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __pow__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-
-    def __radd__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __rsub__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __rmul__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __rtruediv__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
-    def __rpow__(self: ArrayT, other: ArrayT | float) -> ArrayT: ...
 
 
 class Transformation(Protocol):
     """Protocol for transformations of Gaussian random fields."""
 
-    def __call__(self, x: ArrayT, var: float, /) -> ArrayT:
+    def __call__(self, x: NDArray[Any], var: float, /) -> NDArray[Any]:
         """Transform a Gaussian random field *x* with variance *var*."""
 
 
@@ -58,17 +25,17 @@ class Dispatch(Protocol):
     """Protocol for the result of dispatch()."""
 
     def __call__(
-        self, t1: Transformation, t2: Transformation, x: ArrayT, /
-    ) -> ArrayT: ...
+        self, t1: Transformation, t2: Transformation, x: NDArray[Any], /
+    ) -> NDArray[Any]: ...
 
     def add(
         self,
-        impl: Callable[[TransformationT, TransformationT, ArrayT], ArrayT],
-    ) -> Callable[[TransformationT, TransformationT, ArrayT], ArrayT]: ...
+        impl: Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]],
+    ) -> Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]]: ...
 
 
 def dispatch(
-    func: Callable[[Transformation, Transformation, ArrayT], ArrayT],
+    func: Callable[[Transformation, Transformation, NDArray[Any]], NDArray[Any]],
 ) -> Dispatch:
     """Create a simple dispatcher for transformation pairs."""
     outer = functools.singledispatch(func)
@@ -76,8 +43,8 @@ def dispatch(
     register = outer.register
 
     def add(
-        impl: Callable[[TransformationT, TransformationT, ArrayT], ArrayT],
-    ) -> Callable[[TransformationT, TransformationT, ArrayT], ArrayT]:
+        impl: Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]],
+    ) -> Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]]:
         from inspect import signature
         from typing import get_type_hints
 
@@ -103,7 +70,11 @@ def dispatch(
         return impl
 
     @functools.wraps(func)
-    def wrapper(t1: Transformation, t2: Transformation, x: ArrayT) -> ArrayT:
+    def wrapper(
+        t1: Transformation,
+        t2: Transformation,
+        x: NDArray[Any],
+    ) -> NDArray[Any]:
         inner = dispatch(type(t1))
         if inner is not func:
             impl = inner.dispatch(type(t2))  # type: ignore[attr-defined]
@@ -116,7 +87,7 @@ def dispatch(
 
 
 @dispatch
-def corr(t1: Transformation, t2: Transformation, x: ArrayT, /) -> ArrayT:
+def corr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray[Any]:
     """
     Transform a Gaussian angular correlation function.
 
@@ -138,7 +109,7 @@ def corr(t1: Transformation, t2: Transformation, x: ArrayT, /) -> ArrayT:
 
 
 @dispatch
-def icorr(t1: Transformation, t2: Transformation, x: ArrayT, /) -> ArrayT:
+def icorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray[Any]:
     """
     Inverse-transform an angular correlation function.
 
@@ -160,7 +131,7 @@ def icorr(t1: Transformation, t2: Transformation, x: ArrayT, /) -> ArrayT:
 
 
 @dispatch
-def dcorr(t1: Transformation, t2: Transformation, x: ArrayT, /) -> ArrayT:
+def dcorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray[Any]:
     """
     Derivative of the angular correlation function transform.
 
@@ -181,7 +152,11 @@ def dcorr(t1: Transformation, t2: Transformation, x: ArrayT, /) -> ArrayT:
     raise NotImplementedError(msg)
 
 
-def compute(cl: ArrayT, t1: Transformation, t2: Transformation | None = None) -> ArrayT:
+def compute(
+    cl: NDArray[Any],
+    t1: Transformation,
+    t2: Transformation | None = None,
+) -> NDArray[Any]:
     """
     Compute a band-limited Gaussian angular power spectrum for the
     target spectrum *cl* and the transformations *t1* and *t2*.  If *t2*

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-from ._core import Transformation, corr, dcorr, icorr
+from glass.grf._core import Transformation, corr, dcorr, icorr
 
 
 def _relerr(dx: NDArray[Any], x: NDArray[Any]) -> float:

@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.testing as npt
 import pytest
 
 import glass.grf
@@ -19,7 +18,7 @@ def test_one_transformation(cl, rng):
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, t)
 
-    npt.assert_array_equal(gl1, gl2)
+    np.testing.assert_array_equal(gl1, gl2)
 
 
 def test_pad(cl, rng):
@@ -44,7 +43,7 @@ def test_initial(cl, rng):
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, initial=gl)
 
-    npt.assert_array_equal(gl1, gl2)
+    np.testing.assert_array_equal(gl1, gl2)
 
 
 def test_no_iterations(cl):
@@ -53,7 +52,7 @@ def test_no_iterations(cl):
     gl1 = glass.grf.compute(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, maxiter=0)
 
-    npt.assert_array_equal(gl1, gl2)
+    np.testing.assert_array_equal(gl1, gl2)
 
 
 def test_lognormal(cl, rng):
@@ -68,12 +67,12 @@ def test_lognormal(cl, rng):
 
     assert info > 0
 
-    npt.assert_allclose(cl_[1 : cl.size], cl[1:], atol=0.0, rtol=cltol)
+    np.testing.assert_allclose(cl_[1 : cl.size], cl[1:], atol=0.0, rtol=cltol)
 
     gl_ = glass.grf.compute(cl_, t1, t2)
 
     assert gl[0] == gl0
-    npt.assert_allclose(gl_[1 : gl.size], gl[1:])
+    np.testing.assert_allclose(gl_[1 : gl.size], gl[1:])
 
 
 def test_monopole(cl, rng):
