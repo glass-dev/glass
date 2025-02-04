@@ -1,6 +1,7 @@
-======================
-Gaussian random fields
-======================
+.. module:: glass.grf
+
+:mod:`glass.grf` --- Gaussian random fields
+===========================================
 
 .. currentmodule:: glass.grf
 

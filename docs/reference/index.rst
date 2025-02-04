@@ -1,20 +1,9 @@
-=============
-API reference
-=============
-
-Sub-packages
-------------
+==================
+Function reference
+==================
 
 .. toctree::
-   :maxdepth: 2
-
-   grf/index
-
-Modules
--------
-
-.. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    shells
    fields
