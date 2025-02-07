@@ -13,7 +13,16 @@ from glass.grf._core import corr, dcorr, icorr
 
 @dataclass
 class Normal:
-    """Transformation for normal fields."""
+    """
+    Transformation for normal fields.
+
+    .. math::
+
+       t(X) = X
+
+    This is the identity transformation.
+
+    """
 
     def __call__(self, x: NDArray[Any], _var: float, /) -> NDArray[Any]:
         """Return *x* unchanged."""
@@ -22,7 +31,18 @@ class Normal:
 
 @dataclass
 class Lognormal:
-    """Transformation for lognormal fields."""
+    r"""
+    Transformation for lognormal fields.
+
+    .. math::
+
+       t(X) = \lambda \bigl[\exp(X - \tfrac{\sigma^2}{2}) - 1\bigr]
+
+    The "lognormal shift" parameter :math:`\lambda` is the scale
+    parameter of the distribution, with determines the smallest
+    possible value :math:`-\lambda` of the lognormal field.
+
+    """
 
     lamda: float = 1.0
 
@@ -37,12 +57,23 @@ class Lognormal:
 
 @dataclass
 class SquaredNormal:
-    """
-    Transformation for squared normal fields.
+    r"""
+    Transformation for squared normal fields as introduced by
+    [Tessore25]_.
 
-    References
-    ----------
-    .. [1] https://arxiv.org/abs/2408.16903
+    .. math::
+
+       t(X) = \lambda \, \bigl[(X - a)^2 - 1\bigr]
+
+    The transformation is characterised by the shape parameter *a*,
+    which is related to the variance :math:`\sigma^2` of the Gaussian
+    random field, :math:`a = \sqrt{1 - \sigma^2}`.
+
+    The "shift" parameter :math:`\lambda` is the scale parameter of the
+    distribution, with determines the smallest possible value
+    :math:`-\lambda` of the squared normal field.
+
+    .. [Tessore25] https://arxiv.org/abs/2408.16903
 
     """
 

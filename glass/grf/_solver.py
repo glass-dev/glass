@@ -34,34 +34,33 @@ def solve(
     """
     Solve for a Gaussian angular power spectrum.
 
-    Parameters
-    ----------
-    cl : (n,) array
-    t1, t2 : :class:`Transformation`
+    Given the input angular power spectrum *cl* and a pair of
+    transformations *t1* and *t2*, computes a Gaussian angular spectrum
+    that reproduces *cl* after the transformations are applied.  This is
+    done using the iterative solver proposed in [Tessore23]_.
 
-    Returns
-    -------
-    gl : (n,) array
-        Gaussian angular power spectrum solution.
-    cl : (n + pad,) array
-        Realised transformed angular power spectrum.
-    info : {0, 1, 2, 3}
-        Indicates success of failure of the solution.  Possible values are
+    The internal padding of the solver is set by *pad*, and the initial
+    solution can be passed as *initial*.  The convergence is controlled
+    by the relative errors *cltol* and *gltol*, and the maximum number
+    of iterations *maxiter*.
 
-        * ``0``, solution did not converge in *maxiter* iterations;
-        * ``1``, solution converged in *cl* relative error;
-        * ``2``, solution converged in *gl* relative error;
-        * ``3``, solution converged in both *cl* and *gl* relative error.
+    If *monopole* is provided, the monopole of the Gaussian angular
+    power spectrum is fixed to that value and ignored by the solver.
 
-    See Also
-    --------
-    glass.grf.compute: Direct computation for band-limited spectra.
+    Returns a tuple *gl*, *cl*, *info* where *gl* is the Gaussian
+    angular power spectrum solution, *cl* is the realised angular power
+    spectrum after transformation, and *info* indicates success of
+    failure of the solution.  Possible *info* values are
 
-    References
-    ----------
-    .. [1] Tessore N., Loureiro A., Joachimi B., von Wietersheim-Kramsta M.,
-           Jeffrey N., 2023, OJAp, 6, 11. doi:10.21105/astro.2302.01942
+    * ``0``, solution did not converge in *maxiter* iterations;
+    * ``1``, solution converged in *cl* relative error;
+    * ``2``, solution converged in *gl* relative error;
+    * ``3``, solution converged in both *cl* and *gl* relative error.
 
+    .. seealso::
+
+       :func:`glass.grf.compute`
+          Direct computation for band-limited spectra.
 
     """
     if t2 is None:

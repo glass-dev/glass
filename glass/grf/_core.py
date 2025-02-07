@@ -21,7 +21,7 @@ class Transformation(Protocol):
         """Transform a Gaussian random field *x* with variance *var*."""
 
 
-class Dispatch(Protocol):
+class _Dispatch(Protocol):
     """Protocol for the result of dispatch()."""
 
     def __call__(
@@ -36,7 +36,7 @@ class Dispatch(Protocol):
 
 def dispatch(
     func: Callable[[Transformation, Transformation, NDArray[Any]], NDArray[Any]],
-) -> Dispatch:
+) -> _Dispatch:
     """Create a simple dispatcher for transformation pairs."""
     outer = functools.singledispatch(func)
     dispatch = outer.dispatch
@@ -93,14 +93,14 @@ def corr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray[
 
     Parameters
     ----------
-    t1, t2 : :class:`Transformation`
+    t1, t2 :
         Transformations of the Gaussian random field.
-    x : array_like
+    x :
         The Gaussian angular correlation function.
 
     Returns
     -------
-    y : array_like
+    y :
         The transformed angular correlation function.
 
     """
@@ -115,14 +115,14 @@ def icorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray
 
     Parameters
     ----------
-    t1, t2 : :class:`Transformation`
+    t1, t2 :
         Transformations of the Gaussian random field.
-    x : array_like
+    x :
         The transformed angular correlation function.
 
     Returns
     -------
-    y : array_like
+    y :
         The Gaussian angular correlation function.
 
     """
@@ -137,14 +137,14 @@ def dcorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray
 
     Parameters
     ----------
-    t1, t2 : :class:`Transformation`
+    t1, t2 :
         Transformations of the Gaussian random field.
-    x : array_like
+    x :
         The Gaussian angular correlation function.
 
     Returns
     -------
-    y : array_like
+    y :
         The derivative of the transformed angular correlation function.
 
     """
@@ -164,14 +164,14 @@ def compute(
 
     Parameters
     ----------
-    cl : array_like
+    cl :
         The angular power spectrum after the transformations.
-    t1, t2 : :class:`Transformation`
+    t1, t2 :
         Transformations applied to the Gaussian random field(s).
 
     Returns
     -------
-    gl : array_like
+    gl :
         Gaussian angular power spectrum.
 
     Examples
