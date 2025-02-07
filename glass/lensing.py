@@ -27,7 +27,7 @@ Applying lensing
 
 .. autofunction:: deflect
 
-"""  # noqa: D400
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -156,7 +156,7 @@ def from_convergence(
     ...
 
 
-def from_convergence(
+def from_convergence(  # noqa: PLR0913
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,

@@ -34,10 +34,11 @@ def inv_triangle_number(triangle_number: int) -> int:
     The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`.  If
     the argument is :math:`T_n`, then :math:`n` is returned.  Otherwise,
     a :class:`ValueError` is raised.
-    """
+    """  # noqa: D205, D401
     n = math.floor(math.sqrt(2 * triangle_number))
     if n * (n + 1) // 2 != triangle_number:
-        raise ValueError(f"not a triangle number: {triangle_number}")
+        msg = f"not a triangle number: {triangle_number}"
+        raise ValueError(msg)
     return n
 
 
@@ -281,7 +282,8 @@ def discretized_cls(
         try:
             n = inv_triangle_number(len(cls))
         except ValueError:
-            raise ValueError("length of cls array is not a triangle number") from None
+            msg = "length of cls array is not a triangle number"
+            raise ValueError(msg) from None
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
@@ -501,7 +503,7 @@ def getcl(
         The angular power spectrum for indices *i* and *j* from an
         array in *GLASS* ordering.
 
-    """
+    """  # noqa: D205
     if j > i:
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
@@ -527,7 +529,7 @@ def enumerate_spectra(
     >>> list(enumerate_spectra(spectra))
     [(0, 0, [1, 2, 3]), (1, 1, [4, 5, 6]), (1, 0, [7, 8, 9])]
 
-    """
+    """  # noqa: D205
     for k, cl in enumerate(entries):
         i = int((2 * k + 0.25) ** 0.5 - 0.5)
         j = i * (i + 3) // 2 - k
@@ -550,7 +552,7 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
            [2, 1],
            [2, 0]])
 
-    """
+    """  # noqa: D205
     i, j = np.tril_indices(n)
     return np.transpose([i, i - j])
 
@@ -601,7 +603,8 @@ def effective_cls(
     try:
         n = inv_triangle_number(len(cls))
     except ValueError:
-        raise ValueError("length of cls is not a triangle number") from None
+        msg = "length of cls is not a triangle number"
+        raise ValueError(msg) from None
 
     # find lmax if not given
     if lmax is None:
@@ -658,7 +661,7 @@ def lognormal_fields(
     Create lognormal fields for radial windows *shells*.  If *shifts* is
     given, it must be a callable that returns a lognormal shift (i.e.
     the scale parameter) at the nominal redshift of each shell.
-    """
+    """  # noqa: D205
     if shift is None:
         shift = lambda _z: 1.0  # noqa: E731
 
@@ -670,10 +673,11 @@ def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
     Compute a sequence of Gaussian angular power spectra.  After
     transformation by *fields*, the expected two-point statistics should
     recover *spectra* when using a band-limited transform [Tessore23]_.
-    """
+    """  # noqa: D205
     n = len(fields)
     if len(spectra) != n * (n + 1) // 2:
-        raise ValueError("mismatch between number of fields and spectra")
+        msg = "mismatch between number of fields and spectra"
+        raise ValueError(msg)
 
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
@@ -688,10 +692,11 @@ def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
     transformation by *fields*, the expected two-point statistics should
     recover *spectra* when using a non-band-limited transform
     [Tessore23]_.
-    """
+    """  # noqa: D205
     n = len(fields)
     if len(spectra) != n * (n + 1) // 2:
-        raise ValueError("mismatch between number of fields and spectra")
+        msg = "mismatch between number of fields and spectra"
+        raise ValueError(msg)
 
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
@@ -770,7 +775,8 @@ def generate(
     """
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:
-        raise ValueError("mismatch between number of fields and gls")
+        msg = "mismatch between number of fields and gls"
+        raise ValueError(msg)
 
     variances = (cltovar(getcl(gls, i, i)) for i in range(n))
     grf = generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)

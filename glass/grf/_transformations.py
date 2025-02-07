@@ -75,7 +75,7 @@ class SquaredNormal:
 
     .. [Tessore25] https://arxiv.org/abs/2408.16903
 
-    """
+    """  # noqa: D205
 
     a: float
     lamda: float = 1.0

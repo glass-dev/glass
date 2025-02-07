@@ -19,7 +19,7 @@ def _relerr(dx: NDArray[Any], x: NDArray[Any]) -> float:
     return np.fabs(q).max()  # type: ignore[no-any-return]
 
 
-def solve(
+def solve(  # noqa: PLR0912, PLR0913
     cl: NDArray[Any],
     t1: Transformation,
     t2: Transformation | None = None,
@@ -68,7 +68,8 @@ def solve(
 
     n = len(cl)
     if pad < 0:
-        raise ValueError("pad must be a positive integer")
+        msg = "pad must be a positive integer"
+        raise ValueError(msg)
 
     if initial is None:
         gl = corrtocl(icorr(t1, t2, cltocorr(cl)))

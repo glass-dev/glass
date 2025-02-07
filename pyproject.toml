@@ -141,17 +141,9 @@ lint.allowed-confusables = [
 lint.ignore = [
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
-    "D205", # missing-blank-line-after-summary
     "D212", # blank-line-before-class
-    "D401", # non-imperative-mood
-    "EM101",
-    "EM102",
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
-    "PLR0912", # too-many-branches
-    "PLR0913", # too-many-arguments
     "RUF003", # ambiguous-unicode-character-comment
-    "SIM108",
-    "TRY003",
 ]
 lint.isort = {known-first-party = [
     "glass",

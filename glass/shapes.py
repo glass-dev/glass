@@ -20,7 +20,7 @@ Utilities
 
 .. autofunction:: triaxial_axis_ratio
 
-"""  # noqa: D400
+"""  # noqa: D205, D400
 
 from __future__ import annotations
 
@@ -97,7 +97,7 @@ def triaxial_axis_ratio(
     )
 
 
-def ellipticity_ryden04(
+def ellipticity_ryden04(  # noqa: PLR0913
     mu: float | npt.NDArray[np.float64],
     sigma: float | npt.NDArray[np.float64],
     gamma: float | npt.NDArray[np.float64],

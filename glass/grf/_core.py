@@ -50,10 +50,12 @@ def dispatch(
 
         sig = signature(impl)
         if len(sig.parameters) != 3:
-            raise TypeError("invalid signature")
+            msg = "invalid signature"
+            raise TypeError(msg)
         par1, par2, _ = sig.parameters.values()
         if par1.annotation is par1.empty or par2.annotation is par2.empty:
-            raise TypeError("invalid signature")
+            msg = "invalid signature"
+            raise TypeError(msg)
         a, b, *_ = get_type_hints(impl).values()
 
         inner_a = dispatch(a)
@@ -75,12 +77,10 @@ def dispatch(
         t2: Transformation,
         x: NDArray[Any],
     ) -> NDArray[Any]:
-        inner = dispatch(type(t1))
-        if inner is not func:
-            impl = inner.dispatch(type(t2))  # type: ignore[attr-defined]
-        else:
-            impl = func
-        return impl(t1, t2, x)  # type: ignore[no-any-return]
+        impl = dispatch(type(t1))
+        if impl is not func:
+            impl = impl.dispatch(type(t2))  # type: ignore[attr-defined]
+        return impl(t1, t2, x)
 
     wrapper.add = add  # type: ignore[attr-defined]
     return wrapper  # type: ignore[return-value]
@@ -147,7 +147,7 @@ def dcorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray
     y :
         The derivative of the transformed angular correlation function.
 
-    """
+    """  # noqa: D401
     msg = f"{t1.__class__.__name__} x {t2.__class__.__name__}"
     raise NotImplementedError(msg)
 
@@ -186,7 +186,7 @@ def compute(
     --------
     glass.grf.solve: Iterative solver for non-band-limited spectra.
 
-    """
+    """  # noqa: D205
     if t2 is None:
         t2 = t1
 
