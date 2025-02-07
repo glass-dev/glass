@@ -1,5 +1,3 @@
-import unittest.mock
-
 import numpy as np
 import pytest
 
@@ -36,7 +34,7 @@ def test_dispatch():
 
 
 def test_dispatch_bad_function():
-    test = glass.grf._core.dispatch(unittest.mock.Mock())
+    test = glass.grf._core.dispatch(lambda _a, _b: ...)
 
     with pytest.raises(TypeError):
 
@@ -67,10 +65,11 @@ def test_corr_unknown():
         glass.grf.dcorr(t1, t2, x)
 
 
-@unittest.mock.patch("transformcl.corrtocl")
-@unittest.mock.patch("glass.grf._core.icorr")
-@unittest.mock.patch("transformcl.cltocorr")
-def test_compute(cltocorr, icorr, corrtocl):
+def test_compute(mocker):
+    cltocorr = mocker.patch("transformcl.cltocorr")
+    icorr = mocker.patch("glass.grf._core.icorr")
+    corrtocl = mocker.patch("transformcl.corrtocl")
+
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
     x = np.zeros(10)
