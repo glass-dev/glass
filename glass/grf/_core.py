@@ -18,7 +18,21 @@ class Transformation(Protocol):
     """Protocol for transformations of Gaussian random fields."""
 
     def __call__(self, x: NDArray[Any], var: float, /) -> NDArray[Any]:
-        """Transform a Gaussian random field *x* with variance *var*."""
+        """
+        Transform a Gaussian random field *x* with variance *var*.
+
+        Parameters
+        ----------
+        x
+            The Gaussian random field to be transformed.
+        var
+            Variance of the Gaussian random field.
+
+        Returns
+        -------
+            The transformed Gaussian random field.
+
+        """
 
 
 class _Dispatch(Protocol):

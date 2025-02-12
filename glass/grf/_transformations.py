@@ -42,6 +42,11 @@ class Lognormal:
     parameter of the distribution, with determines the smallest
     possible value :math:`-\lambda` of the lognormal field.
 
+    Parameters
+    ----------
+    lamda
+        The parameter :math:`\lambda`.
+
     """
 
     lamda: float = 1.0
@@ -74,6 +79,13 @@ class SquaredNormal:
     :math:`-\lambda` of the squared normal field.
 
     .. [Tessore25] https://arxiv.org/abs/2408.16903
+
+    Parameters
+    ----------
+    a
+        The parameter :math:`a`.
+    lamda
+        The parameter :math:`\lambda`.
 
     """  # noqa: D205
 
