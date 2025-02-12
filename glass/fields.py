@@ -649,7 +649,19 @@ def effective_cls(
 
 
 def gaussian_fields(shells: Sequence[RadialWindow]) -> Sequence[grf.Normal]:
-    """Create Gaussian random fields for radial windows *shells*."""
+    """
+    Create Gaussian random fields for radial windows *shells*.
+
+    Parameters
+    ----------
+    shells
+        Window functions for the simulated shells.
+
+    Returns
+    -------
+        A sequence describing the Gaussian random fields.
+
+    """
     return [grf.Normal() for _shell in shells]
 
 
@@ -661,6 +673,18 @@ def lognormal_fields(
     Create lognormal fields for radial windows *shells*.  If *shifts* is
     given, it must be a callable that returns a lognormal shift (i.e.
     the scale parameter) at the nominal redshift of each shell.
+
+    Parameters
+    ----------
+    shells
+        Window functions for the simulated shells.
+    shift
+        Callable that returns the lognormal shift for each field.
+
+    Returns
+    -------
+        A sequence describing the lognormal fields.
+
     """  # noqa: D205
     if shift is None:
         shift = lambda _z: 1.0  # noqa: E731
@@ -670,10 +694,24 @@ def lognormal_fields(
 
 def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
     """
-    Compute a sequence of Gaussian angular power spectra.  After
-    transformation by *fields*, the expected two-point statistics should
-    recover *spectra* when using a band-limited transform [Tessore23]_.
-    """  # noqa: D205
+    Compute a sequence of Gaussian angular power spectra.
+
+    After transformation by *fields*, the expected two-point statistics
+    should recover *spectra* when using a band-limited transform
+    [Tessore23]_.
+
+    Parameters
+    ----------
+    fields
+        The fields to be simulated.
+    spectra
+        The desired angular power spectra of the fields.
+
+    Returns
+    -------
+        Gaussian angular power spectra for simulation.
+
+    """
     n = len(fields)
     if len(spectra) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and spectra"
@@ -688,11 +726,24 @@ def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
 
 def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
     """
-    Solve a sequence of Gaussian angular power spectra.  After
-    transformation by *fields*, the expected two-point statistics should
-    recover *spectra* when using a non-band-limited transform
+    Solve a sequence of Gaussian angular power spectra.
+
+    After transformation by *fields*, the expected two-point statistics
+    should recover *spectra* when using a non-band-limited transform
     [Tessore23]_.
-    """  # noqa: D205
+
+    Parameters
+    ----------
+    fields
+        The fields to be simulated.
+    spectra
+        The desired angular power spectra of the fields.
+
+    Returns
+    -------
+        Gaussian angular power spectra for simulation.
+
+    """
     n = len(fields)
     if len(spectra) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and spectra"
