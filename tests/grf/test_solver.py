@@ -4,7 +4,7 @@ import pytest
 import glass.grf
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def cl():
     lmax = 100
     ell = np.arange(lmax + 1)

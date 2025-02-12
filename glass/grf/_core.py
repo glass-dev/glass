@@ -93,14 +93,13 @@ def corr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray[
 
     Parameters
     ----------
-    t1, t2 :
+    t1, t2
         Transformations of the Gaussian random field.
-    x :
+    x
         The Gaussian angular correlation function.
 
     Returns
     -------
-    y :
         The transformed angular correlation function.
 
     """
@@ -115,14 +114,13 @@ def icorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray
 
     Parameters
     ----------
-    t1, t2 :
+    t1, t2
         Transformations of the Gaussian random field.
-    x :
+    x
         The transformed angular correlation function.
 
     Returns
     -------
-    y :
         The Gaussian angular correlation function.
 
     """
@@ -137,14 +135,13 @@ def dcorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray
 
     Parameters
     ----------
-    t1, t2 :
+    t1, t2
         Transformations of the Gaussian random field.
-    x :
+    x
         The Gaussian angular correlation function.
 
     Returns
     -------
-    y :
         The derivative of the transformed angular correlation function.
 
     """  # noqa: D401
@@ -164,14 +161,13 @@ def compute(
 
     Parameters
     ----------
-    cl :
+    cl
         The angular power spectrum after the transformations.
-    t1, t2 :
+    t1, t2
         Transformations applied to the Gaussian random field(s).
 
     Returns
     -------
-    gl :
         Gaussian angular power spectrum.
 
     Examples

@@ -15,6 +15,7 @@ from glass import (
     multalm,
     transform_cls,
 )
+from glass.fields import inv_triangle_number
 
 
 def test_iternorm() -> None:
@@ -416,12 +417,12 @@ def test_getcl() -> None:
 
 
 def test_inv_triangle_number():
-    from glass.fields import inv_triangle_number
-
     for n in range(10_000):
         assert inv_triangle_number(n * (n + 1) // 2) == n
 
-    for t in 2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20:
+    not_triangle_numbers = [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
+
+    for t in not_triangle_numbers:
         with pytest.raises(ValueError, match="not a triangle number"):
             inv_triangle_number(t)
 

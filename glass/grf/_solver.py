@@ -57,10 +57,29 @@ def solve(  # noqa: PLR0912, PLR0913
     * ``2``, solution converged in *gl* relative error;
     * ``3``, solution converged in both *cl* and *gl* relative error.
 
-    .. seealso::
+    Parameters
+    ----------
+    cl
+        The angular power spectrum after the transformations.
+    t1, t2
+        Transformations applied to the Gaussian random field(s).
+    pad
+        Internal padding applied to the transforms.
+    initial
+        Initial solution. If not provided, uses the result of
+        :func:`glass.grf.compute`.
+    cltol
+        Relative error for convergence in the desired output.
+    gltol
+        Relative error for convergence in the solution.
+    maxiter
+        Maximum number of iterations of the solver.
+    monopole
+        Fix the monopole of the solution to the given value.
 
-       :func:`glass.grf.compute`
-          Direct computation for band-limited spectra.
+    See Also
+    --------
+    glass.grf.compute : Direct computation for band-limited spectra.
 
     """
     if t2 is None:
@@ -87,6 +106,8 @@ def solve(  # noqa: PLR0912, PLR0913
         fl[0] = 0
     clerr = _relerr(fl, cl)
 
+    # this is a very basic Gauss-Newton solver
+    # see https://arxiv.org/pdf/2302.01942 for details
     info = 0
     for _ in range(maxiter):
         if clerr <= cltol:
@@ -100,6 +121,8 @@ def solve(  # noqa: PLR0912, PLR0913
         if monopole is not None:
             xl[0] = 0
 
+        # we know the "direction" of the step xl at this point
+        # make xl smaller (by half) until we get an improved solution
         while True:
             gl_ = gl + xl
             gt_ = cltocorr(np.pad(gl_, (0, pad)))
