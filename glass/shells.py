@@ -41,7 +41,7 @@ Weight functions
 .. autofunction:: volume_weight
 .. autofunction:: density_weight
 
-"""  # noqa: D205, D400
+"""  # noqa: D400
 
 from __future__ import annotations
 
