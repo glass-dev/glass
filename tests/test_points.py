@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
-import numpy.typing as npt
 import pytest
 
 from glass import (
@@ -20,24 +19,25 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     import pytest_mock
+    from numpy.typing import NDArray
 
 
 def catpos(
     pos: Generator[
         tuple[
-            npt.NDArray[np.float64],
-            npt.NDArray[np.float64],
-            int | npt.NDArray[np.int_],
+            NDArray[np.float64],
+            NDArray[np.float64],
+            int | NDArray[np.int_],
         ]
     ],
 ) -> tuple[
-    npt.NDArray[np.float64],
-    npt.NDArray[np.float64],
-    int | npt.NDArray[np.int_],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    int | NDArray[np.int_],
 ]:
     lon = np.empty(0)
     lat = np.empty(0)
-    cnt: int | npt.NDArray[np.int_] = 0
+    cnt: int | NDArray[np.int_] = 0
     for lo, la, co in pos:
         lon = np.concatenate([lon, lo])
         lat = np.concatenate([lat, la])
@@ -120,7 +120,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 
     # case: single-dimensional input
 
-    ngal: float | npt.NDArray[np.float64] = 1e-3
+    ngal: float | NDArray[np.float64] = 1e-3
     delta = np.zeros(npix)
     bias = 0.8
     vis = np.ones(npix)
@@ -243,7 +243,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 def test_uniform_positions(rng: np.random.Generator) -> None:
     # case: scalar input
 
-    ngal: float | npt.NDArray[np.float64] = 1e-3
+    ngal: float | NDArray[np.float64] = 1e-3
 
     lon, lat, cnt = catpos(uniform_positions(ngal))
 

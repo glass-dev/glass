@@ -29,19 +29,22 @@ from __future__ import annotations
 
 import itertools
 import math
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
-import numpy.typing as npt
 
 from glass.core.array import cumulative_trapezoid
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Visibility map masking galactic and ecliptic plane.
 
@@ -85,12 +88,12 @@ def vmap_galactic_ecliptic(
 
 
 def gaussian_nz(
-    z: npt.NDArray[np.float64],
-    mean: float | npt.NDArray[np.float64],
-    sigma: float | npt.NDArray[np.float64],
+    z: NDArray[np.float64],
+    mean: float | NDArray[np.float64],
+    sigma: float | NDArray[np.float64],
     *,
-    norm: float | npt.NDArray[np.float64] | None = None,
-) -> npt.NDArray[np.float64]:
+    norm: float | NDArray[np.float64] | None = None,
+) -> NDArray[np.float64]:
     """
     Gaussian redshift distribution.
 
@@ -129,13 +132,13 @@ def gaussian_nz(
 
 
 def smail_nz(
-    z: npt.NDArray[np.float64],
-    z_mode: float | npt.NDArray[np.float64],
-    alpha: float | npt.NDArray[np.float64],
-    beta: float | npt.NDArray[np.float64],
+    z: NDArray[np.float64],
+    z_mode: float | NDArray[np.float64],
+    alpha: float | NDArray[np.float64],
+    beta: float | NDArray[np.float64],
     *,
-    norm: float | npt.NDArray[np.float64] | None = None,
-) -> npt.NDArray[np.float64]:
+    norm: float | NDArray[np.float64] | None = None,
+) -> NDArray[np.float64]:
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -235,8 +238,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: npt.NDArray[np.float64],
-    nz: npt.NDArray[np.float64],
+    z: NDArray[np.float64],
+    nz: NDArray[np.float64],
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -271,11 +274,11 @@ def equal_dens_zbins(
 
 
 def tomo_nz_gausserr(
-    z: npt.NDArray[np.float64],
-    nz: npt.NDArray[np.float64],
+    z: NDArray[np.float64],
+    nz: NDArray[np.float64],
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Tomographic redshift bins with a Gaussian redshift error.
 

@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING
+
 import numpy as np
-import numpy.typing as npt
 import pytest
 
 from glass.core.array import (
@@ -9,6 +10,9 @@ from glass.core.array import (
     ndinterp,
     trapezoid_product,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def test_broadcast_first() -> None:
@@ -60,7 +64,7 @@ def test_ndinterp() -> None:
     xp = np.array([0, 1, 2, 3, 4])
     yp = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
 
-    x: float | npt.NDArray[np.float64] = 0.5
+    x: float | NDArray[np.float64] = 0.5
     y = ndinterp(x, xp, yp)
     assert np.shape(y) == ()
     np.testing.assert_allclose(y, 1.15, atol=1e-15)
