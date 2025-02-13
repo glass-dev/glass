@@ -32,18 +32,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache nox
-        uses: actions/cache@v4
-        with:
-          key: test-${{ hashFiles('pyproject.toml') }}
-          path: .nox
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
           python-version: 3.x
+
+      - name: Cache nox
+        uses: actions/cache@v4
+        with:
+          key:
+            examples-${{ hashFiles('pyproject.toml') }}-${{
+            hashFiles('noxfile.py') }}-${{ env.pythonLocation }}
+          path: .nox
 
       - name: Install nox
         run: python -m pip install nox
