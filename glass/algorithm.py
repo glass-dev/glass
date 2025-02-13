@@ -1,4 +1,4 @@
-"""Core module for algorithms."""
+"""Module for algorithms."""
 
 from __future__ import annotations
 

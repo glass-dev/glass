@@ -1,16 +1,16 @@
-.. module:: glass.core.algorithm
+.. module:: glass.algorithm
 
-:mod:`glass.core.algorithm` --- General purpose algorithms
-==========================================================
+:mod:`glass.algorithm` --- General purpose algorithms
+=====================================================
 
-.. currentmodule:: glass.core.algorithm
+.. currentmodule:: glass.algorithm
 
 This module contains general implementations of algorithms which are used by
 GLASS, but are otherwise unrelated to GLASS functionality.
 
-This module must be imported manually::
+This module should be imported manually if used outside of GLASS::
 
-    import glass.core.algorithm as algo
+    import glass.algorithm
 
 
 Non-negative least squares
