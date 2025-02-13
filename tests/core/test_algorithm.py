@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from glass.core.algorithm import nnls
+import glass.core.algorithm
 
 
 def test_nnls(rng: np.random.Generator) -> None:
@@ -10,14 +10,16 @@ def test_nnls(rng: np.random.Generator) -> None:
     a = np.arange(25.0).reshape(-1, 5)
     b = np.arange(5.0)
     y = a @ b
-    res = nnls(a, y)
+    res = glass.core.algorithm.nnls(a, y)
     assert np.linalg.norm((a @ res) - y) < 1e-7
 
     a = rng.uniform(low=-10, high=10, size=[50, 10])
     b = np.abs(rng.uniform(low=-2, high=2, size=[10]))
     b[::2] = 0
     x = a @ b
-    res = nnls(a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0))
+    res = glass.core.algorithm.nnls(
+        a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0)
+    )
     np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
@@ -26,8 +28,8 @@ def test_nnls(rng: np.random.Generator) -> None:
     b = rng.standard_normal((100,))
 
     with pytest.raises(ValueError, match="input `a` is not a matrix"):
-        nnls(b, a)
+        glass.core.algorithm.nnls(b, a)
     with pytest.raises(ValueError, match="input `b` is not a vector"):
-        nnls(a, a)
+        glass.core.algorithm.nnls(a, a)
     with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
-        nnls(a.T, b)
+        glass.core.algorithm.nnls(a.T, b)

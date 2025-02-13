@@ -3,12 +3,7 @@ import numpy.typing as npt
 import pytest
 import pytest_mock
 
-from glass import (
-    galaxy_shear,
-    gaussian_phz,
-    redshifts,
-    redshifts_from_nz,
-)
+import glass
 
 
 def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
@@ -18,20 +13,20 @@ def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
     w.wa = np.exp(-0.5 * (w.za - 0.5) ** 2 / 0.1**2)
 
     # sample redshifts (scalar)
-    z = redshifts(13, w)
+    z = glass.redshifts(13, w)
     assert z.shape == (13,)
     assert z.min() >= 0.0
     assert z.max() <= 1.0
 
     # sample redshifts (array)
-    z = redshifts(np.array([[1, 2], [3, 4]]), w)
+    z = glass.redshifts(np.array([[1, 2], [3, 4]]), w)
     assert z.shape == (10,)
 
 
 def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     # test sampling
 
-    redshifts = redshifts_from_nz(
+    redshifts = glass.redshifts_from_nz(
         10,
         np.array([0, 1, 2, 3, 4]),
         np.array([1, 0, 0, 0, 0]),
@@ -39,7 +34,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     )
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(
+    redshifts = glass.redshifts_from_nz(
         10,
         np.array([0, 1, 2, 3, 4]),
         np.array([0, 0, 1, 0, 0]),
@@ -47,7 +42,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     )
     assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(
+    redshifts = glass.redshifts_from_nz(
         10,
         np.array([0, 1, 2, 3, 4]),
         np.array([0, 0, 0, 0, 1]),
@@ -55,7 +50,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     )
     assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
-    redshifts = redshifts_from_nz(
+    redshifts = glass.redshifts_from_nz(
         10,
         np.array([0, 1, 2, 3, 4]),
         np.array([0, 0, 1, 1, 1]),
@@ -65,7 +60,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # test with rng
 
-    redshifts = redshifts_from_nz(
+    redshifts = glass.redshifts_from_nz(
         10,
         np.array([0, 1, 2, 3, 4]),
         np.array([0, 0, 1, 1, 1]),
@@ -82,7 +77,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
-    redshifts = redshifts_from_nz(count, z, nz, warn=False)
+    redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (count,)
     assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
@@ -93,7 +88,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
-    redshifts = redshifts_from_nz(count, z, nz, warn=False)
+    redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
     assert np.shape(redshifts) == (60,)
 
@@ -103,7 +98,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     z = np.linspace(0, 1, 100)
     nz = np.array([z * (1 - z), (z - 0.5) ** 2])
 
-    redshifts = redshifts_from_nz(count, z, nz, warn=False)
+    redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (20,)
 
@@ -113,7 +108,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     z = np.linspace(0, 1, 100)
     nz = np.array([z * (1 - z), (z - 0.5) ** 2])
 
-    redshifts = redshifts_from_nz(count, z, nz, warn=False)
+    redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (120,)
 
@@ -124,10 +119,10 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     nz = np.array([z * (1 - z), (z - 0.5) ** 2])
 
     with pytest.raises(ValueError, match="shape mismatch"):
-        redshifts_from_nz(count, z, nz, warn=False)
+        glass.redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
-        redshifts = redshifts_from_nz(
+        redshifts = glass.redshifts_from_nz(
             10,
             np.array([0, 1, 2, 3, 4]),
             np.array([1, 0, 0, 0, 0]),
@@ -143,7 +138,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         rng.normal(size=(12,)),
     )
 
-    shear = galaxy_shear(
+    shear = glass.galaxy_shear(
         np.array([]),
         np.array([]),
         np.array([]),
@@ -158,12 +153,12 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         rng.normal(size=(512,)),
         rng.normal(size=(512,)),
     )
-    shear = galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
+    shear = glass.galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
     assert np.shape(shear) == (512,)
 
     # shape with no reduced shear
 
-    shear = galaxy_shear(
+    shear = glass.galaxy_shear(
         np.array([]),
         np.array([]),
         np.array([]),
@@ -179,7 +174,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         rng.normal(size=(512,)),
         rng.normal(size=(512,)),
     )
-    shear = galaxy_shear(
+    shear = glass.galaxy_shear(
         gal_lon,
         gal_lat,
         gal_eps,
@@ -199,13 +194,13 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z: float | npt.NDArray[np.float64] = np.linspace(0, 1, 100)
     sigma_0: float | npt.NDArray[np.float64] = 0.0
 
-    phz = gaussian_phz(z, sigma_0)
+    phz = glass.gaussian_phz(z, sigma_0)
 
     np.testing.assert_array_equal(z, phz)
 
     # test with rng
 
-    phz = gaussian_phz(z, sigma_0, rng=rng)
+    phz = glass.gaussian_phz(z, sigma_0, rng=rng)
 
     np.testing.assert_array_equal(z, phz)
 
@@ -214,7 +209,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = 0.0
     sigma_0 = np.ones(100)
 
-    phz = gaussian_phz(z, sigma_0)
+    phz = glass.gaussian_phz(z, sigma_0)
 
     assert isinstance(phz, np.ndarray)
     assert phz.shape == (100,)
@@ -225,7 +220,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = 1.0
     sigma_0 = np.ones(100)
 
-    phz = gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
+    phz = glass.gaussian_phz(z, sigma_0, lower=0.5, upper=1.5)
 
     assert isinstance(phz, np.ndarray)
     assert phz.shape == (100,)
@@ -239,7 +234,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = 1.0
     sigma_0 = 0.0
 
-    phz = gaussian_phz(z, sigma_0)
+    phz = glass.gaussian_phz(z, sigma_0)
 
     assert np.ndim(phz) == 0
     assert phz == z
@@ -249,7 +244,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = np.linspace(0, 1, 10)
     sigma_0 = 0.0
 
-    phz = gaussian_phz(z, sigma_0)
+    phz = glass.gaussian_phz(z, sigma_0)
 
     assert isinstance(phz, np.ndarray)
     assert phz.shape == (10,)
@@ -260,7 +255,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = 1.0
     sigma_0 = np.zeros(10)
 
-    phz = gaussian_phz(z, sigma_0)
+    phz = glass.gaussian_phz(z, sigma_0)
 
     assert isinstance(phz, np.ndarray)
     assert phz.shape == (10,)
@@ -271,7 +266,7 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
     z = np.linspace(0, 1, 10)
     sigma_0 = np.zeros((11, 1))
 
-    phz = gaussian_phz(z, sigma_0)
+    phz = glass.gaussian_phz(z, sigma_0)
 
     assert isinstance(phz, np.ndarray)
     assert phz.shape == (11, 10)
@@ -279,13 +274,13 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # test resampling
 
-    phz = gaussian_phz(np.array(0.0), np.array(1.0), lower=np.array([0]))
+    phz = glass.gaussian_phz(np.array(0.0), np.array(1.0), lower=np.array([0]))
     assert isinstance(phz, float)
 
-    phz = gaussian_phz(np.array(0.0), np.array(1.0), upper=np.array([1]))
+    phz = glass.gaussian_phz(np.array(0.0), np.array(1.0), upper=np.array([1]))
     assert isinstance(phz, float)
 
     # test error
 
     with pytest.raises(ValueError, match="requires lower < upper"):
-        phz = gaussian_phz(z, sigma_0, lower=np.array([1]), upper=np.array([0]))
+        phz = glass.gaussian_phz(z, sigma_0, lower=np.array([1]), upper=np.array([0]))

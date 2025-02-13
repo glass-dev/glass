@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass import load_cls, save_cls, write_catalog
+import glass
 
 # check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
@@ -19,7 +19,7 @@ cls_file = "Cls.npz"
 
 def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> None:
     cls = rng.normal(size=(10, 10))
-    save_cls(tmp_path / cls_file, cls)
+    glass.save_cls(tmp_path / cls_file, cls)
 
     assert pathlib.Path.exists(tmp_path / cls_file)
 
@@ -31,7 +31,7 @@ def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> Non
     np.testing.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
     np.testing.assert_array_equal(cls, np.split(values, split))
 
-    npz = load_cls(tmp_path / cls_file)
+    npz = glass.load_cls(tmp_path / cls_file)
     np.testing.assert_array_equal(npz, cls)
 
 
@@ -56,7 +56,7 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
             hdu.write(data, names=names, firstrow=hdu.get_nrows())
 
     with (
-        write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
+        glass.write_catalog(tmp_path / filename_gfits, ext="CATALOG") as out,
         fitsio.FITS(tmp_path / filename_tfits, "rw", clobber=True) as my_fits,
     ):
         for i in range(my_max):
@@ -99,7 +99,7 @@ def test_write_exception(tmp_path: pathlib.Path) -> None:
         raise TestWriteError(msg)
 
     try:
-        with write_catalog(tmp_path / filename, ext="CATALOG") as out:
+        with glass.write_catalog(tmp_path / filename, ext="CATALOG") as out:
             for i in range(my_max):
                 if i == except_int:
                     msg = "Unhandled exception"

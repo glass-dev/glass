@@ -8,7 +8,7 @@ from typing import Any
 
 from numpy.typing import NDArray  # noqa: TC002
 
-from glass.grf._core import corr, dcorr, icorr
+from glass.grf import corr, dcorr, icorr
 
 
 @dataclass

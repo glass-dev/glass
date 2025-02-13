@@ -26,17 +26,16 @@ import healpix
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.array import broadcast_leading_axes, cumulative_trapezoid
+import glass
+import glass.core.array
 
 if typing.TYPE_CHECKING:
     from cosmology import Cosmology
 
-    from glass.shells import RadialWindow
-
 
 def redshifts(
     n: int | npt.NDArray[np.float64],
-    w: RadialWindow,
+    w: glass.RadialWindow,
     *,
     rng: np.random.Generator | None = None,
 ) -> npt.NDArray[np.float64]:
@@ -117,7 +116,7 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, *rest = broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    dims, *rest = glass.core.array.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
     count_out, z_out, nz_out = rest
 
     # list of results for all dimensions
@@ -129,7 +128,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
+        cdf = glass.core.array.cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
         cdf /= cdf[-1]
 
         # sample redshifts and store result

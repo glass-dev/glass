@@ -7,14 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from glass import (
-    effective_bias,
-    linear_bias,
-    loglinear_bias,
-    position_weights,
-    positions_from_delta,
-    uniform_positions,
-)
+import glass
 
 if typing.TYPE_CHECKING:
     import collections.abc
@@ -54,17 +47,17 @@ def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
     z = np.linspace(0, 1, 10)
     bz = np.zeros((10,))
 
-    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), np.zeros((10,)))
 
     z = np.zeros((10,))
     bz = np.full_like(z, 0.5)
 
-    np.testing.assert_allclose(effective_bias(z, bz, w), np.zeros((10,)))
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), np.zeros((10,)))
 
     z = np.linspace(0, 1, 10)
     bz = np.full_like(z, 0.5)
 
-    np.testing.assert_allclose(effective_bias(z, bz, w), 0.25)
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
 
 
 def test_linear_bias(rng: np.random.Generator) -> None:
@@ -73,21 +66,21 @@ def test_linear_bias(rng: np.random.Generator) -> None:
     delta = np.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(linear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.linear_bias(delta, b), np.zeros((2, 2)))
 
     # test with 0 b
 
     delta = rng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(linear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.linear_bias(delta, b), np.zeros((2, 2)))
 
     # compare with original implementation
 
     delta = rng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(linear_bias(delta, b), b * delta)
+    np.testing.assert_allclose(glass.linear_bias(delta, b), b * delta)
 
 
 def test_loglinear_bias(rng: np.random.Generator) -> None:
@@ -96,21 +89,23 @@ def test_loglinear_bias(rng: np.random.Generator) -> None:
     delta = np.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(loglinear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.loglinear_bias(delta, b), np.zeros((2, 2)))
 
     # test with 0 b
 
     delta = rng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(loglinear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.loglinear_bias(delta, b), np.zeros((2, 2)))
 
     # compare with numpy implementation
 
     delta = rng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(loglinear_bias(delta, b), np.expm1(b * np.log1p(delta)))
+    np.testing.assert_allclose(
+        glass.loglinear_bias(delta, b), np.expm1(b * np.log1p(delta))
+    )
 
 
 def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR0915
@@ -125,14 +120,14 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(npix)
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
 
     # test with rng
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis, rng=rng))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis, rng=rng))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -140,7 +135,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: Nons bias and callable bias model
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x)
+        glass.positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x)
     )
 
     assert isinstance(cnt, int)
@@ -148,7 +143,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 
     # case: None vis
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, None))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, None))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -156,7 +151,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: remove monopole
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, delta, bias, vis, remove_monopole=True)
+        glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True)
     )
 
     assert isinstance(cnt, int)
@@ -165,7 +160,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: negative delta
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis)
+        glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis)
     )
 
     assert isinstance(cnt, int)
@@ -175,7 +170,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: large delta
 
     lon, lat, cnt = catpos(
-        positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis)
+        glass.positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis)
     )
 
     assert isinstance(cnt, int)
@@ -188,7 +183,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (2,)
@@ -202,7 +197,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -216,7 +211,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -227,7 +222,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 
     vis[: vis.size // 2] = 0.0
 
-    lon, lat, cnt = catpos(positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -237,7 +232,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # test TypeError
 
     with pytest.raises(TypeError, match="bias_model must be string or callable"):
-        next(positions_from_delta(ngal, delta, bias, vis, bias_model=0))  # type: ignore[arg-type]
+        next(glass.positions_from_delta(ngal, delta, bias, vis, bias_model=0))  # type: ignore[arg-type]
 
 
 def test_uniform_positions(rng: np.random.Generator) -> None:
@@ -245,11 +240,11 @@ def test_uniform_positions(rng: np.random.Generator) -> None:
 
     ngal: float | npt.NDArray[np.float64] = 1e-3
 
-    lon, lat, cnt = catpos(uniform_positions(ngal))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal))
 
     # test with rng
 
-    lon, lat, cnt = catpos(uniform_positions(ngal, rng=rng))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal, rng=rng))
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -258,7 +253,7 @@ def test_uniform_positions(rng: np.random.Generator) -> None:
 
     ngal = np.array([1e-3, 2e-3, 3e-3])
 
-    lon, lat, cnt = catpos(uniform_positions(ngal))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal))
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3,)
@@ -268,7 +263,7 @@ def test_uniform_positions(rng: np.random.Generator) -> None:
 
     ngal = np.array([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
 
-    lon, lat, cnt = catpos(uniform_positions(ngal))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal))
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -281,7 +276,7 @@ def test_position_weights(rng: np.random.Generator) -> None:
             counts = rng.random(cshape)
             bias = None if bshape is None else rng.random(bshape)
 
-            weights = position_weights(counts, bias)
+            weights = glass.position_weights(counts, bias)
 
             expected = counts / counts.sum(axis=0, keepdims=True)
             if bias is not None:

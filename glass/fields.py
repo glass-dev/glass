@@ -14,7 +14,8 @@ import numpy.typing as npt
 from gaussiancl import gaussiancl
 from transformcl import cltovar
 
-from glass import grf
+import glass
+import glass.grf
 
 if TYPE_CHECKING:
     import collections.abc
@@ -23,9 +24,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass.shells import RadialWindow
-
-    Fields = Sequence[grf.Transformation]
+    Fields = Sequence[glass.grf.Transformation]
     Cls = Sequence[NDArray[Any]]
 
 
@@ -648,7 +647,7 @@ def effective_cls(
     return out
 
 
-def gaussian_fields(shells: Sequence[RadialWindow]) -> Sequence[grf.Normal]:
+def gaussian_fields(shells: Sequence[glass.RadialWindow]) -> Sequence[glass.grf.Normal]:
     """
     Create Gaussian random fields for radial windows *shells*.
 
@@ -662,13 +661,13 @@ def gaussian_fields(shells: Sequence[RadialWindow]) -> Sequence[grf.Normal]:
         A sequence describing the Gaussian random fields.
 
     """
-    return [grf.Normal() for _shell in shells]
+    return [glass.grf.Normal() for _shell in shells]
 
 
 def lognormal_fields(
-    shells: Sequence[RadialWindow],
+    shells: Sequence[glass.RadialWindow],
     shift: Callable[[float], float] | None = None,
-) -> Sequence[grf.Lognormal]:
+) -> Sequence[glass.grf.Lognormal]:
     """
     Create lognormal fields for radial windows *shells*.  If *shifts* is
     given, it must be a callable that returns a lognormal shift (i.e.
@@ -689,7 +688,7 @@ def lognormal_fields(
     if shift is None:
         shift = lambda _z: 1.0  # noqa: E731
 
-    return [grf.Lognormal(shift(shell.zeff)) for shell in shells]
+    return [glass.grf.Lognormal(shift(shell.zeff)) for shell in shells]
 
 
 def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
@@ -719,7 +718,7 @@ def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
 
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
-        gl = grf.compute(cl, fields[i], fields[j])
+        gl = glass.grf.compute(cl, fields[i], fields[j])
         gls.append(gl)
     return gls
 
@@ -765,7 +764,7 @@ def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
             monopole = 0.0 if cl[0] == 0 else None
 
             # call solver
-            gl, _cl_out, info = grf.solve(cl, t1, t2, pad=pad, monopole=monopole)
+            gl, _cl_out, info = glass.grf.solve(cl, t1, t2, pad=pad, monopole=monopole)
 
             # warn if solver didn't converge
             if info == 0:

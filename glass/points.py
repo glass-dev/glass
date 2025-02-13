@@ -37,12 +37,11 @@ import healpix
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.array import broadcast_first, broadcast_leading_axes, trapezoid_product
+import glass
+import glass.core.array
 
 if typing.TYPE_CHECKING:
     import collections.abc
-
-    from glass.shells import RadialWindow
 
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
@@ -51,7 +50,7 @@ ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 def effective_bias(
     z: npt.NDArray[np.float64],
     bz: npt.NDArray[np.float64],
-    w: RadialWindow,
+    w: glass.RadialWindow,
 ) -> float | npt.NDArray[np.double]:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
@@ -85,7 +84,7 @@ def effective_bias(
 
     """
     norm = np.trapezoid(w.wa, w.za)
-    return trapezoid_product((z, bz), (w.za, w.wa)) / norm
+    return glass.core.array.trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(
@@ -188,7 +187,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias_model
         The bias model to apply. If a string, refers to a function in
         the :mod:`~glass.points` module, e.g. ``'linear'`` for
-        :func:`linear_bias()` or ``'loglinear'`` for :func:`loglinear_bias`.
+        :func:`glass.linear_bias()` or ``'glass.loglinear'`` for
+        :func:`glass.loglinear_bias`.
     remove_monopole
         If true, the monopole of the density contrast
         after biasing is fixed to zero.
@@ -231,7 +231,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs.append((bias, 0))
     if vis is not None:
         inputs.append((vis, 1))
-    dims, *rest = broadcast_leading_axes(*inputs)
+    dims, *rest = glass.core.array.broadcast_leading_axes(*inputs)
     ngal, delta, *rest = rest
     if bias is not None:
         bias, *rest = rest
@@ -408,7 +408,7 @@ def position_weights(
     """
     # bring densities and bias into the same shape
     if bias is not None:
-        densities, bias = broadcast_first(densities, bias)
+        densities, bias = glass.core.array.broadcast_first(densities, bias)
     # normalise densities after shape has been fixed
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
