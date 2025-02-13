@@ -27,7 +27,7 @@ Applying lensing
 
 .. autofunction:: deflect
 
-"""  # noqa: D205, D400
+"""  # noqa: D400
 
 from __future__ import annotations
 
