@@ -31,70 +31,70 @@ Applying lensing
 
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING, Literal, overload
 
 import healpy as hp
 import numpy as np
 import numpy.typing as npt
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
     from cosmology import Cosmology
 
     from glass.shells import RadialWindow
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[False] = False,
-    shear: typing.Literal[False] = False,
+    potential: Literal[True] = True,
+    deflection: Literal[False] = False,
+    shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[npt.NDArray[np.float64]]:
     # returns psi
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[False] = False,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[False] = False,
+    potential: Literal[False] = False,
+    deflection: Literal[True] = True,
+    shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[npt.NDArray[np.complex128]]:
     # returns alpha
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[False] = False,
-    deflection: typing.Literal[False] = False,
-    shear: typing.Literal[True] = True,
+    potential: Literal[False] = False,
+    deflection: Literal[False] = False,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[npt.NDArray[np.complex128]]:
     # returns gamma
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[False] = False,
+    potential: Literal[True] = True,
+    deflection: Literal[True] = True,
+    shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[
     npt.NDArray[np.float64],
@@ -104,14 +104,14 @@ def from_convergence(
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[False] = False,
-    shear: typing.Literal[True] = True,
+    potential: Literal[True] = True,
+    deflection: Literal[False] = False,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[
     npt.NDArray[np.float64],
@@ -121,14 +121,14 @@ def from_convergence(
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[False] = False,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[True] = True,
+    potential: Literal[False] = False,
+    deflection: Literal[True] = True,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[
     npt.NDArray[np.complex128],
@@ -138,14 +138,14 @@ def from_convergence(
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
     kappa: npt.NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[True] = True,
+    potential: Literal[True] = True,
+    deflection: Literal[True] = True,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[
     npt.NDArray[np.float64],
@@ -526,7 +526,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """
@@ -554,7 +554,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> npt.NDArray[np.float64]:
     """

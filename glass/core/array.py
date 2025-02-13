@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import typing
 from functools import partial
+from typing import TYPE_CHECKING, Unpack
 
 import numpy as np
 import numpy.typing as npt
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def broadcast_first(
@@ -40,7 +40,7 @@ def broadcast_leading_axes(
     ],
 ) -> tuple[
     tuple[int, ...],
-    typing.Unpack[tuple[npt.NDArray[np.float64], ...]],
+    Unpack[tuple[npt.NDArray[np.float64], ...]],
 ]:
     """
     Broadcast all but the last N axes.
@@ -89,8 +89,8 @@ def broadcast_leading_axes(
 
 def ndinterp(  # noqa: PLR0913
     x: float | npt.NDArray[np.float64],
-    xp: collections.abc.Sequence[float] | npt.NDArray[np.float64],
-    fp: collections.abc.Sequence[float] | npt.NDArray[np.float64],
+    xp: Sequence[float] | npt.NDArray[np.float64],
+    fp: Sequence[float] | npt.NDArray[np.float64],
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
@@ -16,7 +16,7 @@ from glass import (
     shear_from_convergence,  # noqa: F401
 )
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from cosmology import Cosmology
 
 

@@ -26,28 +26,27 @@ Utility functions
 
 from __future__ import annotations
 
-import collections.abc
-import typing
 import warnings
+from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
+from typing import TYPE_CHECKING, Any
 
 import healpy as hp
 import numpy as np
 import numpy.typing as npt
 from gaussiancl import gaussiancl
 
-Cls = collections.abc.Sequence[
-    npt.NDArray[np.float64] | collections.abc.Sequence[float]
-]
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Iterable
+
+Cls = Sequence[npt.NDArray[np.float64] | Sequence[float]]
 
 
 def iternorm(
     k: int,
-    cov: collections.abc.Iterable[npt.NDArray[np.float64]],
+    cov: Iterable[npt.NDArray[np.float64]],
     size: int | tuple[int, ...] = (),
-) -> collections.abc.Generator[
-    tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
-]:
+) -> Generator[tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]]:
     """
     Return the vector a and variance sigma^2 for iterative normal sampling.
 
@@ -132,7 +131,7 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> collections.abc.Generator[npt.NDArray[np.float64]]:
+) -> Generator[npt.NDArray[np.float64]]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
 
@@ -205,8 +204,8 @@ def multalm(
 
 def transform_cls(
     cls: Cls,
-    tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
-    pars: tuple[typing.Any, ...] = (),
+    tfm: str | Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
+    pars: tuple[Any, ...] = (),
 ) -> Cls:
     """
     Transform Cls to Gaussian Cls.
@@ -331,7 +330,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.float64]]:
+) -> Generator[npt.NDArray[np.float64]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -438,7 +437,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.float64]]:
+) -> Generator[npt.NDArray[np.float64]]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
 
@@ -482,13 +481,11 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Sequence[npt.NDArray[np.float64] | Sequence[float]],
     i: int,
     j: int,
     lmax: int | None = None,
-) -> npt.NDArray[np.float64] | collections.abc.Sequence[float]:
+) -> npt.NDArray[np.float64] | Sequence[float]:
     """
     Return a specific angular power spectrum from an array.
 
@@ -521,9 +518,7 @@ def getcl(
 
 
 def effective_cls(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Sequence[npt.NDArray[np.float64] | Sequence[float]],
     weights1: npt.NDArray[np.float64],
     weights2: npt.NDArray[np.float64] | None = None,
     *,

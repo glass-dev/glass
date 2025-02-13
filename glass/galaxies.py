@@ -19,8 +19,8 @@ Functions
 
 from __future__ import annotations
 
-import typing
 import warnings
+from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
@@ -28,7 +28,7 @@ import numpy.typing as npt
 
 from glass.core.array import broadcast_leading_axes, cumulative_trapezoid
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from cosmology import Cosmology
 
     from glass.shells import RadialWindow

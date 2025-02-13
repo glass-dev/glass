@@ -31,7 +31,7 @@ Bias models
 
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING, Any
 
 import healpix
 import numpy as np
@@ -39,8 +39,8 @@ import numpy.typing as npt
 
 from glass.core.array import broadcast_first, broadcast_leading_axes, trapezoid_product
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator
 
     from glass.shells import RadialWindow
 
@@ -141,11 +141,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias: float | npt.NDArray[np.float64] | None = None,
     vis: npt.NDArray[np.float64] | None = None,
     *,
-    bias_model: str | typing.Callable[..., typing.Any] = "linear",
+    bias_model: str | Callable[..., Any] = "linear",
     remove_monopole: bool = False,
     batch: int = 1_000_000,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[
+) -> Generator[
     tuple[
         npt.NDArray[np.float64],
         npt.NDArray[np.float64],
@@ -318,7 +318,7 @@ def uniform_positions(
     ngal: float | npt.NDArray[np.int_] | npt.NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[
+) -> Generator[
     tuple[
         npt.NDArray[np.float64],
         npt.NDArray[np.float64],

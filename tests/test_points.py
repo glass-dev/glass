@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
@@ -16,14 +16,14 @@ from glass import (
     uniform_positions,
 )
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
     import pytest_mock
 
 
 def catpos(
-    pos: collections.abc.Generator[
+    pos: Generator[
         tuple[
             npt.NDArray[np.float64],
             npt.NDArray[np.float64],

@@ -45,10 +45,10 @@ Weight functions
 
 from __future__ import annotations
 
-import collections.abc
 import itertools
-import typing
 import warnings
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 import numpy.typing as npt
@@ -56,11 +56,11 @@ import numpy.typing as npt
 from glass.core.algorithm import nnls
 from glass.core.array import ndinterp
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from cosmology import Cosmology
 
-ArrayLike1D = collections.abc.Sequence[float] | npt.NDArray[np.float64]
-WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
+ArrayLike1D = Sequence[float] | npt.NDArray[np.float64]
+WeightFunc = Callable[[ArrayLike1D], npt.NDArray[np.float64]]
 
 
 def distance_weight(
@@ -129,7 +129,7 @@ def density_weight(
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-class RadialWindow(typing.NamedTuple):
+class RadialWindow(NamedTuple):
     """
     A radial window, defined by a window function.
 
@@ -416,7 +416,7 @@ def restrict(
 def partition(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
     *,
     method: str = "nnls",
 ) -> npt.NDArray[np.float64]:
@@ -536,7 +536,7 @@ def partition(
 def partition_lstsq(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
@@ -600,7 +600,7 @@ def partition_lstsq(
 def partition_nnls(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
 ) -> npt.NDArray[np.float64]:
@@ -682,7 +682,7 @@ def partition_nnls(
 def partition_restrict(
     z: npt.NDArray[np.float64],
     fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
 ) -> npt.NDArray[np.float64]:
     """
     Partition by restriction and integration.
@@ -813,7 +813,7 @@ def distance_grid(
 def combine(
     z: npt.NDArray[np.float64],
     weights: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    shells: Sequence[RadialWindow],
 ) -> npt.NDArray[np.float64]:
     r"""
     Evaluate a linear combination of window functions.
