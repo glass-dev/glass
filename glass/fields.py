@@ -829,8 +829,20 @@ def generate(
 
 def glass_to_healpix_spectra(spectra: Cls) -> Cls:
     """
+    Reorder spectra from GLASS to HEALPix order.
+
     Reorder spectra in :ref:`GLASS order <twopoint_order>` to conform to
     (new) HEALPix order.
+
+    Parameters
+    ----------
+    spectra
+        Sequence of spectra in GLASS order.
+
+    Returns
+    -------
+        Sequence of spectra in HEALPix order.
+
     """
     n = inv_triangle_number(len(spectra))
 
@@ -840,8 +852,20 @@ def glass_to_healpix_spectra(spectra: Cls) -> Cls:
 
 def healpix_to_glass_spectra(spectra: Cls) -> Cls:
     """
+    Reorder spectra from HEALPix to GLASS order.
+
     Reorder HEALPix spectra (in new order) to conform to :ref:`GLASS
     order <twopoint_order>`.
+
+    Parameters
+    ----------
+    spectra
+        Sequence of spectra in HEALPix order.
+
+    Returns
+    -------
+        Sequence of spectra in GLASS order.
+
     """
     n = inv_triangle_number(len(spectra))
 
@@ -851,13 +875,19 @@ def healpix_to_glass_spectra(spectra: Cls) -> Cls:
 
 def lognormal_shift_hilbert2011(z: float) -> float:
     """
-    Lognormal shift parameter for the weak lensing convergence
-    from the fitting formula of Hilbert et al. (2011) [1]_.
+    Lognormal shift of Hilbert et al. (2011) for convergence fields.
 
-    References
+    Lognormal shift parameter for the weak lensing convergence
+    from the fitting formula of [Hilbert11]_.
+
+    Parameters
     ----------
-    .. [1] Hilbert S., Hartlap J., Schneider P., 2011, A&A, 536, A85.
-           doi:10.1051/0004-6361/201117294
+    z
+        Redshift.
+
+    Returns
+    -------
+        Lognormal shift.
 
     """
     return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
@@ -865,16 +895,32 @@ def lognormal_shift_hilbert2011(z: float) -> float:
 
 def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> NDArray[Any]:
     """
+    Construct covariance matrix from spectra.
+
     Construct a covariance matrix from the angular power spectra in
     *spectra*.
+
+    Parameters
+    ----------
+    spectra
+        Sequence of angular power spectra.
+    lmax
+        Maximum angular mode number. If not given, the maximum is taken
+        from the provided spectra.
+
+    Returns
+    -------
+        Covariance matrix from the given spectra.
+
     """
     # recover the number of fields from the number of spectra
     try:
         n = inv_triangle_number(len(spectra))
     except ValueError:
-        raise ValueError("invalid number of spectra") from None
+        msg = "invalid number of spectra"
+        raise ValueError(msg) from None
 
-    if lmax is None:
+    if lmax is None:  # noqa: SIM108
         # maximum length in input spectra
         k = max((cl.size for cl in spectra), default=0)
     else:
@@ -910,6 +956,8 @@ def regularized_spectra(
     **method_kwargs: Any,  # noqa: ANN401
 ) -> Cls:
     r"""
+    Regularise a set of angular power spectra.
+
     Regularises a complete set *spectra* of angular power spectra in
     :ref:`standard order <twopoint_order>` such that at every angular
     mode number :math:`\ell`, the matrix :math:`C_\ell^{ij}` is a
@@ -923,6 +971,16 @@ def regularized_spectra(
     The *method* parameter determines how the regularisation is carried
     out.
 
+    Parameters
+    ----------
+    spectra
+        Spectra to be regularised.
+    lmax
+        Maximum angular mode number. If not given, the maximum is taken
+        from the provided spectra.
+    method
+        Regularisation method.
+
     """
     # regularise the cov matrix using the chosen method
     cov_method: Callable[..., NDArray[Any]]
@@ -931,7 +989,8 @@ def regularized_spectra(
     elif method == "nearest":
         from glass.core.algorithm import cov_nearest as cov_method
     else:
-        raise ValueError(f"unknown method '{method}'")
+        msg = f"unknown method '{method}'"  # type: ignore[unreachable]
+        raise ValueError(msg)
 
     # get the cov matrix from spectra
     cov = cov_from_spectra(spectra, lmax=lmax)

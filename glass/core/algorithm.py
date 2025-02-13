@@ -102,6 +102,18 @@ def cov_clip(
     The relative tolerance *rtol* is defined as for
     :func:`~array_api.linalg.matrix_rank`.
 
+    Parameter
+    ---------
+    cov
+        A symmetric matrix (or a stack of matrices).
+    rtol
+        An optional relative tolerance for eigenvalues to be considered
+        positive.
+
+    Returns
+    -------
+        Covariance matrix with negative eigenvalues clipped.
+
     """
     xp = cov.__array_namespace__()
 
@@ -128,8 +140,24 @@ def nearcorr(
     niter: int = 100,
 ) -> npt.NDArray[np.float64]:
     """
-    Nearest correlation matrix using the alternating projections
-    algorithm of [Higham02]_.
+    Compute the nearest correlation matrix.
+
+    Returns the nearest correlation matrix using the alternating
+    projections algorithm of [Higham02]_.
+
+    Parameters
+    ----------
+    a
+        Square matrix (or a stack of square matrices).
+    tol
+        Tolerance for convergence. Default is 16 times machine epsilon.
+    niter
+        Maximum number of iterations.
+
+    Returns
+    -------
+        Nearest correlation matrix.
+
     """
     xp = a.__array_namespace__()
 
@@ -139,7 +167,8 @@ def nearcorr(
     # get size of the covariance matrix and flatten leading dimensions
     *dim, m, n = a.shape
     if m != n:
-        raise ValueError("non-square matrix")
+        msg = "non-square matrix"
+        raise ValueError(msg)
 
     # default tolerance
     if tol is None:
@@ -182,8 +211,26 @@ def cov_nearest(
     niter: int = 100,
 ) -> npt.NDArray[np.float64]:
     """
-    Covariance matrix from nearest correlation matrix :func:`nearcorr`.
-    The diagonal of the result is unchanged.
+    Covariance matrix from nearest correlation matrix.
+
+    Divides *cov* along rows and columns by the square root of the
+    diagonal, then computes the nearest valid correlation matrix using
+    :func:`nearcorr`, before scaling rows and columns back.  The
+    diagonal of the input is hence unchanged.
+
+    Parameters
+    ----------
+    cov
+        A square matrix (or a stack of matrices).
+    tol
+        Tolerance for convergence, see :func:`nearcorr`.
+    niter
+        Maximum number of iterations.
+
+    Returns
+    -------
+        Covariance matrix from nearest correlation matrix.
+
     """
     xp = cov.__array_namespace__()
 
@@ -192,7 +239,8 @@ def cov_nearest(
 
     # cannot fix negative diagonal
     if xp.any(diag < 0):
-        raise ValueError("negative values on the diagonal")
+        msg = "negative values on the diagonal"
+        raise ValueError(msg)
 
     # store the normalisation of the matrix
     norm = xp.sqrt(diag)
