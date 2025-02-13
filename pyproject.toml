@@ -45,6 +45,7 @@ docs = [
     "matplotlib",
     "nbsphinx",
     "sphinx",
+    "sphinx-toolbox",
     "sphinx_autodoc_typehints",
     "sphinxcontrib-katex",
 ]
@@ -71,7 +72,8 @@ Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
 report = {exclude_also = [
-    "if TYPE_CHECKING:",
+    "class \\w+\\(Protocol(\\[(\\w+, )*\\w+\\])?\\):", # protocol classes
+    "if TYPE_CHECKING:", # type-checking imports
 ], omit = [
     "glass/_version.py",
 ], skip_covered = true, sort = "cover"}
@@ -168,12 +170,16 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "noxfile.py" = [
     "T201", # print
 ], "tests*" = [
+    "ANN001", # missing-type-function-argument
+    "ANN201", # missing-return-type-undocumented-public-function
+    "ANN202", # missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
     "D104", # undocumented-public-package
     "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
+    "SLF001", # private-member-access
 ]}
 lint.select = [
     "ALL",
