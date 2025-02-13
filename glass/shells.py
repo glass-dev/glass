@@ -51,7 +51,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-import glass.core.algorithm
+import glass.algorithm
 import glass.core.array
 
 if TYPE_CHECKING:
