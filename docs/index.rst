@@ -24,6 +24,7 @@ Table of Contents
    examples
    user/index
    reference/index
+   modules/index
 
 
 ==================

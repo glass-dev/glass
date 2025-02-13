@@ -176,7 +176,7 @@ class RadialWindow(typing.NamedTuple):
 
     za: npt.NDArray[np.float64]
     wa: npt.NDArray[np.float64]
-    zeff: float | npt.NDArray[np.float64] = 0
+    zeff: float = 0
 
 
 def tophat_windows(
@@ -238,7 +238,7 @@ def tophat_windows(
         z = np.linspace(zmin, zmax, n, dtype=np.float64)
         w = wht(z)
         zeff = np.trapezoid(w * z, z) / np.trapezoid(w, z)
-        ws.append(RadialWindow(z, w, zeff))
+        ws.append(RadialWindow(z, w, zeff.item()))
     return ws
 
 
