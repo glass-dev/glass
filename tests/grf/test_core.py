@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-import glass.grf._core
+import glass.grf
 
 
 def test_dispatch():
