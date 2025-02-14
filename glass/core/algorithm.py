@@ -256,4 +256,4 @@ def cov_nearest(
 
     # find nearest correlation matrix
     corr = cov / xp.where(norm > 0, norm, 1.0)
-    return nearcorr(corr, niter=niter, tol=tol) * norm 
+    return nearcorr(corr, niter=niter, tol=tol) * norm
