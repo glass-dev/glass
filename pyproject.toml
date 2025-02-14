@@ -25,7 +25,6 @@ dependencies = [
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "numpy>=2.1.1",
-    "typing_extensions>=4.12.2", # remove when Python 3.10 is dropped
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
