@@ -6,10 +6,10 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 import numpy as np
-from typing_extensions import Unpack
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from typing import Unpack
 
     from numpy.typing import DTypeLike, NDArray
 
