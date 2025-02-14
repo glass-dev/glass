@@ -127,7 +127,9 @@ testpaths = [
 xfail_strict = true
 
 [tool.ruff]
-extend-exclude = ["examples"]
+extend-exclude = [
+	"examples",
+]
 fix = true
 force-exclude = true
 show-fixes = true
