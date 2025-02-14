@@ -53,7 +53,7 @@ import warnings
 import numpy as np
 import numpy.typing as npt
 
-from glass.core.algorithm import nnls
+from glass.algorithm import nnls
 from glass.core.array import ndinterp
 
 if typing.TYPE_CHECKING:
