@@ -33,3 +33,66 @@ def test_nnls(rng: np.random.Generator) -> None:
         glass.core.algorithm.nnls(a, a)
     with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
         glass.core.algorithm.nnls(a.T, b)
+
+
+def test_cov_clip(rng):
+    # prepare a random matrix
+    m = rng.random((4, 4))
+
+    # symmetric matrix
+    a = (m + m.T) / 2
+
+    # fix by clipping negative eigenvalues
+    cov = glass.core.algorithm.cov_clip(a)
+
+    # make sure all eigenvalues are positive
+    assert np.all(np.linalg.eigvalsh(cov) >= 0)
+
+
+def test_nearcorr():
+    # from Higham (2002)
+    a = np.array(
+        [
+            [1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ],
+    )
+    x = glass.core.algorithm.nearcorr(a)
+    np.testing.assert_allclose(
+        x,
+        [
+            [1.0000, 0.7607, 0.1573],
+            [0.7607, 1.0000, 0.7607],
+            [0.1573, 0.7607, 1.0000],
+        ],
+        atol=0.0001,
+    )
+
+
+def test_cov_nearest(rng, mocker):
+    # prepare a random matrix
+    m = rng.random((4, 4))
+
+    # symmetric matrix
+    a = np.eye(4) + (m + m.T) / 2
+
+    # spy on the call to nearcorr
+    nearcorr = mocker.spy(glass.core.algorithm, "nearcorr")
+
+    # compute covariance
+    cov = glass.core.algorithm.cov_nearest(a)
+
+    # make sure all eigenvalues are positive
+    assert np.all(np.linalg.eigvalsh(cov) >= 0)
+
+    # get normalisation
+    sq_d = np.sqrt(a.diagonal())
+    norm = np.outer(sq_d, sq_d)
+
+    # make sure nearcorr was called with correct input
+    nearcorr.assert_called_once()
+    np.testing.assert_array_almost_equal_nulp(
+        nearcorr.call_args_list[0].args[0],
+        np.divide(a, norm, where=(norm > 0), out=np.zeros_like(a)),
+    )

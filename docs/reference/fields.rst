@@ -61,6 +61,55 @@ Lognormal fields
 
 .. autofunction:: lognormal_fields
 
+GLASS comes with the following functions for setting accurate lognormal shift
+values:
+
+.. autofunction:: lognormal_shift_hilbert2011
+
+
+Regularisation
+--------------
+
+When sets of angular power spectra are used to sample random fields, their
+matrix :math:`C_\ell^{ij}` for fixed :math:`\ell` must form a valid
+positive-definite covariance matrix.  This is not always the case, for example
+due to numerical inaccuracies, or transformations of the underlying fields
+[Xavier16]_.
+
+Regularisation takes sets of spectra which are ill-posed for sampling, and
+returns sets which are well-defined and, in some sense, "close" to the input.
+
+.. autofunction:: regularized_spectra
+
+.. function:: regularized_spectra(..., method="nearest", tol=None, niter=100)
+   :no-index:
+
+   Compute the (possibly defective) correlation matrices of the given spectra,
+   then find the nearest valid correlation matrices, using the alternating
+   projections algorithm of [Higham02]_ with tolerance *tol* for *niter*
+   iterations.  This keeps the diagonals (i.e.  auto-correlations) fixed, but
+   requires all of them to be nonnegative.
+
+   .. seealso::
+
+      :func:`glass.core.algorithm.cov_nearest`
+         Equivalent function for covariance matrices.
+
+      :func:`glass.core.algorithm.nearcorr`
+         Nearest correlation matrix.
+
+.. function:: regularized_spectra(..., method="clip", rtol=None)
+   :no-index:
+
+   Clip negative eigenvalues of the spectra's covariance matrix to zero.  This
+   is a simple fix that guarantees positive semi-definite spectra, but can
+   affect the spectra significantly.
+
+   .. seealso::
+
+      :func:`glass.core.algorithm.cov_clip`
+         Equivalent function for covariance matrices.
+
 
 Indexing
 --------
@@ -68,6 +117,9 @@ Indexing
 .. autofunction:: getcl
 .. autofunction:: enumerate_spectra
 .. autofunction:: spectra_indices
+.. autofunction:: glass_to_healpix_spectra
+.. autofunction:: healpix_to_glass_spectra
+.. autofunction:: cov_from_spectra
 
 
 Deprecated
