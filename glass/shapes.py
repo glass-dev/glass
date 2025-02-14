@@ -20,7 +20,7 @@ Utilities
 
 .. autofunction:: triaxial_axis_ratio
 
-"""  # noqa: D205, D400
+"""  # noqa: D400
 
 from __future__ import annotations
 

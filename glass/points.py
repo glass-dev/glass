@@ -27,7 +27,7 @@ Bias models
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
-"""  # noqa: D205, D400
+"""  # noqa: D400
 
 from __future__ import annotations
 
@@ -222,7 +222,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     if isinstance(bias_model, str):
         bias_model_callable = globals()[f"{bias_model}_bias"]
     elif not callable(bias_model):
-        raise TypeError("bias_model must be string or callable")  # noqa: EM101,TRY003
+        raise TypeError("bias_model must be string or callable")
     else:
         bias_model_callable = bias_model
 

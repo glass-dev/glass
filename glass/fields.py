@@ -32,7 +32,7 @@ def inv_triangle_number(triangle_number: int) -> int:
     The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`.  If
     the argument is :math:`T_n`, then :math:`n` is returned.  Otherwise,
     a :class:`ValueError` is raised.
-    """  # noqa: D205, D401
+    """
     n = math.floor(math.sqrt(2 * triangle_number))
     if n * (n + 1) // 2 != triangle_number:
         msg = f"not a triangle number: {triangle_number}"
@@ -497,7 +497,7 @@ def getcl(
         The angular power spectrum for indices *i* and *j* from an
         array in *GLASS* ordering.
 
-    """  # noqa: D205
+    """
     if j > i:
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
@@ -523,7 +523,7 @@ def enumerate_spectra(
     >>> list(enumerate_spectra(spectra))
     [(0, 0, [1, 2, 3]), (1, 1, [4, 5, 6]), (1, 0, [7, 8, 9])]
 
-    """  # noqa: D205
+    """
     for k, cl in enumerate(entries):
         i = int((2 * k + 0.25) ** 0.5 - 0.5)
         j = i * (i + 3) // 2 - k
@@ -546,7 +546,7 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
            [2, 1],
            [2, 0]])
 
-    """  # noqa: D205
+    """
     i, j = np.tril_indices(n)
     return np.transpose([i, i - j])
 
@@ -677,7 +677,7 @@ def lognormal_fields(
     -------
         A sequence describing the lognormal fields.
 
-    """  # noqa: D205
+    """
     if shift is None:
         shift = lambda _z: 1.0  # noqa: E731
 
