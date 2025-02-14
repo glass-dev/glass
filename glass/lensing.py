@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
     from cosmology import Cosmology
 
-    from glass.shells import RadialWindow
+    import glass
 
 
 @overload
@@ -351,7 +351,7 @@ def shear_from_convergence(
     transform.
 
     .. deprecated:: 2023.6
-       Use the more general :func:`from_convergence` function instead.
+       Use the more general :func:`glass.from_convergence` function instead.
 
     Parameters
     ----------
@@ -420,7 +420,7 @@ class MultiPlaneConvergence:
         self.kappa2: NDArray[np.float64] | None = None
         self.kappa3: NDArray[np.float64] | None = None
 
-    def add_window(self, delta: NDArray[np.float64], w: RadialWindow) -> None:
+    def add_window(self, delta: NDArray[np.float64], w: glass.RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -527,7 +527,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: Sequence[RadialWindow],
+    shells: Sequence[glass.RadialWindow],
     cosmo: Cosmology,
 ) -> NDArray[np.float64]:
     """
@@ -555,7 +555,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: NDArray[np.float64],
-    shells: Sequence[RadialWindow],
+    shells: Sequence[glass.RadialWindow],
     cosmo: Cosmology,
 ) -> NDArray[np.float64]:
     """

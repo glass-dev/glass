@@ -53,8 +53,8 @@ from typing import TYPE_CHECKING, NamedTuple
 import numpy as np
 from numpy.typing import NDArray
 
-from glass.core.algorithm import nnls
-from glass.core.array import ndinterp
+import glass.core.algorithm
+import glass.core.array
 
 if TYPE_CHECKING:
     from cosmology import Cosmology
@@ -144,8 +144,8 @@ class RadialWindow(NamedTuple):
     immutable (however, the array entries may **not** be immutable; do
     not change them in place)::
 
-        >>> from glass import RadialWindow
-        >>> w1 = RadialWindow(..., ..., zeff=0.1)
+        >>> import glass
+        >>> w1 = glass.RadialWindow(..., ..., zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
@@ -409,7 +409,9 @@ def restrict(
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
-    fr = ndinterp(zr, z, f, left=0.0, right=0.0) * ndinterp(zr, w.za, w.wa)
+    fr = glass.core.array.ndinterp(
+        zr, z, f, left=0.0, right=0.0
+    ) * glass.core.array.ndinterp(zr, w.za, w.wa)
     return zr, fr
 
 
@@ -505,7 +507,7 @@ def partition(
     where :math:`\lambda` is a multiplier to enforce the integral
     constraints.
 
-    The :func:`partition()` function implements a number of methods to
+    The :func:`glass.partition()` function implements a number of methods to
     obtain a solution:
 
     If ``method="nnls"`` (the default), obtain a partition from a
@@ -520,7 +522,7 @@ def partition(
     contributions.
 
     If ``method="restrict"``, obtain a partition by integrating the
-    restriction (using :func:`restrict`) of the function :math:`f` to
+    restriction (using :func:`glass.restrict`) of the function :math:`f` to
     each window. For overlapping shells, this method might produce
     results which are far from the input function.
 
@@ -579,7 +581,7 @@ def partition_lstsq(
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = glass.core.array.ndinterp(zp, z, fz, left=0.0, right=0.0)
     b = b * dz
 
     # append a constraint for the integral
@@ -654,7 +656,7 @@ def partition_nnls(
     a = a * dz
 
     # create the target vector of distribution values
-    b = ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = glass.core.array.ndinterp(zp, z, fz, left=0.0, right=0.0)
     b = b * dz
 
     # append a constraint for the integral
@@ -673,7 +675,7 @@ def partition_nnls(
     # for each dim, find non-negative weights x such that y == r @ x
     x = np.empty([len(shells), *dims])
     for i in np.ndindex(*dims):
-        x[(..., *i)] = nnls(r, y[i])  # type: ignore[index]
+        x[(..., *i)] = glass.core.algorithm.nnls(r, y[i])  # type: ignore[index]
 
     # all done
     return x

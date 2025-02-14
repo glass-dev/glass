@@ -34,7 +34,7 @@ from typing import TYPE_CHECKING
 import healpy as hp
 import numpy as np
 
-from glass.core.array import cumulative_trapezoid
+import glass.core.array
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -266,7 +266,7 @@ def equal_dens_zbins(
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
-    cuml_nz = cumulative_trapezoid(nz, z)
+    cuml_nz = glass.core.array.cumulative_trapezoid(nz, z)
     cuml_nz /= cuml_nz[[-1]]
     zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
 

@@ -3,29 +3,16 @@ import pytest
 
 from cosmology import Cosmology
 
-from glass import (
-    RadialWindow,
-    combine,  # noqa: F401
-    cubic_windows,
-    density_weight,
-    distance_grid,
-    distance_weight,
-    linear_windows,
-    partition,
-    redshift_grid,
-    restrict,
-    tophat_windows,
-    volume_weight,
-)
+import glass
 
 
 def test_distance_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`distance_weight`."""
+    """Add unit tests for :func:`glass.distance_weight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = distance_weight(z, cosmo)
+    w = glass.distance_weight(z, cosmo)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 1
@@ -38,12 +25,12 @@ def test_distance_weight(cosmo: Cosmology) -> None:
 
 
 def test_volume_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`volume_weight`."""
+    """Add unit tests for :func:`glass.volume_weight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = volume_weight(z, cosmo)
+    w = glass.volume_weight(z, cosmo)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0
@@ -56,12 +43,12 @@ def test_volume_weight(cosmo: Cosmology) -> None:
 
 
 def test_density_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`density_weight`."""
+    """Add unit tests for :func:`glass.density_weight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = density_weight(z, cosmo)
+    w = glass.density_weight(z, cosmo)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0
@@ -74,11 +61,11 @@ def test_density_weight(cosmo: Cosmology) -> None:
 
 
 def test_tophat_windows() -> None:
-    """Add unit tests for :func:`tophat_windows`."""
+    """Add unit tests for :func:`glass.tophat_windows`."""
     zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
 
-    ws = tophat_windows(zb, dz)
+    ws = glass.tophat_windows(zb, dz)
 
     assert len(ws) == len(zb) - 1
 
@@ -96,7 +83,7 @@ def test_tophat_windows() -> None:
 
 
 def test_linear_windows() -> None:
-    """Add unit tests for :func:`linear_windows`."""
+    """Add unit tests for :func:`glass.linear_windows`."""
     dz = 1e-2
     zgrid = [
         0.0,
@@ -108,7 +95,7 @@ def test_linear_windows() -> None:
 
     # check spacing of redshift grid
 
-    ws = linear_windows(zgrid)
+    ws = glass.linear_windows(zgrid)
     np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
 
     # check number of windows
@@ -121,7 +108,7 @@ def test_linear_windows() -> None:
 
     # check weight function input
 
-    ws = linear_windows(
+    ws = glass.linear_windows(
         zgrid,
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
@@ -131,18 +118,18 @@ def test_linear_windows() -> None:
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
-        linear_windows([])
+        glass.linear_windows([])
 
     # check warning issued
 
     with pytest.warns(
         UserWarning, match="first triangular window does not start at z=0"
     ):
-        linear_windows([0.1, 0.2, 0.3])
+        glass.linear_windows([0.1, 0.2, 0.3])
 
 
 def test_cubic_windows() -> None:
-    """Add unit tests for :func:`cubic_windows`."""
+    """Add unit tests for :func:`glass.cubic_windows`."""
     dz = 1e-2
     zgrid = [
         0.0,
@@ -154,7 +141,7 @@ def test_cubic_windows() -> None:
 
     # check spacing of redshift grid
 
-    ws = cubic_windows(zgrid)
+    ws = glass.cubic_windows(zgrid)
     np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
 
     # check number of windows
@@ -167,7 +154,7 @@ def test_cubic_windows() -> None:
 
     # check weight function input
 
-    ws = cubic_windows(
+    ws = glass.cubic_windows(
         zgrid,
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
@@ -177,29 +164,29 @@ def test_cubic_windows() -> None:
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
-        cubic_windows([])
+        glass.cubic_windows([])
 
     # check warning issued
 
     with pytest.warns(
         UserWarning, match="first cubic spline window does not start at z=0"
     ):
-        cubic_windows([0.1, 0.2, 0.3])
+        glass.cubic_windows([0.1, 0.2, 0.3])
 
 
 def test_restrict() -> None:
-    """Add unit tests for :func:`restrict`."""
+    """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
     z = np.linspace(0.0, 5.0, 1000)
     f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
 
     # window for restriction
-    w = RadialWindow(
+    w = glass.RadialWindow(
         za=np.array([1.0, 2.0, 3.0, 4.0]),
         wa=np.array([0.0, 0.5, 0.5, 0.0]),
     )
 
-    zr, fr = restrict(z, f, w)
+    zr, fr = glass.restrict(z, f, w)
 
     assert zr[0] == w.za[0]
     assert zr[-1] == w.za[-1]
@@ -220,14 +207,14 @@ def test_restrict() -> None:
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(method: str) -> None:
-    """Add unit tests for :func:`partition`."""
+    """Add unit tests for :func:`glass.partition`."""
     shells = [
-        RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
-        RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
-        RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),
-        RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),
-        RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),
-        RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),
+        glass.RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
+        glass.RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
+        glass.RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),
+        glass.RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),
+        glass.RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),
+        glass.RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),
     ]
 
     z = np.linspace(0.0, 5.0, 1000)
@@ -236,7 +223,7 @@ def test_partition(method: str) -> None:
 
     assert fz.shape == (3, 2, 1000)
 
-    part = partition(z, fz, shells, method=method)
+    part = glass.partition(z, fz, shells, method=method)
 
     assert part.shape == (len(shells), 3, 2)
 
@@ -244,25 +231,25 @@ def test_partition(method: str) -> None:
 
 
 def test_redshift_grid() -> None:
-    """Add unit tests for :func:`redshift_grid`."""
+    """Add unit tests for :func:`glass.redshift_grid`."""
     zmin = 0
     zmax = 1
 
     # check num input
 
     num = 5
-    z = redshift_grid(zmin, zmax, num=5)
+    z = glass.redshift_grid(zmin, zmax, num=5)
     assert len(z) == num + 1
 
     # check dz input
 
     dz = 0.2
-    z = redshift_grid(zmin, zmax, dz=dz)
+    z = glass.redshift_grid(zmin, zmax, dz=dz)
     assert len(z) == np.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 
-    z = redshift_grid(zmin, zmax, dz=0.3)
+    z = glass.redshift_grid(zmin, zmax, dz=0.3)
     assert zmax < z[-1]
 
     # check error raised
@@ -271,35 +258,35 @@ def test_redshift_grid() -> None:
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        redshift_grid(zmin, zmax)
+        glass.redshift_grid(zmin, zmax)
 
     with pytest.raises(
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        redshift_grid(zmin, zmax, dz=dz, num=num)
+        glass.redshift_grid(zmin, zmax, dz=dz, num=num)
 
 
 def test_distance_grid(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`distance_grid`."""
+    """Add unit tests for :func:`glass.distance_grid`."""
     zmin = 0
     zmax = 1
 
     # check num input
 
     num = 5
-    x = distance_grid(cosmo, zmin, zmax, num=5)
+    x = glass.distance_grid(cosmo, zmin, zmax, num=5)
     assert len(x) == num + 1
 
     # check dz input
 
     dx = 0.2
-    x = distance_grid(cosmo, zmin, zmax, dx=dx)
+    x = glass.distance_grid(cosmo, zmin, zmax, dx=dx)
     assert len(x) == np.ceil((zmax - zmin) / dx) + 1
 
     # check decrease in distance
 
-    x = distance_grid(cosmo, zmin, zmax, dx=0.3)
+    x = glass.distance_grid(cosmo, zmin, zmax, dx=0.3)
     np.testing.assert_array_less(x[1:], x[:-1])
 
     # check error raised
@@ -308,14 +295,14 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        distance_grid(cosmo, zmin, zmax)
+        glass.distance_grid(cosmo, zmin, zmax)
 
     with pytest.raises(
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
+        glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
 def test_combine() -> None:
-    """Add unit tests for :func:`combine`."""
+    """Add unit tests for :func:`glass.combine`."""

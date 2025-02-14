@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 from transformcl import cltocorr, corrtocl
 
+import glass.grf
+
 if TYPE_CHECKING:
     from typing import Any
 
     from numpy.typing import NDArray
-
-from glass.grf._core import Transformation, corr, dcorr, icorr
 
 
 def _relerr(dx: NDArray[Any], x: NDArray[Any]) -> float:
@@ -21,8 +21,8 @@ def _relerr(dx: NDArray[Any], x: NDArray[Any]) -> float:
 
 def solve(  # noqa: PLR0912, PLR0913
     cl: NDArray[Any],
-    t1: Transformation,
-    t2: Transformation | None = None,
+    t1: glass.grf.Transformation,
+    t2: glass.grf.Transformation | None = None,
     *,
     pad: int = 0,
     initial: NDArray[Any] | None = None,
@@ -91,7 +91,7 @@ def solve(  # noqa: PLR0912, PLR0913
         raise ValueError(msg)
 
     if initial is None:
-        gl = corrtocl(icorr(t1, t2, cltocorr(cl)))
+        gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
     else:
         gl = np.zeros(n)
         gl[: len(initial)] = initial[:n]
@@ -100,7 +100,7 @@ def solve(  # noqa: PLR0912, PLR0913
         gl[0] = monopole
 
     gt = cltocorr(np.pad(gl, (0, pad)))
-    rl = corrtocl(corr(t1, t2, gt))
+    rl = corrtocl(glass.grf.corr(t1, t2, gt))
     fl = rl[:n] - cl
     if monopole is not None:
         fl[0] = 0
@@ -116,7 +116,7 @@ def solve(  # noqa: PLR0912, PLR0913
             break
 
         ft = cltocorr(np.pad(fl, (0, pad)))
-        dt = dcorr(t1, t2, gt)
+        dt = glass.grf.dcorr(t1, t2, gt)
         xl = -corrtocl(ft / dt)[:n]
         if monopole is not None:
             xl[0] = 0
@@ -126,7 +126,7 @@ def solve(  # noqa: PLR0912, PLR0913
         while True:
             gl_ = gl + xl
             gt_ = cltocorr(np.pad(gl_, (0, pad)))
-            rl_ = corrtocl(corr(t1, t2, gt_))
+            rl_ = corrtocl(glass.grf.corr(t1, t2, gt_))
             fl_ = rl_[:n] - cl
             if monopole is not None:
                 fl_[0] = 0

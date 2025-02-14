@@ -3,13 +3,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-from glass.core.array import (
-    broadcast_first,
-    broadcast_leading_axes,
-    cumulative_trapezoid,
-    ndinterp,
-    trapezoid_product,
-)
+import glass.core.array
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -21,7 +15,7 @@ def test_broadcast_first() -> None:
 
     # arrays with shape ((3, 4, 2)) and ((1, 2)) are passed
     # to np.broadcast_arrays; hence it works
-    a_a, b_a = broadcast_first(a, b)
+    a_a, b_a = glass.core.array.broadcast_first(a, b)
     assert a_a.shape == (2, 3, 4)
     assert b_a.shape == (2, 3, 4)
 
@@ -35,7 +29,7 @@ def test_broadcast_first() -> None:
     b = np.ones((5, 6))
 
     with pytest.raises(ValueError, match="shape mismatch"):
-        broadcast_first(a, b)
+        glass.core.array.broadcast_first(a, b)
 
     # plain np.broadcast_arrays will work
     a_a, b_a = np.broadcast_arrays(a, b)
@@ -49,7 +43,9 @@ def test_broadcast_leading_axes() -> None:
     b_in = np.zeros((4, 10))
     c_in = np.zeros((3, 1, 5, 6))
 
-    dims, *rest = broadcast_leading_axes((a_in, 0), (b_in, 1), (c_in, 2))
+    dims, *rest = glass.core.array.broadcast_leading_axes(
+        (a_in, 0), (b_in, 1), (c_in, 2)
+    )
     a_out, b_out, c_out = rest
 
     assert dims == (3, 4)
@@ -65,17 +61,17 @@ def test_ndinterp() -> None:
     yp = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
 
     x: float | NDArray[np.float64] = 0.5
-    y = ndinterp(x, xp, yp)
+    y = glass.core.array.ndinterp(x, xp, yp)
     assert np.shape(y) == ()
     np.testing.assert_allclose(y, 1.15, atol=1e-15)
 
     x = np.array([0.5, 1.5, 2.5])
-    y = ndinterp(x, xp, yp)
+    y = glass.core.array.ndinterp(x, xp, yp)
     assert np.shape(y) == (3,)
     np.testing.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
 
     x = np.array([[0.5, 1.5], [2.5, 3.5]])
-    y = ndinterp(x, xp, yp)
+    y = glass.core.array.ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 2)
     np.testing.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
@@ -84,17 +80,17 @@ def test_ndinterp() -> None:
     yp = np.array([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
 
     x = 0.5
-    y = ndinterp(x, xp, yp)
+    y = glass.core.array.ndinterp(x, xp, yp)
     assert np.shape(y) == (2,)
     np.testing.assert_allclose(y, [1.15, 2.15], atol=1e-15)
 
     x = np.array([0.5, 1.5, 2.5])
-    y = ndinterp(x, xp, yp)
+    y = glass.core.array.ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 3)
     np.testing.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
 
     x = np.array([[0.5, 1.5], [2.5, 3.5]])
-    y = ndinterp(x, xp, yp)
+    y = glass.core.array.ndinterp(x, xp, yp)
     assert np.shape(y) == (2, 2, 2)
     np.testing.assert_allclose(
         y,
@@ -109,12 +105,12 @@ def test_ndinterp() -> None:
     )
 
     x = 0.5
-    y = ndinterp(x, xp, yp, axis=1)
+    y = glass.core.array.ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 1)
     np.testing.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
 
     x = np.array([0.5, 1.5, 2.5])
-    y = ndinterp(x, xp, yp, axis=1)
+    y = glass.core.array.ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 3, 1)
     np.testing.assert_allclose(
         y,
@@ -123,7 +119,7 @@ def test_ndinterp() -> None:
     )
 
     x = np.array([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
-    y = ndinterp(x, xp, yp, axis=1)
+    y = glass.core.array.ndinterp(x, xp, yp, axis=1)
     assert np.shape(y) == (2, 3, 4, 1)
     np.testing.assert_allclose(
         y,
@@ -150,7 +146,7 @@ def test_trapezoid_product() -> None:
     x2 = np.linspace(1, 2, 10)
     f2 = np.full_like(x2, 0.5)
 
-    s = trapezoid_product((x1, f1), (x2, f2))
+    s = glass.core.array.trapezoid_product((x1, f1), (x2, f2))
 
     np.testing.assert_allclose(s, 1.0)
 
@@ -163,18 +159,18 @@ def test_cumulative_trapezoid() -> None:
 
     # default dtype (int)
 
-    ct = cumulative_trapezoid(f, x)
+    ct = glass.core.array.cumulative_trapezoid(f, x)
     np.testing.assert_allclose(ct, np.array([0, 1, 4, 7]))
 
     # explicit dtype (float)
 
-    ct = cumulative_trapezoid(f, x, dtype=float)
+    ct = glass.core.array.cumulative_trapezoid(f, x, dtype=float)
     np.testing.assert_allclose(ct, np.array([0.0, 1.5, 4.0, 7.5]))
 
     # explicit return array
 
     out = np.zeros((4,))
-    ct = cumulative_trapezoid(f, x, dtype=float, out=out)
+    ct = glass.core.array.cumulative_trapezoid(f, x, dtype=float, out=out)
     np.testing.assert_equal(ct, out)
 
     # 2D f and 1D x
@@ -184,12 +180,12 @@ def test_cumulative_trapezoid() -> None:
 
     # default dtype (int)
 
-    ct = cumulative_trapezoid(f, x)
+    ct = glass.core.array.cumulative_trapezoid(f, x)
     np.testing.assert_allclose(ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     # explicit dtype (float)
 
-    ct = cumulative_trapezoid(f, x, dtype=float)
+    ct = glass.core.array.cumulative_trapezoid(f, x, dtype=float)
     np.testing.assert_allclose(
         ct, np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]])
     )
@@ -197,5 +193,5 @@ def test_cumulative_trapezoid() -> None:
     # explicit return array
 
     out = np.zeros((2, 4))
-    ct = cumulative_trapezoid(f, x, dtype=float, out=out)
+    ct = glass.core.array.cumulative_trapezoid(f, x, dtype=float, out=out)
     np.testing.assert_equal(ct, out)
