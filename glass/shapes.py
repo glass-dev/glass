@@ -24,17 +24,21 @@ Utilities
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-import numpy.typing as npt
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def triaxial_axis_ratio(
-    zeta: float | npt.NDArray[np.float64],
-    xi: float | npt.NDArray[np.float64],
+    zeta: float | NDArray[np.float64],
+    xi: float | NDArray[np.float64],
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -98,14 +102,14 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: float | npt.NDArray[np.float64],
-    sigma: float | npt.NDArray[np.float64],
-    gamma: float | npt.NDArray[np.float64],
-    sigma_gamma: float | npt.NDArray[np.float64],
+    mu: float | NDArray[np.float64],
+    sigma: float | NDArray[np.float64],
+    gamma: float | NDArray[np.float64],
+    sigma_gamma: float | NDArray[np.float64],
     size: int | tuple[int, ...] | None = None,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -181,11 +185,11 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
 
 def ellipticity_gaussian(
-    count: int | npt.NDArray[np.int_],
-    sigma: float | npt.NDArray[np.float64],
+    count: int | NDArray[np.int_],
+    sigma: float | NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[np.complex128]:
+) -> NDArray[np.complex128]:
     """
     Sample Gaussian galaxy ellipticities.
 
@@ -237,11 +241,11 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | npt.NDArray[np.int_],
-    sigma: float | npt.NDArray[np.float64],
+    count: int | NDArray[np.int_],
+    sigma: float | NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[np.complex128]:
+) -> NDArray[np.complex128]:
     """
     Sample galaxy ellipticities with intrinsic normal distribution.
 

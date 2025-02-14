@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING
+
 import numpy as np
-import numpy.typing as npt
 import pytest
 import pytest_mock
 
@@ -9,6 +10,9 @@ from glass import (
     redshifts,
     redshifts_from_nz,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
@@ -78,7 +82,7 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: no extra dimensions
 
-    count: int | npt.NDArray[np.float64] = 10
+    count: int | NDArray[np.float64] = 10
     z = np.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -196,8 +200,8 @@ def test_gaussian_phz(rng: np.random.Generator) -> None:
 
     # case: zero variance
 
-    z: float | npt.NDArray[np.float64] = np.linspace(0, 1, 100)
-    sigma_0: float | npt.NDArray[np.float64] = 0.0
+    z: float | NDArray[np.float64] = np.linspace(0, 1, 100)
+    sigma_0: float | NDArray[np.float64] = 0.0
 
     phz = gaussian_phz(z, sigma_0)
 
