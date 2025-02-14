@@ -167,7 +167,12 @@ lint.per-file-ignores = {"__init__.py" = [
     "PLR2004", # magic-value-comparison
     "T201", # print
 ], "glass*" = [
+    "D205", # missing-blank-line-after-summary
+    "D401", # non-imperative-mood
+    "EM101", # raw-string-in-exception
+    "EM102", # f-string-in-exception
     "PLR2004", # TODO: magic-value-comparison
+    "TRY003", # raise-vanilla-args
 ], "glass/grf/_*" = [
     "SLF001", # private-member-access
 ], "noxfile.py" = [

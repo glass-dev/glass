@@ -15,7 +15,7 @@ Functions
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
 
-"""  # noqa: D205, D400
+"""  # noqa: D400
 
 from __future__ import annotations
 

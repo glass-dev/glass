@@ -158,7 +158,7 @@ def dcorr(t1: Transformation, t2: Transformation, x: NDArray[Any], /) -> NDArray
     -------
         The derivative of the transformed angular correlation function.
 
-    """  # noqa: D401
+    """
     msg = f"{t1.__class__.__name__} x {t2.__class__.__name__}"
     raise NotImplementedError(msg)
 
@@ -196,7 +196,7 @@ def compute(
     --------
     glass.grf.solve: Iterative solver for non-band-limited spectra.
 
-    """  # noqa: D205
+    """
     if t2 is None:
         t2 = t1
 

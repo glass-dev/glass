@@ -87,7 +87,7 @@ class SquaredNormal:
     lamda
         The parameter :math:`\lambda`.
 
-    """  # noqa: D205
+    """
 
     a: float
     lamda: float = 1.0

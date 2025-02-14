@@ -63,11 +63,10 @@ __all__ = [
 ]
 
 
-import contextlib
-from importlib.metadata import PackageNotFoundError
-
-with contextlib.suppress(PackageNotFoundError):
-    from ._version import __version__, __version_tuple__
+try:  # noqa: SIM105
+    from ._version import __version__
+except ModuleNotFoundError:
+    pass
 
 # modules
 from glass import grf
