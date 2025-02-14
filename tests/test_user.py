@@ -2,8 +2,8 @@ import importlib.util
 import pathlib
 
 import numpy as np
-import numpy.typing as npt
 import pytest
+from numpy.typing import NDArray
 
 import glass
 
@@ -44,7 +44,7 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
 
     def _test_append(
         fits: fitsio.FITS,
-        data: list[npt.NDArray[np.float64]],
+        data: list[NDArray[np.float64]],
         names: list[str],
     ) -> None:
         """Write routine for FITS test cases."""

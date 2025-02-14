@@ -19,16 +19,17 @@ Input and Output
 
 from __future__ import annotations
 
-import typing
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+if TYPE_CHECKING:
     import importlib.util
     import pathlib
+    from collections.abc import Generator, Sequence
+
+    from numpy.typing import NDArray
 
     if importlib.util.find_spec("fitsio") is not None:
         import fitsio
@@ -36,9 +37,7 @@ if typing.TYPE_CHECKING:
 
 def save_cls(
     filename: str,
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Sequence[NDArray[np.float64] | Sequence[float]],
 ) -> None:
     """
     Save a list of Cls to file.
@@ -61,7 +60,7 @@ def save_cls(
 
 def load_cls(
     filename: str,
-) -> list[npt.NDArray[np.float64] | collections.abc.Sequence[float]]:
+) -> list[NDArray[np.float64] | Sequence[float]]:
     """
     Load a list of Cls from file.
 
@@ -107,7 +106,7 @@ class _FitsWriter:
 
     def _append(
         self,
-        data: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
+        data: NDArray[np.float64] | list[NDArray[np.float64]],
         names: list[str] | None = None,
     ) -> None:
         """
@@ -132,9 +131,9 @@ class _FitsWriter:
 
     def write(
         self,
-        data: npt.NDArray[np.float64] | None = None,
+        data: NDArray[np.float64] | None = None,
         /,
-        **columns: npt.NDArray[np.float64],
+        **columns: NDArray[np.float64],
     ) -> None:
         """
         Write to FITS by calling the internal _append method.
@@ -165,7 +164,7 @@ def write_catalog(
     filename: pathlib.Path,
     *,
     ext: str | None = None,
-) -> collections.abc.Generator[_FitsWriter]:
+) -> Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.
 

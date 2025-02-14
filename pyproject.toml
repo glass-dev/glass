@@ -25,6 +25,7 @@ dependencies = [
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "numpy>=2.1.1",
+    "typing_extensions>=4.12.2", # remove when Python 3.10 is dropped
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -73,8 +74,7 @@ Issues = "https://github.com/glass-dev/glass/issues"
 [tool.coverage]
 report = {exclude_also = [
     "class \\w+\\(Protocol(\\[(\\w+, )*\\w+\\])?\\):", # protocol classes
-    "if TYPE_CHECKING:",
-    "if typing\\.TYPE_CHECKING:",
+    "if TYPE_CHECKING:", # type-checking imports
 ], omit = [
     "glass/_version.py",
 ], skip_covered = true, sort = "cover"}

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
@@ -8,7 +8,7 @@ import pytest
 
 import glass
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from cosmology import Cosmology
 
 

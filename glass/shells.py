@@ -45,28 +45,28 @@ Weight functions
 
 from __future__ import annotations
 
-import collections.abc
 import itertools
-import typing
 import warnings
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
-import numpy.typing as npt
+from numpy.typing import NDArray
 
 import glass.core.algorithm
 import glass.core.array
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from cosmology import Cosmology
 
-ArrayLike1D = collections.abc.Sequence[float] | npt.NDArray[np.float64]
-WeightFunc = typing.Callable[[ArrayLike1D], npt.NDArray[np.float64]]
+ArrayLike1D = Sequence[float] | NDArray[np.float64]
+WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
 def distance_weight(
-    z: npt.NDArray[np.float64],
+    z: NDArray[np.float64],
     cosmo: Cosmology,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Uniform weight in comoving distance.
 
@@ -86,9 +86,9 @@ def distance_weight(
 
 
 def volume_weight(
-    z: npt.NDArray[np.float64],
+    z: NDArray[np.float64],
     cosmo: Cosmology,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Uniform weight in comoving volume.
 
@@ -108,9 +108,9 @@ def volume_weight(
 
 
 def density_weight(
-    z: npt.NDArray[np.float64],
+    z: NDArray[np.float64],
     cosmo: Cosmology,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Uniform weight in matter density.
 
@@ -129,7 +129,7 @@ def density_weight(
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-class RadialWindow(typing.NamedTuple):
+class RadialWindow(NamedTuple):
     """
     A radial window, defined by a window function.
 
@@ -174,8 +174,8 @@ class RadialWindow(typing.NamedTuple):
 
     """
 
-    za: npt.NDArray[np.float64]
-    wa: npt.NDArray[np.float64]
+    za: NDArray[np.float64]
+    wa: NDArray[np.float64]
     zeff: float = 0
 
 
@@ -375,7 +375,7 @@ def restrict(
     z: ArrayLike1D,
     f: ArrayLike1D,
     w: RadialWindow,
-) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """
     Restrict a function to a redshift window.
 
@@ -416,12 +416,12 @@ def restrict(
 
 
 def partition(
-    z: npt.NDArray[np.float64],
-    fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    z: NDArray[np.float64],
+    fz: NDArray[np.float64],
+    shells: Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     r"""
     Partition a function by a sequence of windows.
 
@@ -536,12 +536,12 @@ def partition(
 
 
 def partition_lstsq(
-    z: npt.NDArray[np.float64],
-    fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    z: NDArray[np.float64],
+    fz: NDArray[np.float64],
+    shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Least-squares partition.
 
@@ -600,12 +600,12 @@ def partition_lstsq(
 
 
 def partition_nnls(
-    z: npt.NDArray[np.float64],
-    fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
+    z: NDArray[np.float64],
+    fz: NDArray[np.float64],
+    shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Non-negative least-squares partition.
 
@@ -682,10 +682,10 @@ def partition_nnls(
 
 
 def partition_restrict(
-    z: npt.NDArray[np.float64],
-    fz: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
-) -> npt.NDArray[np.float64]:
+    z: NDArray[np.float64],
+    fz: NDArray[np.float64],
+    shells: Sequence[RadialWindow],
+) -> NDArray[np.float64]:
     """
     Partition by restriction and integration.
 
@@ -716,7 +716,7 @@ def _uniform_grid(
     *,
     step: float | None = None,
     num: int | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Create a uniform grid.
 
@@ -755,7 +755,7 @@ def redshift_grid(
     *,
     dz: float | None = None,
     num: int | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Redshift grid with uniform spacing in redshift.
 
@@ -785,7 +785,7 @@ def distance_grid(
     *,
     dx: float | None = None,
     num: int | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Redshift grid with uniform spacing in comoving distance.
 
@@ -813,10 +813,10 @@ def distance_grid(
 
 
 def combine(
-    z: npt.NDArray[np.float64],
-    weights: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[RadialWindow],
-) -> npt.NDArray[np.float64]:
+    z: NDArray[np.float64],
+    weights: NDArray[np.float64],
+    shells: Sequence[RadialWindow],
+) -> NDArray[np.float64]:
     r"""
     Evaluate a linear combination of window functions.
 

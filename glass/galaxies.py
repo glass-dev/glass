@@ -19,26 +19,27 @@ Functions
 
 from __future__ import annotations
 
-import typing
 import warnings
+from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
-import numpy.typing as npt
 
 import glass
 import glass.core.array
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
     from cosmology import Cosmology
 
 
 def redshifts(
-    n: int | npt.NDArray[np.float64],
+    n: int | NDArray[np.float64],
     w: glass.RadialWindow,
     *,
     rng: np.random.Generator | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Sample redshifts from a radial window function.
 
@@ -64,13 +65,13 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | npt.NDArray[np.float64],
-    z: npt.NDArray[np.float64],
-    nz: npt.NDArray[np.float64],
+    count: int | NDArray[np.float64],
+    z: NDArray[np.float64],
+    nz: NDArray[np.float64],
     *,
     rng: np.random.Generator | None = None,
     warn: bool = True,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -145,15 +146,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: npt.NDArray[np.float64],
-    lat: npt.NDArray[np.float64],
-    eps: npt.NDArray[np.float64],
-    kappa: npt.NDArray[np.float64],
-    gamma1: npt.NDArray[np.float64],
-    gamma2: npt.NDArray[np.float64],
+    lon: NDArray[np.float64],
+    lat: NDArray[np.float64],
+    eps: NDArray[np.float64],
+    kappa: NDArray[np.float64],
+    gamma1: NDArray[np.float64],
+    gamma2: NDArray[np.float64],
     *,
     reduced_shear: bool = True,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Observed galaxy shears from weak lensing.
 
@@ -214,13 +215,13 @@ def galaxy_shear(  # noqa: PLR0913
 
 
 def gaussian_phz(
-    z: float | npt.NDArray[np.float64],
-    sigma_0: float | npt.NDArray[np.float64],
+    z: float | NDArray[np.float64],
+    sigma_0: float | NDArray[np.float64],
     *,
-    lower: float | npt.NDArray[np.float64] | None = None,
-    upper: float | npt.NDArray[np.float64] | None = None,
+    lower: float | NDArray[np.float64] | None = None,
+    upper: float | NDArray[np.float64] | None = None,
     rng: np.random.Generator | None = None,
-) -> float | npt.NDArray[np.float64]:
+) -> float | NDArray[np.float64]:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
@@ -305,7 +306,7 @@ def gaussian_phz(
 
 
 def _kappa_ia_nla(  # noqa: PLR0913
-    delta: npt.NDArray[np.float64],
+    delta: NDArray[np.float64],
     zeff: float,
     a_ia: float,
     cosmo: Cosmology,
@@ -315,7 +316,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     lbar: float = 0.0,
     l0: float = 1e-9,
     beta: float = 0.0,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     r"""
     Effective convergence from intrinsic alignments using the NLA model.
 

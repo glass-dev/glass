@@ -31,140 +31,141 @@ Applying lensing
 
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING, Literal, overload
 
 import healpy as hp
 import numpy as np
-import numpy.typing as npt
 
-if typing.TYPE_CHECKING:
-    import collections.abc
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from numpy.typing import NDArray
 
     from cosmology import Cosmology
 
     import glass
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[False] = False,
-    shear: typing.Literal[False] = False,
+    potential: Literal[True] = True,
+    deflection: Literal[False] = False,
+    shear: Literal[False] = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray[np.float64]]:
+) -> tuple[NDArray[np.float64]]:
     # returns psi
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[False] = False,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[False] = False,
+    potential: Literal[False] = False,
+    deflection: Literal[True] = True,
+    shear: Literal[False] = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray[np.complex128]]:
+) -> tuple[NDArray[np.complex128]]:
     # returns alpha
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[False] = False,
-    deflection: typing.Literal[False] = False,
-    shear: typing.Literal[True] = True,
+    potential: Literal[False] = False,
+    deflection: Literal[False] = False,
+    shear: Literal[True] = True,
     discretized: bool = True,
-) -> tuple[npt.NDArray[np.complex128]]:
+) -> tuple[NDArray[np.complex128]]:
     # returns gamma
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[False] = False,
+    potential: Literal[True] = True,
+    deflection: Literal[True] = True,
+    shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[
-    npt.NDArray[np.float64],
-    npt.NDArray[np.complex128],
+    NDArray[np.float64],
+    NDArray[np.complex128],
 ]:
     # returns psi, alpha
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[False] = False,
-    shear: typing.Literal[True] = True,
+    potential: Literal[True] = True,
+    deflection: Literal[False] = False,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[
-    npt.NDArray[np.float64],
-    npt.NDArray[np.complex128],
+    NDArray[np.float64],
+    NDArray[np.complex128],
 ]:
     # returns psi, gamma
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[False] = False,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[True] = True,
+    potential: Literal[False] = False,
+    deflection: Literal[True] = True,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[
-    npt.NDArray[np.complex128],
-    npt.NDArray[np.complex128],
+    NDArray[np.complex128],
+    NDArray[np.complex128],
 ]:
     # returns alpha, gamma
     ...
 
 
-@typing.overload
+@overload
 def from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
-    potential: typing.Literal[True] = True,
-    deflection: typing.Literal[True] = True,
-    shear: typing.Literal[True] = True,
+    potential: Literal[True] = True,
+    deflection: Literal[True] = True,
+    shear: Literal[True] = True,
     discretized: bool = True,
 ) -> tuple[
-    npt.NDArray[np.float64],
-    npt.NDArray[np.complex128],
-    npt.NDArray[np.complex128],
+    NDArray[np.float64],
+    NDArray[np.complex128],
+    NDArray[np.complex128],
 ]:
     # returns psi, alpha, gamma
     ...
 
 
 def from_convergence(  # noqa: PLR0913
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
     shear: bool = False,
     discretized: bool = True,
-) -> tuple[npt.NDArray[np.float64] | npt.NDArray[np.complex128], ...]:
+) -> tuple[NDArray[np.float64] | NDArray[np.complex128], ...]:
     r"""
     Compute other weak lensing maps from the convergence.
 
@@ -286,7 +287,7 @@ def from_convergence(  # noqa: PLR0913
     ell = np.arange(lmax + 1)
 
     # this tuple will be returned
-    results: tuple[npt.NDArray[np.float64] | npt.NDArray[np.complex128], ...] = ()
+    results: tuple[NDArray[np.float64] | NDArray[np.complex128], ...] = ()
 
     # convert convergence to potential
     fl = np.divide(-2, ell * (ell + 1), where=(ell > 0), out=np.zeros(lmax + 1))
@@ -338,11 +339,11 @@ def from_convergence(  # noqa: PLR0913
 
 
 def shear_from_convergence(
-    kappa: npt.NDArray[np.float64],
+    kappa: NDArray[np.float64],
     lmax: int | None = None,
     *,
     discretized: bool = True,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Weak lensing shear from convergence.
 
@@ -410,16 +411,16 @@ class MultiPlaneConvergence:
         self.cosmo = cosmo
 
         # set up initial values of variables
-        self.z2: float | npt.NDArray[np.float64] = 0.0
-        self.z3: float | npt.NDArray[np.float64] = 0.0
+        self.z2: float | NDArray[np.float64] = 0.0
+        self.z3: float | NDArray[np.float64] = 0.0
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: npt.NDArray[np.float64] = np.array(0.0)
-        self.kappa2: npt.NDArray[np.float64] | None = None
-        self.kappa3: npt.NDArray[np.float64] | None = None
+        self.delta3: NDArray[np.float64] = np.array(0.0)
+        self.kappa2: NDArray[np.float64] | None = None
+        self.kappa3: NDArray[np.float64] | None = None
 
-    def add_window(self, delta: npt.NDArray[np.float64], w: glass.RadialWindow) -> None:
+    def add_window(self, delta: NDArray[np.float64], w: glass.RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -441,8 +442,8 @@ class MultiPlaneConvergence:
 
     def add_plane(
         self,
-        delta: npt.NDArray[np.float64],
-        zsrc: float | npt.NDArray[np.float64],
+        delta: NDArray[np.float64],
+        zsrc: float | NDArray[np.float64],
         wlens: float = 1.0,
     ) -> None:
         """
@@ -505,17 +506,17 @@ class MultiPlaneConvergence:
         self.kappa3 += f * delta2
 
     @property
-    def zsrc(self) -> float | npt.NDArray[np.float64]:
+    def zsrc(self) -> float | NDArray[np.float64]:
         """The redshift of the current convergence plane."""
         return self.z3
 
     @property
-    def kappa(self) -> npt.NDArray[np.float64] | None:
+    def kappa(self) -> NDArray[np.float64] | None:
         """The current convergence plane."""
         return self.kappa3
 
     @property
-    def delta(self) -> npt.NDArray[np.float64]:
+    def delta(self) -> NDArray[np.float64]:
         """The current matter plane."""
         return self.delta3
 
@@ -526,9 +527,9 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: collections.abc.Sequence[glass.RadialWindow],
+    shells: Sequence[glass.RadialWindow],
     cosmo: Cosmology,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Compute the matrix of lensing contributions from each shell.
 
@@ -553,10 +554,10 @@ def multi_plane_matrix(
 
 
 def multi_plane_weights(
-    weights: npt.NDArray[np.float64],
-    shells: collections.abc.Sequence[glass.RadialWindow],
+    weights: NDArray[np.float64],
+    shells: Sequence[glass.RadialWindow],
     cosmo: Cosmology,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Compute effective weights for multi-plane convergence.
 
@@ -600,12 +601,12 @@ def multi_plane_weights(
 
 
 def deflect(
-    lon: float | npt.NDArray[np.float64],
-    lat: float | npt.NDArray[np.float64],
-    alpha: complex | list[float] | npt.NDArray[np.complex128] | npt.NDArray[np.float64],
+    lon: float | NDArray[np.float64],
+    lat: float | NDArray[np.float64],
+    alpha: complex | list[float] | NDArray[np.complex128] | NDArray[np.float64],
 ) -> tuple[
-    npt.NDArray[np.float64],
-    npt.NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
 ]:
     r"""
     Apply deflections to positions.

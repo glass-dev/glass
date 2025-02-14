@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import math
-import typing
 import warnings
+from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
-import numpy.typing as npt
 from gaussiancl import gaussiancl
 from transformcl import cltovar
 
@@ -18,8 +17,7 @@ import glass
 import glass.grf
 
 if TYPE_CHECKING:
-    import collections.abc
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
     from typing import Any
 
     from numpy.typing import NDArray
@@ -43,11 +41,9 @@ def inv_triangle_number(triangle_number: int) -> int:
 
 def iternorm(
     k: int,
-    cov: collections.abc.Iterable[npt.NDArray[np.float64]],
+    cov: Iterable[NDArray[np.float64]],
     size: int | tuple[int, ...] = (),
-) -> collections.abc.Generator[
-    tuple[int | None, npt.NDArray[np.float64], npt.NDArray[np.float64]]
-]:
+) -> Generator[tuple[int | None, NDArray[np.float64], NDArray[np.float64]]]:
     """
     Return the vector a and variance sigma^2 for iterative normal sampling.
 
@@ -132,7 +128,7 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> collections.abc.Generator[npt.NDArray[np.float64]]:
+) -> Generator[NDArray[np.float64]]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
 
@@ -174,11 +170,11 @@ def cls2cov(
 
 
 def multalm(
-    alm: npt.NDArray[np.complex128],
-    bl: npt.NDArray[np.float64],
+    alm: NDArray[np.complex128],
+    bl: NDArray[np.float64],
     *,
     inplace: bool = False,
-) -> npt.NDArray[np.complex128]:
+) -> NDArray[np.complex128]:
     """
     Multiply alm by bl.
 
@@ -205,8 +201,8 @@ def multalm(
 
 def transform_cls(
     cls: Cls,
-    tfm: str | typing.Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]],
-    pars: tuple[typing.Any, ...] = (),
+    tfm: str | Callable[[NDArray[np.float64]], NDArray[np.float64]],
+    pars: tuple[Any, ...] = (),
 ) -> Cls:
     """
     Transform Cls to Gaussian Cls.
@@ -332,7 +328,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.float64]]:
+) -> Generator[NDArray[np.float64]]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -431,7 +427,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> collections.abc.Generator[npt.NDArray[np.float64]]:
+) -> Generator[NDArray[np.float64]]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
 
@@ -475,13 +471,11 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
+    cls: Sequence[NDArray[np.float64] | Sequence[float]],
     i: int,
     j: int,
     lmax: int | None = None,
-) -> npt.NDArray[np.float64] | collections.abc.Sequence[float]:
+) -> NDArray[np.float64] | Sequence[float]:
     """
     Return a specific angular power spectrum from an array in
     :ref:`standard order <twopoint_order>`.
@@ -557,14 +551,12 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
 
 
 def effective_cls(
-    cls: collections.abc.Sequence[
-        npt.NDArray[np.float64] | collections.abc.Sequence[float]
-    ],
-    weights1: npt.NDArray[np.float64],
-    weights2: npt.NDArray[np.float64] | None = None,
+    cls: Sequence[NDArray[np.float64] | Sequence[float]],
+    weights1: NDArray[np.float64],
+    weights2: NDArray[np.float64] | None = None,
     *,
     lmax: int | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Compute effective angular power spectra from weights.
 
