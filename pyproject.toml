@@ -173,6 +173,8 @@ lint.per-file-ignores = {"__init__.py" = [
     "EM102", # f-string-in-exception
     "PLR2004", # TODO: magic-value-comparison
     "TRY003", # raise-vanilla-args
+], "glass/grf/_*" = [
+    "SLF001", # private-member-access
 ], "noxfile.py" = [
     "T201", # print
 ], "tests*" = [
