@@ -78,8 +78,6 @@ class SquaredNormal:
     distribution, with determines the smallest possible value
     :math:`-\lambda` of the squared normal field.
 
-    .. [Tessore25] https://arxiv.org/abs/2408.16903
-
     Parameters
     ----------
     a

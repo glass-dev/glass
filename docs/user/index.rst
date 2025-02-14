@@ -7,4 +7,5 @@ User guide
 
    how-glass-works
    publications
+   bibliography
    definitions
