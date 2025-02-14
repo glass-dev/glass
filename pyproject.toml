@@ -128,7 +128,7 @@ xfail_strict = true
 
 [tool.ruff]
 extend-exclude = [
-	"examples",
+    "examples",
 ]
 fix = true
 force-exclude = true
