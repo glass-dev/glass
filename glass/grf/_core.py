@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-TransformationT = TypeVar("TransformationT", bound="Transformation")
+    TransformationT = TypeVar("TransformationT", bound="Transformation")
 
 
 class Transformation(Protocol):
