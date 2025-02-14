@@ -93,9 +93,9 @@ def nnls(
 
 
 def cov_clip(
-    cov: npt.NDArray[np.float64],
+    cov: NDArray[np.float64],
     rtol: float | None = None,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Covariance matrix from clipping non-positive eigenvalues.
 
@@ -134,11 +134,11 @@ def cov_clip(
 
 
 def nearcorr(
-    a: npt.NDArray[np.float64],
+    a: NDArray[np.float64],
     *,
     tol: float | None = None,
     niter: int = 100,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Compute the nearest correlation matrix.
 
@@ -206,10 +206,10 @@ def nearcorr(
 
 
 def cov_nearest(
-    cov: npt.NDArray[np.float64],
+    cov: NDArray[np.float64],
     tol: float | None = None,
     niter: int = 100,
-) -> npt.NDArray[np.float64]:
+) -> NDArray[np.float64]:
     """
     Covariance matrix from nearest correlation matrix.
 
