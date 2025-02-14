@@ -945,7 +945,8 @@ def check_posdef_spectra(spectra: Cls) -> bool:
     """Test whether angular power spectra are positive semi-definite."""
     cov = cov_from_spectra(spectra)
     xp = cov.__array_namespace__()
-    return xp.all(xp.linalg.eigvalsh(cov) >= 0)  # type: ignore[no-any-return]
+    is_positive_semi_definite: bool = xp.all(xp.linalg.eigvalsh(cov) >= 0)
+    return is_positive_semi_definite
 
 
 def regularized_spectra(
@@ -953,7 +954,7 @@ def regularized_spectra(
     *,
     lmax: int | None = None,
     method: Literal["nearest", "clip"] = "nearest",
-    **method_kwargs: Any,  # noqa: ANN401
+    **method_kwargs: float | None,
 ) -> Cls:
     r"""
     Regularise a set of angular power spectra.
