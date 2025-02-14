@@ -37,10 +37,10 @@ import healpy as hp
 import numpy as np
 import numpy.typing as npt
 
+from cosmology.api import CosmologyConstantsNamespace, StandardCosmology
+
 if typing.TYPE_CHECKING:
     import collections.abc
-
-    from cosmology import Cosmology
 
     from glass.shells import RadialWindow
 
@@ -397,7 +397,10 @@ def shear_from_convergence(
 class MultiPlaneConvergence:
     """Compute convergence fields iteratively from multiple matter planes."""
 
-    def __init__(self, cosmo: Cosmology) -> None:
+    def __init__(
+        self,
+        cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
+    ) -> None:
         """
         Create a new instance to iteratively compute the convergence.
 
@@ -477,15 +480,19 @@ class MultiPlaneConvergence:
         w2, self.w3 = self.w3, wlens
 
         # extrapolation law
-        x2, self.x3 = self.x3, self.cosmo.xm(self.z3)
+        hubble_length = CosmologyConstantsNamespace.c / StandardCosmology.H0
+        x2 = self.x3
+        self.x3 = self.cosmo.transverse_comoving_distance(self.z3) / hubble_length
         r12 = self.r23
-        r13, self.r23 = self.cosmo.xm([z1, self.z2], self.z3) / self.x3
+        r13, self.r23 = self.cosmo.transverse_comoving_distance(
+            [z1, self.z2], self.z3
+        ) / (hubble_length * self.x3)
         t = r13 / r12
 
         # lensing weight of mass plane to be added
-        f = 3 * self.cosmo.omega_m / 2
+        f = 3 * self.cosmo.Omega_m0 / 2
         f *= x2 * self.r23
-        f *= (1 + self.z2) / self.cosmo.ef(self.z2)
+        f *= (1 + self.z2) / self.cosmo.H_over_H0(self.z2)
         f *= w2
 
         # create kappa planes on first iteration
@@ -527,7 +534,7 @@ class MultiPlaneConvergence:
 
 def multi_plane_matrix(
     shells: collections.abc.Sequence[RadialWindow],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Compute the matrix of lensing contributions from each shell.
@@ -555,7 +562,7 @@ def multi_plane_matrix(
 def multi_plane_weights(
     weights: npt.NDArray[np.float64],
     shells: collections.abc.Sequence[RadialWindow],
-    cosmo: Cosmology,
+    cosmo: StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Compute effective weights for multi-plane convergence.

@@ -8,7 +8,7 @@ import numpy.typing as npt
 import packaging.version
 import pytest
 
-from cosmology import Cosmology
+from cosmology import StandardCosmology
 
 from glass import RadialWindow
 
@@ -98,13 +98,12 @@ else:
 # use this as a decorator for tests involving array API compatible functions
 array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.values())
 
-
 # Pytest fixtures
 @pytest.fixture(scope="session")
-def cosmo() -> Cosmology:
+def cosmo() -> StandardCosmology[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     class MockCosmology:
         @property
-        def omega_m(self) -> float:
+        def Omega_m0(self) -> float:  # noqa: N802
             """Matter density parameter at redshift 0."""
             return 0.3
 
@@ -113,9 +112,9 @@ def cosmo() -> Cosmology:
             """Critical density at redshift 0 in Msol Mpc-3."""
             return 3e4
 
-        def ef(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        def H_over_H0(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:  # noqa: N802
             """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
-            return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
+            return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
 
         def xm(
             self,
@@ -133,7 +132,7 @@ def cosmo() -> Cosmology:
 
         def rho_m_z(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
             """Redshift-dependent matter density in Msol Mpc-3."""
-            return self.rho_c * self.omega_m * (1 + z) ** 3
+            return self.rho_c * self.Omega_m0 * (1 + z) ** 3
 
         def dc(
             self,
