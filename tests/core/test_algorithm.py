@@ -33,3 +33,24 @@ def test_nnls(rng: np.random.Generator) -> None:
         glass.core.algorithm.nnls(a, a)
     with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
         glass.core.algorithm.nnls(a.T, b)
+
+
+def test_nearcorr():
+    # from Higham (2002)
+    a = np.array(
+        [
+            [1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ],
+    )
+    x = glass.core.algorithm.nearcorr(a)
+    np.testing.assert_allclose(
+        x,
+        [
+            [1.0000, 0.7607, 0.1573],
+            [0.7607, 1.0000, 0.7607],
+            [0.1573, 0.7607, 1.0000],
+        ],
+        atol=0.0001,
+    )
