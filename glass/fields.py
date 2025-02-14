@@ -6,7 +6,7 @@ import math
 import warnings
 from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
