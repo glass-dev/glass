@@ -158,7 +158,8 @@ def nearcorr(
     a
         Square matrix (or a stack of square matrices).
     tol
-        Tolerance for convergence. Default is 16 times machine epsilon.
+        Tolerance for convergence. Default is dimension times machine
+        epsilon.
     niter
         Maximum number of iterations.
 

@@ -48,6 +48,13 @@ def test_cov_clip(rng):
     # make sure all eigenvalues are positive
     assert np.all(np.linalg.eigvalsh(cov) >= 0)
 
+    # fix by clipping negative eigenvalues
+    cov = glass.core.algorithm.cov_clip(a, rtol=1.0)
+
+    # make sure all eigenvalues are positive
+    h = np.linalg.eigvalsh(a).max()
+    np.testing.assert_allclose(np.linalg.eigvalsh(cov), h)
+
 
 def test_nearcorr():
     # from Higham (2002)
@@ -58,16 +65,28 @@ def test_nearcorr():
             [0.0, 1.0, 1.0],
         ],
     )
-    x = glass.core.algorithm.nearcorr(a)
-    np.testing.assert_allclose(
-        x,
+    b = np.array(
         [
             [1.0000, 0.7607, 0.1573],
             [0.7607, 1.0000, 0.7607],
             [0.1573, 0.7607, 1.0000],
         ],
-        atol=0.0001,
     )
+
+    x = glass.core.algorithm.nearcorr(a)
+    np.testing.assert_allclose(x, b, atol=0.0001)
+
+    # explicit tolerance
+    x = glass.core.algorithm.nearcorr(a, tol=1e-10)
+    np.testing.assert_allclose(x, b, atol=0.0001)
+
+    # no iterations
+    x = glass.core.algorithm.nearcorr(a, niter=0)
+    np.testing.assert_allclose(x, a)
+
+    # non-square matrix should raise
+    with pytest.raises(ValueError, match="non-square matrix"):
+        glass.core.algorithm.nearcorr(np.zeros((4, 3)))
 
 
 def test_cov_nearest(rng, mocker):
@@ -96,3 +115,7 @@ def test_cov_nearest(rng, mocker):
         nearcorr.call_args_list[0].args[0],
         np.divide(a, norm, where=(norm > 0), out=np.zeros_like(a)),
     )
+
+    # cannot deal with negative variances
+    with pytest.raises(ValueError, match="negative values"):
+        glass.core.algorithm.cov_nearest(np.diag([1, 1, -1]))
