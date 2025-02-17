@@ -641,3 +641,21 @@ def test_cov_from_spectra():
             ],
         ],
     )
+
+
+def test_regularized_spectra(mocker, rng):
+    spectra = rng.random(size=(6, 101))
+
+    # test method "nearest"
+    cov_nearest = mocker.spy(glass.core.algorithm, "cov_nearest")
+    glass.fields.regularized_spectra(spectra, method="nearest")
+    cov_nearest.assert_called_once()
+
+    # test method "clip"
+    cov_clip = mocker.spy(glass.core.algorithm, "cov_clip")
+    glass.fields.regularized_spectra(spectra, method="clip")
+    cov_clip.assert_called_once()
+
+    # invalid method
+    with pytest.raises(ValueError, match="unknown method"):
+        glass.fields.regularized_spectra(spectra, method="unknown")
