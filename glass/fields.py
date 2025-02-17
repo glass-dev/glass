@@ -942,7 +942,19 @@ def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> NDArray[Any]:
 
 
 def check_posdef_spectra(spectra: Cls) -> bool:
-    """Test whether angular power spectra are positive semi-definite."""
+    """
+    Test whether angular power spectra are positive semi-definite.
+
+    Parameters
+    ----------
+    spectra
+        Spectra to be tested.
+
+    Returns
+    -------
+        Whether spectra are positive semi-definite or not.
+
+    """
     cov = cov_from_spectra(spectra)
     xp = cov.__array_namespace__()
     is_positive_semi_definite: bool = xp.all(xp.linalg.eigvalsh(cov) >= 0)

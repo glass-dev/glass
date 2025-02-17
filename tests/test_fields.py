@@ -643,6 +643,39 @@ def test_cov_from_spectra():
     )
 
 
+def test_check_posdef_spectra():
+    # posdef spectra
+    assert glass.fields.check_posdef_spectra(
+        np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [0.9, 0.9, 0.9],
+            ]
+        )
+    )
+    # semidef spectra
+    assert glass.fields.check_posdef_spectra(
+        np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 0.0],
+                [0.9, 1.0, 0.0],
+            ]
+        )
+    )
+    # indef spectra
+    assert not glass.fields.check_posdef_spectra(
+        np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [1.1, 1.1, 1.1],
+            ]
+        )
+    )
+
+
 def test_regularized_spectra(mocker, rng):
     spectra = rng.random(size=(6, 101))
 
