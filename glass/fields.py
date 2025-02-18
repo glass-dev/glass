@@ -18,7 +18,7 @@ import glass.grf
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
-    from typing import Any
+    from typing import Any, Literal
 
     from numpy.typing import NDArray
 
@@ -825,3 +825,191 @@ def generate(
 
     for t, x, var in zip(fields, grf, variances, strict=True):
         yield t(x, var)
+
+
+def glass_to_healpix_spectra(spectra: Cls) -> Cls:
+    """
+    Reorder spectra from GLASS to HEALPix order.
+
+    Reorder spectra in :ref:`GLASS order <twopoint_order>` to conform to
+    (new) HEALPix order.
+
+    Parameters
+    ----------
+    spectra
+        Sequence of spectra in GLASS order.
+
+    Returns
+    -------
+        Sequence of spectra in HEALPix order.
+
+    """
+    n = inv_triangle_number(len(spectra))
+
+    comb = [(i, j) for i, j in spectra_indices(n)]
+    return [spectra[comb.index((i + k, i))] for k in range(n) for i in range(n - k)]
+
+
+def healpix_to_glass_spectra(spectra: Cls) -> Cls:
+    """
+    Reorder spectra from HEALPix to GLASS order.
+
+    Reorder HEALPix spectra (in new order) to conform to :ref:`GLASS
+    order <twopoint_order>`.
+
+    Parameters
+    ----------
+    spectra
+        Sequence of spectra in HEALPix order.
+
+    Returns
+    -------
+        Sequence of spectra in GLASS order.
+
+    """
+    n = inv_triangle_number(len(spectra))
+
+    comb = [(i + k, i) for k in range(n) for i in range(n - k)]
+    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
+
+
+def lognormal_shift_hilbert2011(z: float) -> float:
+    """
+    Lognormal shift of Hilbert et al. (2011) for convergence fields.
+
+    Lognormal shift parameter for the weak lensing convergence
+    from the fitting formula of [Hilbert11]_.
+
+    Parameters
+    ----------
+    z
+        Redshift.
+
+    Returns
+    -------
+        Lognormal shift.
+
+    """
+    return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
+
+
+def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> NDArray[Any]:
+    """
+    Construct covariance matrix from spectra.
+
+    Construct a covariance matrix from the angular power spectra in
+    *spectra*.
+
+    Parameters
+    ----------
+    spectra
+        Sequence of angular power spectra.
+    lmax
+        Maximum angular mode number. If not given, the maximum is taken
+        from the provided spectra.
+
+    Returns
+    -------
+        Covariance matrix from the given spectra.
+
+    """
+    # recover the number of fields from the number of spectra
+    try:
+        n = inv_triangle_number(len(spectra))
+    except ValueError:
+        msg = "invalid number of spectra"
+        raise ValueError(msg) from None
+
+    if lmax is None:  # noqa: SIM108
+        # maximum length in input spectra
+        k = max((cl.size for cl in spectra), default=0)
+    else:
+        k = lmax + 1
+
+    # this is the covariance matrix of the spectra
+    # the leading dimension is k, then it is a n-by-n covariance matrix
+    # missing entries are zero, which is the default value
+    cov = np.zeros((k, n, n))
+
+    # fill the matrix up by going through the spectra in order
+    # skip over entries that are None
+    # if the spectra are ragged, some entries at high ell may remain zero
+    # only fill the lower triangular part, everything is symmetric
+    for i, j, cl in enumerate_spectra(spectra):
+        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]
+
+    return cov
+
+
+def check_posdef_spectra(spectra: Cls) -> bool:
+    """
+    Test whether angular power spectra are positive semi-definite.
+
+    Parameters
+    ----------
+    spectra
+        Spectra to be tested.
+
+    Returns
+    -------
+        Whether spectra are positive semi-definite or not.
+
+    """
+    cov = cov_from_spectra(spectra)
+    xp = cov.__array_namespace__()
+    is_positive_semi_definite: bool = xp.all(xp.linalg.eigvalsh(cov) >= 0)
+    return is_positive_semi_definite
+
+
+def regularized_spectra(
+    spectra: Cls,
+    *,
+    lmax: int | None = None,
+    method: Literal["nearest", "clip"] = "nearest",
+    **method_kwargs: float | None,
+) -> Cls:
+    r"""
+    Regularise a set of angular power spectra.
+
+    Regularises a complete set *spectra* of angular power spectra in
+    :ref:`standard order <twopoint_order>` such that at every angular
+    mode number :math:`\ell`, the matrix :math:`C_\ell^{ij}` is a
+    valid positive semi-definite covariance matrix.
+
+    The length of the returned spectra is set by *lmax*, or the maximum
+    length of the given spectra if *lmax* is not given.  Shorter input
+    spectra are padded with zeros as necessary.  Missing spectra can be
+    set to :data:`None` or, preferably, an empty array.
+
+    The *method* parameter determines how the regularisation is carried
+    out.
+
+    Parameters
+    ----------
+    spectra
+        Spectra to be regularised.
+    lmax
+        Maximum angular mode number. If not given, the maximum is taken
+        from the provided spectra.
+    method
+        Regularisation method.
+
+    """
+    # regularise the cov matrix using the chosen method
+    cov_method: Callable[..., NDArray[Any]]
+    if method == "clip":
+        from glass.core.algorithm import cov_clip as cov_method
+    elif method == "nearest":
+        from glass.core.algorithm import cov_nearest as cov_method
+    else:
+        msg = f"unknown method '{method}'"  # type: ignore[unreachable]
+        raise ValueError(msg)
+
+    # get the cov matrix from spectra
+    cov = cov_from_spectra(spectra, lmax=lmax)
+
+    # regularise the cov matrix using the chosen method
+    cov = cov_method(cov, **method_kwargs)
+
+    # return regularised spectra from cov matrix array
+    return [cov[:, i, j] for i, j in spectra_indices(cov.shape[-1])]

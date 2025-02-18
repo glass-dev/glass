@@ -533,3 +533,162 @@ def test_solve_gaussian_spectra(mocker):
     # spectra size mismatch
     with pytest.raises(ValueError, match="fields and spectra"):
         glass.solve_gaussian_spectra(fields, spectra[:2])
+
+
+def test_glass_to_healpix_spectra():
+    inp = [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
+    out = glass.glass_to_healpix_spectra(inp)
+    np.testing.assert_array_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
+
+
+def test_healpix_to_glass_spectra():
+    inp = [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
+    out = glass.healpix_to_glass_spectra(inp)
+    np.testing.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
+
+
+def test_lognormal_shift_hilbert2011():
+    zs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+    shifts = [glass.lognormal_shift_hilbert2011(z) for z in zs]
+
+    # computed by hand
+    check = [0.0103031, 0.02975, 0.0538781, 0.0792, 0.103203, 0.12435, 0.142078, 0.1568]
+
+    np.testing.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
+
+
+def test_cov_from_spectra():
+    spectra = np.array(
+        [
+            [110, 111, 112, 113],
+            [220, 221, 222, 223],
+            [210, 211, 212, 213],
+            [330, 331, 332, 333],
+            [320, 321, 322, 323],
+            [310, 311, 312, 313],
+        ]
+    )
+
+    np.testing.assert_array_equal(
+        glass.cov_from_spectra(spectra),
+        [
+            [
+                [110, 210, 310],
+                [210, 220, 320],
+                [310, 320, 330],
+            ],
+            [
+                [111, 211, 311],
+                [211, 221, 321],
+                [311, 321, 331],
+            ],
+            [
+                [112, 212, 312],
+                [212, 222, 322],
+                [312, 322, 332],
+            ],
+            [
+                [113, 213, 313],
+                [213, 223, 323],
+                [313, 323, 333],
+            ],
+        ],
+    )
+
+    np.testing.assert_array_equal(
+        glass.cov_from_spectra(spectra, lmax=1),
+        [
+            [
+                [110, 210, 310],
+                [210, 220, 320],
+                [310, 320, 330],
+            ],
+            [
+                [111, 211, 311],
+                [211, 221, 321],
+                [311, 321, 331],
+            ],
+        ],
+    )
+
+    np.testing.assert_array_equal(
+        glass.cov_from_spectra(spectra, lmax=4),
+        [
+            [
+                [110, 210, 310],
+                [210, 220, 320],
+                [310, 320, 330],
+            ],
+            [
+                [111, 211, 311],
+                [211, 221, 321],
+                [311, 321, 331],
+            ],
+            [
+                [112, 212, 312],
+                [212, 222, 322],
+                [312, 322, 332],
+            ],
+            [
+                [113, 213, 313],
+                [213, 223, 323],
+                [313, 323, 333],
+            ],
+            [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+            ],
+        ],
+    )
+
+
+def test_check_posdef_spectra():
+    # posdef spectra
+    assert glass.fields.check_posdef_spectra(
+        np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [0.9, 0.9, 0.9],
+            ]
+        )
+    )
+    # semidef spectra
+    assert glass.fields.check_posdef_spectra(
+        np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 0.0],
+                [0.9, 1.0, 0.0],
+            ]
+        )
+    )
+    # indef spectra
+    assert not glass.fields.check_posdef_spectra(
+        np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [1.1, 1.1, 1.1],
+            ]
+        )
+    )
+
+
+def test_regularized_spectra(mocker, rng):
+    spectra = rng.random(size=(6, 101))
+
+    # test method "nearest"
+    cov_nearest = mocker.spy(glass.core.algorithm, "cov_nearest")
+    glass.fields.regularized_spectra(spectra, method="nearest")
+    cov_nearest.assert_called_once()
+
+    # test method "clip"
+    cov_clip = mocker.spy(glass.core.algorithm, "cov_clip")
+    glass.fields.regularized_spectra(spectra, method="clip")
+    cov_clip.assert_called_once()
+
+    # invalid method
+    with pytest.raises(ValueError, match="unknown method"):
+        glass.fields.regularized_spectra(spectra, method="unknown")
