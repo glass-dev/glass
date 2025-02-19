@@ -37,7 +37,7 @@ import healpix
 import numpy as np
 
 import glass
-import glass.core.array
+import glass.arraytools
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -85,7 +85,7 @@ def effective_bias(
 
     """
     norm = np.trapezoid(w.wa, w.za)
-    return glass.core.array.trapezoid_product((z, bz), (w.za, w.wa)) / norm
+    return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(
@@ -232,7 +232,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         inputs.append((bias, 0))
     if vis is not None:
         inputs.append((vis, 1))
-    dims, *rest = glass.core.array.broadcast_leading_axes(*inputs)
+    dims, *rest = glass.arraytools.broadcast_leading_axes(*inputs)
     ngal, delta, *rest = rest
     if bias is not None:
         bias, *rest = rest
@@ -409,7 +409,7 @@ def position_weights(
     """
     # bring densities and bias into the same shape
     if bias is not None:
-        densities, bias = glass.core.array.broadcast_first(densities, bias)
+        densities, bias = glass.arraytools.broadcast_first(densities, bias)
     # normalise densities after shape has been fixed
     densities = densities / np.sum(densities, axis=0)
     # apply bias after normalisation
