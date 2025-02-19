@@ -200,33 +200,6 @@ def test_multalm() -> None:
     np.testing.assert_array_equal(result, alm)
 
 
-def test_transform_cls() -> None:
-    tfm = "lognormal"
-    pars = [2]
-    sub_cls = np.array([1, 2, 3, 4, 5])
-
-    # empty cls
-
-    assert glass.transform_cls([], tfm, pars) == []
-
-    # check output shape
-
-    assert len(glass.transform_cls([sub_cls], tfm, pars)) == 1
-    assert len(glass.transform_cls([sub_cls], tfm, pars)[0]) == 5
-
-    assert len(glass.transform_cls([sub_cls, sub_cls], tfm, pars)) == 2
-    assert len(glass.transform_cls([sub_cls, sub_cls], tfm, pars)[0]) == 5
-    assert len(glass.transform_cls([sub_cls, sub_cls], tfm, pars)[1]) == 5
-
-    # one sequence of empty cls
-
-    assert glass.transform_cls([[], sub_cls], tfm, pars)[0] == []
-
-    # monopole behavior
-
-    assert glass.transform_cls([sub_cls, np.linspace(0, 5, 6)], tfm, pars)[1][0] == 0
-
-
 def test_lognormal_gls() -> None:
     shift = 2
 
@@ -239,18 +212,13 @@ def test_lognormal_gls() -> None:
     assert len(glass.lognormal_gls([np.linspace(1, 5, 5)], shift)) == 1
     assert len(glass.lognormal_gls([np.linspace(1, 5, 5)], shift)[0]) == 5
 
-    assert (
-        len(glass.lognormal_gls([np.linspace(1, 5, 5), np.linspace(1, 5, 5)], shift))
-        == 2
-    )
-    assert (
-        len(glass.lognormal_gls([np.linspace(1, 5, 5), np.linspace(1, 5, 5)], shift)[0])
-        == 5
-    )
-    assert (
-        len(glass.lognormal_gls([np.linspace(1, 5, 5), np.linspace(1, 5, 5)], shift)[1])
-        == 5
-    )
+    inp = [np.linspace(1, 6, 5), np.linspace(1, 5, 4), np.linspace(1, 4, 3)]
+    out = glass.lognormal_gls(inp, shift)
+
+    assert len(out) == 3
+    assert len(out[0]) == 5
+    assert len(out[1]) == 4
+    assert len(out[2]) == 3
 
 
 def test_discretized_cls() -> None:

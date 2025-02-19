@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
-from gaussiancl import gaussiancl
 from transformcl import cltovar
 
 import glass
@@ -24,6 +23,30 @@ if TYPE_CHECKING:
 
     Fields = Sequence[glass.grf.Transformation]
     Cls = Sequence[NDArray[Any]]
+
+try:
+    from warnings import deprecated  # type: ignore[attr-defined]
+except ImportError:
+    if TYPE_CHECKING:
+        from typing import ParamSpec, TypeVar
+
+        _P = ParamSpec("_P")
+        _R = TypeVar("_R")
+
+    def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:
+        """Backport of Python's warnings.deprecated()."""
+        from functools import wraps
+        from warnings import warn
+
+        def decorator(func: Callable[_P, _R], /) -> Callable[_P, _R]:
+            @wraps(func)
+            def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+                warn(msg, category=DeprecationWarning, stacklevel=2)
+                return func(*args, **kwargs)
+
+            return wrapper
+
+        return decorator
 
 
 def inv_triangle_number(triangle_number: int) -> int:
@@ -199,44 +222,6 @@ def multalm(
     return out
 
 
-def transform_cls(
-    cls: Cls,
-    tfm: str | Callable[[NDArray[np.float64]], NDArray[np.float64]],
-    pars: tuple[Any, ...] = (),
-) -> Cls:
-    """
-    Transform Cls to Gaussian Cls.
-
-    Parameters
-    ----------
-    cls
-        Angular matter power spectra in *GLASS* ordering.
-    tfm
-        The transformation to apply.
-    pars
-        The parameters for the transformation.
-
-    Returns
-    -------
-        The transformed angular power spectra.
-
-    """
-    gls = []
-    for cl in cls:
-        if len(cl) > 0:
-            monopole = 0.0 if cl[0] == 0 else None
-            gl, info, _, _ = gaussiancl(cl, tfm, pars, monopole=monopole)
-            if info == 0:
-                warnings.warn(
-                    "Gaussian cl did not converge, inexact transform",
-                    stacklevel=2,
-                )
-        else:
-            gl = []
-        gls.append(gl)
-    return gls
-
-
 def discretized_cls(
     cls: Cls,
     *,
@@ -300,12 +285,19 @@ def discretized_cls(
     return gls
 
 
+@deprecated("use glass.solve_gaussian_spectra() instead")
 def lognormal_gls(
     cls: Cls,
     shift: float = 1.0,
 ) -> Cls:
     """
     Compute Gaussian Cls for a lognormal random field.
+
+    .. deprecated:: 2025.1
+
+       Use :func:`glass.lognormal_fields` and
+       :func:`glass.compute_gaussian_spectra` or
+       :func:`glass.solve_gaussian_spectra` instead.
 
     Parameters
     ----------
@@ -319,52 +311,19 @@ def lognormal_gls(
         The Gaussian angular power spectra for a lognormal random field.
 
     """
-    return transform_cls(cls, "lognormal", (shift,))
+    n = inv_triangle_number(len(cls))
+    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
+    return solve_gaussian_spectra(fields, cls)
 
 
-def generate_gaussian(
+def _generate_grf(
     gls: Cls,
     nside: int,
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
 ) -> Generator[NDArray[np.float64]]:
-    """
-    Sample Gaussian random fields from Cls iteratively.
-
-    A generator that iteratively samples HEALPix maps of Gaussian random fields
-    with the given angular power spectra ``gls`` and resolution parameter
-    ``nside``.
-
-    The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated. This saves memory, as only `ncorr` previous
-    fields need to be kept.
-
-    The ``gls`` array must contain the angular power power spectra of the
-    Gaussian random fields in :ref:`standard order <twopoint_order>`.
-
-    Parameters
-    ----------
-    gls
-        The Gaussian angular power spectra for a random field.
-    nside
-        The resolution parameter for the HEALPix maps.
-    ncorr
-        The number of correlated fields. If not given, all fields are correlated.
-    rng
-        Random number generator. If not given, a default RNG is used.
-
-    Yields
-    ------
-    fields
-        The Gaussian random fields.
-
-    Raises
-    ------
-    ValueError
-        If all gls are empty.
-
-    """
+    """Iteratively sample Gaussian random fields (internal use)."""
     # get the default RNG if not given
     if rng is None:
         rng = np.random.default_rng()
@@ -420,6 +379,60 @@ def generate_gaussian(
         yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
+@deprecated("use glass.generate() instead")
+def generate_gaussian(
+    gls: Cls,
+    nside: int,
+    *,
+    ncorr: int | None = None,
+    rng: np.random.Generator | None = None,
+) -> Generator[NDArray[np.float64]]:
+    """
+    Sample Gaussian random fields from Cls iteratively.
+
+    .. deprecated:: 2025.1
+
+       Use :func:`glass.generate()` instead.
+
+    A generator that iteratively samples HEALPix maps of Gaussian random fields
+    with the given angular power spectra ``gls`` and resolution parameter
+    ``nside``.
+
+    The optional argument ``ncorr`` can be used to artificially limit now many
+    realised fields are correlated. This saves memory, as only `ncorr` previous
+    fields need to be kept.
+
+    The ``gls`` array must contain the angular power power spectra of the
+    Gaussian random fields in :ref:`standard order <twopoint_order>`.
+
+    Parameters
+    ----------
+    gls
+        The Gaussian angular power spectra for a random field.
+    nside
+        The resolution parameter for the HEALPix maps.
+    ncorr
+        The number of correlated fields. If not given, all fields are correlated.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Yields
+    ------
+    fields
+        The Gaussian random fields.
+
+    Raises
+    ------
+    ValueError
+        If all gls are empty.
+
+    """
+    n = inv_triangle_number(len(gls))
+    fields = [glass.grf.Normal() for _ in range(n)]
+    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
+
+
+@deprecated("use glass.generate() instead")
 def generate_lognormal(
     gls: Cls,
     nside: int,
@@ -430,6 +443,10 @@ def generate_lognormal(
 ) -> Generator[NDArray[np.float64]]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
+
+    .. deprecated:: 2025.1
+
+       Use :func:`glass.generate()` instead.
 
     Parameters
     ----------
@@ -450,24 +467,9 @@ def generate_lognormal(
         The lognormal random fields.
 
     """
-    for i, m in enumerate(generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)):
-        # compute the variance of the auto-correlation
-        gl = gls[i * (i + 1) // 2]
-        ell = np.arange(len(gl))
-        var = np.sum((2 * ell + 1) * gl) / (4 * np.pi)
-
-        # fix mean of the Gaussian random field for lognormal transformation
-        m -= var / 2  # noqa: PLW2901
-
-        # exponentiate values in place and subtract 1 in one operation
-        np.expm1(m, out=m)
-
-        # lognormal shift, unless unity
-        if shift != 1:
-            m *= shift  # noqa: PLW2901
-
-        # yield the lognormal map
-        yield m
+    n = inv_triangle_number(len(gls))
+    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
+    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
 
 def getcl(
@@ -821,7 +823,7 @@ def generate(
         raise ValueError(msg)
 
     variances = (cltovar(getcl(gls, i, i)) for i in range(n))
-    grf = generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)
+    grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
         yield t(x, var)
