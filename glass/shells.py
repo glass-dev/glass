@@ -51,7 +51,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-import glass.core.algorithm
+import glass.algorithm
 import glass.core.array
 
 if TYPE_CHECKING:
@@ -677,7 +677,7 @@ def partition_nnls(
     # for each dim, find non-negative weights x such that y == r @ x
     x = np.empty([len(shells), *dims])
     for i in np.ndindex(*dims):
-        x[(..., *i)] = glass.core.algorithm.nnls(r, y[i])  # type: ignore[index]
+        x[(..., *i)] = glass.algorithm.nnls(r, y[i])  # type: ignore[index]
 
     # all done
     return x
