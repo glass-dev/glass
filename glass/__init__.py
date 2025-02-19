@@ -3,6 +3,7 @@
 __all__ = [
     "MultiPlaneConvergence",
     "RadialWindow",
+    "algorithm",
     "check_posdef_spectra",
     "cls2cov",
     "combine",
