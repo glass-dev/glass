@@ -92,10 +92,10 @@ returns sets which are well-defined and, in some sense, "close" to the input.
 
    .. seealso::
 
-      :func:`glass.core.algorithm.cov_nearest`
+      :func:`glass.algorithm.cov_nearest`
          Equivalent function for covariance matrices.
 
-      :func:`glass.core.algorithm.nearcorr`
+      :func:`glass.algorithm.nearcorr`
          Nearest correlation matrix.
 
 .. function:: regularized_spectra(..., method="clip", rtol=None)
@@ -107,7 +107,7 @@ returns sets which are well-defined and, in some sense, "close" to the input.
 
    .. seealso::
 
-      :func:`glass.core.algorithm.cov_clip`
+      :func:`glass.algorithm.cov_clip`
          Equivalent function for covariance matrices.
 
 

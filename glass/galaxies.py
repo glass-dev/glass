@@ -26,7 +26,7 @@ import healpix
 import numpy as np
 
 import glass
-import glass.core.array
+import glass.arraytools
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -117,7 +117,7 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, *rest = glass.core.array.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
     count_out, z_out, nz_out = rest
 
     # list of results for all dimensions
@@ -129,7 +129,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = glass.core.array.cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
+        cdf = glass.arraytools.cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
         cdf /= cdf[-1]
 
         # sample redshifts and store result
@@ -227,7 +227,7 @@ def gaussian_phz(
 
     A simple toy model of photometric redshift errors that assumes a
     Gaussian error with redshift-dependent standard deviation
-    :math:`\sigma(z) = (1 + z) \sigma_0` [1].
+    :math:`\sigma(z) = (1 + z) \sigma_0` [Amara07]_.
 
     Parameters
     ----------
@@ -262,11 +262,6 @@ def gaussian_phz(
     --------
     glass.tomo_nz_gausserr:
         Create tomographic redshift distributions assuming the same model.
-
-    References
-    ----------
-    * [1] Amara A., Réfrégier A., 2007, MNRAS, 381, 1018.
-          doi:10.1111/j.1365-2966.2007.12271.x
 
     Examples
     --------
@@ -350,13 +345,13 @@ def _kappa_ia_nla(  # noqa: PLR0913
     The Non-linear Alignments Model (NLA) describes an effective
     convergence :math:`\kappa_{\rm IA}` that models the effect of
     intrinsic alignments. It is computed from the matter density
-    contrast :math:`\delta` as [1] [3]
+    contrast :math:`\delta` as [Catelan01_] [Bridle07]_
 
     .. math::
 
         \kappa_{\rm IA} = f_{\rm NLA} \, \delta \;,
 
-    where the NLA factor :math:`f_{\rm NLA}` is defined as [4] [5]
+    where the NLA factor :math:`f_{\rm NLA}` is defined as [Johnston19]_ [Tessore23]_
 
     .. math::
 
@@ -368,7 +363,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     with
 
     * :math:`A_{\rm IA}` the intrinsic alignments amplitude,
-    * :math:`C_1` a normalisation constant [2],
+    * :math:`C_1` a normalisation constant [Hirata04]_,
     * :math:`z` the effective redshift of the model,
     * :math:`\bar{\rho}` the mean matter density,
     * :math:`D` the growth factor,
@@ -377,19 +372,6 @@ def _kappa_ia_nla(  # noqa: PLR0913
     * :math:`\bar{L}` the mean luminosity of the galaxy sample, and
     * :math:`\beta` the power that describes the luminosity-dependence
       :math:`\bar{L}` with respect to :math:`L_0`.
-
-    References
-    ----------
-    * [1] Catelan P., Kamionkowski M., Blandford R. D., 2001, MNRAS,
-          320, L7. doi:10.1046/j.1365-8711.2001.04105.x
-    * [2] Hirata C. M., Seljak U., 2004, PhRvD, 70, 063526.
-          doi:10.1103/PhysRevD.70.063526
-    * [3] Bridle S., King L., 2007, NJPh, 9, 444.
-          doi:10.1088/1367-2630/9/12/444
-    * [4] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
-          A&A, 624, A30. doi:10.1051/0004-6361/201834714
-    * [5] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
-          OJAp, 6, 11. doi:10.21105/astro.2302.01942
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc

@@ -1,4 +1,4 @@
-"""Module for array utilities."""  # noqa: A005
+"""Module for array utilities."""
 
 from __future__ import annotations
 

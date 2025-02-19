@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-import glass.core.algorithm
+import glass.algorithm
 
 
 def test_nnls(rng: np.random.Generator) -> None:
@@ -10,16 +10,14 @@ def test_nnls(rng: np.random.Generator) -> None:
     a = np.arange(25.0).reshape(-1, 5)
     b = np.arange(5.0)
     y = a @ b
-    res = glass.core.algorithm.nnls(a, y)
+    res = glass.algorithm.nnls(a, y)
     assert np.linalg.norm((a @ res) - y) < 1e-7
 
     a = rng.uniform(low=-10, high=10, size=[50, 10])
     b = np.abs(rng.uniform(low=-2, high=2, size=[10]))
     b[::2] = 0
     x = a @ b
-    res = glass.core.algorithm.nnls(
-        a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0)
-    )
+    res = glass.algorithm.nnls(a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0))
     np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
@@ -28,11 +26,11 @@ def test_nnls(rng: np.random.Generator) -> None:
     b = rng.standard_normal((100,))
 
     with pytest.raises(ValueError, match="input `a` is not a matrix"):
-        glass.core.algorithm.nnls(b, a)
+        glass.algorithm.nnls(b, a)
     with pytest.raises(ValueError, match="input `b` is not a vector"):
-        glass.core.algorithm.nnls(a, a)
+        glass.algorithm.nnls(a, a)
     with pytest.raises(ValueError, match="the shapes of `a` and `b` do not match"):
-        glass.core.algorithm.nnls(a.T, b)
+        glass.algorithm.nnls(a.T, b)
 
 
 def test_cov_clip(rng):
@@ -43,13 +41,13 @@ def test_cov_clip(rng):
     a = (m + m.T) / 2
 
     # fix by clipping negative eigenvalues
-    cov = glass.core.algorithm.cov_clip(a)
+    cov = glass.algorithm.cov_clip(a)
 
     # make sure all eigenvalues are positive
     assert np.all(np.linalg.eigvalsh(cov) >= 0)
 
     # fix by clipping negative eigenvalues
-    cov = glass.core.algorithm.cov_clip(a, rtol=1.0)
+    cov = glass.algorithm.cov_clip(a, rtol=1.0)
 
     # make sure all eigenvalues are positive
     h = np.linalg.eigvalsh(a).max()
@@ -73,20 +71,20 @@ def test_nearcorr():
         ],
     )
 
-    x = glass.core.algorithm.nearcorr(a)
+    x = glass.algorithm.nearcorr(a)
     np.testing.assert_allclose(x, b, atol=0.0001)
 
     # explicit tolerance
-    x = glass.core.algorithm.nearcorr(a, tol=1e-10)
+    x = glass.algorithm.nearcorr(a, tol=1e-10)
     np.testing.assert_allclose(x, b, atol=0.0001)
 
     # no iterations
-    x = glass.core.algorithm.nearcorr(a, niter=0)
+    x = glass.algorithm.nearcorr(a, niter=0)
     np.testing.assert_allclose(x, a)
 
     # non-square matrix should raise
     with pytest.raises(ValueError, match="non-square matrix"):
-        glass.core.algorithm.nearcorr(np.zeros((4, 3)))
+        glass.algorithm.nearcorr(np.zeros((4, 3)))
 
 
 def test_cov_nearest(rng, mocker):
@@ -97,10 +95,10 @@ def test_cov_nearest(rng, mocker):
     a = np.eye(4) + (m + m.T) / 2
 
     # spy on the call to nearcorr
-    nearcorr = mocker.spy(glass.core.algorithm, "nearcorr")
+    nearcorr = mocker.spy(glass.algorithm, "nearcorr")
 
     # compute covariance
-    cov = glass.core.algorithm.cov_nearest(a)
+    cov = glass.algorithm.cov_nearest(a)
 
     # make sure all eigenvalues are positive
     assert np.all(np.linalg.eigvalsh(cov) >= 0)
@@ -118,4 +116,4 @@ def test_cov_nearest(rng, mocker):
 
     # cannot deal with negative variances
     with pytest.raises(ValueError, match="negative values"):
-        glass.core.algorithm.cov_nearest(np.diag([1, 1, -1]))
+        glass.algorithm.cov_nearest(np.diag([1, 1, -1]))

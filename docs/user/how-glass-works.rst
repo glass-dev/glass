@@ -109,7 +109,7 @@ Angular discretisation
 The projected fields :math:`F_i` are still continuous functions on the sphere.
 They therefore require further discretisation, which turns :math:`F_i` into a
 spherical map of finite resolution.  In *GLASS*, this is done using the
-*HEALPix* [#healpix]_ discretisation of the sphere.
+*HEALPix* [HEALPix05]_ discretisation of the sphere.
 
 Any spherical map is a discrete collection of spherical pixels :math:`F_{i,k}`,
 :math:`k = 1, 2, \ldots`.  There are two ways that values can be assigned to
@@ -234,6 +234,3 @@ or
         \frac{\int W_i(z) \, dz}{W_i(z_{{\rm eff}, i})} \, F_i \;,
 
 or set to some other value.
-
-.. [#healpix] Gorski et al., 2005, ApJ, 622, 759,
-   https://healpix.sourceforge.io
