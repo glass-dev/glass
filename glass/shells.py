@@ -567,7 +567,7 @@ def partition_lstsq(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)  # type: ignore[assignment]
+        zp = np.union1d(zp, w.za)
 
     # get extra leading axes of fz
     *dims, _ = np.shape(fz)
@@ -631,7 +631,7 @@ def partition_nnls(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)  # type: ignore[assignment]
+        zp = np.union1d(zp, w.za)
 
     # get extra leading axes of fz
     *dims, _ = np.shape(fz)

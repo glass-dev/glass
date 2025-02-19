@@ -201,7 +201,7 @@ def from_convergence(  # noqa: PLR0913
     Notes
     -----
     The weak lensing fields are computed from the convergence or
-    deflection potential in the following way. [1]
+    deflection potential in the following way. [Tessore23]_
 
     Define the spin-raising and spin-lowering operators of the
     spin-weighted spherical harmonics as
@@ -264,11 +264,6 @@ def from_convergence(  # noqa: PLR0913
 
         2 \gamma_{lm}
         = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
-
-    References
-    ----------
-    * [1] Tessore N., et al., OJAp, 6, 11 (2023).
-          doi:10.21105/astro.2302.01942
 
     """
     # no output means no computation, return empty tuple
