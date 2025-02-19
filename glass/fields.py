@@ -998,9 +998,9 @@ def regularized_spectra(
     # regularise the cov matrix using the chosen method
     cov_method: Callable[..., NDArray[Any]]
     if method == "clip":
-        from glass.core.algorithm import cov_clip as cov_method
+        from glass.algorithm import cov_clip as cov_method
     elif method == "nearest":
-        from glass.core.algorithm import cov_nearest as cov_method
+        from glass.algorithm import cov_nearest as cov_method
     else:
         msg = f"unknown method '{method}'"  # type: ignore[unreachable]
         raise ValueError(msg)

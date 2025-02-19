@@ -677,7 +677,7 @@ def partition_nnls(
     # for each dim, find non-negative weights x such that y == r @ x
     x = np.empty([len(shells), *dims])
     for i in np.ndindex(*dims):
-        x[(..., *i)] = glass.core.algorithm.nnls(r, y[i])  # type: ignore[index]
+        x[(..., *i)] = glass.algorithm.nnls(r, y[i])  # type: ignore[index]
 
     # all done
     return x
