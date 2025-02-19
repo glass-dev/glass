@@ -418,15 +418,15 @@ def test_getcl() -> None:
             np.testing.assert_array_equal(result[2:], expected)
 
 
-def test_inv_triangle_number():
+def test_nfields_from_nspectra():
     for n in range(10_000):
-        assert glass.fields.inv_triangle_number(n * (n + 1) // 2) == n
+        assert glass.nfields_from_nspectra(n * (n + 1) // 2) == n
 
     not_triangle_numbers = [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
     for t in not_triangle_numbers:
         with pytest.raises(ValueError, match="not a triangle number"):
-            glass.fields.inv_triangle_number(t)
+            glass.nfields_from_nspectra(t)
 
 
 def test_enumerate_spectra():

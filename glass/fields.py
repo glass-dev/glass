@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     Cls = Sequence[NDArray[Any]]
 
 
-def inv_triangle_number(triangle_number: int) -> int:
+def nfields_from_nspectra(triangle_number: int) -> int:
     r"""
     The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`.  If
     the argument is :math:`T_n`, then :math:`n` is returned.  Otherwise,
@@ -275,7 +275,7 @@ def discretized_cls(
     """
     if ncorr is not None:
         try:
-            n = inv_triangle_number(len(cls))
+            n = nfields_from_nspectra(len(cls))
         except ValueError:
             msg = "length of cls array is not a triangle number"
             raise ValueError(msg) from None
@@ -371,7 +371,7 @@ def generate_gaussian(
 
     # number of gls and number of fields
     ngls = len(gls)
-    ngrf = inv_triangle_number(ngls)
+    ngrf = nfields_from_nspectra(ngls)
 
     # number of correlated fields if not specified
     if ncorr is None:
@@ -592,7 +592,7 @@ def effective_cls(
     """
     # this is the number of fields
     try:
-        n = inv_triangle_number(len(cls))
+        n = nfields_from_nspectra(len(cls))
     except ValueError:
         msg = "length of cls is not a triangle number"
         raise ValueError(msg) from None
@@ -844,7 +844,7 @@ def glass_to_healpix_spectra(spectra: Cls) -> Cls:
         Sequence of spectra in HEALPix order.
 
     """
-    n = inv_triangle_number(len(spectra))
+    n = nfields_from_nspectra(len(spectra))
 
     comb = [(i, j) for i, j in spectra_indices(n)]
     return [spectra[comb.index((i + k, i))] for k in range(n) for i in range(n - k)]
@@ -867,7 +867,7 @@ def healpix_to_glass_spectra(spectra: Cls) -> Cls:
         Sequence of spectra in GLASS order.
 
     """
-    n = inv_triangle_number(len(spectra))
+    n = nfields_from_nspectra(len(spectra))
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
     return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
@@ -915,7 +915,7 @@ def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> NDArray[Any]:
     """
     # recover the number of fields from the number of spectra
     try:
-        n = inv_triangle_number(len(spectra))
+        n = nfields_from_nspectra(len(spectra))
     except ValueError:
         msg = "invalid number of spectra"
         raise ValueError(msg) from None
