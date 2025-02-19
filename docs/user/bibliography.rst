@@ -15,6 +15,9 @@ Bibliography
 .. [Catelan01] Catelan P., Kamionkowski M., Blandford R. D., 2001, MNRAS,
     320, L7. doi:10.1046/j.1365-8711.2001.04105.x
 
+.. [HEALPix05] Gorski et al., 2005, ApJ, 622, 759,
+    https://healpix.sourceforge.io
+
 .. [Higham02] Higham N. J., 2002, IMA J. Numer. Anal., 22, 329.
 
 .. [Hilbert11] Hilbert S., Hartlap J., Schneider P., 2011, A&A, 536, A85.
