@@ -26,7 +26,7 @@ import healpix
 import numpy as np
 
 import glass
-import glass.core.array
+import glass.arraytools
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -117,7 +117,7 @@ def redshifts_from_nz(
         rng = np.random.default_rng()
 
     # bring inputs' leading axes into common shape
-    dims, *rest = glass.core.array.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
+    dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
     count_out, z_out, nz_out = rest
 
     # list of results for all dimensions
@@ -129,7 +129,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = glass.core.array.cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
+        cdf = glass.arraytools.cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
         cdf /= cdf[-1]
 
         # sample redshifts and store result

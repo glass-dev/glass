@@ -52,7 +52,7 @@ from typing import TYPE_CHECKING, NamedTuple
 import numpy as np
 
 import glass.algorithm
-import glass.core.array
+import glass.arraytools
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -411,9 +411,9 @@ def restrict(
     """
     z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
     zr = np.union1d(w.za, z_)
-    fr = glass.core.array.ndinterp(
+    fr = glass.arraytools.ndinterp(
         zr, z, f, left=0.0, right=0.0
-    ) * glass.core.array.ndinterp(zr, w.za, w.wa)
+    ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
     return zr, fr
 
 
@@ -583,7 +583,7 @@ def partition_lstsq(
     a = a * dz
 
     # create the target vector of distribution values
-    b = glass.core.array.ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = glass.arraytools.ndinterp(zp, z, fz, left=0.0, right=0.0)
     b = b * dz
 
     # append a constraint for the integral
@@ -658,7 +658,7 @@ def partition_nnls(
     a = a * dz
 
     # create the target vector of distribution values
-    b = glass.core.array.ndinterp(zp, z, fz, left=0.0, right=0.0)
+    b = glass.arraytools.ndinterp(zp, z, fz, left=0.0, right=0.0)
     b = b * dz
 
     # append a constraint for the integral
