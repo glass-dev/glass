@@ -47,20 +47,22 @@ from __future__ import annotations
 
 import itertools
 import warnings
-from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
-from numpy.typing import NDArray
 
 import glass.core.algorithm
 import glass.core.array
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from numpy.typing import NDArray
+
     from cosmology import Cosmology
 
-ArrayLike1D = Sequence[float] | NDArray[np.float64]
-WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
+    ArrayLike1D = Sequence[float] | NDArray[np.float64]
+    WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
 def distance_weight(
