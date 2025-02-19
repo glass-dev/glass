@@ -38,9 +38,6 @@ Bibliography
 
 .. [Smail94] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
 
-.. [Tessore23] Tessore, N., Loureiro, A., Joachimi, B., et al., 2023,
-    OJAp, 6, 11. doi:10.21105/astro.2302.01942
-
 .. [Tessore25] Tessore N., Joachimi B., Loureiro A., et al., 2025, A&A,
     694, A141. doi:10.1051/0004-6361/202452018. arXiv:2408.16903.
 
