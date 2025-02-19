@@ -44,8 +44,8 @@ docs = [
     "ipython",
     "matplotlib",
     "nbsphinx",
-    "sphinx",
     "sphinx-toolbox",
+    "sphinx<8.2.0",
     "sphinx_autodoc_typehints",
     "sphinxcontrib-katex",
 ]
