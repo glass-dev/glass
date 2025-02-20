@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     Cls = Sequence[NDArray[Any]]
 
 try:
-    from warnings import deprecated  # type: ignore[attr-defined]
+    from warnings import deprecated
 except ImportError:
     if TYPE_CHECKING:
         from typing import ParamSpec, TypeVar
@@ -33,7 +33,9 @@ except ImportError:
         _P = ParamSpec("_P")
         _R = TypeVar("_R")
 
-    def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:
+    def deprecated(  # type: ignore[no-redef]
+        msg: str, /
+    ) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps
         from warnings import warn
