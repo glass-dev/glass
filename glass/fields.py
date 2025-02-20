@@ -26,15 +26,16 @@ if TYPE_CHECKING:
     Cls = Sequence[NDArray[Any]]
 
 
-def nfields_from_nspectra(triangle_number: int) -> int:
+def nfields_from_nspectra(nspectra: int) -> int:
     r"""
-    The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`.  If
-    the argument is :math:`T_n`, then :math:`n` is returned.  Otherwise,
-    a :class:`ValueError` is raised.
+    Returns the number of fields for a number of spectra.
+
+    Given the number of spectra nspectra, returns the number of
+    fields n such that n * (n + 1) // 2 == nspectra.
     """
-    n = math.floor(math.sqrt(2 * triangle_number))
-    if n * (n + 1) // 2 != triangle_number:
-        msg = f"not a triangle number: {triangle_number}"
+    n = math.floor(math.sqrt(2 * nspectra))
+    if n * (n + 1) // 2 != nspectra:
+        msg = f"invalid numer of spectra: {nspectra}"
         raise ValueError(msg)
     return n
 
@@ -274,11 +275,7 @@ def discretized_cls(
 
     """
     if ncorr is not None:
-        try:
-            n = nfields_from_nspectra(len(cls))
-        except ValueError:
-            msg = "length of cls array is not a triangle number"
-            raise ValueError(msg) from None
+        n = nfields_from_nspectra(len(cls))
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
@@ -591,11 +588,7 @@ def effective_cls(
 
     """
     # this is the number of fields
-    try:
-        n = nfields_from_nspectra(len(cls))
-    except ValueError:
-        msg = "length of cls is not a triangle number"
-        raise ValueError(msg) from None
+    n = nfields_from_nspectra(len(cls))
 
     # find lmax if not given
     if lmax is None:
@@ -914,11 +907,7 @@ def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> NDArray[Any]:
 
     """
     # recover the number of fields from the number of spectra
-    try:
-        n = nfields_from_nspectra(len(spectra))
-    except ValueError:
-        msg = "invalid number of spectra"
-        raise ValueError(msg) from None
+    n = nfields_from_nspectra(len(spectra))
 
     if lmax is None:  # noqa: SIM108
         # maximum length in input spectra

@@ -270,9 +270,7 @@ def test_discretized_cls() -> None:
 
     # check ValueError for triangle number
 
-    with pytest.raises(
-        ValueError, match="length of cls array is not a triangle number"
-    ):
+    with pytest.raises(ValueError, match="invalid numer of spectra:"):
         glass.discretized_cls([np.arange(10), np.arange(10)], ncorr=1)
 
     # ncorr not None
@@ -307,7 +305,7 @@ def test_effective_cls() -> None:
 
     # check ValueError for triangle number
 
-    with pytest.raises(ValueError, match="length of cls is not a triangle number"):
+    with pytest.raises(ValueError, match="invalid numer of spectra:"):
         glass.effective_cls([np.arange(10), np.arange(10)], np.ones((2, 1)))
 
     # check ValueError for triangle number
@@ -425,7 +423,7 @@ def test_nfields_from_nspectra():
     not_triangle_numbers = [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
     for t in not_triangle_numbers:
-        with pytest.raises(ValueError, match="not a triangle number"):
+        with pytest.raises(ValueError, match=f"invalid numer of spectra: {t}"):
             glass.nfields_from_nspectra(t)
 
 
