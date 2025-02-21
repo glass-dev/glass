@@ -4,6 +4,48 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2025.1 (24 Feb 2025)
+--------------------
+
+* ``Python 3.9`` and ``NumPy < 2.1.1`` are no longer supported.
+
+* Improved type hints for :func:`glass.lensing.from_convergence`.
+
+* ``SciPy`` has been removed as a dependency for testing.
+
+* It is now possible to install ``glass`` both through git archives and from
+  ``conda`` (in addition to PyPI as before).
+
+* A new module :mod:`glass.grf` has been added with the machinery required to
+  generate Gaussian random fields.
+
+* New functions have been added for a FLASK-like (the predecessor to GLASS)
+  legacy mode.
+
+  * :func:`glass.check_posdef_spectra`
+  * :func:`glass.cov_from_spectra`
+  * :func:`glass.glass_to_healpix_spectra`
+  * :func:`glass.healpix_to_glass_spectra`
+  * :func:`glass.lognormal_shift_hilbert2011`
+  * :func:`glass.regularized_spectra`
+
+* All imports in the examples have been changed to be directly from ``glass``
+  rather than from a particular module. This reflects the authors' intended use
+  of the library.
+
+* Following the addition of the :mod:`glass.grf` module, the
+  ``generate_gaussian()`` and ``generate_lognormal()`` functions have been
+  deprecated.
+
+* A standalone bibliography has been added to the documentation.
+
+* A new function :func:`glass.nfields_from_nspectra` has been added to compute
+  the number of fields for a number of spectra.
+
+* The :mod:`glass.algorithm` module has been made public. This module contains
+  general implementations of the algorithms which are used by ``glass``, but are
+  otherwise unrelated to the functionality of ``glass``.
+
 
 2024.2 (15 Nov 2024)
 --------------------
