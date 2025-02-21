@@ -323,8 +323,41 @@ def _generate_grf(
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
 ) -> Generator[NDArray[np.float64]]:
-    """Iteratively sample Gaussian random fields (internal use)."""
-    # get the default RNG if not given
+    """
+    Iteratively sample Gaussian random fields (internal use).
+
+    A generator that iteratively samples HEALPix maps of Gaussian random fields
+    with the given angular power spectra ``gls`` and resolution parameter
+    ``nside``.
+
+    The optional argument ``ncorr`` can be used to artificially limit now many
+    realised fields are correlated. This saves memory, as only `ncorr` previous
+    fields need to be kept.
+
+    The ``gls`` array must contain the angular power power spectra of the
+    Gaussian random fields in :ref:`standard order <twopoint_order>`.
+
+    Parameters
+    ----------
+    gls
+        The Gaussian angular power spectra for a random field.
+    nside
+        The resolution parameter for the HEALPix maps.
+    ncorr
+        The number of correlated fields. If not given, all fields are correlated.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Yields
+    ------
+    fields
+        The Gaussian random fields.
+
+    Raises
+    ------
+    ValueError
+        If all gls are empty.
+    """
     if rng is None:
         rng = np.random.default_rng()
 
