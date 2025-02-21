@@ -1,8 +1,9 @@
 ---
 ci:
+  autofix_commit_msg: "pre-commit.ci: style fixes"
   autofix_prs: false
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
-  autofix_commit_msg: "pre-commit.ci: style fixes"
+  autoupdate_schedule: monthly
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
