@@ -13,6 +13,10 @@ These notes document the changes between individual *GLASS* releases.
 
 * ``SciPy`` has been removed as a dependency for testing.
 
+* Fixed a bug in :func:`glass.fixed_zbins` that prevented the user supplying
+  ``nbins`` as an argument. The functions intended use is to accept eiher ``dz``
+  or ``nbins`` as an argument, but not both.
+
 * It is now possible to install ``glass`` both through git archives and from
   ``conda`` (in addition to PyPI as before).
 

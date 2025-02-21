@@ -10,6 +10,7 @@ All functional changes to the project are documented in this file.
 - gh-368: add type overloading for `lensing.from_convergence` (#395)
 - gh-384: rename all internal functions to `trapezoid` over `trapz` (#392)
 - gh-440: remove scipy as a test dependency (#462)
+- gh-443: `if` should be `elif` in `fixed_zbins` (#444)
 - gh-445: place all public function in `__all__` (#446)
 - gh-465: enable installing glass through git archives (#483)
 - gh-470: instructions to install using conda (#481)
