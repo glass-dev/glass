@@ -4,7 +4,7 @@
 
 All functional changes to the project are documented in this file.
 
-## [2025.1] (24 Feb 2025)
+## [2025.1] (21 Feb 2025)
 
 - gh-163: drop `Python 3.9` & `NumPy < 2.1.1` support (#391)
 - gh-368: add type overloading for `lensing.from_convergence` (#395)

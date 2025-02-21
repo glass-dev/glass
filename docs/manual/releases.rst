@@ -4,7 +4,7 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
-2025.1 (24 Feb 2025)
+2025.1 (21 Feb 2025)
 --------------------
 
 * ``Python 3.9`` and ``NumPy < 2.1.1`` are no longer supported.
