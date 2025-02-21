@@ -30,12 +30,12 @@ def nfields_from_nspectra(nspectra: int) -> int:
     r"""
     Returns the number of fields for a number of spectra.
 
-    Given the number of spectra nspectra, returns the number of
-    fields n such that n * (n + 1) // 2 == nspectra.
+    Given the number of spectra *nspectra*, returns the number of
+    fields *n* such that ``n * (n + 1) // 2 == nspectra``.
     """
     n = math.floor(math.sqrt(2 * nspectra))
     if n * (n + 1) // 2 != nspectra:
-        msg = f"invalid numer of spectra: {nspectra}"
+        msg = f"invalid number of spectra: {nspectra}"
         raise ValueError(msg)
     return n
 
