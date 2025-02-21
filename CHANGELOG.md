@@ -4,6 +4,25 @@
 
 All functional changes to the project are documented in this file.
 
+## [2025.1] (24 Feb 2025)
+
+- gh-163: drop `Python 3.9` & `NumPy < 2.1.1` support (#391)
+- gh-368: add type overloading for `lensing.from_convergence` (#395)
+- gh-384: rename all internal functions to `trapezoid` over `trapz` (#392)
+- gh-440: remove scipy as a test dependency (#462)
+- gh-445: place all public function in `__all__` (#446)
+- gh-465: enable installing glass through git archives (#483)
+- gh-470: instructions to install using conda (#481)
+- gh-478: glass.core.array -> glass.arraytools (#524)
+- gh-493: add module for Gaussian random fields (#494)
+- gh-496: functions for legacy mode (#497)
+- gh-501: change imports to be directly from `glass` (#512)
+- gh-504: deprecate old generator functions (#523)
+- gh-508: create standalone bibliography page (#518)
+- gh-509: `inv_triangle_number` -> `nfields_from_nspectra` (plus make it public)
+  (#527)
+- gh-513: make algorithm a public module (#514)
+
 ## [2024.2] (15 Nov 2024)
 
 - gh-188: add docstrings to all functions and tidy docs (#381)
