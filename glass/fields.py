@@ -308,7 +308,7 @@ def lognormal_gls(
         The Gaussian angular power spectra for a lognormal random field.
 
     """
-    n = inv_triangle_number(len(cls))
+    n = nfields_from_nspectra(len(cls))
     fields = [glass.grf.Lognormal(shift) for _ in range(n)]
     return solve_gaussian_spectra(fields, cls)
 
@@ -457,7 +457,7 @@ def generate_gaussian(
         If all gls are empty.
 
     """
-    n = inv_triangle_number(len(gls))
+    n = nfields_from_nspectra(len(gls))
     fields = [glass.grf.Normal() for _ in range(n)]
     yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
@@ -497,7 +497,7 @@ def generate_lognormal(
         The lognormal random fields.
 
     """
-    n = inv_triangle_number(len(gls))
+    n = nfields_from_nspectra(len(gls))
     fields = [glass.grf.Lognormal(shift) for _ in range(n)]
     yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
