@@ -62,7 +62,6 @@ __all__ = [
     "spectra_indices",
     "tomo_nz_gausserr",
     "tophat_windows",
-    "transform_cls",
     "triaxial_axis_ratio",
     "uniform_positions",
     "vmap_galactic_ecliptic",
@@ -102,7 +101,6 @@ from glass.fields import (
     regularized_spectra,
     solve_gaussian_spectra,
     spectra_indices,
-    transform_cls,
 )
 from glass.galaxies import (
     galaxy_shear,

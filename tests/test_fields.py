@@ -200,33 +200,6 @@ def test_multalm() -> None:
     np.testing.assert_array_equal(result, alm)
 
 
-def test_transform_cls() -> None:
-    tfm = "lognormal"
-    pars = [2]
-    sub_cls = np.array([1, 2, 3, 4, 5])
-
-    # empty cls
-
-    assert glass.transform_cls([], tfm, pars) == []
-
-    # check output shape
-
-    assert len(glass.transform_cls([sub_cls], tfm, pars)) == 1
-    assert len(glass.transform_cls([sub_cls], tfm, pars)[0]) == 5
-
-    assert len(glass.transform_cls([sub_cls, sub_cls], tfm, pars)) == 2
-    assert len(glass.transform_cls([sub_cls, sub_cls], tfm, pars)[0]) == 5
-    assert len(glass.transform_cls([sub_cls, sub_cls], tfm, pars)[1]) == 5
-
-    # one sequence of empty cls
-
-    assert glass.transform_cls([[], sub_cls], tfm, pars)[0] == []
-
-    # monopole behavior
-
-    assert glass.transform_cls([sub_cls, np.linspace(0, 5, 6)], tfm, pars)[1][0] == 0
-
-
 def test_lognormal_gls() -> None:
     shift = 2
 
@@ -239,18 +212,13 @@ def test_lognormal_gls() -> None:
     assert len(glass.lognormal_gls([np.linspace(1, 5, 5)], shift)) == 1
     assert len(glass.lognormal_gls([np.linspace(1, 5, 5)], shift)[0]) == 5
 
-    assert (
-        len(glass.lognormal_gls([np.linspace(1, 5, 5), np.linspace(1, 5, 5)], shift))
-        == 2
-    )
-    assert (
-        len(glass.lognormal_gls([np.linspace(1, 5, 5), np.linspace(1, 5, 5)], shift)[0])
-        == 5
-    )
-    assert (
-        len(glass.lognormal_gls([np.linspace(1, 5, 5), np.linspace(1, 5, 5)], shift)[1])
-        == 5
-    )
+    inp = [np.linspace(1, 6, 5), np.linspace(1, 5, 4), np.linspace(1, 4, 3)]
+    out = glass.lognormal_gls(inp, shift)
+
+    assert len(out) == 3
+    assert len(out[0]) == 5
+    assert len(out[1]) == 4
+    assert len(out[2]) == 3
 
 
 def test_discretized_cls() -> None:
@@ -334,25 +302,25 @@ def test_effective_cls() -> None:
     assert result.shape == (1, 1, 15)
 
 
-def test_generate_gaussian() -> None:
+def test_generate_grf() -> None:
     gls = [np.array([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
 
-    gaussian_fields = list(glass.generate_gaussian(gls, nside))
+    gaussian_fields = list(glass.fields._generate_grf(gls, nside))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
     rng = np.random.default_rng(seed=42)
-    gaussian_fields = list(glass.generate_gaussian(gls, nside, rng=rng))
+    gaussian_fields = list(glass.fields._generate_grf(gls, nside, rng=rng))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
     rng = np.random.default_rng(seed=42)
     new_gaussian_fields = list(
-        glass.generate_gaussian(gls, nside, ncorr=ncorr, rng=rng)
+        glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng)
     )
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
@@ -360,35 +328,55 @@ def test_generate_gaussian() -> None:
     np.testing.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
     with pytest.raises(ValueError, match="all gls are empty"):
-        list(glass.generate_gaussian([], nside))
+        list(glass.fields._generate_grf([], nside))
 
 
-def test_generate_lognormal(rng: np.random.Generator) -> None:
-    gls = [np.array([1.0, 0.5, 0.1])]
-    nside = 4
+def test_generate_gaussian() -> None:
+    with pytest.deprecated_call():
+        glass.generate_gaussian([np.array([1.0, 0.5, 0.1])], 4)
 
-    # check shape and values
 
-    lognormal_fields = list(glass.generate_lognormal(gls, nside, shift=1.0, rng=rng))
+def test_generate_lognormal() -> None:
+    with pytest.deprecated_call():
+        glass.generate_lognormal([np.array([1.0, 0.5, 0.1])], 4)
 
-    assert len(lognormal_fields) == len(gls)
-    for m in lognormal_fields:
-        assert m.shape == (192,)
-        assert np.all(m >= -1)
 
-    # check shift
+def test_generate():
+    # shape mismatch error
 
-    # requires resetting the RNG to obtain exact the same result multiplied by 2 (shift)
-    rng = np.random.default_rng(seed=42)
-    lognormal_fields = list(glass.generate_lognormal(gls, nside, shift=1.0, rng=rng))
+    fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
 
-    rng = np.random.default_rng(seed=42)
-    new_lognormal_fields = list(
-        glass.generate_lognormal(gls, nside, shift=2.0, rng=rng)
-    )
+    with pytest.raises(ValueError, match="mismatch between number of fields and gls"):
+        list(glass.generate(fields, [np.ones(10), np.ones(10)], nside=16))
 
-    for ms, mu in zip(new_lognormal_fields, lognormal_fields, strict=False):
-        np.testing.assert_allclose(ms, mu * 2.0)
+    # check output shape
+
+    nside = 16
+    npix = hp.nside2npix(nside)
+    gls = [np.ones(10), np.ones(10), np.ones(10)]
+
+    result = list(glass.generate(fields, gls, nside=nside))
+
+    assert len(result) == 2
+    for field in result:
+        assert field.shape == (npix,)
+
+    # check ncorr behavior
+
+    result_default = list(glass.generate(fields, gls, nside=nside, ncorr=None))
+    assert len(result_default) == 2
+
+    # ncorr = 1 (forcing only one previous correlation)
+    result_limited = list(glass.generate(fields, gls, nside=nside, ncorr=1))
+    assert len(result_limited) == 2
+
+    # non-identity field
+
+    fields = [lambda x, var: x, lambda x, var: x**2]  # noqa: ARG005
+
+    result = list(glass.generate(fields, gls, nside=nside))
+
+    np.testing.assert_allclose(result[1], result[0] ** 2, rtol=1e-02)
 
 
 def test_getcl() -> None:
