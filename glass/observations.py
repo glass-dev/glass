@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import itertools
 import math
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
@@ -40,6 +40,7 @@ import glass.arraytools
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+    from collections.abc import Callable
 
 
 def vmap_galactic_ecliptic(
