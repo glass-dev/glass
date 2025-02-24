@@ -339,21 +339,25 @@ class AngularVariableDepthMask:
 
     Parameters
     ----------
-    vardepth_map : array_like
+    vardepth_map
         Map of variable which traces the depth per tomographic bin.
-    n_bins : int
+    n_bins
         Number of tomographic bins.
-    zbins : array_like
+    zbins
         Shell redshift limits.
     """
 
-    def __init__(self, vardepth_map, n_bins, zbins):
+    def __init__(self, 
+                 vardepth_map: NDArray[np.float64], 
+                 n_bins: int, 
+                 zbins: NDArray[np.float64]
+                 ):
         self.vardepth_map = vardepth_map
         self.n_bins = n_bins
         self.zbins = zbins
 
-    def test_index(self, index):
-        r"""Test the index for validity."""
+    def check_index(self, index) -> None:
+        r"""Check the index for validity."""
         if not isinstance(index, tuple):
             raise ValueError("Index must be an tuple of two integers")
 
@@ -382,7 +386,7 @@ class AngularVariableDepthMask:
             If the index is invalid.
 
         """
-        self.test_index(index)
+        self.check_index(index)
 
         return self.vardepth_map[index[0]]
 
@@ -394,25 +398,25 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
 
     Parameters
     ----------
-    vardepth_map : array_like
+    vardepth_map
         Map of variable which traces the depth per tomographic bin. If vardepth_tomo_functions is not provided, the values are treated like a map of galaxy count ratios.
-    n_bins : int
+    n_bins
         Number of tomographic bins.
-    zbins : array_like
+    zbins
         Shell redshift limits.
-    ztomo : array_like, optional
+    ztomo
         Tomographic redshift bin limits.
-    dndz : array_like, optional
+    dndz
         Redshift distributions per tomographic bin.
-    z : array_like, optional
+    z
         Redshift domain of dndz.
-    dndz_vardepth : array_like
+    dndz_vardepth
         Redshift distribution affected by variable depth (n_bins x len(vardepth_values) x len(z)).
-    vardepth_values : array_like
+    vardepth_values
         Variable depth tracer domain/values of dndz_vardepth.
-    vardepth_los_tracer : array_like, optional
+    vardepth_los_tracer
         Map of the variable depth tracer for line-of-sight direction. If provided, it is assumed to cover the same domain as vardepth_values.
-    vardepth_tomo_functions : array_like, optional
+    vardepth_tomo_functions
         List of functions which map the input vardepth_map to the ratio between the galaxy count due to the variable depth and the galaxy count without variable depth (for each tomographic bin). If provided, it is assumed that there is one vardepth_map which traces the variable depth for all tomographic bins.
 
     References
@@ -425,16 +429,16 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
 
     def __init__(
         self,
-        vardepth_map,
-        n_bins,
-        zbins,
-        ztomo,
-        dndz,
-        z,
-        dndz_vardepth,
-        vardepth_values,
-        vardepth_los_tracer=None,
-        vardepth_tomo_functions=None,
+        vardepth_map: NDArray[np.float64],
+        n_bins: int,
+        zbins: list(tuple[float, float]),
+        ztomo: list(tuple[float, float]),
+        dndz: NDArray[np.float64],
+        z: NDArray[np.float64],
+        dndz_vardepth: NDArray[np.float64],
+        vardepth_values: NDArray[np.float64],
+        vardepth_los_tracer: NDArray[np.float64] | None=None,
+        vardepth_tomo_functions: list[callable] | None=None,
     ):
         super().__init__(vardepth_map, n_bins, zbins)
         self.ztomo = ztomo
@@ -497,7 +501,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
             If the index is invalid.
 
         """
-        self.test_index(index)
+        self.check_index(index)
 
         if self.vardepth_tomo_functions is None:
             angular_vardepth_map = angular_tracer_map = self.vardepth_map[index[0]]
