@@ -429,7 +429,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         traces the variable depth for all tomographic bins.
     """
 
-    def __init__(
+    def __init__( # noqa: PLR0912
         self,
         vardepth_map: NDArray[np.float64],
         n_bins: int,
@@ -441,7 +441,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         vardepth_values: NDArray[np.float64],
         vardepth_los_tracer: NDArray[np.float64] | None = None,
         vardepth_tomo_functions: list[Callable] | None = None,
-    ) -> None: # noqa: PLR0912
+    ) -> None: 
         super().__init__(vardepth_map, n_bins, zbins)
         self.ztomo = ztomo
         self.dndz = dndz
