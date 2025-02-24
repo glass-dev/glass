@@ -47,5 +47,5 @@ Bibliography
 .. [Xavier16] Xavier H. S., et al., 2016, MNRAS, 459, 3693.
     doi:10.1093/mnras/stw874
 
-.. [Wietesheim-Kramsta2024] von Wietesheim-Kramsta M., Lin, K., et al., 
+.. [Wietesheim-Kramsta2024] von Wietesheim-Kramsta M., Lin, K., et al.,
     2024, A&A, 695, A223. doi:10.1051/0004-6361/202450487
