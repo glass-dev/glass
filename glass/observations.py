@@ -328,3 +328,163 @@ def tomo_nz_gausserr(
     binned_nz *= nz
 
     return binned_nz  # type: ignore[no-any-return]
+    
+class angular_variable_depth_mask:
+    r'''Variable depth mask for tomographic bins.
+    
+    This class allows to create a mask with a different variable depth mask in the angular direction for each tomographic bin.
+    
+    Parameters
+    ----------
+    vardepth_map : array_like
+        Map of variable which traces the depth per tomographic bin.
+    n_bins : int
+        Number of tomographic bins.
+    zbins : array_like
+        Shell redshift limits.
+    '''
+
+    def __init__(self, vardepth_map, n_bins, zbins):
+        self.vardepth_map = vardepth_map
+        self.n_bins = n_bins
+        self.zbins = zbins
+    
+    def test_index(self, index):
+        r'''Test the index for validity.
+        '''
+        if not isinstance(index, tuple):
+            raise ValueError('Index must be an tuple of two integers')
+
+        if index[0] >= self.n_bins:
+            raise ValueError('Leading index cannot exceed number of tomographic bins')
+
+        if index[1] >= len(self.zbins):
+            raise ValueError('Trailing index cannot exceed number of shells')
+        
+    def __getitem__(self, index):
+        r'''Get the mask for the given index.
+
+        Parameters
+        ----------
+        index : tuple
+            Indices of the tomographic bin and shell pair.
+
+        Returns
+        -------
+        mask : array_like
+            Mask for the given index.
+
+        Raises
+        ------
+        ValueError
+            If the index is invalid.
+
+        '''
+        self.test_index(index)
+
+        return self.vardepth_map[index[0]]
+    
+class angular_los_variable_depth_mask(angular_variable_depth_mask):
+    r'''Variable depth mask for tomographic bins.
+    
+    This class allows to create a mask with a different variable depth mask in both the angular and the line-of-sight directions for each tomographic bin.
+    
+    Parameters
+    ----------
+    vardepth_map : array_like
+        Map of variable which traces the depth per tomographic bin. If vardepth_tomo_functions is not provided, the values are treated like a map of galaxy count ratios.
+    n_bins : int
+        Number of tomographic bins.
+    zbins : array_like
+        Shell redshift limits.
+    ztomo : array_like, optional
+        Tomographic redshift bin limits.
+    dndz : array_like, optional
+        Redshift distributions per tomographic bin.
+    z : array_like, optional
+        Redshift domain of dndz.
+    dndz_vardepth : array_like
+        Redshift distribution affected by variable depth (n_bins x len(vardepth_values) x len(z)).
+    vardepth_values : array_like
+        Variable depth tracer domain/values of dndz_vardepth.
+    vardepth_los_tracer : array_like, optional
+        Map of the variable depth tracer for line-of-sight direction. If provided, it is assumed to cover the same domain as vardepth_values.
+    vardepth_tomo_functions : array_like, optional
+        List of functions which map the input vardepth_map to the ratio between the galaxy count due to the variable depth and the galaxy count without variable depth (for each tomographic bin). If provided, it is assumed that there is one vardepth_map which traces the variable depth for all tomographic bins.
+    
+    References
+    ----------
+    .. [1] Joachimi B., Lin, C.-A., et al., 2021, A&A, 646, A129.
+           doi:10.1051/0004-6361/202038831
+    .. [2] von Wietesheim-Kramsta M., Lin, K., et al., 2024, A&A, 695, A223.
+           doi:10.1051/0004-6361/202450487
+    '''
+    def __init__(self, vardepth_map, n_bins, zbins, ztomo, dndz, z, dndz_vardepth, vardepth_values, vardepth_los_tracer=None, vardepth_tomo_functions=None):
+        super().__init__(vardepth_map, n_bins, zbins)
+        self.ztomo = ztomo
+        self.dndz = dndz
+        self.z = z
+        self.dndz_vardepth = dndz_vardepth
+        self.vardepth_values = vardepth_values
+        self.vardepth_los_tracer = vardepth_los_tracer
+        self.vardepth_tomo_functions = vardepth_tomo_functions
+
+        if vardepth_tomo_functions is not None:
+            self.vardepth_map = np.atleast_2d(vardepth_map).reshape(1, -1)
+    
+    def get_los_fraction(self, index):
+        r'''Gets the fraction of galaxies affected by variable depth in the line-of-sight direction for the given tomographic bin and shell.
+        
+        Parameters
+        ----------
+        index : tuple
+            Indices of the tomographic bin and shell pair.
+
+        Returns
+        -------
+        fraction_vardepth : array_like
+            Fraction of galaxies affected by variable depth in the line-of-sight direction.
+        '''
+        is_in_shell = (self.zbins[index[1]][0] < self.z) & (self.z <= self.zbins[index[1]][1])
+
+        n_gal_in_tomo_vardepth   = np.trapz(self.dndz_vardepth[index[0]][:, is_in_shell], self.z[is_in_shell])
+        n_gal_in_tomo            = np.trapz(self.dndz[index[0]][is_in_shell], self.z[is_in_shell])
+        fraction_vardepth = np.divide(n_gal_in_tomo_vardepth, n_gal_in_tomo, out=np.ones_like(n_gal_in_tomo_vardepth), where=n_gal_in_tomo!=0)
+
+        return fraction_vardepth
+
+    def __getitem__(self, index):
+        r'''Get the mask for the given index.
+
+        Parameters
+        ----------
+        index : tuple
+            Indices of the tomographic bin and shell pair.
+
+        Returns
+        -------
+        mask : array_like
+            Mask for the given index.
+
+        Raises
+        ------
+        ValueError
+            If the index is invalid.
+
+        '''
+        self.test_index(index)
+
+        if self.vardepth_tomo_functions is None:
+            angular_vardepth_map = angular_tracer_map = self.vardepth_map[index[0]]
+        else:
+            angular_vardepth_map    = self.vardepth_tomo_functions[index[0]](self.vardepth_map[0])
+            angular_tracer_map      = self.vardepth_map[0]
+
+        los_fraction_vardepth = self.get_los_fraction(index)
+
+        if self.vardepth_los_tracer is None:
+            los_vardepth_map =  np.interp(angular_tracer_map, self.vardepth_values, los_fraction_vardepth)
+        else:
+            los_vardepth_map = np.interp(self.vardepth_los_tracer, self.vardepth_values, los_fraction_vardepth)
+        
+        return np.multiply(angular_vardepth_map, los_vardepth_map)
