@@ -335,7 +335,8 @@ def tomo_nz_gausserr(
 class AngularVariableDepthMask:
     r"""Variable depth mask for tomographic bins.
 
-    This class allows to create a mask with a different variable depth mask in the angular direction for each tomographic bin.
+    This class allows to create a mask with a different variable 
+    depth mask in the angular direction for each tomographic bin.
 
     Parameters
     ----------
@@ -372,12 +373,12 @@ class AngularVariableDepthMask:
 
         Parameters
         ----------
-        index : tuple
+        index
             Indices of the tomographic bin and shell pair.
 
         Returns
         -------
-        mask : array_like
+        mask
             Mask for the given index.
 
         Raises
@@ -394,12 +395,16 @@ class AngularVariableDepthMask:
 class AngularLosVariableDepthMask(AngularVariableDepthMask):
     r"""Variable depth mask for tomographic bins.
 
-    This class allows to create a mask with a different variable depth mask in both the angular and the line-of-sight directions for each tomographic bin.
+    This class allows to create a mask with a different variable 
+    depth mask in both the angular and the line-of-sight directions
+    for each tomographic bin.
 
     Parameters
     ----------
     vardepth_map
-        Map of variable which traces the depth per tomographic bin. If vardepth_tomo_functions is not provided, the values are treated like a map of galaxy count ratios.
+        Map of variable which traces the depth per tomographic bin.
+        If vardepth_tomo_functions is not provided, the values are
+        treated like a map of galaxy count ratios.
     n_bins
         Number of tomographic bins.
     zbins
@@ -411,13 +416,19 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
     z
         Redshift domain of dndz.
     dndz_vardepth
-        Redshift distribution affected by variable depth (n_bins x len(vardepth_values) x len(z)).
+        Redshift distribution affected by variable depth 
+        (n_bins x len(vardepth_values) x len(z)).
     vardepth_values
         Variable depth tracer domain/values of dndz_vardepth.
     vardepth_los_tracer
-        Map of the variable depth tracer for line-of-sight direction. If provided, it is assumed to cover the same domain as vardepth_values.
+        Map of the variable depth tracer for line-of-sight direction. If 
+        provided, it is assumed to cover the same domain as vardepth_values.
     vardepth_tomo_functions
-        List of functions which map the input vardepth_map to the ratio between the galaxy count due to the variable depth and the galaxy count without variable depth (for each tomographic bin). If provided, it is assumed that there is one vardepth_map which traces the variable depth for all tomographic bins.
+        List of functions which map the input vardepth_map to the ratio
+        between the galaxy count due to the variable depth and the galaxy
+        count without variable depth (for each tomographic bin). If 
+        provided, it is assumed that there is one vardepth_map which 
+        traces the variable depth for all tomographic bins.
 
     References
     ----------
@@ -453,17 +464,19 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
             self.vardepth_map = np.atleast_2d(vardepth_map).reshape(1, -1)
 
     def get_los_fraction(self, index):
-        r"""Gets the fraction of galaxies affected by variable depth in the line-of-sight direction for the given tomographic bin and shell.
+        r"""Gets the fraction of galaxies affected by variable depth in the
+        line-of-sight direction for the given tomographic bin and shell.
 
         Parameters
         ----------
-        index : tuple
+        index
             Indices of the tomographic bin and shell pair.
 
         Returns
         -------
-        fraction_vardepth : array_like
-            Fraction of galaxies affected by variable depth in the line-of-sight direction.
+        fraction_vardepth
+            Fraction of galaxies affected by variable depth in the
+            line-of-sight direction.
         """
         is_in_shell = (self.zbins[index[1]][0] < self.z) & (
             self.z <= self.zbins[index[1]][1]
@@ -487,12 +500,12 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
 
         Parameters
         ----------
-        index : tuple
+        index
             Indices of the tomographic bin and shell pair.
 
         Returns
         -------
-        mask : array_like
+        mask
             Mask for the given index.
 
         Raises
