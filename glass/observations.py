@@ -429,13 +429,6 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         count without variable depth (for each tomographic bin). If 
         provided, it is assumed that there is one vardepth_map which 
         traces the variable depth for all tomographic bins.
-
-    References
-    ----------
-    .. [1] Joachimi B., Lin, C.-A., et al., 2021, A&A, 646, A129.
-           doi:10.1051/0004-6361/202038831
-    .. [2] von Wietesheim-Kramsta M., Lin, K., et al., 2024, A&A, 695, A223.
-           doi:10.1051/0004-6361/202450487
     """
 
     def __init__(
