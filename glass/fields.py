@@ -17,12 +17,14 @@ import glass.grf
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
-    from typing import Any, Literal
+    from typing import Any, Literal, TypeVar
 
     from numpy.typing import NDArray
 
     Fields = Sequence[glass.grf.Transformation]
     Cls = Sequence[NDArray[Any]]
+
+    T = TypeVar("T")
 
 try:
     from warnings import deprecated  # type: ignore[attr-defined]
@@ -855,7 +857,7 @@ def generate(
         yield t(x, var)
 
 
-def glass_to_healpix_spectra(spectra: Cls) -> Cls:
+def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:
     """
     Reorder spectra from GLASS to HEALPix order.
 
@@ -878,7 +880,7 @@ def glass_to_healpix_spectra(spectra: Cls) -> Cls:
     return [spectra[comb.index((i + k, i))] for k in range(n) for i in range(n - k)]
 
 
-def healpix_to_glass_spectra(spectra: Cls) -> Cls:
+def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
     """
     Reorder spectra from HEALPix to GLASS order.
 
