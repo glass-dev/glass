@@ -22,8 +22,8 @@ Visibility
 ----------
 
 .. autofunction:: vmap_galactic_ecliptic
-.. class:: angular_variable_depth_mask
-.. class:: angular_los_variable_depth_mask
+.. class:: AngularVariableDepthMask
+.. class:: AngularLosVariableDepthMask
 
 """  # noqa: D400
 
