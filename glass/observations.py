@@ -387,7 +387,7 @@ class AngularVariableDepthMask:
         return self.vardepth_map[index[0]]
 
 
-class angular_los_variable_depth_mask(angular_variable_depth_mask):
+class AngularLosVariableDepthMask(AngularVariableDepthMask):
     r"""Variable depth mask for tomographic bins.
 
     This class allows to create a mask with a different variable depth mask in both the angular and the line-of-sight directions for each tomographic bin.
