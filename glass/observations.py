@@ -482,10 +482,12 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
             self.z <= self.zbins[index[1]][1]
         )
 
-        n_gal_in_tomo_vardepth = np.trapz(
+        n_gal_in_tomo_vardepth = np.trapzoid(
             self.dndz_vardepth[index[0]][:, is_in_shell], self.z[is_in_shell]
         )
-        n_gal_in_tomo = np.trapz(self.dndz[index[0]][is_in_shell], self.z[is_in_shell])
+        n_gal_in_tomo = np.trapzoid(
+            self.dndz[index[0]][is_in_shell], self.z[is_in_shell]
+        )
         fraction_vardepth = np.divide(
             n_gal_in_tomo_vardepth,
             n_gal_in_tomo,
