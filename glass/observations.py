@@ -332,7 +332,7 @@ def tomo_nz_gausserr(
     return binned_nz  # type: ignore[no-any-return]
 
 
-class angular_variable_depth_mask:
+class AngularVariableDepthMask:
     r"""Variable depth mask for tomographic bins.
 
     This class allows to create a mask with a different variable depth mask in the angular direction for each tomographic bin.
