@@ -360,7 +360,7 @@ class AngularVariableDepthMask:
     def check_index(self, index) -> None:
         r"""Check the index for validity."""
         if not isinstance(index, tuple):
-            raise ValueError("Index must be an tuple of two integers")
+            raise TypeError("Index must be an tuple of two integers")
 
         if index[0] >= self.n_bins:
             raise ValueError("Leading index cannot exceed number of tomographic bins")
