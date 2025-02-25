@@ -355,7 +355,7 @@ class AngularVariableDepthMask:
         self,
         vardepth_map: NDArray[np.float64],
         n_bins: int,
-        zbins: NDArray[np.float64],
+        zbins: list[tuple[float, float]],
     ) -> None:
         self.vardepth_map = vardepth_map
         self.n_bins = n_bins
