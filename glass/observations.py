@@ -392,7 +392,7 @@ class AngularVariableDepthMask:
         """
         self.check_index(index)
 
-        return self.vardepth_map[index[0]]
+        return self.vardepth_map[index[0]]  # type: ignore[no-any-return]
 
 
 class AngularLosVariableDepthMask(AngularVariableDepthMask):
@@ -485,7 +485,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         n_gal_in_tomo = np.trapezoid(
             self.dndz[index[0]][is_in_shell], self.z[is_in_shell]
         )
-        return np.divide(
+        return np.divide(  # type: ignore[no-any-return]
             n_gal_in_tomo_vardepth,
             n_gal_in_tomo,
             out=np.ones_like(n_gal_in_tomo_vardepth),
@@ -531,4 +531,4 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
                 self.vardepth_los_tracer, self.vardepth_values, los_fraction_vardepth
             )
 
-        return np.multiply(angular_vardepth_map, los_vardepth_map)
+        return np.multiply(angular_vardepth_map, los_vardepth_map)  # type: ignore[no-any-return]
