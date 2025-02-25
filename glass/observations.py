@@ -39,8 +39,9 @@ import numpy as np
 import glass.arraytools
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
     from collections.abc import Callable
+
+    from numpy.typing import NDArray
 
 
 def vmap_galactic_ecliptic(
@@ -428,9 +429,10 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         count without variable depth (for each tomographic bin). If
         provided, it is assumed that there is one vardepth_map which
         traces the variable depth for all tomographic bins.
+
     """
 
-    def __init__( # noqa: PLR0913
+    def __init__(  # noqa: PLR0913
         self,
         vardepth_map: NDArray[np.float64],
         n_bins: int,
@@ -442,7 +444,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         vardepth_values: NDArray[np.float64],
         vardepth_los_tracer: NDArray[np.float64] | None = None,
         vardepth_tomo_functions: list[Callable] | None = None,
-    ) -> None: 
+    ) -> None:
         super().__init__(vardepth_map, n_bins, zbins)
         self.ztomo = ztomo
         self.dndz = dndz
