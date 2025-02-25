@@ -352,7 +352,10 @@ class AngularVariableDepthMask:
     """
 
     def __init__(
-        self, vardepth_map: NDArray[np.float64], n_bins: int, zbins: NDArray[np.float64]
+        self,
+        vardepth_map: NDArray[np.float64],
+        n_bins: int,
+        zbins: NDArray[np.float64],
     ) -> None:
         self.vardepth_map = vardepth_map
         self.n_bins = n_bins
