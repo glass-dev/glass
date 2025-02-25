@@ -446,7 +446,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         dndz_vardepth: NDArray[np.float64],
         vardepth_values: NDArray[np.float64],
         vardepth_los_tracer: NDArray[np.float64] | None = None,
-        vardepth_tomo_functions: list[Callable] | None = None,
+        vardepth_tomo_functions: list[Callable[[NDArray[np.float64]], NDArray[np.float64]]] | None = None,
     ) -> None:
         super().__init__(vardepth_map, n_bins, zbins)
         self.ztomo = ztomo
