@@ -334,7 +334,7 @@ def tomo_nz_gausserr(
 
 
 class AngularVariableDepthMask:
-    r"""Variable depth mask for tomographic bins.
+    """Variable depth mask for tomographic bins.
 
     This class allows to create a mask with a different variable
     depth mask in the angular direction for each tomographic bin.
@@ -347,6 +347,7 @@ class AngularVariableDepthMask:
         Number of tomographic bins.
     zbins
         Shell redshift limits.
+
     """
 
     def __init__(
@@ -357,7 +358,7 @@ class AngularVariableDepthMask:
         self.zbins = zbins
 
     def check_index(self, index: tuple[int, int]) -> None:
-        r"""Check the index for validity."""
+        """Check the index for validity."""
         if not isinstance(index, tuple):
             raise TypeError("Index must be an tuple of two integers")
 
@@ -368,7 +369,7 @@ class AngularVariableDepthMask:
             raise ValueError("Trailing index cannot exceed number of shells")
 
     def __getitem__(self, index: tuple[int, int]) -> NDArray[np.float64]:
-        r"""Get the mask for the given index.
+        """Get the mask for the given index.
 
         Parameters
         ----------
@@ -377,7 +378,6 @@ class AngularVariableDepthMask:
 
         Returns
         -------
-        mask
             Mask for the given index.
 
         Raises
@@ -392,7 +392,7 @@ class AngularVariableDepthMask:
 
 
 class AngularLosVariableDepthMask(AngularVariableDepthMask):
-    r"""Variable depth mask for tomographic bins.
+    """Variable depth mask for tomographic bins.
 
     This class allows to create a mask with a different variable
     depth mask in both the angular and the line-of-sight directions
@@ -456,7 +456,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
             self.vardepth_map = np.atleast_2d(vardepth_map).reshape(1, -1)
 
     def get_los_fraction(self, index: tuple[int, int]) -> NDArray[np.float64]:
-        r"""Gets the fraction of galaxies affected by variable depth in the
+        """Gets the fraction of galaxies affected by variable depth in the
         line-of-sight direction for the given tomographic bin and shell.
 
         Parameters
@@ -466,9 +466,9 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
 
         Returns
         -------
-        fraction_vardepth
             Fraction of galaxies affected by variable depth in the
             line-of-sight direction.
+
         """
         is_in_shell = (self.zbins[index[1]][0] < self.z) & (
             self.z <= self.zbins[index[1]][1]
@@ -488,7 +488,7 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
         )
 
     def __getitem__(self, index: tuple[int, int]) -> NDArray[np.float64]:
-        r"""Get the mask for the given index.
+        """Get the mask for the given index.
 
         Parameters
         ----------
@@ -497,7 +497,6 @@ class AngularLosVariableDepthMask(AngularVariableDepthMask):
 
         Returns
         -------
-        mask
             Mask for the given index.
 
         Raises
