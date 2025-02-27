@@ -127,9 +127,6 @@ testpaths = [
 xfail_strict = true
 
 [tool.ruff]
-extend-exclude = [
-    "examples",
-]
 fix = true
 force-exclude = true
 show-fixes = true
@@ -166,6 +163,10 @@ lint.per-file-ignores = {"__init__.py" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package,
 ], "examples*" = [
+    "ANN001", # missing-type-function-argument
+    "ANN002", # missing-type-args
+    "ANN201", # missing-return-type-undocumented-public-function
+    "D103", # undocumented-public-function
     "PLR2004", # magic-value-comparison
     "T201", # print
 ], "glass*" = [
