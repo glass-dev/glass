@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import healpix
 import numpy as np
 import pytest
 
 import glass
-
-if TYPE_CHECKING:
-    from cosmology import Cosmology
 
 
 def test_from_convergence(rng: np.random.Generator) -> None:
@@ -55,7 +50,7 @@ def test_shear_from_convergence() -> None:
 
 def test_multi_plane_matrix(
     shells: list[glass.RadialWindow],
-    cosmo: Cosmology,
+    cosmo: glass.Cosmology,
     rng: np.random.Generator,
 ) -> None:
     mat = glass.multi_plane_matrix(shells, cosmo)
@@ -77,7 +72,7 @@ def test_multi_plane_matrix(
 
 def test_multi_plane_weights(
     shells: list[glass.RadialWindow],
-    cosmo: Cosmology,
+    cosmo: glass.Cosmology,
     rng: np.random.Generator,
 ) -> None:
     w_in = np.eye(len(shells))

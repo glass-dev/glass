@@ -31,8 +31,6 @@ import glass.arraytools
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
-
 
 def redshifts(
     n: int | NDArray[np.float64],
@@ -304,7 +302,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     delta: NDArray[np.float64],
     zeff: float,
     a_ia: float,
-    cosmo: Cosmology,
+    cosmo: glass.Cosmology,
     *,
     z0: float = 0.0,
     eta: float = 0.0,

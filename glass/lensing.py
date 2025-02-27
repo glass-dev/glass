@@ -41,8 +41,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
-
     import glass
 
 
@@ -393,7 +391,7 @@ def shear_from_convergence(
 class MultiPlaneConvergence:
     """Compute convergence fields iteratively from multiple matter planes."""
 
-    def __init__(self, cosmo: Cosmology) -> None:
+    def __init__(self, cosmo: glass.Cosmology) -> None:
         """
         Create a new instance to iteratively compute the convergence.
 
@@ -523,7 +521,7 @@ class MultiPlaneConvergence:
 
 def multi_plane_matrix(
     shells: Sequence[glass.RadialWindow],
-    cosmo: Cosmology,
+    cosmo: glass.Cosmology,
 ) -> NDArray[np.float64]:
     """
     Compute the matrix of lensing contributions from each shell.
@@ -551,7 +549,7 @@ def multi_plane_matrix(
 def multi_plane_weights(
     weights: NDArray[np.float64],
     shells: Sequence[glass.RadialWindow],
-    cosmo: Cosmology,
+    cosmo: glass.Cosmology,
 ) -> NDArray[np.float64]:
     """
     Compute effective weights for multi-plane convergence.

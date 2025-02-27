@@ -8,8 +8,6 @@ import packaging.version
 import pytest
 from numpy.typing import NDArray
 
-from cosmology import Cosmology
-
 import glass
 
 # Handling of array backends, inspired by-
@@ -101,7 +99,7 @@ array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.value
 
 # Pytest fixtures
 @pytest.fixture(scope="session")
-def cosmo() -> Cosmology:
+def cosmo() -> glass.Cosmology:
     class MockCosmology:
         @property
         def omega_m(self) -> float:
