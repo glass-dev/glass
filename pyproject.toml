@@ -156,7 +156,7 @@ lint.isort = {known-first-party = [
     "local-folder",
 ], sections = {"cosmo" = [
     "camb",
-    "camb.sources"
+    "camb.sources",
     "cosmology",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
