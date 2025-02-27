@@ -146,6 +146,7 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
+    "glass.ext.camb",
 ], section-order = [
     "future",
     "standard-library",
