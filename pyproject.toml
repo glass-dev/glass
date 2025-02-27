@@ -51,6 +51,7 @@ docs = [
 ]
 examples = [
     "camb",
+    "cosmology.compat.camb",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
@@ -146,6 +147,7 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
+    "glass.ext.camb",
 ], section-order = [
     "future",
     "standard-library",
@@ -156,6 +158,7 @@ lint.isort = {known-first-party = [
 ], sections = {"cosmo" = [
     "camb",
     "cosmology.api",
+    "cosmology.compat.camb",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
