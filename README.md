@@ -24,7 +24,7 @@
 
 [![GitHub Discussions](https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github)](https://github.com/orgs/glass-dev/discussions)
 [![Slack](https://img.shields.io/badge/join-Slack-4A154B)](https://glass-dev.github.io/slack)
-[![All Contributors](https://img.shields.io/github/all-contributors/projectOwner/projectName?color=ee8449&style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/github/all-contributors/glass-dev/glass?color=ee8449&style=flat-square)](#contributors)
 
 This is the core library for GLASS, the Generator for Large Scale Structure. For
 more information, see the full [documentation]. There are a number of [examples]
