@@ -2,9 +2,10 @@ import numpy as np
 import pytest
 
 import glass
+from glass.cosmology import Cosmology
 
 
-def test_distance_weight(cosmo: glass.Cosmology) -> None:
+def test_distance_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`glass.distance_weight`."""
     z = np.linspace(0, 1, 6)
 
@@ -22,7 +23,7 @@ def test_distance_weight(cosmo: glass.Cosmology) -> None:
     np.testing.assert_array_less(w[1:], w[:-1])
 
 
-def test_volume_weight(cosmo: glass.Cosmology) -> None:
+def test_volume_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`glass.volume_weight`."""
     z = np.linspace(0, 1, 6)
 
@@ -40,7 +41,7 @@ def test_volume_weight(cosmo: glass.Cosmology) -> None:
     np.testing.assert_array_less(w[:-1], w[1:])
 
 
-def test_density_weight(cosmo: glass.Cosmology) -> None:
+def test_density_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`glass.density_weight`."""
     z = np.linspace(0, 1, 6)
 
@@ -265,7 +266,7 @@ def test_redshift_grid() -> None:
         glass.redshift_grid(zmin, zmax, dz=dz, num=num)
 
 
-def test_distance_grid(cosmo: glass.Cosmology) -> None:
+def test_distance_grid(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`glass.distance_grid`."""
     zmin = 0
     zmax = 1

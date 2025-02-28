@@ -59,13 +59,15 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from glass.cosmology import Cosmology
+
     ArrayLike1D = Sequence[float] | NDArray[np.float64]
     WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
 def distance_weight(
     z: NDArray[np.float64],
-    cosmo: glass.Cosmology,
+    cosmo: Cosmology,
 ) -> NDArray[np.float64]:
     """
     Uniform weight in comoving distance.
@@ -87,7 +89,7 @@ def distance_weight(
 
 def volume_weight(
     z: NDArray[np.float64],
-    cosmo: glass.Cosmology,
+    cosmo: Cosmology,
 ) -> NDArray[np.float64]:
     """
     Uniform weight in comoving volume.
@@ -109,7 +111,7 @@ def volume_weight(
 
 def density_weight(
     z: NDArray[np.float64],
-    cosmo: glass.Cosmology,
+    cosmo: Cosmology,
 ) -> NDArray[np.float64]:
     """
     Uniform weight in matter density.
@@ -779,7 +781,7 @@ def redshift_grid(
 
 
 def distance_grid(
-    cosmo: glass.Cosmology,
+    cosmo: Cosmology,
     zmin: float,
     zmax: float,
     *,
