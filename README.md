@@ -91,3 +91,14 @@ We also have a public [Slack workspace] for discussions about the project.
 [examples]: https://glass.readthedocs.io/stable/examples.html
 [Discussions]: https://github.com/orgs/glass-dev/discussions
 [Slack workspace]: https://glass-dev.github.io/slack
+
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
