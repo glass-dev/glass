@@ -101,10 +101,12 @@ We also have a public [Slack workspace] for discussions about the project.
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://ntessore.page"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/3993688?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Nicolas Tessore"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://paddyroddy.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/15052188?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Patrick J. Roddy"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://saransh-cpp.github.io/"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/74055102?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Saransh Chopra"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ucapbba"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/87702063?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="baugstein"/></td>
       <td align="center" valign="top" width="14.28%"><a href="http://arthurmloureiro.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/6471279?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Arthur Loureiro"/></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://mwiet.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/49800039?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Maximilian von Wietersheim-Kramsta"/></td>
     </tr>
   </tbody>
 </table>

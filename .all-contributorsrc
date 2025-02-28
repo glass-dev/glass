@@ -10,6 +10,13 @@
   "wrapperTemplate": "<p><%= bodyContent %></p>",
   "contributors": [
     {
+      "login": "ntessore",
+      "name": "Nicolas Tessore",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3993688?v=4",
+      "profile": "http://ntessore.page",
+      "contributions": ["code"]
+    },
+    {
       "login": "paddyroddy",
       "name": "Patrick J. Roddy",
       "avatar_url": "https://avatars.githubusercontent.com/u/15052188?v=4",
@@ -35,6 +42,13 @@
       "name": "Arthur Loureiro",
       "avatar_url": "https://avatars.githubusercontent.com/u/6471279?v=4",
       "profile": "http://arthurmloureiro.github.io",
+      "contributions": ["code"]
+    },
+    {
+      "login": "mwiet",
+      "name": "Maximilian von Wietersheim-Kramsta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49800039?v=4",
+      "profile": "https://mwiet.github.io",
       "contributions": ["code"]
     }
   ]
