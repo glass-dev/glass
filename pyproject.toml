@@ -147,7 +147,6 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
-    "glass.ext.camb",
 ], section-order = [
     "future",
     "standard-library",
@@ -157,9 +156,7 @@ lint.isort = {known-first-party = [
     "local-folder",
 ], sections = {"cosmo" = [
     "camb",
-    "camb.sources",
-    "cosmology.api",
-    "cosmology.compat.camb",
+    "cosmology",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
