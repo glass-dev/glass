@@ -390,6 +390,8 @@ def _generate_grf(
         # sample real and imaginary parts, then view as complex number
         rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))
 
+        z = np.asanyarray(healpix_to_glass_spectra(z))
+
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
         alm = multalm(z, s)
@@ -405,6 +407,8 @@ def _generate_grf(
         # modes with m = 0 are real-valued and come first in array
         alm[:n].real += alm[:n].imag
         alm[:n].imag[:] = 0
+
+        alm = np.asanyarray(glass_to_healpix_spectra(alm))
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
