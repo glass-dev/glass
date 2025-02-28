@@ -59,7 +59,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
+    from glass.cosmology import Cosmology
 
     ArrayLike1D = Sequence[float] | NDArray[np.float64]
     WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
