@@ -3,7 +3,9 @@
   "commitType": "docs",
   "contributorsPerLine": 7,
   "contributorTemplate": "<a href=\"<%= contributor.profile %>\"><img src=\"https://images.weserv.nl/?url=<%= contributor.avatar_url %>&h=<%= options.imageSize %>&w=<%= options.imageSize %>&fit=cover&mask=circle&maxage=7d\" alt=\"<%= contributor.name %>\"/>",
-  "files": ["README.md"],
+  "files": [
+    "README.md"
+  ],
   "linkToUsage": false,
   "projectName": "glass",
   "projectOwner": "glass-dev",
@@ -14,14 +16,27 @@
       "name": "Patrick J. Roddy",
       "avatar_url": "https://avatars.githubusercontent.com/u/15052188?v=4",
       "profile": "https://paddyroddy.github.io",
-      "contributions": ["code"]
+      "contributions": [
+        "code"
+      ]
     },
     {
       "login": "Saransh-cpp",
       "name": "Saransh Chopra",
       "avatar_url": "https://avatars.githubusercontent.com/u/74055102?v=4",
       "profile": "https://saransh-cpp.github.io/",
-      "contributions": ["code"]
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "mwiet",
+      "name": "Maximilian von Wietersheim-Kramsta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49800039?v=4",
+      "profile": "https://mwiet.github.io",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
