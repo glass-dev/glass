@@ -1,7 +1,6 @@
 """GLASS package."""
 
 __all__ = [
-    "Cosmology",
     "MultiPlaneConvergence",
     "RadialWindow",
     "algorithm",
@@ -78,7 +77,6 @@ except ModuleNotFoundError:
 
 # modules
 from glass import grf
-from glass.cosmology import Cosmology
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,
