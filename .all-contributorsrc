@@ -1,7 +1,20 @@
 {
+  "commitConvention": "angular",
+  "commitType": "docs",
+  "contributorsPerLine": 7,
   "contributorTemplate": "<a href=\"<%= contributor.profile %>\"><img src=\"https://images.weserv.nl/?url=<%= contributor.avatar_url %>&h=<%= options.imageSize %>&w=<%= options.imageSize %>&fit=cover&mask=circle&maxage=7d\" alt=\"<%= contributor.name %>\"/>",
+  "files": ["README.md"],
   "linkToUsage": false,
   "projectName": "glass",
   "projectOwner": "glass-dev",
-  "wrapperTemplate": "<p><%= bodyContent %></p>"
+  "wrapperTemplate": "<p><%= bodyContent %></p>",
+  "contributors": [
+    {
+      "login": "paddyroddy",
+      "name": "Patrick J. Roddy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15052188?v=4",
+      "profile": "https://paddyroddy.github.io",
+      "contributions": ["code"]
+    }
+  ]
 }

@@ -98,6 +98,13 @@ We also have a public [Slack workspace] for discussions about the project.
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://paddyroddy.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/15052188?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Patrick J. Roddy"/></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
