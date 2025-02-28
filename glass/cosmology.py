@@ -1,3 +1,5 @@
+"""Module for cosmology.api utilities."""
+
 from typing import Protocol
 
 import cosmology.api
