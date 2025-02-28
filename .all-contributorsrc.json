@@ -1,5 +1,7 @@
 {
+  "contributorTemplate": "<a href=\"<%= contributor.profile %>\"><img src=\"https://images.weserv.nl/?url=<%= contributor.avatar_url %>&h=<%= options.imageSize %>&w=<%= options.imageSize %>&fit=cover&mask=circle&maxage=7d\" alt=\"<%= contributor.name %>\"/>",
   "linkToUsage": false,
   "projectName": "glass",
-  "projectOwner": "glass-dev"
+  "projectOwner": "glass-dev",
+  "wrapperTemplate": "<p><%= bodyContent %></p>"
 }
