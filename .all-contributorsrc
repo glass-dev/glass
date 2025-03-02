@@ -64,6 +64,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/15345794?v=4",
       "profile": "https://nialljeffrey.github.io/",
       "contributions": ["code", "ideas"]
+    },
+    {
+      "login": "ARCHER2-HPC",
+      "name": "ARCHER2, UK National Supercomputing Service",
+      "avatar_url": "https://avatars.githubusercontent.com/u/60643641?v=4",
+      "profile": "https://github.com/ARCHER2-HPC",
+      "contributions": ["financial"]
     }
   ]
 }
