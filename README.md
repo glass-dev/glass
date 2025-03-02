@@ -107,6 +107,8 @@ We also have a public [Slack workspace] for discussions about the project.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ucapbba"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/87702063?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="baugstein"/></td>
       <td align="center" valign="top" width="14.28%"><a href="http://arthurmloureiro.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/6471279?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Arthur Loureiro"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://mwiet.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/49800039?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Maximilian von Wietersheim-Kramsta"/></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/joachimi"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/4989590?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="joachimi"/></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://nialljeffrey.github.io/"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/15345794?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Niall Jeffrey"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ARCHER2-HPC"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/60643641?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="ARCHER2, UK National Supercomputing Service"/></td>
     </tr>
   </tbody>
