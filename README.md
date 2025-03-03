@@ -98,8 +98,7 @@ We also have a public [Slack workspace] for discussions about the project.
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<table>
-  <tbody>
+<p>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://ntessore.page"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/3993688?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Nicolas Tessore"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://paddyroddy.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/15052188?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Patrick J. Roddy"/></td>
@@ -108,11 +107,12 @@ We also have a public [Slack workspace] for discussions about the project.
       <td align="center" valign="top" width="14.28%"><a href="http://arthurmloureiro.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/6471279?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Arthur Loureiro"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://mwiet.github.io"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/49800039?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Maximilian von Wietersheim-Kramsta"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/joachimi"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/4989590?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="joachimi"/></td>
+    </tr><br />
+    <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://nialljeffrey.github.io/"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/15345794?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="Niall Jeffrey"/></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ARCHER2-HPC"><img src="https://images.weserv.nl/?url=https://avatars.githubusercontent.com/u/60643641?v=4&h=100&w=100&fit=cover&mask=circle&maxage=7d" alt="ARCHER2, UK National Supercomputing Service"/></td>
     </tr>
-  </tbody>
-</table>
+</p>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
