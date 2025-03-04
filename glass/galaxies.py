@@ -31,7 +31,7 @@ import glass.arraytools
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
+    from glass.cosmology import Cosmology
 
 
 def redshifts(

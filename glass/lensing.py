@@ -41,9 +41,8 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
-
     import glass
+    from glass.cosmology import Cosmology
 
 
 @overload

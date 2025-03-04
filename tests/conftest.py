@@ -8,9 +8,8 @@ import packaging.version
 import pytest
 from numpy.typing import NDArray
 
-from cosmology import Cosmology
-
 import glass
+from glass.cosmology import Cosmology
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
