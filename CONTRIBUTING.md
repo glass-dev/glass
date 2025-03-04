@@ -298,3 +298,30 @@ You can use any of the other common git trailers. In particular, you can use
 ```markdown
 Cc: @octocat
 ```
+
+### Acknowledging contributors
+
+_GLASS_ uses [All Contributors](https://allcontributors.org) to acknowledge
+different types of contributions to the project. The contributor data is stored
+in `.all-contributorsrc` as JSON and is rendered as Markdown in
+`docs/CONTRIBUTORS.md`. The markdown file is further rendered in
+[_GLASS_' documentation](https://glass.readthedocs.io/stable/#contributors).
+
+We encourage people to minimize contribution types, keeping them restricted to
+`code` (usually includes `docs`, `infra`, and other related activities),
+`ideas`, `research`, and `funding`.
+
+To add a new contributor to the JSON and Markdown file, comment
+
+```markdown
+@all-contributors please add @<username> for <contribution1>,<contribution2>,...
+```
+
+on a PR/issue (a relevant PR/issue if it is a code contribution). The comment
+will trigger an automated PR from the all-contributors bot. Contributors should
+be added one at a time to avoid conflicts; one should wait for any existing PR
+by the all-contributors bot to be merged/closed before triggering a new one.
+
+It is often useful to run `all-contributors` CLI for debugging or fixing
+generated files locally. More documentation on the CLI can be found on
+[All Contributor's website](https://allcontributors.org/docs/en/cli/usage).
