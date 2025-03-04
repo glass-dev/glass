@@ -34,3 +34,10 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+============
+Contributors
+============
+
+.. include:: CONTRIBUTORS.md
+   :parser: myst_parser.sphinx_
