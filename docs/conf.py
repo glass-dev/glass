@@ -24,6 +24,7 @@ release = version
 # ones.
 extensions = [
     "matplotlib.sphinxext.plot_directive",
+    "myst_parser",
     "nbsphinx",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
