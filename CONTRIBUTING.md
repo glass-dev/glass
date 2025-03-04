@@ -322,6 +322,13 @@ will trigger an automated PR from the all-contributors bot. Contributors should
 be added one at a time to avoid conflicts; one should wait for any existing PR
 by the all-contributors bot to be merged/closed before triggering a new one.
 
-It is often useful to run `all-contributors` CLI for debugging or fixing
-generated files locally. More documentation on the CLI can be found on
-[All Contributor's website](https://allcontributors.org/docs/en/cli/usage).
+To acknowledge a contributor without a GitHub account, add an entry to
+`.all-contributorsrc` manually and regenerate `docs/CONTRIBUTORS.md` using
+[all-contributors CLI](https://allcontributors.org/docs/en/cli/usage)
+
+```bash
+all-contributors generate
+```
+
+It is also often useful to run `all-contributors` CLI for debugging or fixing
+generated files locally.
