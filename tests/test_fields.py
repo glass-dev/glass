@@ -176,12 +176,13 @@ def test_multalm() -> None:
     result = glass.multalm(alm, bl, inplace=True)
 
     assert np.array_equal(result, alm)  # in-place
-    expected_result = np.array([2.0, 1.0, 3.0, 2.0, 5.0, 6.0])
+    expected_result = np.array([2.0, 1.0, 6.0, 4.0, 2.5, 12.0])
     np.testing.assert_allclose(result, expected_result)
     assert not np.array_equal(alm_copy, result)
 
     # multiple with 1s
 
+    alm = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     bl = np.ones(3)
 
     result = glass.multalm(alm, bl, inplace=False)
@@ -193,7 +194,7 @@ def test_multalm() -> None:
 
     result = glass.multalm(alm, bl, inplace=False)
 
-    expected_result = np.array([0.0, 1.0, 0.0, 2.0, 0.0, 0.0])
+    expected_result = np.array([0.0, 2.0, 0.0, 0.0, 5.0, 0.0])
     np.testing.assert_allclose(result, expected_result)
 
     # empty arrays

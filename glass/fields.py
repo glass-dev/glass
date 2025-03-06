@@ -233,10 +233,18 @@ def multalm(
         The product of alm and bl.
 
     """
-    n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
-    for m in range(n):
-        out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
+    n = len(bl)
+    for d in range(n):
+        indices = []
+        for m in range(d, n):
+            # dynamically calculate indices
+            index = m * (m + 1) // 2 + d
+            indices.append(index)
+
+        if indices:
+            out[indices] *= bl[: len(indices)]
+
     return out
 
 
@@ -405,8 +413,6 @@ def _generate_grf(
         # sample real and imaginary parts, then view as complex number
         rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))
 
-        z = np.asanyarray(healpix_to_glass_spectra(z))
-
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
         alm = multalm(z, s)
@@ -419,11 +425,11 @@ def _generate_grf(
         if j is not None:
             y[:, j] = z
 
+        alm = np.asanyarray(glass.glass_to_healpix_spectra(alm))  # type: ignore[arg-type]
+
         # modes with m = 0 are real-valued and come first in array
         alm[:n].real += alm[:n].imag
         alm[:n].imag[:] = 0
-
-        alm = np.asanyarray(glass_to_healpix_spectra(alm))
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
