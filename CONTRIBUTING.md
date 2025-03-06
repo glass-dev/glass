@@ -305,7 +305,7 @@ _GLASS_ uses [All Contributors](https://allcontributors.org) to acknowledge
 different types of contributions to the project. The contributor data is stored
 in `.all-contributorsrc` as JSON and is rendered as Markdown in
 `docs/CONTRIBUTORS.md`. The markdown file is further rendered in
-[_GLASS_' documentation](https://glass.readthedocs.io/stable/#contributors).
+[_GLASS_' documentation](https://glass.readthedocs.io/latest/#contributors).
 
 We encourage people to minimize contribution types, keeping them restricted to
 `code` (usually includes `docs`, `infra`, and other related activities),
