@@ -404,6 +404,18 @@ def test_getcl() -> None:
             np.testing.assert_array_equal(result[2:], expected)
 
 
+def test_is_inv_triangle_number():
+    for n in range(10_000):
+        new_n, _ = glass.fields._is_inv_triangle_number(n * (n + 1) // 2)
+        assert new_n == n
+
+    not_triangle_numbers = [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
+
+    for t in not_triangle_numbers:
+        _, _is_inv_triangle = glass.fields._is_inv_triangle_number(t)
+        assert not _is_inv_triangle
+
+
 def test_nfields_from_nspectra():
     for n in range(10_000):
         assert glass.nfields_from_nspectra(n * (n + 1) // 2) == n
