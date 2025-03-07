@@ -219,6 +219,16 @@ def multalm(
     """
     Multiply alm by bl.
 
+    The alm should be in GLASS order:
+
+    [
+        00,
+        10, 11,
+        20, 21, 22,
+        30, 31, 32, 33,
+        ...
+    ]
+
     Parameters
     ----------
     alm
@@ -235,15 +245,8 @@ def multalm(
     """
     out = np.asanyarray(alm) if inplace else np.copy(alm)
     n = len(bl)
-    for d in range(n):
-        indices = []
-        for m in range(d, n):
-            # dynamically calculate indices
-            index = m * (m + 1) // 2 + d
-            indices.append(index)
-
-        if indices:
-            out[indices] *= bl[: len(indices)]
+    for ell in range(n):
+        out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
 
     return out
 
@@ -425,7 +428,7 @@ def _generate_grf(
         if j is not None:
             y[:, j] = z
 
-        alm = np.asanyarray(glass.glass_to_healpix_spectra(alm))  # type: ignore[arg-type]
+        alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
         alm[:n].real += alm[:n].imag
@@ -926,6 +929,28 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
     return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
+
+
+def _glass_to_healpix_alm(alm: NDArray[np.complex128]) -> NDArray[np.complex128]:
+    """
+    Reorder alms from GLASS to HEALPix order.
+
+    Reorder alms in GLASS order to conform to (new) HEALPix order.
+
+    Parameters
+    ----------
+    alm
+        alm in GLASS order.
+
+    Returns
+    -------
+        alm in HEALPix order.
+
+    """
+    n = nfields_from_nspectra(alm.size)
+    ell = np.arange(n)
+    out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
+    return np.concatenate(out)
 
 
 def lognormal_shift_hilbert2011(z: float) -> float:
