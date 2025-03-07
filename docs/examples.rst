@@ -45,4 +45,4 @@ More advanced examples doing multiple things at the same time.
 
    examples/2-advanced/cosmic_shear.ipynb
    examples/2-advanced/stage_4_galaxies.ipynb
-   examples/2-advanced/legacy-mode.ipynb
+   examples/2-advanced/legacy_mode.ipynb
