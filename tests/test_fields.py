@@ -5,7 +5,7 @@ import pytest
 import glass
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def not_triangle_numbers() -> list[int]:
     return [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
