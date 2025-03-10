@@ -53,9 +53,10 @@ except ImportError:
 
 def _is_inv_triangle_number(triangle_number: int) -> tuple[int, bool]:
     r"""
-    The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`.  If
-    the argument is :math:`T_n`, then :math:`n` is returned. Otherwise,
-    a :class:`ValueError` is raised.
+    The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`. If
+    the argument is :math:`T_n`, then :math:`n` is returned along with
+    a boolean value. The boolean value is set to ``True`` if the
+    returned :math:`n` is a triangle number and ``False`` if not.
     """
     n = math.floor(math.sqrt(2 * triangle_number))
     return n, n * (n + 1) // 2 == triangle_number
@@ -66,7 +67,8 @@ def nfields_from_nspectra(nspectra: int) -> int:
     Returns the number of fields for a number of spectra.
 
     Given the number of spectra *nspectra*, returns the number of
-    fields *n* such that ``n * (n + 1) // 2 == nspectra``.
+    fields *n* such that ``n * (n + 1) // 2 == nspectra`` or raises
+    a :class:`ValueError` if the number of spectra is invalid.
     """
     n, is_inv_triangle = _is_inv_triangle_number(nspectra)
     if not is_inv_triangle:
