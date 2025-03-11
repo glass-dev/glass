@@ -5,6 +5,11 @@ import pytest
 import glass
 
 
+@pytest.fixture(scope="session")
+def not_triangle_numbers() -> list[int]:
+    return [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
+
+
 def test_iternorm() -> None:
     # check output shapes and types
 
@@ -404,11 +409,18 @@ def test_getcl() -> None:
             np.testing.assert_array_equal(result[2:], expected)
 
 
-def test_nfields_from_nspectra():
+def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
+    for n in range(10_000):
+        assert glass.fields._inv_triangle_number(n * (n + 1) // 2) == n
+
+    for t in not_triangle_numbers:
+        with pytest.raises(ValueError, match=f"not a triangle number: {t}"):
+            glass.fields._inv_triangle_number(t)
+
+
+def test_nfields_from_nspectra(not_triangle_numbers: list[int]):
     for n in range(10_000):
         assert glass.nfields_from_nspectra(n * (n + 1) // 2) == n
-
-    not_triangle_numbers = [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
     for t in not_triangle_numbers:
         with pytest.raises(ValueError, match=f"invalid number of spectra: {t}"):
