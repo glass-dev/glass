@@ -411,12 +411,11 @@ def test_getcl() -> None:
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
     for n in range(10_000):
-        new_n, _ = glass.fields._is_inv_triangle_number(n * (n + 1) // 2)
-        assert new_n == n
+        assert glass.fields._inv_triangle_number(n * (n + 1) // 2) == n
 
     for t in not_triangle_numbers:
-        _, _is_inv_triangle = glass.fields._is_inv_triangle_number(t)
-        assert not _is_inv_triangle
+        with pytest.raises(ValueError, match=f"not a triangle number: {t}"):
+            glass.fields._inv_triangle_number(t)
 
 
 def test_nfields_from_nspectra(not_triangle_numbers: list[int]):
