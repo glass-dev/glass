@@ -61,7 +61,7 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run tests wih every array backend and generate coverage report
+      - name: Run tests with every array backend and generate coverage report
         run: nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
