@@ -947,7 +947,7 @@ def _glass_to_healpix_alm(alm: NDArray[np.complex128]) -> NDArray[np.complex128]
         alm in HEALPix order.
 
     """
-    n = nfields_from_nspectra(alm.size)
+    n = _inv_triangle_number(alm.size)
     ell = np.arange(n)
     out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
     return np.concatenate(out)
