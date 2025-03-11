@@ -243,8 +243,8 @@ def multalm(
         The product of alm and bl.
 
     """
-    out = np.asanyarray(alm) if inplace else np.copy(alm)
     n = len(bl)
+    out = np.asanyarray(alm) if inplace else np.copy(alm)
     for ell in range(n):
         out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
 
