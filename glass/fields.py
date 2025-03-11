@@ -933,8 +933,6 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
 
 def _glass_to_healpix_alm(alm: NDArray[np.complex128]) -> NDArray[np.complex128]:
     """
-    Reorder alms from GLASS to HEALPix order.
-
     Reorder alms in GLASS order to conform to (new) HEALPix order.
 
     Parameters
