@@ -376,7 +376,7 @@ def test_generate():
 
     result = list(glass.generate(fields, gls, nside=nside))
 
-    np.testing.assert_allclose(result[1], result[0] ** 2, rtol=1e-02)
+    np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
 def test_getcl() -> None:
