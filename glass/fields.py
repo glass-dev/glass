@@ -210,7 +210,7 @@ def cls2cov(
         yield cov
 
 
-def multalm(
+def _multalm(
     alm: NDArray[np.complex128],
     bl: NDArray[np.float64],
     *,
@@ -407,11 +407,11 @@ def _generate_grf(
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
-        alm = multalm(z, s)
+        alm = _multalm(z, s)
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += multalm(y[:, i], a[:, i])
+            alm += _multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
