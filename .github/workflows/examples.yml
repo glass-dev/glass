@@ -5,11 +5,13 @@ on:
   push:
     paths:
       - glass/**
+      - examples/**
     branches:
       - main
   pull_request:
     paths:
       - glass/**
+      - examples/**
     types:
       - opened
       - ready_for_review
