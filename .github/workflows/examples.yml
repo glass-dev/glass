@@ -54,7 +54,7 @@ jobs:
 
       - name: Run examples
         run: nox -s examples
-        timeout-minutes: 30
+        timeout-minutes: 20
         env:
           FORCE_COLOR: 1
 
