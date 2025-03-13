@@ -173,27 +173,28 @@ def test_multalm() -> None:
     bl = np.array([2.0, 0.5, 1.0])
     alm_copy = np.copy(alm)
 
-    result = glass.multalm(alm, bl, inplace=True)
+    result = glass.fields._multalm(alm, bl, inplace=True)
 
     assert np.array_equal(result, alm)  # in-place
-    expected_result = np.array([2.0, 1.0, 3.0, 2.0, 5.0, 6.0])
+    expected_result = np.array([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
     np.testing.assert_allclose(result, expected_result)
     assert not np.array_equal(alm_copy, result)
 
     # multiple with 1s
 
+    alm = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     bl = np.ones(3)
 
-    result = glass.multalm(alm, bl, inplace=False)
+    result = glass.fields._multalm(alm, bl, inplace=False)
     np.testing.assert_array_equal(result, alm)
 
     # multiple with 0s
 
     bl = np.array([0.0, 1.0, 0.0])
 
-    result = glass.multalm(alm, bl, inplace=False)
+    result = glass.fields._multalm(alm, bl, inplace=False)
 
-    expected_result = np.array([0.0, 1.0, 0.0, 2.0, 0.0, 0.0])
+    expected_result = np.array([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
     np.testing.assert_allclose(result, expected_result)
 
     # empty arrays
@@ -201,7 +202,7 @@ def test_multalm() -> None:
     alm = np.array([])
     bl = np.array([])
 
-    result = glass.multalm(alm, bl, inplace=False)
+    result = glass.fields._multalm(alm, bl, inplace=False)
     np.testing.assert_array_equal(result, alm)
 
 
@@ -543,6 +544,14 @@ def test_healpix_to_glass_spectra():
     inp = [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
     out = glass.healpix_to_glass_spectra(inp)
     np.testing.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
+
+
+def test_glass_to_healpix_alm():
+    inp = np.array([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
+    out = glass.fields._glass_to_healpix_alm(inp)
+    np.testing.assert_array_equal(
+        out, np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33])
+    )
 
 
 def test_lognormal_shift_hilbert2011():
