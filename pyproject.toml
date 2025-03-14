@@ -43,6 +43,7 @@ docs = [
     "furo",
     "ipython",
     "matplotlib",
+    "myst-parser",
     "nbsphinx",
     "sphinx-toolbox",
     "sphinx<8.2.0",

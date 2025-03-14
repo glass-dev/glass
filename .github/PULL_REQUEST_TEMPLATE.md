@@ -13,9 +13,9 @@ solving -->
 <!-- referring some issue -->
 <!-- Refs: # (issue) -->
 
+<!-- add a one liner changelog entry here if this PR makes any user-facing change
 ## Changelog entry
 
-<!-- add a one liner changelog entry here if this PR makes any user-facing change
 Added: Some new feature
 Changed: Some change in existing functionality
 Deprecated: Some soon-to-be removed feature
