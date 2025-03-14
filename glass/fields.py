@@ -51,17 +51,32 @@ except ImportError:
         return decorator
 
 
+def _inv_triangle_number(triangle_number: int) -> int:
+    r"""
+    The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`. If
+    the argument is :math:`T_n`, then :math:`n` is returned. Otherwise,
+    a :class:`ValueError` is raised.
+    """
+    n = math.floor(math.sqrt(2 * triangle_number))
+    if n * (n + 1) // 2 != triangle_number:
+        msg = f"not a triangle number: {triangle_number}"
+        raise ValueError(msg)
+    return n
+
+
 def nfields_from_nspectra(nspectra: int) -> int:
     r"""
     Returns the number of fields for a number of spectra.
 
     Given the number of spectra *nspectra*, returns the number of
-    fields *n* such that ``n * (n + 1) // 2 == nspectra``.
+    fields *n* such that ``n * (n + 1) // 2 == nspectra`` or raises
+    a :class:`ValueError` if the number of spectra is invalid.
     """
-    n = math.floor(math.sqrt(2 * nspectra))
-    if n * (n + 1) // 2 != nspectra:
+    try:
+        n = _inv_triangle_number(nspectra)
+    except ValueError:
         msg = f"invalid number of spectra: {nspectra}"
-        raise ValueError(msg)
+        raise ValueError(msg) from None
     return n
 
 
@@ -195,7 +210,7 @@ def cls2cov(
         yield cov
 
 
-def multalm(
+def _multalm(
     alm: NDArray[np.complex128],
     bl: NDArray[np.float64],
     *,
@@ -203,6 +218,16 @@ def multalm(
 ) -> NDArray[np.complex128]:
     """
     Multiply alm by bl.
+
+    The alm should be in GLASS order:
+
+    [
+        00,
+        10, 11,
+        20, 21, 22,
+        30, 31, 32, 33,
+        ...
+    ]
 
     Parameters
     ----------
@@ -220,8 +245,9 @@ def multalm(
     """
     n = len(bl)
     out = np.asanyarray(alm) if inplace else np.copy(alm)
-    for m in range(n):
-        out[m * n - m * (m - 1) // 2 : (m + 1) * n - m * (m + 1) // 2] *= bl[m:]
+    for ell in range(n):
+        out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
+
     return out
 
 
@@ -392,15 +418,17 @@ def _generate_grf(
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
-        alm = multalm(z, s)
+        alm = _multalm(z, s)
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += multalm(y[:, i], a[:, i])
+            alm += _multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
             y[:, j] = z
+
+        alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
         alm[:n].real += alm[:n].imag
@@ -901,6 +929,26 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
     return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
+
+
+def _glass_to_healpix_alm(alm: NDArray[np.complex128]) -> NDArray[np.complex128]:
+    """
+    Reorder alms in GLASS order to conform to (new) HEALPix order.
+
+    Parameters
+    ----------
+    alm
+        alm in GLASS order.
+
+    Returns
+    -------
+        alm in HEALPix order.
+
+    """
+    n = _inv_triangle_number(alm.size)
+    ell = np.arange(n)
+    out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
+    return np.concatenate(out)
 
 
 def lognormal_shift_hilbert2011(z: float) -> float:
