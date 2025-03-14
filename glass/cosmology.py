@@ -2,9 +2,9 @@
 
 from typing import Any, Protocol
 
-import cosmology.api
-
 from numpy.typing import NDArray
+
+import cosmology.api
 
 Array = NDArray[Any]
 
