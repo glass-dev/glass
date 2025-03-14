@@ -128,7 +128,7 @@ def density_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return cosmo.critical_density0 * cosmo.Omega_m(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 class RadialWindow(NamedTuple):
