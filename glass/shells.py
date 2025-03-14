@@ -84,7 +84,7 @@ def distance_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
@@ -106,7 +106,7 @@ def volume_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return cosmo.xm(z) ** 2 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 def density_weight(
@@ -128,7 +128,12 @@ def density_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.critical_density0 * cosmo.Omega_m(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return (  # type: ignore[no-any-return]
+        cosmo.critical_density0
+        * cosmo.Omega_m(z)
+        * cosmo.xm(z) ** 2
+        / cosmo.H_over_H0(z)
+    )
 
 
 class RadialWindow(NamedTuple):

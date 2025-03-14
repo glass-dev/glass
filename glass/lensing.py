@@ -480,7 +480,7 @@ class MultiPlaneConvergence:
         # lensing weight of mass plane to be added
         f = 3 * self.cosmo.Omega_m0 / 2
         f *= x2 * self.r23
-        f *= (1 + self.z2) / self.cosmo.ef(self.z2)
+        f *= (1 + self.z2) / self.cosmo.H_over_H0(self.z2)
         f *= w2
 
         # create kappa planes on first iteration
