@@ -478,7 +478,7 @@ class MultiPlaneConvergence:
         t = r13 / r12
 
         # lensing weight of mass plane to be added
-        f = 3 * self.cosmo.omega_m / 2
+        f = 3 * self.cosmo.Omega_m0 / 2
         f *= x2 * self.r23
         f *= (1 + self.z2) / self.cosmo.ef(self.z2)
         f *= w2

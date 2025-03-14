@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 class Cosmology(
     cosmology.api.HasComovingDistance[Array, Array],
+    cosmology.api.HasOmegaM0[Array],
     Protocol,
 ):
     """
