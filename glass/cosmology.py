@@ -1,14 +1,17 @@
 """Module for cosmology.api utilities."""
 
-from typing import Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import cosmology.api
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    Array = NDArray[Any]
+
 
 class Cosmology(
-    cosmology.api.HasHoverH0,
-    cosmology.api.HasOmegaM0,
-    cosmology.api.HasHubbleDistance,
+    cosmology.api.HasComovingDistance[Array, Array],
     Protocol,
 ):
     """

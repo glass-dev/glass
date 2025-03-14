@@ -809,7 +809,7 @@ def distance_grid(
         The redshift grid.
 
     """
-    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
+    xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     x = _uniform_grid(xmin, xmax, step=dx, num=num)
     return cosmo.dc_inv(x)  # type: ignore[no-any-return]
 
