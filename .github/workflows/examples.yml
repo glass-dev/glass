@@ -17,6 +17,7 @@ on:
       - ready_for_review
       - reopened
       - synchronize
+      - labeled
 
 concurrency:
   cancel-in-progress: true
@@ -25,7 +26,9 @@ concurrency:
 
 jobs:
   test-examples:
-    if: github.event.pull_request.draft == false
+    if:
+      github.event.pull_request.draft == false || (github.event.action ==
+      'labeled' && github.event.label.name == 'run-examples')
     name: Test examples
     runs-on: ubuntu-latest
     steps:
