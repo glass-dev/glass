@@ -29,7 +29,7 @@ Bibliography
 .. [Johnston19] Johnston, H., Georgiou, C., Joachimi, B., et al., 2019,
     A&A, 624, A30. doi:10.1051/0004-6361/201834714
 
-.. [Joachimi2021] Joachimi B., Lin, C.-A., et al., 2021, A&A, 646, A129.
+.. [Joachimi21] Joachimi B., Lin, C.-A., et al., 2021, A&A, 646, A129.
     doi:10.1051/0004-6361/202038831
 
 .. [Lawson95] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
@@ -47,5 +47,5 @@ Bibliography
 .. [Xavier16] Xavier H. S., et al., 2016, MNRAS, 459, 3693.
     doi:10.1093/mnras/stw874
 
-.. [Wietesheim-Kramsta2024] von Wietersheim-Kramsta M., Lin, K., et al.,
+.. [Wietesheim-Kramsta24] von Wietersheim-Kramsta M., Lin, K., et al.,
     2024, A&A, 695, A223. doi:10.1051/0004-6361/202450487
