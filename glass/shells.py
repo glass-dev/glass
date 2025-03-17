@@ -134,8 +134,7 @@ def density_weight(
     return (  # type: ignore[no-any-return]
         cosmo.critical_density0
         * cosmo.Omega_m(z)
-        * cosmo.hubble_distance
-        * cosmo.transverse_comoving_distance(z) ** 2
+        * (cosmo.hubble_distance * cosmo.transverse_comoving_distance(z)) ** 2
         / cosmo.H_over_H0(z)
     )
 
