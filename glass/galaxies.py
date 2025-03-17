@@ -375,10 +375,10 @@ def _kappa_ia_nla(  # noqa: PLR0913
 
     """
     c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
-    rho_c1 = c1 * cosmo.rho_c0
+    rho_c1 = c1 * cosmo.critical_density0
 
-    prefactor = -a_ia * rho_c1 * cosmo.Om
-    inverse_linear_growth = 1.0 / cosmo.gf(zeff)
+    prefactor = -a_ia * rho_c1 * cosmo.Omega_m0
+    inverse_linear_growth = 1.0 / cosmo.growth_factor(zeff)
     redshift_dependence = ((1 + zeff) / (1 + z0)) ** eta
     luminosity_dependence = (lbar / l0) ** beta
 
