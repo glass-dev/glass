@@ -157,7 +157,7 @@ lint.isort = {known-first-party = [
     "local-folder",
 ], sections = {"cosmo" = [
     "camb",
-    "cosmology",
+    "cosmology.api",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
