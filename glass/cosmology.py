@@ -14,6 +14,7 @@ class Cosmology(
     cosmology.api.HasCriticalDensity0[Array],  # type: ignore[misc]
     cosmology.api.HasHoverH0[Array, Array],  # type: ignore[misc]
     cosmology.api.HasHubbleDistance[Array],  # type: ignore[misc]
+    cosmology.api.HasInverseComovingDistance[Array],  # type: ignore[misc]
     cosmology.api.HasOmegaM0[Array],  # type: ignore[misc]
     cosmology.api.HasOmegaM[Array, Array],  # type: ignore[misc]
     cosmology.api.HasTransverseComovingDistance[Array, Array],  # type: ignore[misc]

@@ -821,7 +821,7 @@ def distance_grid(
     """
     xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     x = _uniform_grid(xmin, xmax, step=dx, num=num)
-    return cosmo.dc_inv(x)  # type: ignore[no-any-return]
+    return cosmo.inv_comoving_distance(x)  # type: ignore[no-any-return]
 
 
 def combine(

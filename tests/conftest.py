@@ -103,7 +103,7 @@ array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.value
 def cosmo() -> Cosmology:
     class MockCosmology:
         @property
-        def Omega_m0(self) -> float:
+        def Omega_m0(self) -> float:  # noqa: N802
             """Matter density parameter at redshift 0."""
             return 0.3
 
@@ -112,7 +112,7 @@ def cosmo() -> Cosmology:
             """Critical density at redshift 0 in Msol Mpc-3."""
             return 3e4
 
-        def H_over_H0(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        def H_over_H0(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
             """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
             return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
 
@@ -142,7 +142,7 @@ def cosmo() -> Cosmology:
             """Comoving distance :math:`d_c(z)` in Mpc."""
             return self.xm(z) / 1_000 if z2 is None else self.xm(z, z2) / 1_000
 
-        def dc_inv(self, dc: NDArray[np.float64]) -> NDArray[np.float64]:
+        def inv_comoving_distance(self, dc: NDArray[np.float64]) -> NDArray[np.float64]:
             """Inverse function for the comoving distance in Mpc."""
             return 1_000 * (1 / (dc + np.finfo(float).eps))
 
