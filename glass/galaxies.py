@@ -374,7 +374,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
       :math:`\bar{L}` with respect to :math:`L_0`.
 
     """
-    c1 = 5e-14 / cosmo.h**2  # Solar masses per cubic Mpc
+    c1 = 5e-14 / (cosmo.H0 / 100) ** 2  # Solar masses per cubic Mpc
     rho_c1 = c1 * cosmo.critical_density0
 
     prefactor = -a_ia * rho_c1 * cosmo.Omega_m0
