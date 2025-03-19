@@ -37,7 +37,7 @@ Redshift grids
 Weight functions
 ----------------
 
-.. autofunction:: distance_weight
+.. autoclass:: DistanceWeight
 .. autofunction:: volume_weight
 .. autofunction:: density_weight
 
@@ -45,6 +45,7 @@ Weight functions
 
 from __future__ import annotations
 
+import dataclasses
 import itertools
 import warnings
 from typing import TYPE_CHECKING, NamedTuple
@@ -65,26 +66,34 @@ if TYPE_CHECKING:
     WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
-def distance_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
-    """
-    Uniform weight in comoving distance.
+@dataclasses.dataclass
+class DistanceWeight:
+    """Uniform weight in comoving distance.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return 1 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
