@@ -13,6 +13,7 @@ concurrency:
 
 jobs:
   test-examples:
+    if: github.event.label.name == 'run-examples'
     name: Test examples
     runs-on: ubuntu-latest
     steps:
