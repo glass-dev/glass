@@ -1,0 +1,38 @@
+---
+name: Test examples
+
+on:
+  push:
+    paths:
+      - glass/**
+      - examples/**
+    branches:
+      - main
+  pull_request:
+    paths:
+      - glass/**
+      - examples/**
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+concurrency:
+  cancel-in-progress: true
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  test-examples:
+    if: github.event.pull_request.draft == false
+    name: Test examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: run-examples
+        uses: ./.github/actions/examples

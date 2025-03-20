@@ -1,0 +1,25 @@
+---
+name: Test examples
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+concurrency:
+  cancel-in-progress: true
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  test-examples:
+    name: Test examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: run-examples
+        uses: ./.github/actions/examples
