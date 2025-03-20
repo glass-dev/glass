@@ -1,6 +1,5 @@
 ---
-name: Examples
-description: Run examples
+name: Run examples
 runs:
   using: composite
   steps:
