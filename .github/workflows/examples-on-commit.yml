@@ -36,3 +36,4 @@ jobs:
 
       - id: run-examples
         uses: ./.github/actions/examples
+        timeout-minutes: 20
