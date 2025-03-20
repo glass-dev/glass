@@ -30,11 +30,11 @@ To get started, these examples focus on simulating one thing at a time.
 .. nbgallery::
 
    examples/1-basic/shells.ipynb
+   examples/1-basic/galaxy-redshift-distributions.ipynb
    examples/1-basic/matter.ipynb
    examples/1-basic/density.ipynb
    examples/1-basic/lensing.ipynb
    examples/1-basic/photoz.ipynb
-   examples/1-basic/galaxy-redshift-distributions.ipynb
 
 
 Advanced examples
