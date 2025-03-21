@@ -3,8 +3,6 @@ name: Test examples on label
 
 on:
   pull_request:
-    types:
-      - labeled
 
 concurrency:
   cancel-in-progress: true
@@ -17,11 +15,4 @@ jobs:
     name: Test examples
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - id: run-examples
-        uses: ./.github/actions/examples
-        timeout-minutes: 20
+      - uses: glass-dev/glass/.github/workflows/run-examples.yml@main
