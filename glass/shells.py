@@ -45,9 +45,10 @@ Weight functions
 
 from __future__ import annotations
 
+import dataclasses
 import itertools
 import warnings
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -131,7 +132,8 @@ def density_weight(
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-class RadialWindow(NamedTuple):
+@dataclasses.dataclass(frozen=True)
+class RadialWindow:
     """
     A radial window, defined by a window function.
 
@@ -151,12 +153,12 @@ class RadialWindow(NamedTuple):
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
-        AttributeError: can't set attribute
+        FrozenInstanceError: cannot assign to field 'zeff'
 
     To create a new instance with a changed attribute value, use the
-    ``._replace`` method::
+    ``dataclasses.replace`` method::
 
-        >>> w1 = w1._replace(zeff=0.15)
+        >>> w1 = dataclasses.replace(w1, zeff=0.15)
         >>> w1
         RadialWindow(za=..., wa=..., zeff=0.15)
 
@@ -168,11 +170,6 @@ class RadialWindow(NamedTuple):
         Weight array; the values (ordinates) of the window function.
     zeff
         Effective redshift of the window.
-
-    Methods
-    -------
-    _replace
-        Create a new instance with changed attribute values.
 
     """
 
@@ -578,7 +575,9 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = np.array([np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
+    a = np.array(
+        [np.interp(zp, shell.za, shell.wa, left=0.0, right=0.0) for shell in shells]
+    )
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
@@ -646,12 +645,12 @@ def partition_nnls(
         [
             np.interp(
                 zp,
-                za,
-                wa,
+                shell.za,
+                shell.wa,
                 left=0.0,
                 right=0.0,
             )
-            for za, wa, _ in shells
+            for shell in shells
         ],
     )
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
