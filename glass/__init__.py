@@ -1,8 +1,11 @@
 """GLASS package."""
 
 __all__ = [
+    "DensityWeight",
+    "DistanceWeight",
     "MultiPlaneConvergence",
     "RadialWindow",
+    "VolumeWeight",
     "algorithm",
     "check_posdef_spectra",
     "cls2cov",
@@ -11,10 +14,8 @@ __all__ = [
     "cov_from_spectra",
     "cubic_windows",
     "deflect",
-    "density_weight",
     "discretized_cls",
     "distance_grid",
-    "distance_weight",
     "effective_bias",
     "effective_cls",
     "ellipticity_gaussian",
@@ -64,7 +65,6 @@ __all__ = [
     "triaxial_axis_ratio",
     "uniform_positions",
     "vmap_galactic_ecliptic",
-    "volume_weight",
     "write_catalog",
 ]
 
@@ -137,17 +137,17 @@ from glass.shapes import (
     triaxial_axis_ratio,
 )
 from glass.shells import (
+    DensityWeight,
+    DistanceWeight,
     RadialWindow,
+    VolumeWeight,
     combine,
     cubic_windows,
-    density_weight,
     distance_grid,
-    distance_weight,
     linear_windows,
     partition,
     redshift_grid,
     restrict,
     tophat_windows,
-    volume_weight,
 )
 from glass.user import load_cls, save_cls, write_catalog
