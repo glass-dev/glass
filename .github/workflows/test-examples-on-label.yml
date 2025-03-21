@@ -13,4 +13,4 @@ jobs:
   test-examples-on-label:
     if: contains(github.event.pull_request.labels.*.name, 'run-examples')
     name: Test examples on label
-    uses: glass-dev/glass/.github/workflows/run-examples.yml@main
+    uses: glass-dev/glass/.github/workflows/run-examples.yml@saransh/run-examples-on-label
