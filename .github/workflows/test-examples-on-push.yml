@@ -18,11 +18,6 @@ on:
       - reopened
       - synchronize
 
-concurrency:
-  cancel-in-progress: true
-  group: >-
-    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-
 jobs:
   test-examples-on-push:
     if: github.event.pull_request.draft == false
