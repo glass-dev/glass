@@ -5,7 +5,7 @@ on:
   workflow_call:
 
 jobs:
-  triage:
+  run-examples:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
