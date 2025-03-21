@@ -1,0 +1,25 @@
+---
+name: Test examples
+
+on:
+  push:
+    paths:
+      - glass/**
+      - examples/**
+    branches:
+      - main
+  pull_request:
+    paths:
+      - glass/**
+      - examples/**
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+jobs:
+  test-examples-on-push:
+    if: github.event.pull_request.draft == false
+    name: On push
+    uses: glass-dev/glass/.github/workflows/run-examples.yml@main
