@@ -1,6 +1,7 @@
 """GLASS package."""
 
 __all__ = [
+    "DensityWeight",
     "DistanceWeight",
     "MultiPlaneConvergence",
     "RadialWindow",
@@ -13,7 +14,6 @@ __all__ = [
     "cov_from_spectra",
     "cubic_windows",
     "deflect",
-    "density_weight",
     "discretized_cls",
     "distance_grid",
     "effective_bias",
@@ -137,12 +137,12 @@ from glass.shapes import (
     triaxial_axis_ratio,
 )
 from glass.shells import (
+    DensityWeight,
     DistanceWeight,
     RadialWindow,
     VolumeWeight,
     combine,
     cubic_windows,
-    density_weight,
     distance_grid,
     linear_windows,
     partition,
