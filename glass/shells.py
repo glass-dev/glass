@@ -59,7 +59,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
+    from glass.cosmology import Cosmology
 
     ArrayLike1D = Sequence[float] | NDArray[np.float64]
     WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
@@ -84,7 +84,7 @@ def distance_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
 def volume_weight(
@@ -106,7 +106,10 @@ def volume_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return (  # type: ignore[no-any-return]
+        (cosmo.hubble_distance * cosmo.transverse_comoving_distance(z)) ** 2
+        / cosmo.H_over_H0(z)
+    )
 
 
 def density_weight(
@@ -128,7 +131,12 @@ def density_weight(
         The weight function evaluated at redshifts *z*.
 
     """
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+    return (  # type: ignore[no-any-return]
+        cosmo.critical_density0
+        * cosmo.Omega_m(z)
+        * (cosmo.hubble_distance * cosmo.transverse_comoving_distance(z)) ** 2
+        / cosmo.H_over_H0(z)
+    )
 
 
 class RadialWindow(NamedTuple):
@@ -809,9 +817,9 @@ def distance_grid(
         The redshift grid.
 
     """
-    xmin, xmax = cosmo.dc(zmin), cosmo.dc(zmax)
+    xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     x = _uniform_grid(xmin, xmax, step=dx, num=num)
-    return cosmo.dc_inv(x)  # type: ignore[no-any-return]
+    return cosmo.inv_comoving_distance(x)  # type: ignore[no-any-return]
 
 
 def combine(
