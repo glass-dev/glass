@@ -45,9 +45,10 @@ Weight functions
 
 from __future__ import annotations
 
+import dataclasses
 import itertools
 import warnings
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -131,7 +132,8 @@ def density_weight(
     return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-class RadialWindow(NamedTuple):
+@dataclasses.dataclass(frozen=True)
+class RadialWindow:
     """
     A radial window, defined by a window function.
 
@@ -151,12 +153,12 @@ class RadialWindow(NamedTuple):
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
-        AttributeError: can't set attribute
+        FrozenInstanceError: cannot assign to field 'zeff'
 
     To create a new instance with a changed attribute value, use the
-    ``._replace`` method::
+    ``dataclasses.replace`` method::
 
-        >>> w1 = w1._replace(zeff=0.15)
+        >>> w1 = dataclasses.replace(w1, zeff=0.15)
         >>> w1
         RadialWindow(za=..., wa=..., zeff=0.15)
 
@@ -169,16 +171,30 @@ class RadialWindow(NamedTuple):
     zeff
         Effective redshift of the window.
 
-    Methods
-    -------
-    _replace
-        Create a new instance with changed attribute values.
-
     """
 
     za: NDArray[np.float64]
     wa: NDArray[np.float64]
-    zeff: float = 0
+    zeff: float | None = None
+
+    def __post_init__(self) -> None:
+        """Magic method to calculate the effective redshift if not given."""
+        if self.zeff is None:
+            object.__setattr__(self, "zeff", self._calculate_zeff())
+
+    def _calculate_zeff(self) -> float:
+        """Calculate ``zeff`` if not given.
+
+        Returns
+        -------
+            The effective redshift depending on the size of ``za``.
+
+        """
+        if self.za.size > 0:
+            return np.trapezoid(self.za * self.wa, self.za) / np.trapezoid(
+                self.wa, self.za
+            )
+        return 0.0
 
 
 def tophat_windows(
@@ -578,7 +594,9 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = np.array([np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
+    a = np.array(
+        [np.interp(zp, shell.za, shell.wa, left=0.0, right=0.0) for shell in shells]
+    )
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
@@ -646,12 +664,12 @@ def partition_nnls(
         [
             np.interp(
                 zp,
-                za,
-                wa,
+                shell.za,
+                shell.wa,
                 left=0.0,
                 right=0.0,
             )
-            for za, wa, _ in shells
+            for shell in shells
         ],
     )
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
