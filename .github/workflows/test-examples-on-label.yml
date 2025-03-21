@@ -4,11 +4,6 @@ name: Test examples on label
 on:
   pull_request:
 
-concurrency:
-  cancel-in-progress: true
-  group: >-
-    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-
 jobs:
   test-examples-on-label:
     if: contains(github.event.pull_request.labels.*.name, 'run-examples')
