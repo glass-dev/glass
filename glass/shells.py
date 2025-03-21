@@ -175,7 +175,26 @@ class RadialWindow:
 
     za: NDArray[np.float64]
     wa: NDArray[np.float64]
-    zeff: float = 0
+    zeff: float | None = None
+
+    def __post_init__(self) -> None:
+        """Magic method to calculate the effective redshift if not given."""
+        if self.zeff is None:
+            object.__setattr__(self, "zeff", self._calculate_zeff())
+
+    def _calculate_zeff(self) -> float:
+        """Calculate ``zeff`` if not given.
+
+        Returns
+        -------
+            The effective redshift depending on the size of ``za``.
+
+        """
+        if self.za.size > 0:
+            return np.trapezoid(self.za * self.wa, self.za) / np.trapezoid(
+                self.wa, self.za
+            )
+        return 0.0
 
 
 def tophat_windows(
