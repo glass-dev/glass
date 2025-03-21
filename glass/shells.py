@@ -39,7 +39,7 @@ Weight functions
 
 .. autoclass:: DistanceWeight
 .. autoclass:: VolumeWeight
-.. autofunction:: DensityWeight
+.. autoclass:: DensityWeight
 
 """  # noqa: D400
 
