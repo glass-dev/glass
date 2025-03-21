@@ -24,13 +24,13 @@ def test_DistanceWeight(cosmo: Cosmology) -> None:  # noqa: N802
     np.testing.assert_array_less(w[1:], w[:-1])
 
 
-def test_volume_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`glass.volume_weight`."""
+def test_VolumeWeight(cosmo: Cosmology) -> None:  # noqa: N802
+    """Add unit tests for :func:`glass.VolumeWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = glass.volume_weight(z, cosmo)
+    w = glass.VolumeWeight(cosmo)(z)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0

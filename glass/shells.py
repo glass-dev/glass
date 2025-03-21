@@ -38,7 +38,7 @@ Weight functions
 ----------------
 
 .. autoclass:: DistanceWeight
-.. autofunction:: volume_weight
+.. autoclass:: VolumeWeight
 .. autofunction:: density_weight
 
 """  # noqa: D400
@@ -96,26 +96,34 @@ class DistanceWeight:
         return 1 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def volume_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
-    """
-    Uniform weight in comoving volume.
+@dataclasses.dataclass
+class VolumeWeight:
+    """Uniform weight in comoving volume.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return self.cosmo.xm(z) ** 2 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 def density_weight(

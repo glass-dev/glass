@@ -4,6 +4,7 @@ __all__ = [
     "DistanceWeight",
     "MultiPlaneConvergence",
     "RadialWindow",
+    "VolumeWeight",
     "algorithm",
     "check_posdef_spectra",
     "cls2cov",
@@ -64,7 +65,6 @@ __all__ = [
     "triaxial_axis_ratio",
     "uniform_positions",
     "vmap_galactic_ecliptic",
-    "volume_weight",
     "write_catalog",
 ]
 
@@ -139,6 +139,7 @@ from glass.shapes import (
 from glass.shells import (
     DistanceWeight,
     RadialWindow,
+    VolumeWeight,
     combine,
     cubic_windows,
     density_weight,
@@ -148,6 +149,5 @@ from glass.shells import (
     redshift_grid,
     restrict,
     tophat_windows,
-    volume_weight,
 )
 from glass.user import load_cls, save_cls, write_catalog
