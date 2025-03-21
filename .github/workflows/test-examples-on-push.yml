@@ -24,9 +24,7 @@ concurrency:
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
-  test-examples:
+  test-examples-on-push:
     if: github.event.pull_request.draft == false
-    name: Test examples
-    runs-on: ubuntu-latest
-    steps:
-      - uses: glass-dev/glass/.github/workflows/run-examples.yml@main
+    name: Test examples on push
+    uses: glass-dev/glass/.github/workflows/run-examples.yml@main
