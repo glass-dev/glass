@@ -4,6 +4,11 @@ name: Run examples (reusable workflow)
 on:
   workflow_call:
 
+concurrency:
+  cancel-in-progress: true
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
 jobs:
   run-examples:
     runs-on: ubuntu-latest
