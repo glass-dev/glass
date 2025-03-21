@@ -25,7 +25,7 @@ def test_DistanceWeight(cosmo: Cosmology) -> None:  # noqa: N802
 
 
 def test_VolumeWeight(cosmo: Cosmology) -> None:  # noqa: N802
-    """Add unit tests for :func:`glass.VolumeWeight`."""
+    """Add unit tests for :class:`glass.VolumeWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
@@ -61,7 +61,7 @@ def test_DensityWeight(cosmo: Cosmology) -> None:  # noqa: N802
 
 
 def test_tophat_windows() -> None:
-    """Add unit tests for :class:`glass.tophat_windows`."""
+    """Add unit tests for :func:`glass.tophat_windows`."""
     zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
 
