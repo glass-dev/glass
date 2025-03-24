@@ -151,6 +151,10 @@ def cosmo() -> Cosmology:
             """Inverse function for the comoving distance in Mpc."""
             return 1_000 * (1 / (dc + np.finfo(float).eps))
 
+        def Omega_m(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
+            """Matter density parameter at redshift z."""
+            return self.rho_m_z(z) / self.critical_density0
+
     return MockCosmology()
 
 
