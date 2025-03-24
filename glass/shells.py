@@ -37,14 +37,15 @@ Redshift grids
 Weight functions
 ----------------
 
-.. autofunction:: distance_weight
-.. autofunction:: volume_weight
-.. autofunction:: density_weight
+.. autoclass:: DistanceWeight
+.. autoclass:: VolumeWeight
+.. autoclass:: DensityWeight
 
 """  # noqa: D400
 
 from __future__ import annotations
 
+import dataclasses
 import itertools
 import warnings
 from typing import TYPE_CHECKING, NamedTuple
@@ -65,78 +66,105 @@ if TYPE_CHECKING:
     WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
-def distance_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
-    """
-    Uniform weight in comoving distance.
+@dataclasses.dataclass
+class DistanceWeight:
+    """Uniform weight in comoving distance.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return 1 / cosmo.H_over_H0(z)  # type: ignore[no-any-return]
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return 1 / self.cosmo.H_over_H0(z)  # type: ignore[no-any-return]
 
 
-def volume_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
-    """
-    Uniform weight in comoving volume.
+@dataclasses.dataclass
+class VolumeWeight:
+    """Uniform weight in comoving volume.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return (  # type: ignore[no-any-return]
-        (cosmo.transverse_comoving_distance(z) / cosmo.hubble_distance) ** 2
-        / cosmo.H_over_H0(z)
-    )
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return (  # type: ignore[no-any-return]
+            (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
+            ** 2
+            / self.cosmo.H_over_H0(z)
+        )
 
 
-def density_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
+@dataclasses.dataclass
+class DensityWeight:
     """
     Uniform weight in matter density.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return (  # type: ignore[no-any-return]
-        cosmo.critical_density0
-        * cosmo.Omega_m(z)
-        * (cosmo.transverse_comoving_distance(z) / cosmo.hubble_distance) ** 2
-        / cosmo.H_over_H0(z)
-    )
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return (  # type: ignore[no-any-return]
+            self.cosmo.critical_density0
+            * self.cosmo.Omega_m(z)
+            * (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
+            ** 2
+            / self.cosmo.H_over_H0(z)
+        )
 
 
 class RadialWindow(NamedTuple):
