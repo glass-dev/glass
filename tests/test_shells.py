@@ -6,7 +6,7 @@ from cosmology import Cosmology
 import glass
 
 
-def test_DistanceWeight(cosmo: Cosmology) -> None:  # noqa: N802
+def test_distance_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.DistanceWeight`."""
     z = np.linspace(0, 1, 6)
 
@@ -24,7 +24,7 @@ def test_DistanceWeight(cosmo: Cosmology) -> None:  # noqa: N802
     np.testing.assert_array_less(w[1:], w[:-1])
 
 
-def test_VolumeWeight(cosmo: Cosmology) -> None:  # noqa: N802
+def test_volume_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.VolumeWeight`."""
     z = np.linspace(0, 1, 6)
 
@@ -42,7 +42,7 @@ def test_VolumeWeight(cosmo: Cosmology) -> None:  # noqa: N802
     np.testing.assert_array_less(w[:-1], w[1:])
 
 
-def test_DensityWeight(cosmo: Cosmology) -> None:  # noqa: N802
+def test_density_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
