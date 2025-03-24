@@ -474,15 +474,13 @@ class MultiPlaneConvergence:
         # extrapolation law
         x2, self.x3 = (
             self.x3,
-            self.cosmo.hubble_distance
-            * self.cosmo.transverse_comoving_distance(self.z3),
+            self.cosmo.transverse_comoving_distance(self.z3)
+            / self.cosmo.hubble_distance,
         )
         r12 = self.r23
-        r13, self.r23 = (
-            self.cosmo.hubble_distance
-            * self.cosmo.transverse_comoving_distance([z1, self.z2], self.z3)
-            / self.x3
-        )
+        r13, self.r23 = self.cosmo.transverse_comoving_distance(
+            [z1, self.z2], self.z3
+        ) / (self.cosmo.hubble_distance * self.x3)
         t = r13 / r12
 
         # lensing weight of mass plane to be added
