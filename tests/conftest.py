@@ -161,7 +161,7 @@ def cosmo() -> Cosmology:
             z2: NDArray[np.float64] | None = None,
         ) -> NDArray[np.float64]:
             """Transverse comoving distance :math:`d_M(z)` in Mpc."""
-            return self.xm(z) if z2 is None else self.xm(z, z2)
+            return self.hubble_distance * self.xm(z, z2)
 
     return MockCosmology()
 
