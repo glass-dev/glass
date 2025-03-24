@@ -191,9 +191,10 @@ class RadialWindow:
 
         """
         if self.za.size > 0:
-            return np.trapezoid(self.za * self.wa, self.za) / np.trapezoid(
-                self.wa, self.za
-            )
+            return np.trapezoid(  # type: ignore[return-value]
+                self.za * self.wa,
+                self.za,
+            ) / np.trapezoid(self.wa, self.za)
         return 0.0
 
 

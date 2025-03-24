@@ -738,7 +738,12 @@ def lognormal_fields(
     if shift is None:
         shift = lambda _z: 1.0  # noqa: E731
 
-    return [glass.grf.Lognormal(shift(shell.zeff)) for shell in shells]
+    return [
+        glass.grf.Lognormal(
+            shift(shell.zeff)  # type: ignore[arg-type]
+        )
+        for shell in shells
+    ]
 
 
 def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
