@@ -400,27 +400,42 @@ def _generate_grf(
         msg = "all gls are empty"
         raise ValueError(msg)
 
-    # generates the covariance matrix for the iterative sampler
-    cov = cls2cov(gls, n, ngrf, ncorr)
-
     # working arrays for the iterative sampling
     z = np.zeros(n * (n + 1) // 2, dtype=np.complex128)
     y = np.zeros((n * (n + 1) // 2, ncorr), dtype=np.complex128)
 
+    blocks = []
+    block_ns = []
+    for j in range(len(gls)):
+        block = [gls[i][j : j + 1] for i in range(j, len(gls))]
+        blocks.append(block)
+        block_ns.append(len(gls) - j)
+
     # generate the conditional normal distribution for iterative sampling
-    conditional_dist = iternorm(ncorr, cov, size=n)
+    conditional_dists = []
+    for block, block_n in zip(blocks, block_ns, strict=False):
+        # generate the covariance matrix of this block for the iterative sampler
+        block_cov = cls2cov(block, block_n, ngrf, ncorr)
+        # generate the conditional normal distribution for iterative sampling
+        conditional_dist = iternorm(ncorr, block_cov, size=block_n)
+        # store for parallel processing of all blocks
+        conditional_dists.append(conditional_dist)
 
     # sample the fields from the conditional distribution
-    for j, a, s in conditional_dist:
+    for results in zip(*conditional_dists, strict=False):
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
         rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))
+
+        # concatenate individual updates into one update
+        s = np.concatenate([block_s for _, _, block_s in results])
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
         alm = _multalm(z, s)
 
         # add the mean of the conditional distribution
+        a = np.concatenate([block_a for _, block_a, _ in results])
         for i in range(ncorr):
             alm += _multalm(y[:, i], a[:, i])
 
