@@ -112,6 +112,11 @@ def cosmo() -> Cosmology:
             """Critical density at redshift 0 in Msol Mpc-3."""
             return 3e4
 
+        @property
+        def hubble_distance(self) -> float:
+            """Hubble distance in Mpc."""
+            return 4.4e3
+
         def H_over_H0(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
             """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
             return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
