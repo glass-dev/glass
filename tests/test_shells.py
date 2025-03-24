@@ -7,12 +7,12 @@ import glass
 
 
 def test_distance_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`glass.distance_weight`."""
+    """Add unit tests for :class:`glass.DistanceWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = glass.distance_weight(z, cosmo)
+    w = glass.DistanceWeight(cosmo)(z)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 1
@@ -25,12 +25,12 @@ def test_distance_weight(cosmo: Cosmology) -> None:
 
 
 def test_volume_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`glass.volume_weight`."""
+    """Add unit tests for :class:`glass.VolumeWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = glass.volume_weight(z, cosmo)
+    w = glass.VolumeWeight(cosmo)(z)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0
@@ -43,12 +43,12 @@ def test_volume_weight(cosmo: Cosmology) -> None:
 
 
 def test_density_weight(cosmo: Cosmology) -> None:
-    """Add unit tests for :func:`glass.density_weight`."""
+    """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = glass.density_weight(z, cosmo)
+    w = glass.DensityWeight(cosmo)(z)
     np.testing.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0
