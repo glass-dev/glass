@@ -318,20 +318,20 @@ def test_radial_window_immutable() -> None:
 
     w = glass.RadialWindow(za, wa, zeff)
 
-    with pytest.raises(dataclasses.FrozenInstanceError) as excinfo:
+    with pytest.raises(
+        dataclasses.FrozenInstanceError, match="cannot assign to field 'za'"
+    ):
         w.za = za
 
-    assert str(excinfo.value) == "cannot assign to field 'za'"
-
-    with pytest.raises(dataclasses.FrozenInstanceError) as excinfo:
+    with pytest.raises(
+        dataclasses.FrozenInstanceError, match="cannot assign to field 'wa'"
+    ):
         w.wa = wa
 
-    assert str(excinfo.value) == "cannot assign to field 'wa'"
-
-    with pytest.raises(dataclasses.FrozenInstanceError) as excinfo:
+    with pytest.raises(
+        dataclasses.FrozenInstanceError, match="cannot assign to field 'zeff'"
+    ):
         w.zeff = zeff
-
-    assert str(excinfo.value) == "cannot assign to field 'zeff'"
 
 
 def test_radial_window_zeff_none() -> None:
