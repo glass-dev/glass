@@ -177,8 +177,8 @@ class RadialWindow:
         >>> w1 = glass.RadialWindow(..., ..., zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
-          File "<stdin>", line 1, in <module>
-        FrozenInstanceError: cannot assign to field 'zeff'
+          File "<string>", line 4, in __setattr__
+        dataclasses.FrozenInstanceError: cannot assign to field 'zeff'
 
     To create a new instance with a changed attribute value, use the
     ``dataclasses.replace`` method::
