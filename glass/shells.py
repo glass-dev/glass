@@ -37,9 +37,9 @@ Redshift grids
 Weight functions
 ----------------
 
-.. autofunction:: distance_weight
-.. autofunction:: volume_weight
-.. autofunction:: density_weight
+.. autoclass:: DistanceWeight
+.. autoclass:: VolumeWeight
+.. autoclass:: DensityWeight
 
 """  # noqa: D400
 
@@ -66,70 +66,95 @@ if TYPE_CHECKING:
     WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
-def distance_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
-    """
-    Uniform weight in comoving distance.
+@dataclasses.dataclass
+class DistanceWeight:
+    """Uniform weight in comoving distance.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return 1 / cosmo.ef(z)  # type: ignore[no-any-return]
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return 1 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def volume_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
-    """
-    Uniform weight in comoving volume.
+@dataclasses.dataclass
+class VolumeWeight:
+    """Uniform weight in comoving volume.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return self.cosmo.xm(z) ** 2 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-def density_weight(
-    z: NDArray[np.float64],
-    cosmo: Cosmology,
-) -> NDArray[np.float64]:
+@dataclasses.dataclass
+class DensityWeight:
     """
     Uniform weight in matter density.
 
-    Parameters
+    Attributes
     ----------
-    z
-        The redshifts at which to evaluate the weight.
     cosmo
         Cosmology instance.
 
-    Returns
-    -------
-        The weight function evaluated at redshifts *z*.
-
     """
-    return cosmo.rho_m_z(z) * cosmo.xm(z) ** 2 / cosmo.ef(z)  # type: ignore[no-any-return]
+
+    cosmo: Cosmology
+
+    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Uniform weight in comoving distance.
+
+        Parameters
+        ----------
+        z
+            The redshifts at which to evaluate the weight.
+
+        Returns
+        -------
+            The weight function evaluated at redshifts *z*.
+
+        """
+        return self.cosmo.rho_m_z(z) * self.cosmo.xm(z) ** 2 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
 @dataclasses.dataclass(frozen=True)
