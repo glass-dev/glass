@@ -64,6 +64,7 @@ def coverage(session: nox.Session) -> None:
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
     session.posargs.append("--doctest-plus")
+    session.posargs.append("--doctest-plus-generate-diff=overwrite")
     session.posargs.append("glass")
     tests(session)
 
