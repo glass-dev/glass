@@ -1,3 +1,5 @@
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -306,3 +308,27 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
 def test_combine() -> None:
     """Add unit tests for :func:`glass.combine`."""
+
+
+def test_radial_window_immutable() -> None:
+    """Checks that the :class:`RadialWindow` class is immutable."""
+    wa = np.array([0.0, 1.0, 0.0])
+    za = np.array([0.0, 1.0, 2.0])
+    zeff = 1.0
+
+    w = glass.RadialWindow(za, wa, zeff)
+
+    with pytest.raises(dataclasses.FrozenInstanceError) as excinfo:
+        w.za = za
+
+    assert str(excinfo.value) == "cannot assign to field 'za'"
+
+    with pytest.raises(dataclasses.FrozenInstanceError) as excinfo:
+        w.wa = wa
+
+    assert str(excinfo.value) == "cannot assign to field 'wa'"
+
+    with pytest.raises(dataclasses.FrozenInstanceError) as excinfo:
+        w.zeff = 1.0
+
+    assert str(excinfo.value) == "cannot assign to field 'zeff'"
