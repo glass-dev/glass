@@ -175,7 +175,7 @@ class RadialWindow:
 
     za: NDArray[np.float64]
     wa: NDArray[np.float64]
-    zeff: float | None = None
+    zeff: float | None = dataclasses.field(default=None)
 
     def __post_init__(self) -> None:
         """Magic method to calculate the effective redshift if not given."""
