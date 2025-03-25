@@ -337,6 +337,7 @@ def test_radial_window_immutable() -> None:
 def test_radial_window_zeff_none() -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
+
     wa = np.array([0.0, 1.0, 0.0])
     za = np.array([0.0, 1.0, 2.0])
 
@@ -345,6 +346,7 @@ def test_radial_window_zeff_none() -> None:
     np.testing.assert_equal(w.zeff, 1.0)
 
     # check zeff is 0.0 when redshift array is empty
+
     za = np.array([])
 
     w = glass.RadialWindow(za, wa)
