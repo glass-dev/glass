@@ -4,24 +4,23 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 if TYPE_CHECKING:
+    import numpy as np
+    from jax.typing import ArrayLike
     from numpy.typing import NDArray
 
 
 def nnls(
-    a: NDArray[np.float64],
-    b: NDArray[np.float64],
+    a: NDArray[np.float64] | ArrayLike,
+    b: NDArray[np.float64] | ArrayLike,
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | ArrayLike:
     """
     Compute a non-negative least squares solution.
 
-    Implementation of the algorithm due to [Lawson95]_ as described by
-    [Bro97]_.
+    Implementation of the algorithm due to [1] as described in [2].
 
     Parameters
     ----------
@@ -47,9 +46,20 @@ def nnls(
     ValueError
         If the shapes of ``a`` and ``b`` do not match.
 
+    References
+    ----------
+    * [1] Lawson, C. L. and Hanson, R. J. (1995), Solving Least Squares
+          Problems. doi: 10.1137/1.9781611971217
+    * [2] Bro, R. and De Jong, S. (1997), A fast
+          non-negativity-constrained least squares algorithm. J.
+          Chemometrics, 11, 393-401.
+
     """
-    a = np.asanyarray(a)
-    b = np.asanyarray(b)
+    if a.__array_namespace__() != b.__array_namespace__():
+        msg = "input arrays should belong to the same array library"
+        raise ValueError(msg)
+
+    xp = a.__array_namespace__()
 
     if a.ndim != 2:
         msg = "input `a` is not a matrix"
@@ -66,25 +76,25 @@ def nnls(
     if maxiter is None:
         maxiter = 3 * n
 
-    index = np.arange(n)
-    p = np.full(n, fill_value=False)
-    x = np.zeros(n)
+    index = xp.arange(n)
+    p = xp.full(n, fill_value=False)
+    x = xp.zeros(n)
     for _ in range(maxiter):
-        if np.all(p):
+        if xp.all(p):
             break
-        w = np.dot(b - a @ x, a)
-        m = index[~p][np.argmax(w[~p])]
+        w = xp.linalg.vecdot(b - a @ x, a, axis=0)
+        m = index[~p][xp.argmax(w[~p])]
         if w[m] <= tol:
             break
         p[m] = True
         while True:
             ap = a[:, p]
-            xp = x[p]
-            sp = np.linalg.solve(ap.T @ ap, b @ ap)
+            x_new = x[p]
+            sp = xp.linalg.solve(ap.T @ ap, b @ ap)
             t = sp <= 0
-            if not np.any(t):
+            if not xp.any(t):
                 break
-            alpha = -np.min(xp[t] / (xp[t] - sp[t]))
+            alpha = -xp.min(x_new[t] / (x_new[t] - sp[t]))
             x[p] += alpha * (sp - xp)
             p[x <= 0] = False
         x[p] = sp
