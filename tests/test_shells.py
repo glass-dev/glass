@@ -1,9 +1,8 @@
 import numpy as np
 import pytest
 
-from cosmology import Cosmology
-
 import glass
+from glass.cosmology import Cosmology
 
 
 def test_distance_weight(cosmo: Cosmology) -> None:

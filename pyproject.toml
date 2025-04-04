@@ -20,7 +20,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "cosmology>=2022.10.9",
+    "cosmology.api>=0.2.0",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "numpy>=2.1.1",
@@ -52,6 +52,7 @@ docs = [
 ]
 examples = [
     "camb",
+    "cosmology.compat.camb",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
@@ -147,7 +148,6 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
-    "glass.ext.camb",
 ], section-order = [
     "future",
     "standard-library",
@@ -157,7 +157,6 @@ lint.isort = {known-first-party = [
     "local-folder",
 ], sections = {"cosmo" = [
     "camb",
-    "camb.sources",
     "cosmology",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
