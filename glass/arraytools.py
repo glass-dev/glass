@@ -11,12 +11,13 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Unpack
 
+    from jax.typing import ArrayLike
     from numpy.typing import DTypeLike, NDArray
 
 
 def broadcast_first(
-    *arrays: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], ...]:
+    *arrays: NDArray[np.float64] | ArrayLike,
+) -> tuple[NDArray[np.float64] | ArrayLike, ...]:
     """
     Broadcast arrays, treating the first axis as common.
 
@@ -37,12 +38,12 @@ def broadcast_first(
 
 def broadcast_leading_axes(
     *args: tuple[
-        float | NDArray[np.float64],
+        float | NDArray[np.float64] | ArrayLike,
         int,
     ],
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[NDArray[np.float64], ...]],
+    Unpack[tuple[NDArray[np.float64] | ArrayLike, ...]],
 ]:
     """
     Broadcast all but the last N axes.
@@ -90,14 +91,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | NDArray[np.float64],
-    xp: Sequence[float] | NDArray[np.float64],
-    fp: Sequence[float] | NDArray[np.float64],
+    x: float | NDArray[np.float64] | ArrayLike,
+    xp: Sequence[float] | NDArray[np.float64] | ArrayLike,
+    fp: Sequence[float] | NDArray[np.float64] | ArrayLike,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | ArrayLike:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -134,13 +135,13 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapezoid_product(
-    f: tuple[NDArray[np.float64], NDArray[np.float64]],
+    f: tuple[NDArray[np.float64] | ArrayLike, NDArray[np.float64] | ArrayLike],
     *ff: tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
+        NDArray[np.float64] | ArrayLike,
+        NDArray[np.float64] | ArrayLike,
     ],
     axis: int = -1,
-) -> float | NDArray[np.float64]:
+) -> float | NDArray[np.float64] | ArrayLike:
     """
     Trapezoidal rule for a product of functions.
 
@@ -158,7 +159,7 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
-    x: NDArray[np.float64]
+    x: NDArray[np.float64] | ArrayLike
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
@@ -172,11 +173,11 @@ def trapezoid_product(
 
 
 def cumulative_trapezoid(
-    f: NDArray[np.int_] | NDArray[np.float64],
-    x: NDArray[np.int_] | NDArray[np.float64],
+    f: NDArray[np.int_] | NDArray[np.float64] | ArrayLike,
+    x: NDArray[np.int_] | NDArray[np.float64] | ArrayLike,
     dtype: DTypeLike | None = None,
-    out: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    out: NDArray[np.float64] | ArrayLike | None = None,
+) -> NDArray[np.float64] | ArrayLike:
     """
     Cumulative trapezoidal rule along last axis.
 
