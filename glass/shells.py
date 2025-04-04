@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import dataclasses
 import itertools
+import math
 import warnings
 from typing import TYPE_CHECKING
 
@@ -200,11 +201,11 @@ class RadialWindow:
 
     za: NDArray[np.float64]
     wa: NDArray[np.float64]
-    zeff: float | None = dataclasses.field(default=None)
+    zeff: float = dataclasses.field(default=math.nan)
 
     def __post_init__(self) -> None:
         """Magic method to calculate the effective redshift if not given."""
-        if self.zeff is None:
+        if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
     def _calculate_zeff(self) -> float:
