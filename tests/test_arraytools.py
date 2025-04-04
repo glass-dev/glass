@@ -57,39 +57,39 @@ def test_broadcast_leading_axes() -> None:
 def test_ndinterp() -> None:
     # test 1d interpolation
 
-    xq = np.array([0, 1, 2, 3, 4])
-    yq = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
+    xq = np.asarray([0, 1, 2, 3, 4])
+    yq = np.asarray([1.1, 1.2, 1.3, 1.4, 1.5])
 
     x: float | NDArray[np.float64] = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert np.shape(y) == ()
     np.testing.assert_allclose(y, 1.15, atol=1e-15)
 
-    x = np.array([0.5, 1.5, 2.5])
+    x = np.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert np.shape(y) == (3,)
     np.testing.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
 
-    x = np.array([[0.5, 1.5], [2.5, 3.5]])
+    x = np.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert np.shape(y) == (2, 2)
     np.testing.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
     # test nd interpolation in final axis
 
-    yq = np.array([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
+    yq = np.asarray([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
 
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert np.shape(y) == (2,)
     np.testing.assert_allclose(y, [1.15, 2.15], atol=1e-15)
 
-    x = np.array([0.5, 1.5, 2.5])
+    x = np.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert np.shape(y) == (2, 3)
     np.testing.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
 
-    x = np.array([[0.5, 1.5], [2.5, 3.5]])
+    x = np.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert np.shape(y) == (2, 2, 2)
     np.testing.assert_allclose(
@@ -100,7 +100,7 @@ def test_ndinterp() -> None:
 
     # test nd interpolation in middle axis
 
-    yq = np.array(
+    yq = np.asarray(
         [[[1.1], [1.2], [1.3], [1.4], [1.5]], [[2.1], [2.2], [2.3], [2.4], [2.5]]],
     )
 
@@ -109,7 +109,7 @@ def test_ndinterp() -> None:
     assert np.shape(y) == (2, 1)
     np.testing.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
 
-    x = np.array([0.5, 1.5, 2.5])
+    x = np.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
     assert np.shape(y) == (2, 3, 1)
     np.testing.assert_allclose(
@@ -118,7 +118,7 @@ def test_ndinterp() -> None:
         atol=1e-15,
     )
 
-    x = np.array([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
+    x = np.asarray([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
     assert np.shape(y) == (2, 3, 4, 1)
     np.testing.assert_allclose(
@@ -154,18 +154,18 @@ def test_trapezoid_product() -> None:
 def test_cumulative_trapezoid() -> None:
     # 1D f and x
 
-    f = np.array([1, 2, 3, 4])
-    x = np.array([0, 1, 2, 3])
+    f = np.asarray([1, 2, 3, 4])
+    x = np.asarray([0, 1, 2, 3])
 
     # default dtype (int)
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    np.testing.assert_allclose(ct, np.array([0, 1, 4, 7]))
+    np.testing.assert_allclose(ct, np.asarray([0, 1, 4, 7]))
 
     # explicit dtype (float)
 
     ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float)
-    np.testing.assert_allclose(ct, np.array([0.0, 1.5, 4.0, 7.5]))
+    np.testing.assert_allclose(ct, np.asarray([0.0, 1.5, 4.0, 7.5]))
 
     # explicit return array
 
@@ -175,19 +175,19 @@ def test_cumulative_trapezoid() -> None:
 
     # 2D f and 1D x
 
-    f = np.array([[1, 4, 9, 16], [2, 3, 5, 7]])
-    x = np.array([0, 1, 2.5, 4])
+    f = np.asarray([[1, 4, 9, 16], [2, 3, 5, 7]])
+    x = np.asarray([0, 1, 2.5, 4])
 
     # default dtype (int)
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    np.testing.assert_allclose(ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
+    np.testing.assert_allclose(ct, np.asarray([[0, 2, 12, 31], [0, 2, 8, 17]]))
 
     # explicit dtype (float)
 
     ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float)
     np.testing.assert_allclose(
-        ct, np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]])
+        ct, np.asarray([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]])
     )
 
     # explicit return array
