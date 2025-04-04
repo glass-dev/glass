@@ -1,20 +1,24 @@
+import types
+
 import numpy as np
 import pytest
+from tests.conftest import array_api_compatible
 
 import glass.algorithm
 
 
-def test_nnls(rng: np.random.Generator) -> None:
+@array_api_compatible
+def test_nnls(rng: np.random.Generator, xp: types.ModuleType) -> None:
     # check output
 
-    a = np.arange(25.0).reshape(-1, 5)
-    b = np.arange(5.0)
+    a = xp.arange(25.0).reshape(-1, 5)
+    b = xp.arange(5.0)
     y = a @ b
     res = glass.algorithm.nnls(a, y)
-    assert np.linalg.norm((a @ res) - y) < 1e-7
+    assert xp.linalg.vector_norm((a @ res) - y) < 1e-7
 
     a = rng.uniform(low=-10, high=10, size=[50, 10])
-    b = np.abs(rng.uniform(low=-2, high=2, size=[10]))
+    b = xp.abs(rng.uniform(low=-2, high=2, size=[10]))
     b[::2] = 0
     x = a @ b
     res = glass.algorithm.nnls(a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0))
