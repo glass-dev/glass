@@ -55,21 +55,21 @@ def test_cov_clip(rng: np.random.Generator, xp: types.ModuleType):
     cov = glass.algorithm.cov_clip(a, rtol=1.0)
 
     # make sure all eigenvalues are positive
-    h = xp.linalg.eigvalsh(a).max()
+    h = xp.max(xp.linalg.eigvalsh(a))
     np.testing.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
 @array_api_compatible
 def test_nearcorr(xp: types.ModuleType):
     # from Higham (2002)
-    a = xp.array(
+    a = xp.asarray(
         [
             [1.0, 1.0, 0.0],
             [1.0, 1.0, 1.0],
             [0.0, 1.0, 1.0],
         ],
     )
-    b = xp.array(
+    b = xp.asarray(
         [
             [1.0000, 0.7607, 0.1573],
             [0.7607, 1.0000, 0.7607],
@@ -113,8 +113,8 @@ def test_cov_nearest(
     assert xp.all(xp.linalg.eigvalsh(cov) >= 0)
 
     # get normalisation
-    sq_d = xp.sqrt(a.diagonal())
-    norm = xp.outer(sq_d, sq_d)
+    sq_d = xp.sqrt(xp.linalg.diagonal(a))
+    norm = xp.linalg.outer(sq_d, sq_d)
 
     # make sure nearcorr was called with correct input
     nearcorr.assert_called_once()
@@ -125,4 +125,4 @@ def test_cov_nearest(
 
     # cannot deal with negative variances
     with pytest.raises(ValueError, match="negative values"):
-        glass.algorithm.cov_nearest(xp.diag(xp.array([1, 1, -1])))
+        glass.algorithm.cov_nearest(xp.asarray([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
