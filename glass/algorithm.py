@@ -177,7 +177,7 @@ def nearcorr(
         tol = n * xp.finfo(a.dtype).eps
 
     # current result, flatten leading dimensions
-    y = a.reshape(-1, n, n)
+    y = xp.reshape(a, (-1, n, n))
 
     # initial correction is zero
     ds = xp.zeros_like(a)
@@ -204,7 +204,8 @@ def nearcorr(
             break
 
     # return result in original shape
-    return y.reshape(*dim, n, n)
+    near_corr_matrix: NDArray[np.float64] = xp.reshape(y, (*dim, n, n))
+    return near_corr_matrix
 
 
 def cov_nearest(
@@ -249,5 +250,5 @@ def cov_nearest(
     norm = norm[..., None, :] * norm[..., :, None]
 
     # find nearest correlation matrix
-    corr = cov / xp.where(norm > 0, norm, 1.0)
+    corr = cov / xp.where(norm > 0, norm, xp.asarray([1.0]))
     return nearcorr(corr, niter=niter, tol=tol) * norm
