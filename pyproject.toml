@@ -23,6 +23,7 @@ dependencies = [
     "cosmology>=2022.10.9",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
+    "jax>=0.5.3",
     "numpy>=2.1.1",
     "transformcl>=2022.8.9",
 ]
