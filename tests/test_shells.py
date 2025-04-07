@@ -1,4 +1,5 @@
 import dataclasses
+import math
 
 import numpy as np
 import pytest
@@ -351,4 +352,4 @@ def test_radial_window_zeff_none() -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    np.testing.assert_equal(w.zeff, 0.0)
+    np.testing.assert_equal(w.zeff, math.nan)
