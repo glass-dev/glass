@@ -57,7 +57,7 @@ import glass.algorithm
 import glass.arraytools
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterator, Sequence
 
     from numpy.typing import NDArray
 
@@ -207,6 +207,16 @@ class RadialWindow:
         """Magic method to calculate the effective redshift if not given."""
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
+
+    def __iter__(self) -> Iterator[NDArray[np.float64] | float]:
+        """
+        Iterate over the window function and effective redshift.
+
+        To be removed upon deprecation of ``glass.ext.camb``.
+        """
+        yield self.za
+        yield self.wa
+        yield self.zeff
 
     def _calculate_zeff(self) -> float:
         """Calculate ``zeff`` if not given.
@@ -621,9 +631,7 @@ def partition_lstsq(
     dz = np.gradient(zp)
 
     # create the window function matrix
-    a = np.array(
-        [np.interp(zp, shell.za, shell.wa, left=0.0, right=0.0) for shell in shells]
-    )
+    a = np.array([np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
@@ -688,16 +696,7 @@ def partition_nnls(
 
     # create the window function matrix
     a = np.array(
-        [
-            np.interp(
-                zp,
-                shell.za,
-                shell.wa,
-                left=0.0,
-                right=0.0,
-            )
-            for shell in shells
-        ],
+        [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
     )
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
