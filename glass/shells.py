@@ -47,8 +47,9 @@ from __future__ import annotations
 
 import dataclasses
 import itertools
+import math
 import warnings
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -56,7 +57,7 @@ import glass.algorithm
 import glass.arraytools
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterator, Sequence
 
     from numpy.typing import NDArray
 
@@ -157,7 +158,8 @@ class DensityWeight:
         return self.cosmo.rho_m_z(z) * self.cosmo.xm(z) ** 2 / self.cosmo.ef(z)  # type: ignore[no-any-return]
 
 
-class RadialWindow(NamedTuple):
+@dataclasses.dataclass(frozen=True)
+class RadialWindow:
     """
     A radial window, defined by a window function.
 
@@ -176,13 +178,13 @@ class RadialWindow(NamedTuple):
         >>> w1 = glass.RadialWindow(..., ..., zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
-          File "<stdin>", line 1, in <module>
-        AttributeError: can't set attribute
+          File "<string>", line 4, in __setattr__
+        dataclasses.FrozenInstanceError: cannot assign to field 'zeff'
 
     To create a new instance with a changed attribute value, use the
-    ``._replace`` method::
+    ``dataclasses.replace`` method::
 
-        >>> w1 = w1._replace(zeff=0.15)
+        >>> w1 = dataclasses.replace(w1, zeff=0.15)
         >>> w1
         RadialWindow(za=..., wa=..., zeff=0.15)
 
@@ -195,16 +197,39 @@ class RadialWindow(NamedTuple):
     zeff
         Effective redshift of the window.
 
-    Methods
-    -------
-    _replace
-        Create a new instance with changed attribute values.
-
     """
 
     za: NDArray[np.float64]
     wa: NDArray[np.float64]
-    zeff: float = 0
+    zeff: float = math.nan
+
+    def __post_init__(self) -> None:
+        """Magic method to calculate the effective redshift if not given."""
+        if math.isnan(self.zeff):
+            object.__setattr__(self, "zeff", self._calculate_zeff())
+
+    def __iter__(self) -> Iterator[NDArray[np.float64] | float]:
+        """
+        Iterate over the window function and effective redshift.
+
+        To be removed upon deprecation of ``glass.ext.camb``.
+        """
+        yield from (self.za, self.wa, self.zeff)
+
+    def _calculate_zeff(self) -> float:
+        """Calculate ``zeff`` if not given.
+
+        Returns
+        -------
+            The effective redshift depending on the size of ``za``.
+
+        """
+        if self.za.size > 0:
+            return np.trapezoid(  # type: ignore[return-value]
+                self.za * self.wa,
+                self.za,
+            ) / np.trapezoid(self.wa, self.za)
+        return math.nan
 
 
 def tophat_windows(
@@ -669,16 +694,7 @@ def partition_nnls(
 
     # create the window function matrix
     a = np.array(
-        [
-            np.interp(
-                zp,
-                za,
-                wa,
-                left=0.0,
-                right=0.0,
-            )
-            for za, wa, _ in shells
-        ],
+        [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
     )
     a /= np.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz

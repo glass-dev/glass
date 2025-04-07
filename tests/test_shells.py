@@ -1,3 +1,6 @@
+import dataclasses
+import math
+
 import numpy as np
 import pytest
 
@@ -306,3 +309,47 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
 def test_combine() -> None:
     """Add unit tests for :func:`glass.combine`."""
+
+
+def test_radial_window_immutable() -> None:
+    """Checks the :class:`RadialWindow` class is immutable."""
+    wa = np.array([0.0, 1.0, 0.0])
+    za = np.array([0.0, 1.0, 2.0])
+    zeff = 1.0
+
+    w = glass.RadialWindow(za, wa, zeff)
+
+    with pytest.raises(
+        dataclasses.FrozenInstanceError, match="cannot assign to field 'za'"
+    ):
+        w.za = za
+
+    with pytest.raises(
+        dataclasses.FrozenInstanceError, match="cannot assign to field 'wa'"
+    ):
+        w.wa = wa
+
+    with pytest.raises(
+        dataclasses.FrozenInstanceError, match="cannot assign to field 'zeff'"
+    ):
+        w.zeff = zeff
+
+
+def test_radial_window_zeff_none() -> None:
+    """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
+    # check zeff is computed when not provided
+
+    wa = np.array([0.0, 1.0, 0.0])
+    za = np.array([0.0, 1.0, 2.0])
+
+    w = glass.RadialWindow(za, wa)
+
+    np.testing.assert_equal(w.zeff, 1.0)
+
+    # check zeff is NaN when redshift array is empty
+
+    za = np.array([])
+
+    w = glass.RadialWindow(za, wa)
+
+    np.testing.assert_equal(w.zeff, math.nan)
