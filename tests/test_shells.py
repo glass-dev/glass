@@ -346,7 +346,7 @@ def test_radial_window_zeff_none() -> None:
 
     np.testing.assert_equal(w.zeff, 1.0)
 
-    # check zeff is 0.0 when redshift array is empty
+    # check zeff is NaN when redshift array is empty
 
     za = np.array([])
 
