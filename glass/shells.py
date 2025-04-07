@@ -221,7 +221,7 @@ class RadialWindow:
                 self.za * self.wa,
                 self.za,
             ) / np.trapezoid(self.wa, self.za)
-        return 0.0
+        return math.nan
 
 
 def tophat_windows(
