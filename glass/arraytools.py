@@ -91,8 +91,8 @@ def broadcast_leading_axes(
 
 def ndinterp(  # noqa: PLR0913
     x: float | NDArray[np.float64],
-    xp: Sequence[float] | NDArray[np.float64],
-    fp: Sequence[float] | NDArray[np.float64],
+    xq: Sequence[float] | NDArray[np.float64],
+    fq: Sequence[float] | NDArray[np.float64],
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
@@ -105,16 +105,16 @@ def ndinterp(  # noqa: PLR0913
     ----------
     x
         The x-coordinates.
-    xp
+    xq
         The x-coordinates of the data points.
-    fp
-        The function values corresponding to the x-coordinates in *xp*.
+    fq
+        The function values corresponding to the x-coordinates in *xq*.
     axis
         The axis to interpolate over.
     left
-        The value to return for x < xp[0].
+        The value to return for x < xq[0].
     right
-        The value to return for x > xp[-1].
+        The value to return for x > xq[-1].
     period
         The period of the function, used for interpolating periodic data.
 
@@ -124,9 +124,9 @@ def ndinterp(  # noqa: PLR0913
 
     """
     return np.apply_along_axis(
-        partial(np.interp, x, xp),
+        partial(np.interp, x, xq),
         axis,
-        fp,
+        fq,
         left=left,
         right=right,
         period=period,
