@@ -200,6 +200,10 @@ def cumulative_trapezoid(
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 
-    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
+    np.cumulative_sum(
+        (f[..., 1:] + f[..., :-1]) / 2 * np.diff(x),
+        axis=-1,
+        out=out[..., 1:],
+    )
     out[..., 0] = 0
     return out
