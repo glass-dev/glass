@@ -5,6 +5,9 @@ ci:
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
 
+default_language_version:
+  python: python3.13
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -35,13 +38,13 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.35.1
+    rev: v1.37.0
     hooks:
       - id: yamllint
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    rev: v0.11.4
     hooks:
       - id: ruff
       - id: ruff-format
@@ -79,7 +82,7 @@ repos:
       - id: mypy
         files: ^glass/
         additional_dependencies:
-          - numpy>=2.2.3
+          - numpy~=2.2.4
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
     hooks:

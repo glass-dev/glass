@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     T = TypeVar("T")
 
 try:
-    from warnings import deprecated  # type: ignore[attr-defined]
+    from warnings import deprecated
 except ImportError:
     if TYPE_CHECKING:
         from typing import ParamSpec, TypeVar
@@ -35,7 +35,7 @@ except ImportError:
         _P = ParamSpec("_P")
         _R = TypeVar("_R")
 
-    def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:
+    def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:  # type: ignore[no-redef]
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps
         from warnings import warn
