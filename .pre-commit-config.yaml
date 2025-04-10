@@ -5,6 +5,9 @@ ci:
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
 
+default_language_version:
+  python: python3.13
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -79,7 +82,7 @@ repos:
       - id: mypy
         files: ^glass/
         additional_dependencies:
-          - numpy>=2.2.3
+          - numpy~=2.2.4
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
     hooks:
