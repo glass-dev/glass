@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from jax import Array
+    from jaxtyping import Array
     from numpy.typing import NDArray
 
 
