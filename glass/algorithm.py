@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
+    from jaxtyping import Array
     from numpy.typing import NDArray
 
 
@@ -93,9 +94,9 @@ def nnls(
 
 
 def cov_clip(
-    cov: NDArray[np.float64],
+    cov: NDArray[np.float64] | Array,
     rtol: float | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Covariance matrix from clipping non-positive eigenvalues.
 
@@ -135,11 +136,11 @@ def cov_clip(
 
 
 def nearcorr(
-    a: NDArray[np.float64],
+    a: NDArray[np.float64] | Array,
     *,
     tol: float | None = None,
     niter: int = 100,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Compute the nearest correlation matrix.
 
@@ -209,10 +210,10 @@ def nearcorr(
 
 
 def cov_nearest(
-    cov: NDArray[np.float64],
+    cov: NDArray[np.float64] | Array,
     tol: float | None = None,
     niter: int = 100,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Covariance matrix from nearest correlation matrix.
 
