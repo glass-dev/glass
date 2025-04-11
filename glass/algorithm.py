@@ -67,28 +67,28 @@ def nnls(
         maxiter = 3 * n
 
     index = np.arange(n)
-    p = np.full(n, fill_value=False)
+    q = np.full(n, fill_value=False)
     x = np.zeros(n)
     for _ in range(maxiter):
-        if np.all(p):
+        if np.all(q):
             break
         w = np.dot(b - a @ x, a)
-        m = index[~p][np.argmax(w[~p])]
+        m = index[~q][np.argmax(w[~q])]
         if w[m] <= tol:
             break
-        p[m] = True
+        q[m] = True
         while True:
-            ap = a[:, p]
-            xp = x[p]
-            sp = np.linalg.solve(ap.T @ ap, b @ ap)
-            t = sp <= 0
+            aq = a[:, q]
+            xq = x[q]
+            sq = np.linalg.solve(aq.T @ aq, b @ aq)
+            t = sq <= 0
             if not np.any(t):
                 break
-            alpha = -np.min(xp[t] / (xp[t] - sp[t]))
-            x[p] += alpha * (sp - xp)
-            p[x <= 0] = False
-        x[p] = sp
-        x[~p] = 0
+            alpha = -np.min(xq[t] / (xq[t] - sq[t]))
+            x[q] += alpha * (sq - xq)
+            q[x <= 0] = False
+        x[q] = sq
+        x[~q] = 0
     return x
 
 
