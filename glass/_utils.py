@@ -1,12 +1,15 @@
-from types import ModuleType
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from jax.typing import ArrayLike
+    from types import ModuleType
+
+    from jax import Array
     from numpy.typing import NDArray
 
 
-def _get_namespace(*arrays: NDArray[Any] | ArrayLike) -> ModuleType:
+def get_namespace(*arrays: NDArray[Any] | Array) -> ModuleType:
     """
     Return the array library (array namespace) of input arrays
     if they belong to the same library or raise a :class:`ValueError`
