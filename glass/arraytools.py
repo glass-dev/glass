@@ -11,12 +11,13 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Unpack
 
+    from jaxtyping import Array
     from numpy.typing import DTypeLike, NDArray
 
 
 def broadcast_first(
-    *arrays: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], ...]:
+    *arrays: NDArray[np.float64] | Array,
+) -> tuple[NDArray[np.float64] | Array, ...]:
     """
     Broadcast arrays, treating the first axis as common.
 
@@ -30,19 +31,19 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
+    arrays = tuple(np.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
     arrays = np.broadcast_arrays(*arrays)
-    return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
+    return tuple(np.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
 
 
 def broadcast_leading_axes(
     *args: tuple[
-        float | NDArray[np.float64],
+        float | NDArray[np.float64] | Array,
         int,
     ],
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[NDArray[np.float64], ...]],
+    Unpack[tuple[NDArray[np.float64] | Array, ...]],
 ]:
     """
     Broadcast all but the last N axes.
@@ -90,14 +91,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | NDArray[np.float64],
-    xq: Sequence[float] | NDArray[np.float64],
-    fq: Sequence[float] | NDArray[np.float64],
+    x: float | NDArray[np.float64] | Array,
+    xq: Sequence[float] | NDArray[np.float64] | Array,
+    fq: Sequence[float] | NDArray[np.float64] | Array,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -134,13 +135,13 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapezoid_product(
-    f: tuple[NDArray[np.float64], NDArray[np.float64]],
+    f: tuple[NDArray[np.float64] | Array, NDArray[np.float64] | Array],
     *ff: tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
+        NDArray[np.float64] | Array,
+        NDArray[np.float64] | Array,
     ],
     axis: int = -1,
-) -> float | NDArray[np.float64]:
+) -> float | NDArray[np.float64] | Array:
     """
     Trapezoidal rule for a product of functions.
 
@@ -158,7 +159,7 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
-    x: NDArray[np.float64]
+    x: NDArray[np.float64] | Array
     x, _ = f
     for x_, _ in ff:
         x = np.union1d(
@@ -172,11 +173,11 @@ def trapezoid_product(
 
 
 def cumulative_trapezoid(
-    f: NDArray[np.int_] | NDArray[np.float64],
-    x: NDArray[np.int_] | NDArray[np.float64],
+    f: NDArray[np.int_] | NDArray[np.float64] | Array,
+    x: NDArray[np.int_] | NDArray[np.float64] | Array,
     dtype: DTypeLike | None = None,
-    out: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    out: NDArray[np.float64] | Array | None = None,
+) -> NDArray[np.float64] | Array:
     """
     Cumulative trapezoidal rule along last axis.
 
@@ -199,6 +200,10 @@ def cumulative_trapezoid(
     if out is None:
         out = np.empty_like(f, dtype=dtype)
 
-    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
+    np.cumulative_sum(
+        (f[..., 1:] + f[..., :-1]) / 2 * np.diff(x),
+        axis=-1,
+        out=out[..., 1:],
+    )
     out[..., 0] = 0
     return out
