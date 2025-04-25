@@ -7,6 +7,7 @@ import numpy as np
 import packaging.version
 import pytest
 from numpy.typing import NDArray
+from tests._jax_rng import Generator
 
 from cosmology import Cosmology
 
@@ -151,8 +152,10 @@ def cosmo() -> Cosmology:
 
 
 @pytest.fixture(scope="session")
-def rng() -> np.random.Generator:
-    return np.random.default_rng(seed=42)
+def rng() -> np.random.Generator | Generator:
+    if array_lib != jax:  # how?
+        return np.random.default_rng(seed=42)
+    return Generator(seed=42)
 
 
 @pytest.fixture(scope="session")
