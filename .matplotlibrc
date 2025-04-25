@@ -1,4 +1,6 @@
 backend: agg
 figure.dpi: 100
 font.family: DejaVu Sans
+legend.frameon: False
+legend.fontsize: small
 savefig.dpi: 100
