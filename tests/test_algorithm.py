@@ -1,5 +1,3 @@
-import types
-
 import numpy as np
 import pytest
 import pytest_mock
@@ -38,7 +36,9 @@ def test_nnls(rng: np.random.Generator) -> None:
 
 
 @array_api_compatible
-def test_cov_clip(rng: np.random.Generator, xp: types.ModuleType):
+def test_cov_clip(backend: list):
+    xp, rng = backend
+
     # prepare a random matrix
     m = xp.asarray(rng.random((4, 4)))
 
@@ -60,7 +60,8 @@ def test_cov_clip(rng: np.random.Generator, xp: types.ModuleType):
 
 
 @array_api_compatible
-def test_nearcorr(xp: types.ModuleType):
+def test_nearcorr(backend: list):
+    xp, _ = backend
     # from Higham (2002)
     a = xp.asarray(
         [
@@ -94,9 +95,9 @@ def test_nearcorr(xp: types.ModuleType):
 
 
 @array_api_compatible
-def test_cov_nearest(
-    rng: np.random.Generator, xp: types.ModuleType, mocker: pytest_mock.MockerFixture
-):
+def test_cov_nearest(backend: list, mocker: pytest_mock.MockerFixture):
+    xp, rng = backend
+
     # prepare a random matrix
     m = xp.asarray(rng.random((4, 4)))
 
