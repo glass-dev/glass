@@ -1,18 +1,19 @@
-"""JAX random number generation as a NumPy generator."""
+"""Dispatcher functionality to unify JAX and NumPy RNG behavior."""
 
 import math
-from threading import Lock
-from typing import Literal, Self, TypeAlias
 
-from jax import Array
+# if TYPE_CHECKING:
+import types
+from threading import Lock
+from typing import Any, Literal, Self, TypeAlias
+
+import numpy as np
 from jax.dtypes import issubdtype, prng_key
-from jax.numpy import array, broadcast_shapes, shape, uint8
+from jax.numpy import array, broadcast_shapes, shape
 from jax.random import (
     beta,
     binomial,
-    bits,
     chisquare,
-    choice,
     dirichlet,
     exponential,
     f,
@@ -20,13 +21,13 @@ from jax.random import (
     key,
     multivariate_normal,
     normal,
-    permutation,
     poisson,
-    randint,
     split,
     uniform,
 )
 from jax.typing import ArrayLike, DTypeLike
+from jaxtyping import Array
+from numpy.typing import NDArray
 
 RealArray: TypeAlias = ArrayLike
 Size: TypeAlias = int | tuple[int, ...] | None
@@ -46,8 +47,8 @@ def _s(size: Size, *bcast: ArrayLike) -> tuple[int, ...]:
     return size
 
 
-class Generator:
-    """Wrapper class for JAX random number generation."""
+class JAXGenerator:
+    """JAX random number generation as a NumPy generator."""
 
     __slots__ = ("key", "lock")
     key: Array
@@ -90,48 +91,9 @@ class Generator:
             self.key, *keys = split(self.key, num=n_children + 1)
         return list(map(self.from_key, keys))
 
-    def integers(
-        self,
-        low: int | ArrayLike,
-        high: int | ArrayLike | None = None,
-        size: Size = None,
-        dtype: DTypeLike = int,
-        endpoint: bool = False,
-    ) -> Array:
-        """
-        Return random integers from the "discrete uniform" distribution
-        of the specified dtype.  If *high* is None (the default), then
-        results are from 0 to *low*.
-        """
-        if high is None:
-            low, high = 0, low
-        if endpoint:
-            high = high + 1
-        return randint(self.__key, _s(size), low, high, dtype)
-
     def random(self, size: Size = None, dtype: DTypeLike = float) -> Array:
         """Return random floats in the half-open interval [0.0, 1.0)."""
         return uniform(self.__key, _s(size), dtype)
-
-    def choice(
-        self,
-        a: Array,
-        size: Size = None,
-        replace: bool = True,
-        p: Array | None = None,
-        axis: int = 0,
-    ) -> Array:
-        """Generate a random sample from a given array."""
-        return choice(self.__key, a, _s(size), replace, p, axis)
-
-    def bytes(self, length: int) -> bytes:
-        """Return random bytes."""
-        shape = (length // uint8.dtype.itemsize,)
-        return bits(self.__key, shape, uint8).tobytes()
-
-    def permutation(self, x: int | Array, axis: int = 0) -> Array:
-        """Randomly permute a sequence, or return a permuted range."""
-        return permutation(self.__key, x, axis, False)
 
     def beta(self, a: RealArray, b: RealArray, size: Size = None) -> Array:
         """Draw samples from a Beta distribution."""
@@ -166,33 +128,6 @@ class Generator:
         """Draw samples from a Gamma distribution."""
         return array(scale) * gamma(self.__key, a, _s(size, a, scale))
 
-    # geometric(p[, size])
-    # Draw samples from the geometric distribution.
-
-    # gumbel([loc, scale, size])
-    # Draw samples from a Gumbel distribution.
-
-    # hypergeometric(ngood, nbad, nsample[, size])
-    # Draw samples from a Hypergeometric distribution.
-
-    # laplace([loc, scale, size])
-    # Draw samples from the Laplace or double exponential distribution with specified location (or mean) and scale (decay).
-
-    # logistic([loc, scale, size])
-    # Draw samples from a logistic distribution.
-
-    # lognormal([mean, sigma, size])
-    # Draw samples from a log-normal distribution.
-
-    # logseries(p[, size])
-    # Draw samples from a logarithmic series distribution.
-
-    # multinomial(n, pvals[, size])
-    # Draw samples from a multinomial distribution.
-
-    # multivariate_hypergeometric(colors, nsample)
-    # Generate variates from a multivariate hypergeometric distribution.
-
     def multivariate_normal(
         self,
         mean: RealArray,
@@ -210,50 +145,19 @@ class Generator:
             method=method,
         )
 
-    # negative_binomial(n, p[, size])
-    # Draw samples from a negative binomial distribution.
-
-    # noncentral_chisquare(df, nonc[, size])
-    # Draw samples from a noncentral chi-square distribution.
-
-    # noncentral_f(dfnum, dfden, nonc[, size])
-    # Draw samples from the noncentral F distribution.
-
     def normal(
         self, loc: float, scale: float, size: Size = None, dtype: DTypeLike = float
     ) -> Array:
+        """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
         return loc + scale * normal(self.__key, _s(size), dtype)
 
-    # pareto(a[, size])
-    # Draw samples from a Pareto II (AKA Lomax) distribution with specified shape.
-
     def poisson(self, lam: float, size: Size = None, dtype: DTypeLike = float) -> Array:
+        """Draw samples from a Poisson distribution."""
         return poisson(self.__key, lam, size, dtype)
-
-    # power(a[, size])
-    # Draws samples in [0, 1] from a power distribution with positive exponent a - 1.
-
-    # rayleigh([scale, size])
-    # Draw samples from a Rayleigh distribution.
-
-    # standard_cauchy([size])
-    # Draw samples from a standard Cauchy distribution with mode = 0.
-
-    # standard_exponential([size, dtype, method, out])
-    # Draw samples from the standard exponential distribution.
-
-    # standard_gamma(shape[, size, dtype, out])
-    # Draw samples from a standard Gamma distribution.
 
     def standard_normal(self, size: Size = None, dtype: DTypeLike = float) -> Array:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
         return normal(self.__key, _s(size), dtype)
-
-    # standard_t(df[, size])
-    # Draw samples from a standard Student's t distribution with df degrees of freedom.
-
-    # triangular(left, mode, right[, size])
-    # Draw samples from the triangular distribution over the interval [left, right].
 
     def uniform(
         self, low: int = 0, high: int = 1, size: Size = None, dtype: DTypeLike = float
@@ -261,14 +165,17 @@ class Generator:
         """Draw samples from a Uniform distribution."""
         return uniform(self.__key, _s(size), dtype, low, high)
 
-    # vonmises(mu, kappa[, size])
-    # Draw samples from a von Mises distribution.
 
-    # wald(mean, scale[, size])
-    # Draw samples from a Wald, or inverse Gaussian, distribution.
+def rng(
+    *,
+    array: NDArray[Any] | Array | None = None,
+    backend: types.ModuleType | None = None,
+) -> JAXGenerator | np.random.Generator:
+    """RNG dispatcher."""
+    assert array is not None or backend is not None
 
-    # weibull(a[, size])
-    # Draw samples from a Weibull distribution.
-
-    # zipf(a[, size])
-    # Draw samples from a Zipf distribution.
+    if (array is not None and array.__array_namespace__().__name__ == "jax.numpy") or (
+        backend is not None and backend.__name__ == "jax.numpy"
+    ):
+        return JAXGenerator(seed=42)
+    return np.random.default_rng(seed=42)

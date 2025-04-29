@@ -7,11 +7,11 @@ import numpy as np
 import packaging.version
 import pytest
 from numpy.typing import NDArray
-from tests._jax_rng import Generator
 
 from cosmology import Cosmology
 
 import glass
+import glass.rng_dispatcher
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
@@ -96,8 +96,16 @@ else:
     msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
     raise ValueError(msg)
 
+rngs = [
+    glass.rng_dispatcher.rng(backend=backend)
+    for backend in xp_available_backends.values()
+]
+
 # use this as a decorator for tests involving array API compatible functions
-array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.values())
+# backends must be matched with their corresponding RNGs
+array_api_compatible = pytest.mark.parametrize(
+    "backend", [xp_available_backends.values(), rngs]
+)
 
 
 # Pytest fixtures
@@ -152,10 +160,8 @@ def cosmo() -> Cosmology:
 
 
 @pytest.fixture(scope="session")
-def rng() -> np.random.Generator | Generator:
-    if array_lib != jax:  # how?
-        return np.random.default_rng(seed=42)
-    return Generator(seed=42)
+def rng() -> np.random.Generator:
+    return np.random.default_rng(seed=42)
 
 
 @pytest.fixture(scope="session")

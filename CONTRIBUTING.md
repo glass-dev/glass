@@ -95,8 +95,10 @@ from tests.conftest import array_api_compatible
 
 
 @array_api_compatible
-def test_something(xp: types.ModuleType):
+def test_something(backend: list):
+    xp, rng = backend
     # use `xp.` to access the array library functionality
+    # use `rng.` to access the corresponding rng functionality
     ...
 ```
 
