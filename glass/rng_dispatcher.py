@@ -3,21 +3,13 @@
 import math
 import types
 from threading import Lock
-from typing import Any, Literal, Self, TypeAlias
+from typing import Any, Self, TypeAlias
 
 import numpy as np
 from jax.dtypes import issubdtype, prng_key
-from jax.numpy import array, broadcast_shapes, shape
+from jax.numpy import broadcast_shapes, shape
 from jax.random import (
-    beta,
-    binomial,
-    chisquare,
-    dirichlet,
-    exponential,
-    f,
-    gamma,
     key,
-    multivariate_normal,
     normal,
     poisson,
     split,
@@ -92,56 +84,6 @@ class JAXGenerator:
     def random(self, size: Size = None, dtype: DTypeLike = float) -> Array:
         """Return random floats in the half-open interval [0.0, 1.0)."""
         return uniform(self.__key, _s(size), dtype)
-
-    def beta(self, a: RealArray, b: RealArray, size: Size = None) -> Array:
-        """Draw samples from a Beta distribution."""
-        return beta(self.__key, a, b, _s(size))
-
-    def binomial(self, n: RealArray, p: RealArray, size: Size = None) -> Array:
-        """Draw samples from a binomial distribution."""
-        return binomial(self.__key, n, p, _s(size))
-
-    def chisquare(self, df: RealArray, size: Size = None) -> Array:
-        """Draw samples from a chi-square distribution."""
-        return chisquare(self.__key, df, _s(size))
-
-    def dirichlet(self, alpha: RealArray, size: Size = None) -> Array:
-        """Draw samples from the Dirichlet distribution."""
-        return dirichlet(self.__key, alpha, _s(size))
-
-    def exponential(self, scale: RealArray = 1.0, size: Size = None) -> Array:
-        """Draw samples from an exponential distribution."""
-        return array(scale) * exponential(self.__key, _s(size, scale))
-
-    def f(self, dfnum: RealArray, dfden: RealArray, size: Size = None) -> Array:
-        """Draw samples from an F distribution."""
-        return f(self.__key, dfnum, dfden, _s(size))
-
-    def gamma(
-        self,
-        a: RealArray,
-        scale: RealArray = 1.0,
-        size: Size = None,
-    ) -> Array:
-        """Draw samples from a Gamma distribution."""
-        return array(scale) * gamma(self.__key, a, _s(size, a, scale))
-
-    def multivariate_normal(
-        self,
-        mean: RealArray,
-        cov: RealArray,
-        size: Size = None,
-        *,
-        method: Literal["svd", "eigh", "cholesky"] = "svd",
-    ) -> Array:
-        """Draw random samples from a multivariate normal distribution."""
-        return multivariate_normal(
-            self.__key,
-            mean,
-            cov,
-            shape=_s(size),
-            method=method,
-        )
 
     def normal(
         self, loc: float, scale: float, size: Size = None, dtype: DTypeLike = float
