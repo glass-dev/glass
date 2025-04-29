@@ -1,8 +1,6 @@
 """Dispatcher functionality to unify JAX and NumPy RNG behavior."""
 
 import math
-
-# if TYPE_CHECKING:
 import types
 from threading import Lock
 from typing import Any, Literal, Self, TypeAlias
@@ -40,7 +38,7 @@ def _s(size: Size, *bcast: ArrayLike) -> tuple[int, ...]:
     """
     if size is None:
         if bcast:
-            return broadcast_shapes(*map(shape, bcast))
+            return broadcast_shapes(*map(shape, bcast))  # type: ignore[no-any-return]
         return ()
     if isinstance(size, int):
         return (size,)
@@ -171,9 +169,7 @@ def rng(
     array: NDArray[Any] | Array | None = None,
     backend: types.ModuleType | None = None,
 ) -> JAXGenerator | np.random.Generator:
-    """RNG dispatcher."""
-    assert array is not None or backend is not None
-
+    """Dispatch RNG on the basis of provided array or backend."""
     if (array is not None and array.__array_namespace__().__name__ == "jax.numpy") or (
         backend is not None and backend.__name__ == "jax.numpy"
     ):

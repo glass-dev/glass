@@ -163,7 +163,7 @@ def cosmo() -> Cosmology:
 
 @pytest.fixture(scope="session")
 def rng() -> np.random.Generator:
-    return np.random.default_rng(seed=42)
+    return glass.rng_dispatcher.rng()
 
 
 @pytest.fixture(scope="session")
