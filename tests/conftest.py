@@ -105,7 +105,8 @@ rngs = [
 # backends must be matched with their corresponding RNGs
 array_api_compatible = pytest.mark.parametrize(
     "backend",
-    [(b, r) for b, r in zip(xp_available_backends.values(), rngs, strict=False)],
+    [(b, r) for b, r in zip(xp_available_backends.values(), rngs, strict=True)],
+    ids=xp_available_backends.values(),
 )
 
 
