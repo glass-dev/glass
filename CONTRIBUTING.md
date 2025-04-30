@@ -101,17 +101,9 @@ if TYPE_CHECKING:
     from glass._array_api_utils import UnifiedGenerator
 
 
-<<<<<<< HEAD
 def test_something(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     # use `xp.` to access the array library functionality
     # use `urng.` to access the corresponding rng functionality
-=======
-@array_api_compatible
-def test_something(backend: list):
-    xp, rng = backend
-    # use `xp.` to access the array library functionality
-    # use `rng.` to access the corresponding rng functionality
->>>>>>> ee2fcfe (a new RNG dispatcher functionality)
     ...
 ```
 
