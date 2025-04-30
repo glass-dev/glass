@@ -127,3 +127,6 @@ def rng(array: NDArray[Any] | Array) -> JAXGenerator | np.random.Generator:
     if array.__array_namespace__().__name__ == "jax.numpy":
         return JAXGenerator(seed=42)
     return np.random.default_rng()
+
+
+UnifiedGenerator: TypeAlias = np.random.Generator | JAXGenerator

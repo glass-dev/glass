@@ -90,12 +90,16 @@ decorating it with `@array_api_compatible`. This will `parameterize` the test to
 run on every array library specified through `GLASS_ARRAY_BACKEND` -
 
 ```python
-import types
+from typing import TYPE_CHECKING
 from tests.conftest import array_api_compatible
+
+if TYPE_CHECKING:
+    from types import ModuleType
+    from glass.rng_dispatcher import UnifiedGenerator
 
 
 @array_api_compatible
-def test_something(backend: list):
+def test_something(backend: tuple[ModuleType, UnifiedGenerator]):
     xp, rng = backend
     # use `xp.` to access the array library functionality
     # use `rng.` to access the corresponding rng functionality
