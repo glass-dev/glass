@@ -91,18 +91,15 @@ run on every array library specified through `GLASS_ARRAY_BACKEND` -
 
 ```python
 from typing import TYPE_CHECKING
-from tests.conftest import array_api_compatible
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from glass.rng import UnifiedGenerator
+    from glass._array_api_utils import UnifiedGenerator
 
 
-@array_api_compatible
-def test_something(backend: tuple[ModuleType, UnifiedGenerator]):
-    xp, rng = backend
+def test_something(xp: ModuleType, urng: UnifiedGenerator):
     # use `xp.` to access the array library functionality
-    # use `rng.` to access the corresponding rng functionality
+    # use `urng.` to access the corresponding rng functionality
     ...
 ```
 
