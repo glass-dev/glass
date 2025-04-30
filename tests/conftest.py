@@ -96,15 +96,19 @@ else:
     msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
     raise ValueError(msg)
 
+# cannot use `rng_dispatcher.rng` as a seed must be
+# passed into NumPy RNGs for reproducibility
 rngs = [
-    glass.rng_dispatcher.rng(backend=backend)
+    glass.rng_dispatcher.JAXGenerator(seed=42)
+    if backend.__name__ == "jax.numpy"
+    else np.random.default_rng(seed=42)
     for backend in xp_available_backends.values()
 ]
 
 # use this as a decorator for tests involving array API compatible functions
-# backends must be matched with their corresponding RNGs
 array_api_compatible = pytest.mark.parametrize(
     "backend",
+    # backends must be matched with their corresponding RNGs
     [(b, r) for b, r in zip(xp_available_backends.values(), rngs, strict=True)],
     ids=xp_available_backends.values(),
 )
@@ -163,7 +167,12 @@ def cosmo() -> Cosmology:
 
 @pytest.fixture(scope="session")
 def rng() -> np.random.Generator:
-    return glass.rng_dispatcher.rng()
+    """
+    RNG fixture for non array API tests.
+
+    Use RNG from @array_api_compatible for array API tests.
+    """
+    return np.random.default_rng(seed=42)
 
 
 @pytest.fixture(scope="session")

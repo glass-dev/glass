@@ -1,7 +1,6 @@
 """Dispatcher functionality to unify JAX and NumPy RNG behavior."""
 
 import math
-import types
 from threading import Lock
 from typing import Any, Self, TypeAlias
 
@@ -15,15 +14,15 @@ from jax.random import (
     split,
     uniform,
 )
-from jax.typing import ArrayLike, DTypeLike
+from jax.typing import DTypeLike
 from jaxtyping import Array
 from numpy.typing import NDArray
 
-RealArray: TypeAlias = ArrayLike
+RealArray: TypeAlias = Array
 Size: TypeAlias = int | tuple[int, ...] | None
 
 
-def _s(size: Size, *bcast: ArrayLike) -> tuple[int, ...]:
+def _s(size: Size, *bcast: Array) -> tuple[int, ...]:
     """
     Return a size, which can be a single int or None, as a shape, which
     is a tuple of int.
@@ -55,7 +54,7 @@ class JAXGenerator:
         rng.lock = Lock()
         return rng
 
-    def __init__(self, seed: int | ArrayLike, *, impl: str | None = None) -> None:
+    def __init__(self, seed: int | Array, *, impl: str | None = None) -> None:
         """Create a wrapper instance with a new key."""
         self.key = key(seed, impl=impl)
         self.lock = Lock()
@@ -106,14 +105,8 @@ class JAXGenerator:
         return uniform(self.__key, _s(size), dtype, low, high)
 
 
-def rng(
-    *,
-    array: NDArray[Any] | Array | None = None,
-    backend: types.ModuleType | None = None,
-) -> JAXGenerator | np.random.Generator:
-    """Dispatch RNG on the basis of provided array or backend."""
-    if (array is not None and array.__array_namespace__().__name__ == "jax.numpy") or (
-        backend is not None and backend.__name__ == "jax.numpy"
-    ):
+def rng(array: NDArray[Any] | Array) -> JAXGenerator | np.random.Generator:
+    """Dispatch RNG on the basis of the provided array or backend."""
+    if array.__array_namespace__().__name__ == "jax.numpy":
         return JAXGenerator(seed=42)
-    return np.random.default_rng(seed=42)
+    return np.random.default_rng()
