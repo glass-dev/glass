@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeAlias
+
+import numpy as np
+
+from glass.jax import JAXGenerator
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -21,3 +25,13 @@ def get_namespace(*arrays: NDArray[Any] | Array) -> ModuleType:
         raise ValueError(msg)
 
     return namespace
+
+
+def rng_dispatcher(array: NDArray[Any] | Array) -> JAXGenerator | np.random.Generator:
+    """Dispatch RNG on the basis of the provided array."""
+    if array.__array_namespace__().__name__ == "jax.numpy":
+        return JAXGenerator(seed=42)
+    return np.random.default_rng()
+
+
+UnifiedGenerator: TypeAlias = np.random.Generator | JAXGenerator

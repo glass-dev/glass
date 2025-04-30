@@ -11,7 +11,8 @@ from numpy.typing import NDArray
 from cosmology import Cosmology
 
 import glass
-import glass.rng
+import glass.jax
+import jax.numpy as jnp
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
@@ -96,22 +97,19 @@ else:
     msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
     raise ValueError(msg)
 
-# cannot use `rng.rng_dispatcher` as a seed must be
-# passed into NumPy RNGs for reproducibility
-rngs = [
-    glass.rng.JAXGenerator(seed=42)
-    if backend.__name__ == "jax.numpy"
-    else np.random.default_rng(seed=42)
-    for backend in xp_available_backends.values()
-]
 
-# use this as a decorator for tests involving array API compatible functions
-array_api_compatible = pytest.mark.parametrize(
-    "backend",
-    # backends must be matched with their corresponding RNGs
-    [(b, r) for b, r in zip(xp_available_backends.values(), rngs, strict=True)],
-    ids=xp_available_backends.values(),
+@pytest.fixture(
+    params=xp_available_backends.values(), ids=xp_available_backends.values()
 )
+def xp(request):
+    return request.param
+
+
+@pytest.fixture
+def urng(xp: types.ModuleType):
+    if xp is jnp:
+        return glass.jax.JAXGenerator(seed=42)
+    return np
 
 
 # Pytest fixtures
@@ -170,7 +168,7 @@ def rng() -> np.random.Generator:
     """
     RNG fixture for non array API tests.
 
-    Use RNG from @array_api_compatible for array API tests.
+    Use `urng` for array API tests.
     """
     return np.random.default_rng(seed=42)
 
