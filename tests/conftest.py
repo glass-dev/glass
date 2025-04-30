@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 from cosmology import Cosmology
 
 import glass
-import glass.rng_dispatcher
+import glass.rng
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
@@ -96,10 +96,10 @@ else:
     msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
     raise ValueError(msg)
 
-# cannot use `rng_dispatcher.rng` as a seed must be
+# cannot use `rng.rng_dispatcher` as a seed must be
 # passed into NumPy RNGs for reproducibility
 rngs = [
-    glass.rng_dispatcher.JAXGenerator(seed=42)
+    glass.rng.JAXGenerator(seed=42)
     if backend.__name__ == "jax.numpy"
     else np.random.default_rng(seed=42)
     for backend in xp_available_backends.values()

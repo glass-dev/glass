@@ -95,7 +95,7 @@ from tests.conftest import array_api_compatible
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from glass.rng_dispatcher import UnifiedGenerator
+    from glass.rng import UnifiedGenerator
 
 
 @array_api_compatible
