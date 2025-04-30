@@ -1,18 +1,27 @@
+from __future__ import annotations
+
 import contextlib
 import importlib.metadata
 import os
-import types
+from typing import TYPE_CHECKING
 
 import numpy as np
 import packaging.version
 import pytest
-from numpy.typing import NDArray
-
-from cosmology import Cosmology
 
 import glass
 import glass.jax
 import jax.numpy as jnp
+
+if TYPE_CHECKING:
+    import types
+
+    from numpy.typing import NDArray
+
+    from cosmology import Cosmology
+
+    from glass._array_api_utils import UnifiedGenerator
+
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
@@ -101,12 +110,12 @@ else:
 @pytest.fixture(
     params=xp_available_backends.values(), ids=xp_available_backends.values()
 )
-def xp(request):
+def xp(request: pytest.FixtureRequest) -> types.ModuleType:
     return request.param
 
 
 @pytest.fixture
-def urng(xp: types.ModuleType):
+def urng(xp: types.ModuleType) -> UnifiedGenerator:
     seed = 42
     if xp is jnp:
         return glass.jax.JAXGenerator(seed=seed)
