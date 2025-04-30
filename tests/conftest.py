@@ -11,7 +11,6 @@ import pytest
 
 import glass
 import glass.jax
-import jax.numpy as jnp
 
 if TYPE_CHECKING:
     import types
@@ -117,9 +116,10 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
 @pytest.fixture
 def urng(xp: types.ModuleType) -> UnifiedGenerator:
     seed = 42
-    if xp is jnp:
+    backend = xp.__name__
+    if backend == "jax.numpy":
         return glass.jax.JAXGenerator(seed=seed)
-    if xp is np:
+    if backend in {"numpy", "array_api_strict"}:
         return np.random.default_rng(seed=seed)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)

@@ -32,9 +32,10 @@ UnifiedGenerator: TypeAlias = np.random.Generator | JAXGenerator
 
 def rng_dispatcher(array: NDArray[Any] | Array) -> UnifiedGenerator:
     """Dispatch RNG on the basis of the provided array."""
-    if array.__array_namespace__().__name__ == "jax.numpy":
+    backend = array.__array_namespace__().__name__
+    if backend == "jax.numpy":
         return JAXGenerator(seed=42)
-    if array.__array_namespace__().__name__ == "numpy":
+    if backend in {"numpy", "array_api_strict"}:
         return np.random.default_rng()
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
