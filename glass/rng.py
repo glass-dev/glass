@@ -122,7 +122,7 @@ class JAXGenerator:
         return uniform(self.__key, _s(size), dtype, low, high)
 
 
-def rng(array: NDArray[Any] | Array) -> JAXGenerator | np.random.Generator:
+def rng_dispatcher(array: NDArray[Any] | Array) -> JAXGenerator | np.random.Generator:
     """Dispatch RNG on the basis of the provided array."""
     if array.__array_namespace__().__name__ == "jax.numpy":
         return JAXGenerator(seed=42)
