@@ -1,8 +1,10 @@
 """Dispatcher functionality to unify JAX and NumPy RNG behavior."""
 
+from __future__ import annotations
+
 import math
 from threading import Lock
-from typing import Any, Self, TypeAlias
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 import numpy as np
 from jax.dtypes import issubdtype, prng_key
@@ -14,12 +16,14 @@ from jax.random import (
     split,
     uniform,
 )
-from jax.typing import DTypeLike
-from jaxtyping import Array
-from numpy.typing import NDArray
+from jax.typing import Array, DTypeLike
+from typing_extensions import Self
 
-RealArray: TypeAlias = Array
-Size: TypeAlias = int | tuple[int, ...] | None
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    RealArray: TypeAlias = Array
+    Size: TypeAlias = int | tuple[int, ...] | None
 
 
 def _s(size: Size, *bcast: Array) -> tuple[int, ...]:
