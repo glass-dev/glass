@@ -16,10 +16,11 @@ from jax.random import (
     split,
     uniform,
 )
-from jax.typing import Array, DTypeLike
+from jax.typing import ArrayLike
 from typing_extensions import Self
 
 if TYPE_CHECKING:
+    from jaxtyping import Array, PRNGKeyArray, Shaped
     from numpy.typing import NDArray
 
     RealArray: TypeAlias = Array
@@ -44,13 +45,13 @@ class JAXGenerator:
     """JAX random number generation as a NumPy generator."""
 
     __slots__ = ("key", "lock")
-    key: Array
+    key: PRNGKeyArray
     lock: Lock
 
     @classmethod
-    def from_key(cls, key: Array) -> Self:
+    def from_key(cls, key: PRNGKeyArray) -> Self:
         """Wrap a JAX random key."""
-        if not isinstance(key, Array) or not issubdtype(key.dtype, prng_key):
+        if not isinstance(key, ArrayLike) or not issubdtype(key.dtype, prng_key):
             msg = "not a random key"
             raise ValueError(msg)
         rng = object.__new__(cls)
@@ -84,26 +85,38 @@ class JAXGenerator:
             self.key, *keys = split(self.key, num=n_children + 1)
         return list(map(self.from_key, keys))
 
-    def random(self, size: Size = None, dtype: DTypeLike = float) -> Array:
+    def random(self, size: Size = None, dtype: Shaped[Array, ...] = float) -> Array:
         """Return random floats in the half-open interval [0.0, 1.0)."""
         return uniform(self.__key, _s(size), dtype)
 
     def normal(
-        self, loc: float, scale: float, size: Size = None, dtype: DTypeLike = float
+        self,
+        loc: float,
+        scale: float,
+        size: Size = None,
+        dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
         return loc + scale * normal(self.__key, _s(size), dtype)
 
-    def poisson(self, lam: float, size: Size = None, dtype: DTypeLike = float) -> Array:
+    def poisson(
+        self, lam: float, size: Size = None, dtype: Shaped[Array, ...] = float
+    ) -> Array:
         """Draw samples from a Poisson distribution."""
         return poisson(self.__key, lam, size, dtype)
 
-    def standard_normal(self, size: Size = None, dtype: DTypeLike = float) -> Array:
+    def standard_normal(
+        self, size: Size = None, dtype: Shaped[Array, ...] = float
+    ) -> Array:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
         return normal(self.__key, _s(size), dtype)
 
     def uniform(
-        self, low: int = 0, high: int = 1, size: Size = None, dtype: DTypeLike = float
+        self,
+        low: int = 0,
+        high: int = 1,
+        size: Size = None,
+        dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a Uniform distribution."""
         return uniform(self.__key, _s(size), dtype, low, high)
