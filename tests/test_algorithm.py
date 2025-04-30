@@ -1,7 +1,8 @@
+import types
+
 import numpy as np
 import pytest
 import pytest_mock
-from tests.conftest import array_api_compatible
 
 import glass.algorithm
 
@@ -35,12 +36,9 @@ def test_nnls(rng: np.random.Generator) -> None:
         glass.algorithm.nnls(a.T, b)
 
 
-@array_api_compatible
-def test_cov_clip(backend: list):
-    xp, rng = backend
-
+def test_cov_clip(xp: types.ModuleType, urng):
     # prepare a random matrix
-    m = xp.asarray(rng.random((4, 4)))
+    m = xp.asarray(urng.random((4, 4)))
 
     # symmetric matrix
     a = (m + m.T) / 2
@@ -59,9 +57,7 @@ def test_cov_clip(backend: list):
     np.testing.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
-@array_api_compatible
-def test_nearcorr(backend: list):
-    xp, _ = backend
+def test_nearcorr(xp: types.ModuleType):
     # from Higham (2002)
     a = xp.asarray(
         [
@@ -94,12 +90,9 @@ def test_nearcorr(backend: list):
         glass.algorithm.nearcorr(xp.zeros((4, 3)))
 
 
-@array_api_compatible
-def test_cov_nearest(backend: list, mocker: pytest_mock.MockerFixture):
-    xp, rng = backend
-
+def test_cov_nearest(xp, urng, mocker: pytest_mock.MockerFixture):
     # prepare a random matrix
-    m = xp.asarray(rng.random((4, 4)))
+    m = xp.asarray(urng.random((4, 4)))
 
     # symmetric matrix
     a = xp.eye(4) + (m + m.T) / 2
