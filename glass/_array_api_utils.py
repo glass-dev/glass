@@ -34,4 +34,7 @@ def rng_dispatcher(array: NDArray[Any] | Array) -> UnifiedGenerator:
     """Dispatch RNG on the basis of the provided array."""
     if array.__array_namespace__().__name__ == "jax.numpy":
         return JAXGenerator(seed=42)
-    return np.random.default_rng()
+    if array.__array_namespace__().__name__ == "numpy":
+        return np.random.default_rng()
+    msg = "the array backend in not supported"
+    raise NotImplementedError(msg)

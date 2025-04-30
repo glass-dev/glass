@@ -119,7 +119,10 @@ def urng(xp: types.ModuleType) -> UnifiedGenerator:
     seed = 42
     if xp is jnp:
         return glass.jax.JAXGenerator(seed=seed)
-    return np.random.default_rng(seed=seed)
+    if xp is np:
+        return np.random.default_rng(seed=seed)
+    msg = "the array backend in not supported"
+    raise NotImplementedError(msg)
 
 
 # Pytest fixtures
