@@ -14,7 +14,7 @@ import jax.random
 from jax.typing import ArrayLike
 
 if TYPE_CHECKING:
-    from jaxtyping import Array, PRNGKeyArray, Shaped
+    from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
 
     RealArray: TypeAlias = Array
     Size: TypeAlias = int | tuple[int, ...] | None
@@ -95,7 +95,7 @@ class JAXGenerator:
         return loc + scale * jax.random.normal(self.__key, _size(size), dtype)
 
     def poisson(
-        self, lam: float, size: Size = None, dtype: Shaped[Array, ...] = float
+        self, lam: float, size: Size = None, dtype: Integer[Array, ...] = int
     ) -> Array:
         """Draw samples from a Poisson distribution."""
         return jax.random.poisson(self.__key, lam, size, dtype)
