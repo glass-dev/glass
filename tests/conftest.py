@@ -204,6 +204,19 @@ def cosmo() -> Cosmology:
 
 
 @pytest.fixture(scope="session")
+<<<<<<< HEAD
+=======
+def rng() -> np.random.Generator:
+    """
+    RNG fixture for non array API tests.
+
+    Use `urng` for array API tests.
+    """
+    return np.random.default_rng(seed=42)
+
+
+@pytest.fixture(scope="session")
+>>>>>>> c972d5a (switch to a fixture in this PR)
 def shells() -> list[glass.RadialWindow]:
     return [
         glass.RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 1.0),
