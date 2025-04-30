@@ -162,17 +162,22 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
+    # strictly speaking we should check all functions within ff are of the same
+    # array library as each other, but for simplicity we only check the first
+    # function in ff in the event that multiple functions are passed in
+    xp = _utils.get_namespace(*f, *ff[0])
+
     x: NDArray[np.float64] | Array
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(
+        x = xp.union1d(
             x[(x >= x_[0]) & (x <= x_[-1])],
             x_[(x_ >= x[0]) & (x_ <= x[-1])],
         )
-    y = np.interp(x, *f)
+    y = xp.interp(x, *f)
     for f_ in ff:
-        y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)
+        y *= xp.interp(x, *f_)
+    return xp.trapezoid(y, x, axis=axis)
 
 
 def cumulative_trapezoid(
