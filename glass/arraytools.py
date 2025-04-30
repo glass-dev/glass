@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Unpack
@@ -31,9 +33,10 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    arrays = tuple(np.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
-    arrays = np.broadcast_arrays(*arrays)
-    return tuple(np.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
+    xp = _utils.get_namespace(*arrays)
+    arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
+    arrays = xp.broadcast_arrays(*arrays)
+    return tuple(xp.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
 
 
 def broadcast_leading_axes(
