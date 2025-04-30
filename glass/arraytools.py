@@ -205,11 +205,13 @@ def cumulative_trapezoid(
         The cumulative integral of the function.
 
     """
-    if out is None:
-        out = np.empty_like(f, dtype=dtype)
+    xp = _utils.get_namespace(f, x, out)
 
-    np.cumulative_sum(
-        (f[..., 1:] + f[..., :-1]) / 2 * np.diff(x),
+    if out is None:
+        out = xp.empty_like(f, dtype=dtype)
+
+    xp.cumulative_sum(
+        (f[..., 1:] + f[..., :-1]) / 2 * xp.diff(x),
         axis=-1,
         out=out[..., 1:],
     )
