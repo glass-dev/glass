@@ -106,7 +106,7 @@ class JAXGenerator:
 
 
 def rng(array: NDArray[Any] | Array) -> JAXGenerator | np.random.Generator:
-    """Dispatch RNG on the basis of the provided array or backend."""
+    """Dispatch RNG on the basis of the provided array."""
     if array.__array_namespace__().__name__ == "jax.numpy":
         return JAXGenerator(seed=42)
     return np.random.default_rng()
