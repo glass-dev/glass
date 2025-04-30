@@ -65,7 +65,6 @@ test = [
     "pytest-doctestplus",
     "pytest-mock",
     "pytest-rerunfailures",
-    "typing_extensions",
 ]
 
 [project.urls]
