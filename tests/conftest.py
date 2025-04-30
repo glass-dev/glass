@@ -107,9 +107,10 @@ def xp(request):
 
 @pytest.fixture
 def urng(xp: types.ModuleType):
+    seed = 42
     if xp is jnp:
-        return glass.jax.JAXGenerator(seed=42)
-    return np
+        return glass.jax.JAXGenerator(seed=seed)
+    return np.random.default_rng(seed=seed)
 
 
 # Pytest fixtures
