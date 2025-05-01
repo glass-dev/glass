@@ -6,12 +6,11 @@ import math
 from threading import Lock
 from typing import TYPE_CHECKING, TypeAlias
 
-from typing_extensions import Self
-
 import jax.dtypes
 import jax.numpy as jnp
 import jax.random
 from jax.typing import ArrayLike
+from typing_extensions import Self
 
 if TYPE_CHECKING:
     from jaxtyping import Array, Integer, PRNGKeyArray, Shaped

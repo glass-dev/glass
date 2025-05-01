@@ -1,7 +1,7 @@
-import pytest
-
 import jax
 import jax.numpy as jnp
+import pytest
+
 from glass._array_api_utils import Generator
 
 
