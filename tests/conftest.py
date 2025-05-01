@@ -110,15 +110,27 @@ else:
     params=xp_available_backends.values(), ids=xp_available_backends.values()
 )
 def xp(request: pytest.FixtureRequest) -> types.ModuleType:
+    """
+    Fixture for array backend.
+
+    Access array library functions using `xp.` in tests.
+    """
     return request.param
 
 
 @pytest.fixture
 def urng(xp: types.ModuleType) -> UnifiedGenerator:
+    """
+    Fixture for a unified RNG interface.
+
+    Access the relevant RNG using `urng.` in tests.
+
+    Must be used with the `xp` fixture. Use `rng` for non array API tests.
+    """
     seed = 42
     backend = xp.__name__
     if backend == "jax.numpy":
-        return glass.jax.JAXGenerator(seed=seed)
+        return glass.jax.Generator(seed=seed)
     if backend in {"numpy", "array_api_strict"}:
         return np.random.default_rng(seed=seed)
     msg = "the array backend in not supported"

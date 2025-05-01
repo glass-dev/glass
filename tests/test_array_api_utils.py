@@ -20,4 +20,4 @@ def test_rng_dispatcher() -> None:
     assert isinstance(rng, np.random.Generator)
 
     rng = glass._array_api_utils.rng_dispatcher(jnp.array([1, 2]))
-    assert isinstance(rng, glass._array_api_utils.JAXGenerator)
+    assert isinstance(rng, glass._array_api_utils.Generator)

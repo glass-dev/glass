@@ -34,7 +34,7 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     return size
 
 
-class JAXGenerator:
+class Generator:
     """JAX random number generation as a NumPy generator."""
 
     __slots__ = ("key", "lock")
