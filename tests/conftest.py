@@ -134,7 +134,7 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
     return request.param
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def urng(xp: types.ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface.
