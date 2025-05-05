@@ -131,8 +131,7 @@ def cov_clip(
     # put matrix back together
     # enforce symmetry
     v = xp.sqrt(w[..., None, :]) * v
-    cov_clipped: NDArray[np.float64] = xp.matmul(v, xp.matrix_transpose(v))
-    return cov_clipped
+    return xp.matmul(v, xp.matrix_transpose(v))
 
 
 def nearcorr(
@@ -205,8 +204,7 @@ def nearcorr(
             break
 
     # return result in original shape
-    near_corr_matrix: NDArray[np.float64] = xp.reshape(y, (*dim, n, n))
-    return near_corr_matrix
+    return xp.reshape(y, (*dim, n, n))
 
 
 def cov_nearest(
@@ -247,7 +245,7 @@ def cov_nearest(
         raise ValueError(msg)
 
     # store the normalisation of the matrix
-    norm: NDArray[np.float64] = xp.sqrt(diag)
+    norm = xp.sqrt(diag)
     norm = norm[..., None, :] * norm[..., :, None]
 
     # find nearest correlation matrix
