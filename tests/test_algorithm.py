@@ -1,10 +1,18 @@
-import types
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-import pytest_mock
 
 import glass.algorithm
+
+if TYPE_CHECKING:
+    import types
+
+    import pytest_mock
+
+    from glass._array_api_utils import UnifiedGenerator
 
 
 def test_nnls(rng: np.random.Generator) -> None:
@@ -36,7 +44,7 @@ def test_nnls(rng: np.random.Generator) -> None:
         glass.algorithm.nnls(a.T, b)
 
 
-def test_cov_clip(xp: types.ModuleType, urng):
+def test_cov_clip(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     # prepare a random matrix
     m = xp.asarray(urng.random((4, 4)))
 
@@ -57,7 +65,7 @@ def test_cov_clip(xp: types.ModuleType, urng):
     np.testing.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
-def test_nearcorr(xp: types.ModuleType):
+def test_nearcorr(xp: types.ModuleType) -> None:
     # from Higham (2002)
     a = xp.asarray(
         [
@@ -90,7 +98,9 @@ def test_nearcorr(xp: types.ModuleType):
         glass.algorithm.nearcorr(xp.zeros((4, 3)))
 
 
-def test_cov_nearest(xp, urng, mocker: pytest_mock.MockerFixture):
+def test_cov_nearest(
+    xp: types.ModuleType, urng: UnifiedGenerator, mocker: pytest_mock.MockerFixture
+) -> None:
     # prepare a random matrix
     m = xp.asarray(urng.random((4, 4)))
 
