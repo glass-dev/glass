@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 import pylevin as levin
 from scipy.interpolate import RectBivariateSpline, UnivariateSpline
@@ -211,9 +213,10 @@ def get_cls(
         )
     )
 
-    shell_cls_dict = {}
-    for i in range(len(chi_lims) - 1):
-        for j in range(len(chi_lims) - 1):
-            shell_cls_dict[f"W{i + 1}xW{j + 1}"] = shell_cls[i, j, :]
-
+    shell_cls_dict = {
+        f"W{i + 1}xW{j + 1}": shell_cls[i, j, :]
+        for i, j in itertools.product(
+            range(len(chi_lims) - 1), range(len(chi_lims) - 1)
+        )
+    }
     return shell_cls, shell_cls_dict, lev_list
