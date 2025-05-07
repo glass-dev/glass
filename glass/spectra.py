@@ -41,7 +41,8 @@ def make_shell_interpolator(shell_z, shell_weights, cosmo) -> list[UnivariateSpl
 
     Returns
     -------
-        A list the length of the number of shells with each element being a UnivariateSpline for that shell.
+        A list the length of the number of shells with each element being a
+        UnivariateSpline for that shell.
 
     """
     chi = cosmo.comoving_distance(shell_z)
@@ -65,7 +66,8 @@ def make_glass_shell_interpolator(ws, cosmo) -> list[UnivariateSpline]:
 
     Returns
     -------
-        A list the length of the number of shells with each element being a UnivariateSpline for that shell.
+        A list the length of the number of shells with each element being a
+        UnivariateSpline for that shell.
 
     """
     return [
@@ -87,16 +89,24 @@ def get_cls(
     pk_interpolator,
     shells_interpolate,
     chi_lims,
-    N_thread=4,  # number of threads used for hyperthreading
-    n_sub=8,  # number of collocation points in each bisection
-    n_bisec_max=64,  # maximum number of bisections used
-    rel_acc=1e-10,  # relative accuracy target
-    boost_bessel=True,  # should the bessel functions be calculated with boost instead of GSL, higher accuracy at high Bessel orders
-    verbose=False,  # should the code talk to you?
+    # number of threads used for hyperthreading
+    N_thread: int = 4,
+    # number of collocation points in each bisection
+    n_sub: int = 8,
+    # maximum number of bisections used
+    n_bisec_max: int = 64,
+    # relative accuracy target
+    rel_acc: float = 1e-10,
+    # should the bessel functions be calculated with boost instead of GSL,
+    # higher accuracy at high Bessel orders
+    boost_bessel: bool = True,
+    # should the code talk to you?
+    verbose: bool = False,
     lev_list=None,
 ):
     """
-    Calculates Cls using the geometric approximation and performing the integral in comoving distance first.
+    Calculates Cls using the geometric approximation and performing the integral
+    in comoving distance first.
 
     Parameters
     ----------
@@ -121,11 +131,14 @@ def get_cls(
     rel_acc
         The relative accuracy target.
     boost_bessel
-        Should the bessel functions be calculated with boost instead of GSL, higher accuracy at high Bessel orders.
+        Should the bessel functions be calculated with boost instead of GSL,
+        higher accuracy at high Bessel orders.
     verbose
         Should the code talk to you?
     lev_list
-        List of Levin objects to load. If None, new Levin objects are created. Useful for speeding up the calculation if we have at hand already calculated bisections.
+        List of Levin objects to load. If None, new Levin objects are created.
+        Useful for speeding up the calculation if we have at hand already
+        calculated bisections.
 
     Returns
     -------
@@ -134,7 +147,9 @@ def get_cls(
     shell_cls_dict
         A dictionary with the shell cls labelled by the shell pair number.
     lev_list
-        A list of Levin objects. If lev_list is None, this will be a list of new Levin objects created during the calculation. If lev_list is not None, this will be the same list passed in as lev_list.
+        A list of Levin objects. If lev_list is None, this will be a list of new
+        Levin objects created during the calculation. If lev_list is not None,
+        this will be the same list passed in as lev_list.
     """
     # Some levin definitions
     integral_type = 0
