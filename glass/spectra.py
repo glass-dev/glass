@@ -1,12 +1,20 @@
 import itertools
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pylevin as levin
 from scipy.interpolate import RectBivariateSpline, UnivariateSpline
 from tqdm import tqdm
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
-def make_pk_interpolators(pk, k, z) -> RectBivariateSpline:
+    from cosmology import Cosmology
+
+
+def make_pk_interpolators(
+    pk, k: NDArray[float], z: NDArray[float]
+) -> RectBivariateSpline:
     """
     Spline interpolator for the matter power spectrum.
 
@@ -28,7 +36,9 @@ def make_pk_interpolators(pk, k, z) -> RectBivariateSpline:
     return pkz_interp
 
 
-def make_shell_interpolator(shell_z, shell_weights, cosmo) -> list[UnivariateSpline]:
+def make_shell_interpolator(
+    shell_z, shell_weights, cosmo: Cosmology
+) -> list[UnivariateSpline]:
     """
     Spline interpolator for comoving shells.
 
@@ -55,7 +65,7 @@ def make_shell_interpolator(shell_z, shell_weights, cosmo) -> list[UnivariateSpl
     return shell_interp
 
 
-def make_glass_shell_interpolator(ws, cosmo) -> list[UnivariateSpline]:
+def make_glass_shell_interpolator(ws, cosmo: Cosmology) -> list[UnivariateSpline]:
     """
     Spline interpolator for comoving shells.
 
@@ -84,26 +94,26 @@ def make_glass_shell_interpolator(ws, cosmo) -> list[UnivariateSpline]:
     ]
 
 
-def get_cls(
-    num_shells,
-    ell_min,  # can be set to 1
-    ell_max,
+def get_cls(  # noqa: PLR0913
+    num_shells: int,
+    ell_min: int,  # can be set to 1
+    ell_max: int,
     pk_interpolator,
     shells_interpolate,
     chi_lims,
     # number of threads used for hyperthreading
-    N_thread=4,
+    N_thread: int = 4,
     # number of collocation points in each bisection
-    n_sub=8,
+    n_sub: int = 8,
     # maximum number of bisections used
-    n_bisec_max=64,
+    n_bisec_max: int = 64,
     # relative accuracy target
-    rel_acc=1e-10,
+    rel_acc: float = 1e-10,
     # should the bessel functions be calculated with boost instead of GSL,
     # higher accuracy at high Bessel orders
-    boost_bessel=True,
+    boost_bessel: bool = True,
     # should the code talk to you?
-    verbose=False,
+    verbose: bool = False,
     lev_list=None,
 ):
     """
