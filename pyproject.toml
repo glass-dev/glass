@@ -59,6 +59,7 @@ examples = [
 ]
 test = [
     "fitsio",
+    "jax>=0.4.32",
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
