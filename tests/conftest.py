@@ -22,6 +22,13 @@ if TYPE_CHECKING:
     from glass._array_api_utils import UnifiedGenerator
 
 
+if TYPE_CHECKING:
+    import types
+
+    from numpy.typing import NDArray
+
+    from cosmology import Cosmology
+
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
 
@@ -106,6 +113,7 @@ else:
     raise ValueError(msg)
 
 
+# Pytest fixtures
 @pytest.fixture(params=xp_available_backends.values(), scope="session")
 def xp(request: pytest.FixtureRequest) -> types.ModuleType:
     """
@@ -135,7 +143,16 @@ def urng(xp: types.ModuleType) -> UnifiedGenerator:
     raise NotImplementedError(msg)
 
 
-# Pytest fixtures
+@pytest.fixture(scope="session")
+def rng() -> np.random.Generator:
+    """
+    RNG fixture for non array API tests.
+
+    Use `urng` for array API tests.
+    """
+    return np.random.default_rng(seed=42)
+
+
 @pytest.fixture(scope="session")
 def cosmo() -> Cosmology:
     class MockCosmology:
@@ -184,16 +201,6 @@ def cosmo() -> Cosmology:
             return 1_000 * (1 / (dc + np.finfo(float).eps))
 
     return MockCosmology()
-
-
-@pytest.fixture(scope="session")
-def rng() -> np.random.Generator:
-    """
-    RNG fixture for non array API tests.
-
-    Use `urng` for array API tests.
-    """
-    return np.random.default_rng(seed=42)
 
 
 @pytest.fixture(scope="session")
