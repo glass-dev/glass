@@ -10,14 +10,13 @@ import packaging.version
 import pytest
 
 import glass
-from glass.cosmology import Cosmology
 
 if TYPE_CHECKING:
     import types
 
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
+    from glass.cosmology import Cosmology
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
