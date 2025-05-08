@@ -10,6 +10,17 @@ import packaging.version
 import pytest
 
 import glass
+import glass.jax
+
+if TYPE_CHECKING:
+    import types
+
+    from numpy.typing import NDArray
+
+    from cosmology import Cosmology
+
+    from glass._array_api_utils import UnifiedGenerator
+
 
 if TYPE_CHECKING:
     import types
@@ -114,6 +125,35 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
 
 
 @pytest.fixture(scope="session")
+def urng(xp: types.ModuleType) -> UnifiedGenerator:
+    """
+    Fixture for a unified RNG interface.
+
+    Access the relevant RNG using `urng.` in tests.
+
+    Must be used with the `xp` fixture. Use `rng` for non array API tests.
+    """
+    seed = 42
+    backend = xp.__name__
+    if backend == "jax.numpy":
+        return glass.jax.Generator(seed=seed)
+    if backend in {"numpy", "array_api_strict"}:
+        return np.random.default_rng(seed=seed)
+    msg = "the array backend in not supported"
+    raise NotImplementedError(msg)
+
+
+@pytest.fixture(scope="session")
+def rng() -> np.random.Generator:
+    """
+    RNG fixture for non array API tests.
+
+    Use `urng` for array API tests.
+    """
+    return np.random.default_rng(seed=42)
+
+
+@pytest.fixture(scope="session")
 def cosmo() -> Cosmology:
     class MockCosmology:
         @property
@@ -161,11 +201,6 @@ def cosmo() -> Cosmology:
             return 1_000 * (1 / (dc + np.finfo(float).eps))
 
     return MockCosmology()
-
-
-@pytest.fixture(scope="session")
-def rng() -> np.random.Generator:
-    return np.random.default_rng(seed=42)
 
 
 @pytest.fixture(scope="session")
