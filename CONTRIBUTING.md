@@ -101,7 +101,7 @@ if TYPE_CHECKING:
     from glass._array_api_utils import UnifiedGenerator
 
 
-def test_something(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_something(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     # use `xp.` to access the array library functionality
     # use `urng.` to access the corresponding rng functionality
     ...
