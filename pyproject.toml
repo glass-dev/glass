@@ -52,7 +52,7 @@ docs = [
 ]
 examples = [
     "camb",
-    "cosmology.compat.camb",
+    "cosmology.compat.camb>=0.2.0",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
