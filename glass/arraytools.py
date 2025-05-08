@@ -7,16 +7,19 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Unpack
 
+    from jaxtyping import Array
     from numpy.typing import DTypeLike, NDArray
 
 
 def broadcast_first(
-    *arrays: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], ...]:
+    *arrays: NDArray[np.float64] | Array,
+) -> tuple[NDArray[np.float64] | Array, ...]:
     """
     Broadcast arrays, treating the first axis as common.
 
@@ -30,19 +33,20 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
-    arrays = np.broadcast_arrays(*arrays)
-    return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
+    xp = _utils.get_namespace(*arrays)
+    arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
+    arrays = xp.broadcast_arrays(*arrays)
+    return tuple(xp.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
 
 
 def broadcast_leading_axes(
     *args: tuple[
-        float | NDArray[np.float64],
+        float | NDArray[np.float64] | Array,
         int,
     ],
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[NDArray[np.float64], ...]],
+    Unpack[tuple[NDArray[np.float64] | Array, ...]],
 ]:
     """
     Broadcast all but the last N axes.
@@ -90,14 +94,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | NDArray[np.float64],
-    xq: Sequence[float] | NDArray[np.float64],
-    fq: Sequence[float] | NDArray[np.float64],
+    x: float | NDArray[np.float64] | Array,
+    xq: Sequence[float] | NDArray[np.float64] | Array,
+    fq: Sequence[float] | NDArray[np.float64] | Array,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -134,13 +138,13 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapezoid_product(
-    f: tuple[NDArray[np.float64], NDArray[np.float64]],
+    f: tuple[NDArray[np.float64] | Array, NDArray[np.float64] | Array],
     *ff: tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
+        NDArray[np.float64] | Array,
+        NDArray[np.float64] | Array,
     ],
     axis: int = -1,
-) -> float | NDArray[np.float64]:
+) -> float | NDArray[np.float64] | Array:
     """
     Trapezoidal rule for a product of functions.
 
@@ -158,25 +162,30 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
-    x: NDArray[np.float64]
+    # strictly speaking we should check all functions within ff are of the same
+    # array library as each other, but for simplicity we only check the first
+    # function in ff in the event that multiple functions are passed in
+    xp = _utils.get_namespace(*f, *ff[0])
+
+    x: NDArray[np.float64] | Array
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(
+        x = xp.union1d(
             x[(x >= x_[0]) & (x <= x_[-1])],
             x_[(x_ >= x[0]) & (x_ <= x[-1])],
         )
-    y = np.interp(x, *f)
+    y = xp.interp(x, *f)
     for f_ in ff:
-        y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)
+        y *= xp.interp(x, *f_)
+    return xp.trapezoid(y, x, axis=axis)
 
 
 def cumulative_trapezoid(
-    f: NDArray[np.int_] | NDArray[np.float64],
-    x: NDArray[np.int_] | NDArray[np.float64],
+    f: NDArray[np.int_] | NDArray[np.float64] | Array,
+    x: NDArray[np.int_] | NDArray[np.float64] | Array,
     dtype: DTypeLike | None = None,
-    out: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    out: NDArray[np.float64] | Array | None = None,
+) -> NDArray[np.float64] | Array:
     """
     Cumulative trapezoidal rule along last axis.
 
@@ -196,9 +205,15 @@ def cumulative_trapezoid(
         The cumulative integral of the function.
 
     """
-    if out is None:
-        out = np.empty_like(f, dtype=dtype)
+    xp = _utils.get_namespace(f, x, out)
 
-    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
+    if out is None:
+        out = xp.empty_like(f, dtype=dtype)
+
+    xp.cumulative_sum(
+        (f[..., 1:] + f[..., :-1]) / 2 * xp.diff(x),
+        axis=-1,
+        out=out[..., 1:],
+    )
     out[..., 0] = 0
     return out
