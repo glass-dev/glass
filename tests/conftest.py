@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 import contextlib
 import importlib.metadata
 import os
-import types
+from typing import TYPE_CHECKING
 
 import numpy as np
 import packaging.version
 import pytest
-from numpy.typing import NDArray
-
-from cosmology import Cosmology
 
 import glass
+
+if TYPE_CHECKING:
+    import types
+
+    from numpy.typing import NDArray
+
+    from cosmology import Cosmology
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
@@ -95,11 +101,18 @@ else:
     msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
     raise ValueError(msg)
 
-# use this as a decorator for tests involving array API compatible functions
-array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.values())
-
 
 # Pytest fixtures
+@pytest.fixture(params=xp_available_backends.values(), scope="session")
+def xp(request: pytest.FixtureRequest) -> types.ModuleType:
+    """
+    Fixture for array backend.
+
+    Access array library functions using `xp.` in tests.
+    """
+    return request.param
+
+
 @pytest.fixture(scope="session")
 def cosmo() -> Cosmology:
     class MockCosmology:
