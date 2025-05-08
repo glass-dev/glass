@@ -1,12 +1,15 @@
 """Module for cosmology.api utilities."""
 
-from typing import Any, Protocol
-
-from numpy.typing import NDArray
+from typing import TYPE_CHECKING, Protocol
 
 import cosmology.api
 
-Array = NDArray[Any]
+if TYPE_CHECKING:
+    from typing import Any
+
+    from numpy.typing import NDArray
+
+    Array = NDArray[Any]
 
 
 class Cosmology(
