@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import dataclasses
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
-from cosmology import Cosmology
-
 import glass
+
+if TYPE_CHECKING:
+    from glass.cosmology import Cosmology
 
 
 def test_distance_weight(cosmo: Cosmology) -> None:
