@@ -50,7 +50,7 @@ def rng_dispatcher(array: NDArray[Any] | JAXArray) -> UnifiedGenerator:
 
 
 class Generator:
-    """JAX random number generation as a NumPy generator."""
+    """NumPy random number generator returning array_api_strict Array."""
 
     __slots__ = ("rng",)
 
