@@ -46,7 +46,7 @@ def test_nnls(rng: np.random.Generator) -> None:
 
 def test_cov_clip(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     # prepare a random matrix
-    m = xp.asarray(urng.random((4, 4)))
+    m = urng.random((4, 4))
 
     # symmetric matrix
     a = (m + m.T) / 2
@@ -102,7 +102,7 @@ def test_cov_nearest(
     xp: types.ModuleType, urng: UnifiedGenerator, mocker: pytest_mock.MockerFixture
 ) -> None:
     # prepare a random matrix
-    m = xp.asarray(urng.random((4, 4)))
+    m = urng.random((4, 4))
 
     # symmetric matrix
     a = xp.eye(4) + (m + m.T) / 2
