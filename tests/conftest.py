@@ -10,6 +10,7 @@ import packaging.version
 import pytest
 
 import glass
+import glass._array_api_utils
 import glass.jax
 
 if TYPE_CHECKING:
@@ -137,8 +138,10 @@ def urng(xp: types.ModuleType) -> UnifiedGenerator:
     backend = xp.__name__
     if backend == "jax.numpy":
         return glass.jax.Generator(seed=seed)
-    if backend in {"numpy", "array_api_strict"}:
+    if backend == "numpy":
         return np.random.default_rng(seed=seed)
+    if backend == "array_api_strict":
+        return glass._array_api_utils.Generator(seed=seed)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
