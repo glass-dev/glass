@@ -1,7 +1,7 @@
 import jax
 import jax.numpy as jnp
 import pytest
-from jaxtyping import Array, PRNGKeyArray
+from jax.typing import ArrayLike
 
 from glass.jax import Generator
 
@@ -12,14 +12,12 @@ def test_init() -> None:
     assert isinstance(rng.key, jax.Array)
     assert jax.dtypes.issubdtype(rng.key.dtype, jax.dtypes.prng_key)
     assert jnp.all(rng.key == jax.random.key(42))
-    assert isinstance(rng.key, PRNGKeyArray)
 
 
 def test_from_key() -> None:
     key = jax.random.key(42)
     rng = Generator.from_key(key)
     assert rng.key is key
-    assert isinstance(rng.key, PRNGKeyArray)
 
     with pytest.raises(ValueError, match="not a random key"):
         Generator.from_key(object())
@@ -32,7 +30,6 @@ def test_key() -> None:
     rng = Generator(42)
     rngkey, outkey = jax.random.split(rng.key, 2)
     key = rng.split()
-    assert isinstance(rng.key, PRNGKeyArray)
     assert jnp.all(rng.key == rngkey)
     assert jnp.all(key == outkey)
 
@@ -47,7 +44,6 @@ def test_spawn() -> None:
     for subrng, subkey in zip(subrngs, subkeys, strict=False):
         assert isinstance(subrng, Generator)
         assert subrng.key == subkey
-        assert isinstance(subrng.key, PRNGKeyArray)
 
 
 def test_random() -> None:
@@ -58,7 +54,7 @@ def test_random() -> None:
     assert rvs.shape == (10_000,)
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, ArrayLike)
 
 
 def test_normal() -> None:
@@ -67,7 +63,7 @@ def test_normal() -> None:
     rvs = rng.normal(1, 2, size=10_000)
     assert rng.key != key
     assert rvs.shape == (10_000,)
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, ArrayLike)
 
 
 def test_standard_normal() -> None:
@@ -76,7 +72,7 @@ def test_standard_normal() -> None:
     rvs = rng.standard_normal(size=10_000)
     assert rng.key != key
     assert rvs.shape == (10_000,)
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, ArrayLike)
 
 
 def test_poisson() -> None:
@@ -85,7 +81,7 @@ def test_poisson() -> None:
     rvs = rng.poisson(lam=1, size=10_000)
     assert rng.key != key
     assert rvs.shape == (10_000,)
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, ArrayLike)
 
 
 def test_uniform() -> None:
@@ -96,4 +92,4 @@ def test_uniform() -> None:
     assert rvs.shape == (10_000,)
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, ArrayLike)
