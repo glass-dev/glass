@@ -20,12 +20,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "cosmology.api>=0.3.0",
+    "cosmology.api>=0.3.1",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "numpy>=2.1.1",
     "transformcl>=2022.8.9",
-    "typing_extensions>=4.13.2",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
