@@ -85,18 +85,25 @@ GLASS_ARRAY_BACKEND=jax python -m pytest
 GLASS_ARRAY_BACKEND=all python -m pytest
 ```
 
-Moreover, one can mark a test to be compatible with the array API standard by
-decorating it with `@array_api_compatible`. This will `parameterize` the test to
-run on every array library specified through `GLASS_ARRAY_BACKEND` -
+Moreover, one can test if a function is compatible with the array API standard
+by using the `xp` fixture in tests. Further, the corresponding RNG `Generator`
+can be accessed using the `urng` (a unified RNG interface) fixture. This will
+`parametrize` the test to run on every array library specified through
+`GLASS_ARRAY_BACKEND` -
 
 ```python
-import types
-from tests.conftest import array_api_compatible
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import types
+    from glass._array_api_utils import UnifiedGenerator
 
 
-@array_api_compatible
-def test_something(xp: types.ModuleType):
+def test_something(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     # use `xp.` to access the array library functionality
+    # use `urng.` to access the corresponding rng functionality
     ...
 ```
 

@@ -20,12 +20,13 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "cosmology>=2022.10.9",
+    "cosmology.api>=0.3.2",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "jaxtyping>=0.3.1",
     "numpy>=2.1.1",
     "transformcl>=2022.8.9",
+    "typing_extensions>=4.13.2",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -53,6 +54,7 @@ docs = [
 ]
 examples = [
     "camb",
+    "cosmology.compat.camb>=0.2.0",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
@@ -150,7 +152,8 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
-    "glass.ext.camb",
+], known-third-party = [
+    "jax",
 ], section-order = [
     "future",
     "standard-library",
@@ -160,7 +163,6 @@ lint.isort = {known-first-party = [
     "local-folder",
 ], sections = {"cosmo" = [
     "camb",
-    "camb.sources",
     "cosmology",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
