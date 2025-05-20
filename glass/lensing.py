@@ -41,9 +41,8 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from cosmology import Cosmology
-
     import glass
+    from glass.cosmology import Cosmology
 
 
 @overload
@@ -473,15 +472,21 @@ class MultiPlaneConvergence:
         w2, self.w3 = self.w3, wlens
 
         # extrapolation law
-        x2, self.x3 = self.x3, self.cosmo.xm(self.z3)
+        x2, self.x3 = (
+            self.x3,
+            self.cosmo.transverse_comoving_distance(self.z3)
+            / self.cosmo.hubble_distance,
+        )
         r12 = self.r23
-        r13, self.r23 = self.cosmo.xm([z1, self.z2], self.z3) / self.x3
+        r13, self.r23 = self.cosmo.transverse_comoving_distance(
+            [z1, self.z2], self.z3
+        ) / (self.cosmo.hubble_distance * self.x3)
         t = r13 / r12
 
         # lensing weight of mass plane to be added
-        f = 3 * self.cosmo.omega_m / 2
+        f = 3 * self.cosmo.Omega_m0 / 2
         f *= x2 * self.r23
-        f *= (1 + self.z2) / self.cosmo.ef(self.z2)
+        f *= (1 + self.z2) / self.cosmo.H_over_H0(self.z2)
         f *= w2
 
         # create kappa planes on first iteration
