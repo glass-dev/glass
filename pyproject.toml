@@ -59,6 +59,7 @@ examples = [
     "matplotlib",
 ]
 test = [
+    "array_api_strict>=2",
     "fitsio",
     "jax>=0.4.32",
     "pytest",

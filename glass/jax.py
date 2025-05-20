@@ -85,8 +85,8 @@ class Generator:
 
     def normal(
         self,
-        loc: float,
-        scale: float,
+        loc: float = 0.0,
+        scale: float = 1.0,
         size: Size = None,
         dtype: Shaped[Array, ...] = float,
     ) -> Array:
