@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numbers
 from typing import TYPE_CHECKING, Any, TypeAlias
 
 import numpy as np
@@ -19,12 +20,14 @@ def get_namespace(*arrays: NDArray[Any] | Array) -> ModuleType:
     if they belong to the same library or raise a :class:`ValueError`
     if they do not.
     """
-    namespace = arrays[0].__array_namespace__()
-    if any(
-        array.__array_namespace__() != namespace
+    # removing everything that isn't strictly an array type
+    array_types = [
+        array.__array_namespace__
         for array in arrays
-        if array is not None
-    ):
+        if array is not None and not isinstance(array, numbers.Number)
+    ]
+    namespace = array_types[0]
+    if any(array_type != namespace for array_type in array_types):
         msg = "input arrays should belong to the same array library"
         raise ValueError(msg)
 
