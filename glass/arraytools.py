@@ -79,7 +79,7 @@ def broadcast_leading_axes(
     (3, 4, 5, 6)
 
     """
-    xp = _utils.get_namespace(args)
+    xp = _utils.get_namespace(*args)
     shapes, trails = [], []
     for a, n in args:
         s = xp.shape(a)
