@@ -2,12 +2,10 @@ import types
 
 import numpy as np
 import pytest
-import tests.conftest
 
 import glass.arraytools
 
 
-@tests.conftest.array_api_compatible
 def test_broadcast_first(xp: types.ModuleType) -> None:
     a = xp.ones((2, 3, 4))
     b = xp.ones((2, 1))
@@ -37,7 +35,6 @@ def test_broadcast_first(xp: types.ModuleType) -> None:
     assert b_a.shape == (4, 5, 6)
 
 
-@tests.conftest.array_api_compatible
 def test_broadcast_leading_axes(xp: types.ModuleType) -> None:
     a_in = 0
     b_in = xp.zeros((4, 10))
@@ -54,7 +51,6 @@ def test_broadcast_leading_axes(xp: types.ModuleType) -> None:
     assert c_out.shape == (3, 4, 5, 6)
 
 
-@tests.conftest.array_api_compatible
 def test_ndinterp(xp: types.ModuleType) -> None:
     # test 1d interpolation
 
@@ -140,7 +136,6 @@ def test_ndinterp(xp: types.ModuleType) -> None:
     )
 
 
-@tests.conftest.array_api_compatible
 def test_trapezoid_product(xp: types.ModuleType) -> None:
     x1 = xp.linspace(0, 2, 100)
     f1 = xp.full_like(x1, 2.0)
@@ -153,7 +148,6 @@ def test_trapezoid_product(xp: types.ModuleType) -> None:
     np.testing.assert_allclose(s, 1.0)
 
 
-@tests.conftest.array_api_compatible
 def test_cumulative_trapezoid(xp: types.ModuleType) -> None:
     # 1D f and x
 

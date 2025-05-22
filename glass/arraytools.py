@@ -5,14 +5,13 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Unpack
 
+    import numpy as np
     from jaxtyping import Array
     from numpy.typing import DTypeLike, NDArray
 
@@ -80,15 +79,16 @@ def broadcast_leading_axes(
     (3, 4, 5, 6)
 
     """
+    xp = _utils.get_namespace(args)
     shapes, trails = [], []
     for a, n in args:
-        s = np.shape(a)
+        s = xp.shape(a)
         i = len(s) - n
         shapes.append(s[:i])
         trails.append(s[i:])
-    dims = np.broadcast_shapes(*shapes)
+    dims = xp.broadcast_shapes(*shapes)
     arrs = (
-        np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails, strict=False)
+        xp.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails, strict=False)
     )
     return (dims, *arrs)
 
@@ -127,8 +127,9 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    return np.apply_along_axis(
-        partial(np.interp, x, xq),
+    xp = _utils.get_namespace(x, xq, fq)
+    return xp.apply_along_axis(
+        partial(xp.interp, x, xq),
         axis,
         fq,
         left=left,
