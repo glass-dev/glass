@@ -41,7 +41,7 @@ def rng_dispatcher(array: NDArray[Any] | JAXArray) -> UnifiedGenerator:
     backend = array.__array_namespace__().__name__
     if backend == "jax.numpy":
         return glass.jax.Generator(seed=42)
-    if backend in "numpy":
+    if backend == "numpy":
         return np.random.default_rng()
     if backend == "array_api_strict":
         return Generator(seed=42)
