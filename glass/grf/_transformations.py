@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 # cannot use jaxtyping.Array here as it cannot be moved under
-# a TYPE_CHECKING block
+# a type checking block
 from jax.typing import ArrayLike  # noqa: TC002
 from numpy.typing import NDArray  # noqa: TC002
 
