@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
+    from jaxtyping import Array
     from numpy.typing import NDArray
 
 
@@ -93,9 +94,9 @@ def nnls(
 
 
 def cov_clip(
-    cov: NDArray[np.float64],
+    cov: NDArray[np.float64] | Array,
     rtol: float | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Covariance matrix from clipping non-positive eigenvalues.
 
@@ -130,16 +131,15 @@ def cov_clip(
     # put matrix back together
     # enforce symmetry
     v = xp.sqrt(w[..., None, :]) * v
-    cov_clipped: NDArray[np.float64] = xp.matmul(v, xp.matrix_transpose(v))
-    return cov_clipped
+    return xp.matmul(v, xp.matrix_transpose(v))
 
 
 def nearcorr(
-    a: NDArray[np.float64],
+    a: NDArray[np.float64] | Array,
     *,
     tol: float | None = None,
     niter: int = 100,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Compute the nearest correlation matrix.
 
@@ -177,7 +177,7 @@ def nearcorr(
         tol = n * xp.finfo(a.dtype).eps
 
     # current result, flatten leading dimensions
-    y = a.reshape(-1, n, n)
+    y = xp.reshape(a, (-1, n, n))
 
     # initial correction is zero
     ds = xp.zeros_like(a)
@@ -204,14 +204,14 @@ def nearcorr(
             break
 
     # return result in original shape
-    return y.reshape(*dim, n, n)
+    return xp.reshape(y, (*dim, n, n))
 
 
 def cov_nearest(
-    cov: NDArray[np.float64],
+    cov: NDArray[np.float64] | Array,
     tol: float | None = None,
     niter: int = 100,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Covariance matrix from nearest correlation matrix.
 
@@ -245,7 +245,7 @@ def cov_nearest(
         raise ValueError(msg)
 
     # store the normalisation of the matrix
-    norm: NDArray[np.float64] = xp.sqrt(diag)
+    norm = xp.sqrt(diag)
     norm = norm[..., None, :] * norm[..., :, None]
 
     # find nearest correlation matrix
