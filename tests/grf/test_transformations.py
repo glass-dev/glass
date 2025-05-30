@@ -22,14 +22,14 @@ def test_lognormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     for lam in 1.0, urng.uniform():
         var = urng.uniform()
         t = glass.grf.Lognormal(lam)
-        x = xp.asarray(urng.standard_normal(10))
+        x = urng.standard_normal(10)
         y = lam * xp.expm1(x - var / 2)
         np.testing.assert_array_equal(t(x, var), y)
 
 
 def test_sqnormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     for lam in 1.0, urng.uniform():
-        var = xp.asarray(urng.uniform())
+        var = urng.uniform()
         a = xp.sqrt(1 - var)
         t = glass.grf.SquaredNormal(a, lam)
         x = urng.standard_normal(10)
@@ -40,7 +40,7 @@ def test_sqnormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
 def test_normal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
-    x = xp.asarray(urng.random(10))
+    x = urng.random(10)
     np.testing.assert_array_equal(glass.grf.corr(t1, t2, x), x)
     np.testing.assert_array_equal(glass.grf.icorr(t1, t2, x), x)
     np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
@@ -53,7 +53,7 @@ def test_lognormal_lognormal(xp: types.ModuleType, urng: UnifiedGenerator) -> No
     lam2 = urng.uniform()
     t2 = glass.grf.Lognormal(lam2)
 
-    x = xp.asarray(urng.random(10))
+    x = urng.random(10)
     y = lam1 * lam2 * xp.expm1(x)
     dy = lam1 * lam2 * xp.exp(x)
 
@@ -68,7 +68,7 @@ def test_lognormal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
 
     t2 = glass.grf.Normal()
 
-    x = xp.asarray(urng.random(10))
+    x = urng.random(10)
     y = lam1 * x
     dy = lam1 * xp.ones_like(x)
 
@@ -78,11 +78,11 @@ def test_lognormal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
 
 
 def test_sqnormal_sqnormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
-    lam1, var1 = xp.asarray(urng.uniform(size=2))
+    lam1, var1 = urng.uniform(size=2)
     a1 = xp.sqrt(1 - var1)
     t1 = glass.grf.SquaredNormal(a1, lam1)
 
-    lam2, var2 = xp.asarray(urng.uniform(size=2))
+    lam2, var2 = urng.uniform(size=2)
     a2 = xp.sqrt(1 - var2)
     t2 = glass.grf.SquaredNormal(a2, lam2)
 
