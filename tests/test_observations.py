@@ -1,8 +1,10 @@
 import healpix
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 import glass
+import glass.observations
 
 
 def test_vmap_galactic_ecliptic() -> None:
@@ -136,3 +138,86 @@ def test_tomo_nz_gausserr() -> None:
     # check the shape of the output
 
     np.testing.assert_array_equal(binned_nz.shape, (len(zbins), len(z)))
+
+
+@pytest.mark.parametrize(
+    ("vardepth_map", "n_bins", "zbins", "index", "expected_mask"),
+    [
+        (
+            np.array([[1.0, 2.0], [3.0, 4.0]]),
+            2,
+            [(0.0, 0.5), (0.5, 1.0)],
+            (0, 0),
+            np.array([1.0, 2.0]),
+        ),
+        (
+            np.array([[1.0, 2.0], [3.0, 4.0]]),
+            2,
+            [(0.0, 0.5), (0.5, 1.0)],
+            (1, 1),
+            np.array([3.0, 4.0]),
+        ),
+    ],
+    ids=["test_valid_index_1", "test_valid_index_2"],
+)
+def test_getitem_happy_path(
+    vardepth_map: NDArray[np.float64],
+    n_bins: int,
+    zbins: list[tuple[float, float]],
+    index: tuple[int, int],
+    expected_mask: NDArray[np.float64],
+) -> None:
+    # Arrange
+    mask = glass.observations.AngularVariableDepthMask(vardepth_map, n_bins, zbins)
+
+    # Act
+    result = mask[index]
+
+    # Assert
+    np.testing.assert_array_equal(result, expected_mask)
+
+
+@pytest.mark.parametrize(
+    ("vardepth_map", "n_bins", "zbins", "index", "expected_error"),
+    [
+        (
+            np.array([[1.0, 2.0], [3.0, 4.0]]),
+            2,
+            [(0.0, 0.5), (0.5, 1.0)],
+            (2, 0),
+            ValueError,
+        ),
+        (
+            np.array([[1.0, 2.0], [3.0, 4.0]]),
+            2,
+            [(0.0, 0.5), (0.5, 1.0)],
+            (0, 2),
+            ValueError,
+        ),
+        (
+            np.array([[1.0, 2.0], [3.0, 4.0]]),
+            2,
+            [(0.0, 0.5), (0.5, 1.0)],
+            0,
+            TypeError,
+        ),
+    ],
+    ids=[
+        "test_invalid_index_1",
+        "test_invalid_index_2",
+        "test_invalid_index_type",
+    ],
+)
+def test_getitem_error_cases(
+    vardepth_map: NDArray[np.float64],
+    n_bins: int,
+    zbins: list[tuple[float, float]],
+    index: tuple[int, int],
+    expected_error: type[BaseException],
+) -> None:
+    # Arrange
+    mask = glass.observations.AngularVariableDepthMask(vardepth_map, n_bins, zbins)
+
+    # Act & Assert
+    with pytest.raises(expected_error):
+        mask[index]
