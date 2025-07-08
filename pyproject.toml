@@ -135,6 +135,7 @@ xfail_strict = true
 [tool.ruff]
 fix = true
 force-exclude = true
+per-file-target-version = {"examples/*" = "py313"}
 show-fixes = true
 src = [
     "glass",
