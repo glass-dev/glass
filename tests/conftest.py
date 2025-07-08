@@ -65,7 +65,7 @@ def _import_and_add_array_api_strict(
     xp_available_backends: dict[str, types.ModuleType],
 ) -> None:
     """Add array_api_strict to the backends dictionary."""
-    import array_api_strict  # noqa: PLC0415
+    import array_api_strict
 
     _check_version("array_api_strict", "2.0.0")
     xp_available_backends.update({"array_api_strict": array_api_strict})
@@ -74,7 +74,7 @@ def _import_and_add_array_api_strict(
 
 def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> None:
     """Add jax to the backends dictionary."""
-    import jax  # noqa: PLC0415
+    import jax
 
     _check_version("jax", "0.4.32")
     xp_available_backends.update({"jax.numpy": jax.numpy})

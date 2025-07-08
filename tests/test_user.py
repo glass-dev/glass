@@ -37,7 +37,7 @@ def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> Non
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_basic_write(tmp_path: pathlib.Path) -> None:
-    import fitsio  # noqa: PLC0415
+    import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
     filename_tfits = "tfits.fits"  # file created on the fly to test against
@@ -109,7 +109,7 @@ def test_write_exception(tmp_path: pathlib.Path) -> None:
                 out.write(RA=array, RB=array2)
 
     except TestWriteError:
-        import fitsio  # noqa: PLC0415
+        import fitsio
 
         with fitsio.FITS(tmp_path / filename) as hdul:
             data = hdul[1].read()
