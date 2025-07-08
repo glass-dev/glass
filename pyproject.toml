@@ -196,6 +196,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "D103", # TODO: undocumented-public-function
     "D104", # undocumented-public-package
     "INP001", # implicit-namespace-package
+    "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "SLF001", # private-member-access
