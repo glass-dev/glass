@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING, Protocol, TypeVar
+from inspect import signature
+from typing import TYPE_CHECKING, Protocol, TypeVar, get_type_hints
 
 import transformcl
 
@@ -59,9 +60,6 @@ def dispatch(
     def add(
         impl: Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]],
     ) -> Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]]:
-        from inspect import signature
-        from typing import get_type_hints
-
         sig = signature(impl)
         if len(sig.parameters) != 3:
             msg = "invalid signature"
