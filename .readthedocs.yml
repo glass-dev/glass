@@ -6,14 +6,10 @@ build:
   tools:
     python: "3.13"
   jobs:
-    install:
+    pre_install:
       - python -m pip install --upgrade pip
-      - python -m pip install --group docs
-
-python:
-  install:
-    - method: pip
-      path: .
+    install:
+      - python -m pip install -e . --group docs
 
 sphinx:
   configuration: docs/conf.py
