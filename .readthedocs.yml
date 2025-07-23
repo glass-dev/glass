@@ -10,5 +10,10 @@ build:
       - python -m pip install --upgrade pip
       - python -m pip install --group docs
 
+python:
+  install:
+    - method: pip
+      path: .
+
 sphinx:
   configuration: docs/conf.py
