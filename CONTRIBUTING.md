@@ -20,7 +20,7 @@ These options can be used with `pip` with the editable (`-e`) mode of
 installation in the following way -
 
 ```bash
-pip install -e ".[docs,test]"
+pip install -e . --group docs --group test
 ```
 
 ## Tooling
