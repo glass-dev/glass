@@ -5,6 +5,37 @@ requires = [
     "hatchling",
 ]
 
+[dependency-groups]
+docs = [
+    "furo",
+    "ipython",
+    "matplotlib",
+    "myst-parser",
+    "nbsphinx",
+    "sphinx-toolbox",
+    "sphinx<8.2.0",
+    "sphinx_autodoc_typehints",
+    "sphinxcontrib-katex",
+]
+examples = [
+    "camb",
+    "cosmology.compat.camb>=0.2.0",
+    "glass.ext.camb",
+    "jax>=0.4.32",
+    "jupyter",
+    "matplotlib",
+]
+test = [
+    "array_api_strict>=2.0,<2.4",
+    "fitsio",
+    "jax>=0.4.32",
+    "pytest",
+    "pytest-cov",
+    "pytest-doctestplus",
+    "pytest-mock",
+    "pytest-rerunfailures",
+]
+
 [project]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -38,37 +69,6 @@ name = "glass"
 readme = "README.md"
 requires-python = ">=3.10"
 license.text = "MIT License"
-
-[project.optional-dependencies]
-docs = [
-    "furo",
-    "ipython",
-    "matplotlib",
-    "myst-parser",
-    "nbsphinx",
-    "sphinx-toolbox",
-    "sphinx<8.2.0",
-    "sphinx_autodoc_typehints",
-    "sphinxcontrib-katex",
-]
-examples = [
-    "camb",
-    "cosmology.compat.camb>=0.2.0",
-    "glass.ext.camb",
-    "jax>=0.4.32",
-    "jupyter",
-    "matplotlib",
-]
-test = [
-    "array_api_strict>=2.0,<2.4",
-    "fitsio",
-    "jax>=0.4.32",
-    "pytest",
-    "pytest-cov",
-    "pytest-doctestplus",
-    "pytest-mock",
-    "pytest-rerunfailures",
-]
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"

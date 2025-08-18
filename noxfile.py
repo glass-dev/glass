@@ -37,7 +37,7 @@ def lint(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
-    session.install("-c", ".github/test-constraints.txt", "-e", ".[test]")
+    session.install("-c", ".github/test-constraints.txt", "-e", ".", "--group", "test")
 
     array_backend = os.environ.get("GLASS_ARRAY_BACKEND")
     if array_backend == "array_api_strict":
@@ -72,7 +72,7 @@ def doctests(session: nox.Session) -> None:
 @nox.session
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
-    session.install("-e", ".[examples]")
+    session.install("-e", ".", "--group", "examples")
 
     if session.posargs:
         if "html" in session.posargs:
@@ -100,7 +100,7 @@ def examples(session: nox.Session) -> None:
 @nox.session
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
-    session.install("-e", ".[docs]")
+    session.install("-e", ".", "--group", "docs")
     session.chdir("docs")
     session.run("sphinx-build", "-M", "html", ".", "_build")
 
