@@ -505,6 +505,22 @@ def test_compute_gaussian_spectra(mocker):
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
+def test_compute_gaussian_spectra_gh639(mocker):
+    """Test compute_gaussian_spectra() with an empty input."""
+    mock = mocker.patch("glass.grf.compute")
+
+    fields = [glass.grf.Normal(), glass.grf.Normal()]
+    spectra = [np.zeros(10), np.zeros(10), np.zeros(0)]
+
+    gls = glass.compute_gaussian_spectra(fields, spectra)
+
+    assert mock.call_count == 2
+    assert mock.call_args_list[0] == mocker.call(spectra[0], fields[0], fields[0])
+    assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
+    assert gls[:2] == [mock.return_value, mock.return_value]
+    assert gls[2].size == 0
+
+
 def test_solve_gaussian_spectra(mocker):
     mock = mocker.patch("glass.grf.solve")
 

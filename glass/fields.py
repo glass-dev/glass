@@ -768,7 +768,7 @@ def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
 
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
-        gl = glass.grf.compute(cl, fields[i], fields[j])
+        gl = glass.grf.compute(cl, fields[i], fields[j]) if cl.size > 0 else 0 * cl
         gls.append(gl)
     return gls
 
