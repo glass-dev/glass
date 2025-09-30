@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
@@ -99,7 +99,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
@@ -123,7 +123,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
