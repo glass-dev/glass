@@ -16,6 +16,8 @@ if TYPE_CHECKING:
     from numpy.typing import DTypeLike, NDArray
 
     Size: TypeAlias = int | tuple[int, ...] | None
+
+    GlassAnyArray: TypeAlias = JAXArray | NDArray[Any]
     GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
 
 
