@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
+import array_api_extra as xpx
 import healpy as hp
 import numpy as np
 from transformcl import cltovar
@@ -557,11 +558,11 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: Sequence[NDArray[np.float64] | Sequence[float]],
+    cls: Sequence[GLASSFloatArray | Sequence[float]],
     i: int,
     j: int,
     lmax: int | None = None,
-) -> NDArray[np.float64] | Sequence[float]:
+) -> GLASSFloatArray | Sequence[float]:
     """
     Return a specific angular power spectrum from an array in
     :ref:`standard order <twopoint_order>`.
@@ -583,6 +584,8 @@ def getcl(
         array in *GLASS* ordering.
 
     """
+    xp = _utils.get_namespace(*cls)
+
     if j > i:
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
@@ -590,7 +593,7 @@ def getcl(
         if len(cl) > lmax + 1:
             cl = cl[: lmax + 1]
         else:
-            cl = np.pad(cl, (0, lmax + 1 - len(cl)))
+            cl = xpx.pad(cl, (0, lmax + 1 - len(cl)), xp=xp)
     return cl
 
 
