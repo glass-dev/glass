@@ -15,7 +15,7 @@ def not_triangle_numbers() -> list[int]:
 def test_iternorm(xp: types.ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        return
+        pytest.skip()
 
     # check output shapes and types
 
@@ -131,7 +131,7 @@ def test_iternorm(xp: types.ModuleType) -> None:
 def test_cls2cov(xp: types.ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        return
+        pytest.skip()
 
     # check output values and shape
 
@@ -207,44 +207,48 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov2 != pytest.approx(cov3)
 
 
-def test_multalm() -> None:
+def test_multalm(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip()
+
     # check output values and shapes
 
-    alm = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    bl = np.array([2.0, 0.5, 1.0])
-    alm_copy = np.copy(alm)
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    bl = xp.asarray([2.0, 0.5, 1.0])
+    alm_copy = xp.asarray(alm, copy=True)
 
     result = glass.fields._multalm(alm, bl, inplace=True)
 
-    assert np.array_equal(result, alm)  # in-place
-    expected_result = np.array([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    np.testing.assert_allclose(result, expected_result)
-    assert not np.array_equal(alm_copy, result)
+    assert result == pytest.approx(alm)
+    expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
+    assert result == pytest.approx(expected_result)
+    assert alm_copy != pytest.approx(result)
 
     # multiple with 1s
 
-    alm = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    bl = np.ones(3)
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    bl = xp.ones(3)
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    np.testing.assert_array_equal(result, alm)
+    assert result == pytest.approx(alm)
 
     # multiple with 0s
 
-    bl = np.array([0.0, 1.0, 0.0])
+    bl = xp.asarray([0.0, 1.0, 0.0])
 
     result = glass.fields._multalm(alm, bl, inplace=False)
 
-    expected_result = np.array([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    np.testing.assert_allclose(result, expected_result)
+    expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
+    assert result == pytest.approx(expected_result)
 
     # empty arrays
 
-    alm = np.array([])
-    bl = np.array([])
+    alm = xp.asarray([])
+    bl = xp.asarray([])
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    np.testing.assert_array_equal(result, alm)
+    assert result == pytest.approx(alm)
 
 
 def test_lognormal_gls() -> None:

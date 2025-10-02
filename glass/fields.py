@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import GLASSFloatArray
+    from glass._array_api_utils import GLASSComplexArray, GLASSFloatArray
 
     Fields = Sequence[glass.grf.Transformation]
     Cls = Sequence[NDArray[Any]]
@@ -229,11 +229,11 @@ def cls2cov(
 
 
 def _multalm(
-    alm: NDArray[np.complex128],
-    bl: NDArray[np.float64],
+    alm: GLASSComplexArray,
+    bl: GLASSFloatArray,
     *,
     inplace: bool = False,
-) -> NDArray[np.complex128]:
+) -> GLASSComplexArray:
     """
     Multiply alm by bl.
 
@@ -261,8 +261,14 @@ def _multalm(
         The product of alm and bl.
 
     """
-    n = len(bl)
-    out = np.asanyarray(alm) if inplace else np.copy(alm)
+    xp = _utils.get_namespace(alm, bl)
+
+    n = bl.size
+    # Ideally would be xp.asanyarray but this does not yet exist. The key difference
+    # between the two in numpy is that asanyarray maintains subclasses of NDArray
+    # whereas asarray will return the base class NDArray. Currently, we don't seem
+    # to pass a subclass of NDArray so this, so it might be okay
+    out = xp.asarray(alm) if inplace else xp.asarray(alm, copy=True)
     for ell in range(n):
         out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
 

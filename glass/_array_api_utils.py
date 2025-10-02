@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
     Size: TypeAlias = int | tuple[int, ...] | None
     GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
+    GLASSComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
 
 
 def get_namespace(*arrays: NDArray[Any] | JAXArray) -> ModuleType:
