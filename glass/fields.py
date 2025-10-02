@@ -185,7 +185,7 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> Generator[NDArray[np.float64]]:
+) -> Generator[GLASSFloatArray]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
 
@@ -211,15 +211,17 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
-    cov = np.zeros((nl, nc + 1))
+    xp = _utils.get_namespace(*cls)
+
+    cov = xp.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and np.any(np.less(cl, 0)):
+            if i == 0 and np.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = len(cl)
+            n = cl.size
             cov[:n, i] = cl
             cov[n:, i] = 0
         cov /= 2
