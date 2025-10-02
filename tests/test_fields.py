@@ -1,3 +1,5 @@
+import types
+
 import healpy as hp
 import numpy as np
 import pytest
@@ -10,13 +12,13 @@ def not_triangle_numbers() -> list[int]:
     return [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
 
-def test_iternorm() -> None:
+def test_iternorm(xp: types.ModuleType) -> None:
     # check output shapes and types
 
     k = 2
 
     generator = glass.iternorm(
-        k, np.array([1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2])
+        k, xp.asarray([1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2])
     )
     result = next(generator)
 
@@ -33,13 +35,14 @@ def test_iternorm() -> None:
 
     generator = glass.iternorm(
         k,
-        np.array(
-            [
+        [
+            xp.asarray(arr)
+            for arr in [
                 [1.0, 0.5, 0.5],
                 [0.5, 0.2, 0.1],
                 [0.5, 0.1, 0.2],
             ]
-        ),
+        ],
         size,
     )
     result = next(generator)
@@ -53,13 +56,26 @@ def test_iternorm() -> None:
     # test shape mismatch error
 
     with pytest.raises(TypeError, match="covariance row 0: shape"):
-        list(glass.iternorm(k, np.array([[1.0, 0.5], [0.5, 0.2]])))
+        list(
+            glass.iternorm(
+                k,
+                [
+                    xp.asarray(arr)
+                    for arr in [
+                        [1.0, 0.5],
+                        [0.5, 0.2],
+                    ]
+                ],
+            )
+        )
 
     # test positive definite error
 
     with pytest.raises(ValueError, match="covariance matrix is not positive definite"):
         list(
-            glass.iternorm(k, np.array([1.0, 0.5, 0.9, 0.5, 0.2, 0.4, 0.9, 0.4, -1.0]))
+            glass.iternorm(
+                k, xp.asarray([1.0, 0.5, 0.9, 0.5, 0.2, 0.4, 0.9, 0.4, -1.0])
+            )
         )
 
     # test multiple iterations
@@ -68,12 +84,24 @@ def test_iternorm() -> None:
 
     generator = glass.iternorm(
         k,
-        np.array(
+        [
             [
-                [[1.0, 0.5, 0.5], [0.5, 0.2, 0.1], [0.5, 0.1, 0.2]],
-                [[2.0, 1.0, 0.8], [1.0, 0.5, 0.3], [0.8, 0.3, 0.6]],
-            ]
-        ),
+                xp.asarray(arr)
+                for arr in [
+                    [1.0, 0.5, 0.5],
+                    [0.5, 0.2, 0.1],
+                    [0.5, 0.1, 0.2],
+                ]
+            ],
+            [
+                xp.asarray(arr)
+                for arr in [
+                    [2.0, 1.0, 0.8],
+                    [1.0, 0.5, 0.3],
+                    [0.8, 0.3, 0.6],
+                ]
+            ],
+        ],
         size,
     )
 
@@ -88,13 +116,13 @@ def test_iternorm() -> None:
 
     # test k = 0
 
-    generator = glass.iternorm(0, np.array([1.0]))
+    generator = glass.iternorm(0, xp.asarray([1.0]))
 
     j, a, s = result
 
     assert j == 1
     assert a.shape == (3, 2)
-    assert isinstance(s, np.ndarray)
+    assert s.shape == (3,)
     assert s.shape == (3,)
 
 
