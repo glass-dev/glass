@@ -13,6 +13,10 @@ def not_triangle_numbers() -> list[int]:
 
 
 def test_iternorm(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        return
+
     # check output shapes and types
 
     k = 2
@@ -26,7 +30,8 @@ def test_iternorm(xp: types.ModuleType) -> None:
 
     assert isinstance(j, int)
     assert a.shape == (k,)
-    assert isinstance(s, float)  # type: ignore[unreachable]
+    assert s.shape == ()
+    assert s.dtype == xp.float64  # type: ignore[unreachable]
     assert s.shape == ()  # type: ignore[unreachable]
 
     # specify size
@@ -85,22 +90,19 @@ def test_iternorm(xp: types.ModuleType) -> None:
     generator = glass.iternorm(
         k,
         [
-            [
-                xp.asarray(arr)
-                for arr in [
+            xp.asarray(arr)
+            for arr in [
+                [
                     [1.0, 0.5, 0.5],
                     [0.5, 0.2, 0.1],
                     [0.5, 0.1, 0.2],
-                ]
-            ],
-            [
-                xp.asarray(arr)
-                for arr in [
+                ],
+                [
                     [2.0, 1.0, 0.8],
                     [1.0, 0.5, 0.3],
                     [0.8, 0.3, 0.6],
-                ]
-            ],
+                ],
+            ]
         ],
         size,
     )

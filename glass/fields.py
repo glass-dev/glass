@@ -13,6 +13,7 @@ import numpy as np
 from transformcl import cltovar
 
 import glass
+import glass._array_api_utils as _utils
 import glass.grf
 
 if TYPE_CHECKING:
@@ -20,6 +21,8 @@ if TYPE_CHECKING:
     from typing import Any, Literal, TypeVar
 
     from numpy.typing import NDArray
+
+    from glass._array_api_utils import GLASSFloatArray
 
     Fields = Sequence[glass.grf.Transformation]
     Cls = Sequence[NDArray[Any]]
@@ -82,9 +85,9 @@ def nfields_from_nspectra(nspectra: int) -> int:
 
 def iternorm(
     k: int,
-    cov: Iterable[NDArray[np.float64]],
+    cov: Iterable[GLASSFloatArray],
     size: int | tuple[int, ...] = (),
-) -> Generator[tuple[int | None, NDArray[np.float64], NDArray[np.float64]]]:
+) -> Generator[tuple[int | None, GLASSFloatArray, GLASSFloatArray]]:
     """
     Return the vector a and variance sigma^2 for iterative normal sampling.
 
@@ -114,19 +117,28 @@ def iternorm(
         If the covariance matrix is not positive definite.
 
     """
+    # Convert to list here to allow determining the namespace
+    cov_expanded = list(cov)
+    xp = _utils.get_namespace(cov_expanded[0])
+
     n = (size,) if isinstance(size, int) else size
 
-    m = np.zeros((*n, k, k))
-    a = np.zeros((*n, k))
-    s = np.zeros((*n,))
+    m = xp.zeros((*n, k, k))
+    a = xp.zeros((*n, k))
+    s = xp.zeros((*n,))
     q = (*n, k + 1)
     j = 0 if k > 0 else None
 
-    for i, x in enumerate(cov):
-        x = np.asanyarray(x)  # noqa: PLW2901
+    # We must use cov_expanded here as cov has been consumed to determine the namespace
+    for i, x in enumerate(cov_expanded):
+        # Ideally would be xp.asanyarray but this does not yet exist. The key difference
+        # between the two in numpy is that asanyarray maintains subclasses of NDArray
+        # whereas asarray will return the base class NDArray. Currently, we don't seem
+        # to pass a subclass of NDArray so this, so it might be okay
+        x = xp.asarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
-                x = np.broadcast_to(x, q)  # noqa: PLW2901
+                x = xp.broadcast_to(x, q)  # noqa: PLW2901
             except ValueError:
                 msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
                 raise TypeError(msg) from None
@@ -135,30 +147,34 @@ def iternorm(
         if j is not None:
             # compute new entries of matrix A
             m[..., :, j] = 0
-            m[..., j : j + 1, :] = np.matmul(a[..., np.newaxis, :], m)
-            m[..., j, j] = np.where(s != 0, -1, 0)
-            np.divide(
-                m[..., j, :],
-                -s[..., np.newaxis],
-                where=(m[..., j, :] != 0),
-                out=m[..., j, :],
-            )
+            m[..., j : j + 1, :] = xp.matmul(a[..., xp.newaxis, :], m)
+            m[..., j, j] = xp.where(s != 0, -1, s)
+            # To ensure we don't divide by zero or nan we use a mask to only divide the
+            # appropriate values of m and s
+            m_j = m[..., j, :]
+            s_broadcast = xp.broadcast_to(s[..., xp.newaxis], m_j.shape)
+            mask = (m_j != 0) & (s_broadcast != 0) & ~xp.isnan(s_broadcast)
+            m_j[mask] = xp.divide(m_j[mask], -s_broadcast[mask])
+            m[..., j, :] = m_j
 
             # compute new vector a
-            c = x[..., 1:, np.newaxis]
-            a = np.matmul(m[..., :j], c[..., k - j :, :])
-            a += np.matmul(m[..., j:], c[..., : k - j, :])
-            a = a.reshape(*n, k)
+            c = x[..., 1:, xp.newaxis]
+            a = xp.matmul(m[..., :j], c[..., k - j :, :])
+            a += xp.matmul(m[..., j:], c[..., : k - j, :])
+            a = xp.reshape(a, (*n, k))
 
             # next rolling index
             j = (j - 1) % k
 
         # compute new standard deviation
-        s = x[..., 0] - np.einsum("...i,...i", a, a)
-        if np.any(s < 0):
+        # einsum is not currently included in the array-api spec but is mentioned here
+        # https://data-apis.org/array-api/latest/extensions/linear_algebra_functions.html.
+        # Therefore, replace with call to sum for now
+        s = x[..., 0] - xp.sum(a * a, axis=-1)
+        if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
-        s = np.sqrt(s)
+        s = xp.sqrt(s)
 
         # yield the next index, vector a, and standard deviation s
         yield j, a, s
