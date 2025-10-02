@@ -430,29 +430,31 @@ def test_generate():
     np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl() -> None:
+def test_getcl(xp: types.ModuleType) -> None:
     # make a mock Cls array with the index pairs as entries
     cls = [
-        np.array([i, j], dtype=np.float64) for i in range(10) for j in range(i, -1, -1)
+        xp.asarray([i, j], dtype=xp.float64)
+        for i in range(10)
+        for j in range(i, -1, -1)
     ]
     # make sure indices are retrieved correctly
     for i in range(10):
         for j in range(10):
             result = glass.getcl(cls, i, j)
-            expected = np.array([min(i, j), max(i, j)], dtype=np.float64)
-            np.testing.assert_array_equal(np.sort(result), expected)
+            expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
+            assert xp.sort(result) == pytest.approx(expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
-            expected = np.array([max(i, j)], dtype=np.float64)
-            assert len(result) == 1
-            np.testing.assert_array_equal(result, expected)
+            expected = xp.asarray([max(i, j)], dtype=xp.float64)
+            assert result.size == 1
+            assert result == pytest.approx(expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
-            expected = np.zeros((49,), dtype=np.float64)
-            assert len(result) == 51
-            np.testing.assert_array_equal(result[2:], expected)
+            expected = xp.zeros((49,), dtype=xp.float64)
+            assert result.size == 51
+            assert result[2:] == pytest.approx(expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
