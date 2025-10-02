@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from numpy.typing import DTypeLike, NDArray
 
     Size: TypeAlias = int | tuple[int, ...] | None
+    GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
 
 
 def get_namespace(*arrays: NDArray[Any] | JAXArray) -> ModuleType:
