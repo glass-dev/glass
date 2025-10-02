@@ -128,13 +128,17 @@ def test_iternorm(xp: types.ModuleType) -> None:
     assert s.shape == (3,)
 
 
-def test_cls2cov() -> None:
+def test_cls2cov(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        return
+
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [np.array([1.0, 0.5, 0.3]), None, np.array([0.7, 0.6, 0.1])],  # type: ignore[list-item]
+        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],  # type: ignore[list-item]
         nl,
         nf,
         nc,
@@ -142,21 +146,23 @@ def test_cls2cov() -> None:
     cov = next(generator)
 
     assert cov.shape == (nl, nc + 1)
+    assert cov.dtype == xp.float64  # type: ignore[unreachable]
 
-    np.testing.assert_array_equal(cov[:, 0], np.array([0.5, 0.25, 0.15]))
-    np.testing.assert_array_equal(cov[:, 1], 0)
-    np.testing.assert_array_equal(cov[:, 2], 0)
+    assert cov[:, 0] == pytest.approx(xp.asarray([0.5, 0.25, 0.15]))
+    assert cov[:, 1] == pytest.approx(0)
+    assert cov[:, 2] == pytest.approx(0)
 
     # test negative value error
 
     generator = glass.cls2cov(
-        np.array(  # type: ignore[arg-type]
-            [
+        [
+            xp.asarray(arr)
+            for arr in [  # type: ignore[arg-type]
                 [-1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
                 [0.7, 0.6, 0.1],
             ]
-        ),
+        ],
         nl,
         nf,
         nc,
@@ -169,8 +175,9 @@ def test_cls2cov() -> None:
     nl, nf, nc = 3, 3, 2
 
     generator = glass.cls2cov(
-        np.array(  # type: ignore[arg-type]
-            [
+        [
+            xp.asarray(arr)
+            for arr in [  # type: ignore[arg-type]
                 [1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
                 [0.7, 0.6, 0.1],
@@ -178,22 +185,26 @@ def test_cls2cov() -> None:
                 [0.6, 0.3, 0.2],
                 [0.8, 0.7, 0.4],
             ]
-        ),
+        ],
         nl,
         nf,
         nc,
     )
 
-    cov1 = np.copy(next(generator))
-    cov2 = np.copy(next(generator))
+    cov1 = xp.asarray(next(generator), copy=True)
+    cov2 = xp.asarray(next(generator), copy=True)
     cov3 = next(generator)
 
     assert cov1.shape == (nl, nc + 1)
     assert cov2.shape == (nl, nc + 1)
     assert cov3.shape == (nl, nc + 1)
 
-    assert not np.array_equal(cov1, cov2)
-    assert not np.array_equal(cov2, cov3)
+    assert cov1.dtype == xp.float64
+    assert cov2.dtype == xp.float64
+    assert cov3.dtype == xp.float64
+
+    assert cov1 != pytest.approx(cov2)
+    assert cov2 != pytest.approx(cov3)
 
 
 def test_multalm() -> None:
