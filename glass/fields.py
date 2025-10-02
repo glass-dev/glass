@@ -149,16 +149,17 @@ def iternorm(
             # compute new entries of matrix A
             m[..., :, j] = 0
             m[..., j : j + 1, :] = xp.matmul(a[..., xp.newaxis, :], m)
-            m[..., j, j] = xp.where(s != 0, -1, 0)
-            np.divide(
-                m[..., j, :],
-                -s[..., np.newaxis],
-                where=(m[..., j, :] != 0),
-                out=m[..., j, :],
-            )
+            m[..., j, j] = xp.where(s != 0, -1, s)
+            # To ensure we don't divide by zero or nan we use a mask to only divide the
+            # appropriate values of m and s
+            m_j = m[..., j, :]
+            s_broadcast = xp.broadcast_to(s[..., xp.newaxis], m_j.shape)
+            mask = (m_j != 0) & (s_broadcast != 0) & ~xp.isnan(s_broadcast)
+            m_j[mask] = xp.divide(m_j[mask], -s_broadcast[mask])
+            m[..., j, :] = m_j
 
             # compute new vector a
-            c = x[..., 1:, np.newaxis]
+            c = x[..., 1:, xp.newaxis]
             a = xp.matmul(m[..., :j], c[..., k - j :, :])
             a += xp.matmul(m[..., j:], c[..., : k - j, :])
             a = xp.reshape(a, (*n, k))
@@ -169,9 +170,8 @@ def iternorm(
         # compute new standard deviation
         # einsum is not currently included in the array-api spec but is mentioned here
         # https://data-apis.org/array-api/latest/extensions/linear_algebra_functions.html.
-        # However, einsum appears to be implemented in jax, numpy and cupy using similar
-        # interfaces.
-        s = x[..., 0] - xp.einsum("...i,...i", a, a)
+        # Therefore, replace with call to sum for now
+        s = x[..., 0] - xp.sum(a * a, axis=-1)
         if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
