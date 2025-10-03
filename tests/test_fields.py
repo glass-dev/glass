@@ -316,41 +316,48 @@ def test_discretized_cls() -> None:
         np.testing.assert_allclose(cl[:n], expected)
 
 
-def test_effective_cls() -> None:
+def test_effective_cls(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip()
+
     # empty cls
 
-    result = glass.effective_cls([], np.array([]))
+    result = glass.effective_cls([], xp.asarray([]))
     assert result.shape == (0,)
 
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="invalid number of spectra:"):
-        glass.effective_cls([np.arange(10), np.arange(10)], np.ones((2, 1)))
+        glass.effective_cls([xp.arange(10), xp.arange(10)], xp.ones((2, 1)))
 
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="shape mismatch between fields and weights1"):
-        glass.effective_cls([], np.ones((3, 1)))
+        glass.effective_cls([], xp.ones((3, 1)))
 
     # check with only weights1
 
-    cls = [np.arange(15), np.arange(15), np.arange(15)]
-    weights1 = np.ones((2, 1))
+    # Test a Sequence of xp arrays work as well as a Sequence of floats
+    cls_xp = [xp.arange(15.0) for _ in range(3)]
+    cls_floats = [[float(i) for i in range(15)] for _ in range(3)]
+    weights1 = xp.ones((2, 1))
 
-    result = glass.effective_cls(cls, weights1)
-    assert result.shape == (1, 1, 15)
+    for cls in [cls_xp, cls_floats]:
+        result = glass.effective_cls(cls, weights1)
+        assert result.shape == (1, 1, 15)
 
-    # check truncation if lmax provided
+        # check truncation if lmax provided
 
-    result = glass.effective_cls(cls, weights1, lmax=5)
+        result = glass.effective_cls(cls, weights1, lmax=5)
 
-    assert result.shape == (1, 1, 6)
-    np.testing.assert_allclose(result[..., 6:], 0)
+        assert result.shape == (1, 1, 6)
+        assert result[..., 6:] == pytest.approx(0)
 
-    # check with weights1 and weights2 and weights1 is weights2
+        # check with weights1 and weights2 and weights1 is weights2
 
-    result = glass.effective_cls(cls, weights1, weights2=weights1)
-    assert result.shape == (1, 1, 15)
+        result = glass.effective_cls(cls, weights1, weights2=weights1)
+        assert result.shape == (1, 1, 15)
 
 
 def test_generate_grf() -> None:
