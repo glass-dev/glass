@@ -638,12 +638,12 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
 
 
 def effective_cls(
-    cls: Sequence[NDArray[np.float64] | Sequence[float]],
-    weights1: NDArray[np.float64],
-    weights2: NDArray[np.float64] | None = None,
+    cls: Sequence[GLASSFloatArray | Sequence[float]],
+    weights1: GLASSFloatArray,
+    weights2: GLASSFloatArray | None = None,
     *,
     lmax: int | None = None,
-) -> NDArray[np.float64]:
+) -> GLASSFloatArray:
     """
     Compute effective angular power spectra from weights.
 
@@ -677,16 +677,26 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
+    # Try with cls and weights but if cls is a Sequence[float] then we use weights only
+    # and convert cls to an xp array
+    xp = None
+    xp_cls = cls
+    try:
+        xp = _utils.get_namespace(*cls, weights1, weights2)
+    except AttributeError:
+        xp = _utils.get_namespace(weights1, weights2)
+        xp_cls = [xp.asarray(cl) for cl in cls]
+
     # this is the number of fields
-    n = nfields_from_nspectra(len(cls))
+    n = nfields_from_nspectra(len(xp_cls))
 
     # find lmax if not given
     if lmax is None:
-        lmax = max(map(len, cls), default=0) - 1
+        lmax = max((cl.shape[0] for cl in xp_cls), default=0) - 1  # type: ignore[union-attr]
 
     # broadcast weights1 such that its shape ends in n
-    weights1 = np.asanyarray(weights1)
-    weights2 = np.asanyarray(weights2) if weights2 is not None else weights1
+    weights1 = xp.asarray(weights1)
+    weights2 = xp.asarray(weights2) if weights2 is not None else weights1
 
     shape1, shape2 = weights1.shape, weights2.shape
     for i, shape in enumerate((shape1, shape2)):
@@ -703,7 +713,7 @@ def effective_cls(
     )
 
     # create the output array: axes for all input axes plus lmax+1
-    out = np.empty(shape1[1:] + shape2[1:] + (lmax + 1,))
+    out = xp.empty(shape1[1:] + shape2[1:] + (lmax + 1,))
 
     # helper that will grab the entire first column (i.e. shells)
     c = (slice(None),)
@@ -713,12 +723,13 @@ def effective_cls(
     for j1, j2 in pairs:
         w1, w2 = weights1[c + j1], weights2[c + j2]
         cl = sum(
-            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
-            for i1, i2 in np.ndindex(n, n)
+            w1[i1] * w2[i2] * getcl(xp_cls, i1, i2, lmax=lmax)
+            for i1 in range(n)
+            for i2 in range(n)
         )
-        out[j1 + j2] = cl
+        out[j1 + j2 + (...,)] = cl
         if weights2 is weights1 and j1 != j2:
-            out[j2 + j1] = cl
+            out[j2 + j1 + (...,)] = cl
     return out
 
 
