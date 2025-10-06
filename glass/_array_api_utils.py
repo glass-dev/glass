@@ -109,55 +109,86 @@ UnifiedGenerator: TypeAlias = np.random.Generator | glass.jax.Generator | Genera
 class GlassXPAdditions:
     """Additional functions missing from both array-api-strict and array-api-extra."""
 
-    @staticmethod
+    xp : ModuleType
+
+    def __init__(self, xp: ModuleType) -> None:
+        self.xp = xp
+
     def trapezoid(
-        y: GlassAnyArray, x: GlassAnyArray = None, dx: float = 1.0, axis: int = -1
+        self, y: GlassAnyArray, x: GlassAnyArray = None, dx: float = 1.0, axis: int = -1
     ) -> GlassAnyArray:
         """Integrate along the given axis using the composite trapezoidal rule."""
-        backend = get_namespace(y, x).__name__
+        backend = self.xp.__name__
         if backend == "jax.numpy":
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
         if backend == "numpy":
             return np.trapezoid(y, x=x, dx=dx, axis=axis)
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return np.trapezoid(np.asarray(y), x=np.asarray(x), dx=dx, axis=axis)
+            return self.xp.asarray(
+                np.trapezoid(np.asarray(y), x=np.asarray(x), dx=dx, axis=axis)
+            )
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    @staticmethod
-    def union1d(ar1: GlassAnyArray, ar2: GlassAnyArray) -> GlassAnyArray:
+    def union1d(self, ar1: GlassAnyArray, ar2: GlassAnyArray) -> GlassAnyArray:
         """Compute the set union of two 1D arrays."""
-        xp = get_namespace(ar1, ar2)
-        backend = xp.__name__
+        backend = self.xp.__name__
         if backend == "jax.numpy":
             return glass.jax.union1d(ar1, ar2)
         if backend == "numpy":
             return np.union1d(ar1, ar2)
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return xp.asarray(np.union1d(np.asarray(ar1), xp.asarray(ar2)))
+            return self.xp.asarray(np.union1d(np.asarray(ar1), np.asarray(ar2)))
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    @staticmethod
-    def interp(
-        x: GlassFloatArray, x_points: GlassFloatArray, y_points: GlassFloatArray
+    def interp(  # noqa: PLR0913
+        self, x: GlassAnyArray,
+        x_points: GlassAnyArray,
+        y_points: GlassAnyArray,
+        left: float = None,
+        right: float = None,
+        period: float = None
     ) -> GlassAnyArray:
         """
         One-dimensional linear interpolation for monotonically increasing
         sample points.
         """
-        xp = get_namespace(x, x_points, y_points)
-        backend = xp.__name__
+        backend = self.xp.__name__
         if backend == "jax.numpy":
-            return glass.jax.interp(x, x_points, y_points)
+            return glass.jax.interp(
+                x, x_points, y_points, left=left, right=right, period=period
+            )
         if backend == "numpy":
-            return np.interp(x, x_points, y_points)
+            return np.interp(
+                x, x_points, y_points, left=left, right=right, period=period
+            )
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return xp.asarray(
-                np.interp(np.asarray(x), np.asarray(x_points), np.asarray(y_points))
+            return self.xp.asarray(
+                np.interp(
+                    np.asarray(x),
+                    np.asarray(x_points),
+                    np.asarray(y_points),
+                    left=left,
+                    right=right,
+                    period=period
+                )
             )
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def gradient(self, f: GlassAnyArray) -> GlassAnyArray:
+        """Return the gradient of an N-dimensional array."""
+        backend = self.xp.__name__
+        if backend == "jax.numpy":
+            return glass.jax.gradient(f)
+        if backend == "numpy":
+            return np.gradient(f)
+        if backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            return self.xp.asarray(np.gradient(np.asarray(f)))
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

@@ -42,12 +42,11 @@ def trapezoid(
 
 
 def union1d(ar1: ArrayLike, ar2: ArrayLike) -> Array:
-    """Wrapper for jax.scipy.integrate.trapezoid."""
+    """Wrapper for jax.numpy.trapezoid."""
     return jnp.union1d(ar1, ar2)
 
-
 def interp(x: ArrayLike, x_points: ArrayLike, y_points: ArrayLike) -> Array:
-    """Wrapper for jax.scipy.integrate.trapezoid."""
+    """Wrapper for jax.numpy.interp."""
     return jnp.interp(x, x_points, y_points)
 
 

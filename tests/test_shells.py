@@ -190,6 +190,8 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
 
 def test_restrict(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.restrict`."""
+    glass_xpx = GlassXPAdditions(xp)
+
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1000)
     f = xp.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
@@ -212,18 +214,20 @@ def test_restrict(xp: types.ModuleType) -> None:
         assert zr[i] == zi
 
         # Using design principle of scipy (i.e. copy, use np, copy back)
-        assert fr[i] == wi * GlassXPAdditions.interp(zi, z, f)
+        assert fr[i] == wi * glass_xpx.interp(zi, z, f)
 
     for zi, fi in zip(z, f, strict=False):
         if w.za[0] <= zi <= w.za[-1]:
             i = xp.searchsorted(zr, zi)
             assert zr[i] == zi
-            assert fr[i] == fi * GlassXPAdditions.interp(zi, w.za, w.wa)
+            assert fr[i] == fi * glass_xpx.interp(zi, w.za, w.wa)
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(xp: types.ModuleType, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
+    glass_xpx = GlassXPAdditions(xp)
+
     shells = [
         glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
         glass.RadialWindow(
@@ -251,7 +255,7 @@ def test_partition(xp: types.ModuleType, method: str) -> None:
 
     assert part.shape == (len(shells), 3, 2)
 
-    assert part.sum(axis=0) == pytest.approx(GlassXPAdditions.trapezoid(fz, z))
+    assert part.sum(axis=0) == pytest.approx(glass_xpx.trapezoid(fz, z))
 
 
 def test_redshift_grid() -> None:
