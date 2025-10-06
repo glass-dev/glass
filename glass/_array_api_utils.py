@@ -117,7 +117,47 @@ class GlassXPAdditions:
         backend = get_namespace(y, x).__name__
         if backend == "jax.numpy":
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
-        if backend in {"numpy", "array_api_strict"}:
+        if backend == "numpy":
             return np.trapezoid(y, x=x, dx=dx, axis=axis)
+        if backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            return np.trapezoid(np.asarray(y), x=np.asarray(x), dx=dx, axis=axis)
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    @staticmethod
+    def union1d(ar1: GlassAnyArray, ar2: GlassAnyArray) -> GlassAnyArray:
+        """Compute the set union of two 1D arrays."""
+        xp = get_namespace(ar1, ar2)
+        backend = xp.__name__
+        if backend == "jax.numpy":
+            return glass.jax.union1d(ar1, ar2)
+        if backend == "numpy":
+            return np.union1d(ar1, ar2)
+        if backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            return xp.asarray(np.union1d(np.asarray(ar1), xp.asarray(ar2)))
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    @staticmethod
+    def interp(
+        x: GlassFloatArray, x_points: GlassFloatArray, y_points: GlassFloatArray
+    ) -> GlassAnyArray:
+        """
+        One-dimensional linear interpolation for monotonically increasing
+        sample points.
+        """
+        xp = get_namespace(x, x_points, y_points)
+        backend = xp.__name__
+        if backend == "jax.numpy":
+            return glass.jax.interp(x, x_points, y_points)
+        if backend == "numpy":
+            return np.interp(x, x_points, y_points)
+        if backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            return xp.asarray(
+                np.interp(np.asarray(x), np.asarray(x_points), np.asarray(y_points))
+            )
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
