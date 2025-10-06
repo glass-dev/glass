@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import glass
+from glass._array_api_utils import GlassXPAdditions
 
 if TYPE_CHECKING:
     import types
@@ -187,16 +188,16 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
         glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_restrict() -> None:
+def test_restrict(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
-    z = np.linspace(0.0, 5.0, 1000)
-    f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
+    z = xp.linspace(0.0, 5.0, 1000)
+    f = xp.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
 
     # window for restriction
     w = glass.RadialWindow(
-        za=np.array([1.0, 2.0, 3.0, 4.0]),
-        wa=np.array([0.0, 0.5, 0.5, 0.0]),
+        za=xp.asarray([1.0, 2.0, 3.0, 4.0]),
+        wa=xp.asarray([0.0, 0.5, 0.5, 0.0]),
     )
 
     zr, fr = glass.restrict(z, f, w)
@@ -207,32 +208,42 @@ def test_restrict() -> None:
     assert fr[0] == fr[-1] == 0.0
 
     for zi, wi in zip(w.za, w.wa, strict=False):
-        i = np.searchsorted(zr, zi)
+        i = xp.searchsorted(zr, zi)
         assert zr[i] == zi
-        assert fr[i] == wi * np.interp(zi, z, f)
+
+        # Using design principle of scipy (i.e. copy, use np, copy back)
+        assert fr[i] == wi * GlassXPAdditions.interp(zi, z, f)
 
     for zi, fi in zip(z, f, strict=False):
         if w.za[0] <= zi <= w.za[-1]:
-            i = np.searchsorted(zr, zi)
+            i = xp.searchsorted(zr, zi)
             assert zr[i] == zi
-            assert fr[i] == fi * np.interp(zi, w.za, w.wa)
+            assert fr[i] == fi * GlassXPAdditions.interp(zi, w.za, w.wa)
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(method: str) -> None:
+def test_partition(xp: types.ModuleType, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
     shells = [
-        glass.RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
-        glass.RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
-        glass.RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),
-        glass.RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),
-        glass.RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),
-        glass.RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),
+        glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
+        glass.RadialWindow(
+            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 0.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 1.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 2.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 3.5
+        ),
+        glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
     ]
 
-    z = np.linspace(0.0, 5.0, 1000)
-    k = 1 + np.arange(6).reshape(3, 2, 1)
-    fz = np.exp(-z / k)
+    z = xp.linspace(0.0, 5.0, 1000)
+    k = 1.0 + xp.reshape(xp.arange(6.0), (3, 2, 1))
+    fz = xp.exp(-z / k)
 
     assert fz.shape == (3, 2, 1000)
 
@@ -240,7 +251,7 @@ def test_partition(method: str) -> None:
 
     assert part.shape == (len(shells), 3, 2)
 
-    np.testing.assert_allclose(part.sum(axis=0), np.trapezoid(fz, z))
+    assert part.sum(axis=0) == pytest.approx(GlassXPAdditions.trapezoid(fz, z))
 
 
 def test_redshift_grid() -> None:

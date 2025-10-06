@@ -461,10 +461,10 @@ def cubic_windows(
 
 
 def restrict(
-    z: ArrayLike1D,
-    f: ArrayLike1D,
+    z: GlassFloatArray,
+    f: GlassFloatArray,
     w: RadialWindow,
-) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+) -> tuple[GlassFloatArray, GlassFloatArray]:
     """
     Restrict a function to a redshift window.
 
@@ -496,8 +496,14 @@ def restrict(
         The restricted function
 
     """
-    z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
-    zr = np.union1d(w.za, z_)
+    if z.ndim != 1:
+        msg = "z must be 1D arrays"
+        raise ValueError(msg)
+    xp = _utils.get_namespace(z, f)
+
+    z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
+    zr = GlassXPAdditions.union1d(w.za, z_)
+
     fr = glass.arraytools.ndinterp(
         zr, z, f, left=0.0, right=0.0
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)

@@ -41,6 +41,16 @@ def trapezoid(
     return integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
 
+def union1d(ar1: ArrayLike, ar2: ArrayLike) -> Array:
+    """Wrapper for jax.scipy.integrate.trapezoid."""
+    return jnp.union1d(ar1, ar2)
+
+
+def interp(x: ArrayLike, x_points: ArrayLike, y_points: ArrayLike) -> Array:
+    """Wrapper for jax.scipy.integrate.trapezoid."""
+    return jnp.interp(x, x_points, y_points)
+
+
 class Generator:
     """JAX random number generation as a NumPy generator."""
 
