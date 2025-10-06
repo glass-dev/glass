@@ -295,6 +295,9 @@ def tophat_windows(
     :ref:`user-window-functions`
 
     """
+    if zbins.ndim != 1:
+        msg = "zbins must be a 1D array"
+        raise ValueError(msg)
     if zbins.size < 2:
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
@@ -360,13 +363,16 @@ def linear_windows(
     :ref:`user-window-functions`
 
     """
-    xp = _utils.get_namespace(zgrid)
-
+    if zgrid.ndim != 1:
+        msg = "zgrid must be a 1D array"
+        raise ValueError(msg)
     if zgrid.size < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
+    
+    xp = _utils.get_namespace(zgrid)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
