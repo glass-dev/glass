@@ -245,11 +245,12 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
+        glass_xpx = GlassXPAdditions(self.xp)
         if self.za.size > 0:
-            return GlassXPAdditions.trapezoid(  # type: ignore[return-value]
+            return glass_xpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
                 self.za,
-            ) / GlassXPAdditions.trapezoid(self.wa, self.za)
+            ) / glass_xpx.trapezoid(self.wa, self.za)
         return math.nan
 
 
@@ -308,6 +309,7 @@ def tophat_windows(
         )
 
     xp = _utils.get_namespace(zbins)
+    glass_xpx = GlassXPAdditions(xp)
 
     wht: WeightFunc
     wht = weight if weight is not None else xp.ones_like
@@ -316,8 +318,8 @@ def tophat_windows(
         n = int(max(xp.round((zmax - zmin) / dz), 2))
         z = xp.linspace(zmin, zmax, n, dtype=zbins.dtype)
         w = wht(z)
-        zeff = GlassXPAdditions.trapezoid(w * z, z) / GlassXPAdditions.trapezoid(w, z)
-        ws.append(RadialWindow(z, w, zeff.item()))
+        zeff = glass_xpx.trapezoid(w * z, z) / glass_xpx.trapezoid(w, z)
+        ws.append(RadialWindow(z, w, zeff))
     return ws
 
 
@@ -500,9 +502,10 @@ def restrict(
         msg = "z must be 1D arrays"
         raise ValueError(msg)
     xp = _utils.get_namespace(z, f)
+    glass_xpx = GlassXPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
-    zr = GlassXPAdditions.union1d(w.za, z_)
+    zr = glass_xpx.union1d(w.za, z_)
 
     fr = glass.arraytools.ndinterp(
         zr, z, f, left=0.0, right=0.0
@@ -511,12 +514,12 @@ def restrict(
 
 
 def partition(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     r"""
     Partition a function by a sequence of windows.
 
