@@ -371,7 +371,7 @@ def linear_windows(
         raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
-    
+
     xp = _utils.get_namespace(zgrid)
 
     ws = []
@@ -391,7 +391,7 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: ArrayLike1D,
+    zgrid: GlassFloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -433,22 +433,27 @@ def cubic_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zgrid) < 3:
+    if zgrid.ndim != 1:
+        msg = "zgrid must be a 1D array"
+        raise ValueError(msg)
+    if zgrid.size < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
+    xp = _utils.get_namespace(zgrid)
+
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
-        n = max(round((zmid - zmin) / dz), 2) - 1
-        m = max(round((zmax - zmid) / dz), 2)
-        z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
+        n = int(max(xp.round((zmid - zmin) / dz), 2)) - 1
+        m = int(max(xp.round((zmax - zmid) / dz), 2))
+        z = xp.concat(
+            (xp.linspace(zmin, zmid, n, endpoint=False), xp.linspace(zmid, zmax, m)),
         )
-        u = np.linspace(0.0, 1.0, n, endpoint=False)
-        v = np.linspace(1.0, 0.0, m)
-        w = np.concatenate([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
+        u = xp.linspace(0.0, 1.0, n, endpoint=False)
+        v = xp.linspace(1.0, 0.0, m)
+        w = xp.concat([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
         if weight is not None:
             w *= weight(z)
         ws.append(RadialWindow(z, w, zmid))
