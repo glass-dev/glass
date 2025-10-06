@@ -254,7 +254,7 @@ class RadialWindow:
 
 
 def tophat_windows(
-    zbins: ArrayLike1D,
+    zbins: GlassFloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -295,7 +295,7 @@ def tophat_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zbins) < 2:
+    if zbins.size < 2:
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
     if zbins[0] != 0:
@@ -304,14 +304,16 @@ def tophat_windows(
             stacklevel=2,
         )
 
+    xp = _utils.get_namespace(zbins)
+
     wht: WeightFunc
-    wht = weight if weight is not None else np.ones_like
+    wht = weight if weight is not None else xp.ones_like
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
-        n = max(round((zmax - zmin) / dz), 2)
-        z = np.linspace(zmin, zmax, n, dtype=np.float64)
+        n = int(max(xp.round((zmax - zmin) / dz), 2))
+        z = xp.linspace(zmin, zmax, n, dtype=zbins.dtype)
         w = wht(z)
-        zeff = np.trapezoid(w * z, z) / np.trapezoid(w, z)
+        zeff = GlassXPAdditions.trapezoid(w * z, z) / GlassXPAdditions.trapezoid(w, z)
         ws.append(RadialWindow(z, w, zeff.item()))
     return ws
 

@@ -69,14 +69,14 @@ def test_density_weight(cosmo: Cosmology) -> None:
     np.testing.assert_array_less(w[:-1], w[1:])
 
 
-def test_tophat_windows() -> None:
+def test_tophat_windows(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.tophat_windows`."""
-    zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
+    zb = xp.asarray([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
 
     ws = glass.tophat_windows(zb, dz)
 
-    assert len(ws) == len(zb) - 1
+    assert len(ws) == zb.size - 1
 
     assert all(
         z0 == w.za[0] and zn == w.za[-1]
@@ -84,11 +84,11 @@ def test_tophat_windows() -> None:
     )
 
     assert all(
-        zn <= z0 + len(w.za) * dz <= zn + dz
+        zn <= z0 + w.za.size * dz <= zn + dz
         for w, z0, zn in zip(ws, zb, zb[1:], strict=False)
     )
 
-    assert all(np.all(w.wa == 1) for w in ws)
+    assert all(xp.all(w.wa == 1) for w in ws)
 
 
 def test_linear_windows() -> None:
