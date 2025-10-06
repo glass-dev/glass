@@ -23,10 +23,10 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import GLASSComplexArray, GLASSFloatArray
+    from glass._array_api_utils import GLASSAnyArray, GLASSComplexArray, GLASSFloatArray
 
     Fields = Sequence[glass.grf.Transformation]
-    Cls = Sequence[GLASSFloatArray]
+    Cls = Sequence[GLASSAnyArray]
 
     T = TypeVar("T")
 
@@ -558,7 +558,7 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: Sequence[GLASSFloatArray],
+    cls: Cls,
     i: int,
     j: int,
     lmax: int | None = None,
@@ -638,7 +638,7 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
 
 
 def effective_cls(
-    cls: Sequence[GLASSFloatArray | Sequence[float]],
+    cls: Cls,
     weights1: GLASSFloatArray,
     weights2: GLASSFloatArray | None = None,
     *,
@@ -679,20 +679,14 @@ def effective_cls(
     """
     # Try with cls and weights but if cls is a Sequence[float] then we use weights only
     # and convert cls to an xp array
-    xp = None
-    xp_cls = cls
-    try:
-        xp = _utils.get_namespace(*cls, weights1, weights2)
-    except AttributeError:
-        xp = _utils.get_namespace(weights1, weights2)
-        xp_cls = [xp.asarray(cl) for cl in cls]
+    xp = _utils.get_namespace(*cls, weights1, weights2)
 
     # this is the number of fields
-    n = nfields_from_nspectra(len(xp_cls))
+    n = nfields_from_nspectra(len(cls))
 
     # find lmax if not given
     if lmax is None:
-        lmax = max((cl.shape[0] for cl in xp_cls), default=0) - 1  # type: ignore[union-attr]
+        lmax = max((cl.shape[0] for cl in cls), default=0) - 1
 
     # broadcast weights1 such that its shape ends in n
     weights1 = xp.asarray(weights1)
@@ -723,7 +717,7 @@ def effective_cls(
     for j1, j2 in pairs:
         w1, w2 = weights1[c + j1], weights2[c + j2]
         cl = sum(
-            w1[i1] * w2[i2] * getcl(xp_cls, i1, i2, lmax=lmax)
+            w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
             for i1 in range(n)
             for i2 in range(n)
         )

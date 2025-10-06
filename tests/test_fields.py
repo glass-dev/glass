@@ -338,26 +338,23 @@ def test_effective_cls(xp: types.ModuleType) -> None:
 
     # check with only weights1
 
-    # Test a Sequence of xp arrays work as well as a Sequence of floats
-    cls_xp = [xp.arange(15.0) for _ in range(3)]
-    cls_floats = [[float(i) for i in range(15)] for _ in range(3)]
+    cls = [xp.arange(15.0) for _ in range(3)]
     weights1 = xp.ones((2, 1))
 
-    for cls in [cls_xp, cls_floats]:
-        result = glass.effective_cls(cls, weights1)
-        assert result.shape == (1, 1, 15)
+    result = glass.effective_cls(cls, weights1)
+    assert result.shape == (1, 1, 15)
 
-        # check truncation if lmax provided
+    # check truncation if lmax provided
 
-        result = glass.effective_cls(cls, weights1, lmax=5)
+    result = glass.effective_cls(cls, weights1, lmax=5)
 
-        assert result.shape == (1, 1, 6)
-        assert result[..., 6:] == pytest.approx(0)
+    assert result.shape == (1, 1, 6)
+    assert result[..., 6:] == pytest.approx(0)
 
-        # check with weights1 and weights2 and weights1 is weights2
+    # check with weights1 and weights2 and weights1 is weights2
 
-        result = glass.effective_cls(cls, weights1, weights2=weights1)
-        assert result.shape == (1, 1, 15)
+    result = glass.effective_cls(cls, weights1, weights2=weights1)
+    assert result.shape == (1, 1, 15)
 
 
 def test_generate_grf() -> None:
