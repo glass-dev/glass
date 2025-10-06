@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 
     Size: TypeAlias = int | tuple[int, ...] | None
 
+    GlassAnyArray: TypeAlias = NDArray[Any] | JAXArray
+    GlassFloatArray: TypeAlias = NDArray[np.float64] | JAXArray
+
 
 def get_namespace(*arrays: NDArray[Any] | JAXArray) -> ModuleType:
     """
@@ -101,3 +104,20 @@ class Generator:
 
 
 UnifiedGenerator: TypeAlias = np.random.Generator | glass.jax.Generator | Generator
+
+
+class GlassXPAdditions:
+    """Additional functions missing from both array-api-strict and array-api-extra."""
+
+    @staticmethod
+    def trapezoid(
+        y: GlassAnyArray, x: GlassAnyArray = None, dx: float = 1.0, axis: int = -1
+    ) -> GlassAnyArray:
+        """Integrate along the given axis using the composite trapezoidal rule."""
+        backend = get_namespace(y, x).__name__
+        if backend == "jax.numpy":
+            return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
+        if backend in {"numpy", "array_api_strict"}:
+            return np.trapezoid(y, x=x, dx=dx, axis=axis)
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)

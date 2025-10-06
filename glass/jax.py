@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, TypeAlias
 import jax.dtypes
 import jax.numpy as jnp
 import jax.random
+from jax.scipy import integrate
 from jax.typing import ArrayLike
 from typing_extensions import Self
 
@@ -31,6 +32,13 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     if isinstance(size, int):
         return (size,)
     return size
+
+
+def trapezoid(
+    y: ArrayLike, x: ArrayLike = None, dx: ArrayLike = 1.0, axis: int = -1
+) -> Array:
+    """Wrapper for jax.scipy.integrate.trapezoid."""
+    return integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
 
 class Generator:
