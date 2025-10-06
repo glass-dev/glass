@@ -319,7 +319,7 @@ def tophat_windows(
 
 
 def linear_windows(
-    zgrid: ArrayLike1D,
+    zgrid: GlassFloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -360,7 +360,9 @@ def linear_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zgrid) < 3:
+    xp = _utils.get_namespace(zgrid)
+
+    if zgrid.size < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
@@ -368,13 +370,13 @@ def linear_windows(
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
-        n = max(round((zmid - zmin) / dz), 2) - 1
-        m = max(round((zmax - zmid) / dz), 2)
-        z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
+        n = int(max(xp.round((zmid - zmin) / dz), 2)) - 1
+        m = int(max(xp.round((zmax - zmid) / dz), 2))
+        z = xp.concat(
+            (xp.linspace(zmin, zmid, n, endpoint=False), xp.linspace(zmid, zmax, m)),
         )
-        w = np.concatenate(
-            [np.linspace(0.0, 1.0, n, endpoint=False), np.linspace(1.0, 0.0, m)],
+        w = xp.concat(
+            (xp.linspace(0.0, 1.0, n, endpoint=False), xp.linspace(1.0, 0.0, m)),
         )
         if weight is not None:
             w *= weight(z)

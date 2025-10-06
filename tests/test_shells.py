@@ -91,29 +91,31 @@ def test_tophat_windows(xp: types.ModuleType) -> None:
     assert all(xp.all(w.wa == 1) for w in ws)
 
 
-def test_linear_windows() -> None:
+def test_linear_windows(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
     dz = 1e-2
-    zgrid = [
-        0.0,
-        0.20224358,
-        0.42896272,
-        0.69026819,
-        1.0,
-    ]
+    zgrid = xp.asarray(
+        [
+            0.0,
+            0.20224358,
+            0.42896272,
+            0.69026819,
+            1.0,
+        ]
+    )
 
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
+    assert dz == pytest.approx(xp.mean(xp.diff(ws[0].za)), abs=1e-2)
 
     # check number of windows
 
-    assert len(ws) == len(zgrid) - 2
+    assert len(ws) == zgrid.size - 2
 
     # check values of zeff
 
-    np.testing.assert_array_equal([w.zeff for w in ws], zgrid[1:-1])
+    assert [w.zeff for w in ws] == pytest.approx(zgrid[1:-1])
 
     # check weight function input
 
@@ -122,19 +124,19 @@ def test_linear_windows() -> None:
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
     for w in ws:
-        np.testing.assert_array_equal(w.wa, np.zeros_like(w.wa))
+        assert w.wa == pytest.approx(xp.zeros_like(w.wa))
 
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
-        glass.linear_windows([])
+        glass.linear_windows(xp.asarray([]))
 
     # check warning issued
 
     with pytest.warns(
         UserWarning, match="first triangular window does not start at z=0"
     ):
-        glass.linear_windows([0.1, 0.2, 0.3])
+        glass.linear_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
 def test_cubic_windows() -> None:
