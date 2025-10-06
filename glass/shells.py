@@ -53,14 +53,18 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
+from glass._array_api_utils import GlassXPAdditions
 
 if TYPE_CHECKING:
+    import types
     from collections.abc import Callable, Iterator, Sequence
 
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import GlassFloatArray
     from glass.cosmology import Cosmology
 
     ArrayLike1D = Sequence[float] | NDArray[np.float64]
@@ -209,16 +213,23 @@ class RadialWindow:
 
     """
 
-    za: NDArray[np.float64]
-    wa: NDArray[np.float64]
+    za: GlassFloatArray
+    wa: GlassFloatArray
     zeff: float = math.nan
+    xp: types.ModuleType = None
 
     def __post_init__(self) -> None:
-        """Magic method to calculate the effective redshift if not given."""
+        """
+        Magic method to setup optional inputs
+        - Calculates the effective redshift if not given.
+        - Determines xp from za and wa.
+        """
+        if self.xp is None:
+            object.__setattr__(self, "xp", _utils.get_namespace(self.za, self.wa))
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
-    def __iter__(self) -> Iterator[NDArray[np.float64] | float]:
+    def __iter__(self) -> Iterator[GlassFloatArray]:
         """
         Iterate over the window function and effective redshift.
 
@@ -235,10 +246,10 @@ class RadialWindow:
 
         """
         if self.za.size > 0:
-            return np.trapezoid(  # type: ignore[return-value]
+            return GlassXPAdditions.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
                 self.za,
-            ) / np.trapezoid(self.wa, self.za)
+            ) / GlassXPAdditions.trapezoid(self.wa, self.za)
         return math.nan
 
 

@@ -10,6 +10,8 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    import types
+
     from glass.cosmology import Cosmology
 
 
@@ -315,10 +317,10 @@ def test_combine() -> None:
     """Add unit tests for :func:`glass.combine`."""
 
 
-def test_radial_window_immutable() -> None:
+def test_radial_window_immutable(xp: types.ModiuleType) -> None:
     """Checks the :class:`RadialWindow` class is immutable."""
-    wa = np.array([0.0, 1.0, 0.0])
-    za = np.array([0.0, 1.0, 2.0])
+    wa = xp.asarray([0.0, 1.0, 0.0])
+    za = xp.asarray([0.0, 1.0, 2.0])
     zeff = 1.0
 
     w = glass.RadialWindow(za, wa, zeff)
@@ -339,21 +341,21 @@ def test_radial_window_immutable() -> None:
         w.zeff = zeff
 
 
-def test_radial_window_zeff_none() -> None:
+def test_radial_window_zeff_none(xp: types.ModiuleType) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
 
-    wa = np.array([0.0, 1.0, 0.0])
-    za = np.array([0.0, 1.0, 2.0])
+    wa = xp.asarray([0.0, 1.0, 0.0])
+    za = xp.asarray([0.0, 1.0, 2.0])
 
     w = glass.RadialWindow(za, wa)
 
-    np.testing.assert_equal(w.zeff, 1.0)
+    assert w.zeff == pytest.approx(1.0)
 
     # check zeff is NaN when redshift array is empty
 
-    za = np.array([])
+    za = xp.asarray([])
 
     w = glass.RadialWindow(za, wa)
 
-    np.testing.assert_equal(w.zeff, math.nan)
+    assert math.isnan(w.zeff)
