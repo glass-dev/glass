@@ -255,7 +255,7 @@ def test_partition(xp: types.ModuleType, method: str) -> None:
 
     assert part.shape == (len(shells), 3, 2)
 
-    assert part.sum(axis=0) == pytest.approx(glass_xpx.trapezoid(fz, z))
+    assert xp.sum(part, axis=0) == pytest.approx(glass_xpx.trapezoid(fz, z))
 
 
 def test_redshift_grid() -> None:
