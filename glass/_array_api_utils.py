@@ -109,7 +109,7 @@ UnifiedGenerator: TypeAlias = np.random.Generator | glass.jax.Generator | Genera
 class GlassXPAdditions:
     """Additional functions missing from both array-api-strict and array-api-extra."""
 
-    xp : ModuleType
+    xp: ModuleType
 
     def __init__(self, xp: ModuleType) -> None:
         self.xp = xp
@@ -125,9 +125,11 @@ class GlassXPAdditions:
             return np.trapezoid(y, x=x, dx=dx, axis=axis)
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return self.xp.asarray(
-                np.trapezoid(np.asarray(y), x=np.asarray(x), dx=dx, axis=axis)
-            )
+            y_np = np.asarray(y, copy=True)
+            x_np = np.asarray(x, copy=True)
+            result_np = np.trapezoid(y_np, x_np, dx=dx, axis=axis)
+            return self.xp.asarray(result_np, copy=True)
+
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
@@ -140,17 +142,22 @@ class GlassXPAdditions:
             return np.union1d(ar1, ar2)
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return self.xp.asarray(np.union1d(np.asarray(ar1), np.asarray(ar2)))
+            ar1_np = np.asarray(ar1, copy=True)
+            ar2_np = np.asarray(ar2, copy=True)
+            result_np = np.union1d(ar1_np, ar2_np)
+            return self.xp.asarray(result_np, copy=True)
+
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
     def interp(  # noqa: PLR0913
-        self, x: GlassAnyArray,
+        self,
+        x: GlassAnyArray,
         x_points: GlassAnyArray,
         y_points: GlassAnyArray,
-        left: float = None,
-        right: float = None,
-        period: float = None
+        left: float | None = None,
+        right: float | None = None,
+        period: float | None = None,
     ) -> GlassAnyArray:
         """
         One-dimensional linear interpolation for monotonically increasing
@@ -167,16 +174,14 @@ class GlassXPAdditions:
             )
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return self.xp.asarray(
-                np.interp(
-                    np.asarray(x),
-                    np.asarray(x_points),
-                    np.asarray(y_points),
-                    left=left,
-                    right=right,
-                    period=period
-                )
+            x_np = np.asarray(x, copy=True)
+            x_points_np = np.asarray(x_points, copy=True)
+            y_points_np = np.asarray(y_points, copy=True)
+            result_np = np.interp(
+                x_np, x_points_np, y_points_np, left=left, right=right, period=period
             )
+            return self.xp.asarray(result_np, copy=True)
+
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
@@ -189,6 +194,28 @@ class GlassXPAdditions:
             return np.gradient(f)
         if backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            return self.xp.asarray(np.gradient(np.asarray(f)))
+            f_np = np.asarray(f, copy=True)
+            result_np = np.gradient(f_np)
+            return self.xp.asarray(result_np, copy=True)
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def linalg_lstsq(
+        self, a: GlassAnyArray, b: GlassAnyArray, rcond: float | None = None
+    ) -> tuple[GlassAnyArray, GlassAnyArray, GlassAnyArray, GlassAnyArray]:
+        """Return the gradient of an N-dimensional array."""
+        backend = self.xp.__name__
+        if backend == "jax.numpy":
+            return glass.jax.linalg_lstsq(a, b, rcond=rcond)
+        if backend == "numpy":
+            return np.linalg.lstsq(a, b, rcond=rcond)
+        if backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            a_np = np.asarray(a, copy=True)
+            b_np = np.asarray(b, copy=True)
+            result_np = np.linalg.lstsq(a_np, b_np, rcond=rcond)
+            return tuple(self.xp.asarray(res, copy=True) for res in result_np)
+
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

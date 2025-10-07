@@ -45,9 +45,29 @@ def union1d(ar1: ArrayLike, ar2: ArrayLike) -> Array:
     """Wrapper for jax.numpy.trapezoid."""
     return jnp.union1d(ar1, ar2)
 
-def interp(x: ArrayLike, x_points: ArrayLike, y_points: ArrayLike) -> Array:
+
+def interp(  # noqa: PLR0913
+    x: ArrayLike,
+    x_points: ArrayLike,
+    y_points: ArrayLike,
+    left: ArrayLike = None,
+    right: ArrayLike = None,
+    period: ArrayLike = None,
+) -> Array:
     """Wrapper for jax.numpy.interp."""
-    return jnp.interp(x, x_points, y_points)
+    return jnp.interp(x, x_points, y_points, left=left, right=right, period=period)
+
+
+def gradient(f: ArrayLike) -> Array:
+    """Wrapper for jax.numpy.gradient."""
+    return jnp.gradient(f)
+
+
+def linalg_lstsq(
+    a: ArrayLike, b: ArrayLike, rcond: float | None = None
+) -> tuple[Array, Array, Array, Array]:
+    """Wrapper for jax.numpy.linalg.lstsq."""
+    return jnp.linalg.lstsq(a, b, rcond)  # type: ignore[no-any-return]
 
 
 class Generator:
