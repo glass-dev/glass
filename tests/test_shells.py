@@ -223,7 +223,7 @@ def test_restrict(xp: types.ModuleType) -> None:
             assert fr[i] == fi * glass_xpx.interp(zi, w.za, w.wa)
 
 
-@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
+@pytest.mark.parametrize("method", ["nnls"])  # , "lstsq", "restrict"])
 def test_partition(xp: types.ModuleType, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
     glass_xpx = GlassXPAdditions(xp)

@@ -110,20 +110,22 @@ class GlassXPAdditions:
     """Additional functions missing from both array-api-strict and array-api-extra."""
 
     xp: ModuleType
+    backend: str
 
     def __init__(self, xp: ModuleType) -> None:
         self.xp = xp
+        self.backend = xp.__name__
 
     def trapezoid(
         self, y: GlassAnyArray, x: GlassAnyArray = None, dx: float = 1.0, axis: int = -1
     ) -> GlassAnyArray:
         """Integrate along the given axis using the composite trapezoidal rule."""
-        backend = self.xp.__name__
-        if backend == "jax.numpy":
+        self.backend = self.xp.__name__
+        if self.backend == "jax.numpy":
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
-        if backend == "numpy":
+        if self.backend == "numpy":
             return np.trapezoid(y, x=x, dx=dx, axis=axis)
-        if backend == "array_api_strict":
+        if self.backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
             y_np = np.asarray(y, copy=True)
             x_np = np.asarray(x, copy=True)
@@ -135,12 +137,11 @@ class GlassXPAdditions:
 
     def union1d(self, ar1: GlassAnyArray, ar2: GlassAnyArray) -> GlassAnyArray:
         """Compute the set union of two 1D arrays."""
-        backend = self.xp.__name__
-        if backend == "jax.numpy":
+        if self.backend == "jax.numpy":
             return glass.jax.union1d(ar1, ar2)
-        if backend == "numpy":
+        if self.backend == "numpy":
             return np.union1d(ar1, ar2)
-        if backend == "array_api_strict":
+        if self.backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
             ar1_np = np.asarray(ar1, copy=True)
             ar2_np = np.asarray(ar2, copy=True)
@@ -163,16 +164,15 @@ class GlassXPAdditions:
         One-dimensional linear interpolation for monotonically increasing
         sample points.
         """
-        backend = self.xp.__name__
-        if backend == "jax.numpy":
+        if self.backend == "jax.numpy":
             return glass.jax.interp(
                 x, x_points, y_points, left=left, right=right, period=period
             )
-        if backend == "numpy":
+        if self.backend == "numpy":
             return np.interp(
                 x, x_points, y_points, left=left, right=right, period=period
             )
-        if backend == "array_api_strict":
+        if self.backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
             x_np = np.asarray(x, copy=True)
             x_points_np = np.asarray(x_points, copy=True)
@@ -187,12 +187,11 @@ class GlassXPAdditions:
 
     def gradient(self, f: GlassAnyArray) -> GlassAnyArray:
         """Return the gradient of an N-dimensional array."""
-        backend = self.xp.__name__
-        if backend == "jax.numpy":
+        if self.backend == "jax.numpy":
             return glass.jax.gradient(f)
-        if backend == "numpy":
+        if self.backend == "numpy":
             return np.gradient(f)
-        if backend == "array_api_strict":
+        if self.backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
             f_np = np.asarray(f, copy=True)
             result_np = np.gradient(f_np)
@@ -205,16 +204,45 @@ class GlassXPAdditions:
         self, a: GlassAnyArray, b: GlassAnyArray, rcond: float | None = None
     ) -> tuple[GlassAnyArray, GlassAnyArray, GlassAnyArray, GlassAnyArray]:
         """Return the gradient of an N-dimensional array."""
-        backend = self.xp.__name__
-        if backend == "jax.numpy":
+        if self.backend == "jax.numpy":
             return glass.jax.linalg_lstsq(a, b, rcond=rcond)
-        if backend == "numpy":
+        if self.backend == "numpy":
             return np.linalg.lstsq(a, b, rcond=rcond)
-        if backend == "array_api_strict":
+        if self.backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
             a_np = np.asarray(a, copy=True)
             b_np = np.asarray(b, copy=True)
             result_np = np.linalg.lstsq(a_np, b_np, rcond=rcond)
+            return tuple(self.xp.asarray(res, copy=True) for res in result_np)
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def einsum(self, subscripts: str, *operands: GlassAnyArray) -> GlassAnyArray:
+        """Evaluates the Einstein summation convention on the operands."""
+        if self.backend == "jax.numpy":
+            return glass.jax.einsum(subscripts, *operands)
+        if self.backend == "numpy":
+            return np.einsum(subscripts, *operands)
+        if self.backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            operands_np = (np.asarray(op, copy=True) for op in operands)
+            result_np = np.einsum(subscripts, *operands_np)
+            return self.xp.asarray(result_np, copy=True)
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def linalg_qr(self, a: GlassAnyArray) -> tuple[GlassAnyArray, GlassAnyArray]:
+        """Return the gradient of an N-dimensional array."""
+        if self.backend == "jax.numpy":
+            return glass.jax.linalg_qr(a)
+        if self.backend == "numpy":
+            return np.linalg.qr(a)
+        if self.backend == "array_api_strict":
+            # Using design principle of scipy (i.e. copy, use np, copy back)
+            a_np = np.asarray(a, copy=True)
+            result_np = np.linalg.qr(a_np)
             return tuple(self.xp.asarray(res, copy=True) for res in result_np)
 
         msg = "the array backend in not supported"

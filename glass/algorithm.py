@@ -6,18 +6,22 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
     from jaxtyping import Array
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import GlassFloatArray
+
 
 def nnls(
-    a: NDArray[np.float64],
-    b: NDArray[np.float64],
+    a: GlassFloatArray,
+    b: GlassFloatArray,
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Compute a non-negative least squares solution.
 
@@ -49,8 +53,10 @@ def nnls(
         If the shapes of ``a`` and ``b`` do not match.
 
     """
-    a = np.asanyarray(a)
-    b = np.asanyarray(b)
+    xp = _utils.get_namespace(a, b)
+
+    a = xp.asarray(a)
+    b = xp.asarray(b)
 
     if a.ndim != 2:
         msg = "input `a` is not a matrix"
@@ -67,25 +73,27 @@ def nnls(
     if maxiter is None:
         maxiter = 3 * n
 
-    index = np.arange(n)
-    q = np.full(n, fill_value=False)
-    x = np.zeros(n)
+    index = xp.arange(n)
+    q = xp.full(n, fill_value=False)
+    x = xp.zeros(n)
     for _ in range(maxiter):
-        if np.all(q):
+        if xp.all(q):
             break
-        w = np.dot(b - a @ x, a)
-        m = index[~q][np.argmax(w[~q])]
+        w = xp.vecdot(b - a @ x, a)
+        m = int(index[~q][xp.argmax(w[~q])])
         if w[m] <= tol:
             break
         q[m] = True
         while True:
-            aq = a[:, q]
+            aq = xp.take(a, xp.nonzero(q)[0], axis=1)
             xq = x[q]
-            sq = np.linalg.solve(aq.T @ aq, b @ aq)
+            aq_np = np.asarray(aq, copy=True)
+            sq_np = np.linalg.solve(aq_np.T @ aq_np, b @ aq_np)
+            sq = xp.asarray(sq_np, copy=True)
             t = sq <= 0
-            if not np.any(t):
+            if not xp.any(t):
                 break
-            alpha = -np.min(xq[t] / (xq[t] - sq[t]))
+            alpha = -xp.min(xq[t] / (xq[t] - sq[t]))
             x[q] += alpha * (sq - xq)
             q[x <= 0] = False
         x[q] = sq
