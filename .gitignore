@@ -12,3 +12,4 @@ coverage*
 *.html
 .ipynb_checkpoints
 .jupyter
+.*_cache

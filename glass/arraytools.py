@@ -7,11 +7,14 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from typing import Unpack
 
     from numpy.typing import DTypeLike, NDArray
+
+    from glass._array_api_utils import GlassFloatArray
 
 
 def broadcast_first(
@@ -90,14 +93,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | NDArray[np.float64],
-    xq: Sequence[float] | NDArray[np.float64],
-    fq: Sequence[float] | NDArray[np.float64],
+    x: float | GlassFloatArray,
+    xq: GlassFloatArray,
+    fq: GlassFloatArray,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -123,14 +126,23 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    return np.apply_along_axis(
-        partial(np.interp, x, xq),
+    xp = _utils.get_namespace(x, xq, fq)
+
+    # Using design principle of scipy (i.e. copy, use np, copy back)
+    x_np = np.asarray(x, copy=True)
+    xq_np = np.asarray(xq, copy=True)
+    fq_np = np.asarray(fq, copy=True)
+
+    reuslt_np = np.apply_along_axis(
+        partial(np.interp, x_np, xq_np),
         axis,
-        fq,
+        fq_np,
         left=left,
         right=right,
         period=period,
     )
+
+    return xp.asarray(reuslt_np, copy=True)
 
 
 def trapezoid_product(

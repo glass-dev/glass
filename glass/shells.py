@@ -53,14 +53,18 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
+from glass._array_api_utils import GlassXPAdditions
 
 if TYPE_CHECKING:
+    import types
     from collections.abc import Callable, Iterator, Sequence
 
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import GlassFloatArray
     from glass.cosmology import Cosmology
 
     ArrayLike1D = Sequence[float] | NDArray[np.float64]
@@ -209,16 +213,23 @@ class RadialWindow:
 
     """
 
-    za: NDArray[np.float64]
-    wa: NDArray[np.float64]
+    za: GlassFloatArray
+    wa: GlassFloatArray
     zeff: float = math.nan
+    xp: types.ModuleType | None = None
 
     def __post_init__(self) -> None:
-        """Magic method to calculate the effective redshift if not given."""
+        """
+        Magic method to setup optional inputs
+        - Calculates the effective redshift if not given.
+        - Determines xp from za and wa.
+        """
+        if self.xp is None:
+            object.__setattr__(self, "xp", _utils.get_namespace(self.za, self.wa))
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
-    def __iter__(self) -> Iterator[NDArray[np.float64] | float]:
+    def __iter__(self) -> Iterator[GlassFloatArray]:
         """
         Iterate over the window function and effective redshift.
 
@@ -234,16 +245,17 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
+        glass_xpx = GlassXPAdditions(self.xp)  # type: ignore[arg-type]
         if self.za.size > 0:
-            return np.trapezoid(  # type: ignore[return-value]
+            return glass_xpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
                 self.za,
-            ) / np.trapezoid(self.wa, self.za)
+            ) / glass_xpx.trapezoid(self.wa, self.za)
         return math.nan
 
 
 def tophat_windows(
-    zbins: ArrayLike1D,
+    zbins: GlassFloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -284,7 +296,10 @@ def tophat_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zbins) < 2:
+    if zbins.ndim != 1:
+        msg = "zbins must be a 1D array"
+        raise ValueError(msg)
+    if zbins.size < 2:
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
     if zbins[0] != 0:
@@ -293,20 +308,23 @@ def tophat_windows(
             stacklevel=2,
         )
 
+    xp = _utils.get_namespace(zbins)
+    glass_xpx = GlassXPAdditions(xp)
+
     wht: WeightFunc
-    wht = weight if weight is not None else np.ones_like
+    wht = weight if weight is not None else xp.ones_like
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
-        n = max(round((zmax - zmin) / dz), 2)
-        z = np.linspace(zmin, zmax, n, dtype=np.float64)
+        n = int(max(xp.round((zmax - zmin) / dz), 2))
+        z = xp.linspace(zmin, zmax, n, dtype=zbins.dtype)
         w = wht(z)
-        zeff = np.trapezoid(w * z, z) / np.trapezoid(w, z)
-        ws.append(RadialWindow(z, w, zeff.item()))
+        zeff = glass_xpx.trapezoid(w * z, z) / glass_xpx.trapezoid(w, z)
+        ws.append(RadialWindow(z, w, float(zeff)))
     return ws
 
 
 def linear_windows(
-    zgrid: ArrayLike1D,
+    zgrid: GlassFloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -347,21 +365,26 @@ def linear_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zgrid) < 3:
+    if zgrid.ndim != 1:
+        msg = "zgrid must be a 1D array"
+        raise ValueError(msg)
+    if zgrid.size < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
+    xp = _utils.get_namespace(zgrid)
+
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
-        n = max(round((zmid - zmin) / dz), 2) - 1
-        m = max(round((zmax - zmid) / dz), 2)
-        z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
+        n = int(max(xp.round((zmid - zmin) / dz), 2)) - 1
+        m = int(max(xp.round((zmax - zmid) / dz), 2))
+        z = xp.concat(
+            (xp.linspace(zmin, zmid, n, endpoint=False), xp.linspace(zmid, zmax, m)),
         )
-        w = np.concatenate(
-            [np.linspace(0.0, 1.0, n, endpoint=False), np.linspace(1.0, 0.0, m)],
+        w = xp.concat(
+            (xp.linspace(0.0, 1.0, n, endpoint=False), xp.linspace(1.0, 0.0, m)),
         )
         if weight is not None:
             w *= weight(z)
@@ -370,7 +393,7 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: ArrayLike1D,
+    zgrid: GlassFloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -412,22 +435,27 @@ def cubic_windows(
     :ref:`user-window-functions`
 
     """
-    if len(zgrid) < 3:
+    if zgrid.ndim != 1:
+        msg = "zgrid must be a 1D array"
+        raise ValueError(msg)
+    if zgrid.size < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
+    xp = _utils.get_namespace(zgrid)
+
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
-        n = max(round((zmid - zmin) / dz), 2) - 1
-        m = max(round((zmax - zmid) / dz), 2)
-        z = np.concatenate(
-            [np.linspace(zmin, zmid, n, endpoint=False), np.linspace(zmid, zmax, m)],
+        n = int(max(xp.round((zmid - zmin) / dz), 2)) - 1
+        m = int(max(xp.round((zmax - zmid) / dz), 2))
+        z = xp.concat(
+            (xp.linspace(zmin, zmid, n, endpoint=False), xp.linspace(zmid, zmax, m)),
         )
-        u = np.linspace(0.0, 1.0, n, endpoint=False)
-        v = np.linspace(1.0, 0.0, m)
-        w = np.concatenate([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
+        u = xp.linspace(0.0, 1.0, n, endpoint=False)
+        v = xp.linspace(1.0, 0.0, m)
+        w = xp.concat([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
         if weight is not None:
             w *= weight(z)
         ws.append(RadialWindow(z, w, zmid))
@@ -435,10 +463,10 @@ def cubic_windows(
 
 
 def restrict(
-    z: ArrayLike1D,
-    f: ArrayLike1D,
+    z: GlassFloatArray,
+    f: GlassFloatArray,
     w: RadialWindow,
-) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+) -> tuple[GlassFloatArray, GlassFloatArray]:
     """
     Restrict a function to a redshift window.
 
@@ -470,8 +498,15 @@ def restrict(
         The restricted function
 
     """
-    z_ = np.compress(np.greater(z, w.za[0]) & np.less(z, w.za[-1]), z)
-    zr = np.union1d(w.za, z_)
+    if z.ndim != 1:
+        msg = "z must be 1D arrays"
+        raise ValueError(msg)
+    xp = _utils.get_namespace(z, f)
+    glass_xpx = GlassXPAdditions(xp)
+
+    z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
+    zr = glass_xpx.union1d(w.za, z_)
+
     fr = glass.arraytools.ndinterp(
         zr, z, f, left=0.0, right=0.0
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
@@ -479,12 +514,12 @@ def restrict(
 
 
 def partition(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     r"""
     Partition a function by a sequence of windows.
 
@@ -595,16 +630,16 @@ def partition(
     except KeyError:
         msg = f"invalid method: {method}"
         raise ValueError(msg) from None
-    return partition_method(z, fz, shells)  # type: ignore[no-any-return]
+    return partition_method(z, fz, shells)
 
 
 def partition_lstsq(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Least-squares partition.
 
@@ -624,23 +659,28 @@ def partition_lstsq(
         The partition.
 
     """
+    xp = _utils.get_namespace(z, fz)
+    glass_xpx = GlassXPAdditions(xp)
+
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)
+        zp = glass_xpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
-    *dims, _ = np.shape(fz)
+    *dims, _ = fz.shape
 
     # compute grid spacing
-    dz = np.gradient(zp)
+    dz = glass_xpx.gradient(zp)
 
     # create the window function matrix
-    a = np.array([np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
-    a /= np.trapezoid(a, zp, axis=-1)[..., None]
+    a = xp.asarray(
+        [glass_xpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
+    )
+    a /= glass_xpx.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -649,26 +689,32 @@ def partition_lstsq(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
+    a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
+    b = xp.concat(
+        [b, mult * xp.reshape(glass_xpx.trapezoid(fz, z), (*dims, 1))], axis=-1
+    )
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = np.linalg.lstsq(a.T, b.reshape(-1, zp.size + 1).T, rcond=None)[0]
-    x = x.T.reshape(*dims, len(shells))
+    x = glass_xpx.linalg_lstsq(
+        xp.matrix_transpose(a),
+        xp.matrix_transpose(xp.reshape(b, (-1, zp.size + 1))),
+        rcond=None,
+    )[0]
+    x = xp.reshape(xp.matrix_transpose(x), (*dims, len(shells)))
     # roll the last axis of size len(shells) to the front
-    return np.moveaxis(x, -1, 0)
+    return xp.moveaxis(x, -1, 0)
 
 
 def partition_nnls(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Non-negative least-squares partition.
 
@@ -688,25 +734,28 @@ def partition_nnls(
         The partition.
 
     """
+    xp = _utils.get_namespace(z, fz)
+    glass_xpx = GlassXPAdditions(xp)
+
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)
+        zp = glass_xpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
-    *dims, _ = np.shape(fz)
+    *dims, _ = fz.shape
 
     # compute grid spacing
-    dz = np.gradient(zp)
+    dz = glass_xpx.gradient(zp)
 
     # create the window function matrix
-    a = np.array(
-        [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
+    a = xp.asarray(
+        [glass_xpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
     )
-    a /= np.trapezoid(a, zp, axis=-1)[..., None]
+    a /= glass_xpx.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -715,31 +764,36 @@ def partition_nnls(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
+    a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
+    b = xp.concat(
+        [b, mult * xp.reshape(glass_xpx.trapezoid(fz, z), (*dims, 1))], axis=-1
+    )
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
-    q, r = np.linalg.qr(a.T)
-    y = np.einsum("ji,...j", q, b)
+    q, r = glass_xpx.linalg_qr(a.T)
+    y = glass_xpx.einsum("ji,...j", q, b)
 
-    # for each dim, find non-negative weights x such that y == r @ x
-    x = np.empty([len(shells), *dims])
-    for i in np.ndindex(*dims):
-        x[(..., *i)] = glass.algorithm.nnls(r, y[i])  # type: ignore[index]
+    x = xp.stack(
+        [
+            glass.algorithm.nnls(r, y[(*i, ...)])  # type: ignore[arg-type]
+            for i in itertools.product(*(range(d) for d in dims))
+        ],
+        axis=0,
+    )
 
     # all done
-    return x
+    return xp.reshape(xp.moveaxis(x, 0, -1), [len(shells), *dims])
 
 
 def partition_restrict(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Partition by restriction and integration.
 
@@ -757,11 +811,14 @@ def partition_restrict(
         The partition.
 
     """
-    part = np.empty((len(shells),) + np.shape(fz)[:-1])
-    for i, w in enumerate(shells):
+    xp = _utils.get_namespace(z, fz)
+    glass_xpx = GlassXPAdditions(xp)
+
+    parts = []
+    for _, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        part[i] = np.trapezoid(fr, zr, axis=-1)
-    return part
+        parts.append(glass_xpx.trapezoid(fr, zr, axis=-1))
+    return xp.stack(parts)
 
 
 def _uniform_grid(
