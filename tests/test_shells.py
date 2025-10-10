@@ -223,9 +223,12 @@ def test_restrict(xp: types.ModuleType) -> None:
             assert fr[i] == fi * glass_xpx.interp(zi, w.za, w.wa)
 
 
-@pytest.mark.parametrize("method", ["nnls"])  # , "lstsq", "restrict"])
+@pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(xp: types.ModuleType, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
+    if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
+        pytest.skip("Arrays in " + method + " are not immutable, so do not support jax")
+
     glass_xpx = GlassXPAdditions(xp)
 
     shells = [
