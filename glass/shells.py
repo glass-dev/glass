@@ -777,29 +777,23 @@ def partition_nnls(
     q, r = glass_xpx.linalg_qr(a.T)
     y = glass_xpx.einsum("ji,...j", q, b)
 
-    # for each dim, find non-negative weights x such that y == r @ x
-    # x = xp.empty([len(shells), *dims])
-    # for i in itertools.product(*(range(d) for d in dims)):
-    #     x[(..., *i)] = glass.algorithm.nnls(r, y[(*i, ...)])  # type: ignore[index]
-
     x = xp.stack(
         [
-            glass.algorithm.nnls(r, y[(*i, ...)])
+            glass.algorithm.nnls(r, y[(*i, ...)])  # type: ignore[arg-type]
             for i in itertools.product(*(range(d) for d in dims))
         ],
         axis=0,
     )
-    x = xp.reshape(xp.moveaxis(x, 0, -1), [len(shells), *dims])
 
     # all done
-    return x
+    return xp.reshape(xp.moveaxis(x, 0, -1), [len(shells), *dims])
 
 
 def partition_restrict(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Partition by restriction and integration.
 
@@ -817,11 +811,14 @@ def partition_restrict(
         The partition.
 
     """
-    part = np.empty((len(shells),) + np.shape(fz)[:-1])
-    for i, w in enumerate(shells):
+    xp = _utils.get_namespace(z, fz)
+    glass_xpx = GlassXPAdditions(xp)
+
+    parts = []
+    for _, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        part[i] = np.trapezoid(fr, zr, axis=-1)
-    return part
+        parts.append(glass_xpx.trapezoid(fr, zr, axis=-1))
+    return xp.stack(parts)
 
 
 def _uniform_grid(
