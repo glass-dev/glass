@@ -70,6 +70,16 @@ def linalg_lstsq(
     return jnp.linalg.lstsq(a, b, rcond)  # type: ignore[no-any-return]
 
 
+def linalg_qr(a: ArrayLike) -> tuple[Array, Array]:
+    """Wrapper for jax.numpy.linalg.lstsq."""
+    return jnp.linalg.qr(a)  # type: ignore[no-any-return]
+
+
+def einsum(subscripts: str, *operands: ArrayLike) -> Array:
+    """Wrapper for jax.numpy.einsum."""
+    return jnp.einsum(subscripts, *operands)
+
+
 class Generator:
     """JAX random number generation as a NumPy generator."""
 

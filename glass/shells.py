@@ -709,12 +709,12 @@ def partition_lstsq(
 
 
 def partition_nnls(
-    z: NDArray[np.float64],
-    fz: NDArray[np.float64],
+    z: GlassFloatArray,
+    fz: GlassFloatArray,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     """
     Non-negative least-squares partition.
 
@@ -734,25 +734,28 @@ def partition_nnls(
         The partition.
 
     """
+    xp = _utils.get_namespace(z, fz)
+    glass_xpx = GlassXPAdditions(xp)
+
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
 
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = np.union1d(zp, w.za)
+        zp = glass_xpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
-    *dims, _ = np.shape(fz)
+    *dims, _ = fz.shape
 
     # compute grid spacing
-    dz = np.gradient(zp)
+    dz = glass_xpx.gradient(zp)
 
     # create the window function matrix
-    a = np.array(
-        [np.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
+    a = xp.asarray(
+        [glass_xpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
     )
-    a /= np.trapezoid(a, zp, axis=-1)[..., None]
+    a /= glass_xpx.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -761,21 +764,32 @@ def partition_nnls(
 
     # append a constraint for the integral
     mult = 1 / sumtol
-    a = np.concatenate([a, mult * np.ones((len(shells), 1))], axis=-1)
-    b = np.concatenate([b, mult * np.reshape(np.trapezoid(fz, z), (*dims, 1))], axis=-1)
+    a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
+    b = xp.concat(
+        [b, mult * xp.reshape(glass_xpx.trapezoid(fz, z), (*dims, 1))], axis=-1
+    )
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
-    q, r = np.linalg.qr(a.T)
-    y = np.einsum("ji,...j", q, b)
+    q, r = glass_xpx.linalg_qr(a.T)
+    y = glass_xpx.einsum("ji,...j", q, b)
 
     # for each dim, find non-negative weights x such that y == r @ x
-    x = np.empty([len(shells), *dims])
-    for i in np.ndindex(*dims):
-        x[(..., *i)] = glass.algorithm.nnls(r, y[i])  # type: ignore[index]
+    # x = xp.empty([len(shells), *dims])
+    # for i in itertools.product(*(range(d) for d in dims)):
+    #     x[(..., *i)] = glass.algorithm.nnls(r, y[(*i, ...)])  # type: ignore[index]
+
+    x = xp.stack(
+        [
+            glass.algorithm.nnls(r, y[(*i, ...)])
+            for i in itertools.product(*(range(d) for d in dims))
+        ],
+        axis=0,
+    )
+    x = xp.reshape(xp.moveaxis(x, 0, -1), [len(shells), *dims])
 
     # all done
     return x
