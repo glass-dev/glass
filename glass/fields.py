@@ -168,10 +168,9 @@ def iternorm(
             j = (j - 1) % k
 
         # compute new standard deviation
-        # einsum is not currently included in the array-api spec but is mentioned here
-        # https://data-apis.org/array-api/latest/extensions/linear_algebra_functions.html.
-        # Therefore, replace with call to sum for now
-        s = x[..., 0] - xp.sum(a * a, axis=-1)
+        a_np = np.asarray(a, copy=True)
+        einsum_result_np = np.einsum("...i,...i", a_np, a_np)
+        s = x[..., 0] - xp.asarray(einsum_result_np, copy=True)
         if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
