@@ -15,7 +15,7 @@ def not_triangle_numbers() -> list[int]:
 def test_iternorm(xp: types.ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        pytest.skip()
+        pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
 
     # check output shapes and types
 
@@ -125,13 +125,12 @@ def test_iternorm(xp: types.ModuleType) -> None:
     assert j == 1
     assert a.shape == (3, 2)
     assert s.shape == (3,)
-    assert s.shape == (3,)
 
 
 def test_cls2cov(xp: types.ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        pytest.skip()
+        pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
 
     # check output values and shape
 
@@ -210,7 +209,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
 def test_multalm(xp: types.ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        pytest.skip()
+        pytest.skip("Arrays in multalm are not immutable, so do not support jax")
 
     # check output values and shapes
 
@@ -319,7 +318,7 @@ def test_discretized_cls() -> None:
 def test_effective_cls(xp: types.ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        pytest.skip()
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
 
     # empty cls
 
