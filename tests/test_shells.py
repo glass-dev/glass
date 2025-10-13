@@ -337,6 +337,8 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
 def test_combine(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.combine`."""
+    glass_xpx = GlassXPAdditions(xp)
+
     z = xp.linspace(0.0, 5.0, 1000)
     weights = xp.asarray(
         [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183]
@@ -366,8 +368,7 @@ def test_combine(xp: types.ModuleType) -> None:
     assert sum(result) == pytest.approx(929.267284)
 
     # Check integral w.r.t z has not changed
-    result_np = xp.asarray(result)
-    assert xp.trapz(result_np, z) == pytest.approx(4.643139)
+    assert glass_xpx.trapezoid(result, z) == pytest.approx(4.643139)
 
 
 def test_radial_window_immutable(xp: types.ModuleType) -> None:

@@ -932,10 +932,10 @@ def distance_grid(
 
 
 def combine(
-    z: NDArray[np.float64],
-    weights: NDArray[np.float64],
+    z: GlassFloatArray,
+    weights: GlassFloatArray,
     shells: Sequence[RadialWindow],
-) -> NDArray[np.float64]:
+) -> GlassFloatArray:
     r"""
     Evaluate a linear combination of window functions.
 
@@ -967,17 +967,24 @@ def combine(
         Find weights for a given function.
 
     """
-    return np.sum(  # type: ignore[no-any-return]
-        [
-            np.expand_dims(weight, -1)
-            * np.interp(
-                z,
-                shell.za,
-                shell.wa / np.trapezoid(shell.wa, shell.za),
-                left=0.0,
-                right=0.0,
-            )
-            for shell, weight in zip(shells, weights, strict=False)
-        ],
+    xp = _utils.get_namespace(
+        z, weights, *(arr for shell in shells for arr in (shell.za, shell.wa))
+    )
+    glass_xpx = GlassXPAdditions(xp)
+
+    return xp.sum(
+        xp.asarray(
+            [
+                xp.expand_dims(weight, axis=-1)
+                * glass_xpx.interp(
+                    z,
+                    shell.za,
+                    shell.wa / glass_xpx.trapezoid(shell.wa, shell.za),
+                    left=0.0,
+                    right=0.0,
+                )
+                for shell, weight in zip(shells, weights, strict=False)
+            ]
+        ),
         axis=0,
     )
