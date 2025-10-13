@@ -133,7 +133,7 @@ def ndinterp(  # noqa: PLR0913
     xq_np = np.asarray(xq, copy=True)
     fq_np = np.asarray(fq, copy=True)
 
-    reuslt_np = np.apply_along_axis(
+    result_np = np.apply_along_axis(
         partial(np.interp, x_np, xq_np),
         axis,
         fq_np,
@@ -142,7 +142,7 @@ def ndinterp(  # noqa: PLR0913
         period=period,
     )
 
-    return xp.asarray(reuslt_np, copy=True)
+    return xp.asarray(result_np, copy=True)
 
 
 def trapezoid_product(
