@@ -189,7 +189,10 @@ class RadialWindow:
     not change them in place)::
 
         >>> import glass
-        >>> w1 = glass.RadialWindow(..., ..., zeff=0.1)
+        >>> import numpy as np
+        >>> za = np.asarray([0.0, 1.0])
+        >>> wa = np.asarray([1.0, 0.0])
+        >>> w1 = glass.RadialWindow(za, wa, zeff=0.1)
         >>> w1.zeff = 0.15
         Traceback (most recent call last):
           File "<string>", line 4, in __setattr__
@@ -199,8 +202,8 @@ class RadialWindow:
     ``dataclasses.replace`` method::
 
         >>> w1 = dataclasses.replace(w1, zeff=0.15)
-        >>> w1
-        RadialWindow(za=..., wa=..., zeff=0.15)
+        >>> w1.zeff
+        0.15
 
     Attributes
     ----------
