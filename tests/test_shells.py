@@ -335,11 +335,42 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine() -> None:
+def test_combine(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.combine`."""
+    z = xp.linspace(0.0, 5.0, 1000)
+    weights = xp.asarray(
+        [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183]
+    )
+    shells = [
+        glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
+        glass.RadialWindow(
+            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 0.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 1.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 2.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 3.5
+        ),
+        glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
+    ]
+
+    result = glass.combine(z, weights, shells)
+
+    assert result.shape == z.shape
+
+    # Check sum of result
+    assert sum(result) == pytest.approx(929.267284)
+
+    # Check integral w.r.t z has not changed
+    result_np = xp.asarray(result)
+    assert xp.trapz(result_np, z) == pytest.approx(4.643139)
 
 
-def test_radial_window_immutable(xp: types.ModiuleType) -> None:
+def test_radial_window_immutable(xp: types.ModuleType) -> None:
     """Checks the :class:`RadialWindow` class is immutable."""
     wa = xp.asarray([0.0, 1.0, 0.0])
     za = xp.asarray([0.0, 1.0, 2.0])
@@ -363,7 +394,7 @@ def test_radial_window_immutable(xp: types.ModiuleType) -> None:
         w.zeff = zeff
 
 
-def test_radial_window_zeff_none(xp: types.ModiuleType) -> None:
+def test_radial_window_zeff_none(xp: types.ModuleType) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
 
