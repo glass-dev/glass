@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 import warnings
 from collections.abc import Sequence
@@ -119,8 +120,8 @@ def iternorm(
 
     """
     # Convert to list here to allow determining the namespace
-    cov_expanded = list(cov)
-    xp = _utils.get_namespace(cov_expanded[0])
+    first = next(cov)  # type: ignore[call-overload]
+    xp = _utils.get_namespace(first)
 
     n = (size,) if isinstance(size, int) else size
 
@@ -131,7 +132,7 @@ def iternorm(
     j = 0 if k > 0 else None
 
     # We must use cov_expanded here as cov has been consumed to determine the namespace
-    for i, x in enumerate(cov_expanded):
+    for i, x in enumerate(itertools.chain([first], cov)):
         # Ideally would be xp.asanyarray but this does not yet exist. The key difference
         # between the two in numpy is that asanyarray maintains subclasses of NDArray
         # whereas asarray will return the base class NDArray. Currently, we don't seem
