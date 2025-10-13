@@ -107,7 +107,12 @@ UnifiedGenerator: TypeAlias = np.random.Generator | glass.jax.Generator | Genera
 
 
 class GlassXPAdditions:
-    """Additional functions missing from both array-api-strict and array-api-extra."""
+    """
+    Additional functions missing from both array-api-strict and array-api-extra.
+
+    This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
+    for details.
+    """
 
     xp: ModuleType
     backend: str
@@ -119,7 +124,11 @@ class GlassXPAdditions:
     def trapezoid(
         self, y: GlassAnyArray, x: GlassAnyArray = None, dx: float = 1.0, axis: int = -1
     ) -> GlassAnyArray:
-        """Integrate along the given axis using the composite trapezoidal rule."""
+        """
+        Integrate along the given axis using the composite trapezoidal rule.
+
+        See https://github.com/glass-dev/glass/issues/646
+        """
         self.backend = self.xp.__name__
         if self.backend == "jax.numpy":
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
@@ -136,7 +145,11 @@ class GlassXPAdditions:
         raise NotImplementedError(msg)
 
     def union1d(self, ar1: GlassAnyArray, ar2: GlassAnyArray) -> GlassAnyArray:
-        """Compute the set union of two 1D arrays."""
+        """
+        Compute the set union of two 1D arrays.
+
+        See https://github.com/glass-dev/glass/issues/647
+        """
         if self.backend == "jax.numpy":
             return glass.jax.union1d(ar1, ar2)
         if self.backend == "numpy":
@@ -163,6 +176,8 @@ class GlassXPAdditions:
         """
         One-dimensional linear interpolation for monotonically increasing
         sample points.
+
+        See https://github.com/glass-dev/glass/issues/650
         """
         if self.backend == "jax.numpy":
             return glass.jax.interp(
@@ -186,7 +201,11 @@ class GlassXPAdditions:
         raise NotImplementedError(msg)
 
     def gradient(self, f: GlassAnyArray) -> GlassAnyArray:
-        """Return the gradient of an N-dimensional array."""
+        """
+        Return the gradient of an N-dimensional array.
+
+        See https://github.com/glass-dev/glass/issues/648
+        """
         if self.backend == "jax.numpy":
             return glass.jax.gradient(f)
         if self.backend == "numpy":
@@ -203,7 +222,11 @@ class GlassXPAdditions:
     def linalg_lstsq(
         self, a: GlassAnyArray, b: GlassAnyArray, rcond: float | None = None
     ) -> tuple[GlassAnyArray, GlassAnyArray, GlassAnyArray, GlassAnyArray]:
-        """Return the gradient of an N-dimensional array."""
+        """
+        Return the gradient of an N-dimensional array.
+
+        See https://github.com/glass-dev/glass/issues/649
+        """
         if self.backend == "jax.numpy":
             return glass.jax.linalg_lstsq(a, b, rcond=rcond)
         if self.backend == "numpy":
@@ -219,7 +242,11 @@ class GlassXPAdditions:
         raise NotImplementedError(msg)
 
     def einsum(self, subscripts: str, *operands: GlassAnyArray) -> GlassAnyArray:
-        """Evaluates the Einstein summation convention on the operands."""
+        """
+        Evaluates the Einstein summation convention on the operands.
+
+        See https://github.com/glass-dev/glass/issues/657
+        """
         if self.backend == "jax.numpy":
             return glass.jax.einsum(subscripts, *operands)
         if self.backend == "numpy":
@@ -234,7 +261,11 @@ class GlassXPAdditions:
         raise NotImplementedError(msg)
 
     def linalg_qr(self, a: GlassAnyArray) -> tuple[GlassAnyArray, GlassAnyArray]:
-        """Return the gradient of an N-dimensional array."""
+        """
+        Return the gradient of an N-dimensional array.
+
+        See https://github.com/glass-dev/glass/issues/658
+        """
         if self.backend == "jax.numpy":
             return glass.jax.linalg_qr(a)
         if self.backend == "numpy":
