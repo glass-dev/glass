@@ -827,7 +827,8 @@ def _uniform_grid(
     *,
     step: float | None = None,
     num: int | None = None,
-) -> NDArray[np.float64]:
+    xp: types.ModuleType | None = None,
+) -> GlassFloatArray:
     """
     Create a uniform grid.
 
@@ -841,6 +842,8 @@ def _uniform_grid(
         The spacing.
     num
         The number of samples.
+    xp
+        The array library to use. If None, defaults to numpy
 
     Returns
     -------
@@ -852,10 +855,12 @@ def _uniform_grid(
         If both ``step`` and ``num`` are given.
 
     """
+    if xp is None:
+        xp = np
     if step is not None and num is None:
-        return np.arange(start, np.nextafter(stop + step, stop), step)
+        return xp.arange(start, stop + step, step)
     if step is None and num is not None:
-        return np.linspace(start, stop, num + 1, dtype=np.float64)
+        return xp.linspace(start, stop, num + 1, dtype=xp.float64)
     msg = "exactly one of grid step size or number of steps must be given"
     raise ValueError(msg)
 
@@ -866,7 +871,8 @@ def redshift_grid(
     *,
     dz: float | None = None,
     num: int | None = None,
-) -> NDArray[np.float64]:
+    xp: types.ModuleType | None = None,
+) -> GlassFloatArray:
     """
     Redshift grid with uniform spacing in redshift.
 
@@ -880,13 +886,15 @@ def redshift_grid(
         The redshift spacing.
     num
         The number redshift samples.
+    xp
+        The array library to use. If None, defaults to numpy
 
     Returns
     -------
         The redshift grid.
 
     """
-    return _uniform_grid(zmin, zmax, step=dz, num=num)
+    return _uniform_grid(zmin, zmax, step=dz, num=num, xp=xp)
 
 
 def distance_grid(

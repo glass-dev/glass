@@ -261,7 +261,7 @@ def test_partition(xp: types.ModuleType, method: str) -> None:
     assert xp.sum(part, axis=0) == pytest.approx(glass_xpx.trapezoid(fz, z))
 
 
-def test_redshift_grid() -> None:
+def test_redshift_grid(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.redshift_grid`."""
     zmin = 0
     zmax = 1
@@ -269,18 +269,18 @@ def test_redshift_grid() -> None:
     # check num input
 
     num = 5
-    z = glass.redshift_grid(zmin, zmax, num=5)
-    assert len(z) == num + 1
+    z = glass.redshift_grid(zmin, zmax, num=5, xp=xp)
+    assert z.size == num + 1
 
     # check dz input
 
     dz = 0.2
-    z = glass.redshift_grid(zmin, zmax, dz=dz)
-    assert len(z) == np.ceil((zmax - zmin) / dz) + 1
+    z = glass.redshift_grid(zmin, zmax, dz=dz, xp=xp)
+    assert z.size == math.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 
-    z = glass.redshift_grid(zmin, zmax, dz=0.3)
+    z = glass.redshift_grid(zmin, zmax, dz=0.3, xp=xp)
     assert zmax < z[-1]
 
     # check error raised
@@ -289,13 +289,13 @@ def test_redshift_grid() -> None:
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        glass.redshift_grid(zmin, zmax)
+        glass.redshift_grid(zmin, zmax, xp=xp)
 
     with pytest.raises(
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        glass.redshift_grid(zmin, zmax, dz=dz, num=num)
+        glass.redshift_grid(zmin, zmax, dz=dz, num=num, xp=xp)
 
 
 def test_distance_grid(cosmo: Cosmology) -> None:
