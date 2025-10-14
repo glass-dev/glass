@@ -12,13 +12,17 @@ def not_triangle_numbers() -> list[int]:
     return [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
 
-def test_iternorm() -> None:
+def test_iternorm(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
+
     # check output shapes and types
 
     k = 2
 
     generator = glass.iternorm(
-        k, np.array([1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2])
+        k, (xp.asarray(x) for x in [1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2])
     )
     result = next(generator)
 
@@ -26,7 +30,8 @@ def test_iternorm() -> None:
 
     assert isinstance(j, int)
     assert a.shape == (k,)
-    assert isinstance(s, float)  # type: ignore[unreachable]
+    assert s.shape == ()
+    assert s.dtype == xp.float64  # type: ignore[unreachable]
     assert s.shape == ()  # type: ignore[unreachable]
 
     # specify size
@@ -35,8 +40,9 @@ def test_iternorm() -> None:
 
     generator = glass.iternorm(
         k,
-        np.array(
-            [
+        (
+            xp.asarray(arr)
+            for arr in [
                 [1.0, 0.5, 0.5],
                 [0.5, 0.2, 0.1],
                 [0.5, 0.1, 0.2],
@@ -55,13 +61,27 @@ def test_iternorm() -> None:
     # test shape mismatch error
 
     with pytest.raises(TypeError, match="covariance row 0: shape"):
-        list(glass.iternorm(k, np.array([[1.0, 0.5], [0.5, 0.2]])))
+        list(
+            glass.iternorm(
+                k,
+                (
+                    xp.asarray(arr)
+                    for arr in [
+                        [1.0, 0.5],
+                        [0.5, 0.2],
+                    ]
+                ),
+            )
+        )
 
     # test positive definite error
 
     with pytest.raises(ValueError, match="covariance matrix is not positive definite"):
         list(
-            glass.iternorm(k, np.array([1.0, 0.5, 0.9, 0.5, 0.2, 0.4, 0.9, 0.4, -1.0]))
+            glass.iternorm(
+                k,
+                (xp.asarray(x) for x in [1.0, 0.5, 0.9, 0.5, 0.2, 0.4, 0.9, 0.4, -1.0]),
+            )
         )
 
     # test multiple iterations
@@ -70,10 +90,19 @@ def test_iternorm() -> None:
 
     generator = glass.iternorm(
         k,
-        np.array(
-            [
-                [[1.0, 0.5, 0.5], [0.5, 0.2, 0.1], [0.5, 0.1, 0.2]],
-                [[2.0, 1.0, 0.8], [1.0, 0.5, 0.3], [0.8, 0.3, 0.6]],
+        (
+            xp.asarray(arr)
+            for arr in [
+                [
+                    [1.0, 0.5, 0.5],
+                    [0.5, 0.2, 0.1],
+                    [0.5, 0.1, 0.2],
+                ],
+                [
+                    [2.0, 1.0, 0.8],
+                    [1.0, 0.5, 0.3],
+                    [0.8, 0.3, 0.6],
+                ],
             ]
         ),
         size,
@@ -90,23 +119,26 @@ def test_iternorm() -> None:
 
     # test k = 0
 
-    generator = glass.iternorm(0, np.array([1.0]))
+    generator = glass.iternorm(0, xp.asarray([1.0]))
 
     j, a, s = result
 
     assert j == 1
     assert a.shape == (3, 2)
-    assert isinstance(s, np.ndarray)
     assert s.shape == (3,)
 
 
-def test_cls2cov() -> None:
+def test_cls2cov(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
+
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [np.array([1.0, 0.5, 0.3]), None, np.array([0.7, 0.6, 0.1])],  # type: ignore[list-item]
+        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],  # type: ignore[list-item]
         nl,
         nf,
         nc,
@@ -114,21 +146,23 @@ def test_cls2cov() -> None:
     cov = next(generator)
 
     assert cov.shape == (nl, nc + 1)
+    assert cov.dtype == xp.float64  # type: ignore[unreachable]
 
-    np.testing.assert_array_equal(cov[:, 0], np.array([0.5, 0.25, 0.15]))
-    np.testing.assert_array_equal(cov[:, 1], 0)
-    np.testing.assert_array_equal(cov[:, 2], 0)
+    assert cov[:, 0] == pytest.approx(xp.asarray([0.5, 0.25, 0.15]))
+    assert cov[:, 1] == pytest.approx(0)
+    assert cov[:, 2] == pytest.approx(0)
 
     # test negative value error
 
     generator = glass.cls2cov(
-        np.array(  # type: ignore[arg-type]
-            [
+        [
+            xp.asarray(arr)
+            for arr in [  # type: ignore[arg-type]
                 [-1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
                 [0.7, 0.6, 0.1],
             ]
-        ),
+        ],
         nl,
         nf,
         nc,
@@ -141,8 +175,9 @@ def test_cls2cov() -> None:
     nl, nf, nc = 3, 3, 2
 
     generator = glass.cls2cov(
-        np.array(  # type: ignore[arg-type]
-            [
+        [
+            xp.asarray(arr)
+            for arr in [  # type: ignore[arg-type]
                 [1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
                 [0.7, 0.6, 0.1],
@@ -150,62 +185,70 @@ def test_cls2cov() -> None:
                 [0.6, 0.3, 0.2],
                 [0.8, 0.7, 0.4],
             ]
-        ),
+        ],
         nl,
         nf,
         nc,
     )
 
-    cov1 = np.copy(next(generator))
-    cov2 = np.copy(next(generator))
+    cov1 = xp.asarray(next(generator), copy=True)
+    cov2 = xp.asarray(next(generator), copy=True)
     cov3 = next(generator)
 
     assert cov1.shape == (nl, nc + 1)
     assert cov2.shape == (nl, nc + 1)
     assert cov3.shape == (nl, nc + 1)
 
-    assert not np.array_equal(cov1, cov2)
-    assert not np.array_equal(cov2, cov3)
+    assert cov1.dtype == xp.float64
+    assert cov2.dtype == xp.float64
+    assert cov3.dtype == xp.float64
+
+    assert cov1 != pytest.approx(cov2)
+    assert cov2 != pytest.approx(cov3)
 
 
-def test_multalm() -> None:
+def test_multalm(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in multalm are not immutable, so do not support jax")
+
     # check output values and shapes
 
-    alm = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    bl = np.array([2.0, 0.5, 1.0])
-    alm_copy = np.copy(alm)
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    bl = xp.asarray([2.0, 0.5, 1.0])
+    alm_copy = xp.asarray(alm, copy=True)
 
     result = glass.fields._multalm(alm, bl, inplace=True)
 
-    assert np.array_equal(result, alm)  # in-place
-    expected_result = np.array([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    np.testing.assert_allclose(result, expected_result)
-    assert not np.array_equal(alm_copy, result)
+    assert result == pytest.approx(alm)
+    expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
+    assert result == pytest.approx(expected_result)
+    assert alm_copy != pytest.approx(result)
 
     # multiple with 1s
 
-    alm = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    bl = np.ones(3)
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    bl = xp.ones(3)
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    np.testing.assert_array_equal(result, alm)
+    assert result == pytest.approx(alm)
 
     # multiple with 0s
 
-    bl = np.array([0.0, 1.0, 0.0])
+    bl = xp.asarray([0.0, 1.0, 0.0])
 
     result = glass.fields._multalm(alm, bl, inplace=False)
 
-    expected_result = np.array([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    np.testing.assert_allclose(result, expected_result)
+    expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
+    assert result == pytest.approx(expected_result)
 
     # empty arrays
 
-    alm = np.array([])
-    bl = np.array([])
+    alm = xp.asarray([])
+    bl = xp.asarray([])
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    np.testing.assert_array_equal(result, alm)
+    assert result == pytest.approx(alm)
 
 
 def test_lognormal_gls() -> None:
@@ -273,26 +316,30 @@ def test_discretized_cls() -> None:
         np.testing.assert_allclose(cl[:n], expected)
 
 
-def test_effective_cls() -> None:
+def test_effective_cls(xp: types.ModuleType) -> None:
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
     # empty cls
 
-    result = glass.effective_cls([], np.array([]))
+    result = glass.effective_cls([], xp.asarray([]))
     assert result.shape == (0,)
 
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="invalid number of spectra:"):
-        glass.effective_cls([np.arange(10), np.arange(10)], np.ones((2, 1)))
+        glass.effective_cls([xp.arange(10), xp.arange(10)], xp.ones((2, 1)))
 
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="shape mismatch between fields and weights1"):
-        glass.effective_cls([], np.ones((3, 1)))
+        glass.effective_cls([], xp.ones((3, 1)))
 
     # check with only weights1
 
-    cls = [np.arange(15), np.arange(15), np.arange(15)]
-    weights1 = np.ones((2, 1))
+    cls = [xp.arange(15.0) for _ in range(3)]
+    weights1 = xp.ones((2, 1))
 
     result = glass.effective_cls(cls, weights1)
     assert result.shape == (1, 1, 15)
@@ -302,7 +349,7 @@ def test_effective_cls() -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    np.testing.assert_allclose(result[..., 6:], 0)
+    assert result[..., 6:] == pytest.approx(0)
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -387,29 +434,31 @@ def test_generate():
     np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl() -> None:
+def test_getcl(xp: types.ModuleType) -> None:
     # make a mock Cls array with the index pairs as entries
     cls = [
-        np.array([i, j], dtype=np.float64) for i in range(10) for j in range(i, -1, -1)
+        xp.asarray([i, j], dtype=xp.float64)
+        for i in range(10)
+        for j in range(i, -1, -1)
     ]
     # make sure indices are retrieved correctly
     for i in range(10):
         for j in range(10):
             result = glass.getcl(cls, i, j)
-            expected = np.array([min(i, j), max(i, j)], dtype=np.float64)
-            np.testing.assert_array_equal(np.sort(result), expected)
+            expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
+            assert xp.sort(result) == pytest.approx(expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
-            expected = np.array([max(i, j)], dtype=np.float64)
-            assert len(result) == 1
-            np.testing.assert_array_equal(result, expected)
+            expected = xp.asarray([max(i, j)], dtype=xp.float64)
+            assert result.size == 1
+            assert result == pytest.approx(expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
-            expected = np.zeros((49,), dtype=np.float64)
-            assert len(result) == 51
-            np.testing.assert_array_equal(result[2:], expected)
+            expected = xp.zeros((49,), dtype=xp.float64)
+            assert result.size == 51
+            assert result[2:] == pytest.approx(expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]):

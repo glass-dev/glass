@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 import warnings
 from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
+import array_api_extra as xpx
 import healpy as hp
 import numpy as np
 from transformcl import cltovar
 
 import glass
+import glass._array_api_utils as _utils
 import glass.grf
 
 if TYPE_CHECKING:
@@ -21,8 +24,10 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import GLASSAnyArray, GLASSComplexArray, GLASSFloatArray
+
     Fields = Sequence[glass.grf.Transformation]
-    Cls = Sequence[NDArray[Any]]
+    Cls = Sequence[GLASSAnyArray]
 
     T = TypeVar("T")
 
@@ -82,9 +87,9 @@ def nfields_from_nspectra(nspectra: int) -> int:
 
 def iternorm(
     k: int,
-    cov: Iterable[NDArray[np.float64]],
+    cov: Iterable[GLASSFloatArray],
     size: int | tuple[int, ...] = (),
-) -> Generator[tuple[int | None, NDArray[np.float64], NDArray[np.float64]]]:
+) -> Generator[tuple[int | None, GLASSFloatArray, GLASSFloatArray]]:
     """
     Return the vector a and variance sigma^2 for iterative normal sampling.
 
@@ -114,19 +119,28 @@ def iternorm(
         If the covariance matrix is not positive definite.
 
     """
+    # Convert to list here to allow determining the namespace
+    first = next(cov)  # type: ignore[call-overload]
+    xp = _utils.get_namespace(first)
+
     n = (size,) if isinstance(size, int) else size
 
-    m = np.zeros((*n, k, k))
-    a = np.zeros((*n, k))
-    s = np.zeros((*n,))
+    m = xp.zeros((*n, k, k))
+    a = xp.zeros((*n, k))
+    s = xp.zeros((*n,))
     q = (*n, k + 1)
     j = 0 if k > 0 else None
 
-    for i, x in enumerate(cov):
-        x = np.asanyarray(x)  # noqa: PLW2901
+    # We must use cov_expanded here as cov has been consumed to determine the namespace
+    for i, x in enumerate(itertools.chain([first], cov)):
+        # Ideally would be xp.asanyarray but this does not yet exist. The key difference
+        # between the two in numpy is that asanyarray maintains subclasses of NDArray
+        # whereas asarray will return the base class NDArray. Currently, we don't seem
+        # to pass a subclass of NDArray so this, so it might be okay
+        x = xp.asarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
-                x = np.broadcast_to(x, q)  # noqa: PLW2901
+                x = xp.broadcast_to(x, q)  # noqa: PLW2901
             except ValueError:
                 msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
                 raise TypeError(msg) from None
@@ -135,30 +149,33 @@ def iternorm(
         if j is not None:
             # compute new entries of matrix A
             m[..., :, j] = 0
-            m[..., j : j + 1, :] = np.matmul(a[..., np.newaxis, :], m)
-            m[..., j, j] = np.where(s != 0, -1, 0)
-            np.divide(
-                m[..., j, :],
-                -s[..., np.newaxis],
-                where=(m[..., j, :] != 0),
-                out=m[..., j, :],
-            )
+            m[..., j : j + 1, :] = xp.matmul(a[..., xp.newaxis, :], m)
+            m[..., j, j] = xp.where(s != 0, -1, s)
+            # To ensure we don't divide by zero or nan we use a mask to only divide the
+            # appropriate values of m and s
+            m_j = m[..., j, :]
+            s_broadcast = xp.broadcast_to(s[..., xp.newaxis], m_j.shape)
+            mask = (m_j != 0) & (s_broadcast != 0) & ~xp.isnan(s_broadcast)
+            m_j[mask] = xp.divide(m_j[mask], -s_broadcast[mask])
+            m[..., j, :] = m_j
 
             # compute new vector a
-            c = x[..., 1:, np.newaxis]
-            a = np.matmul(m[..., :j], c[..., k - j :, :])
-            a += np.matmul(m[..., j:], c[..., : k - j, :])
-            a = a.reshape(*n, k)
+            c = x[..., 1:, xp.newaxis]
+            a = xp.matmul(m[..., :j], c[..., k - j :, :])
+            a += xp.matmul(m[..., j:], c[..., : k - j, :])
+            a = xp.reshape(a, (*n, k))
 
             # next rolling index
             j = (j - 1) % k
 
         # compute new standard deviation
-        s = x[..., 0] - np.einsum("...i,...i", a, a)
-        if np.any(s < 0):
+        a_np = np.asarray(a, copy=True)
+        einsum_result_np = np.einsum("...i,...i", a_np, a_np)
+        s = x[..., 0] - xp.asarray(einsum_result_np, copy=True)
+        if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
-        s = np.sqrt(s)
+        s = xp.sqrt(s)
 
         # yield the next index, vector a, and standard deviation s
         yield j, a, s
@@ -169,7 +186,7 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> Generator[NDArray[np.float64]]:
+) -> Generator[GLASSFloatArray]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
 
@@ -195,15 +212,17 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
-    cov = np.zeros((nl, nc + 1))
+    xp = _utils.get_namespace(*cls)
+
+    cov = xp.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and np.any(np.less(cl, 0)):
+            if i == 0 and np.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = len(cl)
+            n = cl.size
             cov[:n, i] = cl
             cov[n:, i] = 0
         cov /= 2
@@ -211,11 +230,11 @@ def cls2cov(
 
 
 def _multalm(
-    alm: NDArray[np.complex128],
-    bl: NDArray[np.float64],
+    alm: GLASSComplexArray,
+    bl: GLASSFloatArray,
     *,
     inplace: bool = False,
-) -> NDArray[np.complex128]:
+) -> GLASSComplexArray:
     """
     Multiply alm by bl.
 
@@ -243,8 +262,14 @@ def _multalm(
         The product of alm and bl.
 
     """
-    n = len(bl)
-    out = np.asanyarray(alm) if inplace else np.copy(alm)
+    xp = _utils.get_namespace(alm, bl)
+
+    n = bl.size
+    # Ideally would be xp.asanyarray but this does not yet exist. The key difference
+    # between the two in numpy is that asanyarray maintains subclasses of NDArray
+    # whereas asarray will return the base class NDArray. Currently, we don't seem
+    # to pass a subclass of NDArray so this, so it might be okay
+    out = xp.asarray(alm) if inplace else xp.asarray(alm, copy=True)
     for ell in range(n):
         out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
 
@@ -533,11 +558,11 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: Sequence[NDArray[np.float64] | Sequence[float]],
+    cls: Cls,
     i: int,
     j: int,
     lmax: int | None = None,
-) -> NDArray[np.float64] | Sequence[float]:
+) -> GLASSFloatArray:
     """
     Return a specific angular power spectrum from an array in
     :ref:`standard order <twopoint_order>`.
@@ -563,10 +588,10 @@ def getcl(
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
     if lmax is not None:
-        if len(cl) > lmax + 1:
+        if cl.size > lmax + 1:
             cl = cl[: lmax + 1]
         else:
-            cl = np.pad(cl, (0, lmax + 1 - len(cl)))
+            cl = xpx.pad(cl, (0, lmax + 1 - cl.size))
     return cl
 
 
@@ -613,12 +638,12 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
 
 
 def effective_cls(
-    cls: Sequence[NDArray[np.float64] | Sequence[float]],
-    weights1: NDArray[np.float64],
-    weights2: NDArray[np.float64] | None = None,
+    cls: Cls,
+    weights1: GLASSFloatArray,
+    weights2: GLASSFloatArray | None = None,
     *,
     lmax: int | None = None,
-) -> NDArray[np.float64]:
+) -> GLASSFloatArray:
     """
     Compute effective angular power spectra from weights.
 
@@ -652,16 +677,20 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
+    # Try with cls and weights but if cls is a Sequence[float] then we use weights only
+    # and convert cls to an xp array
+    xp = _utils.get_namespace(*cls, weights1, weights2)
+
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))
 
     # find lmax if not given
     if lmax is None:
-        lmax = max(map(len, cls), default=0) - 1
+        lmax = max((cl.shape[0] for cl in cls), default=0) - 1
 
     # broadcast weights1 such that its shape ends in n
-    weights1 = np.asanyarray(weights1)
-    weights2 = np.asanyarray(weights2) if weights2 is not None else weights1
+    weights1 = xp.asarray(weights1)
+    weights2 = xp.asarray(weights2) if weights2 is not None else weights1
 
     shape1, shape2 = weights1.shape, weights2.shape
     for i, shape in enumerate((shape1, shape2)):
@@ -678,7 +707,7 @@ def effective_cls(
     )
 
     # create the output array: axes for all input axes plus lmax+1
-    out = np.empty(shape1[1:] + shape2[1:] + (lmax + 1,))
+    out = xp.empty(shape1[1:] + shape2[1:] + (lmax + 1,))
 
     # helper that will grab the entire first column (i.e. shells)
     c = (slice(None),)
@@ -689,11 +718,12 @@ def effective_cls(
         w1, w2 = weights1[c + j1], weights2[c + j2]
         cl = sum(
             w1[i1] * w2[i2] * getcl(cls, i1, i2, lmax=lmax)
-            for i1, i2 in np.ndindex(n, n)
+            for i1 in range(n)
+            for i2 in range(n)
         )
-        out[j1 + j2] = cl
+        out[j1 + j2 + (...,)] = cl
         if weights2 is weights1 and j1 != j2:
-            out[j2 + j1] = cl
+            out[j2 + j1 + (...,)] = cl
     return out
 
 
