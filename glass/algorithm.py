@@ -86,6 +86,10 @@ def nnls(
             break
         q[m] = True
         while True:
+            # Use `xp.task`` here instead of `a[:,q]` to mask the inner arrays, because
+            # array-api requires a masking index to be the sole index, which would
+            # return a 1-D array. However, we want to maintain the shape of `a`,
+            # i.e. `[[a11],[a12],...]` rather than `[a11,a12,...]`
             aq = xp.take(a, xp.nonzero(q)[0], axis=1)
             xq = x[q]
             sq = xp.linalg.solve(aq.T @ aq, b @ aq)
