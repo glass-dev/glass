@@ -15,26 +15,31 @@ if TYPE_CHECKING:
     from glass._array_api_utils import UnifiedGenerator
 
 
-def test_nnls(rng: np.random.Generator) -> None:
+def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+    """Unit tests for glass.algorithm.nnls."""
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in nnls are not immutable, so do not support jax")
     # check output
 
-    a = np.arange(25.0).reshape(-1, 5)
-    b = np.arange(5.0)
+    a = xp.reshape(xp.arange(25.0), (-1, 5))
+    b = xp.arange(5.0)
     y = a @ b
     res = glass.algorithm.nnls(a, y)
-    assert np.linalg.norm((a @ res) - y) < 1e-7
+    assert xp.linalg.vector_norm((a @ res) - y) < 1e-7
 
-    a = rng.uniform(low=-10, high=10, size=[50, 10])
-    b = np.abs(rng.uniform(low=-2, high=2, size=[10]))
+    a = urng.uniform(low=-10, high=10, size=[50, 10])
+    b = xp.abs(urng.uniform(low=-2, high=2, size=[10]))
     b[::2] = 0
     x = a @ b
-    res = glass.algorithm.nnls(a, x, tol=500 * np.linalg.norm(a, 1) * np.spacing(1.0))
-    np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
+    res = glass.algorithm.nnls(
+        a, x, tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps
+    )
+    assert res == pytest.approx(b, rel=0.0, abs=1e-10)
 
     # check matrix and vector's shape
 
-    a = rng.standard_normal((100, 20))
-    b = rng.standard_normal((100,))
+    a = urng.standard_normal((100, 20))
+    b = urng.standard_normal((100,))
 
     with pytest.raises(ValueError, match="input `a` is not a matrix"):
         glass.algorithm.nnls(b, a)

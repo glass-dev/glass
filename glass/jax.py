@@ -14,6 +14,8 @@ from jax.typing import ArrayLike
 from typing_extensions import Self
 
 if TYPE_CHECKING:
+    from types import FunctionType
+
     from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
 
     RealArray: TypeAlias = Array
@@ -70,14 +72,20 @@ def linalg_lstsq(
     return jnp.linalg.lstsq(a, b, rcond)  # type: ignore[no-any-return]
 
 
-def linalg_qr(a: ArrayLike) -> tuple[Array, Array]:
-    """Wrapper for jax.numpy.linalg.lstsq."""
-    return jnp.linalg.qr(a)  # type: ignore[no-any-return]
-
-
 def einsum(subscripts: str, *operands: ArrayLike) -> Array:
     """Wrapper for jax.numpy.einsum."""
     return jnp.einsum(subscripts, *operands)
+
+
+def apply_along_axis(
+    func1d: FunctionType,
+    axis: int,
+    arr: ArrayLike,
+    *args: object,
+    **kwargs: object,
+) -> Array:
+    """Wrapper for jax.numpy.apply_along_axis."""
+    return jnp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
 
 class Generator:

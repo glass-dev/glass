@@ -1,3 +1,5 @@
+import types
+
 import healpy as hp
 import numpy as np
 import pytest
@@ -460,21 +462,21 @@ def test_spectra_indices():
     )
 
 
-def test_gaussian_fields():
+def test_gaussian_fields(xp: types.ModuleType):
     shells = [
-        glass.RadialWindow([], [], 1.0),
-        glass.RadialWindow([], [], 2.0),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1.0),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2.0),
     ]
     fields = glass.gaussian_fields(shells)
     assert len(fields) == len(shells)
     assert all(isinstance(f, glass.grf.Normal) for f in fields)
 
 
-def test_lognormal_fields():
+def test_lognormal_fields(xp: types.ModuleType):
     shells = [
-        glass.RadialWindow([], [], 1),
-        glass.RadialWindow([], [], 2),
-        glass.RadialWindow([], [], 3),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 3),
     ]
 
     fields = glass.lognormal_fields(shells)

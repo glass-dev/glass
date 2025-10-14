@@ -777,7 +777,7 @@ def partition_nnls(
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
-    q, r = glass_xpx.linalg_qr(a.T)
+    q, r = xp.linalg.qr(a.T)
     y = glass_xpx.einsum("ji,...j", q, b)
 
     x = xp.stack(

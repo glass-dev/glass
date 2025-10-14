@@ -126,23 +126,18 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    xp = _utils.get_namespace(x, xq, fq)
+    arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
+    xp = _utils.get_namespace(*arrays_to_check)
+    glass_xpx = _utils.GlassXPAdditions(xp)
 
-    # Using design principle of scipy (i.e. copy, use np, copy back)
-    x_np = np.asarray(x, copy=True)
-    xq_np = np.asarray(xq, copy=True)
-    fq_np = np.asarray(fq, copy=True)
-
-    result_np = np.apply_along_axis(
-        partial(np.interp, x_np, xq_np),
+    return glass_xpx.apply_along_axis(
+        partial(glass_xpx.interp, x, xq),  # type: ignore[arg-type]
         axis,
-        fq_np,
+        fq,
         left=left,
         right=right,
         period=period,
     )
-
-    return xp.asarray(result_np, copy=True)
 
 
 def trapezoid_product(

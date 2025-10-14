@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
+    import numpy as np
     from jaxtyping import Array
     from numpy.typing import NDArray
 
@@ -79,7 +78,9 @@ def nnls(
     for _ in range(maxiter):
         if xp.all(q):
             break
-        w = xp.vecdot(b - a @ x, a)
+        # The sum product over the last axis of arg1 and the second-to-last axis of arg2
+        w = xp.sum((b - a @ x)[..., None] * a, axis=-2)
+
         m = int(index[~q][xp.argmax(w[~q])])
         if w[m] <= tol:
             break
@@ -87,9 +88,7 @@ def nnls(
         while True:
             aq = xp.take(a, xp.nonzero(q)[0], axis=1)
             xq = x[q]
-            aq_np = np.asarray(aq, copy=True)
-            sq_np = np.linalg.solve(aq_np.T @ aq_np, b @ aq_np)
-            sq = xp.asarray(sq_np, copy=True)
+            sq = xp.linalg.solve(aq.T @ aq, b @ aq)
             t = sq <= 0
             if not xp.any(t):
                 break

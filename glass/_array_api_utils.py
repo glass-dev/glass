@@ -9,7 +9,7 @@ import numpy.random
 import glass.jax
 
 if TYPE_CHECKING:
-    from types import ModuleType
+    from types import FunctionType, ModuleType
 
     from array_api_strict._array_object import Array as AArray
     from jaxtyping import Array as JAXArray
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     GlassFloatArray: TypeAlias = NDArray[np.float64] | JAXArray
 
 
-def get_namespace(*arrays: NDArray[Any] | JAXArray) -> ModuleType:
+def get_namespace(*arrays: GlassAnyArray) -> ModuleType:
     """
     Return the array library (array namespace) of input arrays
     if they belong to the same library or raise a :class:`ValueError`
@@ -260,21 +260,28 @@ class GlassXPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def linalg_qr(self, a: GlassAnyArray) -> tuple[GlassAnyArray, GlassAnyArray]:
+    def apply_along_axis(
+        self,
+        func1d: FunctionType,
+        axis: int,
+        arr: GlassAnyArray,
+        *args: object,
+        **kwargs: object,
+    ) -> GlassAnyArray:
         """
-        Return the gradient of an N-dimensional array.
+        Apply a function to 1-D slices along the given axis.
 
-        See https://github.com/glass-dev/glass/issues/658
+        See https://github.com/glass-dev/glass/issues/651
         """
         if self.backend == "jax.numpy":
-            return glass.jax.linalg_qr(a)
+            return glass.jax.apply_along_axis(func1d, axis, arr, *args, **kwargs)
         if self.backend == "numpy":
-            return np.linalg.qr(a)
+            return np.apply_along_axis(func1d, axis, arr, *args, **kwargs)
         if self.backend == "array_api_strict":
             # Using design principle of scipy (i.e. copy, use np, copy back)
-            a_np = np.asarray(a, copy=True)
-            result_np = np.linalg.qr(a_np)
-            return tuple(self.xp.asarray(res, copy=True) for res in result_np)
+            arr_np = np.asarray(arr, copy=True)
+            result_np = np.apply_along_axis(func1d, axis, arr_np, *args, **kwargs)
+            return self.xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
