@@ -19,6 +19,7 @@ def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     """Unit tests for glass.algorithm.nnls."""
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in nnls are not immutable, so do not support jax")
+
     # check output
 
     a = xp.reshape(xp.arange(25.0), (-1, 5))
@@ -32,7 +33,9 @@ def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     b[::2] = 0
     x = a @ b
     res = glass.algorithm.nnls(
-        a, x, tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps
+        a,
+        x,
+        tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps,
     )
     assert res == pytest.approx(b, rel=0.0, abs=1e-10)
 
