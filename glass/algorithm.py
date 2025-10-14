@@ -11,16 +11,16 @@ if TYPE_CHECKING:
     from jaxtyping import Array
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import GlassFloatArray
+    from glass._array_api_utils import FloatArray
 
 
 def nnls(
-    a: GlassFloatArray,
-    b: GlassFloatArray,
+    a: FloatArray,
+    b: FloatArray,
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Compute a non-negative least squares solution.
 

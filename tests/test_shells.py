@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 import glass
-from glass._array_api_utils import GlassXPAdditions
+from glass._array_api_utils import XPAdditions
 
 if TYPE_CHECKING:
     import types
@@ -190,7 +190,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
 
 def test_restrict(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.restrict`."""
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1000)
@@ -214,13 +214,13 @@ def test_restrict(xp: types.ModuleType) -> None:
         assert zr[i] == zi
 
         # Using design principle of scipy (i.e. copy, use np, copy back)
-        assert fr[i] == wi * glass_xpx.interp(zi, z, f)
+        assert fr[i] == wi * uxpx.interp(zi, z, f)
 
     for zi, fi in zip(z, f, strict=False):
         if w.za[0] <= zi <= w.za[-1]:
             i = xp.searchsorted(zr, zi)
             assert zr[i] == zi
-            assert fr[i] == fi * glass_xpx.interp(zi, w.za, w.wa)
+            assert fr[i] == fi * uxpx.interp(zi, w.za, w.wa)
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
@@ -229,7 +229,7 @@ def test_partition(xp: types.ModuleType, method: str) -> None:
     if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
         pytest.skip("Arrays in " + method + " are not immutable, so do not support jax")
 
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     shells = [
         glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
@@ -258,7 +258,7 @@ def test_partition(xp: types.ModuleType, method: str) -> None:
 
     assert part.shape == (len(shells), 3, 2)
 
-    assert xp.sum(part, axis=0) == pytest.approx(glass_xpx.trapezoid(fz, z))
+    assert xp.sum(part, axis=0) == pytest.approx(uxpx.trapezoid(fz, z))
 
 
 def test_redshift_grid(xp: types.ModuleType) -> None:
@@ -337,7 +337,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
 def test_combine(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.combine`."""
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     z = xp.linspace(0.0, 5.0, 1000)
     weights = xp.asarray(
@@ -368,7 +368,7 @@ def test_combine(xp: types.ModuleType) -> None:
     assert sum(result) == pytest.approx(929.267284)
 
     # Check integral w.r.t z has not changed
-    assert glass_xpx.trapezoid(result, z) == pytest.approx(4.643139)
+    assert uxpx.trapezoid(result, z) == pytest.approx(4.643139)
 
 
 def test_radial_window_immutable(xp: types.ModuleType) -> None:

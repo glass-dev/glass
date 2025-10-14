@@ -56,7 +56,7 @@ import numpy as np
 import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
-from glass._array_api_utils import GlassXPAdditions
+from glass._array_api_utils import XPAdditions
 
 if TYPE_CHECKING:
     import types
@@ -64,7 +64,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import GlassFloatArray
+    from glass._array_api_utils import FloatArray
     from glass.cosmology import Cosmology
 
     ArrayLike1D = Sequence[float] | NDArray[np.float64]
@@ -216,8 +216,8 @@ class RadialWindow:
 
     """
 
-    za: GlassFloatArray
-    wa: GlassFloatArray
+    za: FloatArray
+    wa: FloatArray
     zeff: float = math.nan
     xp: types.ModuleType | None = None
 
@@ -232,7 +232,7 @@ class RadialWindow:
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
-    def __iter__(self) -> Iterator[GlassFloatArray]:
+    def __iter__(self) -> Iterator[FloatArray]:
         """
         Iterate over the window function and effective redshift.
 
@@ -248,17 +248,17 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        glass_xpx = GlassXPAdditions(self.xp)  # type: ignore[arg-type]
+        uxpx = XPAdditions(self.xp)  # type: ignore[arg-type]
         if self.za.size > 0:
-            return glass_xpx.trapezoid(  # type: ignore[return-value]
+            return uxpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
                 self.za,
-            ) / glass_xpx.trapezoid(self.wa, self.za)
+            ) / uxpx.trapezoid(self.wa, self.za)
         return math.nan
 
 
 def tophat_windows(
-    zbins: GlassFloatArray,
+    zbins: FloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -312,7 +312,7 @@ def tophat_windows(
         )
 
     xp = _utils.get_namespace(zbins)
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     wht: WeightFunc
     wht = weight if weight is not None else xp.ones_like
@@ -321,13 +321,13 @@ def tophat_windows(
         n = int(max(xp.round((zmax - zmin) / dz), 2))
         z = xp.linspace(zmin, zmax, n, dtype=zbins.dtype)
         w = wht(z)
-        zeff = glass_xpx.trapezoid(w * z, z) / glass_xpx.trapezoid(w, z)
+        zeff = uxpx.trapezoid(w * z, z) / uxpx.trapezoid(w, z)
         ws.append(RadialWindow(z, w, float(zeff)))
     return ws
 
 
 def linear_windows(
-    zgrid: GlassFloatArray,
+    zgrid: FloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -396,7 +396,7 @@ def linear_windows(
 
 
 def cubic_windows(
-    zgrid: GlassFloatArray,
+    zgrid: FloatArray,
     dz: float = 1e-3,
     weight: WeightFunc | None = None,
 ) -> list[RadialWindow]:
@@ -466,10 +466,10 @@ def cubic_windows(
 
 
 def restrict(
-    z: GlassFloatArray,
-    f: GlassFloatArray,
+    z: FloatArray,
+    f: FloatArray,
     w: RadialWindow,
-) -> tuple[GlassFloatArray, GlassFloatArray]:
+) -> tuple[FloatArray, FloatArray]:
     """
     Restrict a function to a redshift window.
 
@@ -505,10 +505,10 @@ def restrict(
         msg = "z must be 1D arrays"
         raise ValueError(msg)
     xp = _utils.get_namespace(z, f)
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
-    zr = glass_xpx.union1d(w.za, z_)
+    zr = uxpx.union1d(w.za, z_)
 
     fr = glass.arraytools.ndinterp(
         zr, z, f, left=0.0, right=0.0
@@ -517,12 +517,12 @@ def restrict(
 
 
 def partition(
-    z: GlassFloatArray,
-    fz: GlassFloatArray,
+    z: FloatArray,
+    fz: FloatArray,
     shells: Sequence[RadialWindow],
     *,
     method: str = "nnls",
-) -> GlassFloatArray:
+) -> FloatArray:
     r"""
     Partition a function by a sequence of windows.
 
@@ -637,12 +637,12 @@ def partition(
 
 
 def partition_lstsq(
-    z: GlassFloatArray,
-    fz: GlassFloatArray,
+    z: FloatArray,
+    fz: FloatArray,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Least-squares partition.
 
@@ -663,7 +663,7 @@ def partition_lstsq(
 
     """
     xp = _utils.get_namespace(z, fz)
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -671,19 +671,19 @@ def partition_lstsq(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = glass_xpx.union1d(zp, w.za)
+        zp = uxpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
     *dims, _ = fz.shape
 
     # compute grid spacing
-    dz = glass_xpx.gradient(zp)
+    dz = uxpx.gradient(zp)
 
     # create the window function matrix
     a = xp.asarray(
-        [glass_xpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
+        [uxpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
     )
-    a /= glass_xpx.trapezoid(a, zp, axis=-1)[..., None]
+    a /= uxpx.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -693,15 +693,13 @@ def partition_lstsq(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
-    b = xp.concat(
-        [b, mult * xp.reshape(glass_xpx.trapezoid(fz, z), (*dims, 1))], axis=-1
-    )
+    b = xp.concat([b, mult * xp.reshape(uxpx.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
-    x = glass_xpx.linalg_lstsq(
+    x = uxpx.linalg_lstsq(
         xp.matrix_transpose(a),
         xp.matrix_transpose(xp.reshape(b, (-1, zp.size + 1))),
         rcond=None,
@@ -712,12 +710,12 @@ def partition_lstsq(
 
 
 def partition_nnls(
-    z: GlassFloatArray,
-    fz: GlassFloatArray,
+    z: FloatArray,
+    fz: FloatArray,
     shells: Sequence[RadialWindow],
     *,
     sumtol: float = 0.01,
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Non-negative least-squares partition.
 
@@ -738,7 +736,7 @@ def partition_nnls(
 
     """
     xp = _utils.get_namespace(z, fz)
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -746,19 +744,19 @@ def partition_nnls(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = glass_xpx.union1d(zp, w.za)
+        zp = uxpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
     *dims, _ = fz.shape
 
     # compute grid spacing
-    dz = glass_xpx.gradient(zp)
+    dz = uxpx.gradient(zp)
 
     # create the window function matrix
     a = xp.asarray(
-        [glass_xpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
+        [uxpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
     )
-    a /= glass_xpx.trapezoid(a, zp, axis=-1)[..., None]
+    a /= uxpx.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
     # create the target vector of distribution values
@@ -768,9 +766,7 @@ def partition_nnls(
     # append a constraint for the integral
     mult = 1 / sumtol
     a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
-    b = xp.concat(
-        [b, mult * xp.reshape(glass_xpx.trapezoid(fz, z), (*dims, 1))], axis=-1
-    )
+    b = xp.concat([b, mult * xp.reshape(uxpx.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
     # now a is a matrix of shape (len(shells), len(zp) + 1)
     # and b is a matrix of shape (*dims, len(zp) + 1)
@@ -778,7 +774,7 @@ def partition_nnls(
 
     # reduce the dimensionality of the problem using a thin QR decomposition
     q, r = xp.linalg.qr(a.T)
-    y = glass_xpx.einsum("ji,...j", q, b)
+    y = uxpx.einsum("ji,...j", q, b)
 
     x = xp.stack(
         [
@@ -793,10 +789,10 @@ def partition_nnls(
 
 
 def partition_restrict(
-    z: GlassFloatArray,
-    fz: GlassFloatArray,
+    z: FloatArray,
+    fz: FloatArray,
     shells: Sequence[RadialWindow],
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Partition by restriction and integration.
 
@@ -815,12 +811,12 @@ def partition_restrict(
 
     """
     xp = _utils.get_namespace(z, fz)
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     parts = []
     for _, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
-        parts.append(glass_xpx.trapezoid(fr, zr, axis=-1))
+        parts.append(uxpx.trapezoid(fr, zr, axis=-1))
     return xp.stack(parts)
 
 
@@ -831,7 +827,7 @@ def _uniform_grid(
     step: float | None = None,
     num: int | None = None,
     xp: types.ModuleType | None = None,
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Create a uniform grid.
 
@@ -875,7 +871,7 @@ def redshift_grid(
     dz: float | None = None,
     num: int | None = None,
     xp: types.ModuleType | None = None,
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Redshift grid with uniform spacing in redshift.
 
@@ -935,10 +931,10 @@ def distance_grid(
 
 
 def combine(
-    z: GlassFloatArray,
-    weights: GlassFloatArray,
+    z: FloatArray,
+    weights: FloatArray,
     shells: Sequence[RadialWindow],
-) -> GlassFloatArray:
+) -> FloatArray:
     r"""
     Evaluate a linear combination of window functions.
 
@@ -973,16 +969,16 @@ def combine(
     xp = _utils.get_namespace(
         z, weights, *(arr for shell in shells for arr in (shell.za, shell.wa))
     )
-    glass_xpx = GlassXPAdditions(xp)
+    uxpx = XPAdditions(xp)
 
     return xp.sum(
         xp.asarray(
             [
                 xp.expand_dims(weight, axis=-1)
-                * glass_xpx.interp(
+                * uxpx.interp(
                     z,
                     shell.za,
-                    shell.wa / glass_xpx.trapezoid(shell.wa, shell.za),
+                    shell.wa / uxpx.trapezoid(shell.wa, shell.za),
                     left=0.0,
                     right=0.0,
                 )

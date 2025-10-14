@@ -20,11 +20,11 @@ if TYPE_CHECKING:
     GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
     GLASSComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
 
-    GlassAnyArray: TypeAlias = NDArray[Any] | JAXArray
-    GlassFloatArray: TypeAlias = NDArray[np.float64] | JAXArray
+    AnyArray: TypeAlias = NDArray[Any] | JAXArray
+    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
 
 
-def get_namespace(*arrays: GlassAnyArray) -> ModuleType:
+def get_namespace(*arrays: AnyArray) -> ModuleType:
     """
     Return the array library (array namespace) of input arrays
     if they belong to the same library or raise a :class:`ValueError`
@@ -109,7 +109,7 @@ class Generator:
 UnifiedGenerator: TypeAlias = np.random.Generator | glass.jax.Generator | Generator
 
 
-class GlassXPAdditions:
+class XPAdditions:
     """
     Additional functions missing from both array-api-strict and array-api-extra.
 
@@ -125,8 +125,8 @@ class GlassXPAdditions:
         self.backend = xp.__name__
 
     def trapezoid(
-        self, y: GlassAnyArray, x: GlassAnyArray = None, dx: float = 1.0, axis: int = -1
-    ) -> GlassAnyArray:
+        self, y: AnyArray, x: AnyArray = None, dx: float = 1.0, axis: int = -1
+    ) -> AnyArray:
         """
         Integrate along the given axis using the composite trapezoidal rule.
 
@@ -147,7 +147,7 @@ class GlassXPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def union1d(self, ar1: GlassAnyArray, ar2: GlassAnyArray) -> GlassAnyArray:
+    def union1d(self, ar1: AnyArray, ar2: AnyArray) -> AnyArray:
         """
         Compute the set union of two 1D arrays.
 
@@ -169,13 +169,13 @@ class GlassXPAdditions:
 
     def interp(  # noqa: PLR0913
         self,
-        x: GlassAnyArray,
-        x_points: GlassAnyArray,
-        y_points: GlassAnyArray,
+        x: AnyArray,
+        x_points: AnyArray,
+        y_points: AnyArray,
         left: float | None = None,
         right: float | None = None,
         period: float | None = None,
-    ) -> GlassAnyArray:
+    ) -> AnyArray:
         """
         One-dimensional linear interpolation for monotonically increasing
         sample points.
@@ -203,7 +203,7 @@ class GlassXPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def gradient(self, f: GlassAnyArray) -> GlassAnyArray:
+    def gradient(self, f: AnyArray) -> AnyArray:
         """
         Return the gradient of an N-dimensional array.
 
@@ -223,8 +223,8 @@ class GlassXPAdditions:
         raise NotImplementedError(msg)
 
     def linalg_lstsq(
-        self, a: GlassAnyArray, b: GlassAnyArray, rcond: float | None = None
-    ) -> tuple[GlassAnyArray, GlassAnyArray, GlassAnyArray, GlassAnyArray]:
+        self, a: AnyArray, b: AnyArray, rcond: float | None = None
+    ) -> tuple[AnyArray, AnyArray, AnyArray, AnyArray]:
         """
         Return the gradient of an N-dimensional array.
 
@@ -244,7 +244,7 @@ class GlassXPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def einsum(self, subscripts: str, *operands: GlassAnyArray) -> GlassAnyArray:
+    def einsum(self, subscripts: str, *operands: AnyArray) -> AnyArray:
         """
         Evaluates the Einstein summation convention on the operands.
 
@@ -267,10 +267,10 @@ class GlassXPAdditions:
         self,
         func1d: FunctionType,
         axis: int,
-        arr: GlassAnyArray,
+        arr: AnyArray,
         *args: object,
         **kwargs: object,
-    ) -> GlassAnyArray:
+    ) -> AnyArray:
         """
         Apply a function to 1-D slices along the given axis.
 

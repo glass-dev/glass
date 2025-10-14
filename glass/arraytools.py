@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import DTypeLike, NDArray
 
-    from glass._array_api_utils import GlassFloatArray
+    from glass._array_api_utils import FloatArray
 
 
 def broadcast_first(
@@ -93,14 +93,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | GlassFloatArray,
-    xq: GlassFloatArray,
-    fq: GlassFloatArray,
+    x: float | FloatArray,
+    xq: FloatArray,
+    fq: FloatArray,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> GlassFloatArray:
+) -> FloatArray:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -128,10 +128,10 @@ def ndinterp(  # noqa: PLR0913
     """
     arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
     xp = _utils.get_namespace(*arrays_to_check)
-    glass_xpx = _utils.GlassXPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
-    return glass_xpx.apply_along_axis(
-        partial(glass_xpx.interp, x, xq),  # type: ignore[arg-type]
+    return uxpx.apply_along_axis(
+        partial(uxpx.interp, x, xq),  # type: ignore[arg-type]
         axis,
         fq,
         left=left,
