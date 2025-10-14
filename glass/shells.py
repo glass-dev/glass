@@ -319,7 +319,7 @@ def tophat_windows(
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
         n = int(max(xp.round((zmax - zmin) / dz), 2))
-        z = xp.linspace(zmin, zmax, n, dtype=zbins.dtype)
+        z = xp.linspace(zmin, zmax, n, dtype=xp.float64)
         w = wht(z)
         zeff = uxpx.trapezoid(w * z, z) / uxpx.trapezoid(w, z)
         ws.append(RadialWindow(z, w, float(zeff)))
