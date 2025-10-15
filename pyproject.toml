@@ -17,14 +17,6 @@ docs = [
     "sphinx_autodoc_typehints",
     "sphinxcontrib-katex",
 ]
-examples = [
-    "camb",
-    "cosmology.compat.camb>=0.2.0",
-    "glass.ext.camb",
-    "jax>=0.4.32",
-    "jupyter",
-    "matplotlib",
-]
 test = [
     "fitsio",
     "jax>=0.4.32",
@@ -67,6 +59,14 @@ maintainers = [
     {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
 ]
 name = "glass"
+optional-dependencies = {examples = [
+    "camb",
+    "cosmology.compat.camb>=0.2.0",
+    "glass.ext.camb",
+    "jax>=0.4.32",
+    "jupyter",
+    "matplotlib",
+]}
 readme = "README.md"
 requires-python = ">=3.10"
 license.text = "MIT License"

@@ -72,7 +72,7 @@ def doctests(session: nox.Session) -> None:
 @nox.session
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
-    session.install("-e", ".", "--group", "examples")
+    session.install("-e", ".[examples]")
 
     if session.posargs:
         if "html" in session.posargs:
