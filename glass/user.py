@@ -193,7 +193,7 @@ def write_catalog(
         The writer object.
 
     """
-    import fitsio
+    import fitsio  # noqa: PLC0415
 
     with fitsio.FITS(filename, "rw", clobber=True) as fits:
         fits.write(None)

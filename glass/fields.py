@@ -42,8 +42,8 @@ except ImportError:
 
     def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:  # type: ignore[no-redef]
         """Backport of Python's warnings.deprecated()."""
-        from functools import wraps
-        from warnings import warn
+        from functools import wraps  # noqa: PLC0415
+        from warnings import warn  # noqa: PLC0415
 
         def decorator(func: Callable[_P, _R], /) -> Callable[_P, _R]:
             @wraps(func)
@@ -1102,9 +1102,9 @@ def regularized_spectra(
     # regularise the cov matrix using the chosen method
     cov_method: Callable[..., NDArray[Any]]
     if method == "clip":
-        from glass.algorithm import cov_clip as cov_method
+        from glass.algorithm import cov_clip as cov_method  # noqa: PLC0415
     elif method == "nearest":
-        from glass.algorithm import cov_nearest as cov_method
+        from glass.algorithm import cov_nearest as cov_method  # noqa: PLC0415
     else:
         msg = f"unknown method '{method}'"  # type: ignore[unreachable]
         raise ValueError(msg)
