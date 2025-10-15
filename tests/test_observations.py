@@ -1,8 +1,11 @@
+from types import ModuleType
+
 import healpix
 import numpy as np
 import pytest
 
 import glass
+from glass._array_api_utils import UnifiedGenerator
 
 
 def test_vmap_galactic_ecliptic() -> None:
@@ -34,32 +37,32 @@ def test_vmap_galactic_ecliptic() -> None:
         glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
 
 
-def test_gaussian_nz(rng: np.random.Generator) -> None:
+def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     """Add unit tests for :func:`glass.gaussian_nz`."""
     mean = 0
     sigma = 1
-    z = np.linspace(0, 1, 11)
+    z = xp.linspace(0, 1, 11)
 
     # check passing in the norm
 
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
-    np.testing.assert_array_equal(nz, np.zeros_like(nz))
+    assert nz == pytest.approx(xp.zeros_like(nz))
 
     # check the value of each entry is close to the norm
 
     norm = 1
     nz = glass.gaussian_nz(z, mean, sigma, norm=norm)
-    np.testing.assert_allclose(nz.sum() / nz.shape, norm, rtol=1e-2)
+    assert xp.sum(nz) / nz.shape[0] == pytest.approx(norm, rel=1e-2)
 
     # check multidimensionality size
 
     nz = glass.gaussian_nz(
         z,
-        np.tile(mean, z.shape),
-        np.tile(sigma, z.shape),
-        norm=rng.normal(size=z.shape),
+        xp.tile(xp.asarray(mean), z.shape),
+        xp.tile(xp.asarray(sigma), z.shape),
+        norm=urng.normal(size=z.shape),
     )
-    np.testing.assert_array_equal(nz.shape, (len(z), len(z)))
+    assert nz.shape == (z.size, z.size)
 
 
 def test_smail_nz() -> None:
