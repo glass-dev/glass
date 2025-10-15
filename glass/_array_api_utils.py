@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     AnyArray: TypeAlias = NDArray[Any] | JAXArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
+    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray
 
 
 def get_namespace(*arrays: AnyArray) -> ModuleType:

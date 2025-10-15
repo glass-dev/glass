@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib.metadata
+import logging
 import os
 from typing import TYPE_CHECKING
 
@@ -31,6 +32,9 @@ if TYPE_CHECKING:
 #   a particular array library (numpy, jax, array_api_strict, ...)
 #   all (try finding every supported array library available in the environment)
 GLASS_ARRAY_BACKEND: str = os.environ.get("GLASS_ARRAY_BACKEND", "")
+
+# Change jax logger to only log ERROR or worse
+logging.getLogger("jax").setLevel(logging.ERROR)
 
 
 def _check_version(lib: str, array_api_compliant_version: str) -> None:

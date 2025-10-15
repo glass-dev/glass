@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 from functools import partial
 from typing import TYPE_CHECKING
 
@@ -141,13 +142,10 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapezoid_product(
-    f: tuple[NDArray[np.float64], NDArray[np.float64]],
-    *ff: tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
-    ],
+    f: tuple[FloatArray, FloatArray],
+    *ff: tuple[FloatArray, FloatArray],
     axis: int = -1,
-) -> float | NDArray[np.float64]:
+) -> float | FloatArray:
     """
     Trapezoidal rule for a product of functions.
 
@@ -165,17 +163,21 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
-    x: NDArray[np.float64]
+    # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
+    xp = _utils.get_namespace(*f, *tuple(itertools.chain(*ff)))
+    uxpx = _utils.XPAdditions(xp)
+
+    x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(
+        x = uxpx.union1d(
             x[(x >= x_[0]) & (x <= x_[-1])],
             x_[(x_ >= x[0]) & (x_ <= x[-1])],
         )
-    y = np.interp(x, *f)
+    y = uxpx.interp(x, *f)
     for f_ in ff:
-        y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)
+        y *= uxpx.interp(x, *f_)
+    return uxpx.trapezoid(y, x, axis=axis)
 
 
 def cumulative_trapezoid(

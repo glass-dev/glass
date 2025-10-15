@@ -37,6 +37,7 @@ import healpix
 import numpy as np
 
 import glass
+import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
@@ -44,15 +45,17 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import DoubleArray, FloatArray
+
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
 def effective_bias(
-    z: NDArray[np.float64],
-    bz: NDArray[np.float64],
+    z: FloatArray,
+    bz: FloatArray,
     w: glass.RadialWindow,
-) -> float | NDArray[np.double]:
+) -> float | DoubleArray:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -84,7 +87,10 @@ def effective_bias(
         \;.
 
     """
-    norm = np.trapezoid(w.wa, w.za)
+    xp = _utils.get_namespace(z, bz, w.za, w.wa)
+    uxpx = _utils.XPAdditions(xp)
+
+    norm = uxpx.trapezoid(w.wa, w.za)
     return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
 

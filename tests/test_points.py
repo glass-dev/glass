@@ -10,6 +10,7 @@ import glass
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from types import ModuleType
 
     import pytest_mock
     from numpy.typing import NDArray
@@ -38,26 +39,25 @@ def catpos(
     return lon, lat, cnt
 
 
-def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
+def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
     # create a mock radial window function
     w = mocker.Mock()
-    w.za = np.linspace(0, 2, 100)
-    w.wa = np.full_like(w.za, 2.0)
+    w.za = xp.linspace(0, 2, 100)
+    w.wa = xp.full_like(w.za, 2.0)
 
-    z = np.linspace(0, 1, 10)
-    bz = np.zeros((10,))
+    z = xp.linspace(0, 1, 10)
+    bz = xp.zeros((10,))
+    assert glass.effective_bias(z, bz, w) == pytest.approx(0.0)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), np.zeros((10,)))
+    z = xp.zeros((10,))
+    bz = xp.full_like(z, 0.5)
 
-    z = np.zeros((10,))
-    bz = np.full_like(z, 0.5)
+    assert glass.effective_bias(z, bz, w) == pytest.approx(0.0)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), np.zeros((10,)))
+    z = xp.linspace(0, 1, 10)
+    bz = xp.full_like(z, 0.5)
 
-    z = np.linspace(0, 1, 10)
-    bz = np.full_like(z, 0.5)
-
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
+    assert glass.effective_bias(z, bz, w) == pytest.approx(0.25)
 
 
 def test_linear_bias(rng: np.random.Generator) -> None:
