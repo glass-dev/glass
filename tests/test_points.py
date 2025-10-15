@@ -83,28 +83,28 @@ def test_linear_bias(xp: ModuleType, urng: Generator) -> None:
     assert glass.linear_bias(delta, b) == pytest.approx(b * delta)
 
 
-def test_loglinear_bias(rng: np.random.Generator) -> None:
+def test_loglinear_bias(xp: ModuleType, urng: Generator) -> None:
     # test with 0 delta
 
-    delta = np.zeros((2, 2))
+    delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), np.zeros((2, 2)))
+    assert glass.loglinear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
 
     # test with 0 b
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), np.zeros((2, 2)))
+    assert glass.loglinear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
 
     # compare with numpy implementation
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(
-        glass.loglinear_bias(delta, b), np.expm1(b * np.log1p(delta))
+    assert glass.loglinear_bias(delta, b) == pytest.approx(
+        xp.expm1(b * xp.log1p(delta))
     )
 
 

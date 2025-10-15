@@ -117,9 +117,9 @@ def linear_bias(
 
 
 def loglinear_bias(
-    delta: NDArray[np.float64],
-    b: float | NDArray[np.float64],
-) -> NDArray[np.float64]:
+    delta: FloatArray,
+    b: float | FloatArray,
+) -> FloatArray:
     r"""
     Log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`.
 
@@ -135,10 +135,12 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    delta_g = np.log1p(delta)
+    arrays_to_check = (delta,) if type(b) is float else (delta, b)
+    xp = _utils.get_namespace(*arrays_to_check)
+
+    delta_g = xp.log1p(delta)
     delta_g *= b
-    np.expm1(delta_g, out=delta_g)
-    return delta_g
+    return xp.expm1(delta_g)
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
