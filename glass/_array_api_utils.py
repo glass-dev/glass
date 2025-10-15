@@ -58,7 +58,8 @@ class Generator:
     __slots__ = ("rng",)
 
     def __init__(
-        self, seed: int | bool | NDArray[np.int_ | np.bool] | None = None
+        self,
+        seed: int | bool | NDArray[np.int_ | np.bool] | None = None,  # noqa: FBT001
     ) -> None:
         self.rng = numpy.random.default_rng(seed=seed)  # type: ignore[arg-type]
 

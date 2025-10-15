@@ -59,8 +59,8 @@ def dispatch(
     def add(
         impl: Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]],
     ) -> Callable[[TransformationT, TransformationT, NDArray[Any]], NDArray[Any]]:
-        from inspect import signature
-        from typing import get_type_hints
+        from inspect import signature  # noqa: PLC0415
+        from typing import get_type_hints  # noqa: PLC0415
 
         sig = signature(impl)
         if len(sig.parameters) != 3:
