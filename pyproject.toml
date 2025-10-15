@@ -5,6 +5,28 @@ requires = [
     "hatchling",
 ]
 
+[dependency-groups]
+docs = [
+    "furo",
+    "ipython",
+    "matplotlib",
+    "myst-parser",
+    "nbsphinx",
+    "sphinx-toolbox",
+    "sphinx<8.2.0",
+    "sphinx_autodoc_typehints",
+    "sphinxcontrib-katex",
+]
+test = [
+    "fitsio",
+    "jax>=0.4.32",
+    "pytest",
+    "pytest-cov",
+    "pytest-doctestplus",
+    "pytest-mock",
+    "pytest-rerunfailures",
+]
+
 [project]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -37,39 +59,17 @@ maintainers = [
     {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
 ]
 name = "glass"
-readme = "README.md"
-requires-python = ">=3.10"
-license.text = "MIT License"
-
-[project.optional-dependencies]
-docs = [
-    "furo",
-    "ipython",
-    "matplotlib",
-    "myst-parser",
-    "nbsphinx",
-    "sphinx-toolbox",
-    "sphinx<8.2.0",
-    "sphinx_autodoc_typehints",
-    "sphinxcontrib-katex",
-]
-examples = [
+optional-dependencies = {examples = [
     "camb",
     "cosmology.compat.camb>=0.2.0",
     "glass.ext.camb",
     "jax>=0.4.32",
     "jupyter",
     "matplotlib",
-]
-test = [
-    "fitsio",
-    "jax>=0.4.32",
-    "pytest",
-    "pytest-cov",
-    "pytest-doctestplus",
-    "pytest-mock",
-    "pytest-rerunfailures",
-]
+]}
+readme = "README.md"
+requires-python = ">=3.10"
+license.text = "MIT License"
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
