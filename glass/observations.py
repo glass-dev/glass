@@ -145,13 +145,13 @@ def gaussian_nz(
 
 
 def smail_nz(
-    z: NDArray[np.float64],
-    z_mode: float | NDArray[np.float64],
-    alpha: float | NDArray[np.float64],
-    beta: float | NDArray[np.float64],
+    z: FloatArray,
+    z_mode: float | FloatArray,
+    alpha: float | FloatArray,
+    beta: float | FloatArray,
     *,
-    norm: float | NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    norm: float | FloatArray | None = None,
+) -> FloatArray:
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -187,17 +187,25 @@ def smail_nz(
     where :math:`z_0` is matched to the given mode of the distribution.
 
     """
-    z_mode = np.asanyarray(z_mode)[..., np.newaxis]
-    alpha = np.asanyarray(alpha)[..., np.newaxis]
-    beta = np.asanyarray(beta)[..., np.newaxis]
+    arrays_to_check = tuple(
+        x
+        for x in (z, z_mode, alpha, beta, norm)
+        if not (isinstance(x, Number) or x is None)
+    )
+    xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
 
-    pz = z**alpha * np.exp(-alpha / beta * (z / z_mode) ** beta)
-    pz /= np.trapezoid(pz, z, axis=-1)[..., np.newaxis]
+    z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
+    alpha = xp.asarray(alpha, dtype=xp.float64)[..., xp.newaxis]
+    beta = xp.asarray(beta, dtype=xp.float64)[..., xp.newaxis]
+
+    pz = z**alpha * xp.exp(-alpha / beta * (z / z_mode) ** beta)
+    pz /= uxpx.trapezoid(pz, z, axis=-1)[..., xp.newaxis]
 
     if norm is not None:
         pz *= norm
 
-    return pz  # type: ignore[no-any-return]
+    return pz
 
 
 def fixed_zbins(
