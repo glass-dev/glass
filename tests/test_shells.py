@@ -10,6 +10,9 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    import types
+
+    from glass._array_api_utils import XPAdditions
     from glass.cosmology import Cosmology
 
 
@@ -67,14 +70,14 @@ def test_density_weight(cosmo: Cosmology) -> None:
     np.testing.assert_array_less(w[:-1], w[1:])
 
 
-def test_tophat_windows() -> None:
+def test_tophat_windows(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.tophat_windows`."""
-    zb = np.array([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
+    zb = xp.asarray([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
 
     ws = glass.tophat_windows(zb, dz)
 
-    assert len(ws) == len(zb) - 1
+    assert len(ws) == zb.size - 1
 
     assert all(
         z0 == w.za[0] and zn == w.za[-1]
@@ -82,36 +85,38 @@ def test_tophat_windows() -> None:
     )
 
     assert all(
-        zn <= z0 + len(w.za) * dz <= zn + dz
+        zn <= z0 + w.za.size * dz <= zn + dz
         for w, z0, zn in zip(ws, zb, zb[1:], strict=False)
     )
 
-    assert all(np.all(w.wa == 1) for w in ws)
+    assert all(xp.all(w.wa == 1) for w in ws)
 
 
-def test_linear_windows() -> None:
+def test_linear_windows(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
     dz = 1e-2
-    zgrid = [
-        0.0,
-        0.20224358,
-        0.42896272,
-        0.69026819,
-        1.0,
-    ]
+    zgrid = xp.asarray(
+        [
+            0.0,
+            0.20224358,
+            0.42896272,
+            0.69026819,
+            1.0,
+        ]
+    )
 
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
+    assert dz == pytest.approx(xp.mean(xp.diff(ws[0].za)), abs=1e-2)
 
     # check number of windows
 
-    assert len(ws) == len(zgrid) - 2
+    assert len(ws) == zgrid.size - 2
 
     # check values of zeff
 
-    np.testing.assert_array_equal([w.zeff for w in ws], zgrid[1:-1])
+    assert [w.zeff for w in ws] == pytest.approx(zgrid[1:-1])
 
     # check weight function input
 
@@ -120,44 +125,46 @@ def test_linear_windows() -> None:
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
     for w in ws:
-        np.testing.assert_array_equal(w.wa, np.zeros_like(w.wa))
+        assert w.wa == pytest.approx(xp.zeros_like(w.wa))
 
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
-        glass.linear_windows([])
+        glass.linear_windows(xp.asarray([]))
 
     # check warning issued
 
     with pytest.warns(
         UserWarning, match="first triangular window does not start at z=0"
     ):
-        glass.linear_windows([0.1, 0.2, 0.3])
+        glass.linear_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_cubic_windows() -> None:
+def test_cubic_windows(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.cubic_windows`."""
     dz = 1e-2
-    zgrid = [
-        0.0,
-        0.20224358,
-        0.42896272,
-        0.69026819,
-        1.0,
-    ]
+    zgrid = xp.asarray(
+        [
+            0.0,
+            0.20224358,
+            0.42896272,
+            0.69026819,
+            1.0,
+        ]
+    )
 
     # check spacing of redshift grid
 
     ws = glass.cubic_windows(zgrid)
-    np.testing.assert_allclose(dz, np.diff(ws[0].za).mean(), atol=1e-2)
+    assert dz == pytest.approx(xp.mean(xp.diff(ws[0].za)), abs=1e-2)
 
     # check number of windows
 
-    assert len(ws) == len(zgrid) - 2
+    assert len(ws) == zgrid.size - 2
 
     # check values of zeff
 
-    np.testing.assert_array_equal([w.zeff for w in ws], zgrid[1:-1])
+    assert [w.zeff for w in ws] == pytest.approx(zgrid[1:-1])
 
     # check weight function input
 
@@ -166,31 +173,31 @@ def test_cubic_windows() -> None:
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
     for w in ws:
-        np.testing.assert_array_equal(w.wa, np.zeros_like(w.wa))
+        assert w.wa == pytest.approx(xp.zeros_like(w.wa))
 
     # check error raised
 
     with pytest.raises(ValueError, match="nodes must have at least 3 entries"):
-        glass.cubic_windows([])
+        glass.cubic_windows(xp.asarray([]))
 
     # check warning issued
 
     with pytest.warns(
         UserWarning, match="first cubic spline window does not start at z=0"
     ):
-        glass.cubic_windows([0.1, 0.2, 0.3])
+        glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_restrict() -> None:
+def test_restrict(xp: types.ModuleType, uxpx: XPAdditions) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
-    z = np.linspace(0.0, 5.0, 1000)
-    f = np.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
+    z = xp.linspace(0.0, 5.0, 1000)
+    f = xp.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
 
     # window for restriction
     w = glass.RadialWindow(
-        za=np.array([1.0, 2.0, 3.0, 4.0]),
-        wa=np.array([0.0, 0.5, 0.5, 0.0]),
+        za=xp.asarray([1.0, 2.0, 3.0, 4.0]),
+        wa=xp.asarray([0.0, 0.5, 0.5, 0.0]),
     )
 
     zr, fr = glass.restrict(z, f, w)
@@ -201,32 +208,45 @@ def test_restrict() -> None:
     assert fr[0] == fr[-1] == 0.0
 
     for zi, wi in zip(w.za, w.wa, strict=False):
-        i = np.searchsorted(zr, zi)
+        i = xp.searchsorted(zr, zi)
         assert zr[i] == zi
-        assert fr[i] == wi * np.interp(zi, z, f)
+
+        # Using design principle of scipy (i.e. copy, use np, copy back)
+        assert fr[i] == wi * uxpx.interp(zi, z, f)
 
     for zi, fi in zip(z, f, strict=False):
         if w.za[0] <= zi <= w.za[-1]:
-            i = np.searchsorted(zr, zi)
+            i = xp.searchsorted(zr, zi)
             assert zr[i] == zi
-            assert fr[i] == fi * np.interp(zi, w.za, w.wa)
+            assert fr[i] == fi * uxpx.interp(zi, w.za, w.wa)
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(method: str) -> None:
+def test_partition(xp: types.ModuleType, uxpx: XPAdditions, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
+    if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
+        pytest.skip("Arrays in " + method + " are not immutable, so do not support jax")
+
     shells = [
-        glass.RadialWindow(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.0),
-        glass.RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 0.5),
-        glass.RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 1.5),
-        glass.RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 2.5),
-        glass.RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 3.5),
-        glass.RadialWindow(np.array([4.0, 5.0]), np.array([0.0, 1.0]), 5.0),
+        glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
+        glass.RadialWindow(
+            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 0.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 1.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 2.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 3.5
+        ),
+        glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
     ]
 
-    z = np.linspace(0.0, 5.0, 1000)
-    k = 1 + np.arange(6).reshape(3, 2, 1)
-    fz = np.exp(-z / k)
+    z = xp.linspace(0.0, 5.0, 1000)
+    k = 1.0 + xp.reshape(xp.arange(6.0), (3, 2, 1))
+    fz = xp.exp(-z / k)
 
     assert fz.shape == (3, 2, 1000)
 
@@ -234,10 +254,10 @@ def test_partition(method: str) -> None:
 
     assert part.shape == (len(shells), 3, 2)
 
-    np.testing.assert_allclose(part.sum(axis=0), np.trapezoid(fz, z))
+    assert xp.sum(part, axis=0) == pytest.approx(uxpx.trapezoid(fz, z))
 
 
-def test_redshift_grid() -> None:
+def test_redshift_grid(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.redshift_grid`."""
     zmin = 0
     zmax = 1
@@ -245,18 +265,18 @@ def test_redshift_grid() -> None:
     # check num input
 
     num = 5
-    z = glass.redshift_grid(zmin, zmax, num=5)
-    assert len(z) == num + 1
+    z = glass.redshift_grid(zmin, zmax, num=5, xp=xp)
+    assert z.size == num + 1
 
     # check dz input
 
     dz = 0.2
-    z = glass.redshift_grid(zmin, zmax, dz=dz)
-    assert len(z) == np.ceil((zmax - zmin) / dz) + 1
+    z = glass.redshift_grid(zmin, zmax, dz=dz, xp=xp)
+    assert z.size == math.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 
-    z = glass.redshift_grid(zmin, zmax, dz=0.3)
+    z = glass.redshift_grid(zmin, zmax, dz=0.3, xp=xp)
     assert zmax < z[-1]
 
     # check error raised
@@ -265,13 +285,13 @@ def test_redshift_grid() -> None:
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        glass.redshift_grid(zmin, zmax)
+        glass.redshift_grid(zmin, zmax, xp=xp)
 
     with pytest.raises(
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        glass.redshift_grid(zmin, zmax, dz=dz, num=num)
+        glass.redshift_grid(zmin, zmax, dz=dz, num=num, xp=xp)
 
 
 def test_distance_grid(cosmo: Cosmology) -> None:
@@ -311,14 +331,44 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine() -> None:
+def test_combine(xp: types.ModuleType, uxpx: XPAdditions) -> None:
     """Add unit tests for :func:`glass.combine`."""
+    z = xp.linspace(0.0, 5.0, 1000)
+    weights = xp.asarray(
+        [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183]
+    )
+    shells = [
+        glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
+        glass.RadialWindow(
+            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 0.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 1.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 2.5
+        ),
+        glass.RadialWindow(
+            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 3.5
+        ),
+        glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
+    ]
+
+    result = glass.combine(z, weights, shells)
+
+    assert result.shape == z.shape
+
+    # Check sum of result
+    assert sum(result) == pytest.approx(929.267284)
+
+    # Check integral w.r.t z has not changed
+    assert uxpx.trapezoid(result, z) == pytest.approx(4.643139)
 
 
-def test_radial_window_immutable() -> None:
+def test_radial_window_immutable(xp: types.ModuleType) -> None:
     """Checks the :class:`RadialWindow` class is immutable."""
-    wa = np.array([0.0, 1.0, 0.0])
-    za = np.array([0.0, 1.0, 2.0])
+    wa = xp.asarray([0.0, 1.0, 0.0])
+    za = xp.asarray([0.0, 1.0, 2.0])
     zeff = 1.0
 
     w = glass.RadialWindow(za, wa, zeff)
@@ -339,21 +389,21 @@ def test_radial_window_immutable() -> None:
         w.zeff = zeff
 
 
-def test_radial_window_zeff_none() -> None:
+def test_radial_window_zeff_none(xp: types.ModuleType) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
 
-    wa = np.array([0.0, 1.0, 0.0])
-    za = np.array([0.0, 1.0, 2.0])
+    wa = xp.asarray([0.0, 1.0, 0.0])
+    za = xp.asarray([0.0, 1.0, 2.0])
 
     w = glass.RadialWindow(za, wa)
 
-    np.testing.assert_equal(w.zeff, 1.0)
+    assert w.zeff == pytest.approx(1.0)
 
     # check zeff is NaN when redshift array is empty
 
-    za = np.array([])
+    za = xp.asarray([])
 
     w = glass.RadialWindow(za, wa)
 
-    np.testing.assert_equal(w.zeff, math.nan)
+    assert math.isnan(w.zeff)

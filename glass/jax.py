@@ -9,10 +9,13 @@ from typing import TYPE_CHECKING, TypeAlias
 import jax.dtypes
 import jax.numpy as jnp
 import jax.random
+from jax.scipy import integrate
 from jax.typing import ArrayLike
 from typing_extensions import Self
 
 if TYPE_CHECKING:
+    from types import FunctionType
+
     from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
 
     RealArray: TypeAlias = Array
@@ -31,6 +34,58 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     if isinstance(size, int):
         return (size,)
     return size
+
+
+def trapezoid(
+    y: ArrayLike, x: ArrayLike = None, dx: ArrayLike = 1.0, axis: int = -1
+) -> Array:
+    """Wrapper for jax.scipy.integrate.trapezoid."""
+    return integrate.trapezoid(y, x=x, dx=dx, axis=axis)
+
+
+def union1d(ar1: ArrayLike, ar2: ArrayLike) -> Array:
+    """Wrapper for jax.numpy.trapezoid."""
+    return jnp.union1d(ar1, ar2)
+
+
+def interp(  # noqa: PLR0913
+    x: ArrayLike,
+    x_points: ArrayLike,
+    y_points: ArrayLike,
+    left: ArrayLike = None,
+    right: ArrayLike = None,
+    period: ArrayLike = None,
+) -> Array:
+    """Wrapper for jax.numpy.interp."""
+    return jnp.interp(x, x_points, y_points, left=left, right=right, period=period)
+
+
+def gradient(f: ArrayLike) -> Array:
+    """Wrapper for jax.numpy.gradient."""
+    return jnp.gradient(f)
+
+
+def linalg_lstsq(
+    a: ArrayLike, b: ArrayLike, rcond: float | None = None
+) -> tuple[Array, Array, Array, Array]:
+    """Wrapper for jax.numpy.linalg.lstsq."""
+    return jnp.linalg.lstsq(a, b, rcond)  # type: ignore[no-any-return]
+
+
+def einsum(subscripts: str, *operands: ArrayLike) -> Array:
+    """Wrapper for jax.numpy.einsum."""
+    return jnp.einsum(subscripts, *operands)
+
+
+def apply_along_axis(
+    func1d: FunctionType,
+    axis: int,
+    arr: ArrayLike,
+    *args: object,
+    **kwargs: object,
+) -> Array:
+    """Wrapper for jax.numpy.apply_along_axis."""
+    return jnp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
 
 class Generator:

@@ -7,11 +7,14 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from typing import Unpack
 
     from numpy.typing import DTypeLike, NDArray
+
+    from glass._array_api_utils import FloatArray
 
 
 def broadcast_first(
@@ -90,14 +93,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | NDArray[np.float64],
-    xq: Sequence[float] | NDArray[np.float64],
-    fq: Sequence[float] | NDArray[np.float64],
+    x: float | FloatArray,
+    xq: FloatArray,
+    fq: FloatArray,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -123,8 +126,12 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    return np.apply_along_axis(
-        partial(np.interp, x, xq),
+    arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
+    xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
+
+    return uxpx.apply_along_axis(
+        partial(uxpx.interp, x, xq),  # type: ignore[arg-type]
         axis,
         fq,
         left=left,
