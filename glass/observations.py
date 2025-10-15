@@ -39,6 +39,8 @@ import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from numpy.typing import NDArray
 
     from glass._array_api_utils import FloatArray
@@ -214,6 +216,7 @@ def fixed_zbins(
     *,
     nbins: int | None = None,
     dz: float | None = None,
+    xp: ModuleType | None = None,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -242,10 +245,12 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
+    xp = np if xp is None else xp
+
     if nbins is not None and dz is None:
-        zbinedges = np.linspace(zmin, zmax, nbins + 1)
+        zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:
-        zbinedges = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
+        zbinedges = xp.arange(zmin, zmax + dz, dz)
     else:
         msg = "exactly one of nbins and dz must be given"
         raise ValueError(msg)
