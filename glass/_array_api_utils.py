@@ -16,13 +16,11 @@ if TYPE_CHECKING:
     from numpy.typing import DTypeLike, NDArray
 
     Size: TypeAlias = int | tuple[int, ...] | None
-    GLASSAnyArray: TypeAlias = JAXArray | NDArray[Any]
-    GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
-    GLASSComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
 
     AnyArray: TypeAlias = NDArray[Any] | JAXArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
+    ComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray
+    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
 
 
 def get_namespace(*arrays: AnyArray) -> ModuleType:
