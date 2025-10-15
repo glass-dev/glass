@@ -1,3 +1,4 @@
+import math
 from types import ModuleType
 
 import healpix
@@ -78,35 +79,40 @@ def test_smail_nz(xp: ModuleType) -> None:
     assert xp.all(pz == xp.zeros_like(pz))
 
 
-def test_fixed_zbins() -> None:
+def test_fixed_zbins(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.fixed_zbins`."""
-    zmin = 0
-    zmax = 1
+    zmin = 0.0
+    zmax = 1.0
 
     # check nbins input
 
     nbins = 5
-    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
-    zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
-    np.testing.assert_array_equal(len(zbins), nbins)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    expected_zbins = xp.asarray(
+        [
+            tuple(xp.asarray(i) for i in pair)
+            for pair in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
+        ]
+    )
+    zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins, xp=xp)
+    assert len(zbins) == nbins
+    assert xp.asarray(zbins) == pytest.approx(expected_zbins, rel=1e-15)
 
     # check dz input
 
     dz = 0.2
-    zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
-    np.testing.assert_array_equal(len(zbins), np.ceil((zmax - zmin) / dz))
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    zbins = glass.fixed_zbins(zmin, zmax, dz=dz, xp=xp)
+    assert len(zbins) == math.ceil((zmax - zmin) / dz)
+    assert xp.asarray(zbins) == pytest.approx(expected_zbins, rel=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
-    zbins = glass.fixed_zbins(zmin, zmax, dz=0.3)
-    np.testing.assert_array_less(zmax, zbins[-1][1])
+    zbins = glass.fixed_zbins(zmin, zmax, dz=0.3, xp=xp)
+    assert zmax < zbins[-1][1]
 
     # check error raised
 
     with pytest.raises(ValueError, match="exactly one of nbins and dz must be given"):
-        glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
+        glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz, xp=xp)
 
 
 def test_equal_dens_zbins() -> None:
