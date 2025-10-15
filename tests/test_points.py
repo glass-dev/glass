@@ -60,27 +60,27 @@ def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> No
     assert glass.effective_bias(z, bz, w) == pytest.approx(0.25)
 
 
-def test_linear_bias(rng: np.random.Generator) -> None:
+def test_linear_bias(xp: ModuleType, urng: Generator) -> None:
     # test with 0 delta
 
-    delta = np.zeros((2, 2))
+    delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), np.zeros((2, 2)))
+    assert glass.linear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
 
     # test with 0 b
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), np.zeros((2, 2)))
+    assert glass.linear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
 
     # compare with original implementation
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), b * delta)
+    assert glass.linear_bias(delta, b) == pytest.approx(b * delta)
 
 
 def test_loglinear_bias(rng: np.random.Generator) -> None:

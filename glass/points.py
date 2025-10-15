@@ -95,9 +95,9 @@ def effective_bias(
 
 
 def linear_bias(
-    delta: NDArray[np.float64],
-    b: float | NDArray[np.float64],
-) -> NDArray[np.float64]:
+    delta: FloatArray,
+    b: float | FloatArray,
+) -> FloatArray:
     r"""
     Linear bias model :math:`\delta_g = b \, \delta`.
 
