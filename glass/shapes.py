@@ -226,7 +226,7 @@ def ellipticity_gaussian(
             e[r] *= sigma[k]
             r = r[np.abs(e[r]) > 1]
         eps[i : i + count[k]] = e
-        i += count[k]
+        i += count[k]  # type: ignore[assignment]
 
     return eps
 
@@ -288,6 +288,6 @@ def ellipticity_intnorm(
         r = np.hypot(e.real, e.imag)
         e *= np.divide(np.tanh(r / 2), r, where=(r > 0), out=r)
         eps[i : i + count[k]] = e
-        i += count[k]
+        i += count[k]  # type: ignore[assignment]
 
     return eps
