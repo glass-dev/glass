@@ -29,15 +29,19 @@ from __future__ import annotations
 
 import itertools
 import math
+from numbers import Number
 from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
 
+import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+    from glass._array_api_utils import FloatArray
 
 
 def vmap_galactic_ecliptic(
@@ -88,12 +92,12 @@ def vmap_galactic_ecliptic(
 
 
 def gaussian_nz(
-    z: NDArray[np.float64],
-    mean: float | NDArray[np.float64],
-    sigma: float | NDArray[np.float64],
+    z: FloatArray,
+    mean: float | FloatArray,
+    sigma: float | FloatArray,
     *,
-    norm: float | NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    norm: float | FloatArray | None = None,
+) -> FloatArray:
     """
     Gaussian redshift distribution.
 
@@ -119,11 +123,20 @@ def gaussian_nz(
         The redshift distribution at the given ``z`` values.
 
     """
-    mean = np.reshape(mean, np.shape(mean) + (1,) * np.ndim(z))
-    sigma = np.reshape(sigma, np.shape(sigma) + (1,) * np.ndim(z))
+    arrays_to_check = tuple(
+        x for x in (z, mean, sigma, norm) if not (isinstance(x, Number) or x is None)
+    )
+    xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
 
-    nz = np.exp(-(((z - mean) / sigma) ** 2) / 2)
-    nz /= np.trapezoid(nz, z, axis=-1)[..., np.newaxis]
+    mean = xp.asarray(mean, dtype=xp.float64)
+    sigma = xp.asarray(sigma, dtype=xp.float64)
+
+    mean = xp.reshape(mean, mean.shape + (1,) * z.ndim)  # type: ignore[union-attr]
+    sigma = xp.reshape(sigma, sigma.shape + (1,) * z.ndim)  # type: ignore[union-attr]
+
+    nz = xp.exp(-(((z - mean) / sigma) ** 2) / 2)
+    nz /= uxpx.trapezoid(nz, z, axis=-1)[..., xp.newaxis]
 
     if norm is not None:
         nz *= norm
