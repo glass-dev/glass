@@ -19,8 +19,8 @@ if TYPE_CHECKING:
 
 
 def broadcast_first(
-    *arrays: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], ...]:
+    *arrays: FloatArray,
+) -> tuple[FloatArray, ...]:
     """
     Broadcast arrays, treating the first axis as common.
 
@@ -34,9 +34,11 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
-    arrays = np.broadcast_arrays(*arrays)
-    return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
+    xp = _utils.get_namespace(*arrays)
+
+    arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
+    arrays = xp.broadcast_arrays(*arrays)
+    return tuple(xp.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
 
 
 def broadcast_leading_axes(

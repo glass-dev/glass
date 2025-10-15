@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     import pytest_mock
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import UnifiedGenerator
+
 
 def catpos(
     pos: Generator[
@@ -60,7 +62,7 @@ def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> No
     assert glass.effective_bias(z, bz, w) == pytest.approx(0.25)
 
 
-def test_linear_bias(xp: ModuleType, urng: Generator) -> None:
+def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # test with 0 delta
 
     delta = xp.zeros((2, 2))
@@ -83,7 +85,7 @@ def test_linear_bias(xp: ModuleType, urng: Generator) -> None:
     assert glass.linear_bias(delta, b) == pytest.approx(b * delta)
 
 
-def test_loglinear_bias(xp: ModuleType, urng: Generator) -> None:
+def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # test with 0 delta
 
     delta = xp.zeros((2, 2))
@@ -270,26 +272,27 @@ def test_uniform_positions(rng: np.random.Generator) -> None:
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights(rng: np.random.Generator) -> None:
+def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    """Unit tests for glass.points.position_weights."""
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
-            counts = rng.random(cshape)
-            bias = None if bshape is None else rng.random(bshape)
+            counts = urng.random(cshape)
+            bias = None if bshape is None else urng.random(bshape)
 
             weights = glass.position_weights(counts, bias)
 
-            expected = counts / counts.sum(axis=0, keepdims=True)
+            expected = counts / xp.sum(counts, axis=0, keepdims=True)
             if bias is not None:
-                if np.ndim(bias) > np.ndim(expected):
-                    expected = np.expand_dims(
+                if bias.ndim > expected.ndim:
+                    expected = xp.expand_dims(
                         expected,
-                        tuple(range(np.ndim(expected), np.ndim(bias))),
+                        axis=tuple(range(expected.ndim, bias.ndim)),
                     )
                 else:
-                    bias = np.expand_dims(
+                    bias = xp.expand_dims(
                         bias,
-                        tuple(range(np.ndim(bias), np.ndim(expected))),
+                        axis=tuple(range(bias.ndim, expected.ndim)),
                     )
                 expected = bias * expected
 
-            np.testing.assert_allclose(weights, expected)
+            assert weights == pytest.approx(expected)

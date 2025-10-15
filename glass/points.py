@@ -388,9 +388,9 @@ def uniform_positions(
 
 
 def position_weights(
-    densities: NDArray[np.float64],
-    bias: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    densities: FloatArray,
+    bias: FloatArray | None = None,
+) -> FloatArray:
     r"""
     Compute relative weights for angular clustering.
 
@@ -415,11 +415,14 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
+    arrays_to_check = (densities,) if bias is None else (densities, bias)
+    xp = _utils.get_namespace(*arrays_to_check)
+
     # bring densities and bias into the same shape
     if bias is not None:
         densities, bias = glass.arraytools.broadcast_first(densities, bias)
     # normalise densities after shape has been fixed
-    densities = densities / np.sum(densities, axis=0)
+    densities = densities / xp.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
         densities = densities * bias
