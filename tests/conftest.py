@@ -119,6 +119,16 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
 
 
 @pytest.fixture(scope="session")
+def uxpx(xp: types.ModuleType) -> glass._array_api_utils.XPAdditions:
+    """
+    Fixture for array backend.
+
+    Access array library functions using `xp.` in tests.
+    """
+    return glass._array_api_utils.XPAdditions(xp)
+
+
+@pytest.fixture(scope="session")
 def urng(xp: types.ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface.
