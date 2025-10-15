@@ -757,7 +757,7 @@ def partition_restrict(
         The partition.
 
     """
-    part = np.empty((len(shells),) + np.shape(fz)[:-1])
+    part = np.empty((len(shells), *np.shape(fz)[:-1]))
     for i, w in enumerate(shells):
         zr, fr = restrict(z, fz, w)
         part[i] = np.trapezoid(fr, zr, axis=-1)

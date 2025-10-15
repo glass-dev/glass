@@ -16,6 +16,9 @@ if TYPE_CHECKING:
     from numpy.typing import DTypeLike, NDArray
 
     Size: TypeAlias = int | tuple[int, ...] | None
+    GLASSAnyArray: TypeAlias = JAXArray | NDArray[Any]
+    GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
+    GLASSComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
 
 
 def get_namespace(*arrays: NDArray[Any] | JAXArray) -> ModuleType:
@@ -55,7 +58,8 @@ class Generator:
     __slots__ = ("rng",)
 
     def __init__(
-        self, seed: int | bool | NDArray[np.int_ | np.bool] | None = None
+        self,
+        seed: int | bool | NDArray[np.int_ | np.bool] | None = None,  # noqa: FBT001
     ) -> None:
         self.rng = numpy.random.default_rng(seed=seed)  # type: ignore[arg-type]
 
