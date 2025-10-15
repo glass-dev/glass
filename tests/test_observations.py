@@ -65,17 +65,17 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     assert nz.shape == (z.size, z.size)
 
 
-def test_smail_nz() -> None:
+def test_smail_nz(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.smail_nz`."""
     alpha = 1
     beta = 1
     mode = 1
-    z = np.linspace(0, 1, 11)
+    z = xp.linspace(0, 1, 11)
 
     # check passing in the norm
 
     pz = glass.smail_nz(z, mode, alpha, beta, norm=0)
-    np.testing.assert_array_equal(pz, np.zeros_like(pz))
+    assert xp.all(pz == xp.zeros_like(pz))
 
 
 def test_fixed_zbins() -> None:
