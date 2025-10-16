@@ -45,6 +45,10 @@ body:
         ```sh
         python -c "import glass; print(glass.__version__)"
         ```
+        or
+        ```sh
+        nox -s version
+        ```
     validations:
       required: true
   - id: additional
