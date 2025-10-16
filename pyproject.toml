@@ -12,9 +12,9 @@ docs = [
     "matplotlib",
     "myst-parser",
     "nbsphinx",
+    "sphinx-autodoc-typehints",
     "sphinx-toolbox",
     "sphinx<8.2.0",
-    "sphinx-autodoc-typehints",
     "sphinxcontrib-katex",
 ]
 test = [
