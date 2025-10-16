@@ -653,3 +653,24 @@ class XPAdditions:
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
+
+    def vectorize(
+        self,
+        pyfunc: Callable[..., Any],
+        otypes: tuple[type[float]],
+    ) -> Callable[..., Any]:
+        """
+        Returns an object that acts like pyfunc, but takes arrays as input.
+
+        See https://github.com/glass-dev/glass/issues/671
+        """
+        if self.backend == "numpy":
+            return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+        if self.backend in {"array_api_strict", "jax.numpy"}:
+            # Import here to prevent users relying on numpy unless in this instance
+            import numpy as np  # noqa: PLC0415
+
+            return np.vectorize(pyfunc, otypes=otypes)
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
