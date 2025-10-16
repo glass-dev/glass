@@ -67,6 +67,7 @@ optional-dependencies = {examples = [
     "cosmology.compat.camb>=0.2.0",
     "glass.ext.camb",
     "jax>=0.4.32",
+    "jaxtyping",
     "jupyter",
     "matplotlib",
 ]}
