@@ -7,7 +7,8 @@ import numpy as np
 import numpy.random
 
 if TYPE_CHECKING:
-    from types import FunctionType, ModuleType
+    from collections.abc import Callable
+    from types import ModuleType
 
     from array_api_strict._array_object import Array as AArray
     from jaxtyping import Array as JAXArray
@@ -279,7 +280,7 @@ class XPAdditions:
 
     def apply_along_axis(
         self,
-        func1d: FunctionType,
+        func1d: Callable[..., Any],
         axis: int,
         arr: AnyArray,
         *args: object,
@@ -290,17 +291,36 @@ class XPAdditions:
 
         See https://github.com/glass-dev/glass/issues/651
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
-
-            return glass.jax.apply_along_axis(func1d, axis, arr, *args, **kwargs)
-        if self.backend == "numpy":
-            return np.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
         if self.backend == "array_api_strict":
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            arr_np = np.asarray(arr, copy=True)
-            result_np = np.apply_along_axis(func1d, axis, arr_np, *args, **kwargs)
-            return self.xp.asarray(result_np, copy=True)
+            # Import here to prevent users relying on numpy unless in this instance
+            import numpy as np  # noqa: PLC0415
+
+            return self.xp.asarray(
+                np.apply_along_axis(func1d, axis, arr, *args, **kwargs), copy=True
+            )
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def vectorize(
+        self,
+        pyfunc: Callable[..., Any],
+        otypes: tuple[type[float]],
+    ) -> Callable[..., Any]:
+        """
+        Returns an object that acts like pyfunc, but takes arrays as input.
+
+        See https://github.com/glass-dev/glass/issues/671
+        """
+        if self.backend == "numpy":
+            return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+        if self.backend in {"array_api_strict", "jax.numpy"}:
+            # Import here to prevent users relying on numpy unless in this instance
+            import numpy as np  # noqa: PLC0415
+
+            return np.vectorize(pyfunc, otypes=otypes)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
