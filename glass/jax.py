@@ -23,6 +23,7 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     is a tuple of int.
     """
     import jax.numpy as jnp  # noqa: PLC0415
+
     if size is None:
         if bcast:
             return jnp.broadcast_shapes(*map(jnp.shape, bcast))  # type: ignore[no-any-return]

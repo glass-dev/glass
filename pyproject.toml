@@ -8,8 +8,8 @@ requires = [
 [dependency-groups]
 docs = [
     "furo",
-    "jaxtyping",
     "ipython",
+    "jaxtyping",
     "matplotlib",
     "myst-parser",
     "nbsphinx",
@@ -19,6 +19,7 @@ docs = [
     "sphinxcontrib-katex",
 ]
 test = [
+    "cosmology.api",
     "fitsio",
     "jax",
     "pytest",
