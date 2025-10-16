@@ -8,6 +8,7 @@ requires = [
 [dependency-groups]
 docs = [
     "furo",
+    "jaxtyping",
     "ipython",
     "matplotlib",
     "myst-parser",
@@ -19,6 +20,7 @@ docs = [
 ]
 test = [
     "fitsio",
+    "jax",
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
@@ -45,7 +47,6 @@ dependencies = [
     "array-api-strict>=2.0,<2.4",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "jax>=0.4.32",
     "transformcl>=2022.8.9",
     "typing-extensions>=4.13.2",
 ]
