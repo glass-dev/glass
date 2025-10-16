@@ -22,6 +22,7 @@ docs = [
 test = [
     "fitsio",
     "jax>=0.4.32",
+    "jaxtyping",
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
