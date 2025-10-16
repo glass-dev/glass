@@ -129,7 +129,7 @@ def redshifts_from_nz(
     # go through extra dimensions; also works if dims is empty
     for k in np.ndindex(dims):
         # compute the CDF of each galaxy population
-        cdf = glass.arraytools.cumulative_trapezoid(nz_out[k], z_out[k], dtype=float)
+        cdf = glass.arraytools.cumulative_trapezoid(nz_out[k], z_out[k])
         cdf /= cdf[-1]
 
         # sample redshifts and store result

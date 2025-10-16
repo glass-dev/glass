@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
+    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
 
 
 class CompatibleBackendNotFoundError(Exception):
