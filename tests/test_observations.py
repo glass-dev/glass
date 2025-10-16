@@ -115,20 +115,25 @@ def test_fixed_zbins(xp: ModuleType) -> None:
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz, xp=xp)
 
 
-def test_equal_dens_zbins() -> None:
+def test_equal_dens_zbins(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.equal_dens_zbins`."""
-    z = np.linspace(0, 1, 11)
+    z = xp.linspace(0, 1, 11)
     nbins = 5
 
     # check expected zbins returned
 
-    expected_zbins = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
-    zbins = glass.equal_dens_zbins(z, np.ones_like(z), nbins)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    expected_zbins = xp.asarray(
+        [
+            tuple(xp.asarray(i) for i in pair)
+            for pair in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
+        ]
+    )
+    zbins = glass.equal_dens_zbins(z, xp.ones_like(z), nbins)
+    assert xp.asarray(zbins) == pytest.approx(expected_zbins, rel=1e-15)
 
     # check output shape
 
-    np.testing.assert_array_equal(len(zbins), nbins)
+    assert len(zbins) == nbins
 
 
 def test_tomo_nz_gausserr() -> None:

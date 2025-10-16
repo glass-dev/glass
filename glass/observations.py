@@ -259,8 +259,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: NDArray[np.float64],
-    nz: NDArray[np.float64],
+    z: FloatArray,
+    nz: FloatArray,
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -283,13 +283,16 @@ def equal_dens_zbins(
         A list of redshift bin edges.
 
     """
+    xp = _utils.get_namespace(z, nz)
+    uxpx = _utils.XPAdditions(xp)
+
     # compute the normalised cumulative distribution function
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
     cuml_nz = glass.arraytools.cumulative_trapezoid(nz, z)
-    cuml_nz /= cuml_nz[[-1]]
-    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
+    cuml_nz /= cuml_nz[-1]
+    zbinedges = uxpx.interp(xp.linspace(0, 1, nbins + 1), cuml_nz, z)
 
     return list(itertools.pairwise(zbinedges))
 
