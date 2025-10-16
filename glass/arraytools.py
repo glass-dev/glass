@@ -13,9 +13,9 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from typing import Unpack
 
-    from numpy.typing import DTypeLike, NDArray
+    from numpy.typing import NDArray
 
-    from glass._array_api_utils import FloatArray
+    from glass._array_api_utils import AnyArray, FloatArray, IntArray
 
 
 def broadcast_first(
@@ -183,11 +183,9 @@ def trapezoid_product(
 
 
 def cumulative_trapezoid(
-    f: NDArray[np.int_] | NDArray[np.float64],
-    x: NDArray[np.int_] | NDArray[np.float64],
-    dtype: DTypeLike | None = None,
-    out: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    f: IntArray | FloatArray,
+    x: IntArray | FloatArray,
+) -> AnyArray:
     """
     Cumulative trapezoidal rule along last axis.
 
@@ -197,19 +195,18 @@ def cumulative_trapezoid(
         The function values.
     x
         The x-coordinates.
-    dtype
-        The output data type.
-    out
-        The output array.
 
     Returns
     -------
         The cumulative integral of the function.
 
     """
-    if out is None:
-        out = np.empty_like(f, dtype=dtype)
+    xp = _utils.get_namespace(f, x)
 
-    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
-    out[..., 0] = 0
-    return out
+    f = xp.asarray(f, dtype=xp.float64)
+    x = xp.asarray(x, dtype=xp.float64)
+
+    # Compute the cumulative trapezoid without mutating any arrays
+    return xp.cumulative_sum(
+        (f[..., 1:] + f[..., :-1]) * 0.5 * xp.diff(x), axis=-1, include_initial=True
+    )

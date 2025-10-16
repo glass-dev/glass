@@ -18,9 +18,10 @@ if TYPE_CHECKING:
     Size: TypeAlias = int | tuple[int, ...] | None
 
     AnyArray: TypeAlias = NDArray[Any] | JAXArray
-    ComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
+    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
+    IntArray: TypeAlias = NDArray[np.int_] | JAXArray
 
 
 def get_namespace(*arrays: AnyArray) -> ModuleType:
