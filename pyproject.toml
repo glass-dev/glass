@@ -9,6 +9,8 @@ requires = [
 docs = [
     "furo",
     "ipython",
+    "jax>=0.4.32",
+    "jaxtyping",
     "matplotlib",
     "myst-parser",
     "nbsphinx",

@@ -10,13 +10,13 @@ import jax.dtypes
 import jax.numpy as jnp
 import jax.random
 from jax.scipy import integrate
-from jax.typing import ArrayLike
+from jaxtyping import Array
 from typing_extensions import Self
 
 if TYPE_CHECKING:
     from types import FunctionType
 
-    from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
+    from jaxtyping import Integer, PRNGKeyArray, Shaped
 
     RealArray: TypeAlias = Array
     Size: TypeAlias = int | tuple[int, ...] | None
@@ -36,43 +36,41 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     return size
 
 
-def trapezoid(
-    y: ArrayLike, x: ArrayLike = None, dx: ArrayLike = 1.0, axis: int = -1
-) -> Array:
+def trapezoid(y: Array, x: Array = None, dx: Array = 1.0, axis: int = -1) -> Array:
     """Wrapper for jax.scipy.integrate.trapezoid."""
     return integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
 
-def union1d(ar1: ArrayLike, ar2: ArrayLike) -> Array:
+def union1d(ar1: Array, ar2: Array) -> Array:
     """Wrapper for jax.numpy.trapezoid."""
     return jnp.union1d(ar1, ar2)
 
 
 def interp(  # noqa: PLR0913
-    x: ArrayLike,
-    x_points: ArrayLike,
-    y_points: ArrayLike,
-    left: ArrayLike = None,
-    right: ArrayLike = None,
-    period: ArrayLike = None,
+    x: Array,
+    x_points: Array,
+    y_points: Array,
+    left: Array = None,
+    right: Array = None,
+    period: Array = None,
 ) -> Array:
     """Wrapper for jax.numpy.interp."""
     return jnp.interp(x, x_points, y_points, left=left, right=right, period=period)
 
 
-def gradient(f: ArrayLike) -> Array:
+def gradient(f: Array) -> Array:
     """Wrapper for jax.numpy.gradient."""
     return jnp.gradient(f)
 
 
 def linalg_lstsq(
-    a: ArrayLike, b: ArrayLike, rcond: float | None = None
+    a: Array, b: Array, rcond: float | None = None
 ) -> tuple[Array, Array, Array, Array]:
     """Wrapper for jax.numpy.linalg.lstsq."""
     return jnp.linalg.lstsq(a, b, rcond)  # type: ignore[no-any-return]
 
 
-def einsum(subscripts: str, *operands: ArrayLike) -> Array:
+def einsum(subscripts: str, *operands: Array) -> Array:
     """Wrapper for jax.numpy.einsum."""
     return jnp.einsum(subscripts, *operands)
 
@@ -80,7 +78,7 @@ def einsum(subscripts: str, *operands: ArrayLike) -> Array:
 def apply_along_axis(
     func1d: FunctionType,
     axis: int,
-    arr: ArrayLike,
+    arr: Array,
     *args: object,
     **kwargs: object,
 ) -> Array:
@@ -98,7 +96,7 @@ class Generator:
     @classmethod
     def from_key(cls, key: PRNGKeyArray) -> Self:
         """Wrap a JAX random key."""
-        if not isinstance(key, ArrayLike) or not jax.dtypes.issubdtype(
+        if not isinstance(key, Array) or not jax.dtypes.issubdtype(
             key.dtype, jax.dtypes.prng_key
         ):
             msg = "not a random key"
