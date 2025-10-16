@@ -298,11 +298,11 @@ def equal_dens_zbins(
 
 
 def tomo_nz_gausserr(
-    z: NDArray[np.float64],
-    nz: NDArray[np.float64],
+    z: FloatArray,
+    nz: FloatArray,
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Tomographic redshift bins with a Gaussian redshift error.
 
@@ -337,23 +337,28 @@ def tomo_nz_gausserr(
         produce redshift bins of fixed size
 
     """
+    xp = _utils.get_namespace(z, nz)
+    uxpx = _utils.XPAdditions(xp)
+
     # converting zbins into an array:
-    zbins_arr = np.asanyarray(zbins)
+    zbins_arr = xp.asarray(zbins)
 
     # bin edges and adds a new axis
-    z_lower = zbins_arr[:, 0, np.newaxis]
-    z_upper = zbins_arr[:, 1, np.newaxis]
+    z_lower = zbins_arr[:, 0, xp.newaxis]
+    z_upper = zbins_arr[:, 1, xp.newaxis]
 
     # we need a vectorised version of the error function:
-    erf = np.vectorize(math.erf, otypes=(float,))
+    erf = uxpx.vectorize(math.erf, otypes=(float,))
 
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz
     # leading axis corresponds to the different bins
     sz = 2**0.5 * sigma_0 * (1 + z)
-    binned_nz = erf((z - z_lower) / sz)
-    binned_nz -= erf((z - z_upper) / sz)
-    binned_nz /= 1 + erf(z / sz)
+    # we need to call xp.asarray here because erf will return a numpy
+    # array for array libs which do not implement vectorize.
+    binned_nz = xp.asarray(erf((z - z_lower) / sz))
+    binned_nz -= xp.asarray(erf((z - z_upper) / sz))
+    binned_nz /= 1 + xp.asarray(erf(z / sz))
     binned_nz *= nz
 
-    return binned_nz  # type: ignore[no-any-return]
+    return binned_nz

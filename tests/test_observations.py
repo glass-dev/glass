@@ -136,17 +136,17 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
     assert len(zbins) == nbins
 
 
-def test_tomo_nz_gausserr() -> None:
+def test_tomo_nz_gausserr(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.tomo_nz_gausserr`."""
     sigma_0 = 0.1
-    z = np.linspace(0, 1, 11)
+    z = xp.linspace(0, 1, 11)
     zbins = [(0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
 
     # check zeros returned
 
-    binned_nz = glass.tomo_nz_gausserr(z, np.zeros_like(z), sigma_0, zbins)
-    np.testing.assert_array_equal(binned_nz, np.zeros_like(binned_nz))
+    binned_nz = glass.tomo_nz_gausserr(z, xp.zeros_like(z), sigma_0, zbins)
+    assert binned_nz == pytest.approx(xp.zeros_like(binned_nz), abs=1e-15)
 
     # check the shape of the output
 
-    np.testing.assert_array_equal(binned_nz.shape, (len(zbins), len(z)))
+    assert binned_nz.shape == (len(zbins), z.size)
