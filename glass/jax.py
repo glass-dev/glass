@@ -69,7 +69,9 @@ def gradient(f: Array) -> Array:
 
 
 def linalg_lstsq(
-    a: Array, b: Array, rcond: float | None = None
+    a: Array,
+    b: Array,
+    rcond: float | None = None,
 ) -> tuple[Array, Array, Array, Array]:
     """Wrapper for jax.numpy.linalg.lstsq."""
     import jax.numpy as jnp  # noqa: PLC0415
@@ -111,7 +113,8 @@ class Generator:
         from jax.typing import ArrayLike  # noqa: PLC0415
 
         if not isinstance(key, ArrayLike) or not jax.dtypes.issubdtype(
-            key.dtype, jax.dtypes.prng_key
+            key.dtype,
+            jax.dtypes.prng_key,
         ):
             msg = "not a random key"
             raise ValueError(msg)
@@ -173,7 +176,10 @@ class Generator:
         return loc + scale * jax.random.normal(self.__key, _size(size), dtype)
 
     def poisson(
-        self, lam: float, size: Size = None, dtype: Integer[Array, ...] = int
+        self,
+        lam: float,
+        size: Size = None,
+        dtype: Integer[Array, ...] = int,
     ) -> Array:
         """Draw samples from a Poisson distribution."""
         import jax.random  # noqa: PLC0415
@@ -181,7 +187,9 @@ class Generator:
         return jax.random.poisson(self.__key, lam, size, dtype)
 
     def standard_normal(
-        self, size: Size = None, dtype: Shaped[Array, ...] = float
+        self,
+        size: Size = None,
+        dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
         import jax.random  # noqa: PLC0415

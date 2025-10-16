@@ -26,7 +26,10 @@ class Normal:
     """
 
     def __call__(
-        self, x: NDArray[Any] | AArray, _var: float, /
+        self,
+        x: NDArray[Any] | AArray,
+        _var: float,
+        /,
     ) -> NDArray[Any] | AArray:
         """Return *x* unchanged."""
         return x
@@ -55,7 +58,10 @@ class Lognormal:
     lamda: float = 1.0
 
     def __call__(
-        self, x: NDArray[Any] | AArray, var: float, /
+        self,
+        x: NDArray[Any] | AArray,
+        var: float,
+        /,
     ) -> NDArray[Any] | AArray:
         """Transform *x* into a lognormal field."""
         xp = x.__array_namespace__()
@@ -96,7 +102,10 @@ class SquaredNormal:
     lamda: float = 1.0
 
     def __call__(
-        self, x: NDArray[Any] | AArray, _var: float, /
+        self,
+        x: NDArray[Any] | AArray,
+        _var: float,
+        /,
     ) -> NDArray[Any] | AArray:
         """Transform *x* into a squared normal field."""
         x = (x - self.a) ** 2 - 1
@@ -132,7 +141,10 @@ def _(_t1: Normal, _t2: Normal, x: NDArray[Any] | AArray, /) -> NDArray[Any] | A
 
 @corr.add
 def _(
-    t1: Lognormal, t2: Lognormal, x: NDArray[Any] | AArray, /
+    t1: Lognormal,
+    t2: Lognormal,
+    x: NDArray[Any] | AArray,
+    /,
 ) -> NDArray[Any] | AArray:
     xp = x.__array_namespace__()
     return t1.lamda * t2.lamda * xp.expm1(x)
@@ -140,7 +152,10 @@ def _(
 
 @icorr.add
 def _(
-    t1: Lognormal, t2: Lognormal, x: NDArray[Any] | AArray, /
+    t1: Lognormal,
+    t2: Lognormal,
+    x: NDArray[Any] | AArray,
+    /,
 ) -> NDArray[Any] | AArray:
     xp = x.__array_namespace__()
     return xp.log1p(x / (t1.lamda * t2.lamda))
@@ -148,7 +163,10 @@ def _(
 
 @dcorr.add
 def _(
-    t1: Lognormal, t2: Lognormal, x: NDArray[Any] | AArray, /
+    t1: Lognormal,
+    t2: Lognormal,
+    x: NDArray[Any] | AArray,
+    /,
 ) -> NDArray[Any] | AArray:
     xp = x.__array_namespace__()
     return t1.lamda * t2.lamda * xp.exp(x)
@@ -181,7 +199,10 @@ def _(t1: Lognormal, _t2: Normal, x: NDArray[Any] | AArray, /) -> NDArray[Any] |
 
 @corr.add
 def _(
-    t1: SquaredNormal, t2: SquaredNormal, x: NDArray[Any] | AArray, /
+    t1: SquaredNormal,
+    t2: SquaredNormal,
+    x: NDArray[Any] | AArray,
+    /,
 ) -> NDArray[Any] | AArray:
     aa = t1.a * t2.a
     ll = t1.lamda * t2.lamda
@@ -190,7 +211,10 @@ def _(
 
 @icorr.add
 def _(
-    t1: SquaredNormal, t2: SquaredNormal, x: NDArray[Any] | AArray, /
+    t1: SquaredNormal,
+    t2: SquaredNormal,
+    x: NDArray[Any] | AArray,
+    /,
 ) -> NDArray[Any] | AArray:
     xp = x.__array_namespace__()
     aa = t1.a * t2.a
@@ -200,7 +224,10 @@ def _(
 
 @dcorr.add
 def _(
-    t1: SquaredNormal, t2: SquaredNormal, x: NDArray[Any] | AArray, /
+    t1: SquaredNormal,
+    t2: SquaredNormal,
+    x: NDArray[Any] | AArray,
+    /,
 ) -> NDArray[Any] | AArray:
     aa = t1.a * t2.a
     ll = t1.lamda * t2.lamda
