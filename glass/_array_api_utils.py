@@ -18,14 +18,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeAlias
 
-import array_api_strict
-import numpy as np
-import numpy.random
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
 
+    import numpy as np
     from array_api_strict._array_object import Array as AArray
     from jaxtyping import Array as JAXArray
     from numpy.typing import DTypeLike, NDArray
@@ -34,11 +31,11 @@ if TYPE_CHECKING:
 
     Size: TypeAlias = int | tuple[int, ...] | None
 
-    AnyArray: TypeAlias = NDArray[Any] | JAXArray
-    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray
-    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
-    IntArray: TypeAlias = NDArray[np.int_] | JAXArray
+    AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
+    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
+    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
+    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
+    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
 
 
 def import_numpy(backend: str, function_name: str) -> ModuleType:
@@ -68,7 +65,7 @@ def import_numpy(backend: str, function_name: str) -> ModuleType:
     backend does not implement a needed function.
     """
     try:
-        import numpy as np  # noqa: PLC0415
+        import numpy  # noqa: ICN001, PLC0415
 
     except ModuleNotFoundError as err:
         msg = (
@@ -79,7 +76,7 @@ def import_numpy(backend: str, function_name: str) -> ModuleType:
         )
         raise ModuleNotFoundError(msg) from err
     else:
-        return np
+        return numpy
 
 
 def get_namespace(*arrays: AnyArray) -> ModuleType:
@@ -135,15 +132,20 @@ def rng_dispatcher(
     NotImplementedError
         If the array backend is not supported.
     """
-    backend = array.__array_namespace__().__name__
+    xp = get_namespace(array)
+    backend = xp.__name__
+
     if backend == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
         return glass.jax.Generator(seed=42)
+
     if backend == "numpy":
-        return np.random.default_rng()
+        return xp.random.default_rng()  # type: ignore[no-any-return]
+
     if backend == "array_api_strict":
         return Generator(seed=42)
+
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
@@ -156,11 +158,11 @@ class Generator:
     with array_api_strict.
     """
 
-    __slots__ = ("rng",)
+    __slots__ = ("axp", "nxp", "rng")
 
     def __init__(
         self,
-        seed: int | bool | NDArray[np.int_ | np.bool] | None = None,  # noqa: FBT001
+        seed: int | bool | AArray | None = None,  # noqa: FBT001
     ) -> None:
         """
         Initialize the Generator.
@@ -170,13 +172,18 @@ class Generator:
         seed : int | bool | NDArray[np.int_ | np.bool] | None, optional
             Seed for the random number generator.
         """
-        self.rng = numpy.random.default_rng(seed=seed)  # type: ignore[arg-type]
+        import array_api_strict  # noqa: PLC0415
+        import numpy as np  # noqa: PLC0415
+
+        self.axp = array_api_strict
+        self.nxp = np
+        self.rng = self.nxp.random.default_rng(seed=seed)
 
     def random(
         self,
         size: Size = None,
-        dtype: DTypeLike | None = np.float64,
-        out: NDArray[Any] | None = None,
+        dtype: DTypeLike | None = None,
+        out: AArray | None = None,
     ) -> AArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
@@ -195,12 +202,13 @@ class Generator:
         AArray
             Array of random floats.
         """
-        return array_api_strict.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        dtype = dtype if dtype is not None else self.nxp.float64
+        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
 
     def normal(
         self,
-        loc: float | NDArray[np.floating] = 0.0,
-        scale: float | NDArray[np.floating] = 1.0,
+        loc: float | AArray = 0.0,
+        scale: float | AArray = 1.0,
         size: Size = None,
     ) -> AArray:
         """
@@ -220,9 +228,9 @@ class Generator:
         AArray
             Array of samples from the normal distribution.
         """
-        return array_api_strict.asarray(self.rng.normal(loc, scale, size))
+        return self.axp.asarray(self.rng.normal(loc, scale, size))
 
-    def poisson(self, lam: float | NDArray[np.floating], size: Size = None) -> AArray:
+    def poisson(self, lam: float | AArray, size: Size = None) -> AArray:
         """
         Draw samples from a Poisson distribution.
 
@@ -238,13 +246,13 @@ class Generator:
         AArray
             Array of samples from the Poisson distribution.
         """
-        return array_api_strict.asarray(self.rng.poisson(lam, size))
+        return self.axp.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
         self,
         size: Size = None,
-        dtype: DTypeLike | None = np.float64,
-        out: NDArray[Any] | None = None,
+        dtype: DTypeLike | None = None,
+        out: AArray | None = None,
     ) -> AArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
@@ -263,12 +271,13 @@ class Generator:
         AArray
             Array of samples from the standard normal distribution.
         """
-        return array_api_strict.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        dtype = dtype if dtype is not None else self.nxp.float64
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
 
     def uniform(
         self,
-        low: float | NDArray[np.floating] = 0.0,
-        high: float | NDArray[np.floating] = 1.0,
+        low: float | AArray = 0.0,
+        high: float | AArray = 1.0,
         size: Size = None,
     ) -> AArray:
         """
@@ -288,7 +297,7 @@ class Generator:
         AArray
             Array of samples from the uniform distribution.
         """
-        return array_api_strict.asarray(self.rng.uniform(low, high, size))
+        return self.axp.asarray(self.rng.uniform(low, high, size))
 
 
 class XPAdditions:
@@ -354,8 +363,10 @@ class XPAdditions:
             import glass.jax  # noqa: PLC0415
 
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
+
         if self.backend == "numpy":
             return self.xp.trapezoid(y, x=x, dx=dx, axis=axis)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "trapezoid")
 
@@ -395,6 +406,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.union1d(ar1, ar2)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "union1d")
 
@@ -452,6 +464,7 @@ class XPAdditions:
             return self.xp.interp(
                 x, x_points, y_points, left=left, right=right, period=period
             )
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "interp")
 
@@ -492,6 +505,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.gradient(f)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "gradient")
 
@@ -546,6 +560,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "linalg.lstsq")
 
@@ -585,6 +600,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.einsum(subscripts, *operands)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "einsum")
 
@@ -637,6 +653,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+
         if self.backend == "array_api_strict":
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(self.backend, "apply_along_axis")
@@ -679,6 +696,7 @@ class XPAdditions:
         """
         if self.backend == "numpy":
             return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
         if self.backend in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(self.backend, "vectorize")
@@ -709,6 +727,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.radians(deg_arr)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "radians")
 
@@ -738,6 +757,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.degrees(deg_arr)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "degrees")
 
