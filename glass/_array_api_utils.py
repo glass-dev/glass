@@ -668,9 +668,33 @@ class XPAdditions:
             return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
         if self.backend in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
-            import numpy as np  # noqa: PLC0415
+            np = import_numpy(self.backend, "vectorize")
 
-            return np.vectorize(pyfunc, otypes=otypes)
+            return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def radians(self, deg_arr: AnyArray) -> AnyArray:
+        """Convert angles from degrees to radians."""
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.radians(deg_arr)
+        if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "radians")
+
+            return self.xp.asarray(np.radians(deg_arr))
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def degrees(self, deg_arr: AnyArray) -> AnyArray:
+        """Convert angles from radians to degrees."""
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.degrees(deg_arr)
+        if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "degrees")
+
+            return self.xp.asarray(np.degrees(deg_arr))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
