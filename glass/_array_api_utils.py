@@ -685,6 +685,7 @@ class XPAdditions:
         """
         if self.backend == "numpy":
             return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
         if self.backend in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(self.backend, "vectorize")
@@ -715,6 +716,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.radians(deg_arr)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "radians")
 
@@ -744,6 +746,7 @@ class XPAdditions:
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.degrees(deg_arr)
+
         if self.backend == "array_api_strict":
             np = import_numpy(self.backend, "degrees")
 
