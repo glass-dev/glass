@@ -1,3 +1,19 @@
+"""
+Array API Utilities for glass.
+============================
+
+This module provides utility functions and classes for working with multiple array
+backends in the glass project, including NumPy, JAX, and array-api-strict. It includes
+functions for importing backends, determining array namespaces, dispatching random
+number generators, and providing missing functionality for array-api-strict through the
+XPAdditions class.
+
+Classes and functions in this module help ensure consistent behavior and compatibility
+across different array libraries, and provide wrappers for common operations such as
+integration, interpolation, and linear algebra.
+
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeAlias
@@ -27,32 +43,29 @@ if TYPE_CHECKING:
 
 def import_numpy(backend: str, function_name: str) -> ModuleType:
     """
-    Wrapper for importing numpy.
+    Import the NumPy module, raising a helpful error if NumPy is not installed.
 
     Parameters
     ----------
-    backend
+    backend : str
         The name of the backend requested by the user.
-    function_name
-        The name of the function which is not implemented in
-        the users chosen backend.
+    function_name : str
+        The name of the function which is not implemented in the user's chosen backend.
 
     Returns
     -------
-        The numpy module type to be called instead of the users
-        chosen backend.
+    ModuleType
+        The NumPy module.
 
     Raises
     ------
     ModuleNotFoundError
-        If numpy is not found in the users environment.
+        If NumPy is not found in the user's environment.
 
     Notes
     -----
-    This is useful as in the case where numpy is not
-    found we can explain to the user why they suddenly
-    need numpy when they didn't before.
-
+    This is useful for explaining to the user why NumPy is required when their chosen
+    backend does not implement a needed function.
     """
     try:
         import numpy as np  # noqa: PLC0415
@@ -71,9 +84,23 @@ def import_numpy(backend: str, function_name: str) -> ModuleType:
 
 def get_namespace(*arrays: AnyArray) -> ModuleType:
     """
-    Return the array library (array namespace) of input arrays
-    if they belong to the same library or raise a :class:`ValueError`
-    if they do not.
+    Return the array library (namespace) of input arrays if they all belong to the same
+    library.
+
+    Parameters
+    ----------
+    *arrays : AnyArray
+        Arrays whose namespace is to be determined.
+
+    Returns
+    -------
+    ModuleType
+        The array namespace module.
+
+    Raises
+    ------
+    ValueError
+        If input arrays do not all belong to the same array library.
     """
     namespace = arrays[0].__array_namespace__()
     if any(
@@ -88,9 +115,26 @@ def get_namespace(*arrays: AnyArray) -> ModuleType:
 
 
 def rng_dispatcher(
-    array: NDArray[Any] | JAXArray,
+    array: AnyArray,
 ) -> np.random.Generator | glass.jax.Generator | Generator:
-    """Dispatch RNG on the basis of the provided array."""
+    """
+    Dispatch a random number generator based on the provided array's backend.
+
+    Parameters
+    ----------
+    array : AnyArray
+        The array whose backend determines the RNG.
+
+    Returns
+    -------
+    np.random.Generator | glass.jax.Generator | Generator
+        The appropriate random number generator for the array's backend.
+
+    Raises
+    ------
+    NotImplementedError
+        If the array backend is not supported.
+    """
     backend = array.__array_namespace__().__name__
     if backend == "jax.numpy":
         import glass.jax  # noqa: PLC0415
@@ -105,7 +149,12 @@ def rng_dispatcher(
 
 
 class Generator:
-    """NumPy random number generator returning array_api_strict Array."""
+    """
+    NumPy random number generator returning array_api_strict Array.
+
+    This class wraps NumPy's random number generator and returns arrays compatible
+    with array_api_strict.
+    """
 
     __slots__ = ("rng",)
 
@@ -113,6 +162,14 @@ class Generator:
         self,
         seed: int | bool | NDArray[np.int_ | np.bool] | None = None,  # noqa: FBT001
     ) -> None:
+        """
+        Initialize the Generator.
+
+        Parameters
+        ----------
+        seed : int | bool | NDArray[np.int_ | np.bool] | None, optional
+            Seed for the random number generator.
+        """
         self.rng = numpy.random.default_rng(seed=seed)  # type: ignore[arg-type]
 
     def random(
@@ -121,7 +178,23 @@ class Generator:
         dtype: DTypeLike | None = np.float64,
         out: NDArray[Any] | None = None,
     ) -> AArray:
-        """Return random floats in the half-open interval [0.0, 1.0)."""
+        """
+        Return random floats in the half-open interval [0.0, 1.0).
+
+        Parameters
+        ----------
+        size : Size, optional
+            Output shape.
+        dtype : DTypeLike | None, optional
+            Desired data type.
+        out : NDArray[Any] | None, optional
+            Optional output array.
+
+        Returns
+        -------
+        AArray
+            Array of random floats.
+        """
         return array_api_strict.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
 
     def normal(
@@ -130,11 +203,41 @@ class Generator:
         scale: float | NDArray[np.floating] = 1.0,
         size: Size = None,
     ) -> AArray:
-        """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
+        """
+        Draw samples from a Normal distribution (mean=loc, stdev=scale).
+
+        Parameters
+        ----------
+        loc : float | NDArray[np.floating], optional
+            Mean of the distribution.
+        scale : float | NDArray[np.floating], optional
+            Standard deviation of the distribution.
+        size : Size, optional
+            Output shape.
+
+        Returns
+        -------
+        AArray
+            Array of samples from the normal distribution.
+        """
         return array_api_strict.asarray(self.rng.normal(loc, scale, size))
 
     def poisson(self, lam: float | NDArray[np.floating], size: Size = None) -> AArray:
-        """Draw samples from a Poisson distribution."""
+        """
+        Draw samples from a Poisson distribution.
+
+        Parameters
+        ----------
+        lam : float | NDArray[np.floating]
+            Expected number of events.
+        size : Size, optional
+            Output shape.
+
+        Returns
+        -------
+        AArray
+            Array of samples from the Poisson distribution.
+        """
         return array_api_strict.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
@@ -143,7 +246,23 @@ class Generator:
         dtype: DTypeLike | None = np.float64,
         out: NDArray[Any] | None = None,
     ) -> AArray:
-        """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
+        """
+        Draw samples from a standard Normal distribution (mean=0, stdev=1).
+
+        Parameters
+        ----------
+        size : Size, optional
+            Output shape.
+        dtype : DTypeLike | None, optional
+            Desired data type.
+        out : NDArray[Any] | None, optional
+            Optional output array.
+
+        Returns
+        -------
+        AArray
+            Array of samples from the standard normal distribution.
+        """
         return array_api_strict.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
 
     def uniform(
@@ -152,13 +271,33 @@ class Generator:
         high: float | NDArray[np.floating] = 1.0,
         size: Size = None,
     ) -> AArray:
-        """Draw samples from a Uniform distribution."""
+        """
+        Draw samples from a Uniform distribution.
+
+        Parameters
+        ----------
+        low : float | NDArray[np.floating], optional
+            Lower bound of the distribution.
+        high : float | NDArray[np.floating], optional
+            Upper bound of the distribution.
+        size : Size, optional
+            Output shape.
+
+        Returns
+        -------
+        AArray
+            Array of samples from the uniform distribution.
+        """
         return array_api_strict.asarray(self.rng.uniform(low, high, size))
 
 
 class XPAdditions:
     """
     Additional functions missing from both array-api-strict and array-api-extra.
+
+    This class provides wrappers for common array operations such as integration,
+    interpolation, and linear algebra, ensuring compatibility across NumPy, JAX,
+    and array-api-strict backends.
 
     This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
     for details.
@@ -168,6 +307,14 @@ class XPAdditions:
     backend: str
 
     def __init__(self, xp: ModuleType) -> None:
+        """
+        Initialize XPAdditions with the given array namespace.
+
+        Parameters
+        ----------
+        xp : ModuleType
+            The array namespace module.
+        """
         self.xp = xp
         self.backend = xp.__name__
 
@@ -177,6 +324,29 @@ class XPAdditions:
         """
         Integrate along the given axis using the composite trapezoidal rule.
 
+        Parameters
+        ----------
+        y : AnyArray
+            Input array to integrate.
+        x : AnyArray, optional
+            Sample points corresponding to y.
+        dx : float, optional
+            Spacing between sample points.
+        axis : int, optional
+            Axis along which to integrate.
+
+        Returns
+        -------
+        AnyArray
+            Integrated result.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/646
         """
         self.backend = self.xp.__name__
@@ -202,6 +372,25 @@ class XPAdditions:
         """
         Compute the set union of two 1D arrays.
 
+        Parameters
+        ----------
+        ar1 : AnyArray
+            First input array.
+        ar2 : AnyArray
+            Second input array.
+
+        Returns
+        -------
+        AnyArray
+            The union of the two arrays.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/647
         """
         if self.backend in {"numpy", "jax.numpy"}:
@@ -228,9 +417,35 @@ class XPAdditions:
         period: float | None = None,
     ) -> AnyArray:
         """
-        One-dimensional linear interpolation for monotonically increasing
-        sample points.
+        One-dimensional linear interpolation for monotonically increasing sample points.
 
+        Parameters
+        ----------
+        x : AnyArray
+            The x-coordinates at which to evaluate the interpolated values.
+        x_points : AnyArray
+            The x-coordinates of the data points.
+        y_points : AnyArray
+            The y-coordinates of the data points.
+        left : float | None, optional
+            Value to return for x < x_points[0].
+        right : float | None, optional
+            Value to return for x > x_points[-1].
+        period : float | None, optional
+            Period for periodic interpolation.
+
+        Returns
+        -------
+        AnyArray
+            Interpolated values.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/650
         """
         if self.backend in {"numpy", "jax.numpy"}:
@@ -256,6 +471,23 @@ class XPAdditions:
         """
         Return the gradient of an N-dimensional array.
 
+        Parameters
+        ----------
+        f : AnyArray
+            Input array.
+
+        Returns
+        -------
+        AnyArray
+            Gradient of the input array.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/648
         """
         if self.backend in {"numpy", "jax.numpy"}:
@@ -275,8 +507,41 @@ class XPAdditions:
         self, a: AnyArray, b: AnyArray, rcond: float | None = None
     ) -> tuple[AnyArray, AnyArray, int, AnyArray]:
         """
-        Return the gradient of an N-dimensional array.
+        Solve a linear least squares problem.
 
+        Parameters
+        ----------
+        a : AnyArray
+            Coefficient matrix.
+        b : AnyArray
+            Ordinate or "dependent variable" values.
+        rcond : float | None, optional
+            Cut-off ratio for small singular values.
+
+        Returns
+        -------
+        x : {(N,), (N, K)} AnyArray
+            Least-squares solution. If b is two-dimensional, the solutions are in the K
+            columns of x.
+
+        residuals : {(1,), (K,), (0,)} AnyArray
+            Sums of squared residuals: Squared Euclidean 2-norm for each column in b - a
+            @ x. If the rank of a is < N or M <= N, this is an empty array. If b is
+            1-dimensional, this is a (1,) shape array. Otherwise the shape is (K,).
+
+        rank : int
+            Rank of matrix a.
+
+        s : (min(M, N),) AnyArray
+            Singular values of a.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/649
         """
         if self.backend in {"numpy", "jax.numpy"}:
@@ -295,8 +560,27 @@ class XPAdditions:
 
     def einsum(self, subscripts: str, *operands: AnyArray) -> AnyArray:
         """
-        Evaluates the Einstein summation convention on the operands.
+        Evaluate the Einstein summation convention on the operands.
 
+        Parameters
+        ----------
+        subscripts : str
+            Specifies the subscripts for summation.
+        *operands : AnyArray
+            Arrays to be summed.
+
+        Returns
+        -------
+        AnyArray
+            Result of the Einstein summation.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/657
         """
         if self.backend in {"numpy", "jax.numpy"}:
@@ -323,7 +607,33 @@ class XPAdditions:
         """
         Apply a function to 1-D slices along the given axis.
 
+        Parameters
+        ----------
+        func1d : Callable[..., Any]
+            Function to apply to 1-D slices.
+        axis : int
+            Axis along which to apply the function.
+        arr : AnyArray
+            Input array.
+        *args : object
+            Additional positional arguments to pass to func1d.
+        **kwargs : object
+            Additional keyword arguments to pass to func1d.
+
+        Returns
+        -------
+        AnyArray
+            Result of applying the function along the axis.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/651
+
         """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
@@ -346,6 +656,25 @@ class XPAdditions:
         """
         Returns an object that acts like pyfunc, but takes arrays as input.
 
+        Parameters
+        ----------
+        pyfunc : Callable[..., Any]
+            Python function to vectorize.
+        otypes : tuple[type[float]]
+            Output types.
+
+        Returns
+        -------
+        Callable[..., Any]
+            Vectorized function.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/671
         """
         if self.backend == "numpy":
@@ -360,7 +689,24 @@ class XPAdditions:
         raise NotImplementedError(msg)
 
     def radians(self, deg_arr: AnyArray) -> AnyArray:
-        """Convert angles from degrees to radians."""
+        """
+        Convert angles from degrees to radians.
+
+        Parameters
+        ----------
+        deg_arr : AnyArray
+            Array of angles in degrees.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Returns
+        -------
+        AnyArray
+            Array of angles in radians.
+        """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.radians(deg_arr)
         if self.backend == "array_api_strict":
@@ -372,7 +718,24 @@ class XPAdditions:
         raise NotImplementedError(msg)
 
     def degrees(self, deg_arr: AnyArray) -> AnyArray:
-        """Convert angles from radians to degrees."""
+        """
+        Convert angles from radians to degrees.
+
+        Parameters
+        ----------
+        deg_arr : AnyArray
+            Array of angles in radians.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Returns
+        -------
+        AnyArray
+            Array of angles in degrees.
+        """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.degrees(deg_arr)
         if self.backend == "array_api_strict":
