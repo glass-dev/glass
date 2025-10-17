@@ -6,7 +6,7 @@ ci:
   autoupdate_schedule: monthly
 
 default_language_version:
-  python: python3.13
+  python: python3.14
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -82,8 +82,8 @@ repos:
       - id: mypy
         files: ^glass/
         additional_dependencies:
-          - numpy~=2.2.4
-          - jaxtyping~=0.3.1
+          - numpy~=2.3.3
+          - jaxtyping~=0.3.3
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
     hooks:
