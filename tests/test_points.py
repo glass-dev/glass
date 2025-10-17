@@ -15,8 +15,6 @@ if TYPE_CHECKING:
     import pytest_mock
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import UnifiedGenerator
-
 
 def catpos(
     pos: Generator[
@@ -62,7 +60,10 @@ def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> No
     assert glass.effective_bias(z, bz, w) == pytest.approx(0.25)
 
 
-def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_linear_bias(
+    xp: ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator,
+) -> None:
     # test with 0 delta
 
     delta = xp.zeros((2, 2))
@@ -85,7 +86,10 @@ def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     assert glass.linear_bias(delta, b) == pytest.approx(b * delta)
 
 
-def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_loglinear_bias(
+    xp: ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator,
+) -> None:
     # test with 0 delta
 
     delta = xp.zeros((2, 2))
@@ -272,7 +276,10 @@ def test_uniform_positions(rng: np.random.Generator) -> None:
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_position_weights(
+    xp: ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator,
+) -> None:
     """Unit tests for glass.points.position_weights."""
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):

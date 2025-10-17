@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 
 import glass
-from glass._array_api_utils import UnifiedGenerator
 
 
 def test_vmap_galactic_ecliptic() -> None:
@@ -38,7 +37,10 @@ def test_vmap_galactic_ecliptic() -> None:
         glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
 
 
-def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_gaussian_nz(
+    xp: ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator,
+) -> None:
     """Add unit tests for :func:`glass.gaussian_nz`."""
     mean = 0
     sigma = 1

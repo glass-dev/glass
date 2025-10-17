@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
+import glass._array_api_utils as _utils
 import glass.algorithm
 
 if TYPE_CHECKING:
@@ -12,10 +13,11 @@ if TYPE_CHECKING:
 
     import pytest_mock
 
-    from glass._array_api_utils import UnifiedGenerator
 
-
-def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_nnls(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | _utils.Generator,
+) -> None:
     """Unit tests for glass.algorithm.nnls."""
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in nnls are not immutable, so do not support jax")
@@ -52,7 +54,10 @@ def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
         glass.algorithm.nnls(a.T, b)
 
 
-def test_cov_clip(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_cov_clip(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | _utils.Generator,
+) -> None:
     # prepare a random matrix
     m = urng.random((4, 4))
 
@@ -107,7 +112,9 @@ def test_nearcorr(xp: types.ModuleType) -> None:
 
 
 def test_cov_nearest(
-    xp: types.ModuleType, urng: UnifiedGenerator, mocker: pytest_mock.MockerFixture
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | _utils.Generator,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     # prepare a random matrix
     m = urng.random((4, 4))
