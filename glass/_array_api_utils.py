@@ -662,6 +662,25 @@ class XPAdditions:
         """
         Returns an object that acts like pyfunc, but takes arrays as input.
 
+        Parameters
+        ----------
+        pyfunc : Callable[..., Any]
+            Python function to vectorize.
+        otypes : tuple[type[float]]
+            Output types.
+
+        Returns
+        -------
+        Callable[..., Any]
+            Vectorized function.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/671
         """
         if self.backend == "numpy":
@@ -676,7 +695,24 @@ class XPAdditions:
         raise NotImplementedError(msg)
 
     def radians(self, deg_arr: AnyArray) -> AnyArray:
-        """Convert angles from degrees to radians."""
+        """
+        Convert angles from degrees to radians.
+
+        Parameters
+        ----------
+        deg_arr : AnyArray
+            Array of angles in degrees.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Returns
+        -------
+        AnyArray
+            Array of angles in radians.
+        """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.radians(deg_arr)
         if self.backend == "array_api_strict":
@@ -688,7 +724,24 @@ class XPAdditions:
         raise NotImplementedError(msg)
 
     def degrees(self, deg_arr: AnyArray) -> AnyArray:
-        """Convert angles from radians to degrees."""
+        """
+        Convert angles from radians to degrees.
+
+        Parameters
+        ----------
+        deg_arr : AnyArray
+            Array of angles in radians.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Returns
+        -------
+        AnyArray
+            Array of angles in degrees.
+        """
         if self.backend in {"numpy", "jax.numpy"}:
             return self.xp.degrees(deg_arr)
         if self.backend == "array_api_strict":
