@@ -119,3 +119,16 @@ def build(session: nox.Session) -> None:
     """Build an SDist and wheel."""
     session.install("build")
     session.run("python", "-m", "build")
+
+
+@nox.session
+def version(session: nox.Session) -> None:
+    """
+    Check the current version of the package.
+
+    The intent of this check is to ensure that the package
+    is installed without any additional dependencies
+    through optional dependencies nor dependency groups.
+    """
+    session.install("-e", ".")
+    session.run("python", "-c", "import glass; print(glass.__version__)")
