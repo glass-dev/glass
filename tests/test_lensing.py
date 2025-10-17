@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import healpix
@@ -9,6 +10,8 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass.cosmology import Cosmology
 
 
@@ -102,28 +105,54 @@ def test_multi_plane_weights(
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(usecomplex: bool) -> None:  # noqa: FBT001
+def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
     d = 5.0
-    r = np.radians(d)
+    r = math.radians(d)
 
     def alpha(re: float, im: float, *, usecomplex: bool) -> complex | list[float]:
         return re + 1j * im if usecomplex else [re, im]
 
     # north
-    lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
+    lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
+    assert lon == pytest.approx(0.0, abs=1e-15)
+    assert lat == pytest.approx(d, abs=1e-15)
 
     # south
-    lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
+    lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
+    assert lon == pytest.approx(0.0, abs=1e-15)
+    assert lat == pytest.approx(-d, abs=1e-15)
 
     # east
-    lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
+    assert lon == pytest.approx(-d, abs=1e-15)
+    assert lat == pytest.approx(0.0, abs=1e-15)
 
     # west
-    lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
-    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
+    assert lon == pytest.approx(d, abs=1e-15)
+    assert lat == pytest.approx(0.0, abs=1e-15)
+
+    # At least one input is an array
+    lon, lat = glass.deflect(
+        xp.asarray(0.0), xp.asarray(0.0), alpha(0, -r, usecomplex=usecomplex)
+    )
+    assert lon == pytest.approx(d, abs=1e-15)
+    assert lat == pytest.approx(0.0, abs=1e-15)
+
+    lon, lat = glass.deflect(
+        xp.asarray([0.0, 0.0]),
+        xp.asarray([0.0, 0.0]),
+        alpha(0, -r, usecomplex=usecomplex),
+    )
+    assert lon == pytest.approx(xp.asarray([d, d]), abs=1e-15)
+    assert lat == pytest.approx(0.0, abs=1e-15)
+
+    # No inputs are arrays and xp not provided
+    with pytest.raises(
+        ValueError,
+        match="Either, one positional input must be an array or xp must be provided",
+    ):
+        glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
 
 
 def test_deflect_many(rng: np.random.Generator) -> None:
