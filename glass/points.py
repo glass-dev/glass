@@ -389,7 +389,7 @@ def uniform_positions(
 
 def position_weights(
     densities: FloatArray,
-    bias: FloatArray | None = None,
+    bias: FloatArray | float | None = None,
 ) -> FloatArray:
     r"""
     Compute relative weights for angular clustering.
@@ -415,8 +415,14 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    arrays_to_check = (densities,) if bias is None else (densities, bias)
+    arrays_to_check = (
+        (densities, bias)
+        if bias is not None and not isinstance(bias, float)
+        else (densities,)
+    )
     xp = _utils.get_namespace(*arrays_to_check)
+
+    bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 
     # bring densities and bias into the same shape
     if bias is not None:
