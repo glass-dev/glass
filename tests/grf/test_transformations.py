@@ -4,21 +4,25 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as utils
 import glass.grf
 
 if TYPE_CHECKING:
     import types
 
-    from glass._array_api_utils import UnifiedGenerator
 
-
-def test_normal(urng: UnifiedGenerator) -> None:
+def test_normal(
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     t = glass.grf.Normal()
     x = urng.standard_normal(10)
     np.testing.assert_array_equal(t(x, 1.0), x)
 
 
-def test_lognormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_lognormal(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     for lam in 1.0, urng.uniform():
         var = urng.uniform()
         t = glass.grf.Lognormal(lam)
@@ -27,7 +31,10 @@ def test_lognormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
         np.testing.assert_array_equal(t(x, var), y)
 
 
-def test_sqnormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_sqnormal(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     for lam in 1.0, urng.uniform():
         var = urng.uniform()
         a = xp.sqrt(1 - var)
@@ -37,7 +44,10 @@ def test_sqnormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
         np.testing.assert_array_equal(t(x, var), y)
 
 
-def test_normal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_normal_normal(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
     x = urng.random(10)
@@ -46,7 +56,10 @@ def test_normal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
 
 
-def test_lognormal_lognormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_lognormal_lognormal(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     lam1 = urng.uniform()
     t1 = glass.grf.Lognormal(lam1)
 
@@ -62,7 +75,10 @@ def test_lognormal_lognormal(xp: types.ModuleType, urng: UnifiedGenerator) -> No
     np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
-def test_lognormal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_lognormal_normal(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     lam1 = urng.uniform()
     t1 = glass.grf.Lognormal(lam1)
 
@@ -77,7 +93,10 @@ def test_lognormal_normal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
     np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
-def test_sqnormal_sqnormal(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_sqnormal_sqnormal(
+    xp: types.ModuleType,
+    urng: np.random.Generator | glass.jax.Generator | utils.Generator,
+) -> None:
     lam1, var1 = urng.uniform(size=2)
     a1 = xp.sqrt(1 - var1)
     t1 = glass.grf.SquaredNormal(a1, lam1)
