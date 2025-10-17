@@ -16,11 +16,10 @@ if TYPE_CHECKING:
     import glass.jax
 
     Size: TypeAlias = int | tuple[int, ...] | None
-    GLASSAnyArray: TypeAlias = JAXArray | NDArray[Any]
-    GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
-    GLASSComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
 
     AnyArray: TypeAlias = NDArray[Any] | JAXArray
+    ComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
+    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
 
 
