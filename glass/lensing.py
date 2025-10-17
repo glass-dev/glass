@@ -31,17 +31,22 @@ Applying lensing
 
 from __future__ import annotations
 
+from numbers import Number
 from typing import TYPE_CHECKING, Literal, overload
 
 import healpy as hp
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from types import ModuleType
 
     from numpy.typing import NDArray
 
     import glass
+    from glass._array_api_utils import ComplexArray, FloatArray
     from glass.cosmology import Cosmology
 
 
@@ -601,12 +606,13 @@ def multi_plane_weights(
 
 
 def deflect(
-    lon: float | NDArray[np.float64],
-    lat: float | NDArray[np.float64],
-    alpha: complex | list[float] | NDArray[np.complex128] | NDArray[np.float64],
+    lon: float | FloatArray,
+    lat: float | FloatArray,
+    alpha: complex | ComplexArray | FloatArray,
+    xp: ModuleType | None = None,
 ) -> tuple[
-    NDArray[np.float64],
-    NDArray[np.float64],
+    FloatArray,
+    FloatArray,
 ]:
     r"""
     Apply deflections to positions.
@@ -639,28 +645,41 @@ def deflect(
     exponential map.
 
     """
-    alpha = np.asanyarray(alpha)
-    if np.iscomplexobj(alpha):
-        alpha1, alpha2 = alpha.real, alpha.imag
+    arrays_to_check = tuple(
+        x
+        for x in (lon, lat, alpha)
+        if not isinstance(x, Number) and not isinstance(x, list)
+    )
+    if len(arrays_to_check) == 0:
+        if xp is None:
+            msg = "Either, one positional input must be an array or xp must be provided"
+            raise ValueError(msg)
     else:
-        alpha1, alpha2 = alpha
+        xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
+
+    alpha = xp.asarray(alpha)
+    if xp.isdtype(alpha.dtype, "complex floating"):  # type: ignore[union-attr]
+        alpha1, alpha2 = xp.real(alpha), xp.imag(alpha)
+    else:
+        alpha1, alpha2 = alpha  # type: ignore[misc]
 
     # we know great-circle navigation:
     # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
     #              cosθ cos|α| + sinθ sin|α| cosγ)
     # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
 
-    t = np.radians(lat)
-    ct, st = np.sin(t), np.cos(t)  # sin and cos flipped: lat not co-lat
+    t = uxpx.radians(xp.asarray(lat))
+    ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
 
-    a = np.hypot(alpha1, alpha2)  # abs(alpha)
-    g = np.arctan2(alpha2, alpha1)  # arg(alpha)
-    ca, sa = np.cos(a), np.sin(a)
-    cg, sg = np.cos(g), np.sin(g)
+    a = xp.hypot(alpha1, alpha2)  # abs(alpha)
+    g = xp.atan2(alpha2, alpha1)  # arg(alpha)
+    ca, sa = xp.cos(a), xp.sin(a)
+    cg, sg = xp.cos(g), xp.sin(g)
 
     # flipped atan2 arguments for lat instead of co-lat
-    tp = np.arctan2(ct * ca + st * sa * cg, np.hypot(ct * sa - st * ca * cg, st * sg))
+    tp = xp.atan2(ct * ca + st * sa * cg, xp.hypot(ct * sa - st * ca * cg, st * sg))
 
-    d = np.arctan2(sa * sg, st * ca - ct * sa * cg)
+    d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - np.degrees(d), np.degrees(tp)
+    return lon - uxpx.degrees(d), uxpx.degrees(tp)
