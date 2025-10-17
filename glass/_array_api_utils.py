@@ -25,6 +25,50 @@ if TYPE_CHECKING:
     IntArray: TypeAlias = NDArray[np.int_] | JAXArray
 
 
+def import_numpy(backend: str, function_name: str) -> ModuleType:
+    """
+    Wrapper for importing numpy.
+
+    Parameters
+    ----------
+    backend
+        The name of the backend requested by the user.
+    function_name
+        The name of the function which is not implemented in
+        the users chosen backend.
+
+    Returns
+    -------
+        The numpy module type to be called instead of the users
+        chosen backend.
+
+    Raises
+    ------
+    ModuleNotFoundError
+        If numpy is not found in the users environment.
+
+    Notes
+    -----
+    This is useful as in the case where numpy is not
+    found we can explain to the user why they suddenly
+    need numpy when they didn't before.
+
+    """
+    try:
+        import numpy as np  # noqa: PLC0415
+
+    except ModuleNotFoundError as err:
+        msg = (
+            "numpy is required here as "
+            + backend
+            + " does not implement "
+            + function_name
+        )
+        raise ModuleNotFoundError(msg) from err
+    else:
+        return np
+
+
 def get_namespace(*arrays: AnyArray) -> ModuleType:
     """
     Return the array library (array namespace) of input arrays
@@ -141,8 +185,10 @@ class XPAdditions:
 
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
         if self.backend == "numpy":
-            return np.trapezoid(y, x=x, dx=dx, axis=axis)
+            return self.xp.trapezoid(y, x=x, dx=dx, axis=axis)
         if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "trapezoid")
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             y_np = np.asarray(y, copy=True)
             x_np = np.asarray(x, copy=True)
@@ -158,13 +204,11 @@ class XPAdditions:
 
         See https://github.com/glass-dev/glass/issues/647
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
-
-            return glass.jax.union1d(ar1, ar2)
-        if self.backend == "numpy":
-            return np.union1d(ar1, ar2)
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.union1d(ar1, ar2)
         if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "union1d")
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             ar1_np = np.asarray(ar1, copy=True)
             ar2_np = np.asarray(ar2, copy=True)
@@ -189,17 +233,13 @@ class XPAdditions:
 
         See https://github.com/glass-dev/glass/issues/650
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
-
-            return glass.jax.interp(
-                x, x_points, y_points, left=left, right=right, period=period
-            )
-        if self.backend == "numpy":
-            return np.interp(
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.interp(
                 x, x_points, y_points, left=left, right=right, period=period
             )
         if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "interp")
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             x_np = np.asarray(x, copy=True)
             x_points_np = np.asarray(x_points, copy=True)
@@ -218,13 +258,11 @@ class XPAdditions:
 
         See https://github.com/glass-dev/glass/issues/648
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
-
-            return glass.jax.gradient(f)
-        if self.backend == "numpy":
-            return np.gradient(f)
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.gradient(f)
         if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "gradient")
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             f_np = np.asarray(f, copy=True)
             result_np = np.gradient(f_np)
@@ -235,19 +273,17 @@ class XPAdditions:
 
     def linalg_lstsq(
         self, a: AnyArray, b: AnyArray, rcond: float | None = None
-    ) -> tuple[AnyArray, AnyArray, AnyArray, AnyArray]:
+    ) -> tuple[AnyArray, AnyArray, int, AnyArray]:
         """
         Return the gradient of an N-dimensional array.
 
         See https://github.com/glass-dev/glass/issues/649
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
-
-            return glass.jax.linalg_lstsq(a, b, rcond=rcond)
-        if self.backend == "numpy":
-            return np.linalg.lstsq(a, b, rcond=rcond)
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
         if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "linalg.lstsq")
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             a_np = np.asarray(a, copy=True)
             b_np = np.asarray(b, copy=True)
@@ -263,13 +299,11 @@ class XPAdditions:
 
         See https://github.com/glass-dev/glass/issues/657
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
-
-            return glass.jax.einsum(subscripts, *operands)
-        if self.backend == "numpy":
-            return np.einsum(subscripts, *operands)
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.einsum(subscripts, *operands)
         if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "einsum")
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             operands_np = (np.asarray(op, copy=True) for op in operands)
             result_np = np.einsum(subscripts, *operands_np)
@@ -295,7 +329,7 @@ class XPAdditions:
             return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
         if self.backend == "array_api_strict":
             # Import here to prevent users relying on numpy unless in this instance
-            import numpy as np  # noqa: PLC0415
+            np = import_numpy(self.backend, "apply_along_axis")
 
             return self.xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs), copy=True
@@ -318,9 +352,33 @@ class XPAdditions:
             return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
         if self.backend in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
-            import numpy as np  # noqa: PLC0415
+            np = import_numpy(self.backend, "vectorize")
 
-            return np.vectorize(pyfunc, otypes=otypes)
+            return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def radians(self, deg_arr: AnyArray) -> AnyArray:
+        """Convert angles from degrees to radians."""
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.radians(deg_arr)
+        if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "radians")
+
+            return self.xp.asarray(np.radians(deg_arr))
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def degrees(self, deg_arr: AnyArray) -> AnyArray:
+        """Convert angles from radians to degrees."""
+        if self.backend in {"numpy", "jax.numpy"}:
+            return self.xp.degrees(deg_arr)
+        if self.backend == "array_api_strict":
+            np = import_numpy(self.backend, "degrees")
+
+            return self.xp.asarray(np.degrees(deg_arr))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
