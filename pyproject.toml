@@ -9,17 +9,19 @@ requires = [
 docs = [
     "furo",
     "ipython",
+    "jaxtyping",
     "matplotlib",
     "myst-parser",
     "nbsphinx",
+    "sphinx-autodoc-typehints",
     "sphinx-toolbox",
     "sphinx<8.2.0",
-    "sphinx_autodoc_typehints",
     "sphinxcontrib-katex",
 ]
 test = [
+    "cosmology.api",
     "fitsio",
-    "jax>=0.4.32",
+    "jax",
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
@@ -43,13 +45,11 @@ classifiers = [
 ]
 dependencies = [
     "array-api-extra>=0.9.0",
-    "array_api_strict>=2.0,<2.4",
-    "cosmology.api>=0.3.2",
+    "array-api-strict>=2.0,<2.4",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "numpy>=2.1.1",
     "transformcl>=2022.8.9",
-    "typing_extensions>=4.13.2",
+    "typing-extensions>=4.13.2",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -61,9 +61,9 @@ maintainers = [
 name = "glass"
 optional-dependencies = {examples = [
     "camb",
-    "cosmology.compat.camb>=0.2.0",
+    "cosmology.api",
+    "cosmology.compat.camb",
     "glass.ext.camb",
-    "jax>=0.4.32",
     "jupyter",
     "matplotlib",
 ]}

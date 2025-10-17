@@ -6,14 +6,14 @@ import array_api_strict
 import numpy as np
 import numpy.random
 
-import glass.jax
-
 if TYPE_CHECKING:
     from types import FunctionType, ModuleType
 
     from array_api_strict._array_object import Array as AArray
     from jaxtyping import Array as JAXArray
     from numpy.typing import DTypeLike, NDArray
+
+    import glass.jax
 
     Size: TypeAlias = int | tuple[int, ...] | None
     GLASSAnyArray: TypeAlias = JAXArray | NDArray[Any]
@@ -42,10 +42,14 @@ def get_namespace(*arrays: AnyArray) -> ModuleType:
     return namespace
 
 
-def rng_dispatcher(array: NDArray[Any] | JAXArray) -> UnifiedGenerator:
+def rng_dispatcher(
+    array: NDArray[Any] | JAXArray,
+) -> np.random.Generator | glass.jax.Generator | Generator:
     """Dispatch RNG on the basis of the provided array."""
     backend = array.__array_namespace__().__name__
     if backend == "jax.numpy":
+        import glass.jax  # noqa: PLC0415
+
         return glass.jax.Generator(seed=42)
     if backend == "numpy":
         return np.random.default_rng()
@@ -107,9 +111,6 @@ class Generator:
         return array_api_strict.asarray(self.rng.uniform(low, high, size))
 
 
-UnifiedGenerator: TypeAlias = np.random.Generator | glass.jax.Generator | Generator
-
-
 class XPAdditions:
     """
     Additional functions missing from both array-api-strict and array-api-extra.
@@ -135,6 +136,8 @@ class XPAdditions:
         """
         self.backend = self.xp.__name__
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
         if self.backend == "numpy":
             return np.trapezoid(y, x=x, dx=dx, axis=axis)
@@ -155,6 +158,8 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/647
         """
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.union1d(ar1, ar2)
         if self.backend == "numpy":
             return np.union1d(ar1, ar2)
@@ -184,6 +189,8 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/650
         """
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.interp(
                 x, x_points, y_points, left=left, right=right, period=period
             )
@@ -211,6 +218,8 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/648
         """
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.gradient(f)
         if self.backend == "numpy":
             return np.gradient(f)
@@ -232,6 +241,8 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/649
         """
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.linalg_lstsq(a, b, rcond=rcond)
         if self.backend == "numpy":
             return np.linalg.lstsq(a, b, rcond=rcond)
@@ -252,6 +263,8 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/657
         """
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.einsum(subscripts, *operands)
         if self.backend == "numpy":
             return np.einsum(subscripts, *operands)
@@ -278,6 +291,8 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/651
         """
         if self.backend == "jax.numpy":
+            import glass.jax  # noqa: PLC0415
+
             return glass.jax.apply_along_axis(func1d, axis, arr, *args, **kwargs)
         if self.backend == "numpy":
             return np.apply_along_axis(func1d, axis, arr, *args, **kwargs)
