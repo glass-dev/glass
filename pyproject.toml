@@ -159,10 +159,14 @@ lint.isort = {known-first-party = [
     "future",
     "standard-library",
     "third-party",
+    "array-api",
     "cosmo",
     "first-party",
     "local-folder",
-], sections = {"cosmo" = [
+], sections = {"array-api" = [
+    "array_api_extra",
+    "array_api_strict",
+], "cosmo" = [
     "camb",
     "cosmology",
 ]}}
