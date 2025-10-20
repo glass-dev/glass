@@ -4,7 +4,7 @@ import contextlib
 import importlib.metadata
 import logging
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 import numpy as np
 import packaging.version
@@ -21,7 +21,9 @@ if TYPE_CHECKING:
 
     from cosmology import Cosmology
 
-    from glass._array_api_utils import UnifiedGenerator
+    UnifiedGenerator: TypeAlias = (
+        np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator
+    )
 
 
 # Handling of array backends, inspired by-
