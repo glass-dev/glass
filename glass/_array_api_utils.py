@@ -2,16 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeAlias
 
-import array_api_strict
 import numpy as np
 import numpy.random
+
+import array_api_strict
 
 if TYPE_CHECKING:
     from types import FunctionType, ModuleType
 
-    from array_api_strict._array_object import Array as AArray
     from jaxtyping import Array as JAXArray
     from numpy.typing import DTypeLike, NDArray
+
+    from array_api_strict._array_object import Array as AArray
 
     import glass.jax
 
