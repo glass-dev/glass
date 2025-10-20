@@ -17,7 +17,7 @@ docs = [
     "nbsphinx",
     "sphinx-autodoc-typehints",
     "sphinx-toolbox",
-    "sphinx",
+    "sphinx<8.2.0",
     "sphinxcontrib-katex",
 ]
 test = [
