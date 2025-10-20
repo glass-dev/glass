@@ -9,10 +9,11 @@ from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
-import array_api_extra as xpx
 import healpy as hp
 import numpy as np
 from transformcl import cltovar
+
+import array_api_extra as xpx
 
 import glass
 import glass._array_api_utils as _utils

@@ -23,9 +23,10 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     import numpy as np
-    from array_api_strict._array_object import Array as AArray
     from jaxtyping import Array as JAXArray
     from numpy.typing import DTypeLike, NDArray
+
+    from array_api_strict._array_object import Array as AArray
 
     import glass.jax
 
@@ -174,8 +175,9 @@ class Generator:
         seed
             Seed for the random number generator.
         """
-        import array_api_strict  # noqa: PLC0415
         import numpy as np  # noqa: PLC0415
+
+        import array_api_strict  # noqa: PLC0415
 
         self.axp = array_api_strict
         self.nxp = np
