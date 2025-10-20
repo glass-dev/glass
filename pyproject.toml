@@ -7,8 +7,10 @@ requires = [
 
 [dependency-groups]
 docs = [
+    "cosmology.api",
     "furo",
     "ipython",
+    "jax",
     "jaxtyping",
     "matplotlib",
     "myst-parser",
