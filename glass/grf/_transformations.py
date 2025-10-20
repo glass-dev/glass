@@ -6,8 +6,9 @@ from dataclasses import dataclass
 # otherwise, the dispatch mechanism cannot resolve the class dynamically
 from typing import Any
 
-from array_api_strict._array_object import Array as AArray  # noqa: TC002
 from numpy.typing import NDArray  # noqa: TC002
+
+from array_api_strict._array_object import Array as AArray  # noqa: TC002
 
 from glass.grf import corr, dcorr, icorr
 
