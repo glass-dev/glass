@@ -629,10 +629,20 @@ def deflect(
     alpha
         Deflection values. Must be complex-valued or have a leading
         axis of size 2 for the real and imaginary component.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, the array library will be determined from the other paremeters,
+        if possible.
 
     Returns
     -------
         The longitudes and latitudes after deflection.
+
+    Raises
+    ------
+    ValueError
+        If the array library cannot be determined, either from `xp` or the other
+        inputted parameters.
 
     Notes
     -----
@@ -650,11 +660,10 @@ def deflect(
         for x in (lon, lat, alpha)
         if not isinstance(x, Number) and not isinstance(x, list)
     )
-    if len(arrays_to_check) == 0:
-        if xp is None:
+    if xp is None:
+        if len(arrays_to_check) == 0:
             msg = "Either, one positional input must be an array or xp must be provided"
             raise ValueError(msg)
-    else:
         xp = _utils.get_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
 

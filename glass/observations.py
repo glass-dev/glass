@@ -234,6 +234,9 @@ def fixed_zbins(
         Number of redshift bins. Only one of ``nbins`` and ``dz`` can be given.
     dz
         Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, numpy with be used.
 
     Returns
     -------
@@ -250,7 +253,11 @@ def fixed_zbins(
     if nbins is not None and dz is None:
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:
-        zbinedges = xp.arange(zmin, zmax + dz, dz)
+        zbinedges = xp.arange(
+            zmin,
+            xp.nextafter(xp.asarray(zmax + dz), xp.asarray(zmax)),
+            dz,
+        )
     else:
         msg = "exactly one of nbins and dz must be given"
         raise ValueError(msg)
