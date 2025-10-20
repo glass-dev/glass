@@ -18,8 +18,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeAlias
 
-import array_api_strict
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
@@ -177,6 +175,8 @@ class Generator:
             Seed for the random number generator.
         """
         import numpy as np  # noqa: PLC0415
+
+        import array_api_strict  # noqa: PLC0415
 
         self.axp = array_api_strict
         self.nxp = np
