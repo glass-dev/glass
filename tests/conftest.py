@@ -4,7 +4,7 @@ import contextlib
 import importlib.metadata
 import logging
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 import numpy as np
 import packaging.version
@@ -20,6 +20,10 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from cosmology import Cosmology
+
+    UnifiedGenerator: TypeAlias = (
+        np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator
+    )
 
 
 # Handling of array backends, inspired by-
@@ -131,9 +135,7 @@ def uxpx(xp: types.ModuleType) -> glass._array_api_utils.XPAdditions:
 
 
 @pytest.fixture(scope="session")
-def urng(
-    xp: types.ModuleType,
-) -> np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator:
+def urng(xp: types.ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface.
 
