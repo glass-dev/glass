@@ -43,14 +43,13 @@ def import_numpy(backend: str, function_name: str) -> ModuleType:
 
     Parameters
     ----------
-    backend : str
+    backend
         The name of the backend requested by the user.
-    function_name : str
+    function_name
         The name of the function which is not implemented in the user's chosen backend.
 
     Returns
     -------
-    ModuleType
         The NumPy module.
 
     Raises
@@ -85,12 +84,11 @@ def get_namespace(*arrays: AnyArray) -> ModuleType:
 
     Parameters
     ----------
-    *arrays : AnyArray
+    *arrays
         Arrays whose namespace is to be determined.
 
     Returns
     -------
-    ModuleType
         The array namespace module.
 
     Raises
@@ -118,12 +116,11 @@ def rng_dispatcher(
 
     Parameters
     ----------
-    array : AnyArray
+    array
         The array whose backend determines the RNG.
 
     Returns
     -------
-    np.random.Generator | glass.jax.Generator | Generator
         The appropriate random number generator for the array's backend.
 
     Raises
@@ -168,7 +165,7 @@ class Generator:
 
         Parameters
         ----------
-        seed : int | bool | NDArray[np.int_ | np.bool] | None, optional
+        seed
             Seed for the random number generator.
         """
         import array_api_strict  # noqa: PLC0415
@@ -189,16 +186,15 @@ class Generator:
 
         Parameters
         ----------
-        size : Size, optional
+        size
             Output shape.
-        dtype : DTypeLike | None, optional
+        dtype
             Desired data type.
-        out : NDArray[Any] | None, optional
+        out
             Optional output array.
 
         Returns
         -------
-        AArray
             Array of random floats.
         """
         dtype = dtype if dtype is not None else self.nxp.float64
@@ -215,16 +211,15 @@ class Generator:
 
         Parameters
         ----------
-        loc : float | NDArray[np.floating], optional
+        loc
             Mean of the distribution.
-        scale : float | NDArray[np.floating], optional
+        scale
             Standard deviation of the distribution.
-        size : Size, optional
+        size
             Output shape.
 
         Returns
         -------
-        AArray
             Array of samples from the normal distribution.
         """
         return self.axp.asarray(self.rng.normal(loc, scale, size))
@@ -235,14 +230,13 @@ class Generator:
 
         Parameters
         ----------
-        lam : float | NDArray[np.floating]
+        lam
             Expected number of events.
-        size : Size, optional
+        size
             Output shape.
 
         Returns
         -------
-        AArray
             Array of samples from the Poisson distribution.
         """
         return self.axp.asarray(self.rng.poisson(lam, size))
@@ -258,16 +252,15 @@ class Generator:
 
         Parameters
         ----------
-        size : Size, optional
+        size
             Output shape.
-        dtype : DTypeLike | None, optional
+        dtype
             Desired data type.
-        out : NDArray[Any] | None, optional
+        out
             Optional output array.
 
         Returns
         -------
-        AArray
             Array of samples from the standard normal distribution.
         """
         dtype = dtype if dtype is not None else self.nxp.float64
@@ -284,16 +277,15 @@ class Generator:
 
         Parameters
         ----------
-        low : float | NDArray[np.floating], optional
+        low
             Lower bound of the distribution.
-        high : float | NDArray[np.floating], optional
+        high
             Upper bound of the distribution.
         size : Size, optional
             Output shape.
 
         Returns
         -------
-        AArray
             Array of samples from the uniform distribution.
         """
         return self.axp.asarray(self.rng.uniform(low, high, size))
@@ -320,7 +312,7 @@ class XPAdditions:
 
         Parameters
         ----------
-        xp : ModuleType
+        xp
             The array namespace module.
         """
         self.xp = xp
@@ -334,18 +326,17 @@ class XPAdditions:
 
         Parameters
         ----------
-        y : AnyArray
+        y
             Input array to integrate.
-        x : AnyArray, optional
+        x
             Sample points corresponding to y.
-        dx : float, optional
+        dx
             Spacing between sample points.
-        axis : int, optional
+        axis
             Axis along which to integrate.
 
         Returns
         -------
-        AnyArray
             Integrated result.
 
         Raises
@@ -384,14 +375,13 @@ class XPAdditions:
 
         Parameters
         ----------
-        ar1 : AnyArray
+        ar1
             First input array.
-        ar2 : AnyArray
+        ar2
             Second input array.
 
         Returns
         -------
-        AnyArray
             The union of the two arrays.
 
         Raises
@@ -432,22 +422,21 @@ class XPAdditions:
 
         Parameters
         ----------
-        x : AnyArray
+        x
             The x-coordinates at which to evaluate the interpolated values.
-        x_points : AnyArray
+        x_points
             The x-coordinates of the data points.
-        y_points : AnyArray
+        y_points
             The y-coordinates of the data points.
-        left : float | None, optional
+        left
             Value to return for x < x_points[0].
-        right : float | None, optional
+        right
             Value to return for x > x_points[-1].
-        period : float | None, optional
+        period
             Period for periodic interpolation.
 
         Returns
         -------
-        AnyArray
             Interpolated values.
 
         Raises
@@ -485,12 +474,11 @@ class XPAdditions:
 
         Parameters
         ----------
-        f : AnyArray
+        f
             Input array.
 
         Returns
         -------
-        AnyArray
             Gradient of the input array.
 
         Raises
@@ -524,28 +512,28 @@ class XPAdditions:
 
         Parameters
         ----------
-        a : AnyArray
+        a
             Coefficient matrix.
-        b : AnyArray
+        b
             Ordinate or "dependent variable" values.
-        rcond : float | None, optional
+        rcond
             Cut-off ratio for small singular values.
 
         Returns
         -------
-        x : {(N,), (N, K)} AnyArray
+        x
             Least-squares solution. If b is two-dimensional, the solutions are in the K
             columns of x.
 
-        residuals : {(1,), (K,), (0,)} AnyArray
+        residuals
             Sums of squared residuals: Squared Euclidean 2-norm for each column in b - a
             @ x. If the rank of a is < N or M <= N, this is an empty array. If b is
             1-dimensional, this is a (1,) shape array. Otherwise the shape is (K,).
 
-        rank : int
+        rank
             Rank of matrix a.
 
-        s : (min(M, N),) AnyArray
+        s
             Singular values of a.
 
         Raises
@@ -578,14 +566,13 @@ class XPAdditions:
 
         Parameters
         ----------
-        subscripts : str
+        subscripts
             Specifies the subscripts for summation.
-        *operands : AnyArray
+        *operands
             Arrays to be summed.
 
         Returns
         -------
-        AnyArray
             Result of the Einstein summation.
 
         Raises
@@ -624,20 +611,19 @@ class XPAdditions:
 
         Parameters
         ----------
-        func1d : Callable[..., Any]
+        func1d
             Function to apply to 1-D slices.
-        axis : int
+        axis
             Axis along which to apply the function.
-        arr : AnyArray
+        arr
             Input array.
-        *args : object
+        *args
             Additional positional arguments to pass to func1d.
-        **kwargs : object
+        **kwargs
             Additional keyword arguments to pass to func1d.
 
         Returns
         -------
-        AnyArray
             Result of applying the function along the axis.
 
         Raises
