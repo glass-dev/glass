@@ -148,7 +148,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xp.float64  # type: ignore[unreachable]
 
-    assert cov[:, 0] == pytest.approx(xp.asarray([0.5, 0.25, 0.15]))
+    np.testing.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
     assert cov[:, 1] == pytest.approx(0)
     assert cov[:, 2] == pytest.approx(0)
 
@@ -220,7 +220,7 @@ def test_multalm(xp: types.ModuleType) -> None:
 
     result = glass.fields._multalm(alm, bl, inplace=True)
 
-    assert result == pytest.approx(alm)
+    np.testing.assert_allclose(result, alm)
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
     assert result == pytest.approx(expected_result)
     assert alm_copy != pytest.approx(result)
@@ -349,7 +349,7 @@ def test_effective_cls(xp: types.ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    assert result[..., 6:] == pytest.approx(0)
+    np.testing.assert_allclose(result[..., 6:], 0)
 
     # check with weights1 and weights2 and weights1 is weights2
 
