@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, TypeAlias
 import jax.dtypes
 import jax.numpy as jnp
 import jax.random
-from jax.scipy import integrate
+import jax.scipy
 from jax.typing import ArrayLike
 from typing_extensions import Self
 
@@ -36,43 +36,43 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     return size
 
 
-def trapezoid(
-    y: ArrayLike, x: ArrayLike = None, dx: ArrayLike = 1.0, axis: int = -1
-) -> Array:
+def trapezoid(y: Array, x: Array = None, dx: Array = 1.0, axis: int = -1) -> Array:
     """Wrapper for jax.scipy.integrate.trapezoid."""
-    return integrate.trapezoid(y, x=x, dx=dx, axis=axis)
+    return jax.scipy.integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
 
-def union1d(ar1: ArrayLike, ar2: ArrayLike) -> Array:
+def union1d(ar1: Array, ar2: Array) -> Array:
     """Wrapper for jax.numpy.trapezoid."""
     return jnp.union1d(ar1, ar2)
 
 
 def interp(  # noqa: PLR0913
-    x: ArrayLike,
-    x_points: ArrayLike,
-    y_points: ArrayLike,
-    left: ArrayLike = None,
-    right: ArrayLike = None,
-    period: ArrayLike = None,
+    x: Array,
+    x_points: Array,
+    y_points: Array,
+    left: Array = None,
+    right: Array = None,
+    period: Array = None,
 ) -> Array:
     """Wrapper for jax.numpy.interp."""
     return jnp.interp(x, x_points, y_points, left=left, right=right, period=period)
 
 
-def gradient(f: ArrayLike) -> Array:
+def gradient(f: Array) -> Array:
     """Wrapper for jax.numpy.gradient."""
     return jnp.gradient(f)
 
 
 def linalg_lstsq(
-    a: ArrayLike, b: ArrayLike, rcond: float | None = None
+    a: Array,
+    b: Array,
+    rcond: float | None = None,
 ) -> tuple[Array, Array, Array, Array]:
     """Wrapper for jax.numpy.linalg.lstsq."""
     return jnp.linalg.lstsq(a, b, rcond)  # type: ignore[no-any-return]
 
 
-def einsum(subscripts: str, *operands: ArrayLike) -> Array:
+def einsum(subscripts: str, *operands: Array) -> Array:
     """Wrapper for jax.numpy.einsum."""
     return jnp.einsum(subscripts, *operands)
 
@@ -80,7 +80,7 @@ def einsum(subscripts: str, *operands: ArrayLike) -> Array:
 def apply_along_axis(
     func1d: FunctionType,
     axis: int,
-    arr: ArrayLike,
+    arr: Array,
     *args: object,
     **kwargs: object,
 ) -> Array:
@@ -99,7 +99,8 @@ class Generator:
     def from_key(cls, key: PRNGKeyArray) -> Self:
         """Wrap a JAX random key."""
         if not isinstance(key, ArrayLike) or not jax.dtypes.issubdtype(
-            key.dtype, jax.dtypes.prng_key
+            key.dtype,
+            jax.dtypes.prng_key,
         ):
             msg = "not a random key"
             raise ValueError(msg)
@@ -149,13 +150,18 @@ class Generator:
         return loc + scale * jax.random.normal(self.__key, _size(size), dtype)
 
     def poisson(
-        self, lam: float, size: Size = None, dtype: Integer[Array, ...] = int
+        self,
+        lam: float,
+        size: Size = None,
+        dtype: Integer[Array, ...] = int,
     ) -> Array:
         """Draw samples from a Poisson distribution."""
         return jax.random.poisson(self.__key, lam, size, dtype)
 
     def standard_normal(
-        self, size: Size = None, dtype: Shaped[Array, ...] = float
+        self,
+        size: Size = None,
+        dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
         return jax.random.normal(self.__key, _size(size), dtype)
