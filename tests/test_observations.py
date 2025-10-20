@@ -1,12 +1,20 @@
+# Required to Postponed evaluation of annotations (i.e. UnifiedGenerator),
+# allowing itto be imported in the TYPE_CHECKING block
+from __future__ import annotations
+
 import math
-from types import ModuleType
+from typing import TYPE_CHECKING
 
 import healpix
 import numpy as np
 import pytest
 
 import glass
-from glass._array_api_utils import UnifiedGenerator
+
+if TYPE_CHECKING:
+    from types import ModuleType
+
+    from conftest import UnifiedGenerator
 
 
 def test_vmap_galactic_ecliptic() -> None:
