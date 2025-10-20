@@ -664,14 +664,13 @@ class XPAdditions:
 
         Parameters
         ----------
-        pyfunc : Callable[..., Any]
+        pyfunc
             Python function to vectorize.
-        otypes : tuple[type[float]]
+        otypes
             Output types.
 
         Returns
         -------
-        Callable[..., Any]
             Vectorized function.
 
         Raises
@@ -683,12 +682,12 @@ class XPAdditions:
         -----
         See https://github.com/glass-dev/glass/issues/671
         """
-        if self.backend == "numpy":
+        if self.xp.__name__ == "numpy":
             return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
 
-        if self.backend in {"array_api_strict", "jax.numpy"}:
+        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
-            np = import_numpy(self.backend, "vectorize")
+            np = import_numpy(self.xp.__name__)
 
             return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
 
@@ -701,24 +700,23 @@ class XPAdditions:
 
         Parameters
         ----------
-        deg_arr : AnyArray
+        deg_arr
             Array of angles in degrees.
+
+        Returns
+        -------
+            Array of angles in radians.
 
         Raises
         ------
         NotImplementedError
             If the array backend is not supported.
-
-        Returns
-        -------
-        AnyArray
-            Array of angles in radians.
         """
-        if self.backend in {"numpy", "jax.numpy"}:
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
             return self.xp.radians(deg_arr)
 
-        if self.backend == "array_api_strict":
-            np = import_numpy(self.backend, "radians")
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
 
             return self.xp.asarray(np.radians(deg_arr))
 
@@ -731,24 +729,23 @@ class XPAdditions:
 
         Parameters
         ----------
-        deg_arr : AnyArray
+        deg_arr
             Array of angles in radians.
+
+        Returns
+        -------
+            Array of angles in degrees.
 
         Raises
         ------
         NotImplementedError
             If the array backend is not supported.
-
-        Returns
-        -------
-        AnyArray
-            Array of angles in degrees.
         """
-        if self.backend in {"numpy", "jax.numpy"}:
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
             return self.xp.degrees(deg_arr)
 
-        if self.backend == "array_api_strict":
-            np = import_numpy(self.backend, "degrees")
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
 
             return self.xp.asarray(np.degrees(deg_arr))
 
