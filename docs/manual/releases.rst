@@ -12,11 +12,11 @@ These notes document the changes between individual *GLASS* releases.
 * Introduced ``array-api-strict`` as a dependency to ensure that the array API
   is correctly implemented.
 
-* Changed the way NumPy and JAX are imported in :mod:`glass._array_api_utils` so
-  that GLASS no longer explicitly depend on either of them. If NumPy is
-  incorrectly imported, a helpful error message will be provided to the user.
-  This aims to reduce confusion if a user suddenly requires NumPy just because
-  they called a specific function.
+* Changed the way NumPy and JAX are imported internally so that GLASS no longer
+  explicitly depend on either of them. If NumPy is incorrectly imported, a
+  helpful error message will be provided to the user. This aims to reduce
+  confusion if a user suddenly requires NumPy just because they called a
+  specific function.
 
 * Add Array API support for functions in the following modules.
 
