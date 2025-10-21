@@ -69,9 +69,9 @@ python -m pytest --cov --doctest-plus
 One can specify a particular array backend for testing by setting the
 `ARRAY_BACKEND` environment variable. The default array backend is NumPy.
 _GLASS_ can be tested with every supported array library available in the
-environment by setting `ARRAY_BACKEND` to `all`. The testing framework
-only installs NumPy automatically; hence, remaining array libraries should
-either be installed manually or developers should use `Nox`.
+environment by setting `ARRAY_BACKEND` to `all`. The testing framework only
+installs NumPy automatically; hence, remaining array libraries should either be
+installed manually or developers should use `Nox`.
 
 ```bash
 # run tests using numpy
