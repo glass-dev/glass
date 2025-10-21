@@ -108,7 +108,7 @@ def test_linear_windows(xp: types.ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    assert dz == pytest.approx(xp.mean(xp.diff(ws[0].za)), abs=1e-2)
+    np.testing.assert_allclose(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -116,7 +116,7 @@ def test_linear_windows(xp: types.ModuleType) -> None:
 
     # check values of zeff
 
-    assert [w.zeff for w in ws] == pytest.approx(zgrid[1:-1])
+    np.testing.assert_allclose([w.zeff for w in ws], zgrid[1:-1])
 
     # check weight function input
 
@@ -156,7 +156,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.cubic_windows(zgrid)
-    assert dz == pytest.approx(xp.mean(xp.diff(ws[0].za)), abs=1e-2)
+    np.testing.assert_allclose(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -164,7 +164,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
 
     # check values of zeff
 
-    assert [w.zeff for w in ws] == pytest.approx(zgrid[1:-1])
+    np.testing.assert_allclose([w.zeff for w in ws], zgrid[1:-1])
 
     # check weight function input
 
