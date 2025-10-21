@@ -148,9 +148,9 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xp.float64  # type: ignore[unreachable]
 
-    assert cov[:, 0] == pytest.approx(xp.asarray([0.5, 0.25, 0.15]))
-    assert cov[:, 1] == pytest.approx(0)
-    assert cov[:, 2] == pytest.approx(0)
+    np.testing.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    np.testing.assert_allclose(cov[:, 1], 0)
+    np.testing.assert_allclose(cov[:, 2], 0)
 
     # test negative value error
 
@@ -203,8 +203,8 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov2.dtype == xp.float64
     assert cov3.dtype == xp.float64
 
-    assert cov1 != pytest.approx(cov2)
-    assert cov2 != pytest.approx(cov3)
+    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov1, cov2)
+    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
 
 
 def test_multalm(xp: types.ModuleType) -> None:
@@ -220,10 +220,15 @@ def test_multalm(xp: types.ModuleType) -> None:
 
     result = glass.fields._multalm(alm, bl, inplace=True)
 
-    assert result == pytest.approx(alm)
+    np.testing.assert_allclose(result, alm)
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    assert result == pytest.approx(expected_result)
-    assert alm_copy != pytest.approx(result)
+    np.testing.assert_allclose(result, expected_result)
+    np.testing.assert_raises(
+        AssertionError,
+        np.testing.assert_allclose,
+        alm_copy,
+        result,
+    )
 
     # multiple with 1s
 
@@ -231,7 +236,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     bl = xp.ones(3)
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    assert result == pytest.approx(alm)
+    np.testing.assert_allclose(result, alm)
 
     # multiple with 0s
 
@@ -240,7 +245,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     result = glass.fields._multalm(alm, bl, inplace=False)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    assert result == pytest.approx(expected_result)
+    np.testing.assert_allclose(result, expected_result)
 
     # empty arrays
 
@@ -248,7 +253,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     bl = xp.asarray([])
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    assert result == pytest.approx(alm)
+    np.testing.assert_allclose(result, alm)
 
 
 def test_lognormal_gls() -> None:
@@ -349,7 +354,7 @@ def test_effective_cls(xp: types.ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    assert result[..., 6:] == pytest.approx(0)
+    np.testing.assert_allclose(result[..., 6:], 0)
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -446,19 +451,19 @@ def test_getcl(xp: types.ModuleType) -> None:
         for j in range(10):
             result = glass.getcl(cls, i, j)
             expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
-            assert xp.sort(result) == pytest.approx(expected)
+            np.testing.assert_allclose(xp.sort(result), expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
             assert result.size == 1
-            assert result == pytest.approx(expected)
+            np.testing.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
             assert result.size == 51
-            assert result[2:] == pytest.approx(expected)
+            np.testing.assert_allclose(result[2:], expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
@@ -617,7 +622,8 @@ def test_glass_to_healpix_alm():
     inp = np.array([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
     np.testing.assert_array_equal(
-        out, np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33])
+        out,
+        np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
 
 

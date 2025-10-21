@@ -48,17 +48,17 @@ def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> No
 
     z = xp.linspace(0, 1, 10)
     bz = xp.zeros((10,))
-    assert glass.effective_bias(z, bz, w) == pytest.approx(0.0)
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
     z = xp.zeros((10,))
     bz = xp.full_like(z, 0.5)
 
-    assert glass.effective_bias(z, bz, w) == pytest.approx(0.0)
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
     z = xp.linspace(0, 1, 10)
     bz = xp.full_like(z, 0.5)
 
-    assert glass.effective_bias(z, bz, w) == pytest.approx(0.25)
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
 
 
 def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
@@ -67,21 +67,21 @@ def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    assert glass.linear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
+    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    assert glass.linear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
+    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with original implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    assert glass.linear_bias(delta, b) == pytest.approx(b * delta)
+    np.testing.assert_allclose(glass.linear_bias(delta, b), b * delta)
 
 
 def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
@@ -90,22 +90,23 @@ def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    assert glass.loglinear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
+    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    assert glass.loglinear_bias(delta, b) == pytest.approx(xp.zeros((2, 2)))
+    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with numpy implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    assert glass.loglinear_bias(delta, b) == pytest.approx(
-        xp.expm1(b * xp.log1p(delta))
+    np.testing.assert_allclose(
+        glass.loglinear_bias(delta, b),
+        xp.expm1(b * xp.log1p(delta)),
     )
 
 
@@ -294,4 +295,4 @@ def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
                     )
                 expected = bias * expected
 
-            assert weights == pytest.approx(expected)
+            np.testing.assert_allclose(weights, expected)

@@ -187,7 +187,8 @@ def test_cumulative_trapezoid() -> None:
 
     ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float)
     np.testing.assert_allclose(
-        ct, np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]])
+        ct,
+        np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]),
     )
 
     # explicit return array
