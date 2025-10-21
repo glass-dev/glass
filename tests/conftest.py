@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 # can be:
 #   a particular array library (numpy, jax, array_api_strict, ...)
 #   all (try finding every supported array library available in the environment)
-GLASS_ARRAY_BACKEND: str = os.environ.get("GLASS_ARRAY_BACKEND", "")
+ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
 
 # Change jax logger to only log ERROR or worse
 logging.getLogger("jax").setLevel(logging.ERROR)
@@ -92,14 +92,14 @@ def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> N
 xp_available_backends: dict[str, types.ModuleType] = {}
 
 # if no backend passed, use numpy by default
-if not GLASS_ARRAY_BACKEND or GLASS_ARRAY_BACKEND == "numpy":
+if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     _import_and_add_numpy(xp_available_backends)
-elif GLASS_ARRAY_BACKEND == "array_api_strict":
+elif ARRAY_BACKEND == "array_api_strict":
     _import_and_add_array_api_strict(xp_available_backends)
-elif GLASS_ARRAY_BACKEND == "jax":
+elif ARRAY_BACKEND == "jax":
     _import_and_add_jax(xp_available_backends)
 # if all, try importing every backend
-elif GLASS_ARRAY_BACKEND == "all":
+elif ARRAY_BACKEND == "all":
     with contextlib.suppress(ImportError):
         _import_and_add_numpy(xp_available_backends)
 
@@ -109,7 +109,7 @@ elif GLASS_ARRAY_BACKEND == "all":
     with contextlib.suppress(ImportError):
         _import_and_add_jax(xp_available_backends)
 else:
-    msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
+    msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
 
 
