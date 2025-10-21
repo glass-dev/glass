@@ -10,7 +10,7 @@ echo "Checking PRs merged after $RELEASE_DATE (tag: $LATEST_TAG)"
 echo ""
 
 # Get all merged PRs since the release date
-gh pr list --state merged --json number,mergedAt,body,title | \
+gh pr list --state merged --limit 100 --json number,mergedAt,body,title | \
 jq -r --arg date "$RELEASE_DATE" '
   .[] |
   select(.mergedAt > $date) |
