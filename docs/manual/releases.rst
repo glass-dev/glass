@@ -4,6 +4,50 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2025.2 (21 Oct 2025)
+--------------------
+
+* Changed the testing flag to be named ``ARRAY_BACKEND``.
+
+* Introduced ``array-api-strict`` as a dependency to ensure that the array API
+  is correctly implemented.
+
+* Changed the way NumPy and JAX are imported in :mod:`glass._array_api_utils` so
+  that GLASS no longer explicitly depend on either of them. If NumPy is
+  incorrectly imported, a helpful error message will be provided to the user.
+  This aims to reduce confusion if a user suddenly requires NumPy just because
+  they called a specific function.
+
+* Add Array API support for functions in the following modules.
+
+    * :mod:`glass.points`
+    * :mod:`glass.shells`
+    * :mod:`glass.fields`
+
+* Removed support for ``Cls`` (angular power spectrum) as ``Sequence[float]``.
+  Cls must now be arrays (NumPy, etc.).
+
+* Changed the ``docs`` and ``test`` optional dependencies to
+  ``dependency-groups`` as these are not needed for the majority of users.
+
+* Changed ``zeff`` will now be computed if not passed into
+  :class:`glass.RadialWindow`.
+
+* The weight functions have been changed to callable classes.
+
+* Fixed a mutable argument bug in the legacy mode notebook.
+
+* Added a notebook example on effective galaxy redshift distributions.
+
+* Removed the ``cosmology`` dependency in favour of the new Array API-compatible
+  ``cosmology.api`` package.
+
+* Made the type hints more permissive for :func:`glass.glass_to_healpix_spectra`
+  and :func:`glass.healpix_to_glass_spectra`.
+
+* Fixed a bug where :func:`glass.compute_gaussian_spectra` did not skip over
+  empty spectra.
+
 2025.1 (21 Feb 2025)
 --------------------
 
