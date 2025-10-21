@@ -89,5 +89,9 @@ def test_monopole(cl, rng):
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=gl0, gltol=1e-8)
 
     assert gl[0] == gl0
-    with pytest.raises(AssertionError):
-        np.testing.assert_allclose(cl_out[0], cl[0])
+    np.testing.assert_raises(
+        AssertionError,
+        np.testing.assert_allclose,
+        cl_out[0],
+        cl[0],
+    )

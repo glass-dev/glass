@@ -203,11 +203,8 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov2.dtype == xp.float64
     assert cov3.dtype == xp.float64
 
-    with pytest.raises(AssertionError):
-        np.testing.assert_allclose(cov1, cov2)
-
-    with pytest.raises(AssertionError):
-        np.testing.assert_allclose(cov2, cov3)
+    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov1, cov2)
+    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
 
 
 def test_multalm(xp: types.ModuleType) -> None:
@@ -226,8 +223,12 @@ def test_multalm(xp: types.ModuleType) -> None:
     np.testing.assert_allclose(result, alm)
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
     np.testing.assert_allclose(result, expected_result)
-    with pytest.raises(AssertionError):
-        np.testing.assert_allclose(alm_copy, result)
+    np.testing.assert_raises(
+        AssertionError,
+        np.testing.assert_allclose,
+        alm_copy,
+        result,
+    )
 
     # multiple with 1s
 
