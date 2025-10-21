@@ -981,7 +981,7 @@ def combine(
                     right=0.0,
                 )
                 for shell, weight in zip(shells, weights, strict=False)
-            ]
+            ],
         ),
         axis=0,
     )

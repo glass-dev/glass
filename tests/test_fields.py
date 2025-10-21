@@ -621,7 +621,8 @@ def test_glass_to_healpix_alm():
     inp = np.array([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
     np.testing.assert_array_equal(
-        out, np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33])
+        out,
+        np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
 
 
