@@ -39,7 +39,7 @@ while read -r pr_number; do
   # Only output if we found actual changelog entries
   if [ -n "$changelog_entries" ]; then
     echo "=== PR #$pr_number: $title ==="
-    echo "${changelog_entries//^/  }"
+    echo "$changelog_entries" | awk '{print "  " $0}'
     echo ""
   fi
 done
