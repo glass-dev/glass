@@ -48,6 +48,8 @@ These notes document the changes between individual *GLASS* releases.
 * Fixed a bug where :func:`glass.compute_gaussian_spectra` did not skip over
   empty spectra.
 
+* Added a script to speed up release notes.
+
 2025.1 (21 Feb 2025)
 --------------------
 
@@ -93,8 +95,6 @@ These notes document the changes between individual *GLASS* releases.
 * The :mod:`glass.algorithm` module has been made public. This module contains
   general implementations of the algorithms which are used by ``glass``, but are
   otherwise unrelated to the functionality of ``glass``.
-
-* Added a script to speed up release notes.
 
 
 2024.2 (15 Nov 2024)
