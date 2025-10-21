@@ -27,6 +27,7 @@ All functional changes to the project are documented in this file.
 - gh-667: Make JAX an optional dependency as intended (#672)
 - gh-409: Port straightforward functions in `points` (#663)
 - gh-691: rename envvar to `ARRAY_BACKEND` (#692)
+- gh-693: Add script to generate release notes (#694)
 
 ## [2025.1] (21 Feb 2025)
 

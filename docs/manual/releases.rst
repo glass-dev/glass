@@ -94,6 +94,8 @@ These notes document the changes between individual *GLASS* releases.
   general implementations of the algorithms which are used by ``glass``, but are
   otherwise unrelated to the functionality of ``glass``.
 
+* Added a script to speed up release notes.
+
 
 2024.2 (15 Nov 2024)
 --------------------
