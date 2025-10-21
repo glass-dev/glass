@@ -178,6 +178,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2025.1]: https://github.com/glass-dev/glass/compare/v2024.2...v2025.1
 [2024.2]: https://github.com/glass-dev/glass/compare/v2024.1...v2024.2
 [2024.1]: https://github.com/glass-dev/glass/compare/v2023.7...v2024.1
 [2023.7]: https://github.com/glass-dev/glass/compare/v2023.6...v2023.7
