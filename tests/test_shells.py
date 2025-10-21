@@ -359,10 +359,10 @@ def test_combine(xp: types.ModuleType, uxpx: XPAdditions) -> None:
     assert result.shape == z.shape
 
     # Check sum of result
-    assert sum(result) == pytest.approx(929.267284)
+    np.testing.assert_allclose(sum(result), 929.267284)
 
     # Check integral w.r.t z has not changed
-    assert uxpx.trapezoid(result, z) == pytest.approx(4.643139)
+    np.testing.assert_allclose(uxpx.trapezoid(result, z), 4.643139, rtol=1e-6)
 
 
 def test_radial_window_immutable(xp: types.ModuleType) -> None:

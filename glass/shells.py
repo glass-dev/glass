@@ -680,9 +680,7 @@ def partition_lstsq(
     dz = uxpx.gradient(zp)
 
     # create the window function matrix
-    a = xp.asarray(
-        [uxpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells]
-    )
+    a = xp.stack([uxpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells])
     a /= uxpx.trapezoid(a, zp, axis=-1)[..., None]
     a = a * dz
 
@@ -753,7 +751,7 @@ def partition_nnls(
     dz = uxpx.gradient(zp)
 
     # create the window function matrix
-    a = xp.asarray(
+    a = xp.stack(
         [uxpx.interp(zp, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
     )
     a /= uxpx.trapezoid(a, zp, axis=-1)[..., None]
@@ -785,7 +783,7 @@ def partition_nnls(
     )
 
     # all done
-    return xp.reshape(xp.moveaxis(x, 0, -1), [len(shells), *dims])
+    return xp.reshape(xp.moveaxis(x, 0, -1), (len(shells), *dims))
 
 
 def partition_restrict(
@@ -972,7 +970,7 @@ def combine(
     uxpx = XPAdditions(xp)
 
     return xp.sum(
-        xp.asarray(
+        xp.stack(
             [
                 xp.expand_dims(weight, axis=-1)
                 * uxpx.interp(
