@@ -31,12 +31,12 @@ jobs:
           - "3.13"
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
@@ -55,6 +55,11 @@ jobs:
 
       - name: Install ubuntu dependencies for fitsio
         run: sudo apt-get install -y libbz2-dev
+
+      - name: Check version
+        run: nox -s version
+        env:
+          FORCE_COLOR: 1
 
       - name: Run doctests
         run: nox -s doctests-${{ matrix.python-version }} --verbose
@@ -94,12 +99,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
@@ -119,11 +124,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip

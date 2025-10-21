@@ -1,22 +1,8 @@
 ---
-name: Test examples
+name: Run examples (reusable workflow)
 
 on:
-  push:
-    paths:
-      - glass/**
-      - examples/**
-    branches:
-      - main
-  pull_request:
-    paths:
-      - glass/**
-      - examples/**
-    types:
-      - opened
-      - ready_for_review
-      - reopened
-      - synchronize
+  workflow_call:
 
 concurrency:
   cancel-in-progress: true
@@ -24,18 +10,16 @@ concurrency:
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
-  test-examples:
-    if: github.event.pull_request.draft == false
-    name: Test examples
+  run-examples:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           cache-dependency-path: pyproject.toml
           cache: pip

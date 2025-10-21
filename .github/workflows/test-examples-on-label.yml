@@ -1,0 +1,17 @@
+---
+name: Test examples
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - opened
+      - reopened
+      - synchronize
+      - unlabeled
+
+jobs:
+  test-examples-on-label:
+    if: contains(github.event.pull_request.labels.*.name, 'run-examples')
+    name: On label
+    uses: glass-dev/glass/.github/workflows/run-examples.yml@main

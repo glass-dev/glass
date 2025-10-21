@@ -37,7 +37,7 @@ def lint(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
-    session.install("-c", ".github/test-constraints.txt", "-e", ".[test]")
+    session.install("-c", ".github/test-constraints.txt", "-e", ".", "--group", "test")
 
     array_backend = os.environ.get("GLASS_ARRAY_BACKEND")
     if array_backend == "array_api_strict":
@@ -64,6 +64,7 @@ def coverage(session: nox.Session) -> None:
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
     session.posargs.append("--doctest-plus")
+    session.posargs.append("--doctest-plus-generate-diff=overwrite")
     session.posargs.append("glass")
     tests(session)
 
@@ -99,9 +100,16 @@ def examples(session: nox.Session) -> None:
 @nox.session
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
-    session.install("-e", ".[docs]")
+    session.install("-e", ".", "--group", "docs")
     session.chdir("docs")
-    session.run("sphinx-build", "-M", "html", ".", "_build")
+    session.run(
+        "sphinx-build",
+        "-M",
+        "html",
+        ".",
+        "_build",
+        "--fail-on-warning",
+    )
 
     port = 8001
 
@@ -118,3 +126,16 @@ def build(session: nox.Session) -> None:
     """Build an SDist and wheel."""
     session.install("build")
     session.run("python", "-m", "build")
+
+
+@nox.session
+def version(session: nox.Session) -> None:
+    """
+    Check the current version of the package.
+
+    The intent of this check is to ensure that the package
+    is installed without any additional dependencies
+    through optional dependencies nor dependency groups.
+    """
+    session.install("-e", ".")
+    session.run("python", "-c", "import glass; print(glass.__version__)")

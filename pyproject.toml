@@ -5,6 +5,32 @@ requires = [
     "hatchling",
 ]
 
+[dependency-groups]
+docs = [
+    "cosmology.api",
+    "furo",
+    "ipython",
+    "jax",
+    "jaxtyping",
+    "matplotlib",
+    "myst-parser",
+    "nbsphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-toolbox",
+    "sphinx<8.2.0",
+    "sphinxcontrib-katex",
+]
+test = [
+    "cosmology.api",
+    "fitsio",
+    "jax",
+    "pytest",
+    "pytest-cov",
+    "pytest-doctestplus",
+    "pytest-mock",
+    "pytest-rerunfailures",
+]
+
 [project]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -20,11 +46,12 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "cosmology>=2022.10.9",
+    "array-api-extra>=0.9.0",
+    "array-api-strict>=2.0",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "numpy>=2.1.1",
     "transformcl>=2022.8.9",
+    "typing-extensions>=4.13.2",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -34,36 +61,17 @@ maintainers = [
     {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
 ]
 name = "glass"
-readme = "README.md"
-requires-python = ">=3.10"
-license.text = "MIT License"
-
-[project.optional-dependencies]
-docs = [
-    "furo",
-    "ipython",
-    "matplotlib",
-    "myst-parser",
-    "nbsphinx",
-    "sphinx-toolbox",
-    "sphinx<8.2.0",
-    "sphinx_autodoc_typehints",
-    "sphinxcontrib-katex",
-]
-examples = [
+optional-dependencies = {examples = [
     "camb",
+    "cosmology.api",
+    "cosmology.compat.camb",
     "glass.ext.camb",
     "jupyter",
     "matplotlib",
-]
-test = [
-    "fitsio",
-    "pytest",
-    "pytest-cov",
-    "pytest-doctestplus",
-    "pytest-mock",
-    "pytest-rerunfailures",
-]
+]}
+readme = "README.md"
+requires-python = ">=3.10"
+license.text = "MIT License"
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
@@ -147,17 +155,21 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
-    "glass.ext.camb",
+], known-third-party = [
+    "jax",
 ], section-order = [
     "future",
     "standard-library",
     "third-party",
+    "array-api",
     "cosmo",
     "first-party",
     "local-folder",
-], sections = {"cosmo" = [
+], sections = {"array-api" = [
+    "array_api_extra",
+    "array_api_strict",
+], "cosmo" = [
     "camb",
-    "camb.sources",
     "cosmology",
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
@@ -191,6 +203,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "D103", # TODO: undocumented-public-function
     "D104", # undocumented-public-package
     "INP001", # implicit-namespace-package
+    "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "SLF001", # private-member-access

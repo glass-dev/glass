@@ -4,19 +4,23 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
+import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
+    import numpy as np
+    from jaxtyping import Array
     from numpy.typing import NDArray
+
+    from glass._array_api_utils import FloatArray
 
 
 def nnls(
-    a: NDArray[np.float64],
-    b: NDArray[np.float64],
+    a: FloatArray,
+    b: FloatArray,
     *,
     tol: float = 0.0,
     maxiter: int | None = None,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Compute a non-negative least squares solution.
 
@@ -48,8 +52,10 @@ def nnls(
         If the shapes of ``a`` and ``b`` do not match.
 
     """
-    a = np.asanyarray(a)
-    b = np.asanyarray(b)
+    xp = _utils.get_namespace(a, b)
+
+    a = xp.asarray(a)
+    b = xp.asarray(b)
 
     if a.ndim != 2:
         msg = "input `a` is not a matrix"
@@ -66,36 +72,42 @@ def nnls(
     if maxiter is None:
         maxiter = 3 * n
 
-    index = np.arange(n)
-    p = np.full(n, fill_value=False)
-    x = np.zeros(n)
+    index = xp.arange(n)
+    q = xp.full(n, fill_value=False)
+    x = xp.zeros(n)
     for _ in range(maxiter):
-        if np.all(p):
+        if xp.all(q):
             break
-        w = np.dot(b - a @ x, a)
-        m = index[~p][np.argmax(w[~p])]
+        # The sum product over the last axis of arg1 and the second-to-last axis of arg2
+        w = xp.sum((b - a @ x)[..., None] * a, axis=-2)
+
+        m = int(index[~q][xp.argmax(w[~q])])
         if w[m] <= tol:
             break
-        p[m] = True
+        q[m] = True
         while True:
-            ap = a[:, p]
-            xp = x[p]
-            sp = np.linalg.solve(ap.T @ ap, b @ ap)
-            t = sp <= 0
-            if not np.any(t):
+            # Use `xp.task`` here instead of `a[:,q]` to mask the inner arrays, because
+            # array-api requires a masking index to be the sole index, which would
+            # return a 1-D array. However, we want to maintain the shape of `a`,
+            # i.e. `[[a11],[a12],...]` rather than `[a11,a12,...]`
+            aq = xp.take(a, xp.nonzero(q)[0], axis=1)
+            xq = x[q]
+            sq = xp.linalg.solve(aq.T @ aq, b @ aq)
+            t = sq <= 0
+            if not xp.any(t):
                 break
-            alpha = -np.min(xp[t] / (xp[t] - sp[t]))
-            x[p] += alpha * (sp - xp)
-            p[x <= 0] = False
-        x[p] = sp
-        x[~p] = 0
+            alpha = -xp.min(xq[t] / (xq[t] - sq[t]))
+            x[q] += alpha * (sq - xq)
+            q[x <= 0] = False
+        x[q] = sq
+        x[~q] = 0
     return x
 
 
 def cov_clip(
-    cov: NDArray[np.float64],
+    cov: NDArray[np.float64] | Array,
     rtol: float | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Covariance matrix from clipping non-positive eigenvalues.
 
@@ -130,16 +142,15 @@ def cov_clip(
     # put matrix back together
     # enforce symmetry
     v = xp.sqrt(w[..., None, :]) * v
-    cov_clipped: NDArray[np.float64] = xp.matmul(v, xp.matrix_transpose(v))
-    return cov_clipped
+    return xp.matmul(v, xp.matrix_transpose(v))
 
 
 def nearcorr(
-    a: NDArray[np.float64],
+    a: NDArray[np.float64] | Array,
     *,
     tol: float | None = None,
     niter: int = 100,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Compute the nearest correlation matrix.
 
@@ -177,7 +188,7 @@ def nearcorr(
         tol = n * xp.finfo(a.dtype).eps
 
     # current result, flatten leading dimensions
-    y = a.reshape(-1, n, n)
+    y = xp.reshape(a, (-1, n, n))
 
     # initial correction is zero
     ds = xp.zeros_like(a)
@@ -204,14 +215,14 @@ def nearcorr(
             break
 
     # return result in original shape
-    return y.reshape(*dim, n, n)
+    return xp.reshape(y, (*dim, n, n))
 
 
 def cov_nearest(
-    cov: NDArray[np.float64],
+    cov: NDArray[np.float64] | Array,
     tol: float | None = None,
     niter: int = 100,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | Array:
     """
     Covariance matrix from nearest correlation matrix.
 
@@ -245,7 +256,7 @@ def cov_nearest(
         raise ValueError(msg)
 
     # store the normalisation of the matrix
-    norm: NDArray[np.float64] = xp.sqrt(diag)
+    norm = xp.sqrt(diag)
     norm = norm[..., None, :] * norm[..., :, None]
 
     # find nearest correlation matrix

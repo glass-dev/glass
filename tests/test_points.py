@@ -10,8 +10,10 @@ import glass
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from types import ModuleType
 
     import pytest_mock
+    from conftest import UnifiedGenerator
     from numpy.typing import NDArray
 
 
@@ -38,73 +40,73 @@ def catpos(
     return lon, lat, cnt
 
 
-def test_effective_bias(mocker: pytest_mock.MockerFixture) -> None:
+def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
     # create a mock radial window function
     w = mocker.Mock()
-    w.za = np.linspace(0, 2, 100)
-    w.wa = np.full_like(w.za, 2.0)
+    w.za = xp.linspace(0, 2, 100)
+    w.wa = xp.full_like(w.za, 2.0)
 
-    z = np.linspace(0, 1, 10)
-    bz = np.zeros((10,))
+    z = xp.linspace(0, 1, 10)
+    bz = xp.zeros((10,))
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), np.zeros((10,)))
+    z = xp.zeros((10,))
+    bz = xp.full_like(z, 0.5)
 
-    z = np.zeros((10,))
-    bz = np.full_like(z, 0.5)
+    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), np.zeros((10,)))
-
-    z = np.linspace(0, 1, 10)
-    bz = np.full_like(z, 0.5)
+    z = xp.linspace(0, 1, 10)
+    bz = xp.full_like(z, 0.5)
 
     np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
 
 
-def test_linear_bias(rng: np.random.Generator) -> None:
+def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # test with 0 delta
 
-    delta = np.zeros((2, 2))
+    delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with original implementation
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
     np.testing.assert_allclose(glass.linear_bias(delta, b), b * delta)
 
 
-def test_loglinear_bias(rng: np.random.Generator) -> None:
+def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # test with 0 delta
 
-    delta = np.zeros((2, 2))
+    delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), np.zeros((2, 2)))
+    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with numpy implementation
 
-    delta = rng.normal(5, 1, size=(2, 2))
+    delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
     np.testing.assert_allclose(
-        glass.loglinear_bias(delta, b), np.expm1(b * np.log1p(delta))
+        glass.loglinear_bias(delta, b),
+        xp.expm1(b * xp.log1p(delta)),
     )
 
 
@@ -270,25 +272,26 @@ def test_uniform_positions(rng: np.random.Generator) -> None:
     assert lon.shape == lat.shape == (cnt.sum(),)
 
 
-def test_position_weights(rng: np.random.Generator) -> None:
+def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    """Unit tests for glass.points.position_weights."""
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
-            counts = rng.random(cshape)
-            bias = None if bshape is None else rng.random(bshape)
+            counts = urng.random(cshape)
+            bias = None if bshape is None else urng.random(bshape)
 
             weights = glass.position_weights(counts, bias)
 
-            expected = counts / counts.sum(axis=0, keepdims=True)
+            expected = counts / xp.sum(counts, axis=0, keepdims=True)
             if bias is not None:
-                if np.ndim(bias) > np.ndim(expected):
-                    expected = np.expand_dims(
+                if bias.ndim > expected.ndim:
+                    expected = xp.expand_dims(
                         expected,
-                        tuple(range(np.ndim(expected), np.ndim(bias))),
+                        axis=tuple(range(expected.ndim, bias.ndim)),
                     )
                 else:
-                    bias = np.expand_dims(
+                    bias = xp.expand_dims(
                         bias,
-                        tuple(range(np.ndim(bias), np.ndim(expected))),
+                        axis=tuple(range(bias.ndim, expected.ndim)),
                     )
                 expected = bias * expected
 

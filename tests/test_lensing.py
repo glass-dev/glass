@@ -9,7 +9,7 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
-    from cosmology import Cosmology
+    from glass.cosmology import Cosmology
 
 
 def test_from_convergence(rng: np.random.Generator) -> None:

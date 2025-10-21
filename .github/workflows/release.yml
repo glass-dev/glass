@@ -15,7 +15,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Replace stable version with the release version
         if: github.event_name == 'release' && github.event.action == 'published'
@@ -38,25 +38,19 @@ jobs:
 
       - uses: hynek/build-and-inspect-python-package@v2
 
-  publish:
+  publish-pypi:
+    if: >-
+      github.event_name == 'release' && github.event.action == 'published'
     needs: dist
     runs-on: ubuntu-latest
     environment:
-      name: >-
-        ${{ (github.event_name == 'release' &&
-         github.event.action == 'published') &&
-         'publish' ||
-         'test-publish' }}
-      url: >-
-        ${{ (github.event_name == 'release' &&
-         github.event.action == 'published') &&
-         'https://pypi.org/project/glass' ||
-         'https://test.pypi.org/project/glass' }}
+      name: publish
+      url: https://pypi.org/project/glass
     permissions:
       id-token: write
     steps:
       - name: Download distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: Packages
           path: dist
@@ -65,12 +59,28 @@ jobs:
         run: ls -l dist/
 
       - name: Publish to PyPI
-        if: >-
-          github.event_name == 'release' && github.event.action == 'published'
         uses: pypa/gh-action-pypi-publish@release/v1
 
+  publish-test-pypi:
+    if: github.event_name == 'workflow_dispatch'
+    needs: dist
+    runs-on: ubuntu-latest
+    environment:
+      name: test-publish
+      url: https://test.pypi.org/project/glass
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: Packages
+          path: dist
+
+      - name: List distributions to be deployed
+        run: ls -l dist/
+
       - name: Publish to TestPyPI
-        if: github.event_name == 'workflow_dispatch'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/

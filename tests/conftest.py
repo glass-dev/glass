@@ -1,16 +1,30 @@
+from __future__ import annotations
+
 import contextlib
 import importlib.metadata
+import logging
 import os
-import types
+from typing import TYPE_CHECKING, TypeAlias
 
 import numpy as np
 import packaging.version
 import pytest
-from numpy.typing import NDArray
-
-from cosmology import Cosmology
 
 import glass
+import glass._array_api_utils
+import glass.jax
+
+if TYPE_CHECKING:
+    import types
+
+    from numpy.typing import NDArray
+
+    from cosmology import Cosmology
+
+    UnifiedGenerator: TypeAlias = (
+        np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator
+    )
+
 
 # Handling of array backends, inspired by-
 # https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/scipy/conftest.py#L139
@@ -20,6 +34,9 @@ import glass
 #   a particular array library (numpy, jax, array_api_strict, ...)
 #   all (try finding every supported array library available in the environment)
 GLASS_ARRAY_BACKEND: str = os.environ.get("GLASS_ARRAY_BACKEND", "")
+
+# Change jax logger to only log ERROR or worse
+logging.getLogger("jax").setLevel(logging.ERROR)
 
 
 def _check_version(lib: str, array_api_compliant_version: str) -> None:
@@ -58,7 +75,7 @@ def _import_and_add_array_api_strict(
 
     _check_version("array_api_strict", "2.0.0")
     xp_available_backends.update({"array_api_strict": array_api_strict})
-    array_api_strict.set_array_api_strict_flags(api_version="2023.12")
+    array_api_strict.set_array_api_strict_flags(api_version="2024.12")
 
 
 def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> None:
@@ -95,27 +112,80 @@ else:
     msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
     raise ValueError(msg)
 
-# use this as a decorator for tests involving array API compatible functions
-array_api_compatible = pytest.mark.parametrize("xp", xp_available_backends.values())
-
 
 # Pytest fixtures
+@pytest.fixture(params=xp_available_backends.values(), scope="session")
+def xp(request: pytest.FixtureRequest) -> types.ModuleType:
+    """
+    Fixture for array backend.
+
+    Access array library functions using `xp.` in tests.
+    """
+    return request.param
+
+
+@pytest.fixture(scope="session")
+def uxpx(xp: types.ModuleType) -> glass._array_api_utils.XPAdditions:
+    """
+    Fixture for array backend.
+
+    Access array library functions using `xp.` in tests.
+    """
+    return glass._array_api_utils.XPAdditions(xp)
+
+
+@pytest.fixture(scope="session")
+def urng(xp: types.ModuleType) -> UnifiedGenerator:
+    """
+    Fixture for a unified RNG interface.
+
+    Access the relevant RNG using `urng.` in tests.
+
+    Must be used with the `xp` fixture. Use `rng` for non array API tests.
+    """
+    seed = 42
+    backend = xp.__name__
+    if backend == "jax.numpy":
+        return glass.jax.Generator(seed=seed)
+    if backend == "numpy":
+        return np.random.default_rng(seed=seed)
+    if backend == "array_api_strict":
+        return glass._array_api_utils.Generator(seed=seed)
+    msg = "the array backend in not supported"
+    raise NotImplementedError(msg)
+
+
+@pytest.fixture(scope="session")
+def rng() -> np.random.Generator:
+    """
+    RNG fixture for non array API tests.
+
+    Use `urng` for array API tests.
+    """
+    return np.random.default_rng(seed=42)
+
+
 @pytest.fixture(scope="session")
 def cosmo() -> Cosmology:
     class MockCosmology:
         @property
-        def omega_m(self) -> float:
+        def Omega_m0(self) -> float:  # noqa: N802
             """Matter density parameter at redshift 0."""
             return 0.3
 
         @property
-        def rho_c(self) -> float:
+        def critical_density0(self) -> float:
             """Critical density at redshift 0 in Msol Mpc-3."""
             return 3e4
 
-        def ef(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        @property
+        def hubble_distance(self) -> float:
+            """Hubble distance in Mpc."""
+            return 4.4e3
+
+        def H_over_H0(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
             """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
-            return (self.omega_m * (1 + z) ** 3 + 1 - self.omega_m) ** 0.5
+            return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
 
         def xm(
             self,
@@ -133,9 +203,9 @@ def cosmo() -> Cosmology:
 
         def rho_m_z(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
             """Redshift-dependent matter density in Msol Mpc-3."""
-            return self.rho_c * self.omega_m * (1 + z) ** 3
+            return self.critical_density0 * self.Omega_m0 * (1 + z) ** 3
 
-        def dc(
+        def comoving_distance(
             self,
             z: NDArray[np.float64],
             z2: NDArray[np.float64] | None = None,
@@ -143,16 +213,23 @@ def cosmo() -> Cosmology:
             """Comoving distance :math:`d_c(z)` in Mpc."""
             return self.xm(z) / 1_000 if z2 is None else self.xm(z, z2) / 1_000
 
-        def dc_inv(self, dc: NDArray[np.float64]) -> NDArray[np.float64]:
+        def inv_comoving_distance(self, dc: NDArray[np.float64]) -> NDArray[np.float64]:
             """Inverse function for the comoving distance in Mpc."""
             return 1_000 * (1 / (dc + np.finfo(float).eps))
 
+        def Omega_m(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
+            """Matter density parameter at redshift z."""
+            return self.rho_m_z(z) / self.critical_density0
+
+        def transverse_comoving_distance(
+            self,
+            z: NDArray[np.float64],
+            z2: NDArray[np.float64] | None = None,
+        ) -> NDArray[np.float64]:
+            """Transverse comoving distance :math:`d_M(z)` in Mpc."""
+            return self.hubble_distance * self.xm(z, z2)
+
     return MockCosmology()
-
-
-@pytest.fixture(scope="session")
-def rng() -> np.random.Generator:
-    return np.random.default_rng(seed=42)
 
 
 @pytest.fixture(scope="session")

@@ -2,21 +2,25 @@
 
 from __future__ import annotations
 
+import itertools
 from functools import partial
 from typing import TYPE_CHECKING
 
 import numpy as np
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from typing import Unpack
 
     from numpy.typing import DTypeLike, NDArray
 
+    from glass._array_api_utils import FloatArray
+
 
 def broadcast_first(
-    *arrays: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], ...]:
+    *arrays: FloatArray,
+) -> tuple[FloatArray, ...]:
     """
     Broadcast arrays, treating the first axis as common.
 
@@ -30,9 +34,11 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
-    arrays = np.broadcast_arrays(*arrays)
-    return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
+    xp = _utils.get_namespace(*arrays)
+
+    arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
+    arrays = xp.broadcast_arrays(*arrays)
+    return tuple(xp.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
 
 
 def broadcast_leading_axes(
@@ -90,14 +96,14 @@ def broadcast_leading_axes(
 
 
 def ndinterp(  # noqa: PLR0913
-    x: float | NDArray[np.float64],
-    xp: Sequence[float] | NDArray[np.float64],
-    fp: Sequence[float] | NDArray[np.float64],
+    x: float | FloatArray,
+    xq: FloatArray,
+    fq: FloatArray,
     axis: int = -1,
     left: float | None = None,
     right: float | None = None,
     period: float | None = None,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Interpolate multi-dimensional array over axis.
 
@@ -105,16 +111,16 @@ def ndinterp(  # noqa: PLR0913
     ----------
     x
         The x-coordinates.
-    xp
+    xq
         The x-coordinates of the data points.
-    fp
-        The function values corresponding to the x-coordinates in *xp*.
+    fq
+        The function values corresponding to the x-coordinates in *xq*.
     axis
         The axis to interpolate over.
     left
-        The value to return for x < xp[0].
+        The value to return for x < xq[0].
     right
-        The value to return for x > xp[-1].
+        The value to return for x > xq[-1].
     period
         The period of the function, used for interpolating periodic data.
 
@@ -123,10 +129,14 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    return np.apply_along_axis(
-        partial(np.interp, x, xp),
+    arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
+    xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
+
+    return uxpx.apply_along_axis(
+        partial(uxpx.interp, x, xq),
         axis,
-        fp,
+        fq,
         left=left,
         right=right,
         period=period,
@@ -134,13 +144,10 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapezoid_product(
-    f: tuple[NDArray[np.float64], NDArray[np.float64]],
-    *ff: tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
-    ],
+    f: tuple[FloatArray, FloatArray],
+    *ff: tuple[FloatArray, FloatArray],
     axis: int = -1,
-) -> float | NDArray[np.float64]:
+) -> float | FloatArray:
     """
     Trapezoidal rule for a product of functions.
 
@@ -158,17 +165,21 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
-    x: NDArray[np.float64]
+    # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
+    xp = _utils.get_namespace(*f, *tuple(itertools.chain(*ff)))
+    uxpx = _utils.XPAdditions(xp)
+
+    x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(
+        x = uxpx.union1d(
             x[(x >= x_[0]) & (x <= x_[-1])],
             x_[(x_ >= x[0]) & (x_ <= x[-1])],
         )
-    y = np.interp(x, *f)
+    y = uxpx.interp(x, *f)
     for f_ in ff:
-        y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)
+        y *= uxpx.interp(x, *f_)
+    return uxpx.trapezoid(y, x, axis=axis)
 
 
 def cumulative_trapezoid(
