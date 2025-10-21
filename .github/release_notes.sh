@@ -4,6 +4,8 @@
 LATEST_TAG=$(gh release view --json tagName -q .tagName)
 RELEASE_DATE=$(git log "$LATEST_TAG" -1 --format=%cI)
 
+echo ""
+echo "=========================================================="
 echo "Checking PRs merged after $RELEASE_DATE (tag: $LATEST_TAG)"
 echo ""
 
