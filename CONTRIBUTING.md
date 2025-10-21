@@ -154,7 +154,11 @@ following changes:
   version. The release notes should translate the changelog entries into prose
   that can be understood by non-developer users of the code. If there are
   breaking changes, a release note should explain what the changes mean for
-  existing code.
+  existing code. There exists a script that helps generate an initial
+  [draft of the release notes](.github/release_notes.sh) from the changelog
+  entries. We recommend running something like
+  `bash .github/release_notes.sh | tee -a docs/manual/releases.rst` to generate
+  the draft and then editing it to make it more user-friendly.
 
 Once these changes are merged into the `main` branch, a new release with title
 `glass yyyy.mm` should be created in the GitHub repository. The description of
