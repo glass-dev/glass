@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# This script generates release notes by extracting changelog entries
+# from merged PRs since the latest release tag. These should be placed
+# in docs/manual/releases.rst and tidied up before publishing a new release.
 
 # Get the latest release tag and date
 LATEST_TAG=$(gh release view --json tagName -q .tagName)
