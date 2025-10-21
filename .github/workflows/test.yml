@@ -70,7 +70,7 @@ jobs:
         run: nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
-          GLASS_ARRAY_BACKEND: all
+          ARRAY_BACKEND: all
 
       - name: Coveralls requires XML report
         run: coverage xml
