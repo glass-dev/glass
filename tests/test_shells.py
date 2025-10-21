@@ -125,7 +125,7 @@ def test_linear_windows(xp: types.ModuleType) -> None:
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
     for w in ws:
-        assert w.wa == pytest.approx(xp.zeros_like(w.wa))
+        np.testing.assert_allclose(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -173,7 +173,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
         weight=lambda _: 0,  # type: ignore[arg-type, return-value]
     )
     for w in ws:
-        assert w.wa == pytest.approx(xp.zeros_like(w.wa))
+        np.testing.assert_allclose(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -254,7 +254,7 @@ def test_partition(xp: types.ModuleType, uxpx: XPAdditions, method: str) -> None
 
     assert part.shape == (len(shells), 3, 2)
 
-    assert xp.sum(part, axis=0) == pytest.approx(uxpx.trapezoid(fz, z))
+    np.testing.assert_allclose(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
 
 
 def test_redshift_grid(xp: types.ModuleType) -> None:
@@ -398,7 +398,7 @@ def test_radial_window_zeff_none(xp: types.ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    assert w.zeff == pytest.approx(1.0)
+    np.testing.assert_allclose(w.zeff, 1.0)
 
     # check zeff is NaN when redshift array is empty
 

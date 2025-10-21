@@ -149,8 +149,8 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov.dtype == xp.float64  # type: ignore[unreachable]
 
     np.testing.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
-    assert cov[:, 1] == pytest.approx(0)
-    assert cov[:, 2] == pytest.approx(0)
+    np.testing.assert_allclose(cov[:, 1], 0)
+    np.testing.assert_allclose(cov[:, 2], 0)
 
     # test negative value error
 
@@ -203,8 +203,11 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     assert cov2.dtype == xp.float64
     assert cov3.dtype == xp.float64
 
-    assert cov1 != pytest.approx(cov2)
-    assert cov2 != pytest.approx(cov3)
+    with pytest.raises(AssertionError):
+        np.testing.assert_allclose(cov1, cov2)
+
+    with pytest.raises(AssertionError):
+        np.testing.assert_allclose(cov2, cov3)
 
 
 def test_multalm(xp: types.ModuleType) -> None:
@@ -222,8 +225,9 @@ def test_multalm(xp: types.ModuleType) -> None:
 
     np.testing.assert_allclose(result, alm)
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    assert result == pytest.approx(expected_result)
-    assert alm_copy != pytest.approx(result)
+    np.testing.assert_allclose(result, expected_result)
+    with pytest.raises(AssertionError):
+        np.testing.assert_allclose(alm_copy, result)
 
     # multiple with 1s
 
@@ -231,7 +235,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     bl = xp.ones(3)
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    assert result == pytest.approx(alm)
+    np.testing.assert_allclose(result, alm)
 
     # multiple with 0s
 
@@ -240,7 +244,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     result = glass.fields._multalm(alm, bl, inplace=False)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    assert result == pytest.approx(expected_result)
+    np.testing.assert_allclose(result, expected_result)
 
     # empty arrays
 
@@ -248,7 +252,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     bl = xp.asarray([])
 
     result = glass.fields._multalm(alm, bl, inplace=False)
-    assert result == pytest.approx(alm)
+    np.testing.assert_allclose(result, alm)
 
 
 def test_lognormal_gls() -> None:
@@ -446,19 +450,19 @@ def test_getcl(xp: types.ModuleType) -> None:
         for j in range(10):
             result = glass.getcl(cls, i, j)
             expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
-            assert xp.sort(result) == pytest.approx(expected)
+            np.testing.assert_allclose(xp.sort(result), expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
             assert result.size == 1
-            assert result == pytest.approx(expected)
+            np.testing.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
             assert result.size == 51
-            assert result[2:] == pytest.approx(expected)
+            np.testing.assert_allclose(result[2:], expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
