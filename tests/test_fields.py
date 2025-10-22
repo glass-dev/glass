@@ -1,10 +1,15 @@
-import types
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
 import pytest
 
 import glass
+
+if TYPE_CHECKING:
+    import types
 
 
 @pytest.fixture(scope="session")
