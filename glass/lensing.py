@@ -645,8 +645,8 @@ def deflect(
 
     Notes
     -----
-    Deflections on the sphere are :term:`deflection` as follows:
-    The complex deflection :math:`\alpha` transports a point
+    Deflections on the sphere are :term:`defined <deflection>` as
+    follows:  The complex deflection :math:`\alpha` transports a point
     on the sphere an angular distance :math:`|\alpha|` along the
     geodesic with bearing :math:`\arg\alpha` in the original point.
 
