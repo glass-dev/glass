@@ -159,7 +159,7 @@ def test_cumulative_trapezoid(xp: ModuleType) -> None:
     x = xp.asarray([0, 1, 2, 3])
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    assert ct == pytest.approx(xp.asarray([0.0, 1.5, 4.0, 7.5]))
+    np.testing.assert_allclose(ct, xp.asarray([0.0, 1.5, 4.0, 7.5]))
 
     # 2D f and 1D x
     f = xp.asarray([[1, 4, 9, 16], [2, 3, 5, 7]])

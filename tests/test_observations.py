@@ -55,13 +55,13 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # check passing in the norm
 
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
-    assert nz == pytest.approx(xp.zeros_like(nz))
+    np.testing.assert_allclose(nz, xp.zeros_like(nz))
 
     # check the value of each entry is close to the norm
 
     norm = 1
     nz = glass.gaussian_nz(z, mean, sigma, norm=norm)
-    assert xp.sum(nz) / nz.shape[0] == pytest.approx(norm, rel=1e-2)
+    np.testing.assert_allclose(xp.sum(nz) / nz.shape[0], norm, rtol=1e-2)
 
     # check multidimensionality size
 
@@ -103,14 +103,14 @@ def test_fixed_zbins(xp: ModuleType) -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins, xp=xp)
     assert len(zbins) == nbins
-    assert xp.asarray(zbins) == pytest.approx(expected_zbins, rel=1e-15)
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz, xp=xp)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    assert xp.asarray(zbins) == pytest.approx(expected_zbins, rel=1e-15)
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -137,7 +137,7 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
         ]
     )
     zbins = glass.equal_dens_zbins(z, xp.ones_like(z), nbins)
-    assert xp.asarray(zbins) == pytest.approx(expected_zbins, rel=1e-15)
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check output shape
 
@@ -153,7 +153,7 @@ def test_tomo_nz_gausserr(xp: ModuleType) -> None:
     # check zeros returned
 
     binned_nz = glass.tomo_nz_gausserr(z, xp.zeros_like(z), sigma_0, zbins)
-    assert binned_nz == pytest.approx(xp.zeros_like(binned_nz), abs=1e-15)
+    np.testing.assert_allclose(binned_nz, xp.zeros_like(binned_nz), rtol=1e-15)
 
     # check the shape of the output
 
