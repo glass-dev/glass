@@ -39,7 +39,7 @@ def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     session.install("-c", ".github/test-constraints.txt", "-e", ".", "--group", "test")
 
-    array_backend = os.environ.get("GLASS_ARRAY_BACKEND")
+    array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
         session.install(ARRAY_BACKENDS["array_api_strict"])
     elif array_backend == "jax":
@@ -102,7 +102,14 @@ def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
     session.install("-e", ".", "--group", "docs")
     session.chdir("docs")
-    session.run("sphinx-build", "-M", "html", ".", "_build")
+    session.run(
+        "sphinx-build",
+        "-M",
+        "html",
+        ".",
+        "_build",
+        "--fail-on-warning",
+    )
 
     port = 8001
 
