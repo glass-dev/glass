@@ -1,5 +1,3 @@
-# Required to Postponed evaluation of annotations (i.e. UnifiedGenerator),
-# allowing itto be imported in the TYPE_CHECKING block
 from __future__ import annotations
 
 import math
