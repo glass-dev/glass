@@ -114,30 +114,25 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
 
     # north
     lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose(lon, 0.0, atol=1e-15)
-    np.testing.assert_allclose(lat, d, atol=1e-15)
+    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
     lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose(lon, 0.0, atol=1e-15)
-    np.testing.assert_allclose(lat, -d, atol=1e-15)
+    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose(lon, -d, atol=1e-15)
-    np.testing.assert_allclose(lat, 0.0, atol=1e-15)
+    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose(lon, d, atol=1e-15)
-    np.testing.assert_allclose(lat, 0.0, atol=1e-15)
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # At least one input is an array
     lon, lat = glass.deflect(
         xp.asarray(0.0), xp.asarray(0.0), alpha(0, -r, usecomplex=usecomplex)
     )
-    np.testing.assert_allclose(lon, d, atol=1e-15)
-    np.testing.assert_allclose(lat, 0.0, atol=1e-15)
+    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     lon, lat = glass.deflect(
         xp.asarray([0.0, 0.0]),
