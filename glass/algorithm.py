@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
