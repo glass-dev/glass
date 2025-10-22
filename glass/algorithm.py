@@ -11,7 +11,61 @@ if TYPE_CHECKING:
     from jaxtyping import Array
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import FloatArray
+    from array_api_strict._array_object import Array as AArray
+
+    from glass._array_api_utils import AnyArray, FloatArray
+
+
+def _apply_masked_changes(
+    arr: AnyArray, masked_arr: AnyArray, mask: AArray
+) -> AnyArray:
+    """
+    Return a new array where elements of arr are replaced by values from
+    masked_arr at positions indicated by mask.
+
+    Example
+    -------
+    >>> arr = xp.asarray([0., 1., 2., 3., 4.])
+    >>> mask = xp.asarray([False, True, True, False, True])
+    >>> masked_arr = xp.asarray([10., 20., 30.])
+    >>> _apply_masked_changes(arr, masked_arr, mask, xp)
+    array([ 0., 10., 20.,  3., 30.])
+
+    Parameters
+    ----------
+    arr
+        The original array to update. Must have the same shape as mask.
+    masked_arr
+        The array of replacement values, with length equal to the number of
+        True entries in mask.
+    mask
+        A boolean array of the same shape as arr indicating which elements
+        should be replaced.
+
+    Returns
+    -------
+        A new array of the same shape and dtype as arr, where elements
+        corresponding to True values in mask are replaced by entries from
+        masked_arr.
+
+    Raises
+    ------
+    ValueError
+        If the shapes of parameters do not match their description.
+
+    """
+    xp = _utils.get_namespace(arr, masked_arr, mask)
+
+    # Verify inputs
+    if arr.shape != mask.shape:
+        msg = "Input mask must have the same shape as arr to be a valid mask."
+        raise ValueError(msg)
+    if xp.count_nonzero(mask) != masked_arr.size:
+        msg = "The size on masked_arr match the number of True values in mask."
+        raise ValueError(msg)
+
+    mask_to_indices = xp.cumulative_sum(xp.astype(mask, xp.int64)) - 1
+    return xp.where(mask, masked_arr[mask_to_indices], arr)
 
 
 def nnls(
@@ -84,6 +138,7 @@ def nnls(
         m = int(index[~q][xp.argmax(w[~q])])
         if w[m] <= tol:
             break
+        # Update q whilst maintaining immutability
         q = xp.concat([q[:m], xp.asarray([True]), q[m + 1 :]])
         while True:
             # Use `xp.task`` here instead of `a[:,q]` to mask the inner arrays, because
@@ -97,10 +152,16 @@ def nnls(
             if not xp.any(t):
                 break
             alpha = -xp.min(xq[t] / (xq[t] - sq[t]))
-            x[q] += alpha * (sq - xq)
+            xq += alpha * (sq - xq)
+
+            # Update x and q whilst maintaining immutability
+            x = _apply_masked_changes(x, xq, q)
             q = xp.where(x <= 0, xp.asarray([False]), q)
-        x[q] = sq
-        x[~q] = 0
+
+        # Update x whilst maintaining immutability
+        x = _apply_masked_changes(x, sq, q)
+        x = xp.where(q, x, 0)
+
     return x
 
 
