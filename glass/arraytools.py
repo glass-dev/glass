@@ -1,6 +1,6 @@
 """Module for array utilities."""
 
-
+from __future__ import annotations
 
 import itertools
 from functools import partial

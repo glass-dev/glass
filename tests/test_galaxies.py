@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-import pytest_mock
 
 import glass
 
 if TYPE_CHECKING:
+    import pytest_mock
     from numpy.typing import NDArray
 
 

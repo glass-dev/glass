@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import importlib.util
 import pathlib
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-from numpy.typing import NDArray
 
 import glass
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 # check if fitsio is available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None

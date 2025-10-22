@@ -1,5 +1,3 @@
-
-
 from dataclasses import dataclass
 
 # type imports for NDArray[Any] cannot be moved into TYPE_CHECKING here

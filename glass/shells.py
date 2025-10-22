@@ -43,7 +43,7 @@ Weight functions
 
 """  # noqa: D400
 
-
+from __future__ import annotations
 
 import dataclasses
 import itertools

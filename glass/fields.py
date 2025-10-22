@@ -1,6 +1,6 @@
 """Functions for random fields."""
 
-
+from __future__ import annotations
 
 import itertools
 import math
