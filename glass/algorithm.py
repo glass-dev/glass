@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
@@ -84,7 +86,7 @@ def nnls(
         m = int(index[~q][xp.argmax(w[~q])])
         if w[m] <= tol:
             break
-        q[m] = True
+        q = xp.concat([q[:m], xp.asarray([True]), q[m + 1 :]])
         while True:
             # Use `xp.task`` here instead of `a[:,q]` to mask the inner arrays, because
             # array-api requires a masking index to be the sole index, which would
@@ -98,7 +100,7 @@ def nnls(
                 break
             alpha = -xp.min(xq[t] / (xq[t] - sq[t]))
             x[q] += alpha * (sq - xq)
-            q[x <= 0] = False
+            q = xp.where(x <= 0, xp.asarray([False]), q)
         x[q] = sq
         x[~q] = 0
     return x
