@@ -7,6 +7,7 @@ requires = [
 
 [dependency-groups]
 docs = [
+    "array-api-strict",
     "cosmology.api",
     "furo",
     "ipython",
@@ -21,6 +22,7 @@ docs = [
     "sphinxcontrib-katex",
 ]
 test = [
+    "array-api-strict",
     "cosmology.api",
     "fitsio",
     "jax",
@@ -47,7 +49,6 @@ classifiers = [
 ]
 dependencies = [
     "array-api-extra>=0.9.0",
-    "array-api-strict>=2.0",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "transformcl>=2022.8.9",
