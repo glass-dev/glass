@@ -15,9 +15,6 @@ if TYPE_CHECKING:
     group="algorithm.nnls",
 )
 def test_nnls(xp: types.ModuleType, benchmark) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in nnls are not immutable, so do not support jax")
-
     # a is 0.0->50.0 with a negative number instead of multiples of 7
     a = xp.arange(0.0, 500.0, 1.0)
     a = xp.where((xp.astype(a, xp.int64) % 7) == 0, -1.1781, a)
