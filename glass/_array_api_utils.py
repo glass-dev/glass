@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
+    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -651,6 +652,104 @@ class XPAdditions:
             return self.xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs), copy=True
             )
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def vectorize(
+        self,
+        pyfunc: Callable[..., Any],
+        otypes: tuple[type[float]],
+    ) -> Callable[..., Any]:
+        """
+        Returns an object that acts like pyfunc, but takes arrays as input.
+
+        Parameters
+        ----------
+        pyfunc
+            Python function to vectorize.
+        otypes
+            Output types.
+
+        Returns
+        -------
+            Vectorized function.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
+        See https://github.com/glass-dev/glass/issues/671
+        """
+        if self.xp.__name__ == "numpy":
+            return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
+            # Import here to prevent users relying on numpy unless in this instance
+            np = import_numpy(self.xp.__name__)
+
+            return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def radians(self, deg_arr: AnyArray) -> AnyArray:
+        """
+        Convert angles from degrees to radians.
+
+        Parameters
+        ----------
+        deg_arr
+            Array of angles in degrees.
+
+        Returns
+        -------
+            Array of angles in radians.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+        """
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.radians(deg_arr)
+
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
+            return self.xp.asarray(np.radians(deg_arr))
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def degrees(self, deg_arr: AnyArray) -> AnyArray:
+        """
+        Convert angles from radians to degrees.
+
+        Parameters
+        ----------
+        deg_arr
+            Array of angles in radians.
+
+        Returns
+        -------
+            Array of angles in degrees.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+        """
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.degrees(deg_arr)
+
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
+            return self.xp.asarray(np.degrees(deg_arr))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

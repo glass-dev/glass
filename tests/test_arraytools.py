@@ -1,3 +1,4 @@
+from types import ModuleType
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -151,48 +152,21 @@ def test_trapezoid_product() -> None:
     np.testing.assert_allclose(s, 1.0)
 
 
-def test_cumulative_trapezoid() -> None:
+def test_cumulative_trapezoid(xp: ModuleType) -> None:
     # 1D f and x
 
-    f = np.array([1, 2, 3, 4])
-    x = np.array([0, 1, 2, 3])
-
-    # default dtype (int)
+    f = xp.asarray([1, 2, 3, 4])
+    x = xp.asarray([0, 1, 2, 3])
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    np.testing.assert_allclose(ct, np.array([0, 1, 4, 7]))
-
-    # explicit dtype (float)
-
-    ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float)
-    np.testing.assert_allclose(ct, np.array([0.0, 1.5, 4.0, 7.5]))
-
-    # explicit return array
-
-    out = np.zeros((4,))
-    ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float, out=out)
-    np.testing.assert_equal(ct, out)
+    np.testing.assert_allclose(ct, xp.asarray([0.0, 1.5, 4.0, 7.5]))
 
     # 2D f and 1D x
-
-    f = np.array([[1, 4, 9, 16], [2, 3, 5, 7]])
-    x = np.array([0, 1, 2.5, 4])
-
-    # default dtype (int)
+    f = xp.asarray([[1, 4, 9, 16], [2, 3, 5, 7]])
+    x = xp.asarray([0, 1, 2.5, 4])
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    np.testing.assert_allclose(ct, np.array([[0, 2, 12, 31], [0, 2, 8, 17]]))
-
-    # explicit dtype (float)
-
-    ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float)
     np.testing.assert_allclose(
         ct,
         np.array([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]),
     )
-
-    # explicit return array
-
-    out = np.zeros((2, 4))
-    ct = glass.arraytools.cumulative_trapezoid(f, x, dtype=float, out=out)
-    np.testing.assert_equal(ct, out)
