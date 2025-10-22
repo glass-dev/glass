@@ -27,7 +27,6 @@ test = [
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
-    "pytest-mock",
     "pytest-rerunfailures",
 ]
 
