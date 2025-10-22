@@ -52,7 +52,6 @@ dependencies = [
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "transformcl>=2022.8.9",
-    "typing-extensions>=4.13.2",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [

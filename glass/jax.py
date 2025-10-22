@@ -11,10 +11,10 @@ import jax.numpy as jnp
 import jax.random
 import jax.scipy
 from jax.typing import ArrayLike
-from typing_extensions import Self
 
 if TYPE_CHECKING:
     from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
+    from typing_extensions import Self
 
     RealArray: TypeAlias = Array
     Size: TypeAlias = int | tuple[int, ...] | None
