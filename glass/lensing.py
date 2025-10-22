@@ -631,7 +631,7 @@ def deflect(
         axis of size 2 for the real and imaginary component.
     xp
         The array library backend to use for array operations. If this is not
-        specified, the array library will be determined from the other paremeters,
+        specified, the array library will be determined from the other parameters,
         if possible.
 
     Returns
@@ -641,13 +641,12 @@ def deflect(
     Raises
     ------
     ValueError
-        If the array library cannot be determined, either from `xp` or the other
-        inputted parameters.
+        If neither an array nor the array backend ``xp`` are provided.
 
     Notes
     -----
-    Deflections on the sphere are :term:`defined <deflection>` as
-    follows:  The complex deflection :math:`\alpha` transports a point
+    Deflections on the sphere are :term:`deflection` as follows:
+    The complex deflection :math:`\alpha` transports a point
     on the sphere an angular distance :math:`|\alpha|` along the
     geodesic with bearing :math:`\arg\alpha` in the original point.
 
