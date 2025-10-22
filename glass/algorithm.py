@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
     import numpy as np
     from jaxtyping import Array
