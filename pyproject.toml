@@ -27,6 +27,7 @@ test = [
     "fitsio",
     "jax",
     "pytest",
+    "pytest-benchmark",
     "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
