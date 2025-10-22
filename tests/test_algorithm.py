@@ -36,7 +36,7 @@ def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
         x,
         tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps,
     )
-    assert res == pytest.approx(b, rel=0.0, abs=1e-10)
+    np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
 
