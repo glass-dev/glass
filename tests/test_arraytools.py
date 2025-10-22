@@ -1,4 +1,5 @@
-from types import ModuleType
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -7,6 +8,8 @@ import pytest
 import glass.arraytools
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from numpy.typing import NDArray
 
 
