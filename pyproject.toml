@@ -7,7 +7,7 @@ requires = [
 
 [dependency-groups]
 docs = [
-    "array_api_strict",
+    "array-api-strict",
     "cosmology.api",
     "furo",
     "ipython",
