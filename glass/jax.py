@@ -1,6 +1,6 @@
 """Wrapper for JAX RNG with a NumPy-like interface."""
 
-from __future__ import annotations
+
 
 import math
 from threading import Lock

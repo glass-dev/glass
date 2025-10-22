@@ -25,7 +25,7 @@ Visibility
 
 """  # noqa: D400
 
-from __future__ import annotations
+
 
 import itertools
 import math
