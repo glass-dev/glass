@@ -33,9 +33,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import array_api_compat
 import healpix
 import numpy as np
+
+import array_api_compat
 
 import glass
 import glass._array_api_utils as _utils
@@ -136,7 +137,6 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-
     xp = array_api_compat.array_namespace(delta, b)
 
     delta_g = xp.log1p(delta)
