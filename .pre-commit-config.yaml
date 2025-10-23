@@ -80,7 +80,6 @@ repos:
     rev: v1.18.2
     hooks:
       - id: mypy
-        files: ^glass/
         additional_dependencies:
           - numpy~=2.3.4
           - jaxtyping~=0.3.3

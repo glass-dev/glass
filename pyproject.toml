@@ -110,8 +110,13 @@ enable_error_code = [
     "redundant-expr",
     "truthy-bool",
 ]
+explicit_package_bases = true
 strict = true
 warn_unreachable = true
+
+[[tool.mypy.overrides]]
+ignore_errors = true
+module = "tests.*"
 
 [tool.pytest.ini_options]
 addopts = [
