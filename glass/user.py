@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 
 def save_cls(
-    filename: str,
+    filename: str | pathlib.Path,
     cls: Sequence[NDArray[np.float64] | Sequence[float]],
 ) -> None:
     """
