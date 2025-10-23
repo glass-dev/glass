@@ -13,13 +13,13 @@ if TYPE_CHECKING:
 
 def test_corr_unknown():
     class Unknown:
-        def corr(self, _other, _x):
+        def corr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
 
-        def icorr(self, _other, _x):
+        def icorr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
 
-        def dcorr(self, _other, _x):
+        def dcorr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
 
     t1 = glass.grf.Normal()
