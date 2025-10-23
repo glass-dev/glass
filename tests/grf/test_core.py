@@ -4,7 +4,7 @@ import pytest
 import glass.grf
 
 
-def test_dispatch():
+def test_dispatch() -> None:
     @glass.grf._core.dispatch
     def test(_a, _b, _c):
         return None
@@ -33,7 +33,7 @@ def test_dispatch():
     assert test(1, (), ...) is None
 
 
-def test_dispatch_bad_function():
+def test_dispatch_bad_function() -> None:
     test = glass.grf._core.dispatch(lambda _a, _b: ...)
 
     with pytest.raises(TypeError):
@@ -47,7 +47,7 @@ def test_dispatch_bad_function():
         def bad_annotation(_a: int, _b, _c: str): ...
 
 
-def test_corr_unknown():
+def test_corr_unknown() -> None:
     class Unknown:
         pass
 
@@ -65,7 +65,7 @@ def test_corr_unknown():
         glass.grf.dcorr(t1, t2, x)
 
 
-def test_compute(mocker):
+def test_compute(mocker) -> None:
     cltocorr = mocker.patch("transformcl.cltocorr")
     icorr = mocker.patch("glass.grf._core.icorr")
     corrtocl = mocker.patch("transformcl.corrtocl")

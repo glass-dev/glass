@@ -396,7 +396,7 @@ def test_generate_lognormal() -> None:
         glass.generate_lognormal([np.array([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate():
+def test_generate() -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
@@ -461,7 +461,7 @@ def test_getcl(xp: types.ModuleType) -> None:
             assert result[2:] == pytest.approx(expected)
 
 
-def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
+def test_is_inv_triangle_number(not_triangle_numbers: list[int]) -> None:
     for n in range(10_000):
         assert glass.fields._inv_triangle_number(n * (n + 1) // 2) == n
 
@@ -470,7 +470,7 @@ def test_is_inv_triangle_number(not_triangle_numbers: list[int]):
             glass.fields._inv_triangle_number(t)
 
 
-def test_nfields_from_nspectra(not_triangle_numbers: list[int]):
+def test_nfields_from_nspectra(not_triangle_numbers: list[int]) -> None:
     for n in range(10_000):
         assert glass.nfields_from_nspectra(n * (n + 1) // 2) == n
 
@@ -479,7 +479,7 @@ def test_nfields_from_nspectra(not_triangle_numbers: list[int]):
             glass.nfields_from_nspectra(t)
 
 
-def test_enumerate_spectra():
+def test_enumerate_spectra() -> None:
     n = 100
     tn = n * (n + 1) // 2
 
@@ -501,7 +501,7 @@ def test_enumerate_spectra():
         next(it)
 
 
-def test_spectra_indices():
+def test_spectra_indices() -> None:
     np.testing.assert_array_equal(glass.spectra_indices(0), np.zeros((0, 2)))
     np.testing.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
     np.testing.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
@@ -511,7 +511,7 @@ def test_spectra_indices():
     )
 
 
-def test_gaussian_fields(xp: types.ModuleType):
+def test_gaussian_fields(xp: types.ModuleType) -> None:
     shells = [
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1.0),
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2.0),
@@ -521,7 +521,7 @@ def test_gaussian_fields(xp: types.ModuleType):
     assert all(isinstance(f, glass.grf.Normal) for f in fields)
 
 
-def test_lognormal_fields(xp: types.ModuleType):
+def test_lognormal_fields(xp: types.ModuleType) -> None:
     shells = [
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1),
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2),
@@ -537,7 +537,7 @@ def test_lognormal_fields(xp: types.ModuleType):
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra(mocker):
+def test_compute_gaussian_spectra(mocker) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
@@ -556,7 +556,7 @@ def test_compute_gaussian_spectra(mocker):
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
-def test_compute_gaussian_spectra_gh639(mocker):
+def test_compute_gaussian_spectra_gh639(mocker) -> None:
     """Test compute_gaussian_spectra() with an empty input."""
     mock = mocker.patch("glass.grf.compute")
 
@@ -572,7 +572,7 @@ def test_compute_gaussian_spectra_gh639(mocker):
     assert gls[2].size == 0
 
 
-def test_solve_gaussian_spectra(mocker):
+def test_solve_gaussian_spectra(mocker) -> None:
     mock = mocker.patch("glass.grf.solve")
 
     result = mock.return_value
@@ -601,19 +601,19 @@ def test_solve_gaussian_spectra(mocker):
         glass.solve_gaussian_spectra(fields, spectra[:2])
 
 
-def test_glass_to_healpix_spectra():
+def test_glass_to_healpix_spectra() -> None:
     inp = [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
     out = glass.glass_to_healpix_spectra(inp)
     np.testing.assert_array_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
 
 
-def test_healpix_to_glass_spectra():
+def test_healpix_to_glass_spectra() -> None:
     inp = [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
     out = glass.healpix_to_glass_spectra(inp)
     np.testing.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
-def test_glass_to_healpix_alm():
+def test_glass_to_healpix_alm() -> None:
     inp = np.array([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
     np.testing.assert_array_equal(
@@ -621,7 +621,7 @@ def test_glass_to_healpix_alm():
     )
 
 
-def test_lognormal_shift_hilbert2011():
+def test_lognormal_shift_hilbert2011() -> None:
     zs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
     shifts = [glass.lognormal_shift_hilbert2011(z) for z in zs]
 
@@ -631,7 +631,7 @@ def test_lognormal_shift_hilbert2011():
     np.testing.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
-def test_cov_from_spectra():
+def test_cov_from_spectra() -> None:
     spectra = np.array(
         [
             [110, 111, 112, 113],
@@ -717,7 +717,7 @@ def test_cov_from_spectra():
     )
 
 
-def test_check_posdef_spectra():
+def test_check_posdef_spectra() -> None:
     # posdef spectra
     assert glass.fields.check_posdef_spectra(
         np.array(
@@ -750,7 +750,7 @@ def test_check_posdef_spectra():
     )
 
 
-def test_regularized_spectra(mocker, rng):
+def test_regularized_spectra(mocker, rng) -> None:
     spectra = rng.random(size=(6, 101))
 
     # test method "nearest"

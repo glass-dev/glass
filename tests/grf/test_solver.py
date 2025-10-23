@@ -1,11 +1,12 @@
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 import glass.grf
 
 
 @pytest.fixture(scope="session")
-def cl():
+def cl() -> NDArray[np.float64]:
     lmax = 100
     ell = np.arange(lmax + 1)
     return 1e-2 / (2 * ell + 1) ** 2
