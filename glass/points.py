@@ -136,8 +136,8 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    arrays_to_check = (delta,) if type(b) is float else (delta, b)
-    xp = _utils.array_namespace(*arrays_to_check)
+
+    xp = array_api_compat.array_namespace(delta, b)
 
     delta_g = xp.log1p(delta)
     delta_g *= b
