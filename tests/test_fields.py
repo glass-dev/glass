@@ -764,7 +764,8 @@ def test_check_posdef_spectra() -> None:
 
 
 def test_regularized_spectra(
-    mocker: pytest_mock.MockerFixture, rng: np.random.Generator
+    mocker: pytest_mock.MockerFixture,
+    rng: np.random.Generator,
 ) -> None:
     spectra = rng.random(size=(6, 101))
 
