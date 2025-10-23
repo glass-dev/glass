@@ -13,6 +13,7 @@ import healpy as hp
 import numpy as np
 from transformcl import cltovar
 
+import array_api_compat
 import array_api_extra as xpx
 
 import glass
@@ -122,7 +123,7 @@ def iternorm(
     """
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
-    xp = _utils.array_namespace(first)
+    xp = array_api_compat.array_namespace(first)
 
     n = (size,) if isinstance(size, int) else size
 
@@ -263,7 +264,7 @@ def _multalm(
         The product of alm and bl.
 
     """
-    xp = _utils.array_namespace(alm, bl)
+    xp = array_api_compat.array_namespace(alm, bl)
 
     n = bl.size
     # Ideally would be xp.asanyarray but this does not yet exist. The key difference

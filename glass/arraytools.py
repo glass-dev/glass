@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import array_api_compat
+
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
@@ -34,7 +36,7 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    xp = _utils.array_namespace(*arrays)
+    xp = array_api_compat.array_namespace(*arrays)
 
     arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
     arrays = xp.broadcast_arrays(*arrays)
@@ -201,7 +203,7 @@ def cumulative_trapezoid(
         The cumulative integral of the function.
 
     """
-    xp = _utils.array_namespace(f, x)
+    xp = array_api_compat.array_namespace(f, x)
 
     f = xp.asarray(f, dtype=xp.float64)
     x = xp.asarray(x, dtype=xp.float64)
