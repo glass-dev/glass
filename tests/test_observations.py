@@ -32,16 +32,16 @@ def test_vmap_galactic_ecliptic() -> None:
     # check errors raised
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, galactic=(1,))  # type: ignore[arg-type]
+        glass.vmap_galactic_ecliptic(n_side, galactic=(1,))
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1,))  # type: ignore[arg-type]
+        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1,))
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, galactic=(1, 2, 3))  # type: ignore[arg-type]
+        glass.vmap_galactic_ecliptic(n_side, galactic=(1, 2, 3))
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))  # type: ignore[arg-type]
+        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))
 
 
 def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:

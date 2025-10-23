@@ -234,7 +234,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # test TypeError
 
     with pytest.raises(TypeError, match="bias_model must be string or callable"):
-        next(glass.positions_from_delta(ngal, delta, bias, vis, bias_model=0))  # type: ignore[arg-type]
+        next(glass.positions_from_delta(ngal, delta, bias, vis, bias_model=0))
 
 
 def test_uniform_positions(rng: np.random.Generator) -> None:

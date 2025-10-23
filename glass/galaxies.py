@@ -138,7 +138,7 @@ def redshifts_from_nz(
             cdf,
             z_out[k],
         )
-        total += count_out[k]
+        total += count_out[k]  # type: ignore[assignment]
 
     assert total == redshifts.size  # noqa: S101
 
