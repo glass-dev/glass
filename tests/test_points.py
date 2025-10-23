@@ -374,10 +374,10 @@ def test_displacement(xp: ModuleType, urng: UnifiedGenerator) -> None:
     """Check that displacement of points is computed correctly."""
     # unit changes for displacements
     deg5 = xp.asarray(5.0) / 180 * xp.pi
-    north = xp.exp(1j * 0.0)
-    east = xp.exp(1j * (xp.pi / 2))
-    south = xp.exp(1j * xp.pi)
-    west = xp.exp(1j * (3 * xp.pi / 2))
+    north = xp.exp(xp.asarray(1j * 0.0))
+    east = xp.exp(xp.asarray(1j * (xp.pi / 2)))
+    south = xp.exp(xp.asarray(1j * xp.pi))
+    west = xp.exp(xp.asarray(1j * (3 * xp.pi / 2)))
 
     zero = xp.asarray(0.0)
     five = xp.asarray(5.0)
