@@ -11,6 +11,8 @@ import glass
 if TYPE_CHECKING:
     import types
 
+    import pytest_mock
+
 
 @pytest.fixture(scope="session")
 def not_triangle_numbers() -> list[int]:
@@ -547,7 +549,7 @@ def test_lognormal_fields(xp: types.ModuleType) -> None:
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra(mocker) -> None:
+def test_compute_gaussian_spectra(mocker: pytest_mock.MockerFixture) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
@@ -566,7 +568,7 @@ def test_compute_gaussian_spectra(mocker) -> None:
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
-def test_compute_gaussian_spectra_gh639(mocker) -> None:
+def test_compute_gaussian_spectra_gh639(mocker: pytest_mock.MockerFixture) -> None:
     """Test compute_gaussian_spectra() with an empty input."""
     mock = mocker.patch("glass.grf.compute")
 
@@ -582,7 +584,7 @@ def test_compute_gaussian_spectra_gh639(mocker) -> None:
     assert gls[2].size == 0
 
 
-def test_solve_gaussian_spectra(mocker) -> None:
+def test_solve_gaussian_spectra(mocker: pytest_mock.MockerFixture) -> None:
     mock = mocker.patch("glass.grf.solve")
 
     result = mock.return_value
@@ -761,7 +763,9 @@ def test_check_posdef_spectra() -> None:
     )
 
 
-def test_regularized_spectra(mocker, rng) -> None:
+def test_regularized_spectra(
+    mocker: pytest_mock.MockerFixture, rng: np.random.Generator
+) -> None:
     spectra = rng.random(size=(6, 101))
 
     # test method "nearest"
