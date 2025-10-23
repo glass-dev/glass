@@ -547,7 +547,7 @@ def displacement(
     sb, cb = xp.sin(b), xp.cos(b)
     sg, cg = xp.sin(g), xp.cos(g)
 
-    r = xp.arctan2(xp.hypot(sa * cb - ca * sb * cg, sb * sg), ca * cb + sa * sb * cg)
+    r = xp.atan2(xp.hypot(sa * cb - ca * sb * cg, sb * sg), ca * cb + sa * sb * cg)
     x = sb * ca - cb * sa * cg
     y = sa * sg
     z = xp.hypot(x, y)

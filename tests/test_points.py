@@ -357,7 +357,7 @@ def test_displace_abs(xp: ModuleType, urng: UnifiedGenerator) -> None:
     arg_alpha = urng.uniform(-xp.pi, xp.pi, size=n)
 
     lon_ = urng.uniform(-np.pi, np.pi, size=n) / xp.pi * 180
-    lat_ = xp.arcsin(urng.uniform(-1, 1, size=n)) / xp.pi * 180
+    lat_ = xp.asin(urng.uniform(-1, 1, size=n)) / xp.pi * 180
 
     lon, lat = glass.displace(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
 
