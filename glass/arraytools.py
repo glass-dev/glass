@@ -34,7 +34,7 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    xp = _utils.get_namespace(*arrays)
+    xp = _utils.array_namespace(*arrays)
 
     arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
     arrays = xp.broadcast_arrays(*arrays)
@@ -130,7 +130,7 @@ def ndinterp(  # noqa: PLR0913
 
     """
     arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.array_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
@@ -166,7 +166,7 @@ def trapezoid_product(
 
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
-    xp = _utils.get_namespace(*f, *tuple(itertools.chain(*ff)))
+    xp = _utils.array_namespace(*f, *tuple(itertools.chain(*ff)))
     uxpx = _utils.XPAdditions(xp)
 
     x: FloatArray
@@ -201,7 +201,7 @@ def cumulative_trapezoid(
         The cumulative integral of the function.
 
     """
-    xp = _utils.get_namespace(f, x)
+    xp = _utils.array_namespace(f, x)
 
     f = xp.asarray(f, dtype=xp.float64)
     x = xp.asarray(x, dtype=xp.float64)

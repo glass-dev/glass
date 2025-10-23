@@ -85,7 +85,7 @@ def import_numpy(backend: str) -> ModuleType:
         return numpy
 
 
-def get_namespace(*arrays: AnyArray) -> ModuleType:
+def array_namespace(*arrays: AnyArray) -> ModuleType:
     """
     Return the array library (namespace) of input arrays if they all belong to the same
     library.
@@ -136,7 +136,7 @@ def rng_dispatcher(
     NotImplementedError
         If the array backend is not supported.
     """
-    xp = get_namespace(array)
+    xp = array_namespace(array)
 
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415

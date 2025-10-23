@@ -228,7 +228,7 @@ class RadialWindow:
         - Determines xp from za and wa.
         """
         if self.xp is None:
-            object.__setattr__(self, "xp", _utils.get_namespace(self.za, self.wa))
+            object.__setattr__(self, "xp", _utils.array_namespace(self.za, self.wa))
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
@@ -311,7 +311,7 @@ def tophat_windows(
             stacklevel=2,
         )
 
-    xp = _utils.get_namespace(zbins)
+    xp = _utils.array_namespace(zbins)
     uxpx = XPAdditions(xp)
 
     wht: WeightFunc
@@ -377,7 +377,7 @@ def linear_windows(
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
-    xp = _utils.get_namespace(zgrid)
+    xp = _utils.array_namespace(zgrid)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
@@ -447,7 +447,7 @@ def cubic_windows(
     if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
-    xp = _utils.get_namespace(zgrid)
+    xp = _utils.array_namespace(zgrid)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
@@ -504,7 +504,7 @@ def restrict(
     if z.ndim != 1:
         msg = "z must be 1D arrays"
         raise ValueError(msg)
-    xp = _utils.get_namespace(z, f)
+    xp = _utils.array_namespace(z, f)
     uxpx = XPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
@@ -662,7 +662,7 @@ def partition_lstsq(
         The partition.
 
     """
-    xp = _utils.get_namespace(z, fz)
+    xp = _utils.array_namespace(z, fz)
     uxpx = XPAdditions(xp)
 
     # make sure nothing breaks
@@ -733,7 +733,7 @@ def partition_nnls(
         The partition.
 
     """
-    xp = _utils.get_namespace(z, fz)
+    xp = _utils.array_namespace(z, fz)
     uxpx = XPAdditions(xp)
 
     # make sure nothing breaks
@@ -808,7 +808,7 @@ def partition_restrict(
         The partition.
 
     """
-    xp = _utils.get_namespace(z, fz)
+    xp = _utils.array_namespace(z, fz)
     uxpx = XPAdditions(xp)
 
     parts = []
@@ -964,7 +964,7 @@ def combine(
         Find weights for a given function.
 
     """
-    xp = _utils.get_namespace(
+    xp = _utils.array_namespace(
         z, weights, *(arr for shell in shells for arr in (shell.za, shell.wa))
     )
     uxpx = XPAdditions(xp)

@@ -122,7 +122,7 @@ def iternorm(
     """
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
-    xp = _utils.get_namespace(first)
+    xp = _utils.array_namespace(first)
 
     n = (size,) if isinstance(size, int) else size
 
@@ -213,7 +213,7 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
-    xp = _utils.get_namespace(*cls)
+    xp = _utils.array_namespace(*cls)
 
     cov = xp.zeros((nl, nc + 1))
     end = 0
@@ -263,7 +263,7 @@ def _multalm(
         The product of alm and bl.
 
     """
-    xp = _utils.get_namespace(alm, bl)
+    xp = _utils.array_namespace(alm, bl)
 
     n = bl.size
     # Ideally would be xp.asanyarray but this does not yet exist. The key difference
@@ -680,7 +680,7 @@ def effective_cls(
     """
     # Try with cls and weights but if cls is a Sequence[float] then we use weights only
     # and convert cls to an xp array
-    xp = _utils.get_namespace(*cls, weights1, weights2)
+    xp = _utils.array_namespace(*cls, weights1, weights2)
 
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))

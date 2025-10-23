@@ -87,7 +87,7 @@ def effective_bias(
         \;.
 
     """
-    xp = _utils.get_namespace(z, bz, w.za, w.wa)
+    xp = _utils.array_namespace(z, bz, w.za, w.wa)
     uxpx = _utils.XPAdditions(xp)
 
     norm = uxpx.trapezoid(w.wa, w.za)
@@ -136,7 +136,7 @@ def loglinear_bias(
 
     """
     arrays_to_check = (delta,) if type(b) is float else (delta, b)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.array_namespace(*arrays_to_check)
 
     delta_g = xp.log1p(delta)
     delta_g *= b
@@ -420,7 +420,7 @@ def position_weights(
         if bias is not None and not isinstance(bias, float)
         else (densities,)
     )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.array_namespace(*arrays_to_check)
 
     bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 

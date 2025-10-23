@@ -129,7 +129,7 @@ def gaussian_nz(
         for x in (z, mean, sigma, norm)
         if not (isinstance(x, (float, int)) or x is None)
     )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.array_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
 
     mean = xp.asarray(mean, dtype=xp.float64)
@@ -195,7 +195,7 @@ def smail_nz(
         for x in (z, z_mode, alpha, beta, norm)
         if not ((isinstance(x, (float, int))) or x is None)
     )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.array_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
 
     z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
@@ -291,7 +291,7 @@ def equal_dens_zbins(
         A list of redshift bin edges.
 
     """
-    xp = _utils.get_namespace(z, nz)
+    xp = _utils.array_namespace(z, nz)
     uxpx = _utils.XPAdditions(xp)
 
     # compute the normalised cumulative distribution function
@@ -345,7 +345,7 @@ def tomo_nz_gausserr(
         produce redshift bins of fixed size
 
     """
-    xp = _utils.get_namespace(z, nz)
+    xp = _utils.array_namespace(z, nz)
     uxpx = _utils.XPAdditions(xp)
 
     # converting zbins into an array:

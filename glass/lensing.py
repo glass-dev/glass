@@ -662,7 +662,7 @@ def deflect(
         if len(arrays_to_check) == 0:
             msg = "Either, one positional input must be an array or xp must be provided"
             raise ValueError(msg)
-        xp = _utils.get_namespace(*arrays_to_check)
+        xp = _utils.array_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
 
     alpha = xp.asarray(alpha)
