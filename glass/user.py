@@ -59,7 +59,7 @@ def save_cls(
 
 
 def load_cls(
-    filename: str,
+    filename: str | pathlib.Path,
 ) -> list[NDArray[np.float64] | Sequence[float]]:
     """
     Load a list of Cls from file.
