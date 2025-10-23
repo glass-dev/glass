@@ -121,7 +121,7 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
 
     Access array library functions using `xp.` in tests.
     """
-    return request.param
+    return request.param  # type: ignore[no-any-return]]
 
 
 @pytest.fixture(scope="session")
