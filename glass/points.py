@@ -33,6 +33,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import array_api_compat
 import healpix
 import numpy as np
 
@@ -415,12 +416,7 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    arrays_to_check = (
-        (densities, bias)
-        if bias is not None and not isinstance(bias, float)
-        else (densities,)
-    )
-    xp = _utils.array_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(densities, bias)
 
     bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 
