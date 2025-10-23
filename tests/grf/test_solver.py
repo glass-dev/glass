@@ -18,7 +18,7 @@ def cl() -> NDArray[np.float64]:
     return 1e-2 / (2 * ell + 1) ** 2
 
 
-def test_one_transformation(cl: NDArray[np.float64], rng: np.random.Generator):
+def test_one_transformation(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -28,7 +28,7 @@ def test_one_transformation(cl: NDArray[np.float64], rng: np.random.Generator):
     np.testing.assert_array_equal(gl1, gl2)
 
 
-def test_pad(cl: NDArray[np.float64], rng: np.random.Generator):
+def test_pad(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -41,7 +41,7 @@ def test_pad(cl: NDArray[np.float64], rng: np.random.Generator):
         glass.grf.solve(cl, t, pad=-1)
 
 
-def test_initial(cl: NDArray[np.float64], rng: np.random.Generator):
+def test_initial(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -53,7 +53,7 @@ def test_initial(cl: NDArray[np.float64], rng: np.random.Generator):
     np.testing.assert_array_equal(gl1, gl2)
 
 
-def test_no_iterations(cl: NDArray[np.float64]):
+def test_no_iterations(cl: NDArray[np.float64]) -> None:
     t = glass.grf.Lognormal()
 
     gl1 = glass.grf.compute(cl, t)
@@ -62,7 +62,7 @@ def test_no_iterations(cl: NDArray[np.float64]):
     np.testing.assert_array_equal(gl1, gl2)
 
 
-def test_lognormal(cl: NDArray[np.float64], rng: np.random.Generator):
+def test_lognormal(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     t1 = glass.grf.Lognormal()
     t2 = glass.grf.Lognormal()
 
@@ -82,7 +82,7 @@ def test_lognormal(cl: NDArray[np.float64], rng: np.random.Generator):
     np.testing.assert_allclose(gl_[1 : gl.size], gl[1:])
 
 
-def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator):
+def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     t = glass.grf.Lognormal()
 
     cl[0] = rng.random()

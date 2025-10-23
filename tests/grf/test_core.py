@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     import pytest_mock
 
 
-def test_corr_unknown():
+def test_corr_unknown() -> None:
     class Unknown:
         def corr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
