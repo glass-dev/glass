@@ -68,7 +68,7 @@ class Generator:
         self,
         seed: int | bool | NDArray[np.int_ | np.bool] | None = None,  # noqa: FBT001
     ) -> None:
-        self.rng = numpy.random.default_rng(seed=seed)  # type: ignore[arg-type]
+        self.rng = numpy.random.default_rng(seed=seed)
 
     def random(
         self,
@@ -77,7 +77,7 @@ class Generator:
         out: NDArray[Any] | None = None,
     ) -> AArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
-        return array_api_strict.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        return array_api_strict.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type,misc]
 
     def normal(
         self,
@@ -99,7 +99,7 @@ class Generator:
         out: NDArray[Any] | None = None,
     ) -> AArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-        return array_api_strict.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        return array_api_strict.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type,misc]
 
     def uniform(
         self,
