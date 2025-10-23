@@ -34,7 +34,7 @@ def test_dispatch() -> None:
 
 
 def test_dispatch_bad_function() -> None:
-    test = glass.grf._core.dispatch(lambda _a, _b: ...)
+    test = glass.grf._core.dispatch(lambda _a, _b: ...)  # type: ignore[misc]
 
     with pytest.raises(TypeError):
 
