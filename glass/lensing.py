@@ -31,7 +31,6 @@ Applying lensing
 
 from __future__ import annotations
 
-from numbers import Number
 from typing import TYPE_CHECKING, Literal, overload
 
 import healpy as hp
@@ -657,7 +656,7 @@ def deflect(
     arrays_to_check = tuple(
         x
         for x in (lon, lat, alpha)
-        if not isinstance(x, Number) and not isinstance(x, list)
+        if not isinstance(x, (float, int, complex)) and not isinstance(x, list)
     )
     if xp is None:
         if len(arrays_to_check) == 0:

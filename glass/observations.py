@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import itertools
 import math
-from numbers import Number
 from typing import TYPE_CHECKING
 
 import healpy as hp
@@ -126,7 +125,9 @@ def gaussian_nz(
 
     """
     arrays_to_check = tuple(
-        x for x in (z, mean, sigma, norm) if not (isinstance(x, Number) or x is None)
+        x
+        for x in (z, mean, sigma, norm)
+        if not (isinstance(x, (float, int)) or x is None)
     )
     xp = _utils.get_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
@@ -192,7 +193,7 @@ def smail_nz(
     arrays_to_check = tuple(
         x
         for x in (z, z_mode, alpha, beta, norm)
-        if not (isinstance(x, Number) or x is None)
+        if not ((isinstance(x, (float, int))) or x is None)
     )
     xp = _utils.get_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
