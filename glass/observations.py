@@ -124,12 +124,7 @@ def gaussian_nz(
         The redshift distribution at the given ``z`` values.
 
     """
-    arrays_to_check = tuple(
-        x
-        for x in (z, mean, sigma, norm)
-        if not (isinstance(x, (float, int)) or x is None)
-    )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.get_namespace(z, mean, sigma, norm)
     uxpx = _utils.XPAdditions(xp)
 
     mean = xp.asarray(mean, dtype=xp.float64)
@@ -190,12 +185,7 @@ def smail_nz(
     where :math:`z_0` is matched to the given mode of the distribution.
 
     """
-    arrays_to_check = tuple(
-        x
-        for x in (z, z_mode, alpha, beta, norm)
-        if not ((isinstance(x, (float, int))) or x is None)
-    )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.get_namespace(z, z_mode, alpha, beta, norm)
     uxpx = _utils.XPAdditions(xp)
 
     z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]

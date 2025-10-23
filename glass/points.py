@@ -135,8 +135,7 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    arrays_to_check = (delta,) if type(b) is float else (delta, b)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.get_namespace(delta, b)
 
     delta_g = xp.log1p(delta)
     delta_g *= b
@@ -415,12 +414,7 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    arrays_to_check = (
-        (densities, bias)
-        if bias is not None and not isinstance(bias, float)
-        else (densities,)
-    )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.get_namespace(densities, bias)
 
     bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 

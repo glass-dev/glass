@@ -104,10 +104,18 @@ def get_namespace(*arrays: AnyArray) -> ModuleType:
     ValueError
         If input arrays do not all belong to the same array library.
     """
-    namespace = arrays[0].__array_namespace__()
+    arrays_to_check = tuple(
+        arr for arr in arrays if hasattr(arr, "__array_namespace__")
+    )
+
+    if len(arrays_to_check) == 0:
+        msg = "At least one input arrays must belong to an array library."
+        raise ValueError(msg)
+
+    namespace = arrays_to_check[0].__array_namespace__()
     if any(
         array.__array_namespace__() != namespace
-        for array in arrays
+        for array in arrays_to_check
         if array is not None
     ):
         msg = "input arrays should belong to the same array library"

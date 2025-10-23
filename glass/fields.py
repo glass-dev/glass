@@ -678,8 +678,6 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
-    # Try with cls and weights but if cls is a Sequence[float] then we use weights only
-    # and convert cls to an xp array
     xp = _utils.get_namespace(*cls, weights1, weights2)
 
     # this is the number of fields

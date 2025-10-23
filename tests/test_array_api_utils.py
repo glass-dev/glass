@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import jax.numpy as jnp
 import numpy as np
 import pytest
@@ -7,15 +11,23 @@ from array_api_strict._array_object import Array
 
 import glass._array_api_utils
 
+if TYPE_CHECKING:
+    from types import ModuleType
 
-def test_get_namespace() -> None:
-    arrays = [np.array([1, 2]), np.array([2, 3])]
+
+def test_get_namespace(xp: ModuleType) -> None:
+    arrays = [xp.asarray([1, 2]), xp.asarray([2, 3])]
     namespace = glass._array_api_utils.get_namespace(*arrays)
-    assert namespace == np
+    assert namespace == xp
 
-    arrays = [np.array([1, 2]), jnp.array([2, 3])]
+    arrays = [np.asarray([1, 2]), jnp.asarray([2, 3])]
     with pytest.raises(ValueError, match="input arrays should"):
         glass._array_api_utils.get_namespace(*arrays)
+
+    with pytest.raises(
+        ValueError, match="At least one input arrays must belong to an array library"
+    ):
+        glass._array_api_utils.get_namespace(0.0, 0.0)
 
 
 def test_rng_dispatcher() -> None:

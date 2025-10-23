@@ -653,16 +653,8 @@ def deflect(
     exponential map.
 
     """
-    arrays_to_check = tuple(
-        x
-        for x in (lon, lat, alpha)
-        if not isinstance(x, (float, int, complex)) and not isinstance(x, list)
-    )
     if xp is None:
-        if len(arrays_to_check) == 0:
-            msg = "Either, one positional input must be an array or xp must be provided"
-            raise ValueError(msg)
-        xp = _utils.get_namespace(*arrays_to_check)
+        xp = _utils.get_namespace(lon, lat, alpha)
     uxpx = _utils.XPAdditions(xp)
 
     alpha = xp.asarray(alpha)

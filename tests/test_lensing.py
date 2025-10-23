@@ -145,7 +145,7 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
     # No inputs are arrays and xp not provided
     with pytest.raises(
         ValueError,
-        match="Either, one positional input must be an array or xp must be provided",
+        match="At least one input arrays must belong to an array library",
     ):
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
 

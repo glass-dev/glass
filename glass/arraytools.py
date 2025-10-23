@@ -129,8 +129,7 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = _utils.get_namespace(x, xq, fq)
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
