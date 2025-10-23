@@ -110,9 +110,6 @@ enable_error_code = [
     "redundant-expr",
     "truthy-bool",
 ]
-plugins = [
-    "numpy.typing.mypy_plugin",
-]
 strict = true
 warn_unreachable = true
 
