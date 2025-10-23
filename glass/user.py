@@ -26,7 +26,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     import importlib.util
-    import pathlib
+    import os
     from collections.abc import Generator, Sequence
 
     from numpy.typing import NDArray
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 
 def save_cls(
-    filename: str,
+    filename: os.PathLike[str],
     cls: Sequence[NDArray[np.float64] | Sequence[float]],
 ) -> None:
     """
@@ -59,7 +59,7 @@ def save_cls(
 
 
 def load_cls(
-    filename: str,
+    filename: os.PathLike[str],
 ) -> list[NDArray[np.float64] | Sequence[float]]:
     """
     Load a list of Cls from file.
@@ -161,7 +161,7 @@ class _FitsWriter:
 
 @contextmanager
 def write_catalog(
-    filename: pathlib.Path,
+    filename: os.PathLike[str],
     *,
     ext: str | None = None,
 ) -> Generator[_FitsWriter]:

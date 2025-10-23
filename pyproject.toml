@@ -112,11 +112,16 @@ enable_error_code = [
     "redundant-expr",
     "truthy-bool",
 ]
-plugins = [
-    "numpy.typing.mypy_plugin",
-]
+explicit_package_bases = true
 strict = true
 warn_unreachable = true
+
+[[tool.mypy.overrides]]
+disable_error_code = [
+    "arg-type",
+    "assignment",
+]
+module = "tests.*"
 
 [tool.pytest.ini_options]
 addopts = [

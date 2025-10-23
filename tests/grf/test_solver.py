@@ -1,17 +1,24 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 import glass.grf
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
 
 @pytest.fixture(scope="session")
-def cl():
+def cl() -> NDArray[np.float64]:
     lmax = 100
     ell = np.arange(lmax + 1)
     return 1e-2 / (2 * ell + 1) ** 2
 
 
-def test_one_transformation(cl, rng):
+def test_one_transformation(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -21,7 +28,7 @@ def test_one_transformation(cl, rng):
     np.testing.assert_array_equal(gl1, gl2)
 
 
-def test_pad(cl, rng):
+def test_pad(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -34,7 +41,7 @@ def test_pad(cl, rng):
         glass.grf.solve(cl, t, pad=-1)
 
 
-def test_initial(cl, rng):
+def test_initial(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -46,7 +53,7 @@ def test_initial(cl, rng):
     np.testing.assert_array_equal(gl1, gl2)
 
 
-def test_no_iterations(cl):
+def test_no_iterations(cl: NDArray[np.float64]) -> None:
     t = glass.grf.Lognormal()
 
     gl1 = glass.grf.compute(cl, t)
@@ -55,7 +62,7 @@ def test_no_iterations(cl):
     np.testing.assert_array_equal(gl1, gl2)
 
 
-def test_lognormal(cl, rng):
+def test_lognormal(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     t1 = glass.grf.Lognormal()
     t2 = glass.grf.Lognormal()
 
@@ -75,7 +82,7 @@ def test_lognormal(cl, rng):
     np.testing.assert_allclose(gl_[1 : gl.size], gl[1:])
 
 
-def test_monopole(cl, rng):
+def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     t = glass.grf.Lognormal()
 
     cl[0] = rng.random()
