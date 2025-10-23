@@ -117,7 +117,10 @@ strict = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-ignore_errors = true
+disable_error_code = [
+    "arg-type",
+    "assignment",
+]
 module = "tests.*"
 
 [tool.pytest.ini_options]

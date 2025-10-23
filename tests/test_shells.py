@@ -122,7 +122,7 @@ def test_linear_windows(xp: types.ModuleType) -> None:
 
     ws = glass.linear_windows(
         zgrid,
-        weight=lambda _: 0,  # type: ignore[arg-type, return-value]
+        weight=lambda _: 0,  # type: ignore[return-value]
     )
     for w in ws:
         np.testing.assert_allclose(w.wa, xp.zeros_like(w.wa))
@@ -170,7 +170,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
 
     ws = glass.cubic_windows(
         zgrid,
-        weight=lambda _: 0,  # type: ignore[arg-type, return-value]
+        weight=lambda _: 0,  # type: ignore[return-value]
     )
     for w in ws:
         np.testing.assert_allclose(w.wa, xp.zeros_like(w.wa))
