@@ -1,7 +1,8 @@
-import array_api_strict
 import jax.numpy as jnp
 import numpy as np
 import pytest
+
+import array_api_strict
 from array_api_strict._array_object import Array
 
 import glass._array_api_utils

@@ -37,6 +37,7 @@ import healpix
 import numpy as np
 
 import glass
+import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
@@ -44,15 +45,17 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import DoubleArray, FloatArray
+
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 
 
 def effective_bias(
-    z: NDArray[np.float64],
-    bz: NDArray[np.float64],
+    z: FloatArray,
+    bz: FloatArray,
     w: glass.RadialWindow,
-) -> float | NDArray[np.double]:
+) -> float | DoubleArray:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -84,14 +87,17 @@ def effective_bias(
         \;.
 
     """
-    norm = np.trapezoid(w.wa, w.za)
+    xp = _utils.get_namespace(z, bz, w.za, w.wa)
+    uxpx = _utils.XPAdditions(xp)
+
+    norm = uxpx.trapezoid(w.wa, w.za)
     return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
 
 def linear_bias(
-    delta: NDArray[np.float64],
-    b: float | NDArray[np.float64],
-) -> NDArray[np.float64]:
+    delta: FloatArray,
+    b: float | FloatArray,
+) -> FloatArray:
     r"""
     Linear bias model :math:`\delta_g = b \, \delta`.
 
@@ -111,9 +117,9 @@ def linear_bias(
 
 
 def loglinear_bias(
-    delta: NDArray[np.float64],
-    b: float | NDArray[np.float64],
-) -> NDArray[np.float64]:
+    delta: FloatArray,
+    b: float | FloatArray,
+) -> FloatArray:
     r"""
     Log-linear bias model :math:`\ln(1 + \delta_g) = b \ln(1 + \delta)`.
 
@@ -129,10 +135,12 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    delta_g = np.log1p(delta)
+    arrays_to_check = (delta,) if type(b) is float else (delta, b)
+    xp = _utils.get_namespace(*arrays_to_check)
+
+    delta_g = xp.log1p(delta)
     delta_g *= b
-    np.expm1(delta_g, out=delta_g)
-    return delta_g
+    return xp.expm1(delta_g)
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
@@ -380,9 +388,9 @@ def uniform_positions(
 
 
 def position_weights(
-    densities: NDArray[np.float64],
-    bias: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    densities: FloatArray,
+    bias: FloatArray | float | None = None,
+) -> FloatArray:
     r"""
     Compute relative weights for angular clustering.
 
@@ -407,11 +415,20 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
+    arrays_to_check = (
+        (densities, bias)
+        if bias is not None and not isinstance(bias, float)
+        else (densities,)
+    )
+    xp = _utils.get_namespace(*arrays_to_check)
+
+    bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
+
     # bring densities and bias into the same shape
     if bias is not None:
         densities, bias = glass.arraytools.broadcast_first(densities, bias)
     # normalise densities after shape has been fixed
-    densities = densities / np.sum(densities, axis=0)
+    densities = densities / xp.sum(densities, axis=0)
     # apply bias after normalisation
     if bias is not None:
         densities = densities * bias

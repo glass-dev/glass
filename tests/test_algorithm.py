@@ -11,8 +11,7 @@ if TYPE_CHECKING:
     import types
 
     import pytest_mock
-
-    from glass._array_api_utils import UnifiedGenerator
+    from conftest import UnifiedGenerator
 
 
 def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
@@ -37,7 +36,7 @@ def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
         x,
         tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps,
     )
-    assert res == pytest.approx(b, rel=0.0, abs=1e-10)
+    np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
 
@@ -107,7 +106,9 @@ def test_nearcorr(xp: types.ModuleType) -> None:
 
 
 def test_cov_nearest(
-    xp: types.ModuleType, urng: UnifiedGenerator, mocker: pytest_mock.MockerFixture
+    xp: types.ModuleType,
+    urng: UnifiedGenerator,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     # prepare a random matrix
     m = urng.random((4, 4))

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 from functools import partial
 from typing import TYPE_CHECKING
 
@@ -12,14 +13,14 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from typing import Unpack
 
-    from numpy.typing import DTypeLike, NDArray
+    from numpy.typing import NDArray
 
-    from glass._array_api_utils import FloatArray
+    from glass._array_api_utils import AnyArray, FloatArray, IntArray
 
 
 def broadcast_first(
-    *arrays: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], ...]:
+    *arrays: FloatArray,
+) -> tuple[FloatArray, ...]:
     """
     Broadcast arrays, treating the first axis as common.
 
@@ -33,9 +34,11 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    arrays = tuple(np.moveaxis(a, 0, -1) if np.ndim(a) else a for a in arrays)
-    arrays = np.broadcast_arrays(*arrays)
-    return tuple(np.moveaxis(a, -1, 0) if np.ndim(a) else a for a in arrays)
+    xp = _utils.get_namespace(*arrays)
+
+    arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
+    arrays = xp.broadcast_arrays(*arrays)
+    return tuple(xp.moveaxis(a, -1, 0) if a.ndim else a for a in arrays)
 
 
 def broadcast_leading_axes(
@@ -131,7 +134,7 @@ def ndinterp(  # noqa: PLR0913
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
-        partial(uxpx.interp, x, xq),  # type: ignore[arg-type]
+        partial(uxpx.interp, x, xq),
         axis,
         fq,
         left=left,
@@ -141,13 +144,10 @@ def ndinterp(  # noqa: PLR0913
 
 
 def trapezoid_product(
-    f: tuple[NDArray[np.float64], NDArray[np.float64]],
-    *ff: tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
-    ],
+    f: tuple[FloatArray, FloatArray],
+    *ff: tuple[FloatArray, FloatArray],
     axis: int = -1,
-) -> float | NDArray[np.float64]:
+) -> float | FloatArray:
     """
     Trapezoidal rule for a product of functions.
 
@@ -165,25 +165,27 @@ def trapezoid_product(
         The integral of the product of the functions.
 
     """
-    x: NDArray[np.float64]
+    # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
+    xp = _utils.get_namespace(*f, *tuple(itertools.chain(*ff)))
+    uxpx = _utils.XPAdditions(xp)
+
+    x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = np.union1d(
+        x = uxpx.union1d(
             x[(x >= x_[0]) & (x <= x_[-1])],
             x_[(x_ >= x[0]) & (x_ <= x[-1])],
         )
-    y = np.interp(x, *f)
+    y = uxpx.interp(x, *f)
     for f_ in ff:
-        y *= np.interp(x, *f_)
-    return np.trapezoid(y, x, axis=axis)
+        y *= uxpx.interp(x, *f_)
+    return uxpx.trapezoid(y, x, axis=axis)
 
 
 def cumulative_trapezoid(
-    f: NDArray[np.int_] | NDArray[np.float64],
-    x: NDArray[np.int_] | NDArray[np.float64],
-    dtype: DTypeLike | None = None,
-    out: NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    f: IntArray | FloatArray,
+    x: IntArray | FloatArray,
+) -> AnyArray:
     """
     Cumulative trapezoidal rule along last axis.
 
@@ -193,19 +195,18 @@ def cumulative_trapezoid(
         The function values.
     x
         The x-coordinates.
-    dtype
-        The output data type.
-    out
-        The output array.
 
     Returns
     -------
         The cumulative integral of the function.
 
     """
-    if out is None:
-        out = np.empty_like(f, dtype=dtype)
+    xp = _utils.get_namespace(f, x)
 
-    np.cumsum((f[..., 1:] + f[..., :-1]) / 2 * np.diff(x), axis=-1, out=out[..., 1:])
-    out[..., 0] = 0
-    return out
+    f = xp.asarray(f, dtype=xp.float64)
+    x = xp.asarray(x, dtype=xp.float64)
+
+    # Compute the cumulative trapezoid without mutating any arrays
+    return xp.cumulative_sum(
+        (f[..., 1:] + f[..., :-1]) * 0.5 * xp.diff(x), axis=-1, include_initial=True
+    )

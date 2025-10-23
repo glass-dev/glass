@@ -1,3 +1,5 @@
+.. automodule:: glass.fields
+
 Random fields
 =============
 

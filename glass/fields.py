@@ -9,10 +9,11 @@ from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
-import array_api_extra as xpx
 import healpy as hp
 import numpy as np
 from transformcl import cltovar
+
+import array_api_extra as xpx
 
 import glass
 import glass._array_api_utils as _utils
@@ -24,10 +25,10 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import GLASSAnyArray, GLASSComplexArray, GLASSFloatArray
+    from glass._array_api_utils import AnyArray, ComplexArray, FloatArray
 
     Fields = Sequence[glass.grf.Transformation]
-    Cls = Sequence[GLASSAnyArray]
+    Cls = Sequence[AnyArray]
 
     T = TypeVar("T")
 
@@ -87,9 +88,9 @@ def nfields_from_nspectra(nspectra: int) -> int:
 
 def iternorm(
     k: int,
-    cov: Iterable[GLASSFloatArray],
+    cov: Iterable[FloatArray],
     size: int | tuple[int, ...] = (),
-) -> Generator[tuple[int | None, GLASSFloatArray, GLASSFloatArray]]:
+) -> Generator[tuple[int | None, FloatArray, FloatArray]]:
     """
     Return the vector a and variance sigma^2 for iterative normal sampling.
 
@@ -186,7 +187,7 @@ def cls2cov(
     nl: int,
     nf: int,
     nc: int,
-) -> Generator[GLASSFloatArray]:
+) -> Generator[FloatArray]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
 
@@ -230,11 +231,11 @@ def cls2cov(
 
 
 def _multalm(
-    alm: GLASSComplexArray,
-    bl: GLASSFloatArray,
+    alm: ComplexArray,
+    bl: FloatArray,
     *,
     inplace: bool = False,
-) -> GLASSComplexArray:
+) -> ComplexArray:
     """
     Multiply alm by bl.
 
@@ -562,7 +563,7 @@ def getcl(
     i: int,
     j: int,
     lmax: int | None = None,
-) -> GLASSFloatArray:
+) -> FloatArray:
     """
     Return a specific angular power spectrum from an array in
     :ref:`standard order <twopoint_order>`.
@@ -639,11 +640,11 @@ def spectra_indices(n: int) -> NDArray[np.integer]:
 
 def effective_cls(
     cls: Cls,
-    weights1: GLASSFloatArray,
-    weights2: GLASSFloatArray | None = None,
+    weights1: FloatArray,
+    weights2: FloatArray | None = None,
     *,
     lmax: int | None = None,
-) -> GLASSFloatArray:
+) -> FloatArray:
     """
     Compute effective angular power spectra from weights.
 

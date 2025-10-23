@@ -4,52 +4,16 @@ import pytest
 import glass.grf
 
 
-def test_dispatch() -> None:
-    @glass.grf._core.dispatch
-    def test(_a, _b, _c):
-        return None
-
-    @test.add
-    def _(_a: int, _b: str, _c: object):
-        return 1
-
-    @test.add
-    def _(_a: list, _b: tuple, _c: object):
-        return 2
-
-    # first match
-    assert test(1, "1", ...) == 1
-    # first match inverted
-    assert test("1", 1, ...) == 1
-    # second match
-    assert test([], (), ...) == 2
-    # second match inverted
-    assert test((), [], ...) == 2
-    # mismatch
-    assert test(..., ..., ...) is None
-    # partial mismatch
-    assert test(1, 2, ...) is None
-    # cross mismatch
-    assert test(1, (), ...) is None
-
-
-def test_dispatch_bad_function() -> None:
-    test = glass.grf._core.dispatch(lambda _a, _b: ...)  # type: ignore[misc]
-
-    with pytest.raises(TypeError):
-
-        @test.add
-        def bad_signature(_a, _b): ...
-
-    with pytest.raises(TypeError):
-
-        @test.add
-        def bad_annotation(_a: int, _b, _c: str): ...
-
-
-def test_corr_unknown() -> None:
+def test_corr_unknown():
     class Unknown:
-        pass
+        def corr(self, _other, _x):
+            return NotImplemented
+
+        def icorr(self, _other, _x):
+            return NotImplemented
+
+        def dcorr(self, _other, _x):
+            return NotImplemented
 
     t1 = glass.grf.Normal()
     t2 = Unknown()

@@ -1,34 +1,108 @@
+"""
+Array API Utilities for glass.
+============================
+
+This module provides utility functions and classes for working with multiple array
+backends in the glass project, including NumPy, JAX, and array-api-strict. It includes
+functions for importing backends, determining array namespaces, dispatching random
+number generators, and providing missing functionality for array-api-strict through the
+XPAdditions class.
+
+Classes and functions in this module help ensure consistent behavior and compatibility
+across different array libraries, and provide wrappers for common operations such as
+integration, interpolation, and linear algebra.
+
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeAlias
 
-import array_api_strict
-import numpy as np
-import numpy.random
-
 if TYPE_CHECKING:
-    from types import FunctionType, ModuleType
+    from collections.abc import Callable
+    from types import ModuleType
 
-    from array_api_strict._array_object import Array as AArray
+    import numpy as np
     from jaxtyping import Array as JAXArray
     from numpy.typing import DTypeLike, NDArray
+
+    from array_api_strict._array_object import Array as AArray
 
     import glass.jax
 
     Size: TypeAlias = int | tuple[int, ...] | None
-    GLASSAnyArray: TypeAlias = JAXArray | NDArray[Any]
-    GLASSFloatArray: TypeAlias = JAXArray | NDArray[np.float64]
-    GLASSComplexArray: TypeAlias = JAXArray | NDArray[np.complex128]
 
-    AnyArray: TypeAlias = NDArray[Any] | JAXArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray
+    AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
+    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
+    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
+    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
+    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
+
+
+class CompatibleBackendNotFoundError(Exception):
+    """
+    Exception raised when an array library backend that
+    implements a requested function, is not found.
+    """
+
+    def __init__(self, missing_backend: str, users_backend: str) -> None:
+        self.message = (
+            f"{missing_backend} is required here as some functions required by GLASS "
+            f"are not supported by {users_backend}"
+        )
+        super().__init__(self.message)
+
+
+def import_numpy(backend: str) -> ModuleType:
+    """
+    Import the NumPy module, raising a helpful error if NumPy is not installed.
+
+    Parameters
+    ----------
+    backend
+        The name of the backend requested by the user.
+
+    Returns
+    -------
+        The NumPy module.
+
+    Raises
+    ------
+    ModuleNotFoundError
+        If NumPy is not found in the user's environment.
+
+    Notes
+    -----
+    This is useful for explaining to the user why NumPy is required when their chosen
+    backend does not implement a needed function.
+    """
+    try:
+        import numpy  # noqa: ICN001, PLC0415
+
+    except ModuleNotFoundError as err:
+        raise CompatibleBackendNotFoundError("numpy", backend) from err
+    else:
+        return numpy
 
 
 def get_namespace(*arrays: AnyArray) -> ModuleType:
     """
-    Return the array library (array namespace) of input arrays
-    if they belong to the same library or raise a :class:`ValueError`
-    if they do not.
+    Return the array library (namespace) of input arrays if they all belong to the same
+    library.
+
+    Parameters
+    ----------
+    *arrays
+        Arrays whose namespace is to be determined.
+
+    Returns
+    -------
+        The array namespace module.
+
+    Raises
+    ------
+    ValueError
+        If input arrays do not all belong to the same array library.
     """
     namespace = arrays[0].__array_namespace__()
     if any(
@@ -43,77 +117,195 @@ def get_namespace(*arrays: AnyArray) -> ModuleType:
 
 
 def rng_dispatcher(
-    array: NDArray[Any] | JAXArray,
+    array: AnyArray,
 ) -> np.random.Generator | glass.jax.Generator | Generator:
-    """Dispatch RNG on the basis of the provided array."""
-    backend = array.__array_namespace__().__name__
-    if backend == "jax.numpy":
+    """
+    Dispatch a random number generator based on the provided array's backend.
+
+    Parameters
+    ----------
+    array
+        The array whose backend determines the RNG.
+
+    Returns
+    -------
+        The appropriate random number generator for the array's backend.
+
+    Raises
+    ------
+    NotImplementedError
+        If the array backend is not supported.
+    """
+    xp = get_namespace(array)
+
+    if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
         return glass.jax.Generator(seed=42)
-    if backend == "numpy":
-        return np.random.default_rng()
-    if backend == "array_api_strict":
+
+    if xp.__name__ == "numpy":
+        return xp.random.default_rng()  # type: ignore[no-any-return]
+
+    if xp.__name__ == "array_api_strict":
         return Generator(seed=42)
+
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
 
 class Generator:
-    """NumPy random number generator returning array_api_strict Array."""
+    """
+    NumPy random number generator returning array_api_strict Array.
 
-    __slots__ = ("rng",)
+    This class wraps NumPy's random number generator and returns arrays compatible
+    with array_api_strict.
+    """
+
+    __slots__ = ("axp", "nxp", "rng")
 
     def __init__(
         self,
-        seed: int | bool | NDArray[np.int_ | np.bool] | None = None,  # noqa: FBT001
+        seed: int | bool | AArray | None = None,  # noqa: FBT001
     ) -> None:
-        self.rng = numpy.random.default_rng(seed=seed)
+        """
+        Initialize the Generator.
+
+        Parameters
+        ----------
+        seed
+            Seed for the random number generator.
+        """
+        import numpy as np  # noqa: PLC0415
+
+        import array_api_strict  # noqa: PLC0415
+
+        self.axp = array_api_strict
+        self.nxp = np
+        self.rng = np.random.default_rng(seed=seed)
 
     def random(
         self,
         size: Size = None,
-        dtype: DTypeLike | None = np.float64,
-        out: NDArray[Any] | None = None,
+        dtype: DTypeLike | None = None,
+        out: AArray | None = None,
     ) -> AArray:
-        """Return random floats in the half-open interval [0.0, 1.0)."""
-        return array_api_strict.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type,misc]
+        """
+        Return random floats in the half-open interval [0.0, 1.0).
+
+        Parameters
+        ----------
+        size
+            Output shape.
+        dtype
+            Desired data type.
+        out
+            Optional output array.
+
+        Returns
+        -------
+            Array of random floats.
+        """
+        dtype = dtype if dtype is not None else self.nxp.float64
+        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
 
     def normal(
         self,
-        loc: float | NDArray[np.floating] = 0.0,
-        scale: float | NDArray[np.floating] = 1.0,
+        loc: float | AArray = 0.0,
+        scale: float | AArray = 1.0,
         size: Size = None,
     ) -> AArray:
-        """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
-        return array_api_strict.asarray(self.rng.normal(loc, scale, size))
+        """
+        Draw samples from a Normal distribution (mean=loc, stdev=scale).
 
-    def poisson(self, lam: float | NDArray[np.floating], size: Size = None) -> AArray:
-        """Draw samples from a Poisson distribution."""
-        return array_api_strict.asarray(self.rng.poisson(lam, size))
+        Parameters
+        ----------
+        loc
+            Mean of the distribution.
+        scale
+            Standard deviation of the distribution.
+        size
+            Output shape.
+
+        Returns
+        -------
+            Array of samples from the normal distribution.
+        """
+        return self.axp.asarray(self.rng.normal(loc, scale, size))
+
+    def poisson(self, lam: float | AArray, size: Size = None) -> AArray:
+        """
+        Draw samples from a Poisson distribution.
+
+        Parameters
+        ----------
+        lam
+            Expected number of events.
+        size
+            Output shape.
+
+        Returns
+        -------
+            Array of samples from the Poisson distribution.
+        """
+        return self.axp.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
         self,
         size: Size = None,
-        dtype: DTypeLike | None = np.float64,
-        out: NDArray[Any] | None = None,
+        dtype: DTypeLike | None = None,
+        out: AArray | None = None,
     ) -> AArray:
-        """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-        return array_api_strict.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type,misc]
+        """
+        Draw samples from a standard Normal distribution (mean=0, stdev=1).
+
+        Parameters
+        ----------
+        size
+            Output shape.
+        dtype
+            Desired data type.
+        out
+            Optional output array.
+
+        Returns
+        -------
+            Array of samples from the standard normal distribution.
+        """
+        dtype = dtype if dtype is not None else self.nxp.float64
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
 
     def uniform(
         self,
-        low: float | NDArray[np.floating] = 0.0,
-        high: float | NDArray[np.floating] = 1.0,
+        low: float | AArray = 0.0,
+        high: float | AArray = 1.0,
         size: Size = None,
     ) -> AArray:
-        """Draw samples from a Uniform distribution."""
-        return array_api_strict.asarray(self.rng.uniform(low, high, size))
+        """
+        Draw samples from a Uniform distribution.
+
+        Parameters
+        ----------
+        low
+            Lower bound of the distribution.
+        high
+            Upper bound of the distribution.
+        size : Size, optional
+            Output shape.
+
+        Returns
+        -------
+            Array of samples from the uniform distribution.
+        """
+        return self.axp.asarray(self.rng.uniform(low, high, size))
 
 
 class XPAdditions:
     """
     Additional functions missing from both array-api-strict and array-api-extra.
+
+    This class provides wrappers for common array operations such as integration,
+    interpolation, and linear algebra, ensuring compatibility across NumPy, JAX,
+    and array-api-strict backends.
 
     This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
     for details.
@@ -123,8 +315,15 @@ class XPAdditions:
     backend: str
 
     def __init__(self, xp: ModuleType) -> None:
+        """
+        Initialize XPAdditions with the given array namespace.
+
+        Parameters
+        ----------
+        xp
+            The array namespace module.
+        """
         self.xp = xp
-        self.backend = xp.__name__
 
     def trapezoid(
         self, y: AnyArray, x: AnyArray = None, dx: float = 1.0, axis: int = -1
@@ -132,16 +331,41 @@ class XPAdditions:
         """
         Integrate along the given axis using the composite trapezoidal rule.
 
+        Parameters
+        ----------
+        y
+            Input array to integrate.
+        x
+            Sample points corresponding to y.
+        dx
+            Spacing between sample points.
+        axis
+            Axis along which to integrate.
+
+        Returns
+        -------
+            Integrated result.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/646
         """
-        self.backend = self.xp.__name__
-        if self.backend == "jax.numpy":
+        if self.xp.__name__ == "jax.numpy":
             import glass.jax  # noqa: PLC0415
 
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
-        if self.backend == "numpy":
-            return np.trapezoid(y, x=x, dx=dx, axis=axis)
-        if self.backend == "array_api_strict":
+
+        if self.xp.__name__ == "numpy":
+            return self.xp.trapezoid(y, x=x, dx=dx, axis=axis)
+
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             y_np = np.asarray(y, copy=True)
             x_np = np.asarray(x, copy=True)
@@ -155,15 +379,32 @@ class XPAdditions:
         """
         Compute the set union of two 1D arrays.
 
+        Parameters
+        ----------
+        ar1
+            First input array.
+        ar2
+            Second input array.
+
+        Returns
+        -------
+            The union of the two arrays.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/647
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.union1d(ar1, ar2)
 
-            return glass.jax.union1d(ar1, ar2)
-        if self.backend == "numpy":
-            return np.union1d(ar1, ar2)
-        if self.backend == "array_api_strict":
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             ar1_np = np.asarray(ar1, copy=True)
             ar2_np = np.asarray(ar2, copy=True)
@@ -183,22 +424,44 @@ class XPAdditions:
         period: float | None = None,
     ) -> AnyArray:
         """
-        One-dimensional linear interpolation for monotonically increasing
-        sample points.
+        One-dimensional linear interpolation for monotonically increasing sample points.
 
+        Parameters
+        ----------
+        x
+            The x-coordinates at which to evaluate the interpolated values.
+        x_points
+            The x-coordinates of the data points.
+        y_points
+            The y-coordinates of the data points.
+        left
+            Value to return for x < x_points[0].
+        right
+            Value to return for x > x_points[-1].
+        period
+            Period for periodic interpolation.
+
+        Returns
+        -------
+            Interpolated values.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/650
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.interp(
+                x, x_points, y_points, left=left, right=right, period=period
+            )
 
-            return glass.jax.interp(
-                x, x_points, y_points, left=left, right=right, period=period
-            )
-        if self.backend == "numpy":
-            return np.interp(
-                x, x_points, y_points, left=left, right=right, period=period
-            )
-        if self.backend == "array_api_strict":
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             x_np = np.asarray(x, copy=True)
             x_points_np = np.asarray(x_points, copy=True)
@@ -215,15 +478,30 @@ class XPAdditions:
         """
         Return the gradient of an N-dimensional array.
 
+        Parameters
+        ----------
+        f
+            Input array.
+
+        Returns
+        -------
+            Gradient of the input array.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/648
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.gradient(f)
 
-            return glass.jax.gradient(f)
-        if self.backend == "numpy":
-            return np.gradient(f)
-        if self.backend == "array_api_strict":
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             f_np = np.asarray(f, copy=True)
             result_np = np.gradient(f_np)
@@ -234,19 +512,51 @@ class XPAdditions:
 
     def linalg_lstsq(
         self, a: AnyArray, b: AnyArray, rcond: float | None = None
-    ) -> tuple[AnyArray, AnyArray, AnyArray, AnyArray]:
+    ) -> tuple[AnyArray, AnyArray, int, AnyArray]:
         """
-        Return the gradient of an N-dimensional array.
+        Solve a linear least squares problem.
 
+        Parameters
+        ----------
+        a
+            Coefficient matrix.
+        b
+            Ordinate or "dependent variable" values.
+        rcond
+            Cut-off ratio for small singular values.
+
+        Returns
+        -------
+        x
+            Least-squares solution. If b is two-dimensional, the solutions are in the K
+            columns of x.
+
+        residuals
+            Sums of squared residuals: Squared Euclidean 2-norm for each column in b - a
+            @ x. If the rank of a is < N or M <= N, this is an empty array. If b is
+            1-dimensional, this is a (1,) shape array. Otherwise the shape is (K,).
+
+        rank
+            Rank of matrix a.
+
+        s
+            Singular values of a.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/649
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
 
-            return glass.jax.linalg_lstsq(a, b, rcond=rcond)
-        if self.backend == "numpy":
-            return np.linalg.lstsq(a, b, rcond=rcond)
-        if self.backend == "array_api_strict":
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             a_np = np.asarray(a, copy=True)
             b_np = np.asarray(b, copy=True)
@@ -258,17 +568,34 @@ class XPAdditions:
 
     def einsum(self, subscripts: str, *operands: AnyArray) -> AnyArray:
         """
-        Evaluates the Einstein summation convention on the operands.
+        Evaluate the Einstein summation convention on the operands.
 
+        Parameters
+        ----------
+        subscripts
+            Specifies the subscripts for summation.
+        *operands
+            Arrays to be summed.
+
+        Returns
+        -------
+            Result of the Einstein summation.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
         See https://github.com/glass-dev/glass/issues/657
         """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.einsum(subscripts, *operands)
 
-            return glass.jax.einsum(subscripts, *operands)
-        if self.backend == "numpy":
-            return np.einsum(subscripts, *operands)
-        if self.backend == "array_api_strict":
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
             # Using design principle of scipy (i.e. copy, use np, copy back)
             operands_np = (np.asarray(op, copy=True) for op in operands)
             result_np = np.einsum(subscripts, *operands_np)
@@ -279,7 +606,7 @@ class XPAdditions:
 
     def apply_along_axis(
         self,
-        func1d: FunctionType,
+        func1d: Callable[..., Any],
         axis: int,
         arr: AnyArray,
         *args: object,
@@ -288,19 +615,141 @@ class XPAdditions:
         """
         Apply a function to 1-D slices along the given axis.
 
-        See https://github.com/glass-dev/glass/issues/651
-        """
-        if self.backend == "jax.numpy":
-            import glass.jax  # noqa: PLC0415
+        Parameters
+        ----------
+        func1d
+            Function to apply to 1-D slices.
+        axis
+            Axis along which to apply the function.
+        arr
+            Input array.
+        *args
+            Additional positional arguments to pass to func1d.
+        **kwargs
+            Additional keyword arguments to pass to func1d.
 
-            return glass.jax.apply_along_axis(func1d, axis, arr, *args, **kwargs)
-        if self.backend == "numpy":
-            return np.apply_along_axis(func1d, axis, arr, *args, **kwargs)
-        if self.backend == "array_api_strict":
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            arr_np = np.asarray(arr, copy=True)
-            result_np = np.apply_along_axis(func1d, axis, arr_np, *args, **kwargs)
-            return self.xp.asarray(result_np, copy=True)
+        Returns
+        -------
+            Result of applying the function along the axis.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
+        See https://github.com/glass-dev/glass/issues/651
+
+        """
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+
+        if self.xp.__name__ == "array_api_strict":
+            # Import here to prevent users relying on numpy unless in this instance
+            np = import_numpy(self.xp.__name__)
+
+            return self.xp.asarray(
+                np.apply_along_axis(func1d, axis, arr, *args, **kwargs), copy=True
+            )
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def vectorize(
+        self,
+        pyfunc: Callable[..., Any],
+        otypes: tuple[type[float]],
+    ) -> Callable[..., Any]:
+        """
+        Returns an object that acts like pyfunc, but takes arrays as input.
+
+        Parameters
+        ----------
+        pyfunc
+            Python function to vectorize.
+        otypes
+            Output types.
+
+        Returns
+        -------
+            Vectorized function.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        Notes
+        -----
+        See https://github.com/glass-dev/glass/issues/671
+        """
+        if self.xp.__name__ == "numpy":
+            return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
+            # Import here to prevent users relying on numpy unless in this instance
+            np = import_numpy(self.xp.__name__)
+
+            return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def radians(self, deg_arr: AnyArray) -> AnyArray:
+        """
+        Convert angles from degrees to radians.
+
+        Parameters
+        ----------
+        deg_arr
+            Array of angles in degrees.
+
+        Returns
+        -------
+            Array of angles in radians.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+        """
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.radians(deg_arr)
+
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
+            return self.xp.asarray(np.radians(deg_arr))
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def degrees(self, deg_arr: AnyArray) -> AnyArray:
+        """
+        Convert angles from radians to degrees.
+
+        Parameters
+        ----------
+        deg_arr
+            Array of angles in radians.
+
+        Returns
+        -------
+            Array of angles in degrees.
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+        """
+        if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            return self.xp.degrees(deg_arr)
+
+        if self.xp.__name__ == "array_api_strict":
+            np = import_numpy(self.xp.__name__)
+
+            return self.xp.asarray(np.degrees(deg_arr))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

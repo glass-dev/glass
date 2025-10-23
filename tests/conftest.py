@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import contextlib
 import importlib.metadata
+import logging
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 import numpy as np
 import packaging.version
@@ -20,7 +21,9 @@ if TYPE_CHECKING:
 
     from cosmology import Cosmology
 
-    from glass._array_api_utils import UnifiedGenerator
+    UnifiedGenerator: TypeAlias = (
+        np.random.Generator | glass.jax.Generator | glass._array_api_utils.Generator
+    )
 
 
 # Handling of array backends, inspired by-
@@ -30,7 +33,10 @@ if TYPE_CHECKING:
 # can be:
 #   a particular array library (numpy, jax, array_api_strict, ...)
 #   all (try finding every supported array library available in the environment)
-GLASS_ARRAY_BACKEND: str = os.environ.get("GLASS_ARRAY_BACKEND", "")
+ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
+
+# Change jax logger to only log ERROR or worse
+logging.getLogger("jax").setLevel(logging.ERROR)
 
 
 def _check_version(lib: str, array_api_compliant_version: str) -> None:
@@ -58,7 +64,7 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
 def _import_and_add_numpy(xp_available_backends: dict[str, types.ModuleType]) -> None:
     """Add numpy to the backends dictionary."""
     _check_version("numpy", "2.1.0")
-    xp_available_backends.update({"numpy": np})
+    xp_available_backends["numpy"] = np
 
 
 def _import_and_add_array_api_strict(
@@ -68,7 +74,7 @@ def _import_and_add_array_api_strict(
     import array_api_strict
 
     _check_version("array_api_strict", "2.0.0")
-    xp_available_backends.update({"array_api_strict": array_api_strict})
+    xp_available_backends["array_api_strict"] = array_api_strict
     array_api_strict.set_array_api_strict_flags(api_version="2024.12")
 
 
@@ -77,7 +83,7 @@ def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> N
     import jax
 
     _check_version("jax", "0.4.32")
-    xp_available_backends.update({"jax.numpy": jax.numpy})
+    xp_available_backends["jax.numpy"] = jax.numpy
     # enable 64 bit numbers
     jax.config.update("jax_enable_x64", val=True)
 
@@ -86,14 +92,14 @@ def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> N
 xp_available_backends: dict[str, types.ModuleType] = {}
 
 # if no backend passed, use numpy by default
-if not GLASS_ARRAY_BACKEND or GLASS_ARRAY_BACKEND == "numpy":
+if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     _import_and_add_numpy(xp_available_backends)
-elif GLASS_ARRAY_BACKEND == "array_api_strict":
+elif ARRAY_BACKEND == "array_api_strict":
     _import_and_add_array_api_strict(xp_available_backends)
-elif GLASS_ARRAY_BACKEND == "jax":
+elif ARRAY_BACKEND == "jax":
     _import_and_add_jax(xp_available_backends)
 # if all, try importing every backend
-elif GLASS_ARRAY_BACKEND == "all":
+elif ARRAY_BACKEND == "all":
     with contextlib.suppress(ImportError):
         _import_and_add_numpy(xp_available_backends)
 
@@ -103,7 +109,7 @@ elif GLASS_ARRAY_BACKEND == "all":
     with contextlib.suppress(ImportError):
         _import_and_add_jax(xp_available_backends)
 else:
-    msg = f"unsupported array backend: {GLASS_ARRAY_BACKEND}"
+    msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
 
 

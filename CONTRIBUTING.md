@@ -67,29 +67,29 @@ python -m pytest --cov --doctest-plus
 ### Array API tests
 
 One can specify a particular array backend for testing by setting the
-`GLASS_ARRAY_BACKEND` environment variable. The default array backend is NumPy.
+`ARRAY_BACKEND` environment variable. The default array backend is NumPy.
 _GLASS_ can be tested with every supported array library available in the
-environment by setting `GLASS_ARRAY_BACKEND` to `all`. The testing framework
-only installs NumPy automatically; hence, remaining array libraries should
-either be installed manually or developers should use `Nox`.
+environment by setting `ARRAY_BACKEND` to `all`. The testing framework only
+installs NumPy automatically; hence, remaining array libraries should either be
+installed manually or developers should use `Nox`.
 
 ```bash
 # run tests using numpy
 python -m pytest
-GLASS_ARRAY_BACKEND=numpy python -m pytest
+ARRAY_BACKEND=numpy python -m pytest
 # run tests using array_api_strict (should be installed manually)
-GLASS_ARRAY_BACKEND=array_api_strict python -m pytest
+ARRAY_BACKEND=array_api_strict python -m pytest
 # run tests using jax (should be installed manually)
-GLASS_ARRAY_BACKEND=jax python -m pytest
+ARRAY_BACKEND=jax python -m pytest
 # run tests using every supported array library available in the environment
-GLASS_ARRAY_BACKEND=all python -m pytest
+ARRAY_BACKEND=all python -m pytest
 ```
 
 Moreover, one can test if a function is compatible with the array API standard
 by using the `xp` fixture in tests. Further, the corresponding RNG `Generator`
 can be accessed using the `urng` (a unified RNG interface) fixture. This will
 `parametrize` the test to run on every array library specified through
-`GLASS_ARRAY_BACKEND` -
+`ARRAY_BACKEND` -
 
 ```python
 from __future__ import annotations
@@ -154,7 +154,11 @@ following changes:
   version. The release notes should translate the changelog entries into prose
   that can be understood by non-developer users of the code. If there are
   breaking changes, a release note should explain what the changes mean for
-  existing code.
+  existing code. There exists a script that helps generate an initial
+  [draft of the release notes](.github/release_notes.sh) from the changelog
+  entries. We recommend running something like
+  `bash .github/release_notes.sh | tee -a docs/manual/releases.rst` to generate
+  the draft and then editing it to make it more user-friendly.
 
 Once these changes are merged into the `main` branch, a new release with title
 `glass yyyy.mm` should be created in the GitHub repository. The description of
@@ -217,20 +221,20 @@ nox -s tests-3.13
 ```
 
 One can specify a particular array backend for testing by setting the
-`GLASS_ARRAY_BACKEND` environment variable. The default array backend is NumPy.
+`ARRAY_BACKEND` environment variable. The default array backend is NumPy.
 _GLASS_ can be tested with every supported array library by setting
-`GLASS_ARRAY_BACKEND` to `all`.
+`ARRAY_BACKEND` to `all`.
 
 ```bash
 # run tests using numpy
 nox -s tests-3.13
-GLASS_ARRAY_BACKEND=numpy nox -s tests-3.13
+ARRAY_BACKEND=numpy nox -s tests-3.13
 # run tests using array_api_strict
-GLASS_ARRAY_BACKEND=array_api_strict nox -s tests-3.13
+ARRAY_BACKEND=array_api_strict nox -s tests-3.13
 # run tests using jax
-GLASS_ARRAY_BACKEND=jax nox -s tests-3.13
+ARRAY_BACKEND=jax nox -s tests-3.13
 # run tests using every supported array library
-GLASS_ARRAY_BACKEND=all nox -s tests-3.13
+ARRAY_BACKEND=all nox -s tests-3.13
 ```
 
 The following command can be used to deploy the docs on `localhost` -
