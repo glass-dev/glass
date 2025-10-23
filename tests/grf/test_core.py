@@ -1,18 +1,25 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 import glass.grf
 
+if TYPE_CHECKING:
+    import pytest_mock
 
-def test_corr_unknown():
+
+def test_corr_unknown() -> None:
     class Unknown:
-        def corr(self, _other, _x):
+        def corr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
 
-        def icorr(self, _other, _x):
+        def icorr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
 
-        def dcorr(self, _other, _x):
+        def dcorr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
 
     t1 = glass.grf.Normal()
@@ -29,7 +36,7 @@ def test_corr_unknown():
         glass.grf.dcorr(t1, t2, x)
 
 
-def test_compute(mocker):
+def test_compute(mocker: pytest_mock.MockerFixture) -> None:
     cltocorr = mocker.patch("transformcl.cltocorr")
     icorr = mocker.patch("glass.grf._core.icorr")
     corrtocl = mocker.patch("transformcl.corrtocl")
