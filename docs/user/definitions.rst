@@ -7,6 +7,7 @@ The *GLASS* code uses the following mathematical definitions.
 .. glossary::
 
    deflection
+   displacement
       The deflection :math:`\alpha` is a complex value with spin weight
       :math:`1`.  It describes the displacement of a position along a geodesic
       (i.e. great circle).  The angular distance of the displacement is the

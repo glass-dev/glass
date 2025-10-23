@@ -296,3 +296,121 @@ def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
                 expected = bias * expected
 
             np.testing.assert_allclose(weights, expected)
+
+
+def test_displace_arg_complex(xp: ModuleType) -> None:
+    """Test displace function with complex-valued displacement."""
+    d = 5.0  # deg
+    r = d / 180 * xp.pi
+
+    # displace the origin so everything is easy
+    lon0 = xp.asarray(0.0)
+    lat0 = xp.asarray(0.0)
+
+    # north
+    lon, lat = glass.displace(lon0, lat0, xp.asarray(r + 0j))
+    assert np.allclose([lon, lat], [0.0, d])
+
+    # south
+    lon, lat = glass.displace(lon0, lat0, xp.asarray(-r + 0j))
+    assert np.allclose([lon, lat], [0.0, -d])
+
+    # east
+    lon, lat = glass.displace(lon0, lat0, xp.asarray(1j * r))
+    assert np.allclose([lon, lat], [-d, 0.0])
+
+    # west
+    lon, lat = glass.displace(lon0, lat0, xp.asarray(-1j * r))
+    assert np.allclose([lon, lat], [d, 0.0])
+
+
+def test_displace_arg_real(xp: ModuleType) -> None:
+    """Test displace function with real-valued argument."""
+    d = 5.0  # deg
+    r = d / 180 * xp.pi
+
+    # displace the origin so everything is easy
+    lon0 = xp.asarray(0.0)
+    lat0 = xp.asarray(0.0)
+
+    # north
+    lon, lat = glass.displace(lon0, lat0, xp.asarray([r, 0]))
+    assert np.allclose([lon, lat], [0.0, d])
+
+    # south
+    lon, lat = glass.displace(lon0, lat0, xp.asarray([-r, 0]))
+    assert np.allclose([lon, lat], [0.0, -d])
+
+    # east
+    lon, lat = glass.displace(lon0, lat0, xp.asarray([0, r]))
+    assert np.allclose([lon, lat], [-d, 0.0])
+
+    # west
+    lon, lat = glass.displace(lon0, lat0, xp.asarray([0, -r]))
+    assert np.allclose([lon, lat], [d, 0.0])
+
+
+def test_displace_abs(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    """Check that points are displaced by the correct angular distance."""
+    n = 1000
+    abs_alpha = urng.uniform(0, 2 * xp.pi, size=n)
+    arg_alpha = urng.uniform(-xp.pi, xp.pi, size=n)
+
+    lon_ = urng.uniform(-np.pi, np.pi, size=n) / xp.pi * 180
+    lat_ = xp.arcsin(urng.uniform(-1, 1, size=n)) / xp.pi * 180
+
+    lon, lat = glass.displace(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
+
+    th = (90.0 - lat) / 180 * xp.pi
+    th_ = (90.0 - lat_) / 180 * xp.pi
+    delt = (lon - lon_) / 180 * xp.pi
+
+    cos_a = xp.cos(th) * xp.cos(th_) + xp.cos(delt) * xp.sin(th) * xp.sin(th_)
+
+    assert np.allclose(cos_a, xp.cos(abs_alpha))
+
+
+def test_displacement(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    """Check that displacement of points is computed correctly."""
+    # unit changes for displacements
+    deg5 = xp.asarray(5.0) / 180 * xp.pi
+    north = xp.exp(1j * 0.0)
+    east = xp.exp(1j * (xp.pi / 2))
+    south = xp.exp(1j * xp.pi)
+    west = xp.exp(1j * (3 * xp.pi / 2))
+
+    zero = xp.asarray(0.0)
+    five = xp.asarray(5.0)
+    ninety = xp.asarray(90.0)
+
+    # test data: coordinates and expected displacement
+    data = [
+        # equator
+        (zero, zero, zero, five, deg5 * north),
+        (zero, zero, -five, zero, deg5 * east),
+        (zero, zero, zero, -five, deg5 * south),
+        (zero, zero, five, zero, deg5 * west),
+        # pole
+        (zero, ninety, ninety * 2, ninety - five, deg5 * north),
+        (zero, ninety, -ninety, ninety - five, deg5 * east),
+        (zero, ninety, zero, ninety - five, deg5 * south),
+        (zero, ninety, ninety, ninety - five, deg5 * west),
+    ]
+
+    # test each displacement individually
+    for from_lon, from_lat, to_lon, to_lat, alpha in data:
+        alpha_ = glass.displacement(from_lon, from_lat, to_lon, to_lat)
+        assert np.allclose(alpha_, alpha), (
+            f"displacement from ({from_lon}, {from_lat}) to ({to_lon}, {to_lat})"
+            f"\ndistance: expected {xp.abs(alpha)}, got {xp.abs(alpha_)}"
+            f"\ndirection: expected {xp.angle(alpha)}, got {xp.angle(alpha_)}"
+        )
+
+    # test on an array
+    alpha = glass.displacement(
+        urng.uniform(-180.0, 180.0, size=(20, 1)),
+        urng.uniform(-90.0, 90.0, size=(20, 1)),
+        urng.uniform(-180.0, 180.0, size=5),
+        urng.uniform(-90.0, 90.0, size=5),
+    )
+    assert alpha.shape == (20, 5)

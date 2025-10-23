@@ -617,6 +617,9 @@ def deflect(
     r"""
     Apply deflections to positions.
 
+    .. deprecated:: >2025.2
+       Use :func:`displace` instead.
+
     Takes an array of :term:`deflection` values and applies them
     to the given positions.
 
