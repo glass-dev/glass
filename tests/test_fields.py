@@ -31,8 +31,8 @@ def test_iternorm(xp: types.ModuleType) -> None:
     assert isinstance(j, int)
     assert a.shape == (k,)
     assert s.shape == ()
-    assert s.dtype == xp.float64  # type: ignore[unreachable]
-    assert s.shape == ()  # type: ignore[unreachable]
+    assert s.dtype == xp.float64
+    assert s.shape == ()
 
     # specify size
 
@@ -138,7 +138,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],  # type: ignore[list-item]
+        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],
         nl,
         nf,
         nc,
@@ -146,7 +146,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     cov = next(generator)
 
     assert cov.shape == (nl, nc + 1)
-    assert cov.dtype == xp.float64  # type: ignore[unreachable]
+    assert cov.dtype == xp.float64
 
     assert cov[:, 0] == pytest.approx(xp.asarray([0.5, 0.25, 0.15]))
     assert cov[:, 1] == pytest.approx(0)
@@ -157,7 +157,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     generator = glass.cls2cov(
         [
             xp.asarray(arr)
-            for arr in [  # type: ignore[arg-type]
+            for arr in [
                 [-1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
                 [0.7, 0.6, 0.1],
@@ -177,7 +177,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     generator = glass.cls2cov(
         [
             xp.asarray(arr)
-            for arr in [  # type: ignore[arg-type]
+            for arr in [
                 [1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
                 [0.7, 0.6, 0.1],
