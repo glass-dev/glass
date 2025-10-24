@@ -45,7 +45,10 @@ def tests(session: nox.Session) -> None:
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
 
-    session.run("pytest", *session.posargs)
+    session.run(
+        "pytest",
+        *session.posargs,
+    )
 
 
 @nox.session(python=ALL_PYTHON)
@@ -58,15 +61,10 @@ def coverage(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
-    session.install(
-        "-c", ".github/test-constraints.txt", "-e", ".", "--group", "doctest"
-    )
-
     session.posargs.append("--doctest-plus")
     session.posargs.append("--doctest-plus-generate-diff=overwrite")
     session.posargs.append("glass")
-
-    session.run("pytest", *session.posargs)
+    tests(session)
 
 
 @nox.session
