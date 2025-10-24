@@ -34,6 +34,8 @@ from typing import TYPE_CHECKING
 import healpy as hp
 import numpy as np
 
+import array_api_compat
+
 import glass._array_api_utils as _utils
 import glass.arraytools
 
@@ -124,12 +126,7 @@ def gaussian_nz(
         The redshift distribution at the given ``z`` values.
 
     """
-    arrays_to_check = tuple(
-        x
-        for x in (z, mean, sigma, norm)
-        if not (isinstance(x, (float, int)) or x is None)
-    )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(z, mean, sigma, norm, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     mean = xp.asarray(mean, dtype=xp.float64)
@@ -190,12 +187,9 @@ def smail_nz(
     where :math:`z_0` is matched to the given mode of the distribution.
 
     """
-    arrays_to_check = tuple(
-        x
-        for x in (z, z_mode, alpha, beta, norm)
-        if not ((isinstance(x, (float, int))) or x is None)
+    xp = array_api_compat.array_namespace(
+        z, z_mode, alpha, beta, norm, use_compat=False
     )
-    xp = _utils.get_namespace(*arrays_to_check)
     uxpx = _utils.XPAdditions(xp)
 
     z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
@@ -291,7 +285,7 @@ def equal_dens_zbins(
         A list of redshift bin edges.
 
     """
-    xp = _utils.get_namespace(z, nz)
+    xp = array_api_compat.array_namespace(z, nz, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     # compute the normalised cumulative distribution function
@@ -345,7 +339,7 @@ def tomo_nz_gausserr(
         produce redshift bins of fixed size
 
     """
-    xp = _utils.get_namespace(z, nz)
+    xp = array_api_compat.array_namespace(z, nz, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     # converting zbins into an array:

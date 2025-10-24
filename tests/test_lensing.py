@@ -12,6 +12,8 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from numpy.typing import NDArray
+
     from glass.cosmology import Cosmology
 
 
@@ -109,8 +111,13 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
     d = 5.0
     r = math.radians(d)
 
-    def alpha(re: float, im: float, *, usecomplex: bool) -> complex | list[float]:
-        return re + 1j * im if usecomplex else [re, im]
+    def alpha(
+        re: float,
+        im: float,
+        *,
+        usecomplex: bool,
+    ) -> complex | NDArray[np.float64]:
+        return re + 1j * im if usecomplex else xp.asarray([re, im])
 
     # north
     lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
@@ -143,11 +150,8 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
     np.testing.assert_allclose(lat, 0.0, atol=1e-15)
 
     # No inputs are arrays and xp not provided
-    with pytest.raises(
-        ValueError,
-        match="Either, one positional input must be an array or xp must be provided",
-    ):
-        glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex))
+    with pytest.raises(TypeError, match="Unrecognized array input"):
+        glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 
 
 def test_deflect_many(rng: np.random.Generator) -> None:
