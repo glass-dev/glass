@@ -13,9 +13,9 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-def test_broadcast_first() -> None:
-    a = np.ones((2, 3, 4))
-    b = np.ones((2, 1))
+def test_broadcast_first(xp: ModuleType) -> None:
+    a = xp.ones((2, 3, 4))
+    b = xp.ones((2, 1))
 
     # arrays with shape ((3, 4, 2)) and ((1, 2)) are passed
     # to np.broadcast_arrays; hence it works
@@ -24,19 +24,19 @@ def test_broadcast_first() -> None:
     assert b_a.shape == (2, 3, 4)
 
     # plain np.broadcast_arrays will not work
-    with pytest.raises(ValueError, match="shape mismatch"):
-        np.broadcast_arrays(a, b)
+    with pytest.raises(ValueError, match=r"shape mismatch|Incompatible shapes"):
+        xp.broadcast_arrays(a, b)
 
     # arrays with shape ((5, 6, 4)) and ((6, 5)) are passed
     # to np.broadcast_arrays; hence it will not work
-    a = np.ones((4, 5, 6))
-    b = np.ones((5, 6))
+    a = xp.ones((4, 5, 6))
+    b = xp.ones((5, 6))
 
-    with pytest.raises(ValueError, match="shape mismatch"):
+    with pytest.raises(ValueError, match=r"shape mismatch|Incompatible shapes"):
         glass.arraytools.broadcast_first(a, b)
 
     # plain np.broadcast_arrays will work
-    a_a, b_a = np.broadcast_arrays(a, b)
+    a_a, b_a = xp.broadcast_arrays(a, b)
 
     assert a_a.shape == (4, 5, 6)
     assert b_a.shape == (4, 5, 6)
