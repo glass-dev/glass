@@ -13,6 +13,10 @@ import pytest
 import glass
 import glass._array_api_utils
 
+with contextlib.suppress(ImportError):
+    # only import if jax is available
+    import glass.jax
+
 if TYPE_CHECKING:
     import types
 
@@ -145,8 +149,6 @@ def urng(xp: types.ModuleType) -> UnifiedGenerator:
     seed = 42
     backend = xp.__name__
     if backend == "jax.numpy":
-        import glass.jax
-
         return glass.jax.Generator(seed=seed)
     if backend == "numpy":
         return np.random.default_rng(seed=seed)
