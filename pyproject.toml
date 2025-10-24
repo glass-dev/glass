@@ -22,15 +22,14 @@ docs = [
     "sphinxcontrib-katex",
 ]
 test = [
-    "array-api-strict",
     "cosmology.api",
     "fitsio",
-    "jax",
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
     "pytest-rerunfailures",
+    "scipy",
 ]
 
 [project]
