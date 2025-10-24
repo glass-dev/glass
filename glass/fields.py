@@ -215,19 +215,27 @@ def cls2cov(
     """
     xp = array_api_compat.array_namespace(*cls, use_compat=False)
 
-    cov = xp.zeros((nl, nc + 1))
+    temp_cov = []
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
+        current_cov = xp.asarray([])
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
             if i == 0 and np.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = cl.size
-            cov[:n, i] = cl
-            cov[n:, i] = 0
-        cov /= 2
-        yield cov
+            # Pad cl/2 with zeros up to nl
+            current_cov = xp.concat([cl * 0.5, xp.zeros(nl - cl.size)])
+        # We only add the last cov to temp_cov
+        temp_cov.append(current_cov)
+        # Pad inverse of the result with zeros up to nc + 1
+        inverse_cov = xp.stack(
+            [
+                *temp_cov,
+                *[xp.zeros(nl) for _ in range(nc + 1 - len(temp_cov))],
+            ]
+        )
+        yield inverse_cov.T
 
 
 def _multalm(

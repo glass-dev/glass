@@ -136,10 +136,6 @@ def test_iternorm(xp: types.ModuleType) -> None:
 
 
 def test_cls2cov(xp: types.ModuleType) -> None:
-    # Call jax version of iternorm once jax version is written
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
-
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2

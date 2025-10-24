@@ -47,8 +47,18 @@ def tests(session: nox.Session) -> None:
 
     session.run(
         "pytest",
+        "--benchmark-skip",
         *session.posargs,
     )
+
+
+@nox.session(python=ALL_PYTHON)
+def benchmark(session: nox.Session) -> None:
+    """Run the unit tests."""
+    session.posargs.append("--benchmark-only")
+    session.posargs.append("-k")
+    session.posargs.append("benchmark")
+    tests(session)
 
 
 @nox.session(python=ALL_PYTHON)
