@@ -123,7 +123,7 @@ def iternorm(
     """
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
-    xp = array_api_compat.array_namespace(first)
+    xp = array_api_compat.array_namespace(first, use_compat=False)
 
     n = (size,) if isinstance(size, int) else size
 
@@ -264,7 +264,7 @@ def _multalm(
         The product of alm and bl.
 
     """
-    xp = array_api_compat.array_namespace(alm, bl)
+    xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
 
     n = bl.size
     # Ideally would be xp.asanyarray but this does not yet exist. The key difference

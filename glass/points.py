@@ -89,7 +89,7 @@ def effective_bias(
         \;.
 
     """
-    xp = _utils.array_namespace(z, bz, w.za, w.wa)
+    xp = array_api_compat.array_namespace(z, bz, w.za, w.wa, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     norm = uxpx.trapezoid(w.wa, w.za)
@@ -137,7 +137,7 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    xp = array_api_compat.array_namespace(delta, b)
+    xp = array_api_compat.array_namespace(delta, b, use_compat=False)
 
     delta_g = xp.log1p(delta)
     delta_g *= b
@@ -416,7 +416,7 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    xp = array_api_compat.array_namespace(densities, bias)
+    xp = array_api_compat.array_namespace(densities, bias, use_compat=False)
 
     bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 

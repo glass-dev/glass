@@ -52,7 +52,7 @@ def nnls(
         If the shapes of ``a`` and ``b`` do not match.
 
     """
-    xp = array_api_compat.array_namespace(a, b)
+    xp = array_api_compat.array_namespace(a, b, use_compat=False)
 
     a = xp.asarray(a)
     b = xp.asarray(b)

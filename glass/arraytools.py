@@ -36,7 +36,7 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    xp = array_api_compat.array_namespace(*arrays)
+    xp = array_api_compat.array_namespace(*arrays, use_compat=False)
 
     arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
     arrays = xp.broadcast_arrays(*arrays)
@@ -203,7 +203,7 @@ def cumulative_trapezoid(
         The cumulative integral of the function.
 
     """
-    xp = array_api_compat.array_namespace(f, x)
+    xp = array_api_compat.array_namespace(f, x, use_compat=False)
 
     f = xp.asarray(f, dtype=xp.float64)
     x = xp.asarray(x, dtype=xp.float64)
