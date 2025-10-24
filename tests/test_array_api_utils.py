@@ -1,6 +1,7 @@
 import importlib
 
 import numpy as np
+import pytest
 
 import glass._array_api_utils
 
