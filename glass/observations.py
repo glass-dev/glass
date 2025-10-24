@@ -34,10 +34,15 @@ from typing import TYPE_CHECKING
 import healpy as hp
 import numpy as np
 
+import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from numpy.typing import NDArray
+
+    from glass._array_api_utils import FloatArray
 
 
 def vmap_galactic_ecliptic(
@@ -88,12 +93,12 @@ def vmap_galactic_ecliptic(
 
 
 def gaussian_nz(
-    z: NDArray[np.float64],
-    mean: float | NDArray[np.float64],
-    sigma: float | NDArray[np.float64],
+    z: FloatArray,
+    mean: float | FloatArray,
+    sigma: float | FloatArray,
     *,
-    norm: float | NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    norm: float | FloatArray | None = None,
+) -> FloatArray:
     """
     Gaussian redshift distribution.
 
@@ -119,11 +124,22 @@ def gaussian_nz(
         The redshift distribution at the given ``z`` values.
 
     """
-    mean = np.reshape(mean, np.shape(mean) + (1,) * np.ndim(z))
-    sigma = np.reshape(sigma, np.shape(sigma) + (1,) * np.ndim(z))
+    arrays_to_check = tuple(
+        x
+        for x in (z, mean, sigma, norm)
+        if not (isinstance(x, (float, int)) or x is None)
+    )
+    xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
 
-    nz = np.exp(-(((z - mean) / sigma) ** 2) / 2)
-    nz /= np.trapezoid(nz, z, axis=-1)[..., np.newaxis]
+    mean = xp.asarray(mean, dtype=xp.float64)
+    sigma = xp.asarray(sigma, dtype=xp.float64)
+
+    mean = xp.reshape(mean, mean.shape + (1,) * z.ndim)  # type: ignore[union-attr]
+    sigma = xp.reshape(sigma, sigma.shape + (1,) * z.ndim)  # type: ignore[union-attr]
+
+    nz = xp.exp(-(((z - mean) / sigma) ** 2) / 2)
+    nz /= uxpx.trapezoid(nz, z, axis=-1)[..., xp.newaxis]
 
     if norm is not None:
         nz *= norm
@@ -132,13 +148,13 @@ def gaussian_nz(
 
 
 def smail_nz(
-    z: NDArray[np.float64],
-    z_mode: float | NDArray[np.float64],
-    alpha: float | NDArray[np.float64],
-    beta: float | NDArray[np.float64],
+    z: FloatArray,
+    z_mode: float | FloatArray,
+    alpha: float | FloatArray,
+    beta: float | FloatArray,
     *,
-    norm: float | NDArray[np.float64] | None = None,
-) -> NDArray[np.float64]:
+    norm: float | FloatArray | None = None,
+) -> FloatArray:
     r"""
     Redshift distribution following Smail et al. (1994).
 
@@ -174,17 +190,25 @@ def smail_nz(
     where :math:`z_0` is matched to the given mode of the distribution.
 
     """
-    z_mode = np.asanyarray(z_mode)[..., np.newaxis]
-    alpha = np.asanyarray(alpha)[..., np.newaxis]
-    beta = np.asanyarray(beta)[..., np.newaxis]
+    arrays_to_check = tuple(
+        x
+        for x in (z, z_mode, alpha, beta, norm)
+        if not ((isinstance(x, (float, int))) or x is None)
+    )
+    xp = _utils.get_namespace(*arrays_to_check)
+    uxpx = _utils.XPAdditions(xp)
 
-    pz = z**alpha * np.exp(-alpha / beta * (z / z_mode) ** beta)
-    pz /= np.trapezoid(pz, z, axis=-1)[..., np.newaxis]
+    z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
+    alpha = xp.asarray(alpha, dtype=xp.float64)[..., xp.newaxis]
+    beta = xp.asarray(beta, dtype=xp.float64)[..., xp.newaxis]
+
+    pz = z**alpha * xp.exp(-alpha / beta * (z / z_mode) ** beta)
+    pz /= uxpx.trapezoid(pz, z, axis=-1)[..., xp.newaxis]
 
     if norm is not None:
         pz *= norm
 
-    return pz  # type: ignore[no-any-return]
+    return pz
 
 
 def fixed_zbins(
@@ -193,6 +217,7 @@ def fixed_zbins(
     *,
     nbins: int | None = None,
     dz: float | None = None,
+    xp: ModuleType | None = None,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -210,6 +235,9 @@ def fixed_zbins(
         Number of redshift bins. Only one of ``nbins`` and ``dz`` can be given.
     dz
         Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, numpy with be used.
 
     Returns
     -------
@@ -221,10 +249,16 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
+    xp = np if xp is None else xp
+
     if nbins is not None and dz is None:
-        zbinedges = np.linspace(zmin, zmax, nbins + 1)
+        zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:
-        zbinedges = np.arange(zmin, np.nextafter(zmax + dz, zmax), dz)
+        zbinedges = xp.arange(
+            zmin,
+            xp.nextafter(xp.asarray(zmax + dz), xp.asarray(zmax)),
+            dz,
+        )
     else:
         msg = "exactly one of nbins and dz must be given"
         raise ValueError(msg)
@@ -233,8 +267,8 @@ def fixed_zbins(
 
 
 def equal_dens_zbins(
-    z: NDArray[np.float64],
-    nz: NDArray[np.float64],
+    z: FloatArray,
+    nz: FloatArray,
     nbins: int,
 ) -> list[tuple[float, float]]:
     """
@@ -257,23 +291,26 @@ def equal_dens_zbins(
         A list of redshift bin edges.
 
     """
+    xp = _utils.get_namespace(z, nz)
+    uxpx = _utils.XPAdditions(xp)
+
     # compute the normalised cumulative distribution function
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
     # interpolate to find the z values at CDF = i/nbins for i = 0, ..., nbins
     cuml_nz = glass.arraytools.cumulative_trapezoid(nz, z)
-    cuml_nz /= cuml_nz[[-1]]
-    zbinedges = np.interp(np.linspace(0, 1, nbins + 1), cuml_nz, z)
+    cuml_nz /= cuml_nz[-1]
+    zbinedges = uxpx.interp(xp.linspace(0, 1, nbins + 1), cuml_nz, z)
 
     return list(itertools.pairwise(zbinedges))
 
 
 def tomo_nz_gausserr(
-    z: NDArray[np.float64],
-    nz: NDArray[np.float64],
+    z: FloatArray,
+    nz: FloatArray,
     sigma_0: float,
     zbins: list[tuple[float, float]],
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Tomographic redshift bins with a Gaussian redshift error.
 
@@ -308,23 +345,28 @@ def tomo_nz_gausserr(
         produce redshift bins of fixed size
 
     """
+    xp = _utils.get_namespace(z, nz)
+    uxpx = _utils.XPAdditions(xp)
+
     # converting zbins into an array:
-    zbins_arr = np.asanyarray(zbins)
+    zbins_arr = xp.asarray(zbins)
 
     # bin edges and adds a new axis
-    z_lower = zbins_arr[:, 0, np.newaxis]
-    z_upper = zbins_arr[:, 1, np.newaxis]
+    z_lower = zbins_arr[:, 0, xp.newaxis]
+    z_upper = zbins_arr[:, 1, xp.newaxis]
 
     # we need a vectorised version of the error function:
-    erf = np.vectorize(math.erf, otypes=(float,))
+    erf = uxpx.vectorize(math.erf, otypes=(float,))
 
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz
     # leading axis corresponds to the different bins
     sz = 2**0.5 * sigma_0 * (1 + z)
-    binned_nz = erf((z - z_lower) / sz)
-    binned_nz -= erf((z - z_upper) / sz)
-    binned_nz /= 1 + erf(z / sz)
+    # we need to call xp.asarray here because erf will return a numpy
+    # array for array libs which do not implement vectorize.
+    binned_nz = xp.asarray(erf((z - z_lower) / sz))
+    binned_nz -= xp.asarray(erf((z - z_upper) / sz))
+    binned_nz /= 1 + xp.asarray(erf(z / sz))
     binned_nz *= nz
 
-    return binned_nz  # type: ignore[no-any-return]
+    return binned_nz

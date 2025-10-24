@@ -7,6 +7,7 @@ requires = [
 
 [dependency-groups]
 docs = [
+    "array-api-strict",
     "cosmology.api",
     "furo",
     "ipython",
@@ -21,6 +22,7 @@ docs = [
     "sphinxcontrib-katex",
 ]
 test = [
+    "array-api-strict",
     "cosmology.api",
     "fitsio",
     "jax",
@@ -48,11 +50,9 @@ classifiers = [
 ]
 dependencies = [
     "array-api-extra>=0.9.0",
-    "array-api-strict>=2.0",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "transformcl>=2022.8.9",
-    "typing-extensions>=4.13.2",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -116,6 +116,13 @@ enable_error_code = [
 strict = true
 warn_unreachable = true
 
+[[tool.mypy.overrides]]
+disable_error_code = [
+    "arg-type",
+    "assignment",
+]
+module = "tests.*"
+
 [tool.pytest.ini_options]
 addopts = [
     "--strict-config",
@@ -144,6 +151,7 @@ lint.allowed-confusables = [
     "α",
     "γ",
 ]
+lint.future-annotations = true
 lint.ignore = [
     "COM812", # missing-trailing-comma (ruff-format recommended)
     "D203", # one-blank-line-before-class
