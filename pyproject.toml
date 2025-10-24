@@ -21,6 +21,10 @@ docs = [
     "sphinx<8.2.0",
     "sphinxcontrib-katex",
 ]
+doctest = [
+    "jax",
+    {include-group = "test"},
+]
 test = [
     "cosmology.api",
     "fitsio",
