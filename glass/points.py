@@ -36,6 +36,8 @@ from typing import TYPE_CHECKING, Any
 import healpix
 import numpy as np
 
+import array_api_compat
+
 import glass
 import glass._array_api_utils as _utils
 import glass.arraytools
@@ -87,7 +89,7 @@ def effective_bias(
         \;.
 
     """
-    xp = _utils.get_namespace(z, bz, w.za, w.wa)
+    xp = array_api_compat.array_namespace(z, bz, w.za, w.wa, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     norm = uxpx.trapezoid(w.wa, w.za)
@@ -135,8 +137,7 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    arrays_to_check = (delta,) if type(b) is float else (delta, b)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(delta, b, use_compat=False)
 
     delta_g = xp.log1p(delta)
     delta_g *= b
@@ -415,12 +416,7 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    arrays_to_check = (
-        (densities, bias)
-        if bias is not None and not isinstance(bias, float)
-        else (densities,)
-    )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(densities, bias, use_compat=False)
 
     bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 

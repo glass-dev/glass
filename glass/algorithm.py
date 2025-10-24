@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import glass._array_api_utils as _utils
+import array_api_compat
 
 if TYPE_CHECKING:
     import numpy as np
@@ -52,7 +52,7 @@ def nnls(
         If the shapes of ``a`` and ``b`` do not match.
 
     """
-    xp = _utils.get_namespace(a, b)
+    xp = array_api_compat.array_namespace(a, b, use_compat=False)
 
     a = xp.asarray(a)
     b = xp.asarray(b)
