@@ -1,6 +1,6 @@
 import pytest
 
-jax = pytest.importorskip("jax")
+jax = pytest.importorskip("jax", reason="tests require jax")
 
 import jax.numpy as jnp  # noqa: E402
 from jax.typing import ArrayLike  # noqa: E402
