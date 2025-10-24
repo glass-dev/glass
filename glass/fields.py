@@ -122,7 +122,7 @@ def iternorm(
     """
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
-    xp = array_api_compat.array_namespace(first, use_compat=False)
+    xp = first.__array_namespace__()
 
     n = (size,) if isinstance(size, int) else size
 

@@ -18,8 +18,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeAlias
 
-import array_api_compat
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
@@ -107,7 +105,7 @@ def rng_dispatcher(
     NotImplementedError
         If the array backend is not supported.
     """
-    xp = array_api_compat.array_namespace(array, use_compat=False)
+    xp = array.__array_namespace__()
 
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415

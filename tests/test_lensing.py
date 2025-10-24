@@ -116,7 +116,7 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
         im: float,
         *,
         usecomplex: bool,
-    ) -> complex | NDArray[float]:
+    ) -> complex | NDArray[np.float64]:
         return re + 1j * im if usecomplex else xp.asarray([re, im])
 
     # north

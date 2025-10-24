@@ -316,7 +316,7 @@ def tophat_windows(
             stacklevel=2,
         )
 
-    xp = array_api_compat.array_namespace(zbins, use_compat=False)
+    xp = zbins.__array_namespace__()
     uxpx = XPAdditions(xp)
 
     wht: WeightFunc
@@ -382,7 +382,7 @@ def linear_windows(
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
-    xp = array_api_compat.array_namespace(zgrid, use_compat=False)
+    xp = zgrid.__array_namespace__()
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
@@ -452,7 +452,7 @@ def cubic_windows(
     if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
-    xp = array_api_compat.array_namespace(zgrid, use_compat=False)
+    xp = zgrid.__array_namespace__()
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
