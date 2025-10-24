@@ -15,6 +15,8 @@ __all__ = [
     "cubic_windows",
     "deflect",
     "discretized_cls",
+    "displace",
+    "displacement",
     "distance_grid",
     "effective_bias",
     "effective_cls",
@@ -123,6 +125,8 @@ from glass.observations import (
     vmap_galactic_ecliptic,
 )
 from glass.points import (
+    displace,
+    displacement,
     effective_bias,
     linear_bias,
     loglinear_bias,
