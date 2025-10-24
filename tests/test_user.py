@@ -12,7 +12,7 @@ import glass
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-# check if fitsio is available for testing
+# check if available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
 delta = 0.001  # Number of points in arrays
