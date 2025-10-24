@@ -10,8 +10,6 @@ import glass.arraytools
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import NDArray
-
 
 def test_broadcast_first(xp: ModuleType) -> None:
     a = xp.ones((2, 3, 4))
@@ -58,44 +56,44 @@ def test_broadcast_leading_axes() -> None:
     assert c_out.shape == (3, 4, 5, 6)
 
 
-def test_ndinterp() -> None:
+def test_ndinterp(xp: ModuleType) -> None:
     # test 1d interpolation
 
-    xq = np.array([0, 1, 2, 3, 4])
-    yq = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
+    xq = xp.asarray([0, 1, 2, 3, 4])
+    yq = xp.asarray([1.1, 1.2, 1.3, 1.4, 1.5])
 
-    x: float | NDArray[np.float64] = 0.5
+    x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
-    assert np.shape(y) == ()
+    assert y.shape == ()
     np.testing.assert_allclose(y, 1.15, atol=1e-15)
 
-    x = np.array([0.5, 1.5, 2.5])
+    x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
-    assert np.shape(y) == (3,)
+    assert y.shape == (3,)
     np.testing.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
 
-    x = np.array([[0.5, 1.5], [2.5, 3.5]])
+    x = xp.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
-    assert np.shape(y) == (2, 2)
+    assert y.shape == (2, 2)
     np.testing.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
     # test nd interpolation in final axis
 
-    yq = np.array([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
+    yq = xp.asarray([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
 
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
-    assert np.shape(y) == (2,)
+    assert y.shape == (2,)
     np.testing.assert_allclose(y, [1.15, 2.15], atol=1e-15)
 
-    x = np.array([0.5, 1.5, 2.5])
+    x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
-    assert np.shape(y) == (2, 3)
+    assert y.shape == (2, 3)
     np.testing.assert_allclose(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
 
-    x = np.array([[0.5, 1.5], [2.5, 3.5]])
+    x = xp.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
-    assert np.shape(y) == (2, 2, 2)
+    assert y.shape == (2, 2, 2)
     np.testing.assert_allclose(
         y,
         [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]],
@@ -104,27 +102,27 @@ def test_ndinterp() -> None:
 
     # test nd interpolation in middle axis
 
-    yq = np.array(
+    yq = xp.asarray(
         [[[1.1], [1.2], [1.3], [1.4], [1.5]], [[2.1], [2.2], [2.3], [2.4], [2.5]]],
     )
 
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
-    assert np.shape(y) == (2, 1)
+    assert y.shape == (2, 1)
     np.testing.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
 
-    x = np.array([0.5, 1.5, 2.5])
+    x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
-    assert np.shape(y) == (2, 3, 1)
+    assert y.shape == (2, 3, 1)
     np.testing.assert_allclose(
         y,
         [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]],
         atol=1e-15,
     )
 
-    x = np.array([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
+    x = xp.asarray([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
-    assert np.shape(y) == (2, 3, 4, 1)
+    assert y.shape == (2, 3, 4, 1)
     np.testing.assert_allclose(
         y,
         [
