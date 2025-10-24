@@ -85,37 +85,6 @@ def import_numpy(backend: str) -> ModuleType:
         return numpy
 
 
-def array_namespace(*arrays: AnyArray) -> ModuleType:
-    """
-    Return the array library (namespace) of input arrays if they all belong to the same
-    library.
-
-    Parameters
-    ----------
-    *arrays
-        Arrays whose namespace is to be determined.
-
-    Returns
-    -------
-        The array namespace module.
-
-    Raises
-    ------
-    ValueError
-        If input arrays do not all belong to the same array library.
-    """
-    namespace = arrays[0].__array_namespace__()
-    if any(
-        array.__array_namespace__() != namespace
-        for array in arrays
-        if array is not None
-    ):
-        msg = "input arrays should belong to the same array library"
-        raise ValueError(msg)
-
-    return namespace
-
-
 def rng_dispatcher(
     array: AnyArray,
 ) -> np.random.Generator | glass.jax.Generator | Generator:

@@ -1,21 +1,10 @@
 import jax.numpy as jnp
 import numpy as np
-import pytest
 
 import array_api_strict
 from array_api_strict._array_object import Array
 
 import glass._array_api_utils
-
-
-def test_array_namespace() -> None:
-    arrays = [np.array([1, 2]), np.array([2, 3])]
-    namespace = glass._array_api_utils.array_namespace(*arrays)
-    assert namespace == np
-
-    arrays = [np.array([1, 2]), jnp.array([2, 3])]
-    with pytest.raises(ValueError, match="input arrays should"):
-        glass._array_api_utils.array_namespace(*arrays)
 
 
 def test_rng_dispatcher() -> None:
