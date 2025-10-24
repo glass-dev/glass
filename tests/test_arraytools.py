@@ -141,12 +141,12 @@ def test_ndinterp(xp: ModuleType) -> None:
     )
 
 
-def test_trapezoid_product() -> None:
-    x1 = np.linspace(0, 2, 100)
-    f1 = np.full_like(x1, 2.0)
+def test_trapezoid_product(xp: ModuleType) -> None:
+    x1 = xp.linspace(0, 2, 100)
+    f1 = xp.full_like(x1, 2.0)
 
-    x2 = np.linspace(1, 2, 10)
-    f2 = np.full_like(x2, 0.5)
+    x2 = xp.linspace(1, 2, 10)
+    f2 = xp.full_like(x2, 0.5)
 
     s = glass.arraytools.trapezoid_product((x1, f1), (x2, f2))
 
