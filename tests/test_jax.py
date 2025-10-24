@@ -1,9 +1,11 @@
-import jax
-import jax.numpy as jnp
 import pytest
-from jax.typing import ArrayLike
 
-from glass.jax import Generator
+jax = pytest.importorskip("jax")
+
+import jax.numpy as jnp  # noqa: E402
+from jax.typing import ArrayLike  # noqa: E402
+
+from glass.jax import Generator  # noqa: E402
 
 
 def test_init() -> None:
