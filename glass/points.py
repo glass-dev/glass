@@ -475,7 +475,7 @@ def displace(
     exponential map.
 
     """
-    xp = _utils.get_namespace(lon, lat, alpha)
+    xp = array_api_compat.get_namespace(lon, lat, alpha, use_compat=False)
 
     alpha = xp.asarray(alpha)
     if xp.isdtype(alpha.dtype, "complex floating"):
@@ -533,7 +533,9 @@ def displacement(
     displace : Apply displacement to a set of points.
 
     """
-    xp = _utils.get_namespace(from_lon, from_lat, to_lon, to_lat)
+    xp = array_api_compat.get_namespace(
+    	from_lon, from_lat, to_lon, to_lat, use_compat=False
+  	)
 
     a = (90.0 - to_lat) / 180 * xp.pi
     b = (90.0 - from_lat) / 180 * xp.pi
