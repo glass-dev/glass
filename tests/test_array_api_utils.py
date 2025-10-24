@@ -1,21 +1,31 @@
-import jax.numpy as jnp
+import importlib
+
 import numpy as np
+import pytest
 
 import array_api_strict
 from array_api_strict._array_object import Array
 
 import glass._array_api_utils
 
+# check if jax is available for testing
+HAVE_JAX = importlib.util.find_spec("jax") is not None
+
 
 def test_rng_dispatcher() -> None:
     rng = glass._array_api_utils.rng_dispatcher(np.asarray([1, 2]))
     assert isinstance(rng, np.random.Generator)
 
-    rng = glass._array_api_utils.rng_dispatcher(jnp.asarray([1, 2]))
-    assert isinstance(rng, glass.jax.Generator)
-
     rng = glass._array_api_utils.rng_dispatcher(array_api_strict.asarray([1, 2]))
     assert isinstance(rng, glass._array_api_utils.Generator)
+
+
+@pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
+def test_rng_dispatcher_jax() -> None:
+    import jax.numpy as jnp
+
+    rng = glass._array_api_utils.rng_dispatcher(jnp.asarray([1, 2]))
+    assert isinstance(rng, glass.jax.Generator)
 
 
 def test_init() -> None:
