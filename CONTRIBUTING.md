@@ -213,11 +213,11 @@ nox -s tests
 Only `tests`, `coverage`, and the `doctests` session run on all supported Python
 versions by default.
 
-To specify a particular Python version (for example `3.13`), use the following
+To specify a particular Python version (for example `3.14`), use the following
 syntax -
 
 ```bash
-nox -s tests-3.13
+nox -s tests-3.14
 ```
 
 One can specify a particular array backend for testing by setting the
@@ -227,14 +227,14 @@ _GLASS_ can be tested with every supported array library by setting
 
 ```bash
 # run tests using numpy
-nox -s tests-3.13
-ARRAY_BACKEND=numpy nox -s tests-3.13
+nox -s tests-3.14
+ARRAY_BACKEND=numpy nox -s tests-3.14
 # run tests using array_api_strict
-ARRAY_BACKEND=array_api_strict nox -s tests-3.13
+ARRAY_BACKEND=array_api_strict nox -s tests-3.14
 # run tests using jax
-ARRAY_BACKEND=jax nox -s tests-3.13
+ARRAY_BACKEND=jax nox -s tests-3.14
 # run tests using every supported array library
-ARRAY_BACKEND=all nox -s tests-3.13
+ARRAY_BACKEND=all nox -s tests-3.14
 ```
 
 The following command can be used to deploy the docs on `localhost` -
