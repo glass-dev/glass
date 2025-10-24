@@ -14,20 +14,20 @@ def test_rng_dispatcher_numpy() -> None:
     assert isinstance(rng, np.random.Generator)
 
 
-@pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
-def test_rng_dispatcher_array_api_strict() -> None:
-    import array_api_strict
-
-    rng = glass._array_api_utils.rng_dispatcher(array_api_strict.asarray([1, 2]))
-    assert isinstance(rng, glass._array_api_utils.Generator)
-
-
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_rng_dispatcher_jax() -> None:
     import jax.numpy as jnp
 
     rng = glass._array_api_utils.rng_dispatcher(jnp.asarray([1, 2]))
     assert isinstance(rng, glass.jax.Generator)
+
+
+@pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
+def test_rng_dispatcher_array_api_strict() -> None:
+    import array_api_strict
+
+    rng = glass._array_api_utils.rng_dispatcher(array_api_strict.asarray([1, 2]))
+    assert isinstance(rng, glass._array_api_utils.Generator)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
