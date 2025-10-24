@@ -285,7 +285,7 @@ def equal_dens_zbins(
         A list of redshift bin edges.
 
     """
-    xp = _utils.array_namespace(z, nz)
+    xp = array_api_compat.array_namespace(z, nz, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     # compute the normalised cumulative distribution function
@@ -339,7 +339,7 @@ def tomo_nz_gausserr(
         produce redshift bins of fixed size
 
     """
-    xp = _utils.array_namespace(z, nz)
+    xp = array_api_compat.array_namespace(z, nz, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     # converting zbins into an array:

@@ -17,7 +17,6 @@ import array_api_compat
 import array_api_extra as xpx
 
 import glass
-import glass._array_api_utils as _utils
 import glass.grf
 
 if TYPE_CHECKING:
@@ -214,7 +213,7 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
-    xp = _utils.array_namespace(*cls)
+    xp = array_api_compat.array_namespace(*cls, use_compat=False)
 
     cov = xp.zeros((nl, nc + 1))
     end = 0
@@ -679,9 +678,7 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
-    # Try with cls and weights but if cls is a Sequence[float] then we use weights only
-    # and convert cls to an xp array
-    xp = _utils.array_namespace(*cls, weights1, weights2)
+    xp = array_api_compat.array_namespace(*cls, weights1, weights2, use_compat=False)
 
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))

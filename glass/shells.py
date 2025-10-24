@@ -53,7 +53,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-import glass._array_api_utils as _utils
+import array_api_compat
+
 import glass.algorithm
 import glass.arraytools
 from glass._array_api_utils import XPAdditions
@@ -228,7 +229,11 @@ class RadialWindow:
         - Determines xp from za and wa.
         """
         if self.xp is None:
-            object.__setattr__(self, "xp", _utils.array_namespace(self.za, self.wa))
+            object.__setattr__(
+                self,
+                "xp",
+                array_api_compat.array_namespace(self.za, self.wa, use_compat=False),
+            )
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
@@ -311,7 +316,7 @@ def tophat_windows(
             stacklevel=2,
         )
 
-    xp = _utils.array_namespace(zbins)
+    xp = array_api_compat.array_namespace(zbins, use_compat=False)
     uxpx = XPAdditions(xp)
 
     wht: WeightFunc
@@ -377,7 +382,7 @@ def linear_windows(
     if zgrid[0] != 0:
         warnings.warn("first triangular window does not start at z=0", stacklevel=2)
 
-    xp = _utils.array_namespace(zgrid)
+    xp = array_api_compat.array_namespace(zgrid, use_compat=False)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
@@ -447,7 +452,7 @@ def cubic_windows(
     if zgrid[0] != 0:
         warnings.warn("first cubic spline window does not start at z=0", stacklevel=2)
 
-    xp = _utils.array_namespace(zgrid)
+    xp = array_api_compat.array_namespace(zgrid, use_compat=False)
 
     ws = []
     for zmin, zmid, zmax in zip(zgrid, zgrid[1:], zgrid[2:], strict=False):
@@ -504,7 +509,7 @@ def restrict(
     if z.ndim != 1:
         msg = "z must be 1D arrays"
         raise ValueError(msg)
-    xp = _utils.array_namespace(z, f)
+    xp = array_api_compat.array_namespace(z, f, use_compat=False)
     uxpx = XPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
@@ -662,7 +667,7 @@ def partition_lstsq(
         The partition.
 
     """
-    xp = _utils.array_namespace(z, fz)
+    xp = array_api_compat.array_namespace(z, fz, use_compat=False)
     uxpx = XPAdditions(xp)
 
     # make sure nothing breaks
@@ -733,7 +738,7 @@ def partition_nnls(
         The partition.
 
     """
-    xp = _utils.array_namespace(z, fz)
+    xp = array_api_compat.array_namespace(z, fz, use_compat=False)
     uxpx = XPAdditions(xp)
 
     # make sure nothing breaks
@@ -808,7 +813,7 @@ def partition_restrict(
         The partition.
 
     """
-    xp = _utils.array_namespace(z, fz)
+    xp = array_api_compat.array_namespace(z, fz, use_compat=False)
     uxpx = XPAdditions(xp)
 
     parts = []
@@ -964,8 +969,11 @@ def combine(
         Find weights for a given function.
 
     """
-    xp = _utils.array_namespace(
-        z, weights, *(arr for shell in shells for arr in (shell.za, shell.wa))
+    xp = array_api_compat.array_namespace(
+        z,
+        weights,
+        *(arr for shell in shells for arr in (shell.za, shell.wa)),
+        use_compat=False,
     )
     uxpx = XPAdditions(xp)
 

@@ -131,8 +131,7 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
-    xp = _utils.array_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(x, xq, fq, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
@@ -168,7 +167,9 @@ def trapezoid_product(
 
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
-    xp = _utils.array_namespace(*f, *tuple(itertools.chain(*ff)))
+    xp = array_api_compat.array_namespace(
+        *f, *tuple(itertools.chain(*ff)), use_compat=False
+    )
     uxpx = _utils.XPAdditions(xp)
 
     x: FloatArray
