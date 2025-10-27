@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
-import glass._array_api_utils as _utils
-
 if TYPE_CHECKING:
     import numpy as np
     from jaxtyping import Array
@@ -56,7 +54,7 @@ def _apply_masked_changes(
         If the shapes of parameters do not match their description.
 
     """
-    xp = _utils.get_namespace(arr, masked_arr, mask)
+    xp = array_api_compat.array_namespace(arr, masked_arr, mask)
 
     # Verify inputs
     if arr.shape != mask.shape:
