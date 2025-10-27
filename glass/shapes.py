@@ -28,17 +28,30 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import array_api_compat
+
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from numpy.typing import NDArray
+
+    import glass.jax
+    from glass._array_api_utils import FloatArray
 
 
 def triaxial_axis_ratio(
-    zeta: float | NDArray[np.float64],
-    xi: float | NDArray[np.float64],
+    zeta: float | FloatArray,
+    xi: float | FloatArray,
     size: int | tuple[int, ...] | None = None,
     *,
-    rng: np.random.Generator | None = None,
-) -> NDArray[np.float64]:
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
+    xp: ModuleType | None = None,
+) -> FloatArray:
     """
     Axis ratio of a randomly projected triaxial ellipsoid.
 
@@ -65,26 +78,32 @@ def triaxial_axis_ratio(
     See equations (11) and (12) in [Binney85]_ for details.
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(zeta, xi, use_compat=False)
+
+    zeta = xp.asarray(zeta)
+    xi = xp.asarray(xi)
+
     # default RNG if not provided
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp)
 
     # get size from inputs if not explicitly provided
     if size is None:
-        size = np.broadcast(zeta, xi).shape
+        size = xp.broadcast_arrays(zeta, xi)[0].shape
 
     # draw random viewing angle (theta, phi)
     cos2_theta = rng.uniform(low=-1.0, high=1.0, size=size)
     cos2_theta *= cos2_theta
     sin2_theta = 1 - cos2_theta
-    cos2_phi = np.cos(rng.uniform(low=0.0, high=2 * np.pi, size=size))
+    cos2_phi = xp.cos(rng.uniform(low=0.0, high=2 * xp.pi, size=size))
     cos2_phi *= cos2_phi
     sin2_phi = 1 - cos2_phi
 
     # transform arrays to quantities that are used in eq. (11)
-    z2m1 = np.square(zeta)
+    z2m1 = xp.square(zeta)
     z2m1 -= 1
-    x2 = np.square(xi)
+    x2 = xp.square(xi)
 
     # eq. (11) multiplied by xi^2 zeta^2
     a = (1 + z2m1 * sin2_phi) * cos2_theta + x2 * sin2_theta
@@ -92,8 +111,8 @@ def triaxial_axis_ratio(
     c = 1 + z2m1 * cos2_phi
 
     # eq. (12)
-    return np.sqrt(  # type: ignore[no-any-return]
-        (a + c - np.sqrt((a - c) ** 2 + b2)) / (a + c + np.sqrt((a - c) ** 2 + b2)),
+    return xp.sqrt(
+        (a + c - xp.sqrt((a - c) ** 2 + b2)) / (a + c + xp.sqrt((a - c) ** 2 + b2)),
     )
 
 

@@ -1,46 +1,61 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 import glass
 
+if TYPE_CHECKING:
+    from types import ModuleType
 
-def test_triaxial_axis_ratio(rng: np.random.Generator) -> None:
+    from conftest import UnifiedGenerator
+
+
+def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    # Pass floats without xp
+    with pytest.raises(TypeError, match="Unrecognized array input"):
+        glass.triaxial_axis_ratio(0.8, 0.4)
+
     # single axis ratio
 
-    q = glass.triaxial_axis_ratio(0.8, 0.4)
-    assert np.isscalar(q)
+    q = glass.triaxial_axis_ratio(0.8, 0.4, xp=xp)
+    assert q.ndim == 0
 
     # many axis ratios
 
-    q = glass.triaxial_axis_ratio(0.8, 0.4, size=1000)
-    assert np.shape(q) == (1000,)
+    q = glass.triaxial_axis_ratio(0.8, 0.4, size=1000, xp=xp)
+    assert q.shape == (1000,)
 
     # explicit shape
 
-    q = glass.triaxial_axis_ratio(0.8, 0.4, size=(10, 10))
-    assert np.shape(q) == (10, 10)
+    q = glass.triaxial_axis_ratio(0.8, 0.4, size=(10, 10), xp=xp)
+    assert q.shape == (10, 10)
 
     # implicit size
 
-    q1 = glass.triaxial_axis_ratio(np.array([0.8, 0.9]), 0.4)
-    q2 = glass.triaxial_axis_ratio(0.8, np.array([0.4, 0.5]))
-    assert np.shape(q1) == np.shape(q2) == (2,)
+    q1 = glass.triaxial_axis_ratio(xp.asarray([0.8, 0.9]), 0.4)
+    q2 = glass.triaxial_axis_ratio(0.8, xp.asarray([0.4, 0.5]))
+    assert q1.shape == q2.shape == (2,)
 
     # broadcasting rule
 
     q = glass.triaxial_axis_ratio(
-        np.array([[0.6, 0.7], [0.8, 0.9]]), np.array([0.4, 0.5])
+        xp.asarray([[0.6, 0.7], [0.8, 0.9]]), xp.asarray([0.4, 0.5])
     )
-    assert np.shape(q) == (2, 2)
+    assert q.shape == (2, 2)
 
     # random parameters and check that projection is
     # between largest and smallest possible value
 
-    zeta, xi = np.sort(rng.uniform(0, 1, size=(2, 1000)), axis=0)
-    qmin = np.min([zeta, xi, xi / zeta], axis=0)
-    qmax = np.max([zeta, xi, xi / zeta], axis=0)
+    sorted_uniform_rnd = xp.sort(urng.uniform(0, 1, size=(2, 1000)), axis=0)
+    zeta = sorted_uniform_rnd[0, :]
+    xi = sorted_uniform_rnd[1, :]
+    qmin = xp.min(xp.stack([zeta, xi, xi / zeta]), axis=0)
+    qmax = xp.max(xp.stack([zeta, xi, xi / zeta]), axis=0)
     q = glass.triaxial_axis_ratio(zeta, xi)
-    assert np.all((qmax >= q) & (q >= qmin))
+    assert xp.all((qmax >= q) & (q >= qmin))
 
 
 def test_ellipticity_ryden04(rng: np.random.Generator) -> None:

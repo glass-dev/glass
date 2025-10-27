@@ -86,15 +86,15 @@ def import_numpy(backend: str) -> ModuleType:
 
 
 def rng_dispatcher(
-    array: AnyArray,
+    xp: ModuleType,
 ) -> np.random.Generator | glass.jax.Generator | Generator:
     """
     Dispatch a random number generator based on the provided array's backend.
 
     Parameters
     ----------
-    array
-        The array whose backend determines the RNG.
+    xp
+        The array backend which determines the RNG.
 
     Returns
     -------
@@ -105,8 +105,6 @@ def rng_dispatcher(
     NotImplementedError
         If the array backend is not supported.
     """
-    xp = array.__array_namespace__()
-
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 

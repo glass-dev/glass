@@ -119,8 +119,8 @@ class Generator:
 
     def uniform(
         self,
-        low: int = 0,
-        high: int = 1,
+        low: float = 0,
+        high: float = 1,
         size: Size = None,
         dtype: Shaped[Array, ...] = float,
     ) -> Array:
