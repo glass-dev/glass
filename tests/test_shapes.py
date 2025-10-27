@@ -58,52 +58,61 @@ def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
     assert xp.all((qmax >= q) & (q >= qmin))
 
 
-def test_ellipticity_ryden04(rng: np.random.Generator) -> None:
+def test_ellipticity_ryden04(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(
+            "Arrays in ellipticity_ryden04 are not immutable, so do not support jax"
+        )
+
+    # Pass floats without xp
+    with pytest.raises(TypeError, match="Unrecognized array input"):
+        glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
+
     # single ellipticity
 
-    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
-    assert np.isscalar(e)
+    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, xp=xp)
+    assert e.ndim == 0
 
     # test with rng
 
-    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=rng)
-    assert np.isscalar(e)
+    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, rng=urng, xp=xp)
+    assert e.ndim == 0
 
     # many ellipticities
 
-    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000)
-    assert np.shape(e) == (1000,)
+    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000, xp=xp)
+    assert e.shape == (1000,)
 
     # explicit shape
 
-    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10))
-    assert np.shape(e) == (10, 10)
+    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=(10, 10), xp=xp)
+    assert e.shape == (10, 10)
 
     # implicit size
 
-    e1 = glass.ellipticity_ryden04(-1.85, 0.89, np.array([0.222, 0.333]), 0.056)
-    e2 = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, np.array([0.056, 0.067]))
-    e3 = glass.ellipticity_ryden04(np.array([-1.85, -2.85]), 0.89, 0.222, 0.056)
-    e4 = glass.ellipticity_ryden04(-1.85, np.array([0.89, 1.001]), 0.222, 0.056)
-    assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
+    e1 = glass.ellipticity_ryden04(-1.85, 0.89, xp.asarray([0.222, 0.333]), 0.056)
+    e2 = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, xp.asarray([0.056, 0.067]))
+    e3 = glass.ellipticity_ryden04(xp.asarray([-1.85, -2.85]), 0.89, 0.222, 0.056)
+    e4 = glass.ellipticity_ryden04(-1.85, xp.asarray([0.89, 1.001]), 0.222, 0.056)
+    assert e1.shape == e2.shape == e3.shape == e4.shape == (2,)
 
     # broadcasting rule
 
     e = glass.ellipticity_ryden04(
-        np.array([-1.9, -2.9]),
+        xp.asarray([-1.9, -2.9]),
         0.9,
-        np.array([[0.2, 0.3], [0.4, 0.5]]),
+        xp.asarray([[0.2, 0.3], [0.4, 0.5]]),
         0.1,
     )
-    assert np.shape(e) == (2, 2)
+    assert e.shape == (2, 2)
 
     # check that result is in the specified range
 
-    e = glass.ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10)
-    assert np.all((e.real >= -1.0) & (e.real <= 1.0))
+    e = glass.ellipticity_ryden04(0.0, 1.0, 0.222, 0.056, size=10, xp=xp)
+    assert xp.all((xp.real(e) >= -1.0) & (xp.real(e) <= 1.0))
 
-    e = glass.ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10)
-    assert np.all((e.real >= -1.0) & (e.real <= 1.0))
+    e = glass.ellipticity_ryden04(0.0, 1.0, 0.0, 1.0, size=10, xp=xp)
+    assert xp.all((xp.real(e) >= -1.0) & (xp.real(e) <= 1.0))
 
 
 @pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])

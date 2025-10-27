@@ -117,14 +117,18 @@ def triaxial_axis_ratio(
 
 
 def ellipticity_ryden04(  # noqa: PLR0913
-    mu: float | NDArray[np.float64],
-    sigma: float | NDArray[np.float64],
-    gamma: float | NDArray[np.float64],
-    sigma_gamma: float | NDArray[np.float64],
+    mu: float | FloatArray,
+    sigma: float | FloatArray,
+    gamma: float | FloatArray,
+    sigma_gamma: float | FloatArray,
     size: int | tuple[int, ...] | None = None,
     *,
-    rng: np.random.Generator | None = None,
-) -> NDArray[np.float64]:
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
+    xp: ModuleType | None = None,
+) -> FloatArray:
     r"""
     Ellipticity distribution following Ryden (2004).
 
@@ -155,43 +159,53 @@ def ellipticity_ryden04(  # noqa: PLR0913
         An array of :term:`ellipticity` from projected axis ratios.
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(
+            mu, sigma, gamma, sigma_gamma, use_compat=False
+        )
+
+    mu = xp.asarray(mu)
+    sigma = xp.asarray(sigma)
+    gamma = xp.asarray(gamma)
+    sigma_gamma = xp.asarray(sigma_gamma)
+
     # default RNG if not provided
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp)
 
     # default size if not given
     if size is None:
-        size = np.broadcast(mu, sigma, gamma, sigma_gamma).shape
+        size = xp.broadcast_arrays(mu, sigma, gamma, sigma_gamma)[0].shape
 
     # broadcast all inputs to output shape
     # this makes it possible to efficiently resample later
-    mu = np.broadcast_to(mu, size, subok=True)
-    sigma = np.broadcast_to(sigma, size, subok=True)
-    gamma = np.broadcast_to(gamma, size, subok=True)
-    sigma_gamma = np.broadcast_to(sigma_gamma, size, subok=True)
+    mu = xp.broadcast_to(mu, size)
+    sigma = xp.broadcast_to(sigma, size)
+    gamma = xp.broadcast_to(gamma, size)
+    sigma_gamma = xp.broadcast_to(sigma_gamma, size)
 
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
-    while np.any(bad := eps > 0):
-        eps[bad] = rng.normal(mu[bad], sigma[bad])
+    while xp.any(bad := eps > 0):
+        eps[bad] = rng.normal(mu[bad], sigma[bad])  #  type: ignore[index]
     gam = rng.normal(gamma, sigma_gamma, size=size)
-    while np.any(bad := (gam < 0) | (gam > 1)):
-        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])
+    while xp.any(bad := (gam < 0) | (gam > 1)):
+        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])  #  type: ignore[index]
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
-    zeta = -np.expm1(eps)
+    zeta = -xp.expm1(eps)
     xi = (1 - gam) * zeta
 
     # random projection of random triaxial ellipsoid
     q = triaxial_axis_ratio(zeta, xi, rng=rng)
 
     # assemble ellipticity with random complex phase
-    e = np.exp(1j * rng.uniform(0, 2 * np.pi, size=np.shape(q)))
+    e = xp.exp(1j * rng.uniform(0, 2 * xp.pi, size=q.shape))
     e *= (1 - q) / (1 + q)
 
     # return the ellipticity
-    return e  # type: ignore[no-any-return]
+    return e
 
 
 def ellipticity_gaussian(

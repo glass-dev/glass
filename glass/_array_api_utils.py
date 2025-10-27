@@ -177,8 +177,8 @@ class Generator:
 
     def normal(
         self,
-        loc: float | AArray = 0.0,
-        scale: float | AArray = 1.0,
+        loc: float | FloatArray = 0.0,
+        scale: float | FloatArray = 1.0,
         size: Size = None,
     ) -> AArray:
         """
