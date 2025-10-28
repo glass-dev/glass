@@ -69,6 +69,7 @@ def broadcast_leading_axes(
     Broadcast all dimensions of ``a``, all except the last dimension of
     ``b``, and all except the last two dimensions of ``c``.
 
+    >>> import numpy as np
     >>> a = 0
     >>> b = np.zeros((4, 10))
     >>> c = np.zeros((3, 1, 5, 6))
