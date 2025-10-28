@@ -6,16 +6,14 @@ import itertools
 from functools import partial
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
+    from types import ModuleType
     from typing import Unpack
-
-    from numpy.typing import NDArray
 
     from glass._array_api_utils import AnyArray, FloatArray, IntArray
 
@@ -45,12 +43,13 @@ def broadcast_first(
 
 def broadcast_leading_axes(
     *args: tuple[
-        float | NDArray[np.float64],
+        float | FloatArray,
         int,
     ],
+    xp: ModuleType | None = None,
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[NDArray[np.float64], ...]],
+    Unpack[tuple[FloatArray, ...]],
 ]:
     """
     Broadcast all but the last N axes.
@@ -84,15 +83,22 @@ def broadcast_leading_axes(
     (3, 4, 5, 6)
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(
+            *[arg[0] for arg in args], use_compat=False
+        )
+
     shapes, trails = [], []
     for a, n in args:
-        s = np.shape(a)
+        a_arr = xp.asarray(a)
+        s = a_arr.shape
         i = len(s) - n
         shapes.append(s[:i])
         trails.append(s[i:])
-    dims = np.broadcast_shapes(*shapes)
+    dims = xpx.broadcast_shapes(*shapes)
     arrs = (
-        np.broadcast_to(a, dims + t) for (a, _), t in zip(args, trails, strict=False)
+        xp.broadcast_to(xp.asarray(a), dims + t)
+        for (a, _), t in zip(args, trails, strict=False)
     )
     return (dims, *arrs)
 

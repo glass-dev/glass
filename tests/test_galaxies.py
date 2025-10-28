@@ -8,101 +8,111 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     import pytest_mock
+    from conftest import UnifiedGenerator
     from numpy.typing import NDArray
 
 
-def test_redshifts(mocker: pytest_mock.MockerFixture) -> None:
+def test_redshifts(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in redshifts are not immutable, so do not support jax")
     # create a mock radial window function
     w = mocker.Mock()
-    w.za = np.linspace(0.0, 1.0, 20)
-    w.wa = np.exp(-0.5 * (w.za - 0.5) ** 2 / 0.1**2)
+    w.za = xp.linspace(0.0, 1.0, 20)
+    w.wa = xp.exp(-0.5 * (w.za - 0.5) ** 2 / 0.1**2)
 
     # sample redshifts (scalar)
     z = glass.redshifts(13, w)
     assert z.shape == (13,)
-    assert z.min() >= 0.0
-    assert z.max() <= 1.0
+    assert xp.min(z) >= 0.0
+    assert xp.max(z) <= 1.0
 
     # sample redshifts (array)
-    z = glass.redshifts(np.array([[1, 2], [3, 4]]), w)
+    z = glass.redshifts(xp.asarray([[1, 2], [3, 4]]), w)
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz(rng: np.random.Generator) -> None:
+def test_redshifts_from_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(
+            "Arrays in redshifts_from_nz are not immutable, so do not support jax"
+        )
+
     # test sampling
 
     redshifts = glass.redshifts_from_nz(
         10,
-        np.array([0, 1, 2, 3, 4]),
-        np.array([1, 0, 0, 0, 0]),
+        xp.asarray([0, 1, 2, 3, 4]),
+        xp.asarray([1, 0, 0, 0, 0]),
         warn=False,
     )
-    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert xp.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     redshifts = glass.redshifts_from_nz(
         10,
-        np.array([0, 1, 2, 3, 4]),
-        np.array([0, 0, 1, 0, 0]),
+        xp.asarray([0, 1, 2, 3, 4]),
+        xp.asarray([0, 0, 1, 0, 0]),
         warn=False,
     )
-    assert np.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
+    assert xp.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
 
     redshifts = glass.redshifts_from_nz(
         10,
-        np.array([0, 1, 2, 3, 4]),
-        np.array([0, 0, 0, 0, 1]),
+        xp.asarray([0, 1, 2, 3, 4]),
+        xp.asarray([0, 0, 0, 0, 1]),
         warn=False,
     )
-    assert np.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
+    assert xp.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
 
     redshifts = glass.redshifts_from_nz(
         10,
-        np.array([0, 1, 2, 3, 4]),
-        np.array([0, 0, 1, 1, 1]),
+        xp.asarray([0, 1, 2, 3, 4]),
+        xp.asarray([0, 0, 1, 1, 1]),
         warn=False,
     )
-    assert not np.any(redshifts <= 1)
+    assert not xp.any(redshifts <= 1)
 
     # test with rng
 
     redshifts = glass.redshifts_from_nz(
         10,
-        np.array([0, 1, 2, 3, 4]),
-        np.array([0, 0, 1, 1, 1]),
+        xp.asarray([0, 1, 2, 3, 4]),
+        xp.asarray([0, 0, 1, 1, 1]),
         warn=False,
-        rng=rng,
+        rng=urng,
     )
-    assert not np.any(redshifts <= 1)
+    assert not xp.any(redshifts <= 1)
 
     # test interface
 
     # case: no extra dimensions
 
     count: int | NDArray[np.float64] = 10
-    z = np.linspace(0, 1, 100)
+    z = xp.linspace(0, 1, 100)
     nz = z * (1 - z)
 
     redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (count,)
-    assert np.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert xp.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
 
     # case: extra dimensions from count
 
-    count = np.array([10, 20, 30])
-    z = np.linspace(0, 1, 100)
+    count = xp.asarray([10, 20, 30])
+    z = xp.linspace(0, 1, 100)
     nz = z * (1 - z)
 
     redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
-    assert np.shape(redshifts) == (60,)
+    assert redshifts.shape == (60,)
 
     # case: extra dimensions from nz
 
     count = 10
-    z = np.linspace(0, 1, 100)
-    nz = np.array([z * (1 - z), (z - 0.5) ** 2])
+    z = xp.linspace(0, 1, 100)
+    nz = xp.stack([z * (1 - z), (z - 0.5) ** 2])
 
     redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
@@ -110,9 +120,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: extra dimensions from count and nz
 
-    count = np.array([[10], [20], [30]])
-    z = np.linspace(0, 1, 100)
-    nz = np.array([z * (1 - z), (z - 0.5) ** 2])
+    count = xp.asarray([[10], [20], [30]])
+    z = xp.linspace(0, 1, 100)
+    nz = xp.stack([z * (1 - z), (z - 0.5) ** 2])
 
     redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
@@ -120,9 +130,9 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
 
     # case: incompatible input shapes
 
-    count = np.array([10, 20, 30])
-    z = np.linspace(0, 1, 100)
-    nz = np.array([z * (1 - z), (z - 0.5) ** 2])
+    count = xp.asarray([10, 20, 30])
+    z = xp.linspace(0, 1, 100)
+    nz = xp.stack([z * (1 - z), (z - 0.5) ** 2])
 
     with pytest.raises(ValueError, match="shape mismatch"):
         glass.redshifts_from_nz(count, z, nz, warn=False)
@@ -130,8 +140,8 @@ def test_redshifts_from_nz(rng: np.random.Generator) -> None:
     with pytest.warns(UserWarning, match="when sampling galaxies"):
         redshifts = glass.redshifts_from_nz(
             10,
-            np.array([0, 1, 2, 3, 4]),
-            np.array([1, 0, 0, 0, 0]),
+            xp.asarray([0, 1, 2, 3, 4]),
+            xp.asarray([1, 0, 0, 0, 0]),
         )
 
 

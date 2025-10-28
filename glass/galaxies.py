@@ -25,21 +25,28 @@ from typing import TYPE_CHECKING
 import healpix
 import numpy as np
 
+import array_api_compat
+
 import glass
+import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from glass._array_api_utils import FloatArray
     from glass.cosmology import Cosmology
 
 
 def redshifts(
-    n: int | NDArray[np.float64],
+    n: int | FloatArray,
     w: glass.RadialWindow,
     *,
-    rng: np.random.Generator | None = None,
-) -> NDArray[np.float64]:
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
+) -> FloatArray:
     """
     Sample redshifts from a radial window function.
 
@@ -65,13 +72,16 @@ def redshifts(
 
 
 def redshifts_from_nz(
-    count: int | NDArray[np.float64],
-    z: NDArray[np.float64],
-    nz: NDArray[np.float64],
+    count: int | FloatArray,
+    z: FloatArray,
+    nz: FloatArray,
     *,
-    rng: np.random.Generator | None = None,
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
     warn: bool = True,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Generate galaxy redshifts from a source distribution.
 
@@ -105,6 +115,9 @@ def redshifts_from_nz(
         samples from all populations.
 
     """
+    xp = array_api_compat.array_namespace(count, z, nz, use_compat=False)
+    uxpx = _utils.XPAdditions(xp)
+
     if warn:
         warnings.warn(
             "when sampling galaxies, redshifts_from_nz() is often not the function you"
@@ -114,29 +127,32 @@ def redshifts_from_nz(
 
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
     count_out, z_out, nz_out = rest
 
     # list of results for all dimensions
-    redshifts = np.empty(count_out.sum())
+    redshifts = xp.empty(xp.sum(count_out))
 
     # keep track of the number of sampled redshifts
     total = 0
 
     # go through extra dimensions; also works if dims is empty
-    for k in np.ndindex(dims):
+    for k in uxpx.ndindex(dims):
+        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
+        z_out_slice = z_out[(*k, ...)] if k != () else z_out
+
         # compute the CDF of each galaxy population
-        cdf = glass.arraytools.cumulative_trapezoid(nz_out[k], z_out[k])
+        cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
         cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count_out[k]] = np.interp(
-            rng.uniform(0, 1, size=count_out[k]),
+        redshifts[total : total + count_out[k]] = uxpx.interp(
+            rng.uniform(0, 1, size=int(count_out[k])),
             cdf,
-            z_out[k],
+            z_out_slice,
         )
         total += count_out[k]  # type: ignore[assignment]
 
