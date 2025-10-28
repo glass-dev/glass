@@ -32,6 +32,8 @@ import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from numpy.typing import NDArray
 
     from glass._array_api_utils import FloatArray
@@ -230,14 +232,18 @@ def galaxy_shear(  # noqa: PLR0913
     return g
 
 
-def gaussian_phz(
-    z: float | NDArray[np.float64],
-    sigma_0: float | NDArray[np.float64],
+def gaussian_phz(  # noqa: PLR0913
+    z: float | FloatArray,
+    sigma_0: float | FloatArray,
     *,
-    lower: float | NDArray[np.float64] | None = None,
-    upper: float | NDArray[np.float64] | None = None,
-    rng: np.random.Generator | None = None,
-) -> float | NDArray[np.float64]:
+    lower: float | FloatArray | None = None,
+    upper: float | FloatArray | None = None,
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
+    xp: ModuleType | None = None,
+) -> FloatArray:
     r"""
     Photometric redshifts assuming a Gaussian error.
 
@@ -257,6 +263,9 @@ def gaussian_phz(
         Bounds for the returned photometric redshifts.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, the backend will be determined from the input arrays.
 
     Returns
     -------
@@ -284,34 +293,50 @@ def gaussian_phz(
     See the :doc:`/examples/1-basic/photoz` example.
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(
+            z, sigma_0, lower, upper, use_compat=False
+        )
+
+    # Ensure inputs are arrays to allow lib utilisation
+    z_arr = xp.asarray(z)
+    sigma_0_arr = xp.asarray(sigma_0)
+
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp)
 
-    sigma = np.add(1, z) * sigma_0
-    dims = np.shape(sigma)
+    # Ensure lower and upper are arrays that have the same shape and type
+    lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)
+    upper_arr = xp.asarray(xp.inf if upper is None else upper, dtype=xp.float64)
+    if lower is None and upper is not None:
+        lower_arr = xp.zeros_like(upper_arr, dtype=xp.float64)
+    if upper is None and lower is not None:
+        upper_arr = xp.full_like(lower_arr, fill_value=np.inf, dtype=xp.float64)
 
-    zphot = rng.normal(z, sigma)
+    sigma = xp.add(1, z_arr) * sigma_0_arr
+    dims = sigma.shape
+    zphot = xp.asarray(rng.normal(z_arr, sigma))
 
-    if lower is None:
-        lower = 0.0
-    if upper is None:
-        upper = np.inf
-
-    if not np.all(lower < upper):
+    # Check for valid user input
+    if (lower_arr.ndim == upper_arr.ndim != 0) and not (
+        lower_arr.shape == upper_arr.shape == zphot.shape
+    ):
+        msg = "lower and upper must best scalars or have the same shape as z"
+        raise ValueError(msg)
+    if not xp.all(lower_arr < upper_arr):
         msg = "requires lower < upper"
         raise ValueError(msg)
 
     if not dims:
-        while zphot < lower or zphot > upper:
-            zphot = rng.normal(z, sigma)
+        while zphot < lower_arr or zphot > upper_arr:
+            zphot = xp.asarray(rng.normal(z_arr, sigma))
     else:
-        z = np.broadcast_to(z, dims)
-        trunc = np.where((zphot < lower) | (zphot > upper))[0]
-        while trunc.size:
-            znew = rng.normal(z[trunc], sigma[trunc])
-            zphot[trunc] = znew
-            trunc = trunc[(znew < lower) | (znew > upper)]
+        z_arr = xp.broadcast_to(z_arr, dims)
+        trunc = (zphot < lower_arr) | (zphot > upper_arr)
+        while xp.count_nonzero(trunc) > 0:
+            zphot = xp.where(trunc, rng.normal(z_arr, sigma), zphot)
+            trunc = (zphot < lower_arr) | (zphot > upper_arr)
 
     return zphot
 
