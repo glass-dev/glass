@@ -26,8 +26,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass._array_api_utils as _utils
@@ -35,7 +33,7 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import NDArray
+    import numpy as np
 
     import glass.jax
     from glass._array_api_utils import ComplexArray, FloatArray, IntArray
@@ -77,7 +75,7 @@ def triaxial_axis_ratio(
         Random number generator. If not given, a default RNG is used.
     xp
         The array library backend to use for array operations. If this is not
-        specified, the backend will be determines from the input arrays.
+        specified, the backend will be determined from the input arrays.
 
     Returns
     -------
@@ -165,7 +163,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
         Random number generator. If not given, a default RNG is used.
     xp
         The array library backend to use for array operations. If this is not
-        specified, the backend will be determines from the input arrays.
+        specified, the backend will be determined from the input arrays.
 
     Returns
     -------
@@ -250,7 +248,7 @@ def ellipticity_gaussian(
         Random number generator. If not given, a default RNG is used.
     xp
         The array library backend to use for array operations. If this is not
-        specified, the backend will be determines from the input arrays.
+        specified, the backend will be determined from the input arrays.
 
     Returns
     -------
@@ -292,11 +290,15 @@ def ellipticity_gaussian(
 
 
 def ellipticity_intnorm(
-    count: int | NDArray[np.int_],
-    sigma: float | NDArray[np.float64],
+    count: int | IntArray,
+    sigma: float | FloatArray,
     *,
-    rng: np.random.Generator | None = None,
-) -> NDArray[np.complex128]:
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
+    xp: ModuleType | None = None,
+) -> ComplexArray:
     """
     Sample galaxy ellipticities with intrinsic normal distribution.
 
@@ -311,6 +313,9 @@ def ellipticity_intnorm(
         Standard deviation of the ellipticity in each component.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, the backend will be determined from the input arrays.
 
     Returns
     -------
@@ -322,32 +327,47 @@ def ellipticity_intnorm(
         If the standard deviation is not in the range [0, sqrt(0.5)].
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
+    uxpx = _utils.XPAdditions(xp)
+
     # default RNG if not provided
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp)
 
     # bring inputs into common shape
-    count, sigma = np.broadcast_arrays(count, sigma)
+    count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
+        xp.asarray(count),
+        xp.asarray(sigma),
+    )
 
     # make sure sigma is admissible
-    if not np.all((sigma >= 0) & (sigma < 0.5**0.5)):
+    if not xp.all((sigma_broadcasted >= 0) & (sigma_broadcasted < 0.5**0.5)):
         msg = "sigma must be between 0 and sqrt(0.5)"
         raise ValueError(msg)
 
     # convert to sigma_eta using fit
-    sigma_eta = sigma * ((8 + 5 * sigma**2) / (2 - 4 * sigma**2)) ** 0.5
+    sigma_eta = (
+        sigma_broadcasted
+        * ((8 + 5 * sigma_broadcasted**2) / (2 - 4 * sigma_broadcasted**2)) ** 0.5
+    )
 
     # allocate flattened output array
-    eps = np.empty(count.sum(), dtype=np.complex128)
+    eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
 
     # sample complex ellipticities
     i = 0
-    for k in np.ndindex(count.shape):
-        e = rng.standard_normal(2 * count[k], np.float64).view(np.complex128)
+    for k in uxpx.ndindex(count_broadcasted.shape):
+        e = _populate_random_complex_array(count_broadcasted[k], rng)
         e *= sigma_eta[k]
-        r = np.hypot(e.real, e.imag)
-        e *= np.divide(np.tanh(r / 2), r, where=(r > 0), out=r)
-        eps[i : i + count[k]] = e
-        i += count[k]  # type: ignore[assignment]
+        r = xp.hypot(xp.real(e), xp.imag(e))
+        e *= xp.where(
+            r > 0,
+            xp.divide(xp.tanh(r / 2), r),
+            xp.asarray(1.0, dtype=e.dtype),
+        )
+
+        eps[i : i + count_broadcasted[k]] = e
+        i += count_broadcasted[k]
 
     return eps

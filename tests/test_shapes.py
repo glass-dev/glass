@@ -157,34 +157,44 @@ def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
     np.testing.assert_allclose(xp.std(xp.imag(eps)[n:]), 0.256, atol=1e-3, rtol=0)
 
 
-def test_ellipticity_intnorm(rng: np.random.Generator) -> None:
+def test_ellipticity_intnorm(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(
+            "Arrays in ellipticity_intnorm are not immutable, so do not support jax"
+        )
+
     n = 1_000_000
 
-    eps = glass.ellipticity_intnorm(n, 0.256)
+    eps = glass.ellipticity_intnorm(n, 0.256, xp=xp)
 
     assert eps.shape == (n,)
+
+    # Pass non-arrays without xp
+
+    with pytest.raises(TypeError, match="Unrecognized array input"):
+        glass.ellipticity_intnorm(n, 0.256)
 
     # test with rng
 
-    eps = glass.ellipticity_intnorm(n, 0.256, rng=rng)
+    eps = glass.ellipticity_intnorm(n, 0.256, rng=urng, xp=xp)
 
     assert eps.shape == (n,)
 
-    np.testing.assert_array_less(np.abs(eps), 1)
+    np.testing.assert_array_less(xp.abs(eps), 1)
 
-    np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
 
-    eps = glass.ellipticity_intnorm(np.array([n, n]), np.array([0.128, 0.256]))
+    eps = glass.ellipticity_intnorm(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    np.testing.assert_array_less(np.abs(eps), 1)
+    np.testing.assert_array_less(xp.abs(eps), 1)
 
-    np.testing.assert_allclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.real(eps)[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.imag(eps)[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.real(eps)[n:]), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.imag(eps)[n:]), 0.256, atol=1e-3, rtol=0)
 
     with pytest.raises(ValueError, match="sigma must be between"):
-        glass.ellipticity_intnorm(1, 0.71)
+        glass.ellipticity_intnorm(1, 0.71, xp=xp)
