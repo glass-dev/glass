@@ -38,7 +38,14 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     import glass.jax
-    from glass._array_api_utils import FloatArray
+    from glass._array_api_utils import ComplexArray, FloatArray, IntArray
+
+
+def _populate_random_complex_array(
+    length: int,
+    rng: np.random._generator.Generator | glass.jax.Generator | _utils.Generator,
+) -> ComplexArray:
+    return rng.standard_normal(length) + (1.0j * rng.standard_normal(length))
 
 
 def triaxial_axis_ratio(
@@ -68,6 +75,9 @@ def triaxial_axis_ratio(
         Size of the random draw.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, the backend will be determines from the input arrays.
 
     Returns
     -------
@@ -153,6 +163,9 @@ def ellipticity_ryden04(  # noqa: PLR0913
         Sample size.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, the backend will be determines from the input arrays.
 
     Returns
     -------
@@ -209,11 +222,15 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
 
 def ellipticity_gaussian(
-    count: int | NDArray[np.int_],
-    sigma: float | NDArray[np.float64],
+    count: int | IntArray,
+    sigma: float | FloatArray,
     *,
-    rng: np.random.Generator | None = None,
-) -> NDArray[np.complex128]:
+    rng: np.random._generator.Generator
+    | glass.jax.Generator
+    | _utils.Generator
+    | None = None,
+    xp: ModuleType | None = None,
+) -> ComplexArray:
     """
     Sample Gaussian galaxy ellipticities.
 
@@ -231,35 +248,45 @@ def ellipticity_gaussian(
         Standard deviation in each component.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations. If this is not
+        specified, the backend will be determines from the input arrays.
 
     Returns
     -------
         An array of galaxy :term:`ellipticity`.
 
     """
-    # default RNG if not provided
-    if rng is None:
-        rng = np.random.default_rng()
+    if xp is None:
+        xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
+    uxpx = _utils.XPAdditions(xp)
 
     # bring inputs into common shape
-    count, sigma = np.broadcast_arrays(count, sigma)
+    count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
+        xp.asarray(count),
+        xp.asarray(sigma),
+    )
+
+    # default RNG if not provided
+    if rng is None:
+        rng = _utils.rng_dispatcher(xp)
 
     # allocate flattened output array
-    eps = np.empty(count.sum(), dtype=np.complex128)
+    eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
 
     # sample complex ellipticities
     # reject those where abs(e) > 0
     i = 0
-    for k in np.ndindex(count.shape):
-        e = rng.standard_normal(2 * count[k], np.float64).view(np.complex128)
-        e *= sigma[k]
-        r = np.where(np.abs(e) > 1)[0]
-        while len(r) > 0:
-            rng.standard_normal(2 * len(r), np.float64, e[r].view(np.float64))
-            e[r] *= sigma[k]
-            r = r[np.abs(e[r]) > 1]
-        eps[i : i + count[k]] = e
-        i += count[k]  # type: ignore[assignment]
+    for k in uxpx.ndindex(count_broadcasted.shape):
+        e = _populate_random_complex_array(count_broadcasted[k], rng)
+        e *= sigma_broadcasted[k]
+        r = xp.abs(e) > 1
+        while xp.count_nonzero(r) > 0:
+            e[r] = _populate_random_complex_array(xp.count_nonzero(r), rng)
+            e[r] *= sigma_broadcasted[k]
+            r = xp.abs(e) > 1
+        eps[i : i + count_broadcasted[k]] = e
+        i += count_broadcasted[k]
 
     return eps
 

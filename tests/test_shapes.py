@@ -65,6 +65,7 @@ def test_ellipticity_ryden04(xp: ModuleType, urng: UnifiedGenerator) -> None:
         )
 
     # Pass floats without xp
+
     with pytest.raises(TypeError, match="Unrecognized array input"):
         glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
 
@@ -116,34 +117,44 @@ def test_ellipticity_ryden04(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
 
 @pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])
-def test_ellipticity_gaussian(rng: np.random.Generator) -> None:
+def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(
+            "Arrays in ellipticity_gaussian are not immutable, so do not support jax"
+        )
+
     n = 1_000_000
 
-    eps = glass.ellipticity_gaussian(n, 0.256)
+    eps = glass.ellipticity_gaussian(n, 0.256, xp=xp)
 
     assert eps.shape == (n,)
+
+    # Pass floats without xp
+
+    with pytest.raises(TypeError, match="Unrecognized array input"):
+        glass.ellipticity_gaussian(n, 0.256)
 
     # test with rng
 
-    eps = glass.ellipticity_gaussian(n, 0.256, rng=rng)
+    eps = glass.ellipticity_gaussian(n, 0.256, rng=urng, xp=xp)
 
     assert eps.shape == (n,)
 
     np.testing.assert_array_less(np.abs(eps), 1)
 
-    np.testing.assert_allclose(np.std(eps.real), 0.256, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
 
-    eps = glass.ellipticity_gaussian(np.array([n, n]), np.array([0.128, 0.256]))
+    eps = glass.ellipticity_gaussian(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    np.testing.assert_array_less(np.abs(eps), 1)
+    np.testing.assert_array_less(xp.abs(eps), 1)
 
-    np.testing.assert_allclose(np.std(eps.real[:n]), 0.128, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag[:n]), 0.128, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.real[n:]), 0.256, atol=1e-3, rtol=0)
-    np.testing.assert_allclose(np.std(eps.imag[n:]), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.real(eps)[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.imag(eps)[:n]), 0.128, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.real(eps)[n:]), 0.256, atol=1e-3, rtol=0)
+    np.testing.assert_allclose(xp.std(xp.imag(eps)[n:]), 0.256, atol=1e-3, rtol=0)
 
 
 def test_ellipticity_intnorm(rng: np.random.Generator) -> None:

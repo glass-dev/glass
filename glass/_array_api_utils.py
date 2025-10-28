@@ -720,3 +720,28 @@ class XPAdditions:
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
+
+    def ndindex(self, shape: tuple[int, ...]) -> np.ndindex:
+        """
+        Wrapper for numpy.ndindex and jax.numpy.indices.
+
+        See relevant docs for details:
+        - NumPy, https://numpy.org/doc/2.2/reference/generated/numpy.ndindex.html
+        - Jax, https://docs.jax.dev/en/latest/_autosummary/jax.numpy.indices.html
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        """
+        if self.xp.__name__ == "numpy":
+            return self.xp.ndindex(shape)  # type: ignore[no-any-return]
+
+        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
+            np = import_numpy(self.xp.__name__)
+
+            return np.ndindex(shape)  # type: ignore[no-any-return]
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
