@@ -11,7 +11,7 @@ HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 def test_rng_dispatcher_numpy() -> None:
-    rng = glass._array_api_utils.rng_dispatcher(np.asarray([1, 2]))
+    rng = glass._array_api_utils.rng_dispatcher(xp=np)
     assert isinstance(rng, np.random.Generator)
 
 
@@ -19,7 +19,7 @@ def test_rng_dispatcher_numpy() -> None:
 def test_rng_dispatcher_jax() -> None:
     import jax.numpy as jnp
 
-    rng = glass._array_api_utils.rng_dispatcher(jnp.asarray([1, 2]))
+    rng = glass._array_api_utils.rng_dispatcher(xp=jnp)
     assert isinstance(rng, glass.jax.Generator)
 
 
@@ -27,7 +27,7 @@ def test_rng_dispatcher_jax() -> None:
 def test_rng_dispatcher_array_api_strict() -> None:
     import array_api_strict
 
-    rng = glass._array_api_utils.rng_dispatcher(array_api_strict.asarray([1, 2]))
+    rng = glass._array_api_utils.rng_dispatcher(xp=array_api_strict)
     assert isinstance(rng, glass._array_api_utils.Generator)
 
 
