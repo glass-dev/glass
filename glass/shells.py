@@ -61,15 +61,12 @@ from glass._array_api_utils import XPAdditions
 
 if TYPE_CHECKING:
     import types
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Iterator, Sequence
 
     from numpy.typing import NDArray
 
-    from glass._types import FloatArray
+    from glass._types import FloatArray, WeightFunc
     from glass.cosmology import Cosmology
-
-    ArrayLike1D = Sequence[float] | NDArray[np.float64]
-    WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
 @dataclasses.dataclass

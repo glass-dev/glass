@@ -16,7 +16,7 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeAlias
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -26,9 +26,7 @@ if TYPE_CHECKING:
 
     from array_api_strict._array_object import Array as AArray
 
-    from glass._types import AnyArray, UnifiedGenerator
-
-    Size: TypeAlias = int | tuple[int, ...] | None
+    from glass._types import AnyArray, Size, UnifiedGenerator
 
 
 class CompatibleBackendNotFoundError(Exception):
