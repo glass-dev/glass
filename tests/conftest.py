@@ -12,7 +12,10 @@ import pytest
 
 import glass
 import glass._array_api_utils
-import glass.jax
+
+with contextlib.suppress(ImportError):
+    # only import if jax is available
+    import glass.jax
 
 if TYPE_CHECKING:
     import types
