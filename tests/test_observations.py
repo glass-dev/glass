@@ -12,7 +12,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import UnifiedGenerator
+    from glass._types import UnifiedGenerator
 
 
 def test_vmap_galactic_ecliptic() -> None:

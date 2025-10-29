@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
     from array_api_strict._array_object import Array as AArray
 
-    import glass.jax
+    from glass._types import UnifiedGenerator
 
     Size: TypeAlias = int | tuple[int, ...] | None
 
@@ -85,9 +85,7 @@ def import_numpy(backend: str) -> ModuleType:
         return numpy
 
 
-def rng_dispatcher(
-    array: AnyArray,
-) -> np.random.Generator | glass.jax.Generator | Generator:
+def rng_dispatcher(array: AnyArray) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.
 
