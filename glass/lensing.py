@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     import glass
-    from glass._array_api_utils import ComplexArray, FloatArray
+    from glass._types import ComplexArray, FloatArray
     from glass.cosmology import Cosmology
 
 

@@ -9,7 +9,7 @@ import glass.grf
 if TYPE_CHECKING:
     import types
 
-    from conftest import UnifiedGenerator
+    from glass._types import UnifiedGenerator
 
 
 def test_normal(urng: UnifiedGenerator) -> None:
