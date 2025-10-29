@@ -6,4 +6,4 @@ updates:
     schedule:
       interval: weekly
     commit-message:
-      prefix: DEV
+      prefix: gh-725
