@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     import types
 
     import pytest_mock
-    from conftest import UnifiedGenerator
+
+    from glass._types import UnifiedGenerator
 
 
 def test_nnls(xp: types.ModuleType, urng: UnifiedGenerator) -> None:

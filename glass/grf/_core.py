@@ -6,19 +6,14 @@ import transformcl
 
 if TYPE_CHECKING:
     from types import NotImplementedType
-    from typing import Any, TypeAlias
 
-    from numpy.typing import NDArray
-
-    from array_api_strict._array_object import Array as AArray
-
-    Array: TypeAlias = NDArray[Any] | AArray
+    from glass._types import AnyArray
 
 
 class Transformation(Protocol):
     """Protocol for transformations of Gaussian random fields."""
 
-    def __call__(self, x: Array, var: float, /) -> Array:
+    def __call__(self, x: AnyArray, var: float, /) -> AnyArray:
         """
         Transform a Gaussian random field *x* with variance *var*.
 
@@ -35,17 +30,23 @@ class Transformation(Protocol):
 
         """
 
-    def corr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def corr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         """Implementation of the corr function."""
 
-    def icorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def icorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         """Implementation of the icorr function."""
 
-    def dcorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def dcorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         """Implementation of the dcorr function."""
 
 
-def corr(t1: Transformation, t2: Transformation, x: Array, /) -> Array:
+def corr(t1: Transformation, t2: Transformation, x: AnyArray, /) -> AnyArray:
     """
     Transform a Gaussian angular correlation function.
 
@@ -71,7 +72,7 @@ def corr(t1: Transformation, t2: Transformation, x: Array, /) -> Array:
     raise NotImplementedError(msg)
 
 
-def icorr(t1: Transformation, t2: Transformation, x: Array, /) -> Array:
+def icorr(t1: Transformation, t2: Transformation, x: AnyArray, /) -> AnyArray:
     """
     Inverse-transform an angular correlation function.
 
@@ -97,7 +98,7 @@ def icorr(t1: Transformation, t2: Transformation, x: Array, /) -> Array:
     raise NotImplementedError(msg)
 
 
-def dcorr(t1: Transformation, t2: Transformation, x: Array, /) -> Array:
+def dcorr(t1: Transformation, t2: Transformation, x: AnyArray, /) -> AnyArray:
     """
     Derivative of the angular correlation function transform.
 
@@ -123,7 +124,9 @@ def dcorr(t1: Transformation, t2: Transformation, x: Array, /) -> Array:
     raise NotImplementedError(msg)
 
 
-def compute(cl: Array, t1: Transformation, t2: Transformation | None = None) -> Array:
+def compute(
+    cl: AnyArray, t1: Transformation, t2: Transformation | None = None
+) -> AnyArray:
     """
     Compute a band-limited Gaussian angular power spectrum for the
     target spectrum *cl* and the transformations *t1* and *t2*.  If *t2*

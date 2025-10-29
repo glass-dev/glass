@@ -69,9 +69,11 @@ html_css_files: list[str] = []
 # This config value contains the locations and names of other projects that
 # should be linked to in this documentation.
 intersphinx_mapping = {
+    "array_api": ("https://data-apis.org/array-api/latest", None),
+    "jax": ("https://docs.jax.dev/en/latest", None),
+    "jaxtyping": ("https://docs.kidger.site/jaxtyping", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "python": ("https://docs.python.org/3", None),
-    "array_api": ("https://data-apis.org/array-api/latest", None),
 }
 
 

@@ -33,15 +33,12 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from types import ModuleType
 
-    import numpy as np
-
-    import glass.jax
-    from glass._array_api_utils import ComplexArray, FloatArray, IntArray
+    from glass._types import ComplexArray, FloatArray, IntArray, UnifiedGenerator
 
 
 def _populate_random_complex_array(
     length: int,
-    rng: np.random._generator.Generator | glass.jax.Generator | _utils.Generator,
+    rng: UnifiedGenerator,
 ) -> ComplexArray:
     return rng.standard_normal(length) + (1.0j * rng.standard_normal(length))
 
@@ -51,10 +48,7 @@ def triaxial_axis_ratio(
     xi: float | FloatArray,
     size: int | tuple[int, ...] | None = None,
     *,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
     xp: ModuleType | None = None,
 ) -> FloatArray:
     """
@@ -131,10 +125,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma_gamma: float | FloatArray,
     size: int | tuple[int, ...] | None = None,
     *,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
     xp: ModuleType | None = None,
 ) -> FloatArray:
     r"""
@@ -223,10 +214,7 @@ def ellipticity_gaussian(
     count: int | IntArray,
     sigma: float | FloatArray,
     *,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
     xp: ModuleType | None = None,
 ) -> ComplexArray:
     """
@@ -293,10 +281,7 @@ def ellipticity_intnorm(
     count: int | IntArray,
     sigma: float | FloatArray,
     *,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
     xp: ModuleType | None = None,
 ) -> ComplexArray:
     """

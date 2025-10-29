@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Unpack
 
-    from glass._array_api_utils import AnyArray, FloatArray, IntArray
+    from glass._types import AnyArray, FloatArray, IntArray
 
 
 def broadcast_first(

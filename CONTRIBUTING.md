@@ -98,7 +98,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import types
-    from glass._array_api_utils import UnifiedGenerator
+
+    from glass._types import UnifiedGenerator
 
 
 def test_something(xp: types.ModuleType, urng: UnifiedGenerator) -> None:

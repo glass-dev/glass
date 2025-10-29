@@ -21,34 +21,27 @@ import glass.grf
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
-    from typing import Any, Literal, TypeVar
+    from typing import Any, Literal
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import AnyArray, ComplexArray, FloatArray
+    from glass._types import Cls, ComplexArray, Fields, FloatArray, T
 
-    Fields = Sequence[glass.grf.Transformation]
-    Cls = Sequence[AnyArray]
-
-    T = TypeVar("T")
 
 try:
     from warnings import deprecated
 except ImportError:
     if TYPE_CHECKING:
-        from typing import ParamSpec, TypeVar
+        from glass._types import P, R
 
-        _P = ParamSpec("_P")
-        _R = TypeVar("_R")
-
-    def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:  # type: ignore[no-redef]
+    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore[no-redef]
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps  # noqa: PLC0415
         from warnings import warn  # noqa: PLC0415
 
-        def decorator(func: Callable[_P, _R], /) -> Callable[_P, _R]:
+        def decorator(func: Callable[P, R], /) -> Callable[P, R]:
             @wraps(func)
-            def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+            def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
                 warn(msg, category=DeprecationWarning, stacklevel=2)
                 return func(*args, **kwargs)
 
