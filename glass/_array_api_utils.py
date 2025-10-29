@@ -22,11 +22,12 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
 
+    import numpy as np
     from numpy.typing import DTypeLike
 
     from array_api_strict._array_object import Array as AArray
 
-    from glass._types import AnyArray, Size, UnifiedGenerator
+    from glass._types import AnyArray, FloatArray, Size, UnifiedGenerator
 
 
 class CompatibleBackendNotFoundError(Exception):
