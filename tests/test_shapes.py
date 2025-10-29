@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # Pass floats without xp
+
     with pytest.raises(TypeError, match="Unrecognized array input"):
         glass.triaxial_axis_ratio(0.8, 0.4)
 

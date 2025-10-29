@@ -86,6 +86,7 @@ def import_numpy(backend: str) -> ModuleType:
 
 
 def rng_dispatcher(
+    *,
     xp: ModuleType,
 ) -> np.random.Generator | glass.jax.Generator | Generator:
     """
@@ -723,7 +724,7 @@ class XPAdditions:
 
     def ndindex(self, shape: tuple[int, ...]) -> np.ndindex:
         """
-        Wrapper for numpy.ndindex and jax.numpy.indices.
+        Wrapper for numpy.ndindex.
 
         See relevant docs for details:
         - NumPy, https://numpy.org/doc/2.2/reference/generated/numpy.ndindex.html
