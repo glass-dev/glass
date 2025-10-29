@@ -35,3 +35,18 @@ if TYPE_CHECKING:
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
+
+# defining types here means the sphinx autodoc can find the type hints
+__all__ = [
+    "AnyArray",
+    "ArrayLike1D",
+    "Cls",
+    "ComplexArray",
+    "DoubleArray",
+    "Fields",
+    "FloatArray",
+    "IntArray",
+    "Size",
+    "UnifiedGenerator",
+    "WeightFunc",
+]
