@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+import array_api_compat
+
 import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
@@ -34,7 +36,7 @@ def broadcast_first(
         The broadcasted arrays.
 
     """
-    xp = _utils.get_namespace(*arrays)
+    xp = array_api_compat.array_namespace(*arrays, use_compat=False)
 
     arrays = tuple(xp.moveaxis(a, 0, -1) if a.ndim else a for a in arrays)
     arrays = xp.broadcast_arrays(*arrays)
@@ -129,8 +131,7 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    arrays_to_check = (xq, fq) if type(x) is float else (x, xq, fq)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(x, xq, fq, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
@@ -166,7 +167,9 @@ def trapezoid_product(
 
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
-    xp = _utils.get_namespace(*f, *tuple(itertools.chain(*ff)))
+    xp = array_api_compat.array_namespace(
+        *f, *tuple(itertools.chain(*ff)), use_compat=False
+    )
     uxpx = _utils.XPAdditions(xp)
 
     x: FloatArray
@@ -201,7 +204,7 @@ def cumulative_trapezoid(
         The cumulative integral of the function.
 
     """
-    xp = _utils.get_namespace(f, x)
+    xp = array_api_compat.array_namespace(f, x, use_compat=False)
 
     f = xp.asarray(f, dtype=xp.float64)
     x = xp.asarray(x, dtype=xp.float64)

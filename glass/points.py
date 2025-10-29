@@ -27,6 +27,13 @@ Bias models
 .. autofunction:: linear_bias
 .. autofunction:: loglinear_bias
 
+
+Displacing points
+-----------------
+
+.. autofunction:: displace
+.. autofunction:: displacement
+
 """  # noqa: D400
 
 from __future__ import annotations
@@ -35,6 +42,8 @@ from typing import TYPE_CHECKING, Any
 
 import healpix
 import numpy as np
+
+import array_api_compat
 
 import glass
 import glass._array_api_utils as _utils
@@ -45,7 +54,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import DoubleArray, FloatArray
+    from glass._array_api_utils import ComplexArray, DoubleArray, FloatArray
 
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
@@ -87,7 +96,7 @@ def effective_bias(
         \;.
 
     """
-    xp = _utils.get_namespace(z, bz, w.za, w.wa)
+    xp = array_api_compat.array_namespace(z, bz, w.za, w.wa, use_compat=False)
     uxpx = _utils.XPAdditions(xp)
 
     norm = uxpx.trapezoid(w.wa, w.za)
@@ -135,8 +144,7 @@ def loglinear_bias(
         The density contrast after biasing.
 
     """
-    arrays_to_check = (delta,) if type(b) is float else (delta, b)
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(delta, b, use_compat=False)
 
     delta_g = xp.log1p(delta)
     delta_g *= b
@@ -415,12 +423,7 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    arrays_to_check = (
-        (densities, bias)
-        if bias is not None and not isinstance(bias, float)
-        else (densities,)
-    )
-    xp = _utils.get_namespace(*arrays_to_check)
+    xp = array_api_compat.array_namespace(densities, bias, use_compat=False)
 
     bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 
@@ -434,3 +437,116 @@ def position_weights(
         densities = densities * bias
     # densities now contains the relative contribution with bias applied
     return densities
+
+
+def displace(
+    lon: FloatArray,
+    lat: FloatArray,
+    alpha: ComplexArray | FloatArray,
+) -> tuple[FloatArray, FloatArray]:
+    r"""
+    Displace positions on the sphere.
+
+    Takes an array of :term:`displacement` values and applies them to
+    the given positions.
+
+    Parameters
+    ----------
+    lon
+        Longitudes to be displaced.
+    lat
+        Latitudes to be displaced.
+    alpha
+        Displacement values. Must be complex-valued or have a leading
+        axis of size 2 for the real and imaginary component.
+
+    Returns
+    -------
+        The longitudes and latitudes after displacement.
+
+    Notes
+    -----
+    Displacements on the sphere are :term:`defined <displacement>` as
+    follows:  The complex displacement :math:`\alpha` transports a point
+    on the sphere an angular distance :math:`|\alpha|` along the
+    geodesic with bearing :math:`\arg\alpha` in the original point.
+
+    In the language of differential geometry, this function is the
+    exponential map.
+
+    """
+    xp = array_api_compat.get_namespace(lon, lat, alpha, use_compat=False)
+
+    alpha = xp.asarray(alpha)
+    if xp.isdtype(alpha.dtype, "complex floating"):
+        alpha1, alpha2 = xp.real(alpha), xp.imag(alpha)
+    else:
+        alpha1, alpha2 = alpha
+
+    # we know great-circle navigation:
+    # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
+    #              cosθ cos|α| + sinθ sin|α| cosγ)
+    # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
+
+    t = xp.asarray(lat) / 180 * xp.pi
+    ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
+
+    a = xp.hypot(alpha1, alpha2)  # abs(alpha)
+    g = xp.atan2(alpha2, alpha1)  # arg(alpha)
+    ca, sa = xp.cos(a), xp.sin(a)
+    cg, sg = xp.cos(g), xp.sin(g)
+
+    # flipped atan2 arguments for lat instead of co-lat
+    tp = xp.atan2(ct * ca + st * sa * cg, xp.hypot(ct * sa - st * ca * cg, st * sg))
+
+    d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
+
+    return lon - d / xp.pi * 180, tp / xp.pi * 180
+
+
+def displacement(
+    from_lon: FloatArray,
+    from_lat: FloatArray,
+    to_lon: FloatArray,
+    to_lat: FloatArray,
+) -> ComplexArray:
+    """
+    Compute the displacement between two sets of positions.
+
+    Compute the complex :term:`displacement` that transforms points with
+    longitude *from_lon* and latitude *from_lat* into points with
+    longitude *to_lon* and latitude *to_lat* (all in degrees).
+
+    Parameters
+    ----------
+    from_lon, from_lat
+        Points before displacement.
+    to_lon, to_lat
+        Points after displacement.
+
+    Returns
+    -------
+        Array of complex displacement.
+
+    See Also
+    --------
+    displace : Apply displacement to a set of points.
+
+    """
+    xp = array_api_compat.get_namespace(
+        from_lon, from_lat, to_lon, to_lat, use_compat=False
+    )
+
+    a = (90.0 - to_lat) / 180 * xp.pi
+    b = (90.0 - from_lat) / 180 * xp.pi
+    g = (from_lon - to_lon) / 180 * xp.pi
+
+    sa, ca = xp.sin(a), xp.cos(a)
+    sb, cb = xp.sin(b), xp.cos(b)
+    sg, cg = xp.sin(g), xp.cos(g)
+
+    r = xp.atan2(xp.hypot(sa * cb - ca * sb * cg, sb * sg), ca * cb + sa * sb * cg)
+    x = sb * ca - cb * sa * cg
+    y = sa * sg
+    z = xp.hypot(x, y)
+    return r * (x / z + 1j * y / z)
