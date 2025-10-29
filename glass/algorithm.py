@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from jaxtyping import Array
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import FloatArray
+    from glass._types import FloatArray
 
 
 def nnls(

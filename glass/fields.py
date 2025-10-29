@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import AnyArray, ComplexArray, FloatArray
+    from glass._types import AnyArray, ComplexArray, FloatArray
 
     Fields = Sequence[glass.grf.Transformation]
     Cls = Sequence[AnyArray]

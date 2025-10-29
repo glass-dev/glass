@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import AnyArray, FloatArray, IntArray
+    from glass._types import AnyArray, FloatArray, IntArray
 
 
 def broadcast_first(

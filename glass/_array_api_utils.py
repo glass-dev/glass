@@ -22,21 +22,13 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
 
-    import numpy as np
-    from jaxtyping import Array as JAXArray
-    from numpy.typing import DTypeLike, NDArray
+    from numpy.typing import DTypeLike
 
     from array_api_strict._array_object import Array as AArray
 
-    from glass._types import UnifiedGenerator
+    from glass._types import AnyArray, UnifiedGenerator
 
     Size: TypeAlias = int | tuple[int, ...] | None
-
-    AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
-    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
-    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
-    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
 
 
 class CompatibleBackendNotFoundError(Exception):
