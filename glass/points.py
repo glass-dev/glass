@@ -54,7 +54,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import ComplexArray, DoubleArray, FloatArray
+    from glass._types import ComplexArray, DoubleArray, FloatArray
 
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi

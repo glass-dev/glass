@@ -16,27 +16,17 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeAlias
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
 
-    import numpy as np
-    from jaxtyping import Array as JAXArray
-    from numpy.typing import DTypeLike, NDArray
+    from numpy.typing import DTypeLike
 
     from array_api_strict._array_object import Array as AArray
 
-    import glass.jax
-
-    Size: TypeAlias = int | tuple[int, ...] | None
-
-    AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
-    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
-    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
-    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
+    from glass._types import AnyArray, Size, UnifiedGenerator
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -85,9 +75,7 @@ def import_numpy(backend: str) -> ModuleType:
         return numpy
 
 
-def rng_dispatcher(
-    array: AnyArray,
-) -> np.random.Generator | glass.jax.Generator | Generator:
+def rng_dispatcher(array: AnyArray) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.
 

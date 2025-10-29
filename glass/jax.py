@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from threading import Lock
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TYPE_CHECKING
 
 import jax.dtypes
 import jax.numpy as jnp
@@ -16,8 +16,7 @@ if TYPE_CHECKING:
     from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
     from typing_extensions import Self
 
-    RealArray: TypeAlias = Array
-    Size: TypeAlias = int | tuple[int, ...] | None
+    from glass._types import Size
 
 
 def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
