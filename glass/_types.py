@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-    from typing import Any, ParamSpec, TypeAlias, TypeVar
+    from typing import ParamSpec, TypeAlias, TypeVar
 
     import numpy as np
     from jaxtyping import Array as JAXArray
@@ -33,18 +33,19 @@ if TYPE_CHECKING:
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
+else:
+    # Runtime fallbacks (for Sphinx / autodoc)
+    # https://github.com/sphinx-doc/sphinx/issues/11991
+    AnyArray = Any
+    ComplexArray = Any
+    DoubleArray = Any
+    FloatArray = Any
+    IntArray = Any
 
-# defining types here means the sphinx autodoc can find the type hints
-__all__ = [
-    "AnyArray",
-    "ArrayLike1D",
-    "Cls",
-    "ComplexArray",
-    "DoubleArray",
-    "Fields",
-    "FloatArray",
-    "IntArray",
-    "Size",
-    "UnifiedGenerator",
-    "WeightFunc",
-]
+    ArrayLike1D = Any
+    Cls = Any
+    Fields = Any
+    Size = Any
+    WeightFunc = Any
+
+    UnifiedGenerator = Any
