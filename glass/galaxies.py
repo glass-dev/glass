@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._array_api_utils import FloatArray
+    from glass._typing import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
 
 
@@ -44,10 +44,7 @@ def redshifts(
     n: int | FloatArray,
     w: glass.RadialWindow,
     *,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> FloatArray:
     """
     Sample redshifts from a radial window function.
@@ -78,10 +75,7 @@ def redshifts_from_nz(
     z: FloatArray,
     nz: FloatArray,
     *,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
     warn: bool = True,
 ) -> FloatArray:
     """
@@ -238,10 +232,7 @@ def gaussian_phz(  # noqa: PLR0913
     *,
     lower: float | FloatArray | None = None,
     upper: float | FloatArray | None = None,
-    rng: np.random._generator.Generator
-    | glass.jax.Generator
-    | _utils.Generator
-    | None = None,
+    rng: UnifiedGenerator | None = None,
     xp: ModuleType | None = None,
 ) -> FloatArray:
     r"""
