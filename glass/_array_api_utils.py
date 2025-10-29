@@ -728,7 +728,6 @@ class XPAdditions:
 
         See relevant docs for details:
         - NumPy, https://numpy.org/doc/2.2/reference/generated/numpy.ndindex.html
-        - Jax, https://docs.jax.dev/en/latest/_autosummary/jax.numpy.indices.html
 
         Raises
         ------
