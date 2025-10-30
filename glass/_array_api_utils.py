@@ -16,27 +16,18 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeAlias
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
 
     import numpy as np
-    from jaxtyping import Array as JAXArray
-    from numpy.typing import DTypeLike, NDArray
+    from numpy.typing import DTypeLike
 
     from array_api_strict._array_object import Array as AArray
 
-    import glass.jax
-
-    Size: TypeAlias = int | tuple[int, ...] | None
-
-    AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
-    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
-    DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
-    IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
+    from glass._types import AnyArray, FloatArray, Size, UnifiedGenerator
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -85,16 +76,14 @@ def import_numpy(backend: str) -> ModuleType:
         return numpy
 
 
-def rng_dispatcher(
-    array: AnyArray,
-) -> np.random.Generator | glass.jax.Generator | Generator:
+def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.
 
     Parameters
     ----------
-    array
-        The array whose backend determines the RNG.
+    xp
+        The array backend which determines the RNG.
 
     Returns
     -------
@@ -105,8 +94,6 @@ def rng_dispatcher(
     NotImplementedError
         If the array backend is not supported.
     """
-    xp = array.__array_namespace__()
-
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
@@ -179,8 +166,8 @@ class Generator:
 
     def normal(
         self,
-        loc: float | AArray = 0.0,
-        scale: float | AArray = 1.0,
+        loc: float | FloatArray = 0.0,
+        scale: float | FloatArray = 1.0,
         size: Size = None,
     ) -> AArray:
         """
@@ -719,6 +706,30 @@ class XPAdditions:
             np = import_numpy(self.xp.__name__)
 
             return self.xp.asarray(np.degrees(deg_arr))
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    def ndindex(self, shape: tuple[int, ...]) -> np.ndindex:
+        """
+        Wrapper for numpy.ndindex.
+
+        See relevant docs for details:
+        - NumPy, https://numpy.org/doc/2.2/reference/generated/numpy.ndindex.html
+
+        Raises
+        ------
+        NotImplementedError
+            If the array backend is not supported.
+
+        """
+        if self.xp.__name__ == "numpy":
+            return self.xp.ndindex(shape)  # type: ignore[no-any-return]
+
+        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
+            np = import_numpy(self.xp.__name__)
+
+            return np.ndindex(shape)  # type: ignore[no-any-return]
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

@@ -13,8 +13,9 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     import pytest_mock
-    from conftest import UnifiedGenerator
     from numpy.typing import NDArray
+
+    from glass._types import UnifiedGenerator
 
 
 def catpos(
