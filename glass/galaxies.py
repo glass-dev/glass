@@ -34,8 +34,6 @@ import glass.arraytools
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import NDArray
-
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
 
@@ -158,15 +156,15 @@ def redshifts_from_nz(
 
 
 def galaxy_shear(  # noqa: PLR0913
-    lon: NDArray[np.float64],
-    lat: NDArray[np.float64],
-    eps: NDArray[np.float64],
-    kappa: NDArray[np.float64],
-    gamma1: NDArray[np.float64],
-    gamma2: NDArray[np.float64],
+    lon: FloatArray,
+    lat: FloatArray,
+    eps: FloatArray,
+    kappa: FloatArray,
+    gamma1: FloatArray,
+    gamma2: FloatArray,
     *,
     reduced_shear: bool = True,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Observed galaxy shears from weak lensing.
 
@@ -333,7 +331,7 @@ def gaussian_phz(  # noqa: PLR0913
 
 
 def _kappa_ia_nla(  # noqa: PLR0913
-    delta: NDArray[np.float64],
+    delta: FloatArray,
     zeff: float,
     a_ia: float,
     cosmo: Cosmology,
@@ -343,7 +341,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     lbar: float = 0.0,
     l0: float = 1e-9,
     beta: float = 0.0,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     r"""
     Effective convergence from intrinsic alignments using the NLA model.
 
@@ -418,4 +416,4 @@ def _kappa_ia_nla(  # noqa: PLR0913
         prefactor * inverse_linear_growth * redshift_dependence * luminosity_dependence
     )
 
-    return delta * f_nla  # type: ignore[no-any-return]
+    return delta * f_nla
