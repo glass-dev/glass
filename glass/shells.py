@@ -182,6 +182,7 @@ class RadialWindow:
     immutable (however, the array entries may **not** be immutable; do
     not change them in place)::
 
+        >>> import dataclasses
         >>> import glass
         >>> import numpy as np
         >>> za = np.asarray([0.0, 1.0])
