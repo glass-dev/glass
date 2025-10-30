@@ -12,8 +12,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import NDArray
-
+    from glass._types import FloatArray
     from glass.cosmology import Cosmology
 
 
@@ -116,7 +115,7 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
         im: float,
         *,
         usecomplex: bool,
-    ) -> complex | NDArray[np.float64]:
+    ) -> complex | FloatArray:
         return re + 1j * im if usecomplex else xp.asarray([re, im])
 
     # north
