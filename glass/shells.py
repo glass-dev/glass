@@ -63,8 +63,6 @@ if TYPE_CHECKING:
     import types
     from collections.abc import Iterator, Sequence
 
-    from numpy.typing import NDArray
-
     from glass._types import FloatArray, WeightFunc
     from glass.cosmology import Cosmology
 
@@ -82,7 +80,7 @@ class DistanceWeight:
 
     cosmo: Cosmology
 
-    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, z: FloatArray) -> FloatArray:
         """
         Uniform weight in comoving distance.
 
@@ -96,7 +94,7 @@ class DistanceWeight:
             The weight function evaluated at redshifts *z*.
 
         """
-        return 1 / self.cosmo.H_over_H0(z)  # type: ignore[no-any-return]
+        return 1 / self.cosmo.H_over_H0(z)
 
 
 @dataclasses.dataclass
@@ -112,7 +110,7 @@ class VolumeWeight:
 
     cosmo: Cosmology
 
-    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, z: FloatArray) -> FloatArray:
         """
         Uniform weight in comoving distance.
 
@@ -126,11 +124,9 @@ class VolumeWeight:
             The weight function evaluated at redshifts *z*.
 
         """
-        return (  # type: ignore[no-any-return]
-            (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
-            ** 2
-            / self.cosmo.H_over_H0(z)
-        )
+        return (
+            self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance
+        ) ** 2 / self.cosmo.H_over_H0(z)
 
 
 @dataclasses.dataclass
@@ -147,7 +143,7 @@ class DensityWeight:
 
     cosmo: Cosmology
 
-    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, z: FloatArray) -> FloatArray:
         """
         Uniform weight in comoving distance.
 
@@ -161,7 +157,7 @@ class DensityWeight:
             The weight function evaluated at redshifts *z*.
 
         """
-        return (  # type: ignore[no-any-return]
+        return (
             self.cosmo.critical_density0
             * self.cosmo.Omega_m(z)
             * (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
@@ -904,7 +900,7 @@ def distance_grid(
     *,
     dx: float | None = None,
     num: int | None = None,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Redshift grid with uniform spacing in comoving distance.
 
@@ -928,7 +924,7 @@ def distance_grid(
     """
     xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     x = _uniform_grid(xmin, xmax, step=dx, num=num)
-    return cosmo.inv_comoving_distance(x)  # type: ignore[no-any-return]
+    return cosmo.inv_comoving_distance(x)
 
 
 def combine(

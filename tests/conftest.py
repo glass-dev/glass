@@ -20,11 +20,9 @@ with contextlib.suppress(ImportError):
 if TYPE_CHECKING:
     import types
 
-    from numpy.typing import NDArray
-
     from cosmology import Cosmology
 
-    from glass._types import UnifiedGenerator
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 # Handling of array backends, inspired by-
@@ -184,15 +182,15 @@ def cosmo() -> Cosmology:
             """Hubble distance in Mpc."""
             return 4.4e3
 
-        def H_over_H0(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
+        def H_over_H0(self, z: FloatArray) -> FloatArray:  # noqa: N802
             """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
             return (self.Omega_m0 * (1 + z) ** 3 + 1 - self.Omega_m0) ** 0.5
 
         def xm(
             self,
-            z: NDArray[np.float64],
-            z2: NDArray[np.float64] | None = None,
-        ) -> NDArray[np.float64]:
+            z: FloatArray,
+            z2: FloatArray | None = None,
+        ) -> FloatArray:
             """
             Dimensionless transverse comoving distance.
 
@@ -202,31 +200,31 @@ def cosmo() -> Cosmology:
                 return np.array(z) * 1_000
             return (np.array(z2) - np.array(z)) * 1_000
 
-        def rho_m_z(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+        def rho_m_z(self, z: FloatArray) -> FloatArray:
             """Redshift-dependent matter density in Msol Mpc-3."""
             return self.critical_density0 * self.Omega_m0 * (1 + z) ** 3
 
         def comoving_distance(
             self,
-            z: NDArray[np.float64],
-            z2: NDArray[np.float64] | None = None,
-        ) -> NDArray[np.float64]:
+            z: FloatArray,
+            z2: FloatArray | None = None,
+        ) -> FloatArray:
             """Comoving distance :math:`d_c(z)` in Mpc."""
             return self.xm(z) / 1_000 if z2 is None else self.xm(z, z2) / 1_000
 
-        def inv_comoving_distance(self, dc: NDArray[np.float64]) -> NDArray[np.float64]:
+        def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
             """Inverse function for the comoving distance in Mpc."""
             return 1_000 * (1 / (dc + np.finfo(float).eps))
 
-        def Omega_m(self, z: NDArray[np.float64]) -> NDArray[np.float64]:  # noqa: N802
+        def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
             """Matter density parameter at redshift z."""
             return self.rho_m_z(z) / self.critical_density0
 
         def transverse_comoving_distance(
             self,
-            z: NDArray[np.float64],
-            z2: NDArray[np.float64] | None = None,
-        ) -> NDArray[np.float64]:
+            z: FloatArray,
+            z2: FloatArray | None = None,
+        ) -> FloatArray:
             """Transverse comoving distance :math:`d_M(z)` in Mpc."""
             return self.hubble_distance * self.xm(z, z2)
 
