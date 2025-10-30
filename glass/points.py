@@ -51,10 +51,17 @@ import glass.arraytools
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
+    from types import ModuleType
 
     from numpy.typing import NDArray
 
-    from glass._types import ComplexArray, DoubleArray, FloatArray
+    from glass._types import (
+        ComplexArray,
+        DoubleArray,
+        FloatArray,
+        IntArray,
+        UnifiedGenerator,
+    )
 
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
@@ -332,14 +339,15 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | NDArray[np.int_] | NDArray[np.float64],
+    ngal: float | IntArray | FloatArray,
     *,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
+    xp: ModuleType | None = None,
 ) -> Generator[
     tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
-        int | NDArray[np.int_],
+        FloatArray,
+        FloatArray,
+        int | IntArray,
     ]
 ]:
     """
@@ -365,32 +373,36 @@ def uniform_positions(
         counts with the same shape is returned.
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(ngal, use_compat=False)
+    uxpx = _utils.XPAdditions(xp)
+
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp=xp)
+
+    ngal = xp.asarray(ngal)
 
     # sample number of galaxies
-    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
+    ngal_sphere = xp.asarray(rng.poisson(xp.multiply(ARCMIN2_SPHERE, ngal)))
 
     # extra dimensions of the output
-    dims = np.shape(ngal)
-
-    # make sure ntot is an array even if scalar
-    ngal = np.broadcast_to(ngal, dims)
+    dims = ngal_sphere.shape
 
     # sample each set of points
-    for k in np.ndindex(dims):
+    for k in uxpx.ndindex(dims):
+        size = (ngal_sphere[k],)
         # sample uniformly over the sphere
-        lon = rng.uniform(-180, 180, size=ngal[k])
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))
+        lon = rng.uniform(-180, 180, size=size)
+        lat = uxpx.degrees(xp.asin(rng.uniform(-1, 1, size=size)))
 
         # report count
-        count: int | NDArray[np.int_]
+        count: int | IntArray
         if dims:
-            count = np.zeros(dims, dtype=int)
-            count[k] = ngal[k]
+            count = xp.zeros(dims, dtype=xp.int64)
+            count[k] = ngal_sphere[k]  # type: ignore[index]
         else:
-            count = int(ngal[k])
+            count = int(ngal_sphere[k])
 
         yield lon, lat, count
 
