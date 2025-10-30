@@ -8,29 +8,27 @@ from transformcl import cltocorr, corrtocl
 import glass.grf
 
 if TYPE_CHECKING:
-    from typing import Any
-
-    from numpy.typing import NDArray
+    from glass._types import AnyArray
 
 
-def _relerr(dx: NDArray[Any], x: NDArray[Any]) -> float:
+def _relerr(dx: AnyArray, x: AnyArray) -> float:
     """Compute the relative error max(|dx/x|)."""
     q = np.divide(dx, x, where=(dx != 0), out=np.zeros_like(dx))
     return np.fabs(q).max()  # type: ignore[no-any-return]
 
 
 def solve(  # noqa: PLR0912, PLR0913
-    cl: NDArray[Any],
+    cl: AnyArray,
     t1: glass.grf.Transformation,
     t2: glass.grf.Transformation | None = None,
     *,
     pad: int = 0,
-    initial: NDArray[Any] | None = None,
+    initial: AnyArray | None = None,
     cltol: float = 1e-5,
     gltol: float = 1e-5,
     maxiter: int = 20,
     monopole: float | None = None,
-) -> tuple[NDArray[Any], NDArray[Any], int]:
+) -> tuple[AnyArray, AnyArray, int]:
     """
     Solve for a Gaussian angular power spectrum.
 
