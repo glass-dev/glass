@@ -31,6 +31,7 @@ Applying lensing
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Literal, overload
 
 import healpy as hp
@@ -43,6 +44,7 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
+    from typing import Any
 
     from numpy.typing import NDArray
 
@@ -687,3 +689,88 @@ def deflect(
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
     return lon - uxpx.degrees(d), uxpx.degrees(tp)
+
+
+def harmonic_shear(
+    kappa: NDArray[Any],
+    lon: NDArray[Any],
+    lat: NDArray[Any],
+) -> NDArray[Any]:
+    r"""
+    Compute shear at given positions in harmonic space.
+
+    Takes a convergence field in harmonic space (i.e. spherical harmonic
+    coefficients :math:`\kappa_{lm}`) and returns the *shear* values in the
+    given positions.
+
+    Parameters
+    ----------
+    kappa
+        Spherical harmonic coefficients of the convergence field.
+    lon, lat
+        Longitude and latitude (in degrees) of positions to evaluate.
+
+    Returns
+    -------
+    gamma
+        Complex shear in the given positions.
+
+    Notes
+    -----
+    The spherical harmonic coefficients of convergence and shear for
+    :math:`l \ge 2` are related as [Tessore23]_
+
+    .. math::
+
+        \gamma_{lm}
+        = -\sqrt{\frac{(l+2) \, (l-1)}{l \, (l+1)}} \, \kappa_{lm} \;,
+
+    with :math:`\gamma_{lm} = ` for :math:`l < 2`.
+
+    """
+    try:
+        import ducc0  # noqa: PLC0415
+    except ModuleNotFoundError as exc:
+        raise RuntimeError("function requires the ducc0 package") from exc
+
+    # should be moved to helper module
+    from glass.fields import _multalm  # noqa: PLC0415
+
+    # turn inputs into spherical coordinates
+    theta = (90.0 - lat.reshape(-1)) / 180 * np.pi
+    phi = (lon.reshape(-1) / 180 * np.pi) % (2 * np.pi)
+    if theta.size != phi.size:
+        raise ValueError("inconsistent input shapes")
+
+    # skip empty list of points
+    if theta.size == 0:
+        return np.zeros(0) + 1j * np.zeros(0)
+
+    # compute lmax from size of kappa alms
+    lmax = (math.isqrt(8 * kappa.shape[-1] + 1) - 3) // 2
+
+    # array for kappa to gamma conversion
+    ell = np.arange(2, lmax + 1)
+    fl = np.concat(
+        [
+            np.zeros(2),
+            -np.sqrt(((ell + 2) * (ell - 1)) / (ell * (ell + 1))),
+        ]
+    )
+
+    # compute inputs to transform
+    alm = np.stack([_multalm(kappa, fl), np.zeros_like(kappa)], axis=0)
+    loc = np.stack([theta, phi], axis=1)
+
+    # compute shear values in positions
+    gamma = ducc0.sht.synthesis_general(
+        alm=alm,
+        spin=2,
+        lmax=lmax,
+        loc=loc,
+        epsilon=2e-13,
+        nthreads=0,
+    )
+
+    # return shear as complex array
+    return np.dot(np.asarray([1, 1j]), gamma)  # type: ignore[no-any-return]
