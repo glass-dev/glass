@@ -2,7 +2,7 @@
 ci:
   autofix_commit_msg: "pre-commit.ci: style fixes"
   autofix_prs: false
-  autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
+  autoupdate_commit_msg: "gh-234: update pre-commit hooks"
   autoupdate_schedule: monthly
 
 default_language_version:
