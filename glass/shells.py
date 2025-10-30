@@ -51,8 +51,6 @@ import math
 import warnings
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass.algorithm
@@ -63,6 +61,7 @@ if TYPE_CHECKING:
     import types
     from collections.abc import Iterator, Sequence
 
+    import numpy as np
     from numpy.typing import NDArray
 
     from glass._types import FloatArray, WeightFunc
@@ -855,7 +854,9 @@ def _uniform_grid(
 
     """
     if xp is None:
-        xp = np
+        import numpy  # noqa: ICN001, PLC0415
+
+        xp = numpy
     if step is not None and num is None:
         return xp.arange(start, stop + step, step)
     if step is None and num is not None:
