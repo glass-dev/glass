@@ -42,8 +42,6 @@ import glass.arraytools
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import NDArray
-
     from glass._types import FloatArray
 
 
@@ -51,7 +49,7 @@ def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
 
@@ -91,7 +89,7 @@ def vmap_galactic_ecliptic(
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    return hp.Rotator(coord="CE").rotate_map_pixel(m)  # type: ignore[no-any-return]
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)
 
 
 def gaussian_nz(

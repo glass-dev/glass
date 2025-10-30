@@ -1,23 +1,23 @@
 """Module for cosmology.api utilities."""
 
-from typing import Any, Protocol
-
-from numpy.typing import NDArray
+from typing import Protocol
 
 import cosmology.api
 
+from glass._types import AnyArray
+
 
 class Cosmology(
-    cosmology.api.HasComovingDistance[NDArray[Any], NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasCriticalDensity0[NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasGrowthFactor[NDArray[Any], NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasHoverH0[NDArray[Any], NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasHubbleDistance[NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasInverseComovingDistance[NDArray[Any], NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasLittleH[NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasOmegaM0[NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasOmegaM[NDArray[Any], NDArray[Any]],  # type: ignore[misc]
-    cosmology.api.HasTransverseComovingDistance[NDArray[Any], NDArray[Any]],  # type: ignore[misc]
+    cosmology.api.HasComovingDistance[AnyArray, AnyArray],  # type: ignore[misc]
+    cosmology.api.HasCriticalDensity0[AnyArray],  # type: ignore[misc]
+    cosmology.api.HasGrowthFactor[AnyArray, AnyArray],  # type: ignore[misc]
+    cosmology.api.HasHoverH0[AnyArray, AnyArray],  # type: ignore[misc]
+    cosmology.api.HasHubbleDistance[AnyArray],  # type: ignore[misc]
+    cosmology.api.HasInverseComovingDistance[AnyArray, AnyArray],  # type: ignore[misc]
+    cosmology.api.HasLittleH[AnyArray],  # type: ignore[misc]
+    cosmology.api.HasOmegaM0[AnyArray],  # type: ignore[misc]
+    cosmology.api.HasOmegaM[AnyArray, AnyArray],  # type: ignore[misc]
+    cosmology.api.HasTransverseComovingDistance[AnyArray, AnyArray],  # type: ignore[misc]
     Protocol,
 ):
     """Cosmology protocol for GLASS."""
