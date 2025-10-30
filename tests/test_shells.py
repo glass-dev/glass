@@ -12,7 +12,7 @@ import glass
 if TYPE_CHECKING:
     import types
 
-    from glass._array_api_utils import XPAdditions
+    import glass._array_api_utils as _utils
     from glass.cosmology import Cosmology
 
 
@@ -188,7 +188,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
         glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_restrict(xp: types.ModuleType, uxpx: XPAdditions) -> None:
+def test_restrict(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1000)
@@ -222,10 +222,10 @@ def test_restrict(xp: types.ModuleType, uxpx: XPAdditions) -> None:
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(xp: types.ModuleType, uxpx: XPAdditions, method: str) -> None:
+def test_partition(xp: types.ModuleType, uxpx: _utils.XPAdditions, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
     if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
-        pytest.skip("Arrays in " + method + " are not immutable, so do not support jax")
+        pytest.skip(f"Arrays in {method} are not immutable, so do not support jax")
 
     shells = [
         glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
@@ -331,7 +331,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine(xp: types.ModuleType, uxpx: XPAdditions) -> None:
+def test_combine(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1000)
     weights = xp.asarray(
