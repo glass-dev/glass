@@ -15,8 +15,6 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from typing import Unpack
 
-    from numpy.typing import NDArray
-
     from glass._types import AnyArray, FloatArray, IntArray
 
 
@@ -45,12 +43,12 @@ def broadcast_first(
 
 def broadcast_leading_axes(
     *args: tuple[
-        float | NDArray[np.float64],
+        float | FloatArray,
         int,
     ],
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[NDArray[np.float64], ...]],
+    Unpack[tuple[FloatArray, ...]],
 ]:
     """
     Broadcast all but the last N axes.
