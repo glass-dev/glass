@@ -21,34 +21,33 @@ import glass.grf
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
-    from typing import Any, Literal, TypeVar
+    from typing import Literal
 
-    from numpy.typing import NDArray
+    from glass._types import (
+        AnyArray,
+        Cls,
+        ComplexArray,
+        Fields,
+        FloatArray,
+        IntArray,
+        T,
+    )
 
-    from glass._array_api_utils import AnyArray, ComplexArray, FloatArray
-
-    Fields = Sequence[glass.grf.Transformation]
-    Cls = Sequence[AnyArray]
-
-    T = TypeVar("T")
 
 try:
     from warnings import deprecated
 except ImportError:
     if TYPE_CHECKING:
-        from typing import ParamSpec, TypeVar
+        from glass._types import P, R
 
-        _P = ParamSpec("_P")
-        _R = TypeVar("_R")
-
-    def deprecated(msg: str, /) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:  # type: ignore[no-redef]
+    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore[no-redef]
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps  # noqa: PLC0415
         from warnings import warn  # noqa: PLC0415
 
-        def decorator(func: Callable[_P, _R], /) -> Callable[_P, _R]:
+        def decorator(func: Callable[P, R], /) -> Callable[P, R]:
             @wraps(func)
-            def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+            def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
                 warn(msg, category=DeprecationWarning, stacklevel=2)
                 return func(*args, **kwargs)
 
@@ -373,7 +372,7 @@ def _generate_grf(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[NDArray[np.float64]]:
+) -> Generator[FloatArray]:
     """
     Iteratively sample Gaussian random fields (internal use).
 
@@ -472,7 +471,7 @@ def generate_gaussian(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[NDArray[np.float64]]:
+) -> Generator[FloatArray]:
     """
     Sample Gaussian random fields from Cls iteratively.
 
@@ -526,7 +525,7 @@ def generate_lognormal(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Generator[NDArray[np.float64]]:
+) -> Generator[FloatArray]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
 
@@ -597,8 +596,8 @@ def getcl(
 
 
 def enumerate_spectra(
-    entries: Iterable[NDArray[Any]],
-) -> Iterator[tuple[int, int, NDArray[Any]]]:
+    entries: Iterable[AnyArray],
+) -> Iterator[tuple[int, int, AnyArray]]:
     """
     Iterate over a set of two-point functions in :ref:`standard order
     <twopoint_order>`, yielding a tuple of indices and their associated
@@ -617,7 +616,7 @@ def enumerate_spectra(
         yield i, j, cl
 
 
-def spectra_indices(n: int) -> NDArray[np.integer]:
+def spectra_indices(n: int) -> IntArray:
     """
     Return an array of indices in :ref:`standard order <twopoint_order>`
     for a set of two-point functions for *n* fields.  Each row is a pair
@@ -864,7 +863,7 @@ def generate(
     *,
     ncorr: int | None = None,
     rng: np.random.Generator | None = None,
-) -> Iterator[NDArray[Any]]:
+) -> Iterator[AnyArray]:
     """
     Sample random fields from Gaussian angular power spectra.
 
@@ -960,7 +959,7 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
     return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
 
 
-def _glass_to_healpix_alm(alm: NDArray[np.complex128]) -> NDArray[np.complex128]:
+def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
     """
     Reorder alms in GLASS order to conform to (new) HEALPix order.
 
@@ -1000,7 +999,7 @@ def lognormal_shift_hilbert2011(z: float) -> float:
     return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
 
 
-def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> NDArray[Any]:
+def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> AnyArray:
     """
     Construct covariance matrix from spectra.
 
@@ -1099,7 +1098,7 @@ def regularized_spectra(
 
     """
     # regularise the cov matrix using the chosen method
-    cov_method: Callable[..., NDArray[Any]]
+    cov_method: Callable[..., AnyArray]
     if method == "clip":
         from glass.algorithm import cov_clip as cov_method  # noqa: PLC0415
     elif method == "nearest":

@@ -51,10 +51,15 @@ import glass.arraytools
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
+    from types import ModuleType
 
-    from numpy.typing import NDArray
-
-    from glass._array_api_utils import ComplexArray, DoubleArray, FloatArray
+    from glass._types import (
+        ComplexArray,
+        DoubleArray,
+        FloatArray,
+        IntArray,
+        UnifiedGenerator,
+    )
 
 
 ARCMIN2_SPHERE = 60**6 // 100 / np.pi
@@ -152,10 +157,10 @@ def loglinear_bias(
 
 
 def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
-    ngal: float | NDArray[np.float64],
-    delta: NDArray[np.float64],
-    bias: float | NDArray[np.float64] | None = None,
-    vis: NDArray[np.float64] | None = None,
+    ngal: float | FloatArray,
+    delta: FloatArray,
+    bias: float | FloatArray | None = None,
+    vis: FloatArray | None = None,
     *,
     bias_model: str | Callable[..., Any] = "linear",
     remove_monopole: bool = False,
@@ -163,9 +168,9 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     rng: np.random.Generator | None = None,
 ) -> Generator[
     tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
-        int | NDArray[np.int_],
+        FloatArray,
+        FloatArray,
+        int | IntArray,
     ]
 ]:
     """
@@ -243,7 +248,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         bias_model_callable = bias_model
 
     # broadcast inputs to common shape of extra dimensions
-    inputs: list[tuple[float | NDArray[np.float64], int]] = [(ngal, 0), (delta, 1)]
+    inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
     if bias is not None:
         inputs.append((bias, 0))
     if vis is not None:
@@ -293,7 +298,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         nside = healpix.npix2nside(npix)
 
         # create a mask to report the count in the right axis
-        cmask: int | NDArray[np.int_]
+        cmask: int | IntArray
         if dims:
             cmask = np.zeros(dims, dtype=int)
             cmask[k] = 1
@@ -332,14 +337,15 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
 
 def uniform_positions(
-    ngal: float | NDArray[np.int_] | NDArray[np.float64],
+    ngal: float | IntArray | FloatArray,
     *,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
+    xp: ModuleType | None = None,
 ) -> Generator[
     tuple[
-        NDArray[np.float64],
-        NDArray[np.float64],
-        int | NDArray[np.int_],
+        FloatArray,
+        FloatArray,
+        int | IntArray,
     ]
 ]:
     """
@@ -365,32 +371,36 @@ def uniform_positions(
         counts with the same shape is returned.
 
     """
+    if xp is None:
+        xp = array_api_compat.array_namespace(ngal, use_compat=False)
+    uxpx = _utils.XPAdditions(xp)
+
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng()
+        rng = _utils.rng_dispatcher(xp=xp)
+
+    ngal = xp.asarray(ngal)
 
     # sample number of galaxies
-    ngal = rng.poisson(np.multiply(ARCMIN2_SPHERE, ngal))
+    ngal_sphere = xp.asarray(rng.poisson(xp.multiply(ARCMIN2_SPHERE, ngal)))
 
     # extra dimensions of the output
-    dims = np.shape(ngal)
-
-    # make sure ntot is an array even if scalar
-    ngal = np.broadcast_to(ngal, dims)
+    dims = ngal_sphere.shape
 
     # sample each set of points
-    for k in np.ndindex(dims):
+    for k in uxpx.ndindex(dims):
+        size = (ngal_sphere[k],)
         # sample uniformly over the sphere
-        lon = rng.uniform(-180, 180, size=ngal[k])
-        lat = np.rad2deg(np.arcsin(rng.uniform(-1, 1, size=ngal[k])))
+        lon = rng.uniform(-180, 180, size=size)
+        lat = uxpx.degrees(xp.asin(rng.uniform(-1, 1, size=size)))
 
         # report count
-        count: int | NDArray[np.int_]
+        count: int | IntArray
         if dims:
-            count = np.zeros(dims, dtype=int)
-            count[k] = ngal[k]
+            count = xp.zeros(dims, dtype=xp.int64)
+            count[k] = ngal_sphere[k]  # type: ignore[index]
         else:
-            count = int(ngal[k])
+            count = int(ngal_sphere[k])
 
         yield lon, lat, count
 
