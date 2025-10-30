@@ -15,28 +15,30 @@ if TYPE_CHECKING:
     import pytest_mock
     from numpy.typing import NDArray
 
-    from glass._types import UnifiedGenerator
+    from glass._types import FloatArray, IntArray, UnifiedGenerator
 
 
 def catpos(
     pos: Generator[
         tuple[
-            NDArray[np.float64],
-            NDArray[np.float64],
-            int | NDArray[np.int_],
+            FloatArray,
+            FloatArray,
+            IntArray,
         ]
     ],
+    *,
+    xp: ModuleType,
 ) -> tuple[
-    NDArray[np.float64],
-    NDArray[np.float64],
-    int | NDArray[np.int_],
+    FloatArray,
+    FloatArray,
+    IntArray,
 ]:
-    lon = np.empty(0)
-    lat = np.empty(0)
-    cnt: int | NDArray[np.int_] = 0
+    lon = xp.empty(0)
+    lat = xp.empty(0)
+    cnt: IntArray = 0
     for lo, la, co in pos:
-        lon = np.concatenate([lon, lo])
-        lat = np.concatenate([lat, la])
+        lon = xp.concat([lon, lo])
+        lat = xp.concat([lat, la])
         cnt = cnt + co
     return lon, lat, cnt
 
@@ -123,14 +125,16 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(npix)
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis), xp=np)
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
 
     # test with rng
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis, rng=rng))
+    lon, lat, cnt = catpos(
+        glass.positions_from_delta(ngal, delta, bias, vis, rng=rng), xp=np
+    )
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -138,7 +142,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: Nons bias and callable bias model
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x)
+        glass.positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -146,7 +151,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 
     # case: None vis
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, None))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, None), xp=np)
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
@@ -154,7 +159,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: remove monopole
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True)
+        glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True), xp=np
     )
 
     assert isinstance(cnt, int)
@@ -163,7 +168,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: negative delta
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis)
+        glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis), xp=np
     )
 
     assert isinstance(cnt, int)
@@ -173,7 +178,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: large delta
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis)
+        glass.positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -186,7 +192,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis), xp=np)
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (2,)
@@ -200,7 +206,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis), xp=np)
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -214,7 +220,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis), xp=np)
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -225,7 +231,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 
     vis[: vis.size // 2] = 0.0
 
-    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis))
+    lon, lat, cnt = catpos(glass.positions_from_delta(ngal, delta, bias, vis), xp=np)
 
     assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
@@ -238,39 +244,49 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
         next(glass.positions_from_delta(ngal, delta, bias, vis, bias_model=0))
 
 
-def test_uniform_positions(rng: np.random.Generator) -> None:
+def test_uniform_positions(xp: ModuleType, urng: UnifiedGenerator) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(
+            "Arrays in uniform_positions are not immutable, so do not support jax"
+        )
+
     # case: scalar input
 
-    ngal: float | NDArray[np.float64] = 1e-3
+    ngal: float | FloatArray = 1e-3
 
-    lon, lat, cnt = catpos(glass.uniform_positions(ngal))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal, xp=xp), xp=xp)
+
+    # Pass non-arrays without xp
+
+    with pytest.raises(TypeError, match="Unrecognized array input"):
+        next(glass.uniform_positions(ngal))
 
     # test with rng
 
-    lon, lat, cnt = catpos(glass.uniform_positions(ngal, rng=rng))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal, rng=urng, xp=xp), xp=xp)
 
     assert isinstance(cnt, int)
     assert lon.shape == lat.shape == (cnt,)
 
     # case: 1-D array input
 
-    ngal = np.array([1e-3, 2e-3, 3e-3])
+    ngal = xp.asarray([1e-3, 2e-3, 3e-3])
 
-    lon, lat, cnt = catpos(glass.uniform_positions(ngal))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert isinstance(cnt, np.ndarray)
+    assert cnt.__array_namespace__() == xp
     assert cnt.shape == (3,)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert lon.shape == lat.shape == (xp.sum(cnt),)
 
     # case: 2-D array input
 
-    ngal = np.array([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
+    ngal = xp.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
 
-    lon, lat, cnt = catpos(glass.uniform_positions(ngal))
+    lon, lat, cnt = catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert isinstance(cnt, np.ndarray)
+    assert cnt.__array_namespace__() == xp
     assert cnt.shape == (3, 2)
-    assert lon.shape == lat.shape == (cnt.sum(),)
+    assert lon.shape == lat.shape == (xp.sum(cnt),)
 
 
 def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
