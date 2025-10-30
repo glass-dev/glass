@@ -506,7 +506,7 @@ def test_enumerate_spectra() -> None:
 
     # go through expected indices and values and compare
     for k, (i, j) in enumerate(indices):
-        assert next(it) == (i, j, k)  # type: ignore[comparison-overlap]
+        assert next(it) == (i, j, k)
 
     # make sure iterator is exhausted
     with pytest.raises(StopIteration):
