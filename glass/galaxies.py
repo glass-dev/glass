@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from glass._typing import FloatArray, UnifiedGenerator
+    from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
 
 
