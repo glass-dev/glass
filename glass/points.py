@@ -347,7 +347,7 @@ def uniform_positions(
     tuple[
         FloatArray,
         FloatArray,
-        IntArray,
+        int | IntArray,
     ]
 ]:
     """
@@ -397,10 +397,10 @@ def uniform_positions(
         lat = uxpx.degrees(xp.asin(rng.uniform(-1, 1, size=size)))
 
         # report count
-        count: IntArray
+        count: int | IntArray
         if dims:
             count = xp.zeros(dims, dtype=xp.int64)
-            count[k] = ngal_sphere[k]
+            count[k] = ngal_sphere[k]  # type: ignore[index]
         else:
             count = int(ngal_sphere[k])
 

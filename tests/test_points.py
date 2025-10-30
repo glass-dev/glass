@@ -274,6 +274,7 @@ def test_uniform_positions(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     lon, lat, cnt = catpos(glass.uniform_positions(ngal), xp=xp)
 
+    assert not isinstance(cnt, int)
     assert cnt.__array_namespace__() == xp
     assert cnt.shape == (3,)
     assert lon.shape == lat.shape == (xp.sum(cnt),)
@@ -284,6 +285,7 @@ def test_uniform_positions(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     lon, lat, cnt = catpos(glass.uniform_positions(ngal), xp=xp)
 
+    assert not isinstance(cnt, int)
     assert cnt.__array_namespace__() == xp
     assert cnt.shape == (3, 2)
     assert lon.shape == lat.shape == (xp.sum(cnt),)
