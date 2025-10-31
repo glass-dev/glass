@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Sequence
     from typing import ParamSpec, TypeAlias, TypeVar
 
     import numpy as np
