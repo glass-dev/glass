@@ -1,6 +1,6 @@
 {
   "commitConvention": "angular",
-  "commitType": "docs",
+  "commitType": "gh-540",
   "contributorsPerLine": 7,
   "files": [
     "docs/CONTRIBUTORS.md"
