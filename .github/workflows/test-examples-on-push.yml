@@ -22,4 +22,4 @@ jobs:
   test-examples-on-push:
     if: github.event.pull_request.draft == false
     name: On push
-    uses: glass-dev/glass/.github/workflows/run-examples.yml@main
+    uses: ./.github/workflows/run-examples.yml
