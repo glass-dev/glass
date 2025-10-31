@@ -131,13 +131,13 @@ class Generator:
         seed
             Seed for the random number generator.
         """
-        import numpy as np  # noqa: PLC0415
+        import numpy  # noqa: ICN001, PLC0415
 
         import array_api_strict  # noqa: PLC0415
 
         self.axp = array_api_strict
-        self.nxp = np
-        self.rng = np.random.default_rng(seed=seed)
+        self.nxp = numpy
+        self.rng = self.nxp.random.default_rng(seed=seed)
 
     def random(
         self,
