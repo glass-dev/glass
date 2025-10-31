@@ -10,8 +10,9 @@ on:
       - main
   pull_request:
     paths:
-      - glass/**
+      - .github/workflows/run-examples.yml
       - examples/**
+      - glass/**
     types:
       - opened
       - ready_for_review
