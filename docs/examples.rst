@@ -34,6 +34,7 @@ To get started, these examples focus on simulating one thing at a time.
    examples/1-basic/matter.ipynb
    examples/1-basic/density.ipynb
    examples/1-basic/lensing.ipynb
+   examples/1-basic/lensing-harmonic.ipynb
    examples/1-basic/photoz.ipynb
 
 
