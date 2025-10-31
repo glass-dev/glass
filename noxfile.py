@@ -25,7 +25,7 @@ ARRAY_BACKENDS = {
 }
 
 
-@nox.session
+@nox.session(python="3.13")
 def lint(session: nox.Session) -> None:
     """Run the linter."""
     session.install("pre-commit")
@@ -69,7 +69,7 @@ def doctests(session: nox.Session) -> None:
     session.run("pytest", *session.posargs)
 
 
-@nox.session
+@nox.session(python="3.13")
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
     session.install("-e", ".[examples]")
@@ -97,7 +97,7 @@ def examples(session: nox.Session) -> None:
         )
 
 
-@nox.session
+@nox.session(python="3.13")
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
     session.install("-e", ".", "--group", "docs")
@@ -121,14 +121,14 @@ def docs(session: nox.Session) -> None:
             print("Unsupported argument to docs")
 
 
-@nox.session
+@nox.session(python="3.13")
 def build(session: nox.Session) -> None:
     """Build an SDist and wheel."""
     session.install("build")
     session.run("python", "-m", "build")
 
 
-@nox.session
+@nox.session(python="3.13")
 def version(session: nox.Session) -> None:
     """
     Check the current version of the package.
