@@ -23,13 +23,7 @@ if TYPE_CHECKING:
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
     IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
-
-    ArrayLike1D: TypeAlias = Sequence[float] | FloatArray
-    Cls: TypeAlias = Sequence[AnyArray]
-    Fields: TypeAlias = Sequence[glass.grf.Transformation]
-    Size: TypeAlias = int | tuple[int, ...] | None
-    WeightFunc: TypeAlias = Callable[[ArrayLike1D], ArrayLike1D]
-
+    FloatArrayLike1D: TypeAlias = Sequence[float] | FloatArray
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
@@ -41,11 +35,5 @@ else:
     DoubleArray = Any
     FloatArray = Any
     IntArray = Any
-
-    ArrayLike1D = Any
-    Cls = Any
-    Fields = Any
-    Size = Any
-    WeightFunc = Any
-
+    FloatArrayLike1D = Any
     UnifiedGenerator = Any
