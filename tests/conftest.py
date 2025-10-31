@@ -11,7 +11,7 @@ import packaging.version
 import pytest
 
 import glass
-import glass._array_api_utils
+import glass._array_api_utils as _utils
 
 with contextlib.suppress(ImportError):
     # only import if jax is available
@@ -124,13 +124,13 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
 
 
 @pytest.fixture(scope="session")
-def uxpx(xp: types.ModuleType) -> glass._array_api_utils.XPAdditions:
+def uxpx(xp: types.ModuleType) -> _utils.XPAdditions:
     """
     Fixture for array backend.
 
     Access array library functions using `xp.` in tests.
     """
-    return glass._array_api_utils.XPAdditions(xp)
+    return _utils.XPAdditions(xp)
 
 
 @pytest.fixture(scope="session")
@@ -149,7 +149,7 @@ def urng(xp: types.ModuleType) -> UnifiedGenerator:
     if backend == "numpy":
         return np.random.default_rng(seed=seed)
     if backend == "array_api_strict":
-        return glass._array_api_utils.Generator(seed=seed)
+        return _utils.Generator(seed=seed)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
