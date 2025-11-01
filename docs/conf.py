@@ -95,6 +95,15 @@ napoleon_google_docstring = False
 
 always_use_bars_union = True
 
+autodoc_type_aliases = {
+    "AnyArray": "AnyArray",
+    "ComplexArray": "ComplexArray",
+    "DoubleArray": "DoubleArray",
+    "FloatArray": "FloatArray",
+    "IntArray": "IntArray",
+    "FloatArrayLike1D": "FloatArrayLike1D",
+    "UnifiedGenerator": "UnifiedGenerator",
+}
 
 # -- plot_directive ----------------------------------------------------------
 

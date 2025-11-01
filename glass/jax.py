@@ -16,10 +16,11 @@ if TYPE_CHECKING:
     from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
     from typing_extensions import Self
 
-    from glass._types import Size
 
-
-def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
+def _size(
+    size: int | tuple[int, ...] | None,
+    *bcast: Array,
+) -> tuple[int, ...]:
     """
     Return a size, which can be a single int or None, as a shape, which
     is a tuple of int.
@@ -71,7 +72,7 @@ class Generator:
             self.key, key = jax.random.split(self.key)
         return key
 
-    def split(self, size: Size = None) -> Array:
+    def split(self, size: int | tuple[int, ...] | None = None) -> Array:
         """Split random key."""
         shape = _size(size)
         with self.lock:
@@ -85,7 +86,11 @@ class Generator:
             self.key, *keys = jax.random.split(self.key, num=n_children + 1)
         return list(map(self.from_key, keys))
 
-    def random(self, size: Size = None, dtype: Shaped[Array, ...] = float) -> Array:
+    def random(
+        self,
+        size: int | tuple[int, ...] | None = None,
+        dtype: Shaped[Array, ...] = float,
+    ) -> Array:
         """Return random floats in the half-open interval [0.0, 1.0)."""
         return jax.random.uniform(self.__key, _size(size), dtype)
 
@@ -93,7 +98,7 @@ class Generator:
         self,
         loc: Array | float = 0.0,
         scale: Array | float = 1.0,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
         dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
@@ -102,7 +107,7 @@ class Generator:
     def poisson(
         self,
         lam: float,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
         dtype: Integer[Array, ...] = int,
     ) -> Array:
         """Draw samples from a Poisson distribution."""
@@ -110,7 +115,7 @@ class Generator:
 
     def standard_normal(
         self,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
         dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
@@ -120,7 +125,7 @@ class Generator:
         self,
         low: float = 0,
         high: float = 1,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
         dtype: Shaped[Array, ...] = float,
     ) -> Array:
         """Draw samples from a Uniform distribution."""
