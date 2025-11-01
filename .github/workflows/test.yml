@@ -108,7 +108,7 @@ jobs:
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
-          python-version: 3.x
+          python-version: 3.13
 
       - name: Install nox
         run: python -m pip install nox[uv]
@@ -132,7 +132,7 @@ jobs:
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
-          python-version: 3.x
+          python-version: 3.13
 
       - name: Install dependencies
         run: |-
