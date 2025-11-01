@@ -23,7 +23,7 @@ jobs:
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
-          python-version: 3.x
+          python-version: 3.13
 
       - name: Cache nox
         uses: actions/cache@v4
@@ -34,7 +34,7 @@ jobs:
           path: .nox
 
       - name: Install nox
-        run: python -m pip install nox[uv]
+        run: python -m pip install nox
 
       - name: Run examples
         run: nox -s examples

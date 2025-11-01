@@ -195,7 +195,7 @@ developers. All of these commands (or sessions in the language of `nox`) -
 `nox` can be installed via `pip` using -
 
 ```bash
-pip install nox[uv]
+pip install nox
 ```
 
 The default sessions (`lint` and `tests`) can be executed using -

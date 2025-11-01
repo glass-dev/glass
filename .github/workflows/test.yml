@@ -51,7 +51,7 @@ jobs:
           path: .nox
 
       - name: Install nox and coverage.py
-        run: python -m pip install coverage[toml] nox[uv]
+        run: python -m pip install coverage[toml] nox
 
       - name: Install ubuntu dependencies for fitsio
         run: sudo apt-get install -y libbz2-dev
@@ -108,10 +108,10 @@ jobs:
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
-          python-version: 3.x
+          python-version: 3.13
 
       - name: Install nox
-        run: python -m pip install nox[uv]
+        run: python -m pip install nox
 
       - name: Build SDist and wheel
         run: nox -s build --verbose
@@ -132,13 +132,13 @@ jobs:
         with:
           cache-dependency-path: pyproject.toml
           cache: pip
-          python-version: 3.x
+          python-version: 3.13
 
       - name: Install dependencies
         run: |-
           sudo apt-get update
           sudo apt-get install -y pandoc
-          python -m pip install nox[uv]
+          python -m pip install nox
 
       - name: Build docs
         run: nox -s docs --verbose
