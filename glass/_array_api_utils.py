@@ -83,7 +83,7 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     Parameters
     ----------
     xp
-        The array backend which determines the RNG.
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -277,7 +277,7 @@ class XPAdditions:
         Parameters
         ----------
         xp
-            The array namespace module.
+            The array library backend to use for array operations.
         """
         self.xp = xp
 
