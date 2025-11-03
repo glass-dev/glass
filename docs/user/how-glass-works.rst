@@ -31,9 +31,10 @@ which are flat and non-overlapping.
 .. plot::
 
     import glass
+    import numpy as np
 
     # create a redshift grid for shell edges
-    zs = glass.redshift_grid(0., 0.5, dz=0.1)
+    zs = glass.redshift_grid(0., 0.5, dz=0.1, xp=np)
 
     # create the top hat windows
     ws = glass.tophat_windows(zs)
@@ -75,6 +76,7 @@ included:
 .. plot::
 
     import glass
+    import numpy as np
 
     plot_windows = [glass.tophat_windows, glass.linear_windows,
                     glass.cubic_windows]
@@ -83,7 +85,7 @@ included:
     fig, axes = plt.subplots(nr, 2, figsize=(8, nr*3), layout="constrained",
                              squeeze=False, sharex=False, sharey=True)
 
-    zs = glass.redshift_grid(0., 0.5, dz=0.1)
+    zs = glass.redshift_grid(0., 0.5, dz=0.1, xp=np)
     zt = np.linspace(0., 0.5, 200)
 
     for ax in axes.flat:
