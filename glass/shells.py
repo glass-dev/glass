@@ -53,9 +53,9 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
+import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
-from glass._array_api_utils import XPAdditions
 
 if TYPE_CHECKING:
     import types
@@ -245,7 +245,7 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        uxpx = XPAdditions(self.xp)  # type: ignore[arg-type]
+        uxpx = _utils.XPAdditions(self.xp)  # type: ignore[arg-type]
         if self.za.size > 0:
             return uxpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
@@ -309,7 +309,7 @@ def tophat_windows(
         )
 
     xp = zbins.__array_namespace__()
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     wht: WeightFunc
     wht = weight if weight is not None else xp.ones_like
@@ -502,7 +502,7 @@ def restrict(
         msg = "z must be 1D arrays"
         raise ValueError(msg)
     xp = array_api_compat.array_namespace(z, f, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
     zr = uxpx.union1d(w.za, z_)
@@ -660,7 +660,7 @@ def partition_lstsq(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -731,7 +731,7 @@ def partition_nnls(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -806,7 +806,7 @@ def partition_restrict(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     parts = []
     for _, w in enumerate(shells):
@@ -969,7 +969,7 @@ def combine(
         *(arr for shell in shells for arr in (shell.za, shell.wa)),
         use_compat=False,
     )
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     return xp.sum(
         xp.stack(
