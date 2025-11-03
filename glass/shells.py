@@ -839,7 +839,7 @@ def _uniform_grid(
     num
         The number of samples.
     xp
-        The array library to use. If None, defaults to numpy
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -883,7 +883,7 @@ def redshift_grid(
     num
         The number redshift samples.
     xp
-        The array library to use. If None, defaults to numpy
+        The array library backend to use for array operations.
 
     Returns
     -------

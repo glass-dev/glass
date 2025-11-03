@@ -228,8 +228,7 @@ def fixed_zbins(
     dz
         Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
     xp
-        The array library backend to use for array operations. If this is not
-        specified, numpy with be used.
+        The array library backend to use for array operations.
 
     Returns
     -------
