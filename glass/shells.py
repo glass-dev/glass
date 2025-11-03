@@ -55,21 +55,16 @@ import numpy as np
 
 import array_api_compat
 
+import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
-from glass._array_api_utils import XPAdditions
 
 if TYPE_CHECKING:
     import types
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Iterator, Sequence
 
-    from numpy.typing import NDArray
-
-    from glass._array_api_utils import FloatArray
+    from glass._types import FloatArray, WeightFunc
     from glass.cosmology import Cosmology
-
-    ArrayLike1D = Sequence[float] | NDArray[np.float64]
-    WeightFunc = Callable[[ArrayLike1D], NDArray[np.float64]]
 
 
 @dataclasses.dataclass
@@ -85,7 +80,7 @@ class DistanceWeight:
 
     cosmo: Cosmology
 
-    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, z: FloatArray) -> FloatArray:
         """
         Uniform weight in comoving distance.
 
@@ -99,7 +94,7 @@ class DistanceWeight:
             The weight function evaluated at redshifts *z*.
 
         """
-        return 1 / self.cosmo.H_over_H0(z)  # type: ignore[no-any-return]
+        return 1 / self.cosmo.H_over_H0(z)
 
 
 @dataclasses.dataclass
@@ -115,7 +110,7 @@ class VolumeWeight:
 
     cosmo: Cosmology
 
-    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, z: FloatArray) -> FloatArray:
         """
         Uniform weight in comoving distance.
 
@@ -129,11 +124,9 @@ class VolumeWeight:
             The weight function evaluated at redshifts *z*.
 
         """
-        return (  # type: ignore[no-any-return]
-            (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
-            ** 2
-            / self.cosmo.H_over_H0(z)
-        )
+        return (
+            self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance
+        ) ** 2 / self.cosmo.H_over_H0(z)
 
 
 @dataclasses.dataclass
@@ -150,7 +143,7 @@ class DensityWeight:
 
     cosmo: Cosmology
 
-    def __call__(self, z: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, z: FloatArray) -> FloatArray:
         """
         Uniform weight in comoving distance.
 
@@ -164,7 +157,7 @@ class DensityWeight:
             The weight function evaluated at redshifts *z*.
 
         """
-        return (  # type: ignore[no-any-return]
+        return (
             self.cosmo.critical_density0
             * self.cosmo.Omega_m(z)
             * (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
@@ -189,6 +182,7 @@ class RadialWindow:
     immutable (however, the array entries may **not** be immutable; do
     not change them in place)::
 
+        >>> import dataclasses
         >>> import glass
         >>> import numpy as np
         >>> za = np.asarray([0.0, 1.0])
@@ -253,7 +247,7 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        uxpx = XPAdditions(self.xp)  # type: ignore[arg-type]
+        uxpx = _utils.XPAdditions(self.xp)  # type: ignore[arg-type]
         if self.za.size > 0:
             return uxpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
@@ -317,7 +311,7 @@ def tophat_windows(
         )
 
     xp = zbins.__array_namespace__()
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     wht: WeightFunc
     wht = weight if weight is not None else xp.ones_like
@@ -510,7 +504,7 @@ def restrict(
         msg = "z must be 1D arrays"
         raise ValueError(msg)
     xp = array_api_compat.array_namespace(z, f, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
     zr = uxpx.union1d(w.za, z_)
@@ -668,7 +662,7 @@ def partition_lstsq(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -739,7 +733,7 @@ def partition_nnls(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -814,7 +808,7 @@ def partition_restrict(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     parts = []
     for _, w in enumerate(shells):
@@ -906,7 +900,7 @@ def distance_grid(
     *,
     dx: float | None = None,
     num: int | None = None,
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """
     Redshift grid with uniform spacing in comoving distance.
 
@@ -930,7 +924,7 @@ def distance_grid(
     """
     xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
     x = _uniform_grid(xmin, xmax, step=dx, num=num)
-    return cosmo.inv_comoving_distance(x)  # type: ignore[no-any-return]
+    return cosmo.inv_comoving_distance(x)
 
 
 def combine(
@@ -975,7 +969,7 @@ def combine(
         *(arr for shell in shells for arr in (shell.za, shell.wa)),
         use_compat=False,
     )
-    uxpx = XPAdditions(xp)
+    uxpx = _utils.XPAdditions(xp)
 
     return xp.sum(
         xp.stack(

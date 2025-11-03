@@ -5,15 +5,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from types import NotImplementedType
-    from typing import Any, TypeAlias
 
-    from numpy.typing import NDArray
-
-    from array_api_strict._array_object import Array as AArray
-
+    from glass._types import AnyArray
     from glass.grf import Transformation
-
-    Array: TypeAlias = NDArray[Any] | AArray
 
 
 @dataclass
@@ -29,21 +23,27 @@ class Normal:
 
     """
 
-    def __call__(self, x: Array, _var: float, /) -> Array:
+    def __call__(self, x: AnyArray, _var: float, /) -> AnyArray:
         """Return *x* unchanged."""
         return x
 
-    def corr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def corr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         if type(other) is Normal:
             return x
         return NotImplemented
 
-    def icorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def icorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         if type(other) is Normal:
             return x
         return NotImplemented
 
-    def dcorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def dcorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         if type(other) is Normal:
             return 1.0 + (0 * x)
         return NotImplemented
@@ -71,7 +71,7 @@ class Lognormal:
 
     lamda: float = 1.0
 
-    def __call__(self, x: Array, var: float, /) -> Array:
+    def __call__(self, x: AnyArray, var: float, /) -> AnyArray:
         """Transform *x* into a lognormal field."""
         xp = x.__array_namespace__()
         x = xp.expm1(x - var / 2)
@@ -79,7 +79,9 @@ class Lognormal:
             x = self.lamda * x
         return x
 
-    def corr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def corr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
         if type(other) is Lognormal:
@@ -90,7 +92,9 @@ class Lognormal:
 
         return NotImplemented
 
-    def icorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def icorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
         if type(other) is Lognormal:
@@ -101,7 +105,9 @@ class Lognormal:
 
         return NotImplemented
 
-    def dcorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def dcorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
         if type(other) is Lognormal:
@@ -143,14 +149,16 @@ class SquaredNormal:
     a: float
     lamda: float = 1.0
 
-    def __call__(self, x: Array, _var: float, /) -> Array:
+    def __call__(self, x: AnyArray, _var: float, /) -> AnyArray:
         """Transform *x* into a squared normal field."""
         x = (x - self.a) ** 2 - 1
         if self.lamda != 1.0:
             x = self.lamda * x
         return x
 
-    def corr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def corr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         if type(other) is SquaredNormal:
             aa = self.a * other.a
             ll = self.lamda * other.lamda
@@ -158,7 +166,9 @@ class SquaredNormal:
 
         return NotImplemented
 
-    def icorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def icorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
         if type(other) is SquaredNormal:
@@ -168,7 +178,9 @@ class SquaredNormal:
 
         return NotImplemented
 
-    def dcorr(self, other: Transformation, x: Array, /) -> Array | NotImplementedType:
+    def dcorr(
+        self, other: Transformation, x: AnyArray, /
+    ) -> AnyArray | NotImplementedType:
         if type(other) is SquaredNormal:
             aa = self.a * other.a
             ll = self.lamda * other.lamda

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     import os
     from collections.abc import Generator, Sequence
 
-    from numpy.typing import NDArray
+    from glass._types import FloatArray
 
     if importlib.util.find_spec("fitsio") is not None:
         import fitsio
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 def save_cls(
     filename: os.PathLike[str],
-    cls: Sequence[NDArray[np.float64] | Sequence[float]],
+    cls: Sequence[FloatArray | Sequence[float]],
 ) -> None:
     """
     Save a list of Cls to file.
@@ -60,7 +60,7 @@ def save_cls(
 
 def load_cls(
     filename: os.PathLike[str],
-) -> list[NDArray[np.float64] | Sequence[float]]:
+) -> Sequence[FloatArray | Sequence[float]]:
     """
     Load a list of Cls from file.
 
@@ -106,7 +106,7 @@ class _FitsWriter:
 
     def _append(
         self,
-        data: NDArray[np.float64] | list[NDArray[np.float64]],
+        data: FloatArray | list[FloatArray],
         names: list[str] | None = None,
     ) -> None:
         """
@@ -131,9 +131,9 @@ class _FitsWriter:
 
     def write(
         self,
-        data: NDArray[np.float64] | None = None,
+        data: FloatArray | None = None,
         /,
-        **columns: NDArray[np.float64],
+        **columns: FloatArray,
     ) -> None:
         """
         Write to FITS by calling the internal _append method.
