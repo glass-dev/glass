@@ -62,7 +62,7 @@ dynamic = [
 ]
 license = "MIT"
 license-files = [
-    "MIT License",
+    "LICENSE",
 ]
 maintainers = [
     {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
