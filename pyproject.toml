@@ -38,7 +38,6 @@ test = [
 
 [project]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -61,6 +60,10 @@ description = "Generator for Large Scale Structure"
 dynamic = [
     "version",
 ]
+license = "MIT"
+license-files = [
+    "LICENSE",
+]
 maintainers = [
     {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
 ]
@@ -75,7 +78,6 @@ optional-dependencies = {examples = [
 ]}
 readme = "README.md"
 requires-python = ">=3.10"
-license.text = "MIT License"
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
