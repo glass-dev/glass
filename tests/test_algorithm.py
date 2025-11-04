@@ -98,7 +98,8 @@ def test_nearcorr(xp: types.ModuleType) -> None:
     np.testing.assert_allclose(x, b, atol=0.0001)
 
     # no iterations
-    x = glass.algorithm.nearcorr(a, niter=0)
+    with pytest.warns(UserWarning, match="Nearest correlation matrix not found"):
+        x = glass.algorithm.nearcorr(a, niter=0)
     np.testing.assert_allclose(x, a)
 
     # non-square matrix should raise
