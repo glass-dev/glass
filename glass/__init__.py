@@ -46,6 +46,7 @@ __all__ = [
     "lognormal_fields",
     "lognormal_gls",
     "lognormal_shift_hilbert2011",
+    "multalm",
     "multi_plane_matrix",
     "multi_plane_weights",
     "nfields_from_nspectra",
@@ -108,6 +109,7 @@ from glass.galaxies import (
     redshifts,
     redshifts_from_nz,
 )
+from glass.harmonictools import multalm
 from glass.lensing import (
     MultiPlaneConvergence,
     deflect,
