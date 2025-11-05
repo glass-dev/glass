@@ -13,8 +13,7 @@ if TYPE_CHECKING:
     import pytest_mock
     from numpy.typing import NDArray
 
-    from conftest import UnifiedGenerator
-    from glass._types import FloatArray
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 def test_redshifts(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:

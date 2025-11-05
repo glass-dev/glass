@@ -10,7 +10,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import UnifiedGenerator
+    from glass._types import UnifiedGenerator
 
 
 def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
