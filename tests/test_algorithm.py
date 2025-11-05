@@ -99,7 +99,8 @@ def test_nearcorr(xp: types.ModuleType) -> None:
 
     # no iterations
     with pytest.warns(
-        UserWarning, match="Nearest correlation matrix not found in 0 iterations"
+        UserWarning,
+        match="Nearest correlation matrix not found in 0 iterations",
     ):
         x = glass.algorithm.nearcorr(a, niter=0)
     np.testing.assert_allclose(x, a)
@@ -110,7 +111,8 @@ def test_nearcorr(xp: types.ModuleType) -> None:
 
     # no convergence
     with pytest.warns(
-        UserWarning, match="Nearest correlation matrix not found in 1 iterations"
+        UserWarning,
+        match="Nearest correlation matrix not found in 1 iterations",
     ):
         x = glass.algorithm.nearcorr(a, niter=1)
 

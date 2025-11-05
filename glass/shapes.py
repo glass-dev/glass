@@ -163,7 +163,11 @@ def ellipticity_ryden04(  # noqa: PLR0913
     """
     if xp is None:
         xp = array_api_compat.array_namespace(
-            mu, sigma, gamma, sigma_gamma, use_compat=False
+            mu,
+            sigma,
+            gamma,
+            sigma_gamma,
+            use_compat=False,
         )
 
     mu = xp.asarray(mu)

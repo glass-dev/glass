@@ -136,7 +136,9 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
 
     # At least one input is an array
     lon, lat = glass.deflect(
-        xp.asarray(0.0), xp.asarray(0.0), alpha(0, -r, usecomplex=usecomplex)
+        xp.asarray(0.0),
+        xp.asarray(0.0),
+        alpha(0, -r, usecomplex=usecomplex),
     )
     np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 

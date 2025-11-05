@@ -28,21 +28,30 @@ class Normal:
         return x
 
     def corr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         if type(other) is Normal:
             return x
         return NotImplemented
 
     def icorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         if type(other) is Normal:
             return x
         return NotImplemented
 
     def dcorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         if type(other) is Normal:
             return 1.0 + (0 * x)
@@ -80,7 +89,10 @@ class Lognormal:
         return x
 
     def corr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
@@ -93,7 +105,10 @@ class Lognormal:
         return NotImplemented
 
     def icorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
@@ -106,7 +121,10 @@ class Lognormal:
         return NotImplemented
 
     def dcorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
@@ -157,7 +175,10 @@ class SquaredNormal:
         return x
 
     def corr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         if type(other) is SquaredNormal:
             aa = self.a * other.a
@@ -167,7 +188,10 @@ class SquaredNormal:
         return NotImplemented
 
     def icorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         xp = x.__array_namespace__()
 
@@ -179,7 +203,10 @@ class SquaredNormal:
         return NotImplemented
 
     def dcorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         if type(other) is SquaredNormal:
             aa = self.a * other.a

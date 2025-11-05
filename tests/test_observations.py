@@ -97,7 +97,7 @@ def test_fixed_zbins(xp: ModuleType) -> None:
         [
             tuple(xp.asarray(i) for i in pair)
             for pair in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
-        ]
+        ],
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins, xp=xp)
     assert len(zbins) == nbins
@@ -132,7 +132,7 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
         [
             tuple(xp.asarray(i) for i in pair)
             for pair in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
-        ]
+        ],
     )
     zbins = glass.equal_dens_zbins(z, xp.ones_like(z), nbins)
     np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)

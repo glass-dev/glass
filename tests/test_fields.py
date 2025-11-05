@@ -29,7 +29,8 @@ def test_iternorm(xp: types.ModuleType) -> None:
     k = 2
 
     generator = glass.iternorm(
-        k, (xp.asarray(x) for x in [1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2])
+        k,
+        (xp.asarray(x) for x in [1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2]),
     )
     result = next(generator)
 
@@ -78,7 +79,7 @@ def test_iternorm(xp: types.ModuleType) -> None:
                         [0.5, 0.2],
                     ]
                 ),
-            )
+            ),
         )
 
     # test positive definite error
@@ -88,7 +89,7 @@ def test_iternorm(xp: types.ModuleType) -> None:
             glass.iternorm(
                 k,
                 (xp.asarray(x) for x in [1.0, 0.5, 0.9, 0.5, 0.2, 0.4, 0.9, 0.4, -1.0]),
-            )
+            ),
         )
 
     # test multiple iterations
@@ -293,7 +294,8 @@ def test_discretized_cls() -> None:
     # power spectra truncated at lmax + 1 if lmax provided
 
     result = glass.discretized_cls(
-        [np.arange(10), np.arange(10), np.arange(10)], lmax=5
+        [np.arange(10), np.arange(10), np.arange(10)],
+        lmax=5,
     )
 
     for cl in result:
@@ -387,7 +389,7 @@ def test_generate_grf() -> None:
     # requires resetting the RNG for reproducibility
     rng = np.random.default_rng(seed=42)
     new_gaussian_fields = list(
-        glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng)
+        glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng),
     )
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
@@ -598,13 +600,25 @@ def test_solve_gaussian_spectra(mocker: pytest_mock.MockerFixture) -> None:
 
     assert mock.call_count == 3
     assert mock.call_args_list[0] == mocker.call(
-        spectra[0], fields[0], fields[0], pad=10, monopole=0.0
+        spectra[0],
+        fields[0],
+        fields[0],
+        pad=10,
+        monopole=0.0,
     )
     assert mock.call_args_list[1] == mocker.call(
-        spectra[1], fields[1], fields[1], pad=20, monopole=0.0
+        spectra[1],
+        fields[1],
+        fields[1],
+        pad=20,
+        monopole=0.0,
     )
     assert mock.call_args_list[2] == mocker.call(
-        spectra[2], fields[1], fields[0], pad=30, monopole=0.0
+        spectra[2],
+        fields[1],
+        fields[0],
+        pad=30,
+        monopole=0.0,
     )
     assert gls == [result, result, result]
 
@@ -653,7 +667,7 @@ def test_cov_from_spectra() -> None:
             [330, 331, 332, 333],
             [320, 321, 322, 323],
             [310, 311, 312, 313],
-        ]
+        ],
     )
 
     np.testing.assert_array_equal(
@@ -738,8 +752,8 @@ def test_check_posdef_spectra() -> None:
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 1.0],
                 [0.9, 0.9, 0.9],
-            ]
-        )
+            ],
+        ),
     )
     # semidef spectra
     assert glass.fields.check_posdef_spectra(
@@ -748,8 +762,8 @@ def test_check_posdef_spectra() -> None:
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 0.0],
                 [0.9, 1.0, 0.0],
-            ]
-        )
+            ],
+        ),
     )
     # indef spectra
     assert not glass.fields.check_posdef_spectra(
@@ -758,8 +772,8 @@ def test_check_posdef_spectra() -> None:
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 1.0],
                 [1.1, 1.1, 1.1],
-            ]
-        )
+            ],
+        ),
     )
 
 
