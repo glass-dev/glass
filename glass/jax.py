@@ -25,12 +25,8 @@ def _size(size: Size, *bcast: Array) -> tuple[int, ...]:
     is a tuple of int.
     """
     if size is None:
-        if bcast:
-            return jnp.broadcast_shapes(*map(jnp.shape, bcast))  # type: ignore[no-any-return]
-        return ()
-    if isinstance(size, int):
-        return (size,)
-    return size
+        return jnp.broadcast_shapes(*map(jnp.shape, bcast)) if bcast else ()
+    return (size, ) if isinstance(size, int) else size
 
 
 def trapezoid(y: Array, x: Array = None, dx: Array = 1.0, axis: int = -1) -> Array:
