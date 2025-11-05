@@ -98,13 +98,21 @@ def test_nearcorr(xp: types.ModuleType) -> None:
     np.testing.assert_allclose(x, b, atol=0.0001)
 
     # no iterations
-    with pytest.warns(UserWarning, match="Nearest correlation matrix not found"):
+    with pytest.warns(
+        UserWarning, match="Nearest correlation matrix not found in 0 iterations"
+    ):
         x = glass.algorithm.nearcorr(a, niter=0)
     np.testing.assert_allclose(x, a)
 
     # non-square matrix should raise
     with pytest.raises(ValueError, match="non-square matrix"):
         glass.algorithm.nearcorr(xp.zeros((4, 3)))
+
+    # no convergence
+    with pytest.warns(
+        UserWarning, match="Nearest correlation matrix not found in 1 iterations"
+    ):
+        x = glass.algorithm.nearcorr(a, niter=1)
 
 
 def test_cov_nearest(
