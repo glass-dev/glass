@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     import types
     from collections.abc import Callable, Iterator, Sequence
 
-    from glass._types import FloatArray, FloatArrayLike1D
+    from glass._types import FloatArray
     from glass.cosmology import Cosmology
 
 
@@ -257,7 +257,7 @@ class RadialWindow:
 def tophat_windows(
     zbins: FloatArray,
     dz: float = 1e-3,
-    weight: Callable[[FloatArrayLike1D], FloatArrayLike1D] | None = None,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.
@@ -311,7 +311,7 @@ def tophat_windows(
     xp = zbins.__array_namespace__()
     uxpx = _utils.XPAdditions(xp)
 
-    wht: Callable[[FloatArrayLike1D], FloatArrayLike1D]
+    wht: Callable[[FloatArray], FloatArray]
     wht = weight if weight is not None else xp.ones_like
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
@@ -326,7 +326,7 @@ def tophat_windows(
 def linear_windows(
     zgrid: FloatArray,
     dz: float = 1e-3,
-    weight: Callable[[FloatArrayLike1D], FloatArrayLike1D] | None = None,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Linear interpolation window functions.
@@ -395,7 +395,7 @@ def linear_windows(
 def cubic_windows(
     zgrid: FloatArray,
     dz: float = 1e-3,
-    weight: Callable[[FloatArrayLike1D], FloatArrayLike1D] | None = None,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Cubic interpolation window functions.

@@ -101,7 +101,6 @@ autodoc_type_aliases = {
     "DoubleArray": "DoubleArray",
     "FloatArray": "FloatArray",
     "IntArray": "IntArray",
-    "FloatArrayLike1D": "FloatArrayLike1D",
     "UnifiedGenerator": "UnifiedGenerator",
 }
 

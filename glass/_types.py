@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from typing import ParamSpec, TypeAlias, TypeVar
 
     import numpy as np
@@ -23,7 +22,6 @@ if TYPE_CHECKING:
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
     IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
-    FloatArrayLike1D: TypeAlias = Sequence[float] | FloatArray
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
@@ -35,5 +33,4 @@ else:
     DoubleArray = Any
     FloatArray = Any
     IntArray = Any
-    FloatArrayLike1D = Any
     UnifiedGenerator = Any

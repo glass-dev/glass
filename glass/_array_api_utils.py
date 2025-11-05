@@ -189,7 +189,9 @@ class Generator:
         return self.axp.asarray(self.rng.normal(loc, scale, size))
 
     def poisson(
-        self, lam: float | AArray, size: int | tuple[int, ...] | None = None
+        self,
+        lam: float | AArray,
+        size: int | tuple[int, ...] | None = None,
     ) -> AArray:
         """
         Draw samples from a Poisson distribution.

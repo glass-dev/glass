@@ -27,7 +27,7 @@ import numpy as np
 if TYPE_CHECKING:
     import importlib.util
     import os
-    from collections.abc import Generator, Sequence
+    from collections.abc import Generator
 
     from glass._types import FloatArray
 
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 def save_cls(
     filename: os.PathLike[str],
-    cls: Sequence[FloatArray | Sequence[float]],
+    cls: FloatArray,
 ) -> None:
     """
     Save a list of Cls to file.
@@ -60,7 +60,7 @@ def save_cls(
 
 def load_cls(
     filename: os.PathLike[str],
-) -> Sequence[FloatArray | Sequence[float]]:
+) -> FloatArray:
     """
     Load a list of Cls from file.
 

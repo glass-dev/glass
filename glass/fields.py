@@ -174,7 +174,7 @@ def iternorm(
 
 
 def cls2cov(
-    cls: Sequence[AnyArray],
+    cls: AnyArray,
     nl: int,
     nf: int,
     nc: int,
@@ -269,12 +269,12 @@ def _multalm(
 
 
 def discretized_cls(
-    cls: Sequence[AnyArray],
+    cls: AnyArray,
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> Sequence[AnyArray]:
+) -> AnyArray:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -329,9 +329,9 @@ def discretized_cls(
 
 @deprecated("use glass.solve_gaussian_spectra() instead")
 def lognormal_gls(
-    cls: Sequence[AnyArray],
+    cls: AnyArray,
     shift: float = 1.0,
-) -> Sequence[AnyArray]:
+) -> AnyArray:
     """
     Compute Gaussian Cls for a lognormal random field.
 
@@ -359,7 +359,7 @@ def lognormal_gls(
 
 
 def _generate_grf(
-    gls: Sequence[AnyArray],
+    gls: AnyArray,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -458,7 +458,7 @@ def _generate_grf(
 
 @deprecated("use glass.generate() instead")
 def generate_gaussian(
-    gls: Sequence[AnyArray],
+    gls: AnyArray,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -511,7 +511,7 @@ def generate_gaussian(
 
 @deprecated("use glass.generate() instead")
 def generate_lognormal(
-    gls: Sequence[AnyArray],
+    gls: AnyArray,
     nside: int,
     shift: float = 1.0,
     *,
@@ -550,7 +550,7 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: Sequence[AnyArray],
+    cls: AnyArray,
     i: int,
     j: int,
     lmax: int | None = None,
@@ -630,7 +630,7 @@ def spectra_indices(n: int) -> IntArray:
 
 
 def effective_cls(
-    cls: Sequence[AnyArray],
+    cls: AnyArray,
     weights1: FloatArray,
     weights2: FloatArray | None = None,
     *,
@@ -763,8 +763,8 @@ def lognormal_fields(
 
 def compute_gaussian_spectra(
     fields: Sequence[glass.grf.Transformation],
-    spectra: Sequence[AnyArray],
-) -> Sequence[AnyArray]:
+    spectra: AnyArray,
+) -> AnyArray:
     """
     Compute a sequence of Gaussian angular power spectra.
 
@@ -798,8 +798,8 @@ def compute_gaussian_spectra(
 
 def solve_gaussian_spectra(
     fields: Sequence[glass.grf.Transformation],
-    spectra: Sequence[AnyArray],
-) -> Sequence[AnyArray]:
+    spectra: AnyArray,
+) -> AnyArray:
     """
     Solve a sequence of Gaussian angular power spectra.
 
@@ -856,7 +856,7 @@ def solve_gaussian_spectra(
 
 def generate(
     fields: Sequence[glass.grf.Transformation],
-    gls: Sequence[AnyArray],
+    gls: AnyArray,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -997,9 +997,7 @@ def lognormal_shift_hilbert2011(z: float) -> float:
     return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
 
 
-def cov_from_spectra(
-    spectra: Sequence[AnyArray], *, lmax: int | None = None
-) -> AnyArray:
+def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     """
     Construct covariance matrix from spectra.
 
@@ -1043,7 +1041,7 @@ def cov_from_spectra(
     return cov
 
 
-def check_posdef_spectra(spectra: Sequence[AnyArray]) -> bool:
+def check_posdef_spectra(spectra: AnyArray) -> bool:
     """
     Test whether angular power spectra are positive semi-definite.
 
@@ -1064,12 +1062,12 @@ def check_posdef_spectra(spectra: Sequence[AnyArray]) -> bool:
 
 
 def regularized_spectra(
-    spectra: Sequence[AnyArray],
+    spectra: AnyArray,
     *,
     lmax: int | None = None,
     method: Literal["nearest", "clip"] = "nearest",
     **method_kwargs: float | None,
-) -> Sequence[AnyArray]:
+) -> AnyArray:
     r"""
     Regularise a set of angular power spectra.
 
