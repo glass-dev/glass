@@ -1,4 +1,5 @@
 """GLASS package."""
+
 import contextlib
 
 __all__ = [
