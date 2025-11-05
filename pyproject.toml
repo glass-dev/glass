@@ -152,6 +152,7 @@ force-exclude = true
 show-fixes = true
 src = [
     "glass",
+    "tests",
 ]
 lint.allowed-confusables = [
     "α",
