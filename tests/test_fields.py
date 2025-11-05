@@ -771,7 +771,10 @@ def test_regularized_spectra(
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")
-    glass.fields.regularized_spectra(spectra, method="nearest")
+    with pytest.warns(UserWarning, match="Nearest correlation matrix not found"):
+        # we don't care about convergence here, only that the correct
+        # method is called so this is to suppress the warning
+        glass.fields.regularized_spectra(spectra, method="nearest")
     cov_nearest.assert_called_once()
 
     # test method "clip"
