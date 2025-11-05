@@ -77,7 +77,7 @@ except ModuleNotFoundError:
     pass
 
 # modules
-from glass import grf
+from glass import algorithm, grf
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,
