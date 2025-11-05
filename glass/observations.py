@@ -186,7 +186,12 @@ def smail_nz(
 
     """
     xp = array_api_compat.array_namespace(
-        z, z_mode, alpha, beta, norm, use_compat=False
+        z,
+        z_mode,
+        alpha,
+        beta,
+        norm,
+        use_compat=False,
     )
     uxpx = _utils.XPAdditions(xp)
 
@@ -209,7 +214,7 @@ def fixed_zbins(
     *,
     nbins: int | None = None,
     dz: float | None = None,
-    xp: ModuleType | None = None,
+    xp: ModuleType,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -228,8 +233,7 @@ def fixed_zbins(
     dz
         Size of redshift bin. Only one of ``nbins`` and ``dz`` can be given.
     xp
-        The array library backend to use for array operations. If this is not
-        specified, numpy with be used.
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -241,8 +245,6 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
-    xp = np if xp is None else xp
-
     if nbins is not None and dz is None:
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:

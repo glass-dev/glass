@@ -30,22 +30,24 @@ which are flat and non-overlapping.
 
 .. plot::
 
+    import numpy as np
+
     import glass
 
     # create a redshift grid for shell edges
-    zs = glass.redshift_grid(0., 0.5, dz=0.1)
+    zs = glass.redshift_grid(0.0, 0.5, dz=0.1, xp=np)
 
     # create the top hat windows
     ws = glass.tophat_windows(zs)
 
     # plot each window
     for i, (za, wa, zeff) in enumerate(ws):
-        plt.plot(za, wa, c='k', lw=2)
+        plt.plot(za, wa, c="k", lw=2)
         plt.fill_between(za, np.zeros_like(wa), wa, alpha=0.5)
-        plt.annotate(f'shell {i+1}', (zeff, 0.5), ha='center', va='center')
+        plt.annotate(f"shell {i + 1}", (zeff, 0.5), ha="center", va="center")
 
-    plt.xlabel('redshift $z$')
-    plt.ylabel('window function $W(z)$')
+    plt.xlabel("redshift $z$")
+    plt.ylabel("window function $W(z)$")
     plt.tight_layout()
 
 Given such a sequence of window functions :math:`W_i`, *GLASS* discretises a
@@ -74,27 +76,39 @@ included:
 
 .. plot::
 
+    import numpy as np
+
     import glass
 
-    plot_windows = [glass.tophat_windows, glass.linear_windows,
-                    glass.cubic_windows]
-    nr = (len(plot_windows)+1)//2
+    plot_windows = [
+        glass.tophat_windows,
+        glass.linear_windows,
+        glass.cubic_windows,
+    ]
+    nr = (len(plot_windows) + 1) // 2
 
-    fig, axes = plt.subplots(nr, 2, figsize=(8, nr*3), layout="constrained",
-                             squeeze=False, sharex=False, sharey=True)
+    fig, axes = plt.subplots(
+        nr,
+        2,
+        figsize=(8, nr * 3),
+        layout="constrained",
+        squeeze=False,
+        sharex=False,
+        sharey=True,
+    )
 
-    zs = glass.redshift_grid(0., 0.5, dz=0.1)
-    zt = np.linspace(0., 0.5, 200)
+    zs = glass.redshift_grid(0.0, 0.5, dz=0.1, xp=np)
+    zt = np.linspace(0.0, 0.5, 200)
 
     for ax in axes.flat:
-        ax.axis(False)
-    for windows, ax in zip(plot_windows, axes.flat):
+        ax.axis("off")
+    for windows, ax in zip(plot_windows, axes.flat, strict=False):
         ws = windows(zs)
         wt = np.zeros_like(zt)
-        ax.axis(True)
+        ax.axis("on")
         ax.set_title(windows.__name__)
-        for i, (za, wa, zeff) in enumerate(ws):
-            wt += np.interp(zt, za, wa, left=0., right=0.)
+        for za, wa, _ in ws:
+            wt += np.interp(zt, za, wa, left=0.0, right=0.0)
             ax.fill_between(za, np.zeros_like(wa), wa, alpha=0.5)
         ax.plot(zt, wt, c="k", lw=2)
     for ax in axes.flat:

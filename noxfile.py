@@ -59,7 +59,12 @@ def coverage(session: nox.Session) -> None:
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
     session.install(
-        "-c", ".github/test-constraints.txt", "-e", ".", "--group", "doctest"
+        "-c",
+        ".github/test-constraints.txt",
+        "-e",
+        ".",
+        "--group",
+        "doctest",
     )
 
     session.posargs.append("--doctest-plus")

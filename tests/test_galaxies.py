@@ -11,10 +11,9 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     import pytest_mock
-    from conftest import UnifiedGenerator
     from numpy.typing import NDArray
 
-    from glass._types import FloatArray
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 def test_redshifts(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
@@ -39,7 +38,7 @@ def test_redshifts(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
 def test_redshifts_from_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
-            "Arrays in redshifts_from_nz are not immutable, so do not support jax"
+            "Arrays in redshifts_from_nz are not immutable, so do not support jax",
         )
 
     # test sampling

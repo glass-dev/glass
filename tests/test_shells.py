@@ -102,7 +102,7 @@ def test_linear_windows(xp: types.ModuleType) -> None:
             0.42896272,
             0.69026819,
             1.0,
-        ]
+        ],
     )
 
     # check spacing of redshift grid
@@ -135,7 +135,8 @@ def test_linear_windows(xp: types.ModuleType) -> None:
     # check warning issued
 
     with pytest.warns(
-        UserWarning, match="first triangular window does not start at z=0"
+        UserWarning,
+        match="first triangular window does not start at z=0",
     ):
         glass.linear_windows(xp.asarray([0.1, 0.2, 0.3]))
 
@@ -150,7 +151,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
             0.42896272,
             0.69026819,
             1.0,
-        ]
+        ],
     )
 
     # check spacing of redshift grid
@@ -183,7 +184,8 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
     # check warning issued
 
     with pytest.warns(
-        UserWarning, match="first cubic spline window does not start at z=0"
+        UserWarning,
+        match="first cubic spline window does not start at z=0",
     ):
         glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
@@ -230,16 +232,24 @@ def test_partition(xp: types.ModuleType, uxpx: _utils.XPAdditions, method: str) 
     shells = [
         glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
         glass.RadialWindow(
-            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 0.5
+            xp.asarray([0.0, 1.0, 2.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            0.5,
         ),
         glass.RadialWindow(
-            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 1.5
+            xp.asarray([1.0, 2.0, 3.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            1.5,
         ),
         glass.RadialWindow(
-            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 2.5
+            xp.asarray([2.0, 3.0, 4.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            2.5,
         ),
         glass.RadialWindow(
-            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 3.5
+            xp.asarray([3.0, 4.0, 5.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            3.5,
         ),
         glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
     ]
@@ -335,21 +345,29 @@ def test_combine(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1000)
     weights = xp.asarray(
-        [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183]
+        [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183],
     )
     shells = [
         glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
         glass.RadialWindow(
-            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 0.5
+            xp.asarray([0.0, 1.0, 2.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            0.5,
         ),
         glass.RadialWindow(
-            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 1.5
+            xp.asarray([1.0, 2.0, 3.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            1.5,
         ),
         glass.RadialWindow(
-            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 2.5
+            xp.asarray([2.0, 3.0, 4.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            2.5,
         ),
         glass.RadialWindow(
-            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 3.5
+            xp.asarray([3.0, 4.0, 5.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            3.5,
         ),
         glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
     ]
@@ -374,17 +392,20 @@ def test_radial_window_immutable(xp: types.ModuleType) -> None:
     w = glass.RadialWindow(za, wa, zeff)
 
     with pytest.raises(
-        dataclasses.FrozenInstanceError, match="cannot assign to field 'za'"
+        dataclasses.FrozenInstanceError,
+        match="cannot assign to field 'za'",
     ):
         w.za = za  # type: ignore[misc]
 
     with pytest.raises(
-        dataclasses.FrozenInstanceError, match="cannot assign to field 'wa'"
+        dataclasses.FrozenInstanceError,
+        match="cannot assign to field 'wa'",
     ):
         w.wa = wa  # type: ignore[misc]
 
     with pytest.raises(
-        dataclasses.FrozenInstanceError, match="cannot assign to field 'zeff'"
+        dataclasses.FrozenInstanceError,
+        match="cannot assign to field 'zeff'",
     ):
         w.zeff = zeff  # type: ignore[misc]
 

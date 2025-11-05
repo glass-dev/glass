@@ -51,8 +51,6 @@ import math
 import warnings
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass._array_api_utils as _utils
@@ -510,7 +508,11 @@ def restrict(
     zr = uxpx.union1d(w.za, z_)
 
     fr = glass.arraytools.ndinterp(
-        zr, z, f, left=0.0, right=0.0
+        zr,
+        z,
+        f,
+        left=0.0,
+        right=0.0,
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
     return zr, fr
 
@@ -823,7 +825,7 @@ def _uniform_grid(
     *,
     step: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType | None = None,
+    xp: types.ModuleType,
 ) -> FloatArray:
     """
     Create a uniform grid.
@@ -839,7 +841,7 @@ def _uniform_grid(
     num
         The number of samples.
     xp
-        The array library to use. If None, defaults to numpy
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -851,8 +853,6 @@ def _uniform_grid(
         If both ``step`` and ``num`` are given.
 
     """
-    if xp is None:
-        xp = np
     if step is not None and num is None:
         return xp.arange(start, stop + step, step)
     if step is None and num is not None:
@@ -867,7 +867,7 @@ def redshift_grid(
     *,
     dz: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType | None = None,
+    xp: types.ModuleType,
 ) -> FloatArray:
     """
     Redshift grid with uniform spacing in redshift.
@@ -883,7 +883,7 @@ def redshift_grid(
     num
         The number redshift samples.
     xp
-        The array library to use. If None, defaults to numpy
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -923,7 +923,8 @@ def distance_grid(
 
     """
     xmin, xmax = cosmo.comoving_distance(zmin), cosmo.comoving_distance(zmax)
-    x = _uniform_grid(xmin, xmax, step=dx, num=num)
+    xp = array_api_compat.array_namespace(xmin, xmax, use_compat=False)
+    x = _uniform_grid(xmin, xmax, step=dx, num=num, xp=xp)
     return cosmo.inv_comoving_distance(x)
 
 

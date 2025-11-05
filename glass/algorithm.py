@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 import array_api_compat
@@ -209,6 +210,15 @@ def nearcorr(
         # check for convergence
         if xp.all(frob(y - x) <= tol * frob(y)):
             break
+
+    else:
+        # nearest correlation matrix was not found
+        warnings.warn(
+            f"Nearest correlation matrix not found in {niter} iterations. "
+            "The result may be invalid. Please run with a larger `niter` value, "
+            "or run the function again on the returned result.",
+            stacklevel=2,
+        )
 
     # return result in original shape
     return xp.reshape(y, (*dim, n, n))
