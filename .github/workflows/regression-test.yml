@@ -1,5 +1,5 @@
 ---
-name: Regression tests
+name: Trigger regression test Workflow
 
 on:
   pull_request:
@@ -12,8 +12,20 @@ on:
       - synchronize
 
 jobs:
-  regression-tests:
-    uses: glass-dev/glass-benchmarks/.github/workflows/regression-test.yaml@v0
-    with:
-      starting_revision: ${{github.event.pull_request.base.ref}}
-      end_revision: ${{github.ref_name}}
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Workflow in Another Repository
+        env:
+          STARTING_REVISION: ${{github.event.pull_request.base.ref}}
+          END_REVISION: ${{github.ref_name}}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/glass-dev/glass-benchmarks/actions/workflows/regression-test/dispatches \
+            -f 'ref=v0' \
+            -f 'inputs[starting_revision]=$STARTING_REVISION' \
+            -f 'inputs[end_revision]=$END_REVISION'
