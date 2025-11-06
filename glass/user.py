@@ -25,18 +25,18 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    import importlib.util
-    import os
     from collections.abc import Generator
+    from importlib.util import find_spec
+    from os import PathLike
 
     from glass._types import FloatArray
 
-    if importlib.util.find_spec("fitsio") is not None:
+    if find_spec("fitsio") is not None:
         import fitsio
 
 
 def save_cls(
-    filename: os.PathLike[str],
+    filename: PathLike[str],
     cls: FloatArray,
 ) -> None:
     """
@@ -59,7 +59,7 @@ def save_cls(
 
 
 def load_cls(
-    filename: os.PathLike[str],
+    filename: PathLike[str],
 ) -> FloatArray:
     """
     Load a list of Cls from file.
@@ -161,7 +161,7 @@ class _FitsWriter:
 
 @contextmanager
 def write_catalog(
-    filename: os.PathLike[str],
+    filename: PathLike[str],
     *,
     ext: str | None = None,
 ) -> Generator[_FitsWriter]:

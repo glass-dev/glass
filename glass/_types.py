@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from array_api_strict._array_object import Array as AArray
 
     import glass._array_api_utils as _utils
-    import glass.grf
     import glass.jax
 
     P = ParamSpec("P")

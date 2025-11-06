@@ -58,8 +58,8 @@ import glass.algorithm
 import glass.arraytools
 
 if TYPE_CHECKING:
-    import types
     from collections.abc import Callable, Iterator, Sequence
+    from types import ModuleType
 
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
@@ -212,7 +212,7 @@ class RadialWindow:
     za: FloatArray
     wa: FloatArray
     zeff: float = math.nan
-    xp: types.ModuleType | None = None
+    xp: ModuleType | None = None
 
     def __post_init__(self) -> None:
         """
@@ -825,7 +825,7 @@ def _uniform_grid(
     *,
     step: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType,
+    xp: ModuleType,
 ) -> FloatArray:
     """
     Create a uniform grid.
@@ -867,7 +867,7 @@ def redshift_grid(
     *,
     dz: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType,
+    xp: ModuleType,
 ) -> FloatArray:
     """
     Redshift grid with uniform spacing in redshift.

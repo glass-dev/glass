@@ -10,13 +10,13 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    import pytest_mock
     from numpy.typing import NDArray
+    from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
 
 
-def test_redshifts(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
+def test_redshifts(xp: ModuleType, mocker: MockerFixture) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in redshifts are not immutable, so do not support jax")
     # create a mock radial window function
