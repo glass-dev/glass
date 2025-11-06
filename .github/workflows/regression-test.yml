@@ -15,5 +15,5 @@ jobs:
   regression-tests:
     uses: glass-dev/glass-benchmarks/.github/workflows/regression-test.yaml@v0
     with:
-      starting_revision: ${{github.event.pull_request.base.ref}}
-      end_revision: ${{github.event.pull_request.head.ref}}
+      starting_revision: ${{ github.event.pull_request.base.ref }}
+      end_revision: ${{ github.event.pull_request.head.ref }}
