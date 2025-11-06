@@ -20,7 +20,6 @@ jobs:
         env:
           STARTING_REVISION: ${{github.event.pull_request.base.ref}}
           END_REVISION: ${{github.ref_name}}
-          GH_TOKEN: ${{ github.token }}
         run: |
           gh api \
             --method POST \
