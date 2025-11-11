@@ -13,6 +13,7 @@ on:
 jobs:
   check-pr-title:
     if: >-
+      github.event.pull_request.user.login != 'allcontributors[bot]' &&
       github.event.pull_request.user.login != 'dependabot[bot]' &&
       github.event.pull_request.user.login != 'pre-commit-ci[bot]'
     runs-on: ubuntu-latest
