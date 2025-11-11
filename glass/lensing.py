@@ -483,7 +483,8 @@ class MultiPlaneConvergence:
         )
         r12 = self.r23
         r13, self.r23 = self.cosmo.transverse_comoving_distance(
-            [z1, self.z2], self.z3
+            [z1, self.z2],
+            self.z3,
         ) / (self.cosmo.hubble_distance * self.x3)
         t = r13 / r12
 

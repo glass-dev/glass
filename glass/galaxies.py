@@ -284,7 +284,11 @@ def gaussian_phz(  # noqa: PLR0913
     """
     if xp is None:
         xp = array_api_compat.array_namespace(
-            z, sigma_0, lower, upper, use_compat=False
+            z,
+            sigma_0,
+            lower,
+            upper,
+            use_compat=False,
         )
 
     # Ensure inputs are arrays to allow lib utilisation

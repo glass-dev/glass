@@ -133,7 +133,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # test with rng
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis, rng=rng), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis, rng=rng),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -159,7 +160,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: remove monopole
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -168,7 +170,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     # case: negative delta
 
     lon, lat, cnt = catpos(
-        glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis), xp=np
+        glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -247,7 +250,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
 def test_uniform_positions(xp: ModuleType, urng: UnifiedGenerator) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
-            "Arrays in uniform_positions are not immutable, so do not support jax"
+            "Arrays in uniform_positions are not immutable, so do not support jax",
         )
 
     # case: scalar input

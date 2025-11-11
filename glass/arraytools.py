@@ -86,7 +86,8 @@ def broadcast_leading_axes(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(
-            *[arg[0] for arg in args], use_compat=False
+            *[arg[0] for arg in args],
+            use_compat=False,
         )
 
     shapes, trails = [], []
@@ -175,7 +176,9 @@ def trapezoid_product(
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
     xp = array_api_compat.array_namespace(
-        *f, *tuple(itertools.chain(*ff)), use_compat=False
+        *f,
+        *tuple(itertools.chain(*ff)),
+        use_compat=False,
     )
     uxpx = _utils.XPAdditions(xp)
 
@@ -218,5 +221,7 @@ def cumulative_trapezoid(
 
     # Compute the cumulative trapezoid without mutating any arrays
     return xp.cumulative_sum(
-        (f[..., 1:] + f[..., :-1]) * 0.5 * xp.diff(x), axis=-1, include_initial=True
+        (f[..., 1:] + f[..., :-1]) * 0.5 * xp.diff(x),
+        axis=-1,
+        include_initial=True,
     )

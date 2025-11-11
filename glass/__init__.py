@@ -1,5 +1,7 @@
 """GLASS package."""
 
+import contextlib
+
 __all__ = [
     "DensityWeight",
     "DistanceWeight",
@@ -72,13 +74,11 @@ __all__ = [
 ]
 
 
-try:  # noqa: SIM105
+with contextlib.suppress(ModuleNotFoundError):
     from ._version import __version__
-except ModuleNotFoundError:
-    pass
 
 # modules
-from glass import grf
+from glass import algorithm, grf
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,

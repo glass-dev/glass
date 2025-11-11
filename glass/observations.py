@@ -186,7 +186,12 @@ def smail_nz(
 
     """
     xp = array_api_compat.array_namespace(
-        z, z_mode, alpha, beta, norm, use_compat=False
+        z,
+        z_mode,
+        alpha,
+        beta,
+        norm,
+        use_compat=False,
     )
     uxpx = _utils.XPAdditions(xp)
 

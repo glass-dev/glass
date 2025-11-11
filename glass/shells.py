@@ -508,7 +508,11 @@ def restrict(
     zr = uxpx.union1d(w.za, z_)
 
     fr = glass.arraytools.ndinterp(
-        zr, z, f, left=0.0, right=0.0
+        zr,
+        z,
+        f,
+        left=0.0,
+        right=0.0,
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
     return zr, fr
 
