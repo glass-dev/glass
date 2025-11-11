@@ -6,4 +6,4 @@ updates:
     schedule:
       interval: weekly
     commit-message:
-      prefix: gh-725
+      prefix: dependabot
