@@ -31,17 +31,26 @@ class Transformation(Protocol):
         """
 
     def corr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         """Implementation of the corr function."""
 
     def icorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         """Implementation of the icorr function."""
 
     def dcorr(
-        self, other: Transformation, x: AnyArray, /
+        self,
+        other: Transformation,
+        x: AnyArray,
+        /,
     ) -> AnyArray | NotImplementedType:
         """Implementation of the dcorr function."""
 
@@ -125,7 +134,9 @@ def dcorr(t1: Transformation, t2: Transformation, x: AnyArray, /) -> AnyArray:
 
 
 def compute(
-    cl: AnyArray, t1: Transformation, t2: Transformation | None = None
+    cl: AnyArray,
+    t1: Transformation,
+    t2: Transformation | None = None,
 ) -> AnyArray:
     """
     Compute a band-limited Gaussian angular power spectrum for the

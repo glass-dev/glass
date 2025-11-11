@@ -83,7 +83,7 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     Parameters
     ----------
     xp
-        The array backend which determines the RNG.
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -131,13 +131,13 @@ class Generator:
         seed
             Seed for the random number generator.
         """
-        import numpy as np  # noqa: PLC0415
+        import numpy  # noqa: ICN001, PLC0415
 
         import array_api_strict  # noqa: PLC0415
 
         self.axp = array_api_strict
-        self.nxp = np
-        self.rng = np.random.default_rng(seed=seed)
+        self.nxp = numpy
+        self.rng = self.nxp.random.default_rng(seed=seed)
 
     def random(
         self,
@@ -277,12 +277,16 @@ class XPAdditions:
         Parameters
         ----------
         xp
-            The array namespace module.
+            The array library backend to use for array operations.
         """
         self.xp = xp
 
     def trapezoid(
-        self, y: AnyArray, x: AnyArray = None, dx: float = 1.0, axis: int = -1
+        self,
+        y: AnyArray,
+        x: AnyArray = None,
+        dx: float = 1.0,
+        axis: int = -1,
     ) -> AnyArray:
         """
         Integrate along the given axis using the composite trapezoidal rule.
@@ -412,7 +416,12 @@ class XPAdditions:
         """
         if self.xp.__name__ in {"numpy", "jax.numpy"}:
             return self.xp.interp(
-                x, x_points, y_points, left=left, right=right, period=period
+                x,
+                x_points,
+                y_points,
+                left=left,
+                right=right,
+                period=period,
             )
 
         if self.xp.__name__ == "array_api_strict":
@@ -423,7 +432,12 @@ class XPAdditions:
             x_points_np = np.asarray(x_points, copy=True)
             y_points_np = np.asarray(y_points, copy=True)
             result_np = np.interp(
-                x_np, x_points_np, y_points_np, left=left, right=right, period=period
+                x_np,
+                x_points_np,
+                y_points_np,
+                left=left,
+                right=right,
+                period=period,
             )
             return self.xp.asarray(result_np, copy=True)
 
@@ -467,7 +481,10 @@ class XPAdditions:
         raise NotImplementedError(msg)
 
     def linalg_lstsq(
-        self, a: AnyArray, b: AnyArray, rcond: float | None = None
+        self,
+        a: AnyArray,
+        b: AnyArray,
+        rcond: float | None = None,
     ) -> tuple[AnyArray, AnyArray, int, AnyArray]:
         """
         Solve a linear least squares problem.
@@ -606,7 +623,8 @@ class XPAdditions:
             np = import_numpy(self.xp.__name__)
 
             return self.xp.asarray(
-                np.apply_along_axis(func1d, axis, arr, *args, **kwargs), copy=True
+                np.apply_along_axis(func1d, axis, arr, *args, **kwargs),
+                copy=True,
             )
 
         msg = "the array backend in not supported"

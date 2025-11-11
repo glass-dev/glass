@@ -46,7 +46,9 @@ def test_broadcast_leading_axes() -> None:
     c_in = np.zeros((3, 1, 5, 6))
 
     dims, *rest = glass.arraytools.broadcast_leading_axes(
-        (a_in, 0), (b_in, 1), (c_in, 2)
+        (a_in, 0),
+        (b_in, 1),
+        (c_in, 2),
     )
     a_out, b_out, c_out = rest
 

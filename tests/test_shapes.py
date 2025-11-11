@@ -10,7 +10,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import UnifiedGenerator
+    from glass._types import UnifiedGenerator
 
 
 def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
@@ -43,7 +43,8 @@ def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # broadcasting rule
 
     q = glass.triaxial_axis_ratio(
-        xp.asarray([[0.6, 0.7], [0.8, 0.9]]), xp.asarray([0.4, 0.5])
+        xp.asarray([[0.6, 0.7], [0.8, 0.9]]),
+        xp.asarray([0.4, 0.5]),
     )
     assert q.shape == (2, 2)
 
@@ -62,7 +63,7 @@ def test_triaxial_axis_ratio(xp: ModuleType, urng: UnifiedGenerator) -> None:
 def test_ellipticity_ryden04(xp: ModuleType, urng: UnifiedGenerator) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
-            "Arrays in ellipticity_ryden04 are not immutable, so do not support jax"
+            "Arrays in ellipticity_ryden04 are not immutable, so do not support jax",
         )
 
     # Pass floats without xp
@@ -121,7 +122,7 @@ def test_ellipticity_ryden04(xp: ModuleType, urng: UnifiedGenerator) -> None:
 def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
-            "Arrays in ellipticity_gaussian are not immutable, so do not support jax"
+            "Arrays in ellipticity_gaussian are not immutable, so do not support jax",
         )
 
     n = 1_000_000
@@ -161,7 +162,7 @@ def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
 def test_ellipticity_intnorm(xp: ModuleType, urng: UnifiedGenerator) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
-            "Arrays in ellipticity_intnorm are not immutable, so do not support jax"
+            "Arrays in ellipticity_intnorm are not immutable, so do not support jax",
         )
 
     n = 1_000_000

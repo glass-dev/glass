@@ -483,7 +483,8 @@ class MultiPlaneConvergence:
         )
         r12 = self.r23
         r13, self.r23 = self.cosmo.transverse_comoving_distance(
-            [z1, self.z2], self.z3
+            [z1, self.z2],
+            self.z3,
         ) / (self.cosmo.hubble_distance * self.x3)
         t = r13 / r12
 
@@ -633,8 +634,7 @@ def deflect(
         axis of size 2 for the real and imaginary component.
     xp
         The array library backend to use for array operations. If this is not
-        specified, the array library will be determined from the other parameters,
-        if possible.
+        specified, the backend will be determined from the input arrays.
 
     Returns
     -------

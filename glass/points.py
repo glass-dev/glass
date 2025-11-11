@@ -544,7 +544,11 @@ def displacement(
 
     """
     xp = array_api_compat.get_namespace(
-        from_lon, from_lat, to_lon, to_lat, use_compat=False
+        from_lon,
+        from_lat,
+        to_lon,
+        to_lat,
+        use_compat=False,
     )
 
     a = (90.0 - to_lat) / 180 * xp.pi
