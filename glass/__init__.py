@@ -48,7 +48,6 @@ __all__ = [
     "lognormal_fields",
     "lognormal_gls",
     "lognormal_shift_hilbert2011",
-    "multalm",
     "multi_plane_matrix",
     "multi_plane_weights",
     "nfields_from_nspectra",
@@ -62,6 +61,7 @@ __all__ = [
     "restrict",
     "save_cls",
     "shear_from_convergence",
+    "sht",
     "smail_nz",
     "solve_gaussian_spectra",
     "spectra_indices",
@@ -78,7 +78,7 @@ with contextlib.suppress(ModuleNotFoundError):
     from ._version import __version__
 
 # modules
-from glass import algorithm, grf
+from glass import algorithm, grf, sht
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,
@@ -109,7 +109,6 @@ from glass.galaxies import (
     redshifts,
     redshifts_from_nz,
 )
-from glass.harmonictools import multalm
 from glass.lensing import (
     MultiPlaneConvergence,
     deflect,

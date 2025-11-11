@@ -18,7 +18,7 @@ import array_api_extra as xpx
 
 import glass
 import glass.grf
-import glass.harmonictools
+import glass.sht
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -397,11 +397,11 @@ def _generate_grf(
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
-        alm = glass.harmonictools.multalm(z, s)
+        alm = glass.sht.multalm(z, s)
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += glass.harmonictools.multalm(y[:, i], a[:, i])
+            alm += glass.sht.multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:

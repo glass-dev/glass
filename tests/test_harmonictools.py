@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-import glass.harmonictools
+import glass.sht
 
 if TYPE_CHECKING:
     import types
@@ -22,7 +22,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     bl = xp.asarray([2.0, 0.5, 1.0])
     alm_copy = xp.asarray(alm, copy=True)
 
-    result = glass.harmonictools.multalm(alm, bl, inplace=True)
+    result = glass.sht.multalm(alm, bl, inplace=True)
 
     np.testing.assert_allclose(result, alm)
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
@@ -39,14 +39,14 @@ def test_multalm(xp: types.ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     bl = xp.ones(3)
 
-    result = glass.harmonictools.multalm(alm, bl, inplace=False)
+    result = glass.sht.multalm(alm, bl, inplace=False)
     np.testing.assert_allclose(result, alm)
 
     # multiple with 0s
 
     bl = xp.asarray([0.0, 1.0, 0.0])
 
-    result = glass.harmonictools.multalm(alm, bl, inplace=False)
+    result = glass.sht.multalm(alm, bl, inplace=False)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
     np.testing.assert_allclose(result, expected_result)
@@ -56,5 +56,5 @@ def test_multalm(xp: types.ModuleType) -> None:
     alm = xp.asarray([])
     bl = xp.asarray([])
 
-    result = glass.harmonictools.multalm(alm, bl, inplace=False)
+    result = glass.sht.multalm(alm, bl, inplace=False)
     np.testing.assert_allclose(result, alm)
