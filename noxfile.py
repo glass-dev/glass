@@ -195,7 +195,11 @@ def version(session: nox.Session) -> None:
 
 @nox.session(python=ALL_PYTHON)
 def benchmarks(session: nox.Session) -> None:
-    """Run the benchmarks."""
+    """
+    Run the benchmark test for a specific revision.
+
+    Note it is not possible to pass extra options to pytest.
+    """
     _check_revision_count(session.posargs, expected_count=1)
     revision = session.posargs[0]
 
@@ -209,7 +213,11 @@ def benchmarks(session: nox.Session) -> None:
 
 @nox.session(python=ALL_PYTHON)
 def regression_tests(session: nox.Session) -> None:
-    """Run the regression test."""
+    """
+    Run regression benchmark tests between two revisions.
+
+    Note it is not possible to pass extra options to pytest.
+    """
     _check_revision_count(session.posargs, expected_count=2)
     before_revision, after_revision = session.posargs
 
