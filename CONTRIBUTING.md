@@ -247,6 +247,34 @@ nox -s docs -- serve
 The `nox` environments created for each type of session on the first run is
 saved under `.nox/` and reused by default.
 
+### Benchmarking
+
+To ensure that _GLASS_ remains performant over time, a set of benchmarks is
+provided in the [benchmarks](./tests/benchmarks/) folder. These benchmarks can
+be run through nox.
+
+A single benchmark can be run by specifying the revision to benchmark against
+the current state of the repository.
+
+```sh
+nox -s benchmark -- <revision-to-benchmark>
+```
+
+The benchmarks can be used to run a regression test of `glass`. These can
+regression tests can be used to compare the performance of two different
+revisions of `glass`.
+
+```sh
+nox -s regression-tests -- <initial-state-revision> <revision-to-compare-to-initial-state>
+```
+
+If an initial state revision is not specified, the current state of `main` is
+used.
+
+```sh
+nox -s regression-tests -- <revision-to-compare-to-main>
+```
+
 ## Contributing workflow
 
 Every change to the repository should come out of an issue where the change is
