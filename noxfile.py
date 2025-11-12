@@ -92,17 +92,36 @@ def tests(session: nox.Session) -> None:
 
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
-    """Run tests and compute coverage."""
+    """Run tests and compute coverage for the core tests."""
     session.install(
-        ".",
         "-c",
         ".github/test-constraints.txt",
+        "-e",
+        ".",
         "--group",
         "coverage",
     )
 
     session.posargs.append("--cov")
     session.run("pytest", *session.posargs)
+
+
+@nox.session(python=ALL_PYTHON)
+def coverage_benchmarks(session: nox.Session) -> None:
+    """Run tests and compute coverage for the benchmark tests."""
+    session.install(
+        "-c",
+        ".github/test-constraints.txt",
+        "-e",
+        ".",
+        "--group",
+        "benchmark",
+        "--group",
+        "coverage",
+    )
+
+    session.posargs.append("--cov")
+    session.run("pytest", BENCHMARK_LOC, *session.posargs)
 
 
 @nox.session(python=ALL_PYTHON)
