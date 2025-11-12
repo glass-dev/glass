@@ -199,11 +199,6 @@ lint.isort = {known-first-party = [
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
-], "conftest.py" = [
-    "D100", # undocumented-public-module
-    "D103", # TODO: undocumented-public-function
-    "INP001", # implicit-namespace-package
-    "PLC0415", # import-outside-top-level
 ], "docs/*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package,
@@ -230,6 +225,11 @@ lint.per-file-ignores = {"__init__.py" = [
     "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
+], "tests/conftest.py" = [
+    "D100", # undocumented-public-module
+    "D103", # TODO: undocumented-public-function
+    "INP001", # implicit-namespace-package
+    "PLC0415", # import-outside-top-level
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
