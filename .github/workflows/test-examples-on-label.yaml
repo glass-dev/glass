@@ -12,6 +12,8 @@ on:
 
 jobs:
   test-examples-on-label:
-    if: contains(github.event.pull_request.labels.*.name, 'run-examples')
+    if: >-
+      github.event.pull_request.draft == false &&
+      contains(github.event.pull_request.labels.*.name, 'run-examples')
     name: On label
     uses: ./.github/workflows/run-examples.yaml
