@@ -10,7 +10,7 @@ on:
       - main
   pull_request:
     paths:
-      - .github/workflows/run-examples.yml
+      - .github/workflows/run-examples.yaml
       - examples/**
       - glass/**
     types:
@@ -23,4 +23,4 @@ jobs:
   test-examples-on-push:
     if: github.event.pull_request.draft == false
     name: On push
-    uses: ./.github/workflows/run-examples.yml
+    uses: ./.github/workflows/run-examples.yaml
