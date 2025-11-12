@@ -214,7 +214,7 @@ def fixed_zbins(
     *,
     nbins: int | None = None,
     dz: float | None = None,
-    xp: ModuleType,
+    xp: ModuleType | None = None,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -245,6 +245,8 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
+    xp = _utils.import_numpy() if xp is None else xp
+
     if nbins is not None and dz is None:
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:
