@@ -59,9 +59,7 @@ def coverage(session: nox.Session) -> None:
         "--group",
         "coverage",
     )
-
     session.posargs.append("--cov")
-
     session.run("pytest", *session.posargs)
 
 
@@ -76,11 +74,9 @@ def doctests(session: nox.Session) -> None:
         "--group",
         "doctest",
     )
-
     session.posargs.append("--doctest-plus")
     session.posargs.append("--doctest-plus-generate-diff=overwrite")
     session.posargs.append("glass")
-
     session.run("pytest", *session.posargs)
 
 
@@ -126,10 +122,10 @@ def docs(session: nox.Session) -> None:
         "--fail-on-warning",
     )
 
-    port = 8001
-
     if session.posargs:
         if "serve" in session.posargs:
+            port = 8001
+
             print(f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit")
             session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
