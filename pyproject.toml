@@ -6,6 +6,12 @@ requires = [
 ]
 
 [dependency-groups]
+coverage = [
+    "array-api-strict",
+    "jax",
+    "pytest-cov",
+    {include-group = "test"},
+]
 docs = [
     "array-api-strict",
     "cosmology.api",
@@ -29,7 +35,6 @@ test = [
     "cosmology.api",
     "fitsio",
     "pytest",
-    "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
     "pytest-rerunfailures",

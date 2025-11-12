@@ -20,7 +20,7 @@ ALL_PYTHON = [
     "3.13",
 ]
 ARRAY_BACKENDS = {
-    "array_api_strict": "array_api_strict>=2",
+    "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
 
@@ -51,8 +51,18 @@ def tests(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage."""
+    session.install(
+        "-c",
+        ".github/test-constraints.txt",
+        "-e",
+        ".",
+        "--group",
+        "coverage",
+    )
+
     session.posargs.append("--cov")
-    tests(session)
+
+    session.run("pytest", *session.posargs)
 
 
 @nox.session(python=ALL_PYTHON)
