@@ -853,9 +853,7 @@ def _uniform_grid(
         If both ``step`` and ``num`` are given.
 
     """
-    if xp is None:
-        np = _utils.import_numpy()
-        xp = np
+    xp = _utils.import_numpy() if xp is None else xp
 
     if step is not None and num is None:
         return xp.arange(start, stop + step, step)
