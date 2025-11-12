@@ -117,7 +117,7 @@ jobs:
       - name: Coveralls finished
         uses: coverallsapp/github-action@v2
         with:
-          carryforward: run-3.10,run-3.11,run-3.12,run-3.13
+          carryforward: core-py3.10,core-py3.11,core-py3.12,core-py3.13,bench-py3.10,bench-py3.11,bench-py3.12,bench-py3.13
           parallel-finished: true
 
   build:
