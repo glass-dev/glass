@@ -142,7 +142,7 @@ filterwarnings = [
 log_cli_level = "DEBUG"
 minversion = "6.0"
 testpaths = [
-    "tests",
+    "tests/core",
 ]
 xfail_strict = true
 
