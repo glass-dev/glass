@@ -32,7 +32,22 @@ def _check_revision_count(
     *,
     expected_count: int,
 ) -> None:
-    """Check that the correct number of revisions have been provided."""
+    """Check that the correct number of revisions have been provided.
+
+    Parameters
+    ----------
+    session_posargs
+        The positional arguments passed to the session.
+    expected_count
+        The expected number of revisions.
+
+    Raises
+    ------
+    ValueError
+        If no revisions are provided.
+    ValueError
+        If the number of provided revisions does not match the expected count.
+    """
     if not session_posargs:
         msg = f"{expected_count} revision(s) not provided"
         raise ValueError(msg)
