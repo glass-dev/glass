@@ -6,6 +6,12 @@ requires = [
 ]
 
 [dependency-groups]
+benchmark = [
+    "array-api-strict",
+    "jax",
+    "pytest-benchmark",
+    {include-group = "test"},
+]
 coverage = [
     "array-api-strict",
     "jax",

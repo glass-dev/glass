@@ -23,6 +23,7 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
+GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 
 
 @nox.session
@@ -35,7 +36,14 @@ def lint(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
-    session.install("-c", ".github/test-constraints.txt", "-e", ".", "--group", "test")
+    session.install(
+        "-c",
+        ".github/test-constraints.txt",
+        "-e",
+        ".",
+        "--group",
+        "test",
+    )
 
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
@@ -59,6 +67,7 @@ def coverage(session: nox.Session) -> None:
         "--group",
         "coverage",
     )
+
     session.posargs.append("--cov")
     session.run("pytest", *session.posargs)
 
@@ -74,6 +83,7 @@ def doctests(session: nox.Session) -> None:
         "--group",
         "doctest",
     )
+
     session.posargs.append("--doctest-plus")
     session.posargs.append("--doctest-plus-generate-diff=overwrite")
     session.posargs.append("glass")
@@ -150,3 +160,25 @@ def version(session: nox.Session) -> None:
     """
     session.install("-e", ".")
     session.run("python", "-c", "import glass; print(glass.__version__)")
+
+
+@nox.session(python=ALL_PYTHON)
+def benchmark(session: nox.Session) -> None:
+    """Run the benchmarks."""
+    if not session.posargs:
+        msg = "Revision not provided"
+        raise ValueError(msg)
+
+    if len(session.posargs) == 1:
+        revision = session.posargs[0]
+    else:
+        msg = (
+            f"Incorrect number of revisions provided ({len(session.posargs)}), "
+            f"expected 2"
+        )
+        raise ValueError(msg)
+
+    session.install(f"git+{GLASS_REPO_URL}@{revision}", "pytest", "pytest-benchmark")
+
+    session.posargs.append("--benchmark-autosave")
+    session.run("pytest", *session.posargs)
