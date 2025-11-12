@@ -71,9 +71,10 @@ def lint(session: nox.Session) -> None:
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     session.install(
-        ".",
         "-c",
         ".github/test-constraints.txt",
+        "-e",
+        ".",
         "--group",
         "test",
     )
@@ -108,9 +109,10 @@ def coverage(session: nox.Session) -> None:
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
     session.install(
-        ".",
         "-c",
         ".github/test-constraints.txt",
+        "-e",
+        ".",
         "--group",
         "doctest",
     )
@@ -124,7 +126,7 @@ def doctests(session: nox.Session) -> None:
 @nox.session
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
-    session.install(".[examples]")
+    session.install("-e", ".[examples]")
 
     if session.posargs:
         if "html" in session.posargs:
@@ -152,7 +154,7 @@ def examples(session: nox.Session) -> None:
 @nox.session
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
-    session.install(".", "--group", "docs")
+    session.install("-e", ".", "--group", "docs")
     session.chdir("docs")
     session.run(
         "sphinx-build",
@@ -189,7 +191,7 @@ def version(session: nox.Session) -> None:
     is installed without any additional dependencies
     through optional dependencies nor dependency groups.
     """
-    session.install(".")
+    session.install("-e", ".")
     session.run("python", "-c", "import glass; print(glass.__version__)")
 
 
@@ -204,7 +206,7 @@ def benchmarks(session: nox.Session) -> None:
     revision = session.posargs[0]
 
     # essentially required just for the dependencies
-    session.install(".", "--group", "benchmark")
+    session.install("-e", ".", "--group", "benchmark")
 
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
@@ -222,7 +224,7 @@ def regression_tests(session: nox.Session) -> None:
     before_revision, after_revision = session.posargs
 
     # essentially required just for the dependencies
-    session.install(".", "--group", "benchmark")
+    session.install("-e", ".", "--group", "benchmark")
 
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
