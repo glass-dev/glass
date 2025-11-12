@@ -165,6 +165,8 @@ def version(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def benchmark(session: nox.Session) -> None:
     """Run the benchmarks."""
+    session.install("-e", ".", "--group", "benchmark")
+
     if not session.posargs:
         msg = "Revision not provided"
         raise ValueError(msg)
@@ -178,7 +180,5 @@ def benchmark(session: nox.Session) -> None:
         )
         raise ValueError(msg)
 
-    session.install(f"git+{GLASS_REPO_URL}@{revision}", "pytest", "pytest-benchmark")
-
-    session.posargs.append("--benchmark-autosave")
-    session.run("pytest", *session.posargs)
+    session.install(f"git+{GLASS_REPO_URL}@{revision}")
+    session.run("pytest", "tests/benchmarks", "--benchmark-autosave")
