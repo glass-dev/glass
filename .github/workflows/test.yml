@@ -66,24 +66,47 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run core tests and generate coverage report
+      - name: Run core tests and save coverage data
         run: nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
+          # Use a unique file to store core coverage data
+          COVERAGE_FILE: .coverage.core.${{ matrix.python-version }}
 
-      - name: Run benchmark tests and generate coverage report
-        run: nox -s coverage-${{ matrix.python-version }} --verbose
-        env:
-          FORCE_COLOR: 1
+      - name: Generate XML report for core tests
+        # Explicitly use the core data file to generate the XML report
+        run: coverage xml -o coverage.core.${{ matrix.python-version }}.xml --data-file .coverage.core.${{ matrix.python-version }}
 
-      - name: Coveralls requires XML report
-        run: coverage xml
-
-      - name: Run Coveralls in parallel
+      - name: Upload core coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          flag-name: run-${{ matrix.python-version }}
+          # Use a unique flag for core tests
+          flag-name: core-py${{ matrix.python-version }}
           parallel: true
+          path-to-lcov: coverage.core.${{ matrix.python-version }}.xml
+          base-path: glass/
+
+      # --- Start Benchmark Coverage Steps ---
+      - name: Run benchmark tests and save coverage data
+        # Note: You need to ensure your noxfile has a 'coverage_benchmarks' session,
+        # otherwise this will fail. Assuming it's named 'coverage_benchmarks'.
+        run: nox -s coverage_benchmarks-${{ matrix.python-version }} --verbose
+        env:
+          FORCE_COLOR: 1
+          # Use a unique file for benchmark coverage data (different from core)
+          COVERAGE_FILE: .coverage.bench.${{ matrix.python-version }}
+
+      - name: Generate XML report for benchmark tests
+        # Explicitly use the benchmark data file to generate the XML report
+        run: coverage xml -o coverage.bench.${{ matrix.python-version }}.xml --data-file .coverage.bench.${{ matrix.python-version }}
+
+      - name: Upload benchmark coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          # Use a unique flag for benchmark tests
+          flag-name: bench-py${{ matrix.python-version }}
+          parallel: true
+          path-to-lcov: coverage.bench.${{ matrix.python-version }}.xml
           base-path: glass/
 
   aggregate-tests:

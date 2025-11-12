@@ -103,7 +103,7 @@ def coverage(session: nox.Session) -> None:
     )
 
     session.posargs.append("--cov")
-    session.run("pytest", *session.posargs)
+    session.run("pytest", *session.posargs, env=os.environ)
 
 
 @nox.session(python=ALL_PYTHON)
@@ -121,7 +121,7 @@ def coverage_benchmarks(session: nox.Session) -> None:
     )
 
     session.posargs.append("--cov")
-    session.run("pytest", BENCHMARK_LOC, *session.posargs)
+    session.run("pytest", BENCHMARK_LOC, *session.posargs, env=os.environ)
 
 
 @nox.session(python=ALL_PYTHON)
