@@ -825,7 +825,7 @@ def _uniform_grid(
     *,
     step: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType,
+    xp: types.ModuleType | None = None,
 ) -> FloatArray:
     """
     Create a uniform grid.
@@ -841,7 +841,7 @@ def _uniform_grid(
     num
         The number of samples.
     xp
-        The array library backend to use for array operations.
+        The array library backend to use for array operations. Defaults to numpy.
 
     Returns
     -------
@@ -853,6 +853,10 @@ def _uniform_grid(
         If both ``step`` and ``num`` are given.
 
     """
+    if xp is None:
+        np = _utils.import_numpy()
+        xp = np
+
     if step is not None and num is None:
         return xp.arange(start, stop + step, step)
     if step is None and num is not None:
@@ -867,7 +871,7 @@ def redshift_grid(
     *,
     dz: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType,
+    xp: types.ModuleType | None = None,
 ) -> FloatArray:
     """
     Redshift grid with uniform spacing in redshift.
@@ -883,7 +887,7 @@ def redshift_grid(
     num
         The number redshift samples.
     xp
-        The array library backend to use for array operations.
+        The array library backend to use for array operations. Defaults to numpy.
 
     Returns
     -------

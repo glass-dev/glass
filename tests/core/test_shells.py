@@ -267,6 +267,29 @@ def test_partition(xp: types.ModuleType, uxpx: _utils.XPAdditions, method: str) 
     np.testing.assert_allclose(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
 
 
+def test_redshift_grid_default_xp() -> None:
+    """Add unit tests for :func:`glass.redshift_grid` with default xp."""
+    zmin = 0
+    zmax = 1
+
+    # check num input
+
+    num = 5
+    z = glass.redshift_grid(zmin, zmax, num=5)
+    assert z.size == num + 1
+
+    # check dz input
+
+    dz = 0.2
+    z = glass.redshift_grid(zmin, zmax, dz=dz)
+    assert z.size == math.ceil((zmax - zmin) / dz) + 1
+
+    # check dz for spacing which results in a max value above zmax
+
+    z = glass.redshift_grid(zmin, zmax, dz=0.3)
+    assert zmax < z[-1]
+
+
 def test_redshift_grid(xp: types.ModuleType) -> None:
     """Add unit tests for :func:`glass.redshift_grid`."""
     zmin = 0

@@ -36,15 +36,17 @@ class CompatibleBackendNotFoundError(Exception):
     implements a requested function, is not found.
     """
 
-    def __init__(self, missing_backend: str, users_backend: str) -> None:
+    def __init__(self, missing_backend: str, users_backend: str | None) -> None:
         self.message = (
-            f"{missing_backend} is required here as some functions required by GLASS "
-            f"are not supported by {users_backend}"
+            f"{missing_backend} is required here as "
+            "no alternative has been provided by the user."
+            if users_backend is None
+            else f"GLASS depends on functions not supported by {users_backend}"
         )
         super().__init__(self.message)
 
 
-def import_numpy(backend: str) -> ModuleType:
+def import_numpy(backend: str | None = None) -> ModuleType:
     """
     Import the NumPy module, raising a helpful error if NumPy is not installed.
 
