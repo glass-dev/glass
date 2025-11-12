@@ -39,8 +39,8 @@ jobs:
         uses: actions/cache@v4
         with:
           key:
-            tests-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('noxfile.py')
-            }}-${{ env.pythonLocation }}
+            regression-${{ hashFiles('pyproject.toml') }}-${{
+            hashFiles('noxfile.py') }}-${{ env.pythonLocation }}
           path: .nox
 
       - name: Install nox
