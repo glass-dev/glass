@@ -127,7 +127,7 @@ disable_error_code = [
     "arg-type",
     "assignment",
 ]
-module = "tests.*"
+module = "tests.core.*"
 
 [tool.pytest.ini_options]
 addopts = [
