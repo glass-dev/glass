@@ -13,7 +13,44 @@ on:
 
 jobs:
   regression-tests:
-    uses: glass-dev/glass-benchmarks/.github/workflows/regression-test.yaml@v0
-    with:
-      starting_revision: ${{ github.event.pull_request.base.ref }}
-      end_revision: ${{ github.event.pull_request.head.ref }}
+    name: Regression test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          cache-dependency-path: pyproject.toml
+          cache: pip
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache nox
+        uses: actions/cache@v4
+        with:
+          key:
+            tests-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('noxfile.py')
+            }}-${{ env.pythonLocation }}
+          path: .nox
+
+      - name: Install nox
+        run: python -m pip install nox
+
+      - name: Run regression test
+        run: >-
+          nox -s regression_tests-${{ matrix.python-version }} -- "$BASE_REF"
+          "$HEAD_REF"
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          FORCE_COLOR: 1
