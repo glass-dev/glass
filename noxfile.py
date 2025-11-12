@@ -1,7 +1,7 @@
 """Nox config."""
 
 import os
-from pathlib import Path
+import pathlib
 
 import nox
 
@@ -23,7 +23,26 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
+BENCHMARK_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
+
+
+def _check_revision_count(
+    session_posargs: list[str],
+    *,
+    expected_count: int,
+) -> None:
+    """Check that the correct number of revisions have been provided."""
+    if not session_posargs:
+        msg = f"{expected_count} revision(s) not provided"
+        raise ValueError(msg)
+
+    if len(session_posargs) != expected_count:
+        msg = (
+            f"Incorrect number of revisions provided ({len(session_posargs)}), "
+            f"expected {expected_count}"
+        )
+        raise ValueError(msg)
 
 
 @nox.session
@@ -37,10 +56,9 @@ def lint(session: nox.Session) -> None:
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     session.install(
+        ".",
         "-c",
         ".github/test-constraints.txt",
-        "-e",
-        ".",
         "--group",
         "test",
     )
@@ -60,10 +78,9 @@ def tests(session: nox.Session) -> None:
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage."""
     session.install(
+        ".",
         "-c",
         ".github/test-constraints.txt",
-        "-e",
-        ".",
         "--group",
         "coverage",
     )
@@ -76,10 +93,9 @@ def coverage(session: nox.Session) -> None:
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
     session.install(
+        ".",
         "-c",
         ".github/test-constraints.txt",
-        "-e",
-        ".",
         "--group",
         "doctest",
     )
@@ -93,7 +109,7 @@ def doctests(session: nox.Session) -> None:
 @nox.session
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
-    session.install("-e", ".[examples]")
+    session.install(".[examples]")
 
     if session.posargs:
         if "html" in session.posargs:
@@ -113,7 +129,7 @@ def examples(session: nox.Session) -> None:
             "jupyter",
             "execute",
             "--inplace",
-            *Path().glob("examples/**/*.ipynb"),
+            *pathlib.Path().glob("examples/**/*.ipynb"),
             *session.posargs,
         )
 
@@ -121,7 +137,7 @@ def examples(session: nox.Session) -> None:
 @nox.session
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
-    session.install("-e", ".", "--group", "docs")
+    session.install(".", "--group", "docs")
     session.chdir("docs")
     session.run(
         "sphinx-build",
@@ -158,27 +174,42 @@ def version(session: nox.Session) -> None:
     is installed without any additional dependencies
     through optional dependencies nor dependency groups.
     """
-    session.install("-e", ".")
+    session.install(".")
     session.run("python", "-c", "import glass; print(glass.__version__)")
 
 
 @nox.session(python=ALL_PYTHON)
-def benchmark(session: nox.Session) -> None:
+def benchmarks(session: nox.Session) -> None:
     """Run the benchmarks."""
-    session.install("-e", ".", "--group", "benchmark")
+    _check_revision_count(session.posargs, expected_count=1)
+    revision = session.posargs[0]
 
-    if not session.posargs:
-        msg = "Revision not provided"
-        raise ValueError(msg)
+    # essentially required just for the dependencies
+    session.install(".", "--group", "benchmark")
 
-    if len(session.posargs) == 1:
-        revision = session.posargs[0]
-    else:
-        msg = (
-            f"Incorrect number of revisions provided ({len(session.posargs)}), "
-            f"expected 2"
-        )
-        raise ValueError(msg)
-
+    # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
-    session.run("pytest", "tests/benchmarks", "--benchmark-autosave")
+    session.run("pytest", BENCHMARK_LOC, "--benchmark-autosave")
+
+
+@nox.session(python=ALL_PYTHON)
+def regression_tests(session: nox.Session) -> None:
+    """Run the regression test."""
+    _check_revision_count(session.posargs, expected_count=2)
+    before_revision, after_revision = session.posargs
+
+    # essentially required just for the dependencies
+    session.install(".", "--group", "benchmark")
+
+    print(f"Generating prior benchmark from revision {before_revision}")
+    session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
+    session.run("pytest", BENCHMARK_LOC, "--benchmark-autosave")
+
+    print(f"Comparing {before_revision} benchmark to revision {after_revision}")
+    session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
+    session.run(
+        "pytest",
+        BENCHMARK_LOC,
+        "--benchmark-compare=0001",
+        "--benchmark-compare-fail=min:5%",
+    )
