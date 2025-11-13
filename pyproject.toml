@@ -127,7 +127,7 @@ disable_error_code = [
     "arg-type",
     "assignment",
 ]
-module = "tests.*"
+module = "tests.core.*"
 
 [tool.pytest.ini_options]
 addopts = [
@@ -142,7 +142,7 @@ filterwarnings = [
 log_cli_level = "DEBUG"
 minversion = "6.0"
 testpaths = [
-    "tests",
+    "tests/core",
 ]
 xfail_strict = true
 
