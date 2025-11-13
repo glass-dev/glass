@@ -3,6 +3,13 @@ name: Regression tests
 
 on:
   pull_request:
+    paths:
+      - .github/workflows/regression-test.yaml
+      - glass/**
+      - noxfile.py
+      - pyproject.toml
+      - tests/benchmarks/**
+      - tests/conftest.py
     branches:
       - main
     types:
