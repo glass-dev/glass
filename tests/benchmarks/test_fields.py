@@ -592,3 +592,34 @@ def test_enumerate_spectra(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     # make sure iterator is exhausted
     with pytest.raises(StopIteration):
         next(it)
+
+
+@pytest.mark.parametrize(
+    ("input_index", "expected_output"),
+    [
+        (1, [[0, 0]]),
+        (2, [[0, 0], [1, 1], [1, 0]]),
+        (3, [[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]]),
+    ],
+)
+def test_spectra_indices(
+    xp: ModuleType,
+    input_index: int,
+    expected_output: list[int],
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.spectra_indices."""
+    np.testing.assert_array_equal(
+        benchmark(glass.fields.spectra_indices, input_index),
+        xp.asarray(expected_output),
+    )
+
+
+def test_spectra_indices_input_of_zero(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.spectra_indices with input of zero."""
+    np.testing.assert_array_equal(
+        benchmark(glass.fields.spectra_indices, 0), xp.zeros((0, 2))
+    )
