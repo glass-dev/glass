@@ -84,13 +84,17 @@ jobs:
           COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
           FORCE_COLOR: 1
 
-      - name: Generate XML report for both sets of tests
+      - name: Generate XML report for benchmark tests
         run: >-
           coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.BENCH_COV_NAME }}-${{
-          matrix.python-version }}.xml; coverage xml --data-file ${{
-          env.CORE_COV_NAME }}-${{ matrix.python-version }} -o ${{
-          env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml;
+          matrix.python-version }}.xml
+
+      - name: Generate XML report for core tests
+        run: >-
+          coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
+          matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
+          matrix.python-version }}.xml;
 
       - name: Upload benchmark coverage to Coveralls
         uses: coverallsapp/github-action@v2
