@@ -8,12 +8,12 @@ import pytest
 import glass.fields
 
 if TYPE_CHECKING:
-    import types
+    from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
-def test_iternorm_no_size(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None:
+def test_iternorm_no_size(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     """Benchmarks for glass.iternorm with default value for size."""
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
@@ -80,7 +80,7 @@ def test_iternorm_no_size(xp: types.ModuleType, benchmark: BenchmarkFixture) -> 
     ],
 )
 def test_iternorm_specify_size(  # noqa: PLR0913
-    xp: types.ModuleType,
+    xp: ModuleType,
     k: int,
     size: int,
     array_in: list[int],
@@ -114,7 +114,7 @@ def test_iternorm_specify_size(  # noqa: PLR0913
     assert s.shape == expected_result[2]
 
 
-def test_iternorm_k_0(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None:
+def test_iternorm_k_0(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     """Benchmarks for glass.iternorm with k set to 0."""
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
@@ -130,7 +130,7 @@ def test_iternorm_k_0(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None
     np.testing.assert_allclose(xp.asarray(s), 1.0)
 
 
-def test_cls2cov(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None:
+def test_cls2cov(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     """Benchmarks for glass.cls2cov."""
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
@@ -158,7 +158,7 @@ def test_cls2cov(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None:
 
 
 def test_cls2cov_multiple_iterations(
-    xp: types.ModuleType, benchmark: BenchmarkFixture
+    xp: ModuleType, benchmark: BenchmarkFixture
 ) -> None:
     """Benchmarks for glass.cls2cov with inputs causing multiple iterations."""
     # Call jax version of iternorm once jax version is written
@@ -233,7 +233,7 @@ def test_cls2cov_multiple_iterations(
     ],
 )
 def test_multalm(
-    xp: types.ModuleType,
+    xp: ModuleType,
     alm_in: list[float],
     bl_in: list[float],
     inplace: bool,  # noqa: FBT001
@@ -263,3 +263,55 @@ def test_multalm(
             alm_copy,
             result,
         )
+
+
+@pytest.mark.parametrize(
+    ("arr_in", "expected_lengths"),
+    [
+        (
+            [],
+            [0],
+        ),
+        (
+            [(1, 5, 5)],
+            [1, 5],
+        ),
+        (
+            [
+                (1, 6, 5),
+                (1, 5, 4),
+                (1, 4, 3),
+            ],
+            [3, 5, 4, 3],
+        ),
+    ],
+)
+def test_lognormal_gls(
+    xp: ModuleType,
+    arr_in: list[tuple[int, int, int]],
+    expected_lengths: list[int],
+    benchmark: BenchmarkFixture,
+) -> None:
+    """
+    Benchmarks for glass.fields._multalm.
+
+    Parameters
+    ----------
+    arr_in
+        A list of input parameter sets to be mapped to a list of
+        xp.linspace(<param-set>)
+    expected_lengths
+        A list of the expected lengths of the output of lognormal_gls. Should follow
+        the structure [len(output), len(output[0]), len(output[1]), ...]
+    """
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ in {"jax.numpy", "array_api_strict"}:
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    shift = 2
+
+    arr = [xp.linspace(*x) for x in arr_in]
+
+    out = benchmark(glass.fields.lognormal_gls, arr, shift)
+    assert len(out) == expected_lengths[0]
+    for i in range(len(expected_lengths) - 1):
+        assert len(out[i]) == expected_lengths[i + 1]
