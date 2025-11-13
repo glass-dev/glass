@@ -1,7 +1,7 @@
 """Nox config."""
 
 import os
-from pathlib import Path
+import pathlib
 
 import nox
 
@@ -21,7 +21,7 @@ ALL_PYTHON = [
     "3.14",
 ]
 ARRAY_BACKENDS = {
-    "array_api_strict": "array_api_strict>=2",
+    "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
 
@@ -36,7 +36,14 @@ def lint(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
-    session.install("-c", ".github/test-constraints.txt", "-e", ".", "--group", "test")
+    session.install(
+        "-c",
+        ".github/test-constraints.txt",
+        "-e",
+        ".",
+        "--group",
+        "test",
+    )
 
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
@@ -98,7 +105,7 @@ def examples(session: nox.Session) -> None:
             "jupyter",
             "execute",
             "--inplace",
-            *Path().glob("examples/**/*.ipynb"),
+            *pathlib.Path().glob("examples/**/*.ipynb"),
             *session.posargs,
         )
 
@@ -117,10 +124,10 @@ def docs(session: nox.Session) -> None:
         "--fail-on-warning",
     )
 
-    port = 8001
-
     if session.posargs:
         if "serve" in session.posargs:
+            port = 8001
+
             print(f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit")
             session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
