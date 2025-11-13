@@ -4,6 +4,7 @@ name: Regression tests
 on:
   pull_request:
     paths:
+      - .github/workflows/regression-test.yml
       - pyproject.toml
       - glass/**
     branches:
