@@ -2,6 +2,7 @@
 
 import os
 import pathlib
+import shutil
 
 import nox
 
@@ -23,7 +24,6 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
-BASELINE_BENCHMARK = "baseline"
 BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 
@@ -230,19 +230,21 @@ def regression_tests(session: nox.Session) -> None:
     # essentially required just for the dependencies
     session.install("-e", ".", "--group", "test")
 
+    # make sure benchmark directory is clean
+    benchmark_dir = pathlib.Path(".benchmarks")
+    if benchmark_dir.exists():
+        session.log(f"Deleting previous benchmark directory: {benchmark_dir}")
+        shutil.rmtree(benchmark_dir)
+
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
-    session.run(
-        "pytest",
-        BENCH_TESTS_LOC,
-        f"--benchmark-save={BASELINE_BENCHMARK}",
-    )
+    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
-        f"--benchmark-compare={BASELINE_BENCHMARK}",
+        "--benchmark-compare=0001",
         "--benchmark-compare-fail=min:5%",
     )
