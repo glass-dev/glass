@@ -254,8 +254,7 @@ To ensure that _GLASS_ remains performant over time, a set of benchmarks are
 provided in the [benchmarks](./tests/benchmarks/) folder. These benchmarks can
 be run through nox.
 
-A single benchmark can be run by specifying the revision to benchmark against
-the current state of the repository.
+A single benchmark can be run by specifying the revision to benchmark.
 
 ```sh
 nox -s benchmark -- <revision-to-benchmark>
