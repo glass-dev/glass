@@ -201,3 +201,65 @@ def test_cls2cov_multiple_iterations(
 
     np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov1, cov2)
     np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
+
+
+@pytest.mark.parametrize(
+    ("alm_in", "bl_in", "inplace", "expected_result"),
+    [
+        (
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            [2.0, 0.5, 1.0],
+            True,
+            [2.0, 1.0, 1.5, 4.0, 5.0, 6.0],
+        ),
+        (
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            [1.0, 1.0, 1.0],
+            False,
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        ),
+        (
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            [0.0, 1.0, 0.0],
+            False,
+            [0.0, 2.0, 3.0, 0.0, 0.0, 0.0],
+        ),
+        (
+            [],
+            [],
+            False,
+            [],
+        ),
+    ],
+)
+def test_multalm(
+    xp: types.ModuleType,
+    alm_in: list[float],
+    bl_in: list[float],
+    inplace: bool,  # noqa: FBT001
+    expected_result: list[float],
+) -> None:
+    """Benchmarks for glass.fields._multalm."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in multalm are not immutable, so do not support jax")
+
+    # check output values and shapes
+
+    alm = xp.asarray(alm_in)
+    bl = xp.asarray(bl_in)
+    alm_copy = xp.asarray(alm, copy=True)
+
+    result = glass.fields._multalm(alm, bl, inplace=inplace)
+
+    np.testing.assert_allclose(result, xp.asarray(expected_result))
+
+    # If inplace alm is updated but the copy is not
+    if inplace:
+        np.testing.assert_allclose(result, alm)
+        np.testing.assert_raises(
+            AssertionError,
+            np.testing.assert_allclose,
+            alm_copy,
+            result,
+        )
