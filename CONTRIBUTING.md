@@ -260,7 +260,7 @@ A single benchmark can be run by specifying the revision to benchmark.
 nox -s benchmark -- <revision-to-benchmark>
 ```
 
-The benchmarks can be used to run a regression test of `glass`. These can
+The benchmarks can be used to run a regression test of `glass`. These
 regression tests can be used to compare the performance of two different
 revisions of `glass`.
 
