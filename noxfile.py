@@ -100,7 +100,7 @@ def coverage(session: nox.Session) -> None:
 @nox.session(python=ALL_PYTHON)
 def coverage_benchmarks(session: nox.Session) -> None:
     """Run tests and compute coverage for the benchmark tests."""
-    session.posargs.extend([str(TESTS_BENCH_LOC), "--cov"])
+    session.posargs.extend([BENCH_TESTS_LOC, "--cov"])
     tests(session)
 
 
@@ -213,7 +213,8 @@ def benchmarks(session: nox.Session) -> None:
 
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
-    session.run("pytest", TESTS_BENCH_LOC, "--benchmark-autosave")
+    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
+
 
 @nox.session(python=ALL_PYTHON)
 def regression_tests(session: nox.Session) -> None:
@@ -230,13 +231,13 @@ def regression_tests(session: nox.Session) -> None:
 
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
-    session.run("pytest", TESTS_BENCH_LOC, "--benchmark-autosave")
+    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",
-        TESTS_BENCH_LOC,
+        BENCH_TESTS_LOC,
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=min:5%",
     )
