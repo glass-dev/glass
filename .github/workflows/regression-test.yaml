@@ -9,6 +9,7 @@ on:
       - glass/**
       - noxfile.py
       - tests/benchmarks/**
+      - tests/conftest.py
     branches:
       - main
     types:
