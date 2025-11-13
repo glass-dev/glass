@@ -235,7 +235,7 @@ def regression_tests(session: nox.Session) -> None:
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
-        f"--benchmark-autosave={BASELINE_BENCHMARK}",
+        f"--benchmark-save={BASELINE_BENCHMARK}",
     )
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
