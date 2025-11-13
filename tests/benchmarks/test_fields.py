@@ -565,3 +565,30 @@ def test_getcl_lmax_50(
     expected = xp.zeros((49,), dtype=xp.float64)
     assert result.size == 51
     np.testing.assert_allclose(result[2:], expected)
+
+
+def test_enumerate_spectra(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
+    """Benchmark for glass.fields.enumerate_spectra."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip(
+            "glass.fields.enumerate_spectra has not been ported to the array-api"
+        )
+    n = 100
+    tn = n * (n + 1) // 2
+
+    # create mock spectra with 1 element counting to tn
+    spectra = xp.reshape(xp.arange(tn), (tn, 1))
+
+    # this is the expected order of indices
+    indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
+
+    # iterator that will enumerate the spectra for checking
+    it = benchmark(glass.fields.enumerate_spectra, spectra)
+
+    # go through expected indices and values and compare
+    for k, (i, j) in enumerate(indices):
+        assert next(it) == (i, j, k)
+
+    # make sure iterator is exhausted
+    with pytest.raises(StopIteration):
+        next(it)
