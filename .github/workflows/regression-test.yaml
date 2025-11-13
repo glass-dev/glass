@@ -3,6 +3,9 @@ name: Regression tests
 
 on:
   pull_request:
+    paths:
+      - pyproject.toml
+      - glass/**
     branches:
       - main
     types:
