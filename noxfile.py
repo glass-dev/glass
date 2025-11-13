@@ -23,8 +23,9 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
-BENCHMARK_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
+TESTS_BENCH_LOC = pathlib.Path("tests/benchmarks")
+TESTS_CORE_LOC = pathlib.Path("tests/core")
 
 
 def _check_revision_count(
@@ -68,7 +69,7 @@ def lint(session: nox.Session) -> None:
 
 
 @nox.session(python=ALL_PYTHON)
-def tests(session: nox.Session) -> None:
+def tests(session: nox.Session, test_path: os.PathLike) -> None:
     """Run the unit tests."""
     session.install(
         "-c",
@@ -87,41 +88,21 @@ def tests(session: nox.Session) -> None:
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
 
-    session.run("pytest", *session.posargs)
+    session.run("pytest", test_path, *session.posargs, env=os.environ)
 
 
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
-    session.install(
-        "-c",
-        ".github/test-constraints.txt",
-        "-e",
-        ".",
-        "--group",
-        "coverage",
-    )
-
     session.posargs.append("--cov")
-    session.run("pytest", *session.posargs, env=os.environ)
+    tests(session, TESTS_CORE_LOC)
 
 
 @nox.session(python=ALL_PYTHON)
 def coverage_benchmarks(session: nox.Session) -> None:
     """Run tests and compute coverage for the benchmark tests."""
-    session.install(
-        "-c",
-        ".github/test-constraints.txt",
-        "-e",
-        ".",
-        "--group",
-        "benchmark",
-        "--group",
-        "coverage",
-    )
-
     session.posargs.append("--cov")
-    session.run("pytest", BENCHMARK_LOC, *session.posargs, env=os.environ)
+    tests(session, TESTS_BENCH_LOC)
 
 
 @nox.session(python=ALL_PYTHON)
@@ -136,9 +117,13 @@ def doctests(session: nox.Session) -> None:
         "doctest",
     )
 
-    session.posargs.append("--doctest-plus")
-    session.posargs.append("--doctest-plus-generate-diff=overwrite")
-    session.posargs.append("glass")
+    session.posargs.extend(
+        [
+            "--doctest-plus",
+            "--doctest-plus-generate-diff=overwrite",
+            "glass",
+        ]
+    )
     session.run("pytest", *session.posargs)
 
 
@@ -225,12 +210,11 @@ def benchmarks(session: nox.Session) -> None:
     revision = session.posargs[0]
 
     # essentially required just for the dependencies
-    session.install("-e", ".", "--group", "benchmark")
+    session.install("-e", ".", "--group", "test")
 
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
-    session.run("pytest", BENCHMARK_LOC, "--benchmark-autosave")
-
+    session.run("pytest", TESTS_BENCH_LOC, "--benchmark-autosave")
 
 @nox.session(python=ALL_PYTHON)
 def regression_tests(session: nox.Session) -> None:
@@ -243,17 +227,17 @@ def regression_tests(session: nox.Session) -> None:
     before_revision, after_revision = session.posargs
 
     # essentially required just for the dependencies
-    session.install("-e", ".", "--group", "benchmark")
+    session.install("-e", ".", "--group", "test")
 
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
-    session.run("pytest", BENCHMARK_LOC, "--benchmark-autosave")
+    session.run("pytest", TESTS_BENCH_LOC, "--benchmark-autosave")
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",
-        BENCHMARK_LOC,
+        TESTS_BENCH_LOC,
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=min:5%",
     )

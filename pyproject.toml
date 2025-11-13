@@ -6,24 +6,11 @@ requires = [
 ]
 
 [dependency-groups]
-array-api = [
-    "array-api-strict",
-    "jax",
-]
-benchmark = [
-    "pytest-benchmark",
-    {include-group = "array-api"},
-    {include-group = "test"},
-]
-coverage = [
-    "pytest-cov",
-    {include-group = "array-api"},
-    {include-group = "test"},
-]
 docs = [
     "cosmology.api",
     "furo",
     "ipython",
+    "jax",
     "jaxtyping",
     "matplotlib",
     "myst-parser",
@@ -32,7 +19,6 @@ docs = [
     "sphinx-toolbox",
     "sphinx<8.2.0",
     "sphinxcontrib-katex",
-    {include-group = "array-api"},
 ]
 doctest = [
     "jax",
@@ -42,6 +28,8 @@ test = [
     "cosmology.api",
     "fitsio",
     "pytest",
+    "pytest-benchmark",
+    "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
     "pytest-rerunfailures",
