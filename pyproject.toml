@@ -29,6 +29,7 @@ test = [
     "cosmology.api",
     "fitsio",
     "pytest",
+    "pytest-benchmark",
     "pytest-cov",
     "pytest-doctestplus",
     "pytest-mock",
@@ -208,6 +209,11 @@ lint.per-file-ignores = {"__init__.py" = [
     "SLF001", # private-member-access
 ], "noxfile.py" = [
     "T201", # print
+], "tests/benchmarks/*" = [
+    "D100", # undocumented-public-module
+    "INP001", # implicit-namespace-package
+    "PLR2004", # magic-value-comparison
+    "S101", # assert
 ], "tests/conftest.py" = [
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function

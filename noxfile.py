@@ -2,6 +2,7 @@
 
 import os
 import pathlib
+import shutil
 
 import nox
 
@@ -23,6 +24,41 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
+BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
+GLASS_REPO_URL = "https://github.com/glass-dev/glass"
+
+
+def _check_revision_count(
+    session_posargs: list[str],
+    *,
+    expected_count: int,
+) -> None:
+    """Check that the correct number of revisions have been provided.
+
+    Parameters
+    ----------
+    session_posargs
+        The positional arguments passed to the session.
+    expected_count
+        The expected number of revisions.
+
+    Raises
+    ------
+    ValueError
+        If no revisions are provided.
+    ValueError
+        If the number of provided revisions does not match the expected count.
+    """
+    if not session_posargs:
+        msg = f"{expected_count} revision(s) not provided"
+        raise ValueError(msg)
+
+    if len(session_posargs) != expected_count:
+        msg = (
+            f"Incorrect number of revisions provided ({len(session_posargs)}), "
+            f"expected {expected_count}"
+        )
+        raise ValueError(msg)
 
 
 @nox.session
@@ -52,13 +88,20 @@ def tests(session: nox.Session) -> None:
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
 
-    session.run("pytest", *session.posargs)
+    session.run("pytest", *session.posargs, env=os.environ)
 
 
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
-    """Run tests and compute coverage."""
+    """Run tests and compute coverage for the core tests."""
     session.posargs.append("--cov")
+    tests(session)
+
+
+@nox.session(python=ALL_PYTHON)
+def coverage_benchmarks(session: nox.Session) -> None:
+    """Run tests and compute coverage for the benchmark tests."""
+    session.posargs.extend([BENCH_TESTS_LOC, "--cov"])
     tests(session)
 
 
@@ -74,10 +117,13 @@ def doctests(session: nox.Session) -> None:
         "doctest",
     )
 
-    session.posargs.append("--doctest-plus")
-    session.posargs.append("--doctest-plus-generate-diff=overwrite")
-    session.posargs.append("glass")
-
+    session.posargs.extend(
+        [
+            "--doctest-plus",
+            "--doctest-plus-generate-diff=overwrite",
+            "glass",
+        ]
+    )
     session.run("pytest", *session.posargs)
 
 
@@ -151,3 +197,54 @@ def version(session: nox.Session) -> None:
     """
     session.install("-e", ".")
     session.run("python", "-c", "import glass; print(glass.__version__)")
+
+
+@nox.session(python=ALL_PYTHON)
+def benchmarks(session: nox.Session) -> None:
+    """
+    Run the benchmark test for a specific revision.
+
+    Note it is not possible to pass extra options to pytest.
+    """
+    _check_revision_count(session.posargs, expected_count=1)
+    revision = session.posargs[0]
+
+    # essentially required just for the dependencies
+    session.install("-e", ".", "--group", "test")
+
+    # overwrite current package with specified revision
+    session.install(f"git+{GLASS_REPO_URL}@{revision}")
+    session.run("pytest", BENCH_TESTS_LOC)
+
+
+@nox.session(python=ALL_PYTHON)
+def regression_tests(session: nox.Session) -> None:
+    """
+    Run regression benchmark tests between two revisions.
+
+    Note it is not possible to pass extra options to pytest.
+    """
+    _check_revision_count(session.posargs, expected_count=2)
+    before_revision, after_revision = session.posargs
+
+    # essentially required just for the dependencies
+    session.install("-e", ".", "--group", "test")
+
+    # make sure benchmark directory is clean
+    benchmark_dir = pathlib.Path(".benchmarks")
+    if benchmark_dir.exists():
+        session.log(f"Deleting previous benchmark directory: {benchmark_dir}")
+        shutil.rmtree(benchmark_dir)
+
+    print(f"Generating prior benchmark from revision {before_revision}")
+    session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
+    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
+
+    print(f"Comparing {before_revision} benchmark to revision {after_revision}")
+    session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        "--benchmark-compare=0001",
+        "--benchmark-compare-fail=min:5%",
+    )
