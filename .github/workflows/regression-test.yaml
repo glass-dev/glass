@@ -18,3 +18,37 @@ jobs:
     with:
       starting_revision: ${{ github.event.pull_request.base.ref }}
       end_revision: ${{ github.event.pull_request.head.ref }}
+
+  write-pr-comment:
+    name: Regression test
+    runs-on: ubuntu-latest
+    needs: regression-tests
+    if: ${{ failure() }}
+    env:
+      REGRESSION_TEST_OUTPUT_FILE: output.txt
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v6
+        with:
+          name: regression_output
+          path: $REGRESSION_TEST_OUTPUT_FILE
+
+      - name: Extract regression information for PR comment
+        id: extract_comment
+        run: >-
+          f=$REGRESSION_TEST_OUTPUT_FILE
+
+          start=$(grep -n -m1 'Performance has regressed:' "$f" | cut -d: -f1)
+            || { echo "No match"; exit 1; }
+          s_dash=$(awk -v n=$start 'NR<=n && /^-+$/ {l=NR} END{print l}' "$f")
+          e_dash=$(awk -v n=$start 'NR>=n && /^-+$/ {print NR; exit}' "$f")
+          PR_COMMENT_MSG=$(sed -n "${s_dash},${e_dash}p" "$f")
+
+          echo "PR_COMMENT_MSG=$PR_COMMENT_MSG" >> $GITHUB_OUTPUT
+
+      - name: Write PR comment
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: >-
+            ${{ steps.extract_comment.outputs.PR_COMMENT_MSG }}
