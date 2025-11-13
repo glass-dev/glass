@@ -213,7 +213,7 @@ def benchmarks(session: nox.Session) -> None:
 
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
-    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
+    session.run("pytest", BENCH_TESTS_LOC)
 
 
 @nox.session(python=ALL_PYTHON)
