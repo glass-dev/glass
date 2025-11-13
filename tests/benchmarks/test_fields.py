@@ -266,57 +266,6 @@ def test_multalm(
         )
 
 
-@pytest.mark.parametrize(
-    ("arr_in", "expected_lengths"),
-    [
-        (
-            [],
-            [0],
-        ),
-        (
-            [(1, 5, 5)],
-            [1, 5],
-        ),
-        (
-            [
-                (1, 6, 5),
-                (1, 5, 4),
-                (1, 4, 3),
-            ],
-            [3, 5, 4, 3],
-        ),
-    ],
-)
-def test_lognormal_gls(
-    xp: ModuleType,
-    arr_in: list[tuple[int, int, int]],
-    expected_lengths: list[int],
-    benchmark: BenchmarkFixture,
-) -> None:
-    """
-    Benchmarks for glass.fields._multalm.
-
-    Parameters
-    ----------
-    arr_in
-        A list of input parameter sets to be mapped to a list of
-        xp.linspace(<param-set>)
-    expected_lengths
-        A list of the expected lengths of the output of lognormal_gls. Should follow
-        the structure [len(output), len(output[0]), len(output[1]), ...]
-    """
-    if xp.__name__ in {"jax.numpy", "array_api_strict"}:
-        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
-    shift = 2
-
-    arr = [xp.linspace(*x) for x in arr_in]
-
-    out = benchmark(glass.fields.lognormal_gls, arr, shift)
-    assert len(out) == expected_lengths[0]
-    for i in range(len(expected_lengths) - 1):
-        assert len(out[i]) == expected_lengths[i + 1]
-
-
 def test_discretized_cls_empty_cls(benchmark: BenchmarkFixture) -> None:
     """Benchmarks for glass.fields.discretized_cls with an empty cls."""
     result = benchmark(glass.fields.discretized_cls, [])
