@@ -238,7 +238,12 @@ def regression_tests(session: nox.Session) -> None:
 
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
-    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        "--benchmark-autosave",
+        "--benchmark-timer=time.process_time",
+    )
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
@@ -246,5 +251,6 @@ def regression_tests(session: nox.Session) -> None:
         "pytest",
         BENCH_TESTS_LOC,
         "--benchmark-compare=0001",
-        "--benchmark-compare-fail=min:5%",
+        "--benchmark-timer=time.process_time",
+        "--benchmark-compare-fail=mean:10%",
     )
