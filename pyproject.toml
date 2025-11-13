@@ -187,17 +187,17 @@ lint.isort = {known-first-party = [
 ]}}
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
-], "docs*" = [
+], "docs/*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package,
-], "examples*" = [
+], "examples/*" = [
     "ANN001", # missing-type-function-argument
     "ANN002", # missing-type-args
     "ANN201", # missing-return-type-undocumented-public-function
     "D103", # undocumented-public-function
     "PLR2004", # magic-value-comparison
     "T201", # print
-], "glass*" = [
+], "glass/*" = [
     "D205", # missing-blank-line-after-summary
     "D401", # non-imperative-mood
     "EM101", # raw-string-in-exception
@@ -208,13 +208,16 @@ lint.per-file-ignores = {"__init__.py" = [
     "SLF001", # private-member-access
 ], "noxfile.py" = [
     "T201", # print
-], "tests*" = [
+], "tests/conftest.py" = [
+    "D100", # undocumented-public-module
+    "D103", # TODO: undocumented-public-function
+    "INP001", # implicit-namespace-package
+    "PLC0415", # import-outside-top-level
+], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
-    "ANN201", # missing-return-type-undocumented-public-function
     "ANN202", # missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
-    "D104", # undocumented-public-package
     "INP001", # implicit-namespace-package
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
