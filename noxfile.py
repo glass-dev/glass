@@ -23,9 +23,8 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
+BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
-TESTS_BENCH_LOC = pathlib.Path("tests/benchmarks")
-TESTS_CORE_LOC = pathlib.Path("tests/core")
 
 
 def _check_revision_count(
@@ -69,7 +68,7 @@ def lint(session: nox.Session) -> None:
 
 
 @nox.session(python=ALL_PYTHON)
-def tests(session: nox.Session, test_path: os.PathLike) -> None:
+def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     session.install(
         "-c",
@@ -88,21 +87,21 @@ def tests(session: nox.Session, test_path: os.PathLike) -> None:
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
 
-    session.run("pytest", test_path, *session.posargs, env=os.environ)
+    session.run("pytest", *session.posargs, env=os.environ)
 
 
 @nox.session(python=ALL_PYTHON)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
     session.posargs.append("--cov")
-    tests(session, TESTS_CORE_LOC)
+    tests(session)
 
 
 @nox.session(python=ALL_PYTHON)
 def coverage_benchmarks(session: nox.Session) -> None:
     """Run tests and compute coverage for the benchmark tests."""
-    session.posargs.append("--cov")
-    tests(session, TESTS_BENCH_LOC)
+    session.posargs.extend([str(TESTS_BENCH_LOC), "--cov"])
+    tests(session)
 
 
 @nox.session(python=ALL_PYTHON)
