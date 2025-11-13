@@ -268,13 +268,6 @@ tests can be used to compare the performance of two different revisions of
 nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
-If an initial state revision is not specified, the current state of `main` is
-used.
-
-```sh
-nox -s regression-tests -- <revision-to-compare>
-```
-
 ## Contributing workflow
 
 Every change to the repository should come out of an issue where the change is
