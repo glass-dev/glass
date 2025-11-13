@@ -4,9 +4,11 @@ name: Regression tests
 on:
   pull_request:
     paths:
-      - .github/workflows/regression-test.yml
+      - .github/workflows/regression-test.yaml
       - pyproject.toml
       - glass/**
+      - noxfile.py
+      - tests/benchmarks/**
     branches:
       - main
     types:
