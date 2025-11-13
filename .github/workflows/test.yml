@@ -17,6 +17,10 @@ concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
+env:
+  BENCH_COV_NAME: cov-bench
+  CORE_COV_NAME: cov-core
+
 jobs:
   tests:
     if: github.event.pull_request.draft == false
@@ -66,48 +70,41 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run core tests and save coverage data
-        run: nox -s coverage-${{ matrix.python-version }} --verbose
-        env:
-          FORCE_COLOR: 1
-          # Use a unique file to store core coverage data
-          COVERAGE_FILE: .coverage.core.${{ matrix.python-version }}
-
-      - name: Generate XML report for core tests
-        # Explicitly use the core data file to generate the XML report
-        run: coverage xml -o coverage.core.${{ matrix.python-version }}.xml --data-file .coverage.core.${{ matrix.python-version }}
-
-      - name: Upload core coverage to Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          # Use a unique flag for core tests
-          flag-name: core-py${{ matrix.python-version }}
-          parallel: true
-          path-to-lcov: coverage.core.${{ matrix.python-version }}.xml
-          base-path: glass/
-
-      # --- Start Benchmark Coverage Steps ---
-      - name: Run benchmark tests and save coverage data
-        # Note: You need to ensure your noxfile has a 'coverage_benchmarks' session,
-        # otherwise this will fail. Assuming it's named 'coverage_benchmarks'.
+      - name: Run benchmark tests and generate coverage report
         run: nox -s coverage_benchmarks-${{ matrix.python-version }} --verbose
         env:
+          COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
           FORCE_COLOR: 1
-          # Use a unique file for benchmark coverage data (different from core)
-          COVERAGE_FILE: .coverage.bench.${{ matrix.python-version }}
 
-      - name: Generate XML report for benchmark tests
-        # Explicitly use the benchmark data file to generate the XML report
-        run: coverage xml -o coverage.bench.${{ matrix.python-version }}.xml --data-file .coverage.bench.${{ matrix.python-version }}
+      - name: Run core tests and generate coverage report
+        run: nox -s coverage-${{ matrix.python-version }} --verbose
+        env:
+          COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
+          FORCE_COLOR: 1
+
+      - name: Generate XML report for both sets of tests
+        run: >-
+          coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
+          matrix.python-version }} -o ${{ env.BENCH_COV_NAME }}-${{
+          matrix.python-version }}.xml; coverage xml --data-file ${{
+          env.CORE_COV_NAME }}-${{ matrix.python-version }} -o ${{
+          env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml;
 
       - name: Upload benchmark coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          # Use a unique flag for benchmark tests
-          flag-name: bench-py${{ matrix.python-version }}
-          parallel: true
-          path-to-lcov: coverage.bench.${{ matrix.python-version }}.xml
           base-path: glass/
+          file: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}.xml
+          flag-name: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
+          parallel: true
+
+      - name: Upload core coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          base-path: glass/
+          file: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml
+          flag-name: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
+          parallel: true
 
   aggregate-tests:
     needs: tests
@@ -117,7 +114,11 @@ jobs:
       - name: Coveralls finished
         uses: coverallsapp/github-action@v2
         with:
-          carryforward: core-py3.10,core-py3.11,core-py3.12,core-py3.13,bench-py3.10,bench-py3.11,bench-py3.12,bench-py3.13
+          carryforward:
+            ${{ env.BENCH_COV_NAME }}-3.10,${{ env.BENCH_COV_NAME }}-3.11,${{
+            env.BENCH_COV_NAME }}-3.12,${{ env.BENCH_COV_NAME }}-3.13,${{
+            env.CORE_COV_NAME }}-3.10,${{ env.CORE_COV_NAME }}-3.11,${{
+            env.CORE_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.13
           parallel-finished: true
 
   build:
