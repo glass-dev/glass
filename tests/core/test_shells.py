@@ -275,18 +275,30 @@ def test_redshift_grid_default_xp() -> None:
     # check num input
 
     num = 5
-    z = glass.redshift_grid(zmin, zmax, num=5)
+    with pytest.warns(
+        UserWarning,
+        match="No array library has been provided",
+    ):
+        z = glass.redshift_grid(zmin, zmax, num=5)
     assert z.size == num + 1
 
     # check dz input
 
     dz = 0.2
-    z = glass.redshift_grid(zmin, zmax, dz=dz)
+    with pytest.warns(
+        UserWarning,
+        match="No array library has been provided",
+    ):
+        z = glass.redshift_grid(zmin, zmax, dz=dz)
     assert z.size == math.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 
-    z = glass.redshift_grid(zmin, zmax, dz=0.3)
+    with pytest.warns(
+        UserWarning,
+        match="No array library has been provided",
+    ):
+        z = glass.redshift_grid(zmin, zmax, dz=0.3)
     assert zmax < z[-1]
 
 
