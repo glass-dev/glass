@@ -78,6 +78,11 @@ def import_numpy(backend: str | None = None) -> ModuleType:
         return numpy
 
 
+def default_xp() -> ModuleType:
+    """Returns the library backend we default to if none is specified by the user."""
+    return import_numpy()
+
+
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.

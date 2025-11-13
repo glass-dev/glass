@@ -841,7 +841,7 @@ def _uniform_grid(
     num
         The number of samples.
     xp
-        The array library backend to use for array operations. Defaults to numpy.
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -853,7 +853,7 @@ def _uniform_grid(
         If both ``step`` and ``num`` are given.
 
     """
-    xp = _utils.import_numpy() if xp is None else xp
+    xp = _utils.default_xp() if xp is None else xp
 
     if step is not None and num is None:
         return xp.arange(start, stop + step, step)

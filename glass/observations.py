@@ -245,7 +245,7 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
-    xp = _utils.import_numpy() if xp is None else xp
+    xp = _utils.default_xp() if xp is None else xp
 
     if nbins is not None and dz is None:
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
