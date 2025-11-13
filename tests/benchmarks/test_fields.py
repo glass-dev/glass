@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpy as hp
 import numpy as np
 import pytest
 
@@ -304,7 +305,6 @@ def test_lognormal_gls(
         A list of the expected lengths of the output of lognormal_gls. Should follow
         the structure [len(output), len(output[0]), len(output[1]), ...]
     """
-    # Call jax version of iternorm once jax version is written
     if xp.__name__ in {"jax.numpy", "array_api_strict"}:
         pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
     shift = 2
@@ -315,3 +315,56 @@ def test_lognormal_gls(
     assert len(out) == expected_lengths[0]
     for i in range(len(expected_lengths) - 1):
         assert len(out[i]) == expected_lengths[i + 1]
+
+
+def test_discretized_cls_empty_cls(benchmark: BenchmarkFixture) -> None:
+    """Benchmarks for glass.fields.discretized_cls with an empty cls."""
+    result = benchmark(glass.fields.discretized_cls, [])
+    assert result == []
+
+
+def test_discretized_cls_lmax_provided(xp: ModuleType) -> None:
+    """Benchmarks for glass.fields.discretized_cls with lmax provided."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    # power spectra truncated at lmax + 1 if lmax provided
+    cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
+    result = glass.fields.discretized_cls(cls, lmax=5)
+
+    for cl in result:
+        assert len(cl) == 6
+
+
+def test_discretized_cls_ncorr_provided(
+    xp: ModuleType, benchmark: BenchmarkFixture
+) -> None:
+    """Benchmarks for glass.fields.discretized_cls with ncorr provided."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
+    ncorr = 0
+    result = benchmark(glass.fields.discretized_cls, cls, ncorr=ncorr)
+
+    assert len(result[0]) == 10
+    assert len(result[1]) == 10
+    assert len(result[2]) == 0  # third correlation should be removed
+
+
+def test_discretized_cls_nside_provided(
+    xp: ModuleType, benchmark: BenchmarkFixture
+) -> None:
+    """Benchmarks for glass.fields.discretized_cls with nside provided."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    # check if pixel window function was applied correctly with nside not None
+    cls = [[], xp.ones(10), xp.ones(10)]
+    nside = 4
+
+    pw = hp.pixwin(nside, lmax=7)
+
+    result = benchmark(glass.fields.discretized_cls, cls, nside=nside)
+
+    for cl in result:
+        n = min(len(cl), len(pw))
+        expected = xp.ones(n) * pw[:n] ** 2
+        np.testing.assert_allclose(cl[:n], expected)
