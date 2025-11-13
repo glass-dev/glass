@@ -128,3 +128,76 @@ def test_iternorm_k_0(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None
     assert j is None
     assert a.shape == (0,)
     np.testing.assert_allclose(xp.asarray(s), 1.0)
+
+
+def test_cls2cov(xp: types.ModuleType, benchmark: BenchmarkFixture) -> None:
+    """Benchmarks for glass.cls2cov."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
+
+    # check output values and shape
+
+    nl, nf, nc = 3, 2, 2
+
+    generator = benchmark(
+        glass.fields.cls2cov,
+        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],
+        nl,
+        nf,
+        nc,
+    )
+    cov = next(generator)
+
+    assert cov.shape == (nl, nc + 1)
+    assert cov.dtype == xp.float64
+
+    np.testing.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    np.testing.assert_allclose(cov[:, 1], 0)
+    np.testing.assert_allclose(cov[:, 2], 0)
+
+
+def test_cls2cov_multiple_iterations(
+    xp: types.ModuleType, benchmark: BenchmarkFixture
+) -> None:
+    """Benchmarks for glass.cls2cov with inputs causing multiple iterations."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
+
+    # test multiple iterations
+
+    nl, nf, nc = 3, 3, 2
+
+    generator = benchmark(
+        glass.fields.cls2cov,
+        [
+            xp.asarray(arr)
+            for arr in [
+                [1.0, 0.5, 0.3],
+                [0.8, 0.4, 0.2],
+                [0.7, 0.6, 0.1],
+                [0.9, 0.5, 0.3],
+                [0.6, 0.3, 0.2],
+                [0.8, 0.7, 0.4],
+            ]
+        ],
+        nl,
+        nf,
+        nc,
+    )
+
+    cov1 = xp.asarray(next(generator), copy=True)
+    cov2 = xp.asarray(next(generator), copy=True)
+    cov3 = next(generator)
+
+    assert cov1.shape == (nl, nc + 1)
+    assert cov2.shape == (nl, nc + 1)
+    assert cov3.shape == (nl, nc + 1)
+
+    assert cov1.dtype == xp.float64
+    assert cov2.dtype == xp.float64
+    assert cov3.dtype == xp.float64
+
+    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov1, cov2)
+    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
