@@ -317,3 +317,72 @@ def test_discretized_cls_nside_provided(
         n = min(len(cl), len(pw))
         expected = xp.ones(n) * pw[:n] ** 2
         np.testing.assert_allclose(cl[:n], expected)
+
+
+@pytest.mark.parametrize(
+    ("cls_size", "weights1_in", "expected_shape"),
+    [
+        (
+            0,
+            [],
+            (0,),
+        ),
+        (
+            3,
+            [[1.0], [1.0]],
+            (1, 1, 15),
+        ),
+    ],
+)
+def test_effective_cls(
+    xp: ModuleType,
+    cls_size: int,
+    weights1_in: list[int],
+    expected_shape: tuple[int, ...],
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmark for glass.fields.effective_cls."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    # empty cls
+    cls = [xp.arange(15.0) for _ in range(cls_size)]
+    weights1 = xp.asarray(weights1_in)
+
+    result = benchmark(glass.fields.effective_cls, cls, weights1)
+    assert result.shape == expected_shape
+
+
+def test_effective_cls_provided_lmax(
+    xp: ModuleType, benchmark: BenchmarkFixture
+) -> None:
+    """Benchmark for glass.fields.effective_cls with lmax provided."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    # check truncation if lmax provided
+    cls = [xp.arange(15.0) for _ in range(3)]
+    weights1 = xp.ones((2, 1))
+
+    result = benchmark(glass.fields.effective_cls, cls, weights1, lmax=5)
+
+    assert result.shape == (1, 1, 6)
+    np.testing.assert_allclose(result[..., 6:], 0)
+
+
+def test_effective_cls_weights2_equal_weights1(
+    xp: ModuleType, benchmark: BenchmarkFixture
+) -> None:
+    """Benchmark for glass.fields.effective_cls with weight2 equal to weights1."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    # check with weights1 and weights2 and weights1 is weights2
+    cls = [xp.arange(15.0) for _ in range(3)]
+    weights1 = xp.ones((2, 1))
+
+    result = benchmark(glass.fields.effective_cls, cls, weights1, weights2=weights1)
+    assert result.shape == (1, 1, 15)
