@@ -70,14 +70,14 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run benchmark tests and generate coverage report
+      - name: Run benchmark tests with all backends and generate coverage report
         run: nox -s coverage_benchmarks-${{ matrix.python-version }} --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
           FORCE_COLOR: 1
 
-      - name: Run core tests and generate coverage report
+      - name: Run core tests with all backends and generate coverage report
         run: nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           ARRAY_BACKEND: all
