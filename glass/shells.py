@@ -885,7 +885,7 @@ def redshift_grid(
     num
         The number redshift samples.
     xp
-        The array library backend to use for array operations. Defaults to numpy.
+        The array library backend to use for array operations.
 
     Returns
     -------
