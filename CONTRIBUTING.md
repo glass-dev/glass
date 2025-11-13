@@ -250,7 +250,7 @@ saved under `.nox/` and reused by default.
 
 ### Benchmarking
 
-To ensure that _GLASS_ remains performant over time, a set of benchmarks is
+To ensure that _GLASS_ remains performant over time, a set of benchmarks are
 provided in the [benchmarks](./tests/benchmarks/) folder. These benchmarks can
 be run through nox.
 
