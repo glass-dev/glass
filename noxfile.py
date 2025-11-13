@@ -23,6 +23,7 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
+BASELINE_BENCHMARK = "baseline"
 BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 
@@ -231,13 +232,17 @@ def regression_tests(session: nox.Session) -> None:
 
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
-    session.run("pytest", BENCH_TESTS_LOC, "--benchmark-autosave")
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        f"--benchmark-autosave={BASELINE_BENCHMARK}",
+    )
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
-        "--benchmark-compare=0001",
+        f"--benchmark-compare={BASELINE_BENCHMARK}",
         "--benchmark-compare-fail=min:5%",
     )
