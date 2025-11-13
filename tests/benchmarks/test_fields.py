@@ -453,3 +453,47 @@ def test_generate_grf_with_ncorr_and_rng(
     )
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
+
+
+@pytest.mark.parametrize("ncorr", [None, 1])
+def test_generate_identity_field(
+    ncorr: int | None, benchmark: BenchmarkFixture
+) -> None:
+    """Benchmarks for glass.fields.generate with the identity as fields input."""
+    fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
+    gls = [np.ones(10), np.ones(10), np.ones(10)]
+    nside = 16
+
+    result = list(
+        benchmark(
+            glass.fields.generate,
+            fields,
+            gls,
+            nside=nside,
+            ncorr=ncorr,
+        )
+    )
+
+    assert len(result) == 2
+    for field in result:
+        assert field.shape == (hp.nside2npix(nside),)
+
+
+def test_generate_non_identity_field(benchmark: BenchmarkFixture) -> None:
+    """Benchmarks for glass.fields.generate with a non-identity as fields input."""
+    gls = [np.ones(10), np.ones(10), np.ones(10)]
+    nside = 16
+
+    fields = [lambda x, var: x, lambda x, var: x**2]  # noqa: ARG005
+
+    result = list(
+        benchmark(
+            glass.fields.generate,
+            fields,
+            gls,
+            nside=nside,
+        )
+    )
+
+    assert len(result) == 2
+    np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
