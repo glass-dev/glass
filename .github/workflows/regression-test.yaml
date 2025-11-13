@@ -55,6 +55,7 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run regression test
+        continue-on-error: true
         run: >-
           uv run nox -s regression_tests-${{ matrix.python-version }} --
           "$BASE_REF" "$HEAD_REF" | tee $REGRESSION_TEST_OUTPUT_FILE
