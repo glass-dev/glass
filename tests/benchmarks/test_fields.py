@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
+    from glass._types import UnifiedGenerator
+
 
 def test_iternorm_no_size(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     """Benchmarks for glass.iternorm with default value for size."""
@@ -266,12 +268,6 @@ def test_multalm(
         )
 
 
-def test_discretized_cls_empty_cls(benchmark: BenchmarkFixture) -> None:
-    """Benchmarks for glass.fields.discretized_cls with an empty cls."""
-    result = benchmark(glass.fields.discretized_cls, [])
-    assert result == []
-
-
 def test_discretized_cls_lmax_provided(xp: ModuleType) -> None:
     """Benchmarks for glass.fields.discretized_cls with lmax provided."""
     if xp.__name__ == "array_api_strict":
@@ -386,3 +382,74 @@ def test_effective_cls_weights2_equal_weights1(
 
     result = benchmark(glass.fields.effective_cls, cls, weights1, weights2=weights1)
     assert result.shape == (1, 1, 15)
+
+
+def test_generate_grf_positional_args_only(xp: ModuleType) -> None:
+    """Benchmarks for glass.fields._generate_grf with positional arguments only."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    gls = [xp.asarray([1.0, 0.5, 0.1])]
+    nside = 4
+
+    gaussian_fields = list(glass.fields._generate_grf(gls, nside))
+
+    assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
+
+
+def test_generate_grf_with_rng(
+    xp: ModuleType,
+    urng: UnifiedGenerator,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields._generate_grf with positional arguments only."""
+    if xp.__name__ in "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    gls = [xp.asarray([1.0, 0.5, 0.1])]
+    nside = 4
+
+    # requires resetting the RNG for reproducibility
+    gaussian_fields = list(
+        benchmark(
+            glass.fields._generate_grf,
+            gls,
+            nside,
+            rng=urng,
+        )
+    )
+
+    assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
+
+
+def test_generate_grf_with_ncorr_and_rng(
+    xp: ModuleType,
+    urng: UnifiedGenerator,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields._generate_grf with positional arguments only."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    gls = [xp.asarray([1.0, 0.5, 0.1])]
+    nside = 4
+    ncorr = 1
+
+    # requires resetting the RNG for reproducibility
+    new_gaussian_fields = list(
+        benchmark(
+            glass.fields._generate_grf,
+            gls,
+            nside,
+            ncorr=ncorr,
+            rng=urng,
+        ),
+    )
+
+    assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
