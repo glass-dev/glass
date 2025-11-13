@@ -17,6 +17,10 @@ concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
+env:
+  BENCH_COV_NAME: cov-bench
+  CORE_COV_NAME: cov-core
+
 jobs:
   tests:
     if: github.event.pull_request.draft == false
@@ -66,21 +70,47 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run tests with every array backend and generate coverage report
+      - name: Run benchmark tests with all backends and generate coverage report
+        run: nox -s coverage_benchmarks-${{ matrix.python-version }} --verbose
+        env:
+          ARRAY_BACKEND: all
+          COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
+          FORCE_COLOR: 1
+
+      - name: Run core tests with all backends and generate coverage report
         run: nox -s coverage-${{ matrix.python-version }} --verbose
         env:
-          FORCE_COLOR: 1
           ARRAY_BACKEND: all
+          COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
+          FORCE_COLOR: 1
 
-      - name: Coveralls requires XML report
-        run: coverage xml
+      - name: Generate XML report for benchmark tests
+        run: >-
+          coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
+          matrix.python-version }} -o ${{ env.BENCH_COV_NAME }}-${{
+          matrix.python-version }}.xml
 
-      - name: Run Coveralls in parallel
+      - name: Generate XML report for core tests
+        run: >-
+          coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
+          matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
+          matrix.python-version }}.xml;
+
+      - name: Upload benchmark coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          flag-name: run-${{ matrix.python-version }}
-          parallel: true
           base-path: glass/
+          file: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}.xml
+          flag-name: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
+          parallel: true
+
+      - name: Upload core coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          base-path: glass/
+          file: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml
+          flag-name: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
+          parallel: true
 
   aggregate-tests:
     needs: tests
@@ -90,7 +120,11 @@ jobs:
       - name: Coveralls finished
         uses: coverallsapp/github-action@v2
         with:
-          carryforward: run-3.10,run-3.11,run-3.12,run-3.13
+          carryforward:
+            ${{ env.BENCH_COV_NAME }}-3.10,${{ env.BENCH_COV_NAME }}-3.11,${{
+            env.BENCH_COV_NAME }}-3.12,${{ env.BENCH_COV_NAME }}-3.13,${{
+            env.CORE_COV_NAME }}-3.10,${{ env.CORE_COV_NAME }}-3.11,${{
+            env.CORE_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.13
           parallel-finished: true
 
   build:
