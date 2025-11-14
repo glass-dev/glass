@@ -9,9 +9,9 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
-    import types
+    from types import ModuleType
 
-    import pytest_mock
+    from pytest_mock import MockerFixture
 
 
 @pytest.fixture(scope="session")
@@ -19,7 +19,7 @@ def not_triangle_numbers() -> list[int]:
     return [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
 
-def test_iternorm(xp: types.ModuleType) -> None:
+def test_iternorm(xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
@@ -136,7 +136,7 @@ def test_iternorm(xp: types.ModuleType) -> None:
     assert s.shape == (3,)
 
 
-def test_cls2cov(xp: types.ModuleType) -> None:
+def test_cls2cov(xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
@@ -215,7 +215,7 @@ def test_cls2cov(xp: types.ModuleType) -> None:
     np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
 
 
-def test_multalm(xp: types.ModuleType) -> None:
+def test_multalm(xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in multalm are not immutable, so do not support jax")
@@ -330,7 +330,7 @@ def test_discretized_cls() -> None:
         np.testing.assert_allclose(cl[:n], expected)
 
 
-def test_effective_cls(xp: types.ModuleType) -> None:
+def test_effective_cls(xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
@@ -448,7 +448,7 @@ def test_generate() -> None:
     np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl(xp: types.ModuleType) -> None:
+def test_getcl(xp: ModuleType) -> None:
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -525,7 +525,7 @@ def test_spectra_indices() -> None:
     )
 
 
-def test_gaussian_fields(xp: types.ModuleType) -> None:
+def test_gaussian_fields(xp: ModuleType) -> None:
     shells = [
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1.0),
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2.0),
@@ -535,7 +535,7 @@ def test_gaussian_fields(xp: types.ModuleType) -> None:
     assert all(isinstance(f, glass.grf.Normal) for f in fields)
 
 
-def test_lognormal_fields(xp: types.ModuleType) -> None:
+def test_lognormal_fields(xp: ModuleType) -> None:
     shells = [
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1),
         glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2),
@@ -551,7 +551,7 @@ def test_lognormal_fields(xp: types.ModuleType) -> None:
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra(mocker: pytest_mock.MockerFixture) -> None:
+def test_compute_gaussian_spectra(mocker: MockerFixture) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
@@ -570,7 +570,7 @@ def test_compute_gaussian_spectra(mocker: pytest_mock.MockerFixture) -> None:
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
-def test_compute_gaussian_spectra_gh639(mocker: pytest_mock.MockerFixture) -> None:
+def test_compute_gaussian_spectra_gh639(mocker: MockerFixture) -> None:
     """Test compute_gaussian_spectra() with an empty input."""
     mock = mocker.patch("glass.grf.compute")
 
@@ -586,7 +586,7 @@ def test_compute_gaussian_spectra_gh639(mocker: pytest_mock.MockerFixture) -> No
     assert gls[2].size == 0
 
 
-def test_solve_gaussian_spectra(mocker: pytest_mock.MockerFixture) -> None:
+def test_solve_gaussian_spectra(mocker: MockerFixture) -> None:
     mock = mocker.patch("glass.grf.solve")
 
     result = mock.return_value
@@ -778,7 +778,7 @@ def test_check_posdef_spectra() -> None:
 
 
 def test_regularized_spectra(
-    mocker: pytest_mock.MockerFixture,
+    mocker: MockerFixture,
     rng: np.random.Generator,
 ) -> None:
     spectra = rng.random(size=(6, 101))

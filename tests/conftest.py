@@ -18,7 +18,7 @@ with contextlib.suppress(ImportError):
     import glass.jax
 
 if TYPE_CHECKING:
-    import types
+    from types import ModuleType
 
     from cosmology import Cosmology
 
@@ -60,14 +60,14 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
         raise ImportError(msg)
 
 
-def _import_and_add_numpy(xp_available_backends: dict[str, types.ModuleType]) -> None:
+def _import_and_add_numpy(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add numpy to the backends dictionary."""
     _check_version("numpy", "2.1.0")
     xp_available_backends["numpy"] = np
 
 
 def _import_and_add_array_api_strict(
-    xp_available_backends: dict[str, types.ModuleType],
+    xp_available_backends: dict[str, ModuleType],
 ) -> None:
     """Add array_api_strict to the backends dictionary."""
     import array_api_strict
@@ -77,7 +77,7 @@ def _import_and_add_array_api_strict(
     array_api_strict.set_array_api_strict_flags(api_version="2024.12")
 
 
-def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> None:
+def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add jax to the backends dictionary."""
     import jax
 
@@ -88,7 +88,7 @@ def _import_and_add_jax(xp_available_backends: dict[str, types.ModuleType]) -> N
 
 
 # a dictionary with all array backends to test
-xp_available_backends: dict[str, types.ModuleType] = {}
+xp_available_backends: dict[str, ModuleType] = {}
 
 # if no backend passed, use numpy by default
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
@@ -114,7 +114,7 @@ else:
 
 # Pytest fixtures
 @pytest.fixture(params=xp_available_backends.values(), scope="session")
-def xp(request: pytest.FixtureRequest) -> types.ModuleType:
+def xp(request: pytest.FixtureRequest) -> ModuleType:
     """
     Fixture for array backend.
 
@@ -124,7 +124,7 @@ def xp(request: pytest.FixtureRequest) -> types.ModuleType:
 
 
 @pytest.fixture(scope="session")
-def uxpx(xp: types.ModuleType) -> _utils.XPAdditions:
+def uxpx(xp: ModuleType) -> _utils.XPAdditions:
     """
     Fixture for array backend.
 
@@ -134,7 +134,7 @@ def uxpx(xp: types.ModuleType) -> _utils.XPAdditions:
 
 
 @pytest.fixture(scope="session")
-def urng(xp: types.ModuleType) -> UnifiedGenerator:
+def urng(xp: ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface.
 
