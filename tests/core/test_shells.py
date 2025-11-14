@@ -10,7 +10,7 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
-    import types
+    from types import ModuleType
 
     import glass._array_api_utils as _utils
     from glass.cosmology import Cosmology
@@ -70,7 +70,7 @@ def test_density_weight(cosmo: Cosmology) -> None:
     np.testing.assert_array_less(w[:-1], w[1:])
 
 
-def test_tophat_windows(xp: types.ModuleType) -> None:
+def test_tophat_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.tophat_windows`."""
     zb = xp.asarray([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
     dz = 0.005
@@ -92,7 +92,7 @@ def test_tophat_windows(xp: types.ModuleType) -> None:
     assert all(xp.all(w.wa == 1) for w in ws)
 
 
-def test_linear_windows(xp: types.ModuleType) -> None:
+def test_linear_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
     dz = 1e-2
     zgrid = xp.asarray(
@@ -141,7 +141,7 @@ def test_linear_windows(xp: types.ModuleType) -> None:
         glass.linear_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_cubic_windows(xp: types.ModuleType) -> None:
+def test_cubic_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.cubic_windows`."""
     dz = 1e-2
     zgrid = xp.asarray(
@@ -190,7 +190,7 @@ def test_cubic_windows(xp: types.ModuleType) -> None:
         glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_restrict(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
+def test_restrict(xp: ModuleType, uxpx: _utils.XPAdditions) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1000)
@@ -224,7 +224,7 @@ def test_restrict(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
 
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
-def test_partition(xp: types.ModuleType, uxpx: _utils.XPAdditions, method: str) -> None:
+def test_partition(xp: ModuleType, uxpx: _utils.XPAdditions, method: str) -> None:
     """Add unit tests for :func:`glass.partition`."""
     if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
         pytest.skip(f"Arrays in {method} are not immutable, so do not support jax")
@@ -267,7 +267,7 @@ def test_partition(xp: types.ModuleType, uxpx: _utils.XPAdditions, method: str) 
     np.testing.assert_allclose(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
 
 
-def test_redshift_grid(xp: types.ModuleType) -> None:
+def test_redshift_grid(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.redshift_grid`."""
     zmin = 0
     zmax = 1
@@ -341,7 +341,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
+def test_combine(xp: ModuleType, uxpx: _utils.XPAdditions) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1000)
     weights = xp.asarray(
@@ -383,7 +383,7 @@ def test_combine(xp: types.ModuleType, uxpx: _utils.XPAdditions) -> None:
     np.testing.assert_allclose(uxpx.trapezoid(result, z), 4.643139, rtol=1e-6)
 
 
-def test_radial_window_immutable(xp: types.ModuleType) -> None:
+def test_radial_window_immutable(xp: ModuleType) -> None:
     """Checks the :class:`RadialWindow` class is immutable."""
     wa = xp.asarray([0.0, 1.0, 0.0])
     za = xp.asarray([0.0, 1.0, 2.0])
@@ -410,7 +410,7 @@ def test_radial_window_immutable(xp: types.ModuleType) -> None:
         w.zeff = zeff  # type: ignore[misc]
 
 
-def test_radial_window_zeff_none(xp: types.ModuleType) -> None:
+def test_radial_window_zeff_none(xp: ModuleType) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
 

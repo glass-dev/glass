@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     import types
 
 
-def test_multalm(xp: types.ModuleType) -> None:
+def test_multalm(xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in multalm are not immutable, so do not support jax")
@@ -39,7 +39,7 @@ def test_multalm(xp: types.ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     bl = xp.ones(3)
 
-    result = glass.sht.multalm(alm, bl, inplace=False)
+    result = gglass.sht.multalm(alm, bl, inplace=False)
     np.testing.assert_allclose(result, alm)
 
     # multiple with 0s

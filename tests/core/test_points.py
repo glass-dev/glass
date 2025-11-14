@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from types import ModuleType
 
-    import pytest_mock
     from numpy.typing import NDArray
+    from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, IntArray, UnifiedGenerator
 
@@ -43,7 +43,7 @@ def catpos(
     return lon, lat, cnt
 
 
-def test_effective_bias(xp: ModuleType, mocker: pytest_mock.MockerFixture) -> None:
+def test_effective_bias(xp: ModuleType, mocker: MockerFixture) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = xp.linspace(0, 2, 100)
