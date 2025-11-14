@@ -1113,3 +1113,29 @@ def regularized_spectra(
 
     # return regularised spectra from cov matrix array
     return [cov[:, i, j] for i, j in spectra_indices(cov.shape[-1])]
+
+
+def harmonic_space(
+    maps: Iterable[NDArray[Any]],
+    lmax: int | None = None,
+) -> Iterator[NDArray[Any]]:
+    """
+    Transform simulated fields to harmonic space.
+
+    This function takes an iterator over maps, such as the one returned by
+    :func:`generate`, and turns it into an iterator over their spherical
+    harmonic coefficients :math:`a_{lm}`.
+
+    Parameters
+    ----------
+    maps
+        Maps to be transformed to harmonic space.
+
+    Returns
+    -------
+    alms
+        Spherical harmonic decomposition of the maps.
+
+    """
+    for m in maps:
+        yield hp.map2alm(m, lmax=lmax, use_pixel_weights=True)
