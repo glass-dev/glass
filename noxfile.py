@@ -71,12 +71,8 @@ def lint(session: nox.Session) -> None:
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
-@nox_uv.session(
-    python=ALL_PYTHON,
-    uv_groups=["test"],
-)
-def tests(session: nox.Session) -> None:
-    """Run the unit tests."""
+def _setup_array_backend(session: nox.Session) -> None:
+    """Installs the requested array_backend."""
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
         session.install(ARRAY_BACKENDS["array_api_strict"])
@@ -84,6 +80,15 @@ def tests(session: nox.Session) -> None:
         session.install(ARRAY_BACKENDS["jax"])
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
+
+
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
+def tests(session: nox.Session) -> None:
+    """Run the unit tests."""
+    _setup_array_backend(session)
 
     session.run("pytest", *session.posargs, env=os.environ)
 
@@ -223,6 +228,8 @@ def regression_tests(session: nox.Session) -> None:
     """
     _check_revision_count(session.posargs, expected_count=2)
     before_revision, after_revision = session.posargs
+
+    _setup_array_backend(session)
 
     # make sure benchmark directory is clean
     benchmark_dir = pathlib.Path(".benchmarks")
