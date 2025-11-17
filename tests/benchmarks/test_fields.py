@@ -834,3 +834,58 @@ def test_cov_from_spectra(
         ),
         expected_output,
     )
+
+
+@pytest.mark.parametrize(
+    "input_array",
+    [
+        # posdef spectra
+        [
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0],
+            [0.9, 0.9, 0.9],
+        ],
+        # semidef spectra
+        [
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 0.0],
+            [0.9, 1.0, 0.0],
+        ],
+    ],
+)
+def test_check_posdef_spectra_true_result(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+    input_array: list[int],
+) -> None:
+    """Benchmarks for glass.fields.check_posdef_spectra where the result is True."""
+    if xp.__name__ in {"array_api_strict"}:
+        pytest.skip(
+            "glass.fields.cov_from_spectra has not been ported to the array-api"
+        )
+    assert benchmark(
+        glass.fields.check_posdef_spectra,
+        xp.asarray(input_array),
+    )
+
+
+def test_check_posdef_spectra_false_result(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.check_posdef_spectra where the result is False."""
+    if xp.__name__ in {"array_api_strict"}:
+        pytest.skip(
+            "glass.fields.cov_from_spectra has not been ported to the array-api"
+        )
+    # indef spectra
+    assert not benchmark(
+        glass.fields.check_posdef_spectra,
+        xp.asarray(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [1.1, 1.1, 1.1],
+            ],
+        ),
+    )
