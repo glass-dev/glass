@@ -635,3 +635,48 @@ def test_compute_gaussian_spectra(
     assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
     assert mock.call_args_list[2] == mocker.call(spectra[2], fields[1], fields[0])
     assert gls == [mock.return_value for _ in range(210)]
+
+
+def test_solve_gaussian_spectra(
+    xp: ModuleType,
+    mocker: MockerFixture,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.solve_gaussian_spectra."""
+    mock = mocker.patch("glass.grf.solve")
+
+    result = mock.return_value
+
+    mock.return_value = (result, None, 3)
+
+    fields = [glass.grf.Normal() for _ in range(10)]
+    spectra = [xp.zeros(5 * (i + 1)) for i in range(55)]
+
+    gls = benchmark(
+        glass.fields.solve_gaussian_spectra,
+        fields,
+        spectra,
+    )
+
+    assert mock.call_args_list[0] == mocker.call(
+        spectra[0],
+        fields[0],
+        fields[0],
+        pad=10,
+        monopole=0.0,
+    )
+    assert mock.call_args_list[1] == mocker.call(
+        spectra[1],
+        fields[1],
+        fields[1],
+        pad=20,
+        monopole=0.0,
+    )
+    assert mock.call_args_list[2] == mocker.call(
+        spectra[2],
+        fields[1],
+        fields[0],
+        pad=30,
+        monopole=0.0,
+    )
+    assert gls == [result for _ in range(len(spectra))]
