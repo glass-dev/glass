@@ -684,3 +684,19 @@ def test_glass_to_healpix_spectra(
     out = benchmark(glass.fields.glass_to_healpix_spectra, inp)
     expected_out = [(10 * i) + (i - d) for d in range(n - 1) for i in range(d + 1, n)]
     np.testing.assert_array_equal(out, expected_out)
+
+
+def test_healpix_to_glass_spectra(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.healpix_to_glass_spectra."""
+    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+        pytest.skip(
+            "glass.fields.healpix_to_glass_spectra has not been ported to the array-api"
+        )
+    n = 100
+    inp = [(10 * i) + (i - d) for d in range(n - 1) for i in range(d + 1, n)]
+    out = benchmark(glass.fields.healpix_to_glass_spectra, inp)
+    expected_out = [(10 * i) + i - j for i in range(n) for j in range(i)]
+    np.testing.assert_array_equal(out, expected_out)
