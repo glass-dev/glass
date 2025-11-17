@@ -594,3 +594,20 @@ def test_gaussian_fields(
     fields = benchmark(glass.fields.gaussian_fields, shells)
     assert len(fields) == len(shells)
     assert all(isinstance(f, glass.grf.Normal) for f in fields)
+
+
+def test_lognormal_fields(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.lognormal_fields."""
+    shells = [
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 3),
+    ]
+
+    fields = benchmark(glass.fields.lognormal_fields, shells)
+    assert len(fields) == len(shells)
+    assert all(isinstance(f, glass.grf.Lognormal) for f in fields)
+    assert [f.lamda for f in fields] == [1.0, 1.0, 1.0]
