@@ -18,6 +18,7 @@ import array_api_extra as xpx
 
 import glass
 import glass.grf
+import glass.harmonics
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -221,53 +222,6 @@ def cls2cov(
         yield cov
 
 
-def _multalm(
-    alm: ComplexArray,
-    bl: FloatArray,
-    *,
-    inplace: bool = False,
-) -> ComplexArray:
-    """
-    Multiply alm by bl.
-
-    The alm should be in GLASS order:
-
-    [
-        00,
-        10, 11,
-        20, 21, 22,
-        30, 31, 32, 33,
-        ...
-    ]
-
-    Parameters
-    ----------
-    alm
-        The alm to multiply.
-    bl
-        The bl to multiply.
-    inplace
-        Whether to perform the operation in place.
-
-    Returns
-    -------
-        The product of alm and bl.
-
-    """
-    xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
-
-    n = bl.size
-    # Ideally would be xp.asanyarray but this does not yet exist. The key difference
-    # between the two in numpy is that asanyarray maintains subclasses of NDArray
-    # whereas asarray will return the base class NDArray. Currently, we don't seem
-    # to pass a subclass of NDArray so this, so it might be okay
-    out = xp.asarray(alm) if inplace else xp.asarray(alm, copy=True)
-    for ell in range(n):
-        out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
-
-    return out
-
-
 def discretized_cls(
     cls: AnyArray,
     *,
@@ -435,11 +389,11 @@ def _generate_grf(
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
-        alm = _multalm(z, s)
+        alm = glass.harmonics.multalm(z, s)
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += _multalm(y[:, i], a[:, i])
+            alm += glass.harmonics.multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
