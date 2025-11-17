@@ -16,8 +16,6 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
-import inspect
-import warnings
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -82,10 +80,6 @@ def import_numpy(backend: str | None = None) -> ModuleType:
 
 def default_xp() -> ModuleType:
     """Returns the library backend we default to if none is specified by the user."""
-    warnings.warn(
-        f"No array library has been provided for call to {inspect.stack()[1].function}",
-        stacklevel=2,
-    )
     return import_numpy()
 
 
