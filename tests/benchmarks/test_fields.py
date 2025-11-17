@@ -643,3 +643,17 @@ def test_spectra_indices_input_of_zero(
     np.testing.assert_array_equal(
         benchmark(glass.fields.spectra_indices, 0), xp.zeros((0, 2))
     )
+
+
+def test_gaussian_fields(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.gaussian_fields."""
+    shells = [
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 1.0),
+        glass.RadialWindow(xp.asarray([]), xp.asarray([]), 2.0),
+    ]
+    fields = benchmark(glass.fields.gaussian_fields, shells)
+    assert len(fields) == len(shells)
+    assert all(isinstance(f, glass.grf.Normal) for f in fields)
