@@ -622,7 +622,7 @@ def test_compute_gaussian_spectra(
     assert mock.call_args_list[0] == mocker.call(spectra[0], fields[0], fields[0])
     assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
     assert mock.call_args_list[2] == mocker.call(spectra[2], fields[1], fields[0])
-    assert gls == [mock.return_value for _ in range(210)]
+    assert gls == [mock.return_value for _ in range(55)]
 
 
 def test_solve_gaussian_spectra(
