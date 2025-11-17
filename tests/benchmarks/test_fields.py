@@ -727,3 +727,110 @@ def test_glass_to_healpix_alm(
         out,
         expected_out,
     )
+
+
+@pytest.mark.parametrize(
+    ("lmax", "expected_output"),
+    [
+        (
+            None,
+            [
+                [
+                    [110, 210, 310],
+                    [210, 220, 320],
+                    [310, 320, 330],
+                ],
+                [
+                    [111, 211, 311],
+                    [211, 221, 321],
+                    [311, 321, 331],
+                ],
+                [
+                    [112, 212, 312],
+                    [212, 222, 322],
+                    [312, 322, 332],
+                ],
+                [
+                    [113, 213, 313],
+                    [213, 223, 323],
+                    [313, 323, 333],
+                ],
+            ],
+        ),
+        (
+            1,
+            [
+                [
+                    [110, 210, 310],
+                    [210, 220, 320],
+                    [310, 320, 330],
+                ],
+                [
+                    [111, 211, 311],
+                    [211, 221, 321],
+                    [311, 321, 331],
+                ],
+            ],
+        ),
+        (
+            4,
+            [
+                [
+                    [110, 210, 310],
+                    [210, 220, 320],
+                    [310, 320, 330],
+                ],
+                [
+                    [111, 211, 311],
+                    [211, 221, 321],
+                    [311, 321, 331],
+                ],
+                [
+                    [112, 212, 312],
+                    [212, 222, 322],
+                    [312, 322, 332],
+                ],
+                [
+                    [113, 213, 313],
+                    [213, 223, 323],
+                    [313, 323, 333],
+                ],
+                [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0],
+                ],
+            ],
+        ),
+    ],
+)
+def test_cov_from_spectra(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+    lmax: int,
+    expected_output: list[int],
+) -> None:
+    """Benchmarks for glass.fields.cov_from_spectra."""
+    if xp.__name__ in {"array_api_strict"}:
+        pytest.skip(
+            "glass.fields.cov_from_spectra has not been ported to the array-api"
+        )
+    spectra = xp.asarray(
+        [
+            [110, 111, 112, 113],
+            [220, 221, 222, 223],
+            [210, 211, 212, 213],
+            [330, 331, 332, 333],
+            [320, 321, 322, 323],
+            [310, 311, 312, 313],
+        ],
+    )
+
+    np.testing.assert_array_equal(
+        benchmark(
+            glass.fields.cov_from_spectra,
+            spectra,
+            lmax=lmax,
+        ),
+        expected_output,
+    )
