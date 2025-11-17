@@ -13,8 +13,6 @@ if TYPE_CHECKING:
 def multalm(
     alm: ComplexArray,
     bl: FloatArray,
-    *,
-    inplace: bool = False,
 ) -> ComplexArray:
     """
     Multiply alm by bl.
@@ -44,14 +42,9 @@ def multalm(
 
     """
     xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
-
-    n = bl.size
-    # Ideally would be xp.asanyarray but this does not yet exist. The key difference
-    # between the two in numpy is that asanyarray maintains subclasses of NDArray
-    # whereas asarray will return the base class NDArray. Currently, we don't seem
-    # to pass a subclass of NDArray so this, so it might be okay
-    out = xp.asarray(alm) if inplace else xp.asarray(alm, copy=True)
-    for ell in range(n):
-        out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
-
-    return out
+    return xp.concat(
+        [
+            alm[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] * bl[ell]
+            for ell in range(bl.size)
+        ]
+    )

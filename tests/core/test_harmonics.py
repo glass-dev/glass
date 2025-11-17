@@ -22,9 +22,8 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.asarray([2.0, 0.5, 1.0])
     alm_copy = xp.asarray(alm, copy=True)
 
-    result = glass.harmonics.multalm(alm, bl, inplace=True)
+    result = glass.harmonics.multalm(alm, bl)
 
-    np.testing.assert_allclose(result, alm)
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
     np.testing.assert_allclose(result, expected_result)
     np.testing.assert_raises(
@@ -39,22 +38,22 @@ def test_multalm(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     bl = xp.ones(3)
 
-    result = glass.harmonics.multalm(alm, bl, inplace=False)
+    result = glass.harmonics.multalm(alm, bl)
     np.testing.assert_allclose(result, alm)
 
     # multiple with 0s
 
     bl = xp.asarray([0.0, 1.0, 0.0])
 
-    result = glass.harmonics.multalm(alm, bl, inplace=False)
+    result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
     np.testing.assert_allclose(result, expected_result)
 
     # empty arrays
 
-    alm = xp.asarray([])
-    bl = xp.asarray([])
+    alm = xp.asarray(xp.asarray([]))
+    bl = xp.asarray(xp.asarray([]))
 
-    result = glass.harmonics.multalm(alm, bl, inplace=False)
-    np.testing.assert_allclose(result, alm)
+    with pytest.raises(ValueError, match="need at least one array to concatenate"):
+        result = glass.harmonics.multalm(alm, bl)
