@@ -122,11 +122,11 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           carryforward:
-            ${{ env.BENCH_COV_NAME }}-3.10,${{ env.BENCH_COV_NAME }}-3.11,${{
-            env.BENCH_COV_NAME }}-3.12,${{ env.BENCH_COV_NAME }}-3.13,${{
-            env.BENCH_COV_NAME }}-3.14,${{ env.CORE_COV_NAME }}-3.10,${{
-            env.CORE_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.12,${{
-            env.CORE_COV_NAME }}-3.13,${{ env.CORE_COV_NAME }}-3.14
+            ${{ env.BENCH_COV_NAME }}-3.10,${{ env.CORE_COV_NAME }}-3.10,${{
+            env.BENCH_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.11,${{
+            env.BENCH_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.12,${{
+            env.BENCH_COV_NAME }}-3.13,${{ env.CORE_COV_NAME }}-3.13,${{
+            env.BENCH_COV_NAME }}-3.14,${{ env.CORE_COV_NAME }}-3.14
           parallel-finished: true
 
   build:
