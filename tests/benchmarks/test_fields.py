@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
+    from pytest_mock import MockerFixture
 
     from glass._types import UnifiedGenerator
 
@@ -611,3 +612,26 @@ def test_lognormal_fields(
     assert len(fields) == len(shells)
     assert all(isinstance(f, glass.grf.Lognormal) for f in fields)
     assert [f.lamda for f in fields] == [1.0, 1.0, 1.0]
+
+
+def test_compute_gaussian_spectra(
+    xp: ModuleType,
+    mocker: MockerFixture,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.compute_gaussian_spectra."""
+    mock = mocker.patch("glass.grf.compute")
+
+    fields = [glass.grf.Normal() for _ in range(10)]
+    spectra = [xp.zeros(10) for _ in range(55)]
+
+    gls = benchmark(
+        glass.fields.compute_gaussian_spectra,
+        fields,
+        spectra,
+    )
+
+    assert mock.call_args_list[0] == mocker.call(spectra[0], fields[0], fields[0])
+    assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
+    assert mock.call_args_list[2] == mocker.call(spectra[2], fields[1], fields[0])
+    assert gls == [mock.return_value for _ in range(210)]
