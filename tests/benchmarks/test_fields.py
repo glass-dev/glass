@@ -680,8 +680,10 @@ def test_glass_to_healpix_spectra(
             "glass.fields.glass_to_healpix_spectra has not been ported to the array-api"
         )
     n = 100
+    # inp structure [11, 22, 21, 33, 32, 31, 44, 43, 42, 41,...]
     inp = [(10 * i) + i - j for i in range(n) for j in range(i)]
     out = benchmark(glass.fields.glass_to_healpix_spectra, inp)
+    # out structure [11, 22, 33, 44, 21, 32, 43, 31, 42, 41,...]
     expected_out = [(10 * i) + (i - d) for d in range(n - 1) for i in range(d + 1, n)]
     np.testing.assert_array_equal(out, expected_out)
 
@@ -696,7 +698,32 @@ def test_healpix_to_glass_spectra(
             "glass.fields.healpix_to_glass_spectra has not been ported to the array-api"
         )
     n = 100
+    # inp structure [11, 22, 33, 44, 21, 32, 43, 31, 42, 41,...]
     inp = [(10 * i) + (i - d) for d in range(n - 1) for i in range(d + 1, n)]
     out = benchmark(glass.fields.healpix_to_glass_spectra, inp)
+    # out structure [11, 22, 21, 33, 32, 31, 44, 43, 42, 41,...]
     expected_out = [(10 * i) + i - j for i in range(n) for j in range(i)]
     np.testing.assert_array_equal(out, expected_out)
+
+
+def test_glass_to_healpix_alm(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields._glass_to_healpix_alm."""
+    if xp.__name__ in {"array_api_strict"}:
+        pytest.skip(
+            "glass.fields._glass_to_healpix_alm has not been ported to the array-api"
+        )
+    n = 100
+    # inp structure [00, 10, 11, 20, 21, 22, 30, 31, 32, 33,...]
+    inp = xp.asarray([(10 * i) + (j) for i in range(n) for j in range(i + 1)])
+    out = benchmark(glass.fields._glass_to_healpix_alm, inp)
+    # out structure [00, 10, 20, 30, 11, 21, 31, 22, 32, 33,...]
+    expected_out = xp.asarray(
+        [(10 * (j)) + (10 * i) + i for i in range(n) for j in range(n - i)]
+    )
+    np.testing.assert_array_equal(
+        out,
+        expected_out,
+    )
