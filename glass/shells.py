@@ -58,10 +58,10 @@ import glass.algorithm
 import glass.arraytools
 
 if TYPE_CHECKING:
-    import types
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Callable, Iterator, Sequence
+    from types import ModuleType
 
-    from glass._types import FloatArray, WeightFunc
+    from glass._types import FloatArray
     from glass.cosmology import Cosmology
 
 
@@ -212,7 +212,7 @@ class RadialWindow:
     za: FloatArray
     wa: FloatArray
     zeff: float = math.nan
-    xp: types.ModuleType | None = None
+    xp: ModuleType | None = None
 
     def __post_init__(self) -> None:
         """
@@ -257,7 +257,7 @@ class RadialWindow:
 def tophat_windows(
     zbins: FloatArray,
     dz: float = 1e-3,
-    weight: WeightFunc | None = None,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.
@@ -311,7 +311,7 @@ def tophat_windows(
     xp = zbins.__array_namespace__()
     uxpx = _utils.XPAdditions(xp)
 
-    wht: WeightFunc
+    wht: Callable[[FloatArray], FloatArray]
     wht = weight if weight is not None else xp.ones_like
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
@@ -326,7 +326,7 @@ def tophat_windows(
 def linear_windows(
     zgrid: FloatArray,
     dz: float = 1e-3,
-    weight: WeightFunc | None = None,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Linear interpolation window functions.
@@ -395,7 +395,7 @@ def linear_windows(
 def cubic_windows(
     zgrid: FloatArray,
     dz: float = 1e-3,
-    weight: WeightFunc | None = None,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Cubic interpolation window functions.
@@ -825,7 +825,7 @@ def _uniform_grid(
     *,
     step: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType | None = None,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Create a uniform grid.
@@ -869,7 +869,7 @@ def redshift_grid(
     *,
     dz: float | None = None,
     num: int | None = None,
-    xp: types.ModuleType | None = None,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Redshift grid with uniform spacing in redshift.

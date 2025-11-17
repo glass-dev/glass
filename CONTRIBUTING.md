@@ -97,12 +97,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import types
+    from types import ModuleType
 
     from glass._types import UnifiedGenerator
 
 
-def test_something(xp: types.ModuleType, urng: UnifiedGenerator) -> None:
+def test_something(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # use `xp.` to access the array library functionality
     # use `urng.` to access the corresponding rng functionality
     ...

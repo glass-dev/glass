@@ -18,20 +18,13 @@ import array_api_extra as xpx
 
 import glass
 import glass.grf
+import glass.harmonics
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
     from typing import Literal
 
-    from glass._types import (
-        AnyArray,
-        Cls,
-        ComplexArray,
-        Fields,
-        FloatArray,
-        IntArray,
-        T,
-    )
+    from glass._types import AnyArray, ComplexArray, FloatArray, IntArray, T
 
 
 try:
@@ -182,7 +175,7 @@ def iternorm(
 
 
 def cls2cov(
-    cls: Cls,
+    cls: AnyArray,
     nl: int,
     nf: int,
     nc: int,
@@ -229,60 +222,13 @@ def cls2cov(
         yield cov
 
 
-def _multalm(
-    alm: ComplexArray,
-    bl: FloatArray,
-    *,
-    inplace: bool = False,
-) -> ComplexArray:
-    """
-    Multiply alm by bl.
-
-    The alm should be in GLASS order:
-
-    [
-        00,
-        10, 11,
-        20, 21, 22,
-        30, 31, 32, 33,
-        ...
-    ]
-
-    Parameters
-    ----------
-    alm
-        The alm to multiply.
-    bl
-        The bl to multiply.
-    inplace
-        Whether to perform the operation in place.
-
-    Returns
-    -------
-        The product of alm and bl.
-
-    """
-    xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
-
-    n = bl.size
-    # Ideally would be xp.asanyarray but this does not yet exist. The key difference
-    # between the two in numpy is that asanyarray maintains subclasses of NDArray
-    # whereas asarray will return the base class NDArray. Currently, we don't seem
-    # to pass a subclass of NDArray so this, so it might be okay
-    out = xp.asarray(alm) if inplace else xp.asarray(alm, copy=True)
-    for ell in range(n):
-        out[ell * (ell + 1) // 2 : (ell + 1) * (ell + 2) // 2] *= bl[ell]
-
-    return out
-
-
 def discretized_cls(
-    cls: Cls,
+    cls: AnyArray,
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> Cls:
+) -> AnyArray:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -337,9 +283,9 @@ def discretized_cls(
 
 @deprecated("use glass.solve_gaussian_spectra() instead")
 def lognormal_gls(
-    cls: Cls,
+    cls: AnyArray,
     shift: float = 1.0,
-) -> Cls:
+) -> AnyArray:
     """
     Compute Gaussian Cls for a lognormal random field.
 
@@ -367,7 +313,7 @@ def lognormal_gls(
 
 
 def _generate_grf(
-    gls: Cls,
+    gls: AnyArray,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -443,11 +389,11 @@ def _generate_grf(
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
-        alm = _multalm(z, s)
+        alm = glass.harmonics.multalm(z, s)
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += _multalm(y[:, i], a[:, i])
+            alm += glass.harmonics.multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
@@ -466,7 +412,7 @@ def _generate_grf(
 
 @deprecated("use glass.generate() instead")
 def generate_gaussian(
-    gls: Cls,
+    gls: AnyArray,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -519,7 +465,7 @@ def generate_gaussian(
 
 @deprecated("use glass.generate() instead")
 def generate_lognormal(
-    gls: Cls,
+    gls: AnyArray,
     nside: int,
     shift: float = 1.0,
     *,
@@ -558,7 +504,7 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: Cls,
+    cls: AnyArray,
     i: int,
     j: int,
     lmax: int | None = None,
@@ -638,7 +584,7 @@ def spectra_indices(n: int) -> IntArray:
 
 
 def effective_cls(
-    cls: Cls,
+    cls: AnyArray,
     weights1: FloatArray,
     weights2: FloatArray | None = None,
     *,
@@ -769,7 +715,10 @@ def lognormal_fields(
     return [glass.grf.Lognormal(shift(shell.zeff)) for shell in shells]
 
 
-def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
+def compute_gaussian_spectra(
+    fields: Sequence[glass.grf.Transformation],
+    spectra: AnyArray,
+) -> AnyArray:
     """
     Compute a sequence of Gaussian angular power spectra.
 
@@ -801,7 +750,10 @@ def compute_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
     return gls
 
 
-def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
+def solve_gaussian_spectra(
+    fields: Sequence[glass.grf.Transformation],
+    spectra: AnyArray,
+) -> AnyArray:
     """
     Solve a sequence of Gaussian angular power spectra.
 
@@ -857,8 +809,8 @@ def solve_gaussian_spectra(fields: Fields, spectra: Cls) -> Cls:
 
 
 def generate(
-    fields: Fields,
-    gls: Cls,
+    fields: Sequence[glass.grf.Transformation],
+    gls: AnyArray,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -999,7 +951,7 @@ def lognormal_shift_hilbert2011(z: float) -> float:
     return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
 
 
-def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> AnyArray:
+def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     """
     Construct covariance matrix from spectra.
 
@@ -1043,7 +995,7 @@ def cov_from_spectra(spectra: Cls, *, lmax: int | None = None) -> AnyArray:
     return cov
 
 
-def check_posdef_spectra(spectra: Cls) -> bool:
+def check_posdef_spectra(spectra: AnyArray) -> bool:
     """
     Test whether angular power spectra are positive semi-definite.
 
@@ -1064,12 +1016,12 @@ def check_posdef_spectra(spectra: Cls) -> bool:
 
 
 def regularized_spectra(
-    spectra: Cls,
+    spectra: AnyArray,
     *,
     lmax: int | None = None,
     method: Literal["nearest", "clip"] = "nearest",
     **method_kwargs: float | None,
-) -> Cls:
+) -> AnyArray:
     r"""
     Regularise a set of angular power spectra.
 

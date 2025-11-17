@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
     from array_api_strict._array_object import Array as AArray
 
-    from glass._types import AnyArray, FloatArray, Size, UnifiedGenerator
+    from glass._types import AnyArray, FloatArray, UnifiedGenerator
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -148,7 +148,7 @@ class Generator:
 
     def random(
         self,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         out: AArray | None = None,
     ) -> AArray:
@@ -175,7 +175,7 @@ class Generator:
         self,
         loc: float | FloatArray = 0.0,
         scale: float | FloatArray = 1.0,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
     ) -> AArray:
         """
         Draw samples from a Normal distribution (mean=loc, stdev=scale).
@@ -195,7 +195,11 @@ class Generator:
         """
         return self.axp.asarray(self.rng.normal(loc, scale, size))
 
-    def poisson(self, lam: float | AArray, size: Size = None) -> AArray:
+    def poisson(
+        self,
+        lam: float | AArray,
+        size: int | tuple[int, ...] | None = None,
+    ) -> AArray:
         """
         Draw samples from a Poisson distribution.
 
@@ -214,7 +218,7 @@ class Generator:
 
     def standard_normal(
         self,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         out: AArray | None = None,
     ) -> AArray:
@@ -241,7 +245,7 @@ class Generator:
         self,
         low: float | AArray = 0.0,
         high: float | AArray = 1.0,
-        size: Size = None,
+        size: int | tuple[int, ...] | None = None,
     ) -> AArray:
         """
         Draw samples from a Uniform distribution.
@@ -252,7 +256,7 @@ class Generator:
             Lower bound of the distribution.
         high
             Upper bound of the distribution.
-        size : Size, optional
+        size
             Output shape.
 
         Returns
