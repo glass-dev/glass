@@ -214,9 +214,7 @@ def test_discretized_cls_lmax_provided(
 ) -> None:
     """Benchmarks for glass.fields.discretized_cls with lmax provided."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip(
-            "glass.fields.discretized_cls has not yet been ported to the array-api"
-        )
+        pytest.skip("glass.fields.discretized_cls has not been ported to the array-api")
     # power spectra truncated at lmax + 1 if lmax provided
     cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
     result = benchmark(glass.fields.discretized_cls, cls, lmax=5)
@@ -231,9 +229,7 @@ def test_discretized_cls_ncorr_provided(
 ) -> None:
     """Benchmarks for glass.fields.discretized_cls with ncorr provided."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip(
-            "glass.fields.discretized_cls has not yet been ported to the array-api"
-        )
+        pytest.skip("glass.fields.discretized_cls has not been ported to the array-api")
     cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
     ncorr = 0
     result = benchmark(glass.fields.discretized_cls, cls, ncorr=ncorr)
@@ -249,9 +245,7 @@ def test_discretized_cls_nside_provided(
 ) -> None:
     """Benchmarks for glass.fields.discretized_cls with nside provided."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip(
-            "glass.fields.discretized_cls has not yet been ported to the array-api"
-        )
+        pytest.skip("glass.fields.discretized_cls has not been ported to the array-api")
     # check if pixel window function was applied correctly with nside not None
     cls = [[], xp.ones(10), xp.ones(10)]
     nside = 4
@@ -340,9 +334,7 @@ def test_generate_grf_positional_args_only(
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip(
-            "glass.fields._generate_grf has not yet been ported to the array-api"
-        )
+        pytest.skip("glass.fields._generate_grf has not been ported to the array-api")
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
 
@@ -361,9 +353,7 @@ def test_generate_grf_with_rng(
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
     if xp.__name__ in "array_api_strict":
-        pytest.skip(
-            "glass.fields._generate_grf has not yet been ported to the array-api"
-        )
+        pytest.skip("glass.fields._generate_grf has not been ported to the array-api")
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
 
@@ -390,9 +380,7 @@ def test_generate_grf_with_ncorr_and_rng(
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip(
-            "glass.fields._generate_grf has not yet been ported to the array-api"
-        )
+        pytest.skip("glass.fields._generate_grf has not been ported to the array-api")
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
 
@@ -680,3 +668,19 @@ def test_solve_gaussian_spectra(
         monopole=0.0,
     )
     assert gls == [result for _ in range(len(spectra))]
+
+
+def test_glass_to_healpix_spectra(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.glass_to_healpix_spectra."""
+    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+        pytest.skip(
+            "glass.fields.glass_to_healpix_spectra has not been ported to the array-api"
+        )
+    n = 100
+    inp = [(10 * i) + i - j for i in range(n) for j in range(i)]
+    out = benchmark(glass.fields.glass_to_healpix_spectra, inp)
+    expected_out = [(10 * i) + (i - d) for d in range(n - 1) for i in range(d + 1, n)]
+    np.testing.assert_array_equal(out, expected_out)
