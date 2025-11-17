@@ -52,8 +52,8 @@ def test_multalm(xp: ModuleType) -> None:
 
     # empty arrays
 
-    alm = xp.asarray(xp.asarray([]))
-    bl = xp.asarray(xp.asarray([]))
+    alm = xp.asarray([])
+    bl = xp.asarray([])
 
     with pytest.raises(
         ValueError,
