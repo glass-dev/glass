@@ -55,5 +55,8 @@ def test_multalm(xp: ModuleType) -> None:
     alm = xp.asarray(xp.asarray([]))
     bl = xp.asarray(xp.asarray([]))
 
-    with pytest.raises(ValueError, match="need at least one array to concatenate"):
+    with pytest.raises(
+        ValueError,
+        match="need at least one array to concatenate",
+    ):
         result = glass.harmonics.multalm(alm, bl)
