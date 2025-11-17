@@ -39,6 +39,7 @@ __all__ = [
     "getcl",
     "glass_to_healpix_spectra",
     "grf",
+    "harmonics",
     "healpix_to_glass_spectra",
     "iternorm",
     "linear_bias",
@@ -77,7 +78,7 @@ with contextlib.suppress(ModuleNotFoundError):
     from ._version import __version__
 
 # modules
-from glass import algorithm, grf
+from glass import algorithm, grf, harmonics
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,

@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
     from typing import ParamSpec, TypeAlias, TypeVar
 
     import numpy as np
@@ -11,7 +10,6 @@ if TYPE_CHECKING:
     from array_api_strict._array_object import Array as AArray
 
     import glass._array_api_utils as _utils
-    import glass.grf
     import glass.jax
 
     P = ParamSpec("P")
@@ -23,13 +21,6 @@ if TYPE_CHECKING:
     DoubleArray: TypeAlias = NDArray[np.double] | JAXArray | AArray
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
     IntArray: TypeAlias = NDArray[np.int_] | JAXArray | AArray
-
-    ArrayLike1D: TypeAlias = Sequence[float] | FloatArray
-    Cls: TypeAlias = Sequence[AnyArray]
-    Fields: TypeAlias = Sequence[glass.grf.Transformation]
-    Size: TypeAlias = int | tuple[int, ...] | None
-    WeightFunc: TypeAlias = Callable[[ArrayLike1D], ArrayLike1D]
-
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
@@ -41,11 +32,4 @@ else:
     DoubleArray = Any
     FloatArray = Any
     IntArray = Any
-
-    ArrayLike1D = Any
-    Cls = Any
-    Fields = Any
-    Size = Any
-    WeightFunc = Any
-
     UnifiedGenerator = Any
