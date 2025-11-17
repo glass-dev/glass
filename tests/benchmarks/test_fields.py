@@ -889,3 +889,52 @@ def test_check_posdef_spectra_false_result(
             ],
         ),
     )
+
+
+def test_regularized_spectra(
+    xp: ModuleType,
+    mocker: MockerFixture,
+    urng: UnifiedGenerator,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.regularized_spectra wiuth the clip method."""
+    if xp.__name__ in {"array_api_strict"}:
+        pytest.skip(
+            "glass.fields.regularized_spectra has not been ported to the array-api"
+        )
+    spectra = urng.random(size=(6, 101))
+
+    # test method "nearest"
+    cov_nearest = mocker.spy(glass.algorithm, "cov_clip")
+    benchmark(
+        glass.fields.regularized_spectra,
+        spectra,
+        method="clip",
+    )
+    cov_nearest.assert_called()
+
+
+def test_regularized_spectra_nearest(
+    xp: ModuleType,
+    mocker: MockerFixture,
+    urng: UnifiedGenerator,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmarks for glass.fields.regularized_spectra with the nearest method."""
+    if xp.__name__ in {"array_api_strict"}:
+        pytest.skip(
+            "glass.fields.regularized_spectra has not been ported to the array-api"
+        )
+    spectra = urng.random(size=(6, 101))
+
+    # test method "nearest"
+    cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")
+    with pytest.warns(UserWarning, match="Nearest correlation matrix not found"):
+        # we don't care about convergence here, only that the correct
+        # method is called so this is to suppress the warning
+        benchmark(
+            glass.fields.regularized_spectra,
+            spectra,
+            method="nearest",
+        )
+    cov_nearest.assert_called()
