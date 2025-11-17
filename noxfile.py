@@ -236,13 +236,19 @@ def regression_tests(session: nox.Session) -> None:
         session.log(f"Deleting previous benchmark directory: {benchmark_dir}")
         shutil.rmtree(benchmark_dir)
 
+    shared_benchmark_flags = [
+        "--benchmark-timer=time.process_time",
+        "--benchmark-columns=mean,stddev,rounds",
+        "--benchmark-sort=name",
+    ]
+
     print(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
         "--benchmark-autosave",
-        "--benchmark-timer=time.process_time",
+        *shared_benchmark_flags,
     )
 
     print(f"Comparing {before_revision} benchmark to revision {after_revision}")
@@ -251,6 +257,6 @@ def regression_tests(session: nox.Session) -> None:
         "pytest",
         BENCH_TESTS_LOC,
         "--benchmark-compare=0001",
-        "--benchmark-timer=time.process_time",
         "--benchmark-compare-fail=mean:10%",
+        *shared_benchmark_flags,
     )
