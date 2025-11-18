@@ -85,7 +85,45 @@ def test_smail_nz(xp: ModuleType) -> None:
     np.testing.assert_array_equal(pz, np.zeros_like(pz))
 
 
-def test_fixed_zbins(xp: ModuleType) -> None:
+def test_fixed_zbins_default_xp() -> None:
+    """Add unit tests for :func:`glass.fixed_zbins` with default xp."""
+    zmin = 0.0
+    zmax = 1.0
+
+    # check nbins input
+
+    nbins = 5
+    expected_zbins = np.asarray(
+        [
+            tuple(np.asarray(i) for i in pair)
+            for pair in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
+        ],
+    )
+    zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
+    assert len(zbins) == nbins
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
+    # check dz input
+
+    dz = 0.2
+    zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
+    assert len(zbins) == math.ceil((zmax - zmin) / dz)
+    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+
+    # check dz for spacing which results in a max value above zmax
+
+    zbins = glass.fixed_zbins(zmin, zmax, dz=0.3)
+    assert zmax < zbins[-1][1]
+
+    # check error raised
+
+    with (
+        pytest.raises(ValueError, match="exactly one of nbins and dz must be given"),
+    ):
+        glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
+
+
+def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.fixed_zbins`."""
     zmin = 0.0
     zmax = 1.0
