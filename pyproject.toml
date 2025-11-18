@@ -10,6 +10,7 @@ build = [
     "build",
 ]
 dev = [
+    "coverage[toml]",
     "nox",
     "nox-uv",
     {include-group = "build"},

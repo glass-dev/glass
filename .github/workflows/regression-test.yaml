@@ -35,12 +35,9 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Set up uv
+        uses: actions/setup-uv@v7
         with:
-          cache-dependency-path: pyproject.toml
-          cache: pip
           python-version: ${{ matrix.python-version }}
 
       - name: Cache nox
@@ -51,13 +48,13 @@ jobs:
             hashFiles('noxfile.py') }}-${{ env.pythonLocation }}
           path: .nox
 
-      - name: Install nox
-        run: python -m pip install nox
+      - name: Install only dev dependencies
+        run: uv sync --only-dev
 
       - name: Run regression test
         run: >-
-          nox -s regression_tests-${{ matrix.python-version }} -- "$BASE_REF"
-          "$HEAD_REF"
+          uv run nox -s regression_tests-${{ matrix.python-version }} --
+          "$BASE_REF" "$HEAD_REF"
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
