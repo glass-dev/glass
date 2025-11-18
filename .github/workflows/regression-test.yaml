@@ -58,7 +58,7 @@ jobs:
         continue-on-error: true
         run: >-
           uv run nox -s regression_tests-${{ matrix.python-version }} --
-          "$BASE_REF" "$HEAD_REF" | tee $REGRESSION_TEST_OUTPUT_FILE
+          "${BASE_REF}" "${HEAD_REF}" | tee ${REGRESSION_TEST_OUTPUT_FILE}
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
@@ -68,13 +68,13 @@ jobs:
         id: extract_comment
         if: failure()
         run: >-
-          f=$REGRESSION_TEST_OUTPUT_FILE; start=$(grep -n -m1 'Performance has
-          regressed:' "$f" | cut -d: -f1)
+          f=${REGRESSION_TEST_OUTPUT_FILE}; start=$(grep -n -m1 'Performance has
+          regressed:' "${f}" | cut -d: -f1)
             || { echo "No match"; exit 1; };
-          s_dash=$(awk -v n=$start 'NR<=n && /^-+$/ {l=NR} END{print l}' "$f");
-          e_dash=$(awk -v n=$start 'NR>=n && /^-+$/ {print NR; exit}' "$f");
-          PR_COMMENT_MSG=$(sed -n "${s_dash},${e_dash}p" "$f"); echo
-          "PR_COMMENT_MSG=$PR_COMMENT_MSG" >> $GITHUB_OUTPUT;
+          s_dash=$(awk -v n=${start} 'NR<=n && /^-+$/ {l=NR} END{print l}'
+          "${f}"); e_dash=$(awk -v n=${start} 'NR>=n && /^-+$/ {print NR; exit}'
+          "${f}"); PR_COMMENT_MSG=$(sed -n "${s_dash},${e_dash}p" "${f}"); echo
+          "PR_COMMENT_MSG=${PR_COMMENT_MSG}" >> ${GITHUB_OUTPUT};
 
       - name: Write PR comment
         if: failure()
