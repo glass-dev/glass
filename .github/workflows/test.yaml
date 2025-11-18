@@ -40,11 +40,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
-          cache-dependency-path: pyproject.toml
-          cache: pip
           python-version: ${{ matrix.python-version }}
 
       - name: Cache nox
@@ -55,31 +53,33 @@ jobs:
             }}-${{ env.pythonLocation }}
           path: .nox
 
-      - name: Install nox and coverage.py
-        run: python -m pip install coverage[toml] nox
+      - name: Install only dev dependencies
+        run: uv sync --only-dev
 
       - name: Install ubuntu dependencies for fitsio
         run: sudo apt-get install -y libbz2-dev
 
       - name: Check version
-        run: nox -s version
+        run: uv run nox -s version
         env:
           FORCE_COLOR: 1
 
       - name: Run doctests
-        run: nox -s doctests-${{ matrix.python-version }} --verbose
+        run: uv run nox -s doctests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
 
       - name: Run benchmark tests with all backends and generate coverage report
-        run: nox -s coverage_benchmarks-${{ matrix.python-version }} --verbose
+        run: >-
+          uv run nox -s coverage_benchmarks-${{ matrix.python-version }}
+          --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
           FORCE_COLOR: 1
 
       - name: Run core tests with all backends and generate coverage report
-        run: nox -s coverage-${{ matrix.python-version }} --verbose
+        run: uv run nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
@@ -87,13 +87,13 @@ jobs:
 
       - name: Generate XML report for benchmark tests
         run: >-
-          coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
+          uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.BENCH_COV_NAME }}-${{
           matrix.python-version }}.xml
 
       - name: Generate XML report for core tests
         run: >-
-          coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
+          uv run coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
           matrix.python-version }}.xml;
 
@@ -139,18 +139,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
-          cache-dependency-path: pyproject.toml
-          cache: pip
           python-version: 3.14
 
-      - name: Install nox
-        run: python -m pip install nox
+      - name: Install only dev dependencies
+        run: uv sync --only-dev
 
       - name: Build SDist and wheel
-        run: nox -s build --verbose
+        run: uv run nox -s build
         env:
           FORCE_COLOR: 1
 
@@ -164,19 +162,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
-          cache-dependency-path: pyproject.toml
-          cache: pip
           python-version: 3.14
 
       - name: Install dependencies
         run: |-
           sudo apt-get update
           sudo apt-get install -y pandoc
-          python -m pip install nox
+          uv sync --only-dev
 
       - name: Build docs
-        run: nox -s docs --verbose
+        run: uv run nox -s docs --verbose
         env:
           FORCE_COLOR: 1

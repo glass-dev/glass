@@ -16,11 +16,10 @@ The developer installation of _GLASS_ comes with several optional dependencies -
 - `examples`: installs libraries used in the examples and a few notebook related
   dependencies
 
-These options can be used with `pip` with the editable (`-e`) mode of
-installation in the following way -
+These options can be used with `uv` in the following way
 
 ```bash
-pip install -e ".[examples]" --group docs --group test
+uv sync --all-extras --group docs --group test
 ```
 
 ## Tooling
@@ -193,23 +192,23 @@ developers. All of these commands (or sessions in the language of `nox`) -
 `docs`, `build`, `version`, `benchmarks`, and `regression_tests` - are defined
 in [noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
 
-`nox` can be installed via `pip` using -
+`nox` can be installed via `uv` using -
 
 ```bash
-pip install nox
+uv sync --only-dev
 ```
 
 The default sessions (`lint` and `tests`) can be executed using -
 
 ```bash
-nox
+uv run nox
 ```
 
 A particular session (for example `tests`) can be run with `nox` on all
 supported Python versions using -
 
 ```bash
-nox -s tests
+uv run nox -s tests
 ```
 
 Only `tests`, `coverage`, `coverage_benchmarks`, `doctests`, `benchmarks`, and
@@ -219,7 +218,7 @@ To specify a particular Python version (for example `3.14`), use the following
 syntax -
 
 ```bash
-nox -s tests-3.14
+uv run nox -s tests-3.14
 ```
 
 One can specify a particular array backend for testing by setting the
@@ -229,20 +228,20 @@ _GLASS_ can be tested with every supported array library by setting
 
 ```bash
 # run tests using numpy
-nox -s tests-3.14
-ARRAY_BACKEND=numpy nox -s tests-3.14
+uv run nox -s tests-3.14
+ARRAY_BACKEND=numpy uv run nox -s tests-3.14
 # run tests using array_api_strict
-ARRAY_BACKEND=array_api_strict nox -s tests-3.14
+ARRAY_BACKEND=array_api_strict uv run nox -s tests-3.14
 # run tests using jax
-ARRAY_BACKEND=jax nox -s tests-3.14
+ARRAY_BACKEND=jax uv run nox -s tests-3.14
 # run tests using every supported array library
-ARRAY_BACKEND=all nox -s tests-3.14
+ARRAY_BACKEND=all uv run nox -s tests-3.14
 ```
 
 The following command can be used to deploy the docs on `localhost` -
 
 ```bash
-nox -s docs -- serve
+uv run nox -s docs -- serve
 ```
 
 The `nox` environments created for each type of session on the first run is
@@ -257,7 +256,7 @@ be run through nox.
 A single benchmark can be run by specifying the revision to benchmark.
 
 ```sh
-nox -s benchmark -- <revision-to-benchmark>
+uv run nox -s benchmark -- <revision-to-benchmark>
 ```
 
 The benchmarks can be used to run a regression test of `glass`. These regression
@@ -265,7 +264,7 @@ tests can be used to compare the performance of two different revisions of
 `glass`.
 
 ```sh
-nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
+uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
 ## Contributing workflow
