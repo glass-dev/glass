@@ -56,10 +56,13 @@ Developer installation
 If you want to install *GLASS* for local development, clone the repository and
 install the package in editable mode::
 
-    $ uv sync
+    $ pip install -e .
 
 All of these words should ideally make sense if you attempt this kind of
 installation.
+
+(If you are using uv for development, you can of course ``uv sync`` your local
+copy instead of pip-installing it.)
 
 
 Versioning
