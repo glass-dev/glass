@@ -134,7 +134,7 @@ def examples(session: nox.Session) -> None:
 
     if session.posargs:
         if "html" in session.posargs:
-            print("Generating HTML for the example notebooks")
+            session.log("Generating HTML for the example notebooks")
             session.run(
                 "jupyter",
                 "nbconvert",
@@ -144,7 +144,7 @@ def examples(session: nox.Session) -> None:
                 "examples/**/*.ipynb",
             )
         else:
-            print("Unsupported argument to examples")
+            session.log("Unsupported argument to examples")
     else:
         session.run(
             "jupyter",
@@ -173,10 +173,12 @@ def docs(session: nox.Session) -> None:
         if "serve" in session.posargs:
             port = 8001
 
-            print(f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit")
+            session.log(
+                f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit"
+            )
             session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
-            print("Unsupported argument to docs")
+            session.log("Unsupported argument to docs")
 
 
 @nox.session
@@ -242,7 +244,7 @@ def regression_tests(session: nox.Session) -> None:
         "--benchmark-sort=name",
     ]
 
-    print(f"Generating prior benchmark from revision {before_revision}")
+    session.log(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
@@ -251,7 +253,7 @@ def regression_tests(session: nox.Session) -> None:
         *shared_benchmark_flags,
     )
 
-    print(f"Comparing {before_revision} benchmark to revision {after_revision}")
+    session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",
