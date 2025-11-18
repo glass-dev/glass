@@ -61,6 +61,9 @@ install the package in editable mode::
 All of these words should ideally make sense if you attempt this kind of
 installation.
 
+(If you are using uv for development, you can of course ``uv sync`` your local
+copy instead of pip-installing it.)
+
 
 Versioning
 ----------
