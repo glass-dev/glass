@@ -39,6 +39,7 @@ import numpy as np
 import array_api_compat
 
 import glass._array_api_utils as _utils
+import glass.harmonics
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -293,7 +294,11 @@ def from_convergence(  # noqa: PLR0913
 
     # if potential is requested, compute map and add to output
     if potential:
-        psi = hp.alm2map(alm, nside, lmax=lmax)
+        psi = glass.harmonics.inverse_transform(
+            alm,
+            nside=nside,
+            lmax=lmax,
+        )
         results += (psi,)
 
     # if no spin-weighted maps are requested, stop here

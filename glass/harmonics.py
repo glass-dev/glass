@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpy as hp
+
 import array_api_compat
 
 if TYPE_CHECKING:
@@ -43,3 +45,35 @@ def multalm(
     """
     xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
     return alm * xp.repeat(bl, xp.arange(bl.size) + 1)
+
+
+def transform(map: FloatArray) -> ComplexArray:
+    """Transform between map and alm representations."""
+    pass
+
+
+def inverse_transform(
+    alm: ComplexArray,
+    *,
+    nside: int | None = None,
+    lmax: int | None = None,
+    pixwin: bool = False,
+    pol: bool = False,
+) -> FloatArray:
+    """
+    Computes the inverse spherical harmonic transform.
+
+    Parameters
+    ----------
+    alm
+        The spherical harmonic coefficients.
+    nside
+        The nside of the output map if using HEALPix.
+    lmax
+        The maximum multipole to use.
+
+    Returns
+    -------
+        The output map.
+    """
+    return hp.alm2map(alm, nside, lmax=lmax)
