@@ -72,8 +72,6 @@ def lint(session: nox.Session) -> None:
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     session.install(
-        "-c",
-        ".github/test-constraints.txt",
         "-e",
         ".",
         "--group",
@@ -109,8 +107,6 @@ def coverage_benchmarks(session: nox.Session) -> None:
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
     session.install(
-        "-c",
-        ".github/test-constraints.txt",
         "-e",
         ".",
         "--group",
