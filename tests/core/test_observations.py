@@ -99,39 +99,26 @@ def test_fixed_zbins_default_xp() -> None:
             for pair in [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
         ],
     )
-    with pytest.warns(
-        UserWarning,
-        match="No array library has been provided",
-    ):
-        zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
+    zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
     assert len(zbins) == nbins
     np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
-    with pytest.warns(
-        UserWarning,
-        match="No array library has been provided",
-    ):
-        zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
+    zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
     np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
-    with pytest.warns(
-        UserWarning,
-        match="No array library has been provided",
-    ):
-        zbins = glass.fixed_zbins(zmin, zmax, dz=0.3)
+    zbins = glass.fixed_zbins(zmin, zmax, dz=0.3)
     assert zmax < zbins[-1][1]
 
     # check error raised
 
     with (
         pytest.raises(ValueError, match="exactly one of nbins and dz must be given"),
-        pytest.warns(UserWarning, match="No array library has been provided"),
     ):
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
 
