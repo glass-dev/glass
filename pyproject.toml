@@ -6,6 +6,15 @@ requires = [
 ]
 
 [dependency-groups]
+build = [
+    "build",
+]
+dev = [
+    "nox",
+    "nox-uv",
+    {include-group = "build"},
+    {include-group = "lint"},
+]
 docs = [
     "array-api-strict",
     "cosmology.api",
@@ -24,6 +33,9 @@ docs = [
 doctest = [
     "jax",
     {include-group = "test"},
+]
+lint = [
+    "pre-commit",
 ]
 test = [
     "cosmology.api",
