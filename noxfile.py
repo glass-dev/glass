@@ -122,7 +122,7 @@ def doctests(session: nox.Session) -> None:
             "--doctest-plus",
             "--doctest-plus-generate-diff=overwrite",
             "glass",
-        ]
+        ],
     )
     session.run("pytest", *session.posargs)
 
@@ -174,7 +174,7 @@ def docs(session: nox.Session) -> None:
             port = 8001
 
             session.log(
-                f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit"
+                f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit",
             )
             session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
