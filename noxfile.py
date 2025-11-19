@@ -5,9 +5,10 @@ import pathlib
 import shutil
 
 import nox
+import nox_uv
 
 # Options to modify nox behaviour
-nox.options.default_venv_backend = "uv|virtualenv"
+nox.options.default_venv_backend = "uv"
 nox.options.reuse_existing_virtualenvs = True
 nox.options.sessions = [
     "lint",
@@ -61,25 +62,21 @@ def _check_revision_count(
         raise ValueError(msg)
 
 
-@nox.session
+@nox_uv.session(
+    uv_no_install_project=True,
+    uv_only_groups=["lint"],
+)
 def lint(session: nox.Session) -> None:
     """Run the linter."""
-    session.install("pre-commit")
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
-    session.install(
-        "-c",
-        ".github/test-constraints.txt",
-        "-e",
-        ".",
-        "--group",
-        "test",
-    )
-
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
         session.install(ARRAY_BACKENDS["array_api_strict"])
@@ -105,36 +102,29 @@ def coverage_benchmarks(session: nox.Session) -> None:
     tests(session)
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["doctest"],
+    uv_no_install_project=True,
+)
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
-    session.install(
-        "-c",
-        ".github/test-constraints.txt",
-        "-e",
-        ".",
-        "--group",
-        "doctest",
-    )
-
     session.posargs.extend(
         [
             "--doctest-plus",
             "--doctest-plus-generate-diff=overwrite",
             "glass",
-        ]
+        ],
     )
     session.run("pytest", *session.posargs)
 
 
-@nox.session
+@nox_uv.session(uv_extras=["examples"])
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
-    session.install("-e", ".[examples]")
-
     if session.posargs:
         if "html" in session.posargs:
-            print("Generating HTML for the example notebooks")
+            session.log("Generating HTML for the example notebooks")
             session.run(
                 "jupyter",
                 "nbconvert",
@@ -144,7 +134,7 @@ def examples(session: nox.Session) -> None:
                 "examples/**/*.ipynb",
             )
         else:
-            print("Unsupported argument to examples")
+            session.log("Unsupported argument to examples")
     else:
         session.run(
             "jupyter",
@@ -155,10 +145,9 @@ def examples(session: nox.Session) -> None:
         )
 
 
-@nox.session
+@nox_uv.session(uv_groups=["docs"])
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
-    session.install("-e", ".", "--group", "docs")
     session.chdir("docs")
     session.run(
         "sphinx-build",
@@ -173,20 +162,24 @@ def docs(session: nox.Session) -> None:
         if "serve" in session.posargs:
             port = 8001
 
-            print(f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit")
+            session.log(
+                f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit",
+            )
             session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
-            print("Unsupported argument to docs")
+            session.log("Unsupported argument to docs")
 
 
-@nox.session
+@nox_uv.session(
+    uv_no_install_project=True,
+    uv_only_groups=["build"],
+)
 def build(session: nox.Session) -> None:
     """Build an SDist and wheel."""
-    session.install("build")
     session.run("python", "-m", "build")
 
 
-@nox.session
+@nox_uv.session
 def version(session: nox.Session) -> None:
     """
     Check the current version of the package.
@@ -195,11 +188,14 @@ def version(session: nox.Session) -> None:
     is installed without any additional dependencies
     through optional dependencies nor dependency groups.
     """
-    session.install("-e", ".")
     session.run("python", "-c", "import glass; print(glass.__version__)")
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_no_install_project=True,
+    uv_only_groups=["test"],
+)
 def benchmarks(session: nox.Session) -> None:
     """
     Run the benchmark test for a specific revision.
@@ -209,15 +205,16 @@ def benchmarks(session: nox.Session) -> None:
     _check_revision_count(session.posargs, expected_count=1)
     revision = session.posargs[0]
 
-    # essentially required just for the dependencies
-    session.install("-e", ".", "--group", "test")
-
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
     session.run("pytest", BENCH_TESTS_LOC)
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_no_install_project=True,
+    uv_only_groups=["test"],
+)
 def regression_tests(session: nox.Session) -> None:
     """
     Run regression benchmark tests between two revisions.
@@ -226,9 +223,6 @@ def regression_tests(session: nox.Session) -> None:
     """
     _check_revision_count(session.posargs, expected_count=2)
     before_revision, after_revision = session.posargs
-
-    # essentially required just for the dependencies
-    session.install("-e", ".", "--group", "test")
 
     # make sure benchmark directory is clean
     benchmark_dir = pathlib.Path(".benchmarks")
@@ -242,7 +236,7 @@ def regression_tests(session: nox.Session) -> None:
         "--benchmark-sort=name",
     ]
 
-    print(f"Generating prior benchmark from revision {before_revision}")
+    session.log(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
@@ -251,7 +245,7 @@ def regression_tests(session: nox.Session) -> None:
         *shared_benchmark_flags,
     )
 
-    print(f"Comparing {before_revision} benchmark to revision {after_revision}")
+    session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",

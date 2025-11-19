@@ -6,6 +6,16 @@ requires = [
 ]
 
 [dependency-groups]
+build = [
+    "build",
+]
+dev = [
+    "coverage[toml]",
+    "nox",
+    "nox-uv",
+    {include-group = "build"},
+    {include-group = "lint"},
+]
 docs = [
     "array-api-strict",
     "cosmology.api",
@@ -24,6 +34,9 @@ docs = [
 doctest = [
     "jax",
     {include-group = "test"},
+]
+lint = [
+    "pre-commit",
 ]
 test = [
     "cosmology.api",
@@ -207,8 +220,6 @@ lint.per-file-ignores = {"__init__.py" = [
     "TRY003", # raise-vanilla-args
 ], "glass/grf/_*" = [
     "SLF001", # private-member-access
-], "noxfile.py" = [
-    "T201", # print
 ], "tests/benchmarks/*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package
