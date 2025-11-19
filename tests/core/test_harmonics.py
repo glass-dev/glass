@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpy as hp
 import numpy as np
 import pytest
 
@@ -57,3 +58,21 @@ def test_multalm(xp: ModuleType) -> None:
 
     result = glass.harmonics.multalm(alm, bl)
     np.testing.assert_allclose(result, alm)
+
+
+def test_transform(xp: ModuleType) -> None:
+    # prepare inputs
+    constant = 1.23
+    lmax = 0
+    nside = 8
+
+    # create an unpolarised map where every pixel is the same
+    simple_map = xp.full(hp.nside2npix(nside), constant)
+
+    a00 = xp.sqrt(4 * xp.pi) * constant
+    # the alm array for lmax=0 has size 1, so it only contains a_00
+    alm_expected = xp.asarray([a00 + 0.0j], dtype=xp.complex128)
+
+    alm_result = glass.harmonics.transform(simple_map, lmax=lmax, polarised_input=False)
+
+    np.testing.assert_allclose(alm_result, alm_expected, rtol=1e-15)
