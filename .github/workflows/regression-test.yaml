@@ -56,6 +56,7 @@ jobs:
           uv run nox -s regression_tests-${{ matrix.python-version }} --
           "$BASE_REF" "$HEAD_REF"
         env:
+          ARRAY_BACKEND: all
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
           FORCE_COLOR: 1
