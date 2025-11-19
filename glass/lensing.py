@@ -312,7 +312,9 @@ def from_convergence(  # noqa: PLR0913
 
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
-        alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
+        alpha = glass.harmonics.inverse_transform(
+            [alm, blm], nside=nside, spin=1, lmax=lmax
+        )
         alpha = alpha[0] + 1j * alpha[1]
         results += (alpha,)
 
@@ -330,7 +332,9 @@ def from_convergence(  # noqa: PLR0913
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    gamma = glass.harmonics.inverse_transform(
+        [alm, blm], nside=nside, spin=2, lmax=lmax
+    )
     gamma = gamma[0] + 1j * gamma[1]
     results += (gamma,)
 
@@ -394,7 +398,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return glass.harmonics.inverse_transform([alm, blm], nside=nside, spin=2, lmax=lmax)
 
 
 class MultiPlaneConvergence:
