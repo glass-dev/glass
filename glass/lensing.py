@@ -45,7 +45,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    import glass
     from glass._types import ComplexArray, FloatArray
     from glass.cosmology import Cosmology
 
@@ -294,11 +293,7 @@ def from_convergence(  # noqa: PLR0913
 
     # if potential is requested, compute map and add to output
     if potential:
-        psi = glass.harmonics.inverse_transform(
-            alm,
-            nside=nside,
-            lmax=lmax,
-        )
+        psi = glass.harmonics.inverse_transform(alm, nside=nside, lmax=lmax)
         results += (psi,)
 
     # if no spin-weighted maps are requested, stop here

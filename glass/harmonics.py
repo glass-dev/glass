@@ -49,16 +49,15 @@ def multalm(
 
 def transform(map: FloatArray) -> ComplexArray:
     """Transform between map and alm representations."""
-    pass
 
 
 def inverse_transform(
     alm: ComplexArray,
     *,
-    nside: int | None = None,
+    nside: int,
+    inplace: bool = False,
     lmax: int | None = None,
-    pixwin: bool = False,
-    pol: bool = False,
+    polarised_input: bool = False,
 ) -> FloatArray:
     """
     Computes the inverse spherical harmonic transform.
@@ -69,11 +68,21 @@ def inverse_transform(
         The spherical harmonic coefficients.
     nside
         The nside of the output map if using HEALPix.
+    inplace
+        Whether to perform the operation in place.
     lmax
         The maximum multipole to use.
+    polarised_input
+        Whether the input alm represents polarised data.
 
     Returns
     -------
         The output map.
     """
-    return hp.alm2map(alm, nside, lmax=lmax)
+    return hp.alm2map(
+        alm,
+        nside,
+        inplace=inplace,
+        lmax=lmax,
+        pol=polarised_input,
+    )
