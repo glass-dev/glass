@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import collections.abc
 from typing import TYPE_CHECKING
 
 import healpy as hp
@@ -80,14 +81,14 @@ def transform(
 
 
 def inverse_transform(  # noqa: PLR0913
-    alm: ComplexArray | list[ComplexArray],
+    alm: ComplexArray | collections.abc.Sequence[ComplexArray],
     *,
     nside: int,
     inplace: bool = False,
     lmax: int | None = None,
     polarised_input: bool = True,
     spin: int | None = None,
-) -> FloatArray:
+) -> FloatArray | list[FloatArray]:
     """
     Computes the inverse spherical harmonic transform.
 
@@ -95,7 +96,7 @@ def inverse_transform(  # noqa: PLR0913
     ----------
     alm
         The spherical harmonic coefficients. If computing a spin-s map (spin is
-        not None), this should be a list or tuple of two coefficient arrays:
+        not None), this should be a sequence of two coefficient arrays:
         [alm, blm]. Otherwise, it is the single alm array.
     nside
         The nside of the output map if using HEALPix.
@@ -127,10 +128,10 @@ def inverse_transform(  # noqa: PLR0913
 
     # check if alm is of the correct form for spin transforms
     if not (hasattr(alm, "shape") and alm.shape[0] == 2) and not (
-        isinstance(alm, (list, tuple)) and len(alm) == 2
+        isinstance(alm, collections.abc.Sequence) and len(alm) == 2
     ):
         # alm must be a sequence [alm, blm]
-        msg = "For spin transforms, alm must be of the form [alm, blm]."
+        msg = "for spin transforms, alm must be of the form [alm, blm]"
         raise ValueError(msg)
     # does not accept "inplace" or "polarised_input" arguments
     return hp.alm2map_spin(alm, nside, spin, lmax)
