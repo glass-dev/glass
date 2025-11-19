@@ -47,8 +47,37 @@ def multalm(
     return alm * xp.repeat(bl, xp.arange(bl.size) + 1)
 
 
-def transform(map: FloatArray) -> ComplexArray:
-    """Transform between map and alm representations."""
+def transform(
+    maps: FloatArray,
+    *,
+    lmax: int | None = None,
+    polarised_input: bool = True,
+    use_pixel_weights: bool = False,
+) -> ComplexArray:
+    """
+    Computes the spherical harmonic transform.
+
+    Parameters
+    ----------
+    maps
+        The input map(s).
+    lmax
+        The maximum multipole to use.
+    polarised_input, optional
+        Whether the input maps represent polarised data.
+    use_pixel_weights, optional
+        Whether to use pixel weights in the transform.
+
+    Returns
+    -------
+        The spherical harmonic coefficients.
+    """
+    return hp.map2alm(
+        maps,
+        lmax=lmax,
+        pol=polarised_input,
+        use_pixel_weights=use_pixel_weights,
+    )
 
 
 def inverse_transform(
@@ -57,7 +86,7 @@ def inverse_transform(
     nside: int,
     inplace: bool = False,
     lmax: int | None = None,
-    polarised_input: bool = False,
+    polarised_input: bool = True,
 ) -> FloatArray:
     """
     Computes the inverse spherical harmonic transform.
