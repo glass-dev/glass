@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-import pytest
 
 import glass.arraytools
 
@@ -16,8 +15,8 @@ if TYPE_CHECKING:
 def test_broadcast_leading_axes(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
     a_in = 0
-    b_in = xp.zeros((4, 10))
-    c_in = xp.zeros((3, 1, 5, 6))
+    b_in = xp.zeros((40, 10))
+    c_in = xp.zeros((300, 1, 50, 60))
 
     dims, *rest = benchmark(
         glass.arraytools.broadcast_leading_axes,
@@ -27,41 +26,41 @@ def test_broadcast_leading_axes(xp: ModuleType, benchmark: BenchmarkFixture) -> 
     )
     a_out, b_out, c_out = rest
 
-    assert dims == (3, 4)
-    assert a_out.shape == (3, 4)
-    assert b_out.shape == (3, 4, 10)
-    assert c_out.shape == (3, 4, 5, 6)
+    assert dims == (300, 40)
+    assert a_out.shape == (300, 40)
+    assert b_out.shape == (300, 40, 10)
+    assert c_out.shape == (300, 40, 50, 60)
 
 
-@pytest.mark.parametrize(
-    ("f_in", "x_in", "ct_out"),
-    [
-        # 1D f and x
-        (
-            [1, 2, 3, 4],
-            [0, 1, 2, 3],
-            [0.0, 1.5, 4.0, 7.5],
-        ),
-        # 2D f and 1D x
-        (
-            [[1, 4, 9, 16], [2, 3, 5, 7]],
-            [0, 1, 2.5, 4],
-            [[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]],
-        ),
-    ],
-)
-def test_cumulative_trapezoid(
+def test_cumulative_trapezoid_1d(
     xp: ModuleType,
-    f_in: list[int],
-    x_in: list[int],
-    ct_out: list[int],
     benchmark: BenchmarkFixture,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
-    # 1D f and x
+    f = xp.arange(5001)[1:]  # [1, 2, 3, 4,...]
+    x = xp.arange(5000)  # [0, 1, 2, 3,...]
 
-    f = xp.asarray(f_in)
-    x = xp.asarray(x_in)
+    expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    np.testing.assert_allclose(ct, xp.asarray(ct_out))
+    np.testing.assert_allclose(ct[:4], xp.asarray(expected_first_4_out))
+
+
+def test_cumulative_trapezoid_2d(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+) -> None:
+    """Benchmark test for glass.arraytools.cumulative_trapezoid."""
+    f = xp.stack(
+        [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
+            xp.arange(2501)[1:],
+            xp.arange(2501)[1:],
+        ]
+    )
+    x = xp.arange(2500)  # [0, 1, 2, 3,...]
+
+    expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
+
+    ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
+    np.testing.assert_allclose(ct[0, :4], xp.asarray(expected_first_4_out))
+    np.testing.assert_allclose(ct[1, :4], xp.asarray(expected_first_4_out))
