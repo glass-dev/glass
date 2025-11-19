@@ -63,14 +63,15 @@ def transform(
         The input map(s).
     lmax
         The maximum multipole to use.
-    polarised_input, optional
+    polarised_input
         Whether the input maps represent polarised data.
-    use_pixel_weights, optional
+    use_pixel_weights
         Whether to use pixel weights in the transform.
 
     Returns
     -------
         The spherical harmonic coefficients.
+
     """
     return hp.map2alm(
         maps,
@@ -114,6 +115,7 @@ def inverse_transform(  # noqa: PLR0913
     Returns
     -------
         The output map(s).
+
     """
     if spin is None:
         # alm is the single alm array or a sequence/array of 3 for polarised data
