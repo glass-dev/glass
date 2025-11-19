@@ -33,8 +33,6 @@ def multalm(
         The alm to multiply.
     bl
         The bl to multiply.
-    inplace
-        Whether to perform the operation in place.
 
     Returns
     -------
