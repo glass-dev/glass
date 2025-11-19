@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import collections.abc
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 import healpy as hp
@@ -81,7 +81,7 @@ def transform(
 
 
 def inverse_transform(  # noqa: PLR0913
-    alm: ComplexArray | collections.abc.Sequence[ComplexArray],
+    alm: ComplexArray | Sequence[ComplexArray],
     *,
     nside: int,
     inplace: bool = False,
@@ -128,7 +128,7 @@ def inverse_transform(  # noqa: PLR0913
 
     # check if alm is of the correct form for spin transforms
     if not (hasattr(alm, "shape") and alm.shape[0] == 2) and not (
-        isinstance(alm, collections.abc.Sequence) and len(alm) == 2
+        isinstance(alm, Sequence) and len(alm) == 2
     ):
         # alm must be a sequence [alm, blm]
         msg = "for spin transforms, alm must be of the form [alm, blm]"
