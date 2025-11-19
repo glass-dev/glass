@@ -89,22 +89,39 @@ def _setup_array_backend(session: nox.Session) -> None:
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     _setup_array_backend(session)
-
     session.run("pytest", *session.posargs, env=os.environ)
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
-    session.posargs.append("--cov")
-    tests(session)
+    _setup_array_backend(session)
+    session.run(
+        "pytest",
+        "--cov",
+        *session.posargs,
+        env=os.environ,
+    )
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
 def coverage_benchmarks(session: nox.Session) -> None:
     """Run tests and compute coverage for the benchmark tests."""
+    _setup_array_backend(session)
     session.posargs.extend([BENCH_TESTS_LOC, "--cov"])
-    tests(session)
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        "--cov",
+        *session.posargs,
+        env=os.environ,
+    )
 
 
 @nox_uv.session(
