@@ -45,7 +45,6 @@ import numpy as np
 
 import array_api_compat
 
-import glass
 import glass._array_api_utils as _utils
 import glass.arraytools
 
