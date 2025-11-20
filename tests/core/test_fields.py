@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass.fields
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -697,7 +698,7 @@ def test_cov_from_spectra() -> None:
 
 def test_check_posdef_spectra() -> None:
     # posdef spectra
-    assert glass.fields.check_posdef_spectra(
+    assert glass.check_posdef_spectra(
         np.array(
             [
                 [1.0, 1.0, 1.0],
@@ -707,7 +708,7 @@ def test_check_posdef_spectra() -> None:
         ),
     )
     # semidef spectra
-    assert glass.fields.check_posdef_spectra(
+    assert glass.check_posdef_spectra(
         np.array(
             [
                 [1.0, 1.0, 1.0],
@@ -717,7 +718,7 @@ def test_check_posdef_spectra() -> None:
         ),
     )
     # indef spectra
-    assert not glass.fields.check_posdef_spectra(
+    assert not glass.check_posdef_spectra(
         np.array(
             [
                 [1.0, 1.0, 1.0],
@@ -739,14 +740,14 @@ def test_regularized_spectra(
     with pytest.warns(UserWarning, match="Nearest correlation matrix not found"):
         # we don't care about convergence here, only that the correct
         # method is called so this is to suppress the warning
-        glass.fields.regularized_spectra(spectra, method="nearest")
+        glass.regularized_spectra(spectra, method="nearest")
     cov_nearest.assert_called_once()
 
     # test method "clip"
     cov_clip = mocker.spy(glass.algorithm, "cov_clip")
-    glass.fields.regularized_spectra(spectra, method="clip")
+    glass.regularized_spectra(spectra, method="clip")
     cov_clip.assert_called_once()
 
     # invalid method
     with pytest.raises(ValueError, match="unknown method"):
-        glass.fields.regularized_spectra(spectra, method="unknown")
+        glass.regularized_spectra(spectra, method="unknown")
