@@ -19,7 +19,7 @@ def test_getcl_lmax_0(
     benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax of 0."""
-    range_size = benchmark_scale_factor * 10
+    range_size = benchmark_scale_factor
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -43,13 +43,13 @@ def test_getcl_lmax_0(
     np.testing.assert_allclose(result, expected)
 
 
-def test_getcl_lmax_50(
+def test_getcl_lmax_larger_than_cls(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
     benchmark_scale_factor: int,
 ) -> None:
-    """Benchmarks for glass.fields.getcl with lmax of 50."""
-    range_size = benchmark_scale_factor * 10
+    """Benchmarks for glass.fields.getcl with lmax larger than the length of cl."""
+    range_size = benchmark_scale_factor
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -61,13 +61,14 @@ def test_getcl_lmax_50(
     random_j = randrange(range_size)
 
     # check padding
+    lmax = range_size + 50
     result = benchmark(
         glass.fields.getcl,
         cls,
         random_i,
         random_j,
-        lmax=50,
+        lmax=lmax,
     )
-    expected = xp.zeros((49,), dtype=xp.float64)
-    assert result.size == 51
+    expected = xp.zeros((lmax - 1,), dtype=xp.float64)
+    assert result.size == lmax + 1
     np.testing.assert_allclose(result[2:], expected)
