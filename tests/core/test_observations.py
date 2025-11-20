@@ -53,7 +53,7 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # check passing in the norm
 
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
-    np.testing.assert_array_equal(nz, np.zeros_like(nz))
+    np.testing.assert_array_equal(nz, xp.zeros_like(nz))
 
     # check the value of each entry is close to the norm
 
@@ -82,7 +82,7 @@ def test_smail_nz(xp: ModuleType) -> None:
     # check passing in the norm
 
     pz = glass.smail_nz(z, mode, alpha, beta, norm=0)
-    np.testing.assert_array_equal(pz, np.zeros_like(pz))
+    np.testing.assert_array_equal(pz, xp.zeros_like(pz))
 
 
 def test_fixed_zbins_default_xp() -> None:
