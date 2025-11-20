@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass.grf
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from pytest_mock import MockerFixture
 
 
-def test_corr_unknown() -> None:
+def test_corr_unknown(xp: ModuleType) -> None:
     class Unknown:
         def corr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
@@ -24,7 +25,7 @@ def test_corr_unknown() -> None:
 
     t1 = glass.grf.Normal()
     t2 = Unknown()
-    x = np.zeros(10)
+    x = xp.zeros(10)
 
     with pytest.raises(NotImplementedError, match="Unknown"):
         glass.grf.corr(t1, t2, x)
@@ -36,14 +37,14 @@ def test_corr_unknown() -> None:
         glass.grf.dcorr(t1, t2, x)
 
 
-def test_compute(mocker: MockerFixture) -> None:
+def test_compute(xp: ModuleType, mocker: MockerFixture) -> None:
     cltocorr = mocker.patch("transformcl.cltocorr")
     icorr = mocker.patch("glass.grf._core.icorr")
     corrtocl = mocker.patch("transformcl.corrtocl")
 
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
-    x = np.zeros(10)
+    x = xp.zeros(10)
 
     result = glass.grf.compute(x, t1, t2)
 

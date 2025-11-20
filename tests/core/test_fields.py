@@ -351,14 +351,14 @@ def test_generate_grf() -> None:
         list(glass.fields._generate_grf([], nside))
 
 
-def test_generate_gaussian() -> None:
+def test_generate_gaussian(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        glass.generate_gaussian([np.array([1.0, 0.5, 0.1])], 4)
+        glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate_lognormal() -> None:
+def test_generate_lognormal(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        glass.generate_lognormal([np.array([1.0, 0.5, 0.1])], 4)
+        glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
 def test_generate() -> None:
@@ -466,8 +466,8 @@ def test_enumerate_spectra() -> None:
         next(it)
 
 
-def test_spectra_indices() -> None:
-    np.testing.assert_array_equal(glass.spectra_indices(0), np.zeros((0, 2)))
+def test_spectra_indices(xp: ModuleType) -> None:
+    np.testing.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
     np.testing.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
     np.testing.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
     np.testing.assert_array_equal(
@@ -502,12 +502,11 @@ def test_lognormal_fields(xp: ModuleType) -> None:
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra(mocker: MockerFixture) -> None:
+def test_compute_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra = [np.zeros(10), np.zeros(10), np.zeros(10)]
-
+    spectra = [xp.zeros(10), xp.zeros(10), xp.zeros(10)]
     gls = glass.compute_gaussian_spectra(fields, spectra)
 
     assert mock.call_count == 3
@@ -521,12 +520,12 @@ def test_compute_gaussian_spectra(mocker: MockerFixture) -> None:
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
-def test_compute_gaussian_spectra_gh639(mocker: MockerFixture) -> None:
+def test_compute_gaussian_spectra_gh639(xp: ModuleType, mocker: MockerFixture) -> None:
     """Test compute_gaussian_spectra() with an empty input."""
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra = [np.zeros(10), np.zeros(10), np.zeros(0)]
+    spectra = [xp.zeros(10), xp.zeros(10), xp.zeros(0)]
 
     gls = glass.compute_gaussian_spectra(fields, spectra)
 
@@ -537,7 +536,7 @@ def test_compute_gaussian_spectra_gh639(mocker: MockerFixture) -> None:
     assert gls[2].size == 0
 
 
-def test_solve_gaussian_spectra(mocker: MockerFixture) -> None:
+def test_solve_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None:
     mock = mocker.patch("glass.grf.solve")
 
     result = mock.return_value
@@ -545,7 +544,7 @@ def test_solve_gaussian_spectra(mocker: MockerFixture) -> None:
     mock.return_value = (result, None, 3)
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra = [np.zeros(5), np.zeros(10), np.zeros(15)]
+    spectra = [xp.zeros(5), xp.zeros(10), xp.zeros(15)]
 
     gls = glass.solve_gaussian_spectra(fields, spectra)
 
