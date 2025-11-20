@@ -19,7 +19,7 @@ def test_broadcast_leading_axes(
 ) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
     # Ensure we don't use too much memory
-    scale_factor = min(benchmark_scale_factor, 1000)
+    scale_factor = min(benchmark_scale_factor, 100)
 
     a_in = 0
     b_shape = (scale_factor * 4, 10)
