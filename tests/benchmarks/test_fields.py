@@ -208,15 +208,23 @@ def test_cls2cov_multiple_iterations(
     np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
 
 
+def _nth_triangular_number(n: int) -> int:
+    """Return the nth triangular number."""
+    return int(n * (n + 1) * 0.5)
+
+
 def test_discretized_cls_lmax_provided(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.discretized_cls with lmax provided."""
     if xp.__name__ == "array_api_strict":
         pytest.skip("glass.fields.discretized_cls has not been ported to the array-api")
     # power spectra truncated at lmax + 1 if lmax provided
-    cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
+    cls = [
+        xp.arange(10) for _ in range(_nth_triangular_number(benchmark_scale_factor * 3))
+    ]
     result = benchmark(glass.fields.discretized_cls, cls, lmax=5)
 
     for cl in result:
@@ -226,11 +234,14 @@ def test_discretized_cls_lmax_provided(
 def test_discretized_cls_ncorr_provided(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.discretized_cls with ncorr provided."""
     if xp.__name__ == "array_api_strict":
         pytest.skip("glass.fields.discretized_cls has not been ported to the array-api")
-    cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
+    cls = [
+        xp.arange(10) for _ in range(_nth_triangular_number(benchmark_scale_factor * 3))
+    ]
     ncorr = 0
     result = benchmark(glass.fields.discretized_cls, cls, ncorr=ncorr)
 
@@ -242,12 +253,14 @@ def test_discretized_cls_ncorr_provided(
 def test_discretized_cls_nside_provided(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.discretized_cls with nside provided."""
     if xp.__name__ == "array_api_strict":
         pytest.skip("glass.fields.discretized_cls has not been ported to the array-api")
     # check if pixel window function was applied correctly with nside not None
-    cls = [[], xp.ones(10), xp.ones(10)]
+    cls = [xp.ones(10) for _ in range(_nth_triangular_number(benchmark_scale_factor))]
+    cls[0] = []
     nside = 4
 
     pw = hp.pixwin(nside, lmax=7)
