@@ -507,6 +507,7 @@ def test_compute_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
     spectra = [xp.zeros(10), xp.zeros(10), xp.zeros(10)]
+
     gls = glass.compute_gaussian_spectra(fields, spectra)
 
     assert mock.call_count == 3
