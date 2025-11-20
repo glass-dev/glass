@@ -90,7 +90,7 @@ def test_redshifts_from_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     # case: no extra dimensions
 
-    count: int | NDArray[np.float64] = 10
+    count: int | NDArray[xp.float64] = 10
     z = xp.linspace(0, 1, 100)
     nz = z * (1 - z)
 
