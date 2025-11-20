@@ -12,11 +12,25 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
-def test_broadcast_leading_axes(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
+def test_broadcast_leading_axes(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
+) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
+    # Ensure we don't use too much memory
+    scale_factor = min(benchmark_scale_factor, 1000)
+
     a_in = 0
-    b_in = xp.zeros((40, 10))
-    c_in = xp.zeros((300, 1, 50, 60))
+    b_shape = (scale_factor * 4, 10)
+    c_shape = (
+        scale_factor * 30,
+        1,
+        scale_factor * 5,
+        scale_factor * 6,
+    )
+    b_in = xp.zeros(b_shape)
+    c_in = xp.zeros(c_shape)
 
     dims, *rest = benchmark(
         glass.arraytools.broadcast_leading_axes,
@@ -26,19 +40,21 @@ def test_broadcast_leading_axes(xp: ModuleType, benchmark: BenchmarkFixture) -> 
     )
     a_out, b_out, c_out = rest
 
-    assert dims == (300, 40)
-    assert a_out.shape == (300, 40)
-    assert b_out.shape == (300, 40, 10)
-    assert c_out.shape == (300, 40, 50, 60)
+    assert dims == (c_shape[0], b_shape[0])
+    assert a_out.shape == (c_shape[0], b_shape[0])
+    assert b_out.shape == (c_shape[0], b_shape[0], b_shape[1])
+    assert c_out.shape == (c_shape[0], b_shape[0], c_shape[2], c_shape[3])
 
 
 def test_cumulative_trapezoid_1d(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
-    f = xp.arange(5001)[1:]  # [1, 2, 3, 4,...]
-    x = xp.arange(5000)  # [0, 1, 2, 3,...]
+    scaled_length = benchmark_scale_factor * 10
+    f = xp.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
+    x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
     expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
@@ -49,15 +65,17 @@ def test_cumulative_trapezoid_1d(
 def test_cumulative_trapezoid_2d(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
+    scaled_length = benchmark_scale_factor * 5
     f = xp.stack(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
-            xp.arange(2501)[1:],
-            xp.arange(2501)[1:],
+            xp.arange(scaled_length + 1)[1:],
+            xp.arange(scaled_length + 1)[1:],
         ]
     )
-    x = xp.arange(2500)  # [0, 1, 2, 3,...]
+    x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
     expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
