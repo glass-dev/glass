@@ -16,9 +16,10 @@ if TYPE_CHECKING:
 def test_getcl_no_lmax(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.getcl with no value of lmax."""
-    range_size = 10
+    range_size = benchmark_scale_factor * 10
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -45,9 +46,10 @@ def test_getcl_no_lmax(
 def test_getcl_lmax_0(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax of 0."""
-    range_size = 10
+    range_size = benchmark_scale_factor * 10
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -74,9 +76,10 @@ def test_getcl_lmax_0(
 def test_getcl_lmax_50(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
+    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax of 50."""
-    range_size = 10
+    range_size = benchmark_scale_factor * 10
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
