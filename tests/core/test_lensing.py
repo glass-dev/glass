@@ -28,30 +28,30 @@ def test_from_convergence(rng: np.random.Generator) -> None:
     # check with all False
 
     results = glass.from_convergence(kappa)
-    np.testing.assert_array_equal(results, ())
+    _compare.assert_array_equal(results, ())
 
     # check all combinations of potential, deflection, shear being True
 
     results = glass.from_convergence(kappa, potential=True)
-    np.testing.assert_array_equal(len(results), 1)
+    _compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, deflection=True)
-    np.testing.assert_array_equal(len(results), 1)
+    _compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, shear=True)
-    np.testing.assert_array_equal(len(results), 1)
+    _compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, potential=True, deflection=True)
-    np.testing.assert_array_equal(len(results), 2)
+    _compare.assert_array_equal(len(results), 2)
 
     results = glass.from_convergence(kappa, potential=True, shear=True)
-    np.testing.assert_array_equal(len(results), 2)
+    _compare.assert_array_equal(len(results), 2)
 
     results = glass.from_convergence(kappa, deflection=True, shear=True)
-    np.testing.assert_array_equal(len(results), 2)
+    _compare.assert_array_equal(len(results), 2)
 
     results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
-    np.testing.assert_array_equal(len(results), 3)
+    _compare.assert_array_equal(len(results), 3)
 
 
 def test_shear_from_convergence() -> None:
@@ -65,8 +65,8 @@ def test_multi_plane_matrix(
 ) -> None:
     mat = glass.multi_plane_matrix(shells, cosmo)
 
-    np.testing.assert_array_equal(mat, np.tril(mat))
-    np.testing.assert_array_equal(np.triu(mat, 1), 0)
+    _compare.assert_array_equal(mat, np.tril(mat))
+    _compare.assert_array_equal(np.triu(mat, 1), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -88,8 +88,8 @@ def test_multi_plane_weights(
     w_in = np.eye(len(shells))
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    np.testing.assert_array_equal(w_out, np.triu(w_out, 1))
-    np.testing.assert_array_equal(np.tril(w_out), 0)
+    _compare.assert_array_equal(w_out, np.triu(w_out, 1))
+    _compare.assert_array_equal(np.tril(w_out), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 

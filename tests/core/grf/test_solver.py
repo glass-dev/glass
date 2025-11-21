@@ -26,7 +26,7 @@ def test_one_transformation(cl: NDArray[np.float64], rng: np.random.Generator) -
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, t)
 
-    np.testing.assert_array_equal(gl1, gl2)
+    _compare.assert_array_equal(gl1, gl2)
 
 
 def test_pad(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
@@ -51,7 +51,7 @@ def test_initial(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, initial=gl)
 
-    np.testing.assert_array_equal(gl1, gl2)
+    _compare.assert_array_equal(gl1, gl2)
 
 
 def test_no_iterations(cl: NDArray[np.float64]) -> None:
@@ -60,7 +60,7 @@ def test_no_iterations(cl: NDArray[np.float64]) -> None:
     gl1 = glass.grf.compute(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, maxiter=0)
 
-    np.testing.assert_array_equal(gl1, gl2)
+    _compare.assert_array_equal(gl1, gl2)
 
 
 def test_lognormal(cl: NDArray[np.float64], rng: np.random.Generator) -> None:

@@ -24,7 +24,7 @@ def test_distance_weight(xp: ModuleType, cosmo: Cosmology) -> None:
     # check shape
 
     w = glass.DistanceWeight(cosmo)(z)
-    np.testing.assert_array_equal(w.shape, z.shape)
+    _compare.assert_array_equal(w.shape, z.shape)
 
     # check first value is 1
 
@@ -42,7 +42,7 @@ def test_volume_weight(xp: ModuleType, cosmo: Cosmology) -> None:
     # check shape
 
     w = glass.VolumeWeight(cosmo)(z)
-    np.testing.assert_array_equal(w.shape, z.shape)
+    _compare.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0
 
@@ -60,7 +60,7 @@ def test_density_weight(cosmo: Cosmology) -> None:
     # check shape
 
     w = glass.DensityWeight(cosmo)(z)
-    np.testing.assert_array_equal(w.shape, z.shape)
+    _compare.assert_array_equal(w.shape, z.shape)
 
     # check first value is 0
 

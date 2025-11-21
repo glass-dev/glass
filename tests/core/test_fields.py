@@ -469,10 +469,10 @@ def test_enumerate_spectra() -> None:
 
 
 def test_spectra_indices(xp: ModuleType) -> None:
-    np.testing.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
-    np.testing.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
-    np.testing.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
-    np.testing.assert_array_equal(
+    _compare.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
+    _compare.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
+    _compare.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
+    _compare.assert_array_equal(
         glass.spectra_indices(3),
         [[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]],
     )
@@ -583,19 +583,19 @@ def test_solve_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None:
 def test_glass_to_healpix_spectra() -> None:
     inp = [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
     out = glass.glass_to_healpix_spectra(inp)
-    np.testing.assert_array_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
+    _compare.assert_array_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
 
 
 def test_healpix_to_glass_spectra() -> None:
     inp = [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
     out = glass.healpix_to_glass_spectra(inp)
-    np.testing.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
+    _compare.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
 def test_glass_to_healpix_alm() -> None:
     inp = np.array([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
-    np.testing.assert_array_equal(
+    _compare.assert_array_equal(
         out,
         np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
@@ -623,7 +623,7 @@ def test_cov_from_spectra() -> None:
         ],
     )
 
-    np.testing.assert_array_equal(
+    _compare.assert_array_equal(
         glass.cov_from_spectra(spectra),
         [
             [
@@ -649,7 +649,7 @@ def test_cov_from_spectra() -> None:
         ],
     )
 
-    np.testing.assert_array_equal(
+    _compare.assert_array_equal(
         glass.cov_from_spectra(spectra, lmax=1),
         [
             [
@@ -665,7 +665,7 @@ def test_cov_from_spectra() -> None:
         ],
     )
 
-    np.testing.assert_array_equal(
+    _compare.assert_array_equal(
         glass.cov_from_spectra(spectra, lmax=4),
         [
             [

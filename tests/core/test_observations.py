@@ -23,12 +23,12 @@ def test_vmap_galactic_ecliptic() -> None:
     # check shape
 
     vmap = glass.vmap_galactic_ecliptic(n_side)
-    np.testing.assert_array_equal(len(vmap), healpix.nside2npix(n_side))
+    _compare.assert_array_equal(len(vmap), healpix.nside2npix(n_side))
 
     # no rotation
 
     vmap = glass.vmap_galactic_ecliptic(n_side, galactic=(0, 0), ecliptic=(0, 0))
-    np.testing.assert_array_equal(vmap, np.zeros_like(vmap))
+    _compare.assert_array_equal(vmap, np.zeros_like(vmap))
 
     # check errors raised
 
@@ -54,7 +54,7 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # check passing in the norm
 
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
-    np.testing.assert_array_equal(nz, xp.zeros_like(nz))
+    _compare.assert_array_equal(nz, xp.zeros_like(nz))
 
     # check the value of each entry is close to the norm
 
@@ -83,7 +83,7 @@ def test_smail_nz(xp: ModuleType) -> None:
     # check passing in the norm
 
     pz = glass.smail_nz(z, mode, alpha, beta, norm=0)
-    np.testing.assert_array_equal(pz, xp.zeros_like(pz))
+    _compare.assert_array_equal(pz, xp.zeros_like(pz))
 
 
 def test_fixed_zbins_default_xp() -> None:
@@ -190,7 +190,7 @@ def test_tomo_nz_gausserr(xp: ModuleType) -> None:
     # check zeros returned
 
     binned_nz = glass.tomo_nz_gausserr(z, xp.zeros_like(z), sigma_0, zbins)
-    np.testing.assert_array_equal(binned_nz, xp.zeros_like(binned_nz))
+    _compare.assert_array_equal(binned_nz, xp.zeros_like(binned_nz))
 
     # check the shape of the output
 

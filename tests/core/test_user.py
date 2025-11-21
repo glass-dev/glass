@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_comparison as _compare
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -32,12 +33,12 @@ def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> Non
         values = npz["values"]
         split = npz["split"]
 
-    np.testing.assert_array_equal(values, np.concatenate(cls))
-    np.testing.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
-    np.testing.assert_array_equal(cls, np.split(values, split))
+    _compare.assert_array_equal(values, np.concatenate(cls))
+    _compare.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
+    _compare.assert_array_equal(cls, np.split(values, split))
 
     npz = glass.load_cls(tmp_path / cls_file)
-    np.testing.assert_array_equal(npz, cls)
+    _compare.assert_array_equal(npz, cls)
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")

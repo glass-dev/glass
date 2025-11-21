@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_comparison as _compare
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -213,13 +214,13 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     phz = glass.gaussian_phz(z, sigma_0)
 
-    np.testing.assert_array_equal(z, phz)
+    _compare.assert_array_equal(z, phz)
 
     # test with rng
 
     phz = glass.gaussian_phz(z, sigma_0, rng=urng)
 
-    np.testing.assert_array_equal(z, phz)
+    _compare.assert_array_equal(z, phz)
 
     # case: truncated normal
 
@@ -262,7 +263,7 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    np.testing.assert_array_equal(z, phz)
+    _compare.assert_array_equal(z, phz)
 
     # case: scalar redshift, array sigma_0
 
@@ -273,7 +274,7 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    np.testing.assert_array_equal(z, phz)
+    _compare.assert_array_equal(z, phz)
 
     # case: array redshift, array sigma_0
 
@@ -284,7 +285,7 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (11, 10)
-    np.testing.assert_array_equal(xp.broadcast_to(z, (11, 10)), phz)
+    _compare.assert_array_equal(xp.broadcast_to(z, (11, 10)), phz)
 
     # shape mismatch
 
