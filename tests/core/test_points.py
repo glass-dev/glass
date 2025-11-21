@@ -447,7 +447,11 @@ def test_displacement(
     # test each displacement individually
     for from_lon, from_lat, to_lon, to_lat, alpha in data:
         alpha_ = glass.displacement(from_lon, from_lat, to_lon, to_lat)
-        compare.assert_allclose(alpha_, alpha)
+        assert np.allclose(alpha_, alpha), (
+            f"displacement from ({from_lon}, {from_lat}) to ({to_lon}, {to_lat})"
+            f"\ndistance: expected {xp.abs(alpha)}, got {xp.abs(alpha_)}"
+            f"\ndirection: expected {xp.angle(alpha)}, got {xp.angle(alpha_)}"
+        )
 
     # test on an array
     alpha = glass.displacement(
