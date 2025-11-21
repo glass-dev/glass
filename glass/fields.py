@@ -16,7 +16,6 @@ from transformcl import cltovar
 import array_api_compat
 import array_api_extra as xpx
 
-import glass
 import glass.grf
 import glass.harmonics
 

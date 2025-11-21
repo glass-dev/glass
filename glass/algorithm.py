@@ -111,8 +111,8 @@ def cov_clip(
     The relative tolerance *rtol* is defined as for
     :func:`~array_api.linalg.matrix_rank`.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     cov
         A symmetric matrix (or a stack of matrices).
     rtol
