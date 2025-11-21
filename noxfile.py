@@ -27,6 +27,11 @@ ARRAY_BACKENDS = {
 }
 BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
+SHARED_BENCHMARK_FLAGS = [
+    "--benchmark-columns=mean,stddev,rounds",
+    "--benchmark-sort=name",
+    "--benchmark-timer=time.process_time",
+]
 
 
 def _check_revision_count(
@@ -118,6 +123,7 @@ def coverage_benchmarks(session: nox.Session) -> None:
         "pytest",
         BENCH_TESTS_LOC,
         "--cov",
+        *SHARED_BENCHMARK_FLAGS,
         *session.posargs,
         env=os.environ,
     )
@@ -253,19 +259,13 @@ def regression_tests(session: nox.Session) -> None:
         session.log(f"Deleting previous benchmark directory: {benchmark_dir}")
         shutil.rmtree(benchmark_dir)
 
-    shared_benchmark_flags = [
-        "--benchmark-timer=time.process_time",
-        "--benchmark-columns=mean,stddev,rounds",
-        "--benchmark-sort=name",
-    ]
-
     session.log(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
         "--benchmark-autosave",
-        *shared_benchmark_flags,
+        *SHARED_BENCHMARK_FLAGS,
     )
 
     session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
@@ -275,5 +275,5 @@ def regression_tests(session: nox.Session) -> None:
         BENCH_TESTS_LOC,
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=mean:10%",
-        *shared_benchmark_flags,
+        *SHARED_BENCHMARK_FLAGS,
     )
