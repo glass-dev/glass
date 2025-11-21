@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
 
 
-def test_distance_weight(cosmo: Cosmology) -> None:
+def test_distance_weight(xp: ModuleType, cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.DistanceWeight`."""
-    z = np.linspace(0, 1, 6)
+    z = xp.linspace(0, 1, 6)
 
     # check shape
 
@@ -34,9 +34,9 @@ def test_distance_weight(cosmo: Cosmology) -> None:
     np.testing.assert_array_less(w[1:], w[:-1])
 
 
-def test_volume_weight(cosmo: Cosmology) -> None:
+def test_volume_weight(xp: ModuleType, cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.VolumeWeight`."""
-    z = np.linspace(0, 1, 6)
+    z = xp.linspace(0, 1, 6)
 
     # check shape
 
@@ -342,7 +342,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
     dx = 0.2
     x = glass.distance_grid(cosmo, zmin, zmax, dx=dx)
-    assert len(x) == np.ceil((zmax - zmin) / dx) + 1
+    assert len(x) == math.ceil((zmax - zmin) / dx) + 1
 
     # check decrease in distance
 
