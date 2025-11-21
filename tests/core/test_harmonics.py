@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
 import pytest
+
+import array_api_extra as xpx
 
 import glass.harmonics
 
@@ -61,6 +64,9 @@ def test_multalm(xp: ModuleType) -> None:
 
 
 def test_transform(xp: ModuleType) -> None:
+    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+        pytest.skip("transform depends on healpy which is not Array API compatible")
+
     # prepare inputs
     constant = 1.23
     lmax = 0
@@ -69,7 +75,7 @@ def test_transform(xp: ModuleType) -> None:
     # create an unpolarised map where every pixel is the same
     simple_map = xp.full(hp.nside2npix(nside), constant)
 
-    a00 = xp.sqrt(4 * xp.pi) * constant
+    a00 = math.sqrt(4 * xp.pi) * constant
     # the alm array for lmax=0 has size 1, so it only contains a_00
     alm_expected = xp.asarray([a00], dtype=xp.complex128)
 
@@ -83,6 +89,9 @@ def test_transform(xp: ModuleType) -> None:
 
 
 def test_inverse_transform(xp: ModuleType) -> None:
+    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+        pytest.skip("transform depends on healpy which is not Array API compatible")
+
     # prepare inputs
     lmax = 1
     nside = 8
@@ -91,7 +100,7 @@ def test_inverse_transform(xp: ModuleType) -> None:
     # create a simple monopole component ensuring a predictable output map value
     alm_size = hp.Alm.getsize(lmax)
     alm_monopole = xp.zeros(alm_size, dtype=xp.complex128)
-    alm_monopole[0] = xp.sqrt(4 * xp.pi)
+    xpx.at(alm_monopole, 0).set(math.sqrt(4 * math.pi))
 
     # standard unpolarised transform without spin
 
