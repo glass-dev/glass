@@ -142,7 +142,7 @@ def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert eps.shape == (n,)
 
-    np.testing.assert_array_less(np.abs(eps), 1)
+    np.testing.assert_array_less(xp.abs(eps), 1)
 
     np.testing.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
     np.testing.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
