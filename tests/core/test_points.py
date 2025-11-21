@@ -337,7 +337,7 @@ def test_position_weights(
             compare.assert_allclose(weights, expected)
 
 
-def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
+def test_displace_arg_complex(xp: ModuleType) -> None:
     """Test displace function with complex-valued displacement."""
     d = 5.0  # deg
     r = d / 180 * xp.pi
@@ -348,22 +348,22 @@ def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray(r + 0j))
-    compare.assert_allclose([lon, lat], [0.0, d])
+    assert np.allclose([lon, lat], [0.0, d])
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-r + 0j))
-    compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
+    assert np.allclose([lon, lat], [0.0, -d])
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray(1j * r))
-    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    assert np.allclose([lon, lat], [-d, 0.0])
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-1j * r))
-    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    assert np.allclose([lon, lat], [d, 0.0])
 
 
-def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
+def test_displace_arg_real(xp: ModuleType) -> None:
     """Test displace function with real-valued argument."""
     d = 5.0  # deg
     r = d / 180 * xp.pi
@@ -374,19 +374,19 @@ def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray([r, 0]))
-    compare.assert_allclose([lon, lat], [0.0, d])
+    assert np.allclose([lon, lat], [0.0, d])
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray([-r, 0]))
-    compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
+    assert np.allclose([lon, lat], [0.0, -d])
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, r]))
-    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    assert np.allclose([lon, lat], [-d, 0.0])
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, -r]))
-    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    assert np.allclose([lon, lat], [d, 0.0])
 
 
 def test_displace_abs(
