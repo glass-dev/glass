@@ -97,9 +97,5 @@ def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=gl0, gltol=1e-8)
 
     assert gl[0] == gl0
-    np.testing.assert_raises(
-        AssertionError,
-        _compare.assert_allclose,
-        cl_out[0],
-        cl[0],
-    )
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        _compare.assert_allclose(cl_out[0], cl[0])

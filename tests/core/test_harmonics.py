@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass._array_comparison as _compare
@@ -27,12 +26,8 @@ def test_multalm(xp: ModuleType) -> None:
 
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
     _compare.assert_allclose(result, expected_result)
-    np.testing.assert_raises(
-        AssertionError,
-        _compare.assert_allclose,
-        alm_copy,
-        result,
-    )
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        _compare.assert_allclose(alm_copy, result)
 
     # multiple with 1s
 

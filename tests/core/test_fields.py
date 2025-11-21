@@ -213,8 +213,11 @@ def test_cls2cov(xp: ModuleType) -> None:
     assert cov2.dtype == xp.float64
     assert cov3.dtype == xp.float64
 
-    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov1, cov2)
-    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        _compare.assert_allclose(cov1, cov2)
+
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        _compare.assert_allclose(cov2, cov3)
 
 
 def test_lognormal_gls() -> None:
