@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
@@ -143,7 +142,7 @@ def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert eps.shape == (n,)
 
-    np.testing.assert_array_less(xp.abs(eps), 1)
+    _compare.assert_array_less(xp.abs(eps), 1)
 
     _compare.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
     _compare.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
@@ -152,7 +151,7 @@ def test_ellipticity_gaussian(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert eps.shape == (2 * n,)
 
-    np.testing.assert_array_less(xp.abs(eps), 1)
+    _compare.assert_array_less(xp.abs(eps), 1)
 
     _compare.assert_allclose(xp.std(xp.real(eps)[:n]), 0.128, atol=1e-3, rtol=0)
     _compare.assert_allclose(xp.std(xp.imag(eps)[:n]), 0.128, atol=1e-3, rtol=0)
@@ -183,7 +182,7 @@ def test_ellipticity_intnorm(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert eps.shape == (n,)
 
-    np.testing.assert_array_less(xp.abs(eps), 1)
+    _compare.assert_array_less(xp.abs(eps), 1)
 
     _compare.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
     _compare.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
@@ -192,7 +191,7 @@ def test_ellipticity_intnorm(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert eps.shape == (2 * n,)
 
-    np.testing.assert_array_less(xp.abs(eps), 1)
+    _compare.assert_array_less(xp.abs(eps), 1)
 
     _compare.assert_allclose(xp.std(xp.real(eps)[:n]), 0.128, atol=1e-3, rtol=0)
     _compare.assert_allclose(xp.std(xp.imag(eps)[:n]), 0.128, atol=1e-3, rtol=0)

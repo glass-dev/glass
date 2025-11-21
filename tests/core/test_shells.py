@@ -32,7 +32,7 @@ def test_distance_weight(xp: ModuleType, cosmo: Cosmology) -> None:
 
     # check values are decreasing
 
-    np.testing.assert_array_less(w[1:], w[:-1])
+    _compare.assert_array_less(w[1:], w[:-1])
 
 
 def test_volume_weight(xp: ModuleType, cosmo: Cosmology) -> None:
@@ -50,7 +50,7 @@ def test_volume_weight(xp: ModuleType, cosmo: Cosmology) -> None:
 
     # check values are increasing
 
-    np.testing.assert_array_less(w[:-1], w[1:])
+    _compare.assert_array_less(w[:-1], w[1:])
 
 
 def test_density_weight(cosmo: Cosmology) -> None:
@@ -68,7 +68,7 @@ def test_density_weight(cosmo: Cosmology) -> None:
 
     # check values are increasing
 
-    np.testing.assert_array_less(w[:-1], w[1:])
+    _compare.assert_array_less(w[:-1], w[1:])
 
 
 def test_tophat_windows(xp: ModuleType) -> None:
@@ -348,7 +348,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
     # check decrease in distance
 
     x = glass.distance_grid(cosmo, zmin, zmax, dx=0.3)
-    np.testing.assert_array_less(x[1:], x[:-1])
+    _compare.assert_array_less(x[1:], x[:-1])
 
     # check error raised
 

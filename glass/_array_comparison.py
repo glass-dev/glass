@@ -23,5 +23,13 @@ def assert_array_equal(
     actual: AnyArray,
     desired: AnyArray,
 ) -> None:
-    """Raise an AssertionError if two array_like objects are not equal."""
+    """Raise an AssertionError if two array objects are not equal."""
     np.testing.assert_array_equal(actual, desired)
+
+
+def assert_array_less(
+    actual: AnyArray,
+    desired: AnyArray,
+) -> None:
+    """Raise an AssertionError if two array objects are not ordered by less than."""
+    np.testing.assert_array_less(actual, desired)
