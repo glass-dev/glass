@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_comparison as _compare
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -51,17 +52,17 @@ def test_effective_bias(xp: ModuleType, mocker: MockerFixture) -> None:
 
     z = xp.linspace(0, 1, 10)
     bz = xp.zeros((10,))
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
+    _compare.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
     z = xp.zeros((10,))
     bz = xp.full_like(z, 0.5)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
+    _compare.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
     z = xp.linspace(0, 1, 10)
     bz = xp.full_like(z, 0.5)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
+    _compare.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
 
 
 def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
@@ -70,21 +71,21 @@ def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
+    _compare.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
+    _compare.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with original implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), b * delta)
+    _compare.assert_allclose(glass.linear_bias(delta, b), b * delta)
 
 
 def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
@@ -93,21 +94,21 @@ def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
+    _compare.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
+    _compare.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with numpy implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(
+    _compare.assert_allclose(
         glass.loglinear_bias(delta, b),
         xp.expm1(b * xp.log1p(delta)),
     )
@@ -175,8 +176,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     )
 
     assert isinstance(cnt, int)
-    np.testing.assert_allclose(lon, [])
-    np.testing.assert_allclose(lat, [])
+    _compare.assert_allclose(lon, [])
+    _compare.assert_allclose(lat, [])
 
     # case: large delta
 
@@ -317,7 +318,7 @@ def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
                     )
                 expected = bias * expected
 
-            np.testing.assert_allclose(weights, expected)
+            _compare.assert_allclose(weights, expected)
 
 
 def test_displace_arg_complex(xp: ModuleType) -> None:

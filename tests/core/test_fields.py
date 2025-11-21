@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_comparison as _compare
 import glass.fields
 
 if TYPE_CHECKING:
@@ -157,9 +158,9 @@ def test_cls2cov(xp: ModuleType) -> None:
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xp.float64
 
-    np.testing.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
-    np.testing.assert_allclose(cov[:, 1], 0)
-    np.testing.assert_allclose(cov[:, 2], 0)
+    _compare.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    _compare.assert_allclose(cov[:, 1], 0)
+    _compare.assert_allclose(cov[:, 2], 0)
 
     # test negative value error
 
@@ -279,7 +280,7 @@ def test_discretized_cls() -> None:
     for cl in result:
         n = min(len(cl), len(pw))
         expected = np.ones(n) * pw[:n] ** 2
-        np.testing.assert_allclose(cl[:n], expected)
+        _compare.assert_allclose(cl[:n], expected)
 
 
 def test_effective_cls(xp: ModuleType) -> None:
@@ -315,7 +316,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    np.testing.assert_allclose(result[..., 6:], 0)
+    _compare.assert_allclose(result[..., 6:], 0)
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -346,7 +347,7 @@ def test_generate_grf() -> None:
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
-    np.testing.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
+    _compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
     with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([], nside))
@@ -397,7 +398,7 @@ def test_generate() -> None:
 
     result = list(glass.generate(fields, gls, nside=nside))
 
-    np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
+    _compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
 def test_getcl(xp: ModuleType) -> None:
@@ -412,19 +413,19 @@ def test_getcl(xp: ModuleType) -> None:
         for j in range(10):
             result = glass.getcl(cls, i, j)
             expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
-            np.testing.assert_allclose(xp.sort(result), expected)
+            _compare.assert_allclose(xp.sort(result), expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
             assert result.size == 1
-            np.testing.assert_allclose(result, expected)
+            _compare.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
             assert result.size == 51
-            np.testing.assert_allclose(result[2:], expected)
+            _compare.assert_allclose(result[2:], expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]) -> None:
@@ -607,7 +608,7 @@ def test_lognormal_shift_hilbert2011() -> None:
     # computed by hand
     check = [0.0103031, 0.02975, 0.0538781, 0.0792, 0.103203, 0.12435, 0.142078, 0.1568]
 
-    np.testing.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
+    _compare.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
 def test_cov_from_spectra() -> None:

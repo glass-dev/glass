@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
+import glass._array_comparison as _compare
 import glass.arraytools
 
 if TYPE_CHECKING:
@@ -110,7 +110,7 @@ def test_ndinterp_with_default_axis(  # noqa: PLR0913
         yq,
     )
     assert y.shape == shape_out
-    np.testing.assert_allclose(y, y_out, atol=1e-15)
+    _compare.assert_allclose(y, y_out, atol=1e-15)
 
 
 @pytest.mark.parametrize(
@@ -168,7 +168,7 @@ def test_ndinterp_nd_interpolation_in_middle_axis(
         axis=1,
     )
     assert y.shape == shape_out
-    np.testing.assert_allclose(y, y_out, atol=1e-15)
+    _compare.assert_allclose(y, y_out, atol=1e-15)
 
 
 def test_trapezoid_product(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
@@ -185,7 +185,7 @@ def test_trapezoid_product(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
         (x2, f2),
     )
 
-    np.testing.assert_allclose(s, 1.0)
+    _compare.assert_allclose(s, 1.0)
 
 
 @pytest.mark.parametrize(
@@ -219,4 +219,4 @@ def test_cumulative_trapezoid(
     x = xp.asarray(x_in)
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    np.testing.assert_allclose(ct, xp.asarray(ct_out))
+    _compare.assert_allclose(ct, xp.asarray(ct_out))

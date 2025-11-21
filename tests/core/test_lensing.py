@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_comparison as _compare
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -76,7 +77,7 @@ def test_multi_plane_matrix(
         if convergence.kappa is not None:
             kappas.append(convergence.kappa.copy())
 
-    np.testing.assert_allclose(mat @ deltas, kappas)
+    _compare.assert_allclose(mat @ deltas, kappas)
 
 
 def test_multi_plane_weights(
@@ -102,7 +103,7 @@ def test_multi_plane_weights(
 
     wmat = glass.multi_plane_weights(weights, shells, cosmo)
 
-    np.testing.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    _compare.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
@@ -120,19 +121,19 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
 
     # north
     lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
+    _compare.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
     lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
+    _compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    _compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    _compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # At least one input is an array
     lon, lat = glass.deflect(
@@ -140,15 +141,15 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
         xp.asarray(0.0),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    np.testing.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    _compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     lon, lat = glass.deflect(
         xp.asarray([0.0, 0.0]),
         xp.asarray([0.0, 0.0]),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    np.testing.assert_allclose(lon, xp.asarray([d, d]), atol=1e-15)
-    np.testing.assert_allclose(lat, 0.0, atol=1e-15)
+    _compare.assert_allclose(lon, xp.asarray([d, d]), atol=1e-15)
+    _compare.assert_allclose(lat, 0.0, atol=1e-15)
 
     # No inputs are arrays and xp not provided
     with pytest.raises(TypeError, match="Unrecognized array input"):
@@ -170,4 +171,4 @@ def test_deflect_many(rng: np.random.Generator) -> None:
 
     dotp = x * x_ + y * y_ + z * z_
 
-    np.testing.assert_allclose(dotp, np.cos(abs_alpha))
+    _compare.assert_allclose(dotp, np.cos(abs_alpha))

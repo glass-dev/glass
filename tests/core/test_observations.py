@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_comparison as _compare
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -59,7 +60,7 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     norm = 1
     nz = glass.gaussian_nz(z, mean, sigma, norm=norm)
-    np.testing.assert_allclose(xp.sum(nz) / nz.shape[0], norm, rtol=1e-2)
+    _compare.assert_allclose(xp.sum(nz) / nz.shape[0], norm, rtol=1e-2)
 
     # check multidimensionality size
 
@@ -101,14 +102,14 @@ def test_fixed_zbins_default_xp() -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
     assert len(zbins) == nbins
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    _compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    _compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -139,14 +140,14 @@ def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins, xp=xp)
     assert len(zbins) == nbins
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    _compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz, xp=xp)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    _compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -173,7 +174,7 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
         ],
     )
     zbins = glass.equal_dens_zbins(z, xp.ones_like(z), nbins)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    _compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check output shape
 

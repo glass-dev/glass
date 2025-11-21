@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
+import glass._array_comparison as _compare
 import glass.grf
 
 if TYPE_CHECKING:
@@ -74,12 +75,12 @@ def test_lognormal(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
 
     assert info > 0
 
-    np.testing.assert_allclose(cl_[1 : cl.size], cl[1:], atol=0.0, rtol=cltol)
+    _compare.assert_allclose(cl_[1 : cl.size], cl[1:], atol=0.0, rtol=cltol)
 
     gl_ = glass.grf.compute(cl_, t1, t2)
 
     assert gl[0] == gl0
-    np.testing.assert_allclose(gl_[1 : gl.size], gl[1:])
+    _compare.assert_allclose(gl_[1 : gl.size], gl[1:])
 
 
 def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
@@ -91,7 +92,7 @@ def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=None, gltol=1e-8)
 
     assert gl[0] != 0.0
-    np.testing.assert_allclose(cl_out[0], cl[0])
+    _compare.assert_allclose(cl_out[0], cl[0])
 
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=gl0, gltol=1e-8)
 

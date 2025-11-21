@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
+import glass._array_comparison as _compare
 import glass.algorithm
 
 if TYPE_CHECKING:
@@ -37,7 +38,7 @@ def test_nnls(xp: ModuleType, urng: UnifiedGenerator) -> None:
         x,
         tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps,
     )
-    np.testing.assert_allclose(res, b, rtol=0.0, atol=1e-10)
+    _compare.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
 
@@ -70,7 +71,7 @@ def test_cov_clip(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     # make sure all eigenvalues are positive
     h = xp.max(xp.linalg.eigvalsh(a))
-    np.testing.assert_allclose(xp.linalg.eigvalsh(cov), h)
+    _compare.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
 def test_nearcorr(xp: ModuleType) -> None:
@@ -91,11 +92,11 @@ def test_nearcorr(xp: ModuleType) -> None:
     )
 
     x = glass.algorithm.nearcorr(a)
-    np.testing.assert_allclose(x, b, atol=0.0001)
+    _compare.assert_allclose(x, b, atol=0.0001)
 
     # explicit tolerance
     x = glass.algorithm.nearcorr(a, tol=1e-10)
-    np.testing.assert_allclose(x, b, atol=0.0001)
+    _compare.assert_allclose(x, b, atol=0.0001)
 
     # no iterations
     with pytest.warns(
@@ -103,7 +104,7 @@ def test_nearcorr(xp: ModuleType) -> None:
         match="Nearest correlation matrix not found in 0 iterations",
     ):
         x = glass.algorithm.nearcorr(a, niter=0)
-    np.testing.assert_allclose(x, a)
+    _compare.assert_allclose(x, a)
 
     # non-square matrix should raise
     with pytest.raises(ValueError, match="non-square matrix"):

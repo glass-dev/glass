@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
+import glass._array_comparison as _compare
 import glass.algorithm
 
 if TYPE_CHECKING:
@@ -62,7 +62,7 @@ def test_cov_clip(
 
     if rtol is not None:
         h = xp.max(xp.linalg.eigvalsh(a))
-        np.testing.assert_allclose(xp.linalg.eigvalsh(cov), h, rtol=1e-6)
+        _compare.assert_allclose(xp.linalg.eigvalsh(cov), h, rtol=1e-6)
 
 
 @pytest.mark.parametrize("tol", [None, 0.0001])
@@ -93,7 +93,7 @@ def test_nearcorr(
     )
 
     x = benchmark(glass.algorithm.nearcorr, a, tol=tol)
-    np.testing.assert_allclose(x, b, atol=0.0001)
+    _compare.assert_allclose(x, b, atol=0.0001)
 
 
 def test_cov_nearest(
