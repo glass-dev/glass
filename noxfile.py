@@ -28,9 +28,9 @@ ARRAY_BACKENDS = {
 BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 SHARED_BENCHMARK_FLAGS = [
-    "--benchmark-timer=time.process_time",
     "--benchmark-columns=mean,stddev,rounds",
     "--benchmark-sort=name",
+    "--benchmark-timer=time.process_time",
 ]
 
 
