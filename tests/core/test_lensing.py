@@ -109,7 +109,11 @@ def test_multi_plane_weights(
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(compare: type[Compare], xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
+def test_deflect_nsew(
+    compare: type[Compare],
+    usecomplex: bool,  # noqa: FBT001
+    xp: ModuleType,
+) -> None:
     d = 5.0
     r = math.radians(d)
 
