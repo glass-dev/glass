@@ -414,7 +414,6 @@ def test_displace_abs(
 
 
 def test_displacement(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
