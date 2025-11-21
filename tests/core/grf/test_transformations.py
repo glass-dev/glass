@@ -2,51 +2,66 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import glass.grf
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
+    from tests.conftest import Compare
 
 
-def test_normal(urng: UnifiedGenerator) -> None:
+def test_normal(compare: type[Compare], urng: UnifiedGenerator) -> None:
     t = glass.grf.Normal()
     x = urng.standard_normal(10)
-    np.testing.assert_array_equal(t(x, 1.0), x)
+    compare.assert_array_equal(t(x, 1.0), x)
 
 
-def test_lognormal(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_lognormal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     for lam in 1.0, urng.uniform():
         var = urng.uniform()
         t = glass.grf.Lognormal(lam)
         x = urng.standard_normal(10)
         y = lam * xp.expm1(x - var / 2)
-        np.testing.assert_array_equal(t(x, var), y)
+        compare.assert_array_equal(t(x, var), y)
 
 
-def test_sqnormal(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_sqnormal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     for lam in 1.0, urng.uniform():
         var = urng.uniform()
         a = xp.sqrt(1 - var)
         t = glass.grf.SquaredNormal(a, lam)
         x = urng.standard_normal(10)
         y = lam * ((x - a) ** 2 - 1)
-        np.testing.assert_array_equal(t(x, var), y)
+        compare.assert_array_equal(t(x, var), y)
 
 
-def test_normal_normal(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_normal_normal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
     x = urng.random(10)
-    np.testing.assert_array_equal(glass.grf.corr(t1, t2, x), x)
-    np.testing.assert_array_equal(glass.grf.icorr(t1, t2, x), x)
-    np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), x)
+    compare.assert_array_equal(glass.grf.icorr(t1, t2, x), x)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
 
 
-def test_lognormal_lognormal(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_lognormal_lognormal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     lam1 = urng.uniform()
     t1 = glass.grf.Lognormal(lam1)
 
@@ -57,12 +72,16 @@ def test_lognormal_lognormal(xp: ModuleType, urng: UnifiedGenerator) -> None:
     y = lam1 * lam2 * xp.expm1(x)
     dy = lam1 * lam2 * xp.exp(x)
 
-    np.testing.assert_array_equal(glass.grf.corr(t1, t2, x), y)
-    np.testing.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
-    np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
+    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
-def test_lognormal_normal(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_lognormal_normal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     lam1 = urng.uniform()
     t1 = glass.grf.Lognormal(lam1)
 
@@ -72,12 +91,16 @@ def test_lognormal_normal(xp: ModuleType, urng: UnifiedGenerator) -> None:
     y = lam1 * x
     dy = lam1 * xp.ones_like(x)
 
-    np.testing.assert_array_equal(glass.grf.corr(t1, t2, x), y)
-    np.testing.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
-    np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
+    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
-def test_sqnormal_sqnormal(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_sqnormal_sqnormal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     lam1, var1 = urng.uniform(size=2)
     a1 = xp.sqrt(1 - var1)
     t1 = glass.grf.SquaredNormal(a1, lam1)
@@ -91,6 +114,6 @@ def test_sqnormal_sqnormal(xp: ModuleType, urng: UnifiedGenerator) -> None:
     y = 2 * lam1 * lam2 * x * (x + 2 * a1 * a2)
     dy = 4 * lam1 * lam2 * (x + a1 * a2)
 
-    np.testing.assert_array_equal(glass.grf.corr(t1, t2, x), y)
-    np.testing.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
-    np.testing.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
+    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)

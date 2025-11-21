@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
     from pytest_mock import MockerFixture
 
+    from tests.conftest import Compare
+
 
 @pytest.fixture(scope="session")
 def not_triangle_numbers() -> list[int]:
@@ -137,7 +139,7 @@ def test_iternorm(xp: ModuleType) -> None:
     assert s.shape == (3,)
 
 
-def test_cls2cov(xp: ModuleType) -> None:
+def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in cls2cov are not immutable, so do not support jax")
@@ -157,9 +159,9 @@ def test_cls2cov(xp: ModuleType) -> None:
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xp.float64
 
-    np.testing.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
-    np.testing.assert_allclose(cov[:, 1], 0)
-    np.testing.assert_allclose(cov[:, 2], 0)
+    compare.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    compare.assert_allclose(cov[:, 1], 0)
+    compare.assert_allclose(cov[:, 2], 0)
 
     # test negative value error
 
@@ -212,8 +214,11 @@ def test_cls2cov(xp: ModuleType) -> None:
     assert cov2.dtype == xp.float64
     assert cov3.dtype == xp.float64
 
-    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov1, cov2)
-    np.testing.assert_raises(AssertionError, np.testing.assert_allclose, cov2, cov3)
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        compare.assert_allclose(cov1, cov2)
+
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        compare.assert_allclose(cov2, cov3)
 
 
 def test_lognormal_gls() -> None:
@@ -237,7 +242,7 @@ def test_lognormal_gls() -> None:
     assert len(out[2]) == 3
 
 
-def test_discretized_cls() -> None:
+def test_discretized_cls(compare: type[Compare]) -> None:
     # empty cls
 
     result = glass.discretized_cls([])
@@ -279,10 +284,10 @@ def test_discretized_cls() -> None:
     for cl in result:
         n = min(len(cl), len(pw))
         expected = np.ones(n) * pw[:n] ** 2
-        np.testing.assert_allclose(cl[:n], expected)
+        compare.assert_allclose(cl[:n], expected)
 
 
-def test_effective_cls(xp: ModuleType) -> None:
+def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
@@ -315,7 +320,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    np.testing.assert_allclose(result[..., 6:], 0)
+    compare.assert_allclose(result[..., 6:], 0)
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -323,7 +328,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     assert result.shape == (1, 1, 15)
 
 
-def test_generate_grf() -> None:
+def test_generate_grf(compare: type[Compare]) -> None:
     gls = [np.array([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
@@ -346,7 +351,7 @@ def test_generate_grf() -> None:
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
-    np.testing.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
+    compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
     with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([], nside))
@@ -362,7 +367,7 @@ def test_generate_lognormal(xp: ModuleType) -> None:
         glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate() -> None:
+def test_generate(compare: type[Compare]) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
@@ -397,10 +402,10 @@ def test_generate() -> None:
 
     result = list(glass.generate(fields, gls, nside=nside))
 
-    np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
+    compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl(xp: ModuleType) -> None:
+def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -412,19 +417,19 @@ def test_getcl(xp: ModuleType) -> None:
         for j in range(10):
             result = glass.getcl(cls, i, j)
             expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
-            np.testing.assert_allclose(xp.sort(result), expected)
+            compare.assert_allclose(xp.sort(result), expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
             assert result.size == 1
-            np.testing.assert_allclose(result, expected)
+            compare.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
             assert result.size == 51
-            np.testing.assert_allclose(result[2:], expected)
+            compare.assert_allclose(result[2:], expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]) -> None:
@@ -467,11 +472,11 @@ def test_enumerate_spectra() -> None:
         next(it)
 
 
-def test_spectra_indices(xp: ModuleType) -> None:
-    np.testing.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
-    np.testing.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
-    np.testing.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
-    np.testing.assert_array_equal(
+def test_spectra_indices(compare: type[Compare], xp: ModuleType) -> None:
+    compare.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
+    compare.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
+    compare.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
+    compare.assert_array_equal(
         glass.spectra_indices(3),
         [[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]],
     )
@@ -503,7 +508,7 @@ def test_lognormal_fields(xp: ModuleType) -> None:
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None:
+def test_compute_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
@@ -522,7 +527,7 @@ def test_compute_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
-def test_compute_gaussian_spectra_gh639(xp: ModuleType, mocker: MockerFixture) -> None:
+def test_compute_gaussian_spectra_gh639(mocker: MockerFixture, xp: ModuleType) -> None:
     """Test compute_gaussian_spectra() with an empty input."""
     mock = mocker.patch("glass.grf.compute")
 
@@ -538,7 +543,7 @@ def test_compute_gaussian_spectra_gh639(xp: ModuleType, mocker: MockerFixture) -
     assert gls[2].size == 0
 
 
-def test_solve_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None:
+def test_solve_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
     mock = mocker.patch("glass.grf.solve")
 
     result = mock.return_value
@@ -579,38 +584,38 @@ def test_solve_gaussian_spectra(xp: ModuleType, mocker: MockerFixture) -> None:
         glass.solve_gaussian_spectra(fields, spectra[:2])
 
 
-def test_glass_to_healpix_spectra() -> None:
+def test_glass_to_healpix_spectra(compare: type[Compare]) -> None:
     inp = [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
     out = glass.glass_to_healpix_spectra(inp)
-    np.testing.assert_array_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
+    compare.assert_array_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
 
 
-def test_healpix_to_glass_spectra() -> None:
+def test_healpix_to_glass_spectra(compare: type[Compare]) -> None:
     inp = [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
     out = glass.healpix_to_glass_spectra(inp)
-    np.testing.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
+    compare.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
-def test_glass_to_healpix_alm() -> None:
+def test_glass_to_healpix_alm(compare: type[Compare]) -> None:
     inp = np.array([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
-    np.testing.assert_array_equal(
+    compare.assert_array_equal(
         out,
         np.array([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
 
 
-def test_lognormal_shift_hilbert2011() -> None:
+def test_lognormal_shift_hilbert2011(compare: type[Compare]) -> None:
     zs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
     shifts = [glass.lognormal_shift_hilbert2011(z) for z in zs]
 
     # computed by hand
     check = [0.0103031, 0.02975, 0.0538781, 0.0792, 0.103203, 0.12435, 0.142078, 0.1568]
 
-    np.testing.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
+    compare.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
-def test_cov_from_spectra() -> None:
+def test_cov_from_spectra(compare: type[Compare]) -> None:
     spectra = np.array(
         [
             [110, 111, 112, 113],
@@ -622,7 +627,7 @@ def test_cov_from_spectra() -> None:
         ],
     )
 
-    np.testing.assert_array_equal(
+    compare.assert_array_equal(
         glass.cov_from_spectra(spectra),
         [
             [
@@ -648,7 +653,7 @@ def test_cov_from_spectra() -> None:
         ],
     )
 
-    np.testing.assert_array_equal(
+    compare.assert_array_equal(
         glass.cov_from_spectra(spectra, lmax=1),
         [
             [
@@ -664,7 +669,7 @@ def test_cov_from_spectra() -> None:
         ],
     )
 
-    np.testing.assert_array_equal(
+    compare.assert_array_equal(
         glass.cov_from_spectra(spectra, lmax=4),
         [
             [

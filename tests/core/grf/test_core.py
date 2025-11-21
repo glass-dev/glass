@@ -37,7 +37,7 @@ def test_corr_unknown(xp: ModuleType) -> None:
         glass.grf.dcorr(t1, t2, x)
 
 
-def test_compute(xp: ModuleType, mocker: MockerFixture) -> None:
+def test_compute(mocker: MockerFixture, xp: ModuleType) -> None:
     cltocorr = mocker.patch("transformcl.cltocorr")
     icorr = mocker.patch("glass.grf._core.icorr")
     corrtocl = mocker.patch("transformcl.corrtocl")

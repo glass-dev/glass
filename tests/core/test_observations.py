@@ -13,21 +13,22 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
+    from tests.conftest import Compare
 
 
-def test_vmap_galactic_ecliptic() -> None:
+def test_vmap_galactic_ecliptic(compare: type[Compare]) -> None:
     """Add unit tests for :func:`glass.vmap_galactic_ecliptic`."""
     n_side = 4
 
     # check shape
 
     vmap = glass.vmap_galactic_ecliptic(n_side)
-    np.testing.assert_array_equal(len(vmap), healpix.nside2npix(n_side))
+    compare.assert_array_equal(len(vmap), healpix.nside2npix(n_side))
 
     # no rotation
 
     vmap = glass.vmap_galactic_ecliptic(n_side, galactic=(0, 0), ecliptic=(0, 0))
-    np.testing.assert_array_equal(vmap, np.zeros_like(vmap))
+    compare.assert_array_equal(vmap, np.zeros_like(vmap))
 
     # check errors raised
 
@@ -44,7 +45,11 @@ def test_vmap_galactic_ecliptic() -> None:
         glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))
 
 
-def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_gaussian_nz(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.gaussian_nz`."""
     mean = 0
     sigma = 1
@@ -53,13 +58,13 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # check passing in the norm
 
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
-    np.testing.assert_array_equal(nz, xp.zeros_like(nz))
+    compare.assert_array_equal(nz, xp.zeros_like(nz))
 
     # check the value of each entry is close to the norm
 
     norm = 1
     nz = glass.gaussian_nz(z, mean, sigma, norm=norm)
-    np.testing.assert_allclose(xp.sum(nz) / nz.shape[0], norm, rtol=1e-2)
+    compare.assert_allclose(xp.sum(nz) / nz.shape[0], norm, rtol=1e-2)
 
     # check multidimensionality size
 
@@ -72,7 +77,7 @@ def test_gaussian_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
     assert nz.shape == (z.size, z.size)
 
 
-def test_smail_nz(xp: ModuleType) -> None:
+def test_smail_nz(compare: type[Compare], xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.smail_nz`."""
     alpha = 1
     beta = 1
@@ -82,10 +87,10 @@ def test_smail_nz(xp: ModuleType) -> None:
     # check passing in the norm
 
     pz = glass.smail_nz(z, mode, alpha, beta, norm=0)
-    np.testing.assert_array_equal(pz, xp.zeros_like(pz))
+    compare.assert_array_equal(pz, xp.zeros_like(pz))
 
 
-def test_fixed_zbins_default_xp() -> None:
+def test_fixed_zbins_default_xp(compare: type[Compare]) -> None:
     """Add unit tests for :func:`glass.fixed_zbins` with default xp."""
     zmin = 0.0
     zmax = 1.0
@@ -101,14 +106,14 @@ def test_fixed_zbins_default_xp() -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
     assert len(zbins) == nbins
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -123,7 +128,7 @@ def test_fixed_zbins_default_xp() -> None:
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
 
 
-def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
+def test_fixed_zbins_xp_provided(compare: type[Compare], xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.fixed_zbins`."""
     zmin = 0.0
     zmax = 1.0
@@ -139,14 +144,14 @@ def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins, xp=xp)
     assert len(zbins) == nbins
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz, xp=xp)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -159,7 +164,7 @@ def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz, xp=xp)
 
 
-def test_equal_dens_zbins(xp: ModuleType) -> None:
+def test_equal_dens_zbins(compare: type[Compare], xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.equal_dens_zbins`."""
     z = xp.linspace(0, 1, 11)
     nbins = 5
@@ -173,14 +178,14 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
         ],
     )
     zbins = glass.equal_dens_zbins(z, xp.ones_like(z), nbins)
-    np.testing.assert_allclose(zbins, expected_zbins, rtol=1e-15)
+    compare.assert_allclose(zbins, expected_zbins, rtol=1e-15)
 
     # check output shape
 
     assert len(zbins) == nbins
 
 
-def test_tomo_nz_gausserr(xp: ModuleType) -> None:
+def test_tomo_nz_gausserr(compare: type[Compare], xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.tomo_nz_gausserr`."""
     sigma_0 = 0.1
     z = xp.linspace(0, 1, 11)
@@ -189,7 +194,7 @@ def test_tomo_nz_gausserr(xp: ModuleType) -> None:
     # check zeros returned
 
     binned_nz = glass.tomo_nz_gausserr(z, xp.zeros_like(z), sigma_0, zbins)
-    np.testing.assert_array_equal(binned_nz, xp.zeros_like(binned_nz))
+    compare.assert_array_equal(binned_nz, xp.zeros_like(binned_nz))
 
     # check the shape of the output
 
