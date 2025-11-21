@@ -16,34 +16,34 @@ def test_broadcast_first(xp: ModuleType) -> None:
     b = xp.ones((2, 1))
 
     # arrays with shape ((3, 4, 2)) and ((1, 2)) are passed
-    # to np.broadcast_arrays; hence it works
+    # to xp.broadcast_arrays; hence it works
     a_a, b_a = glass.arraytools.broadcast_first(a, b)
     assert a_a.shape == (2, 3, 4)
     assert b_a.shape == (2, 3, 4)
 
-    # plain np.broadcast_arrays will not work
+    # plain xp.broadcast_arrays will not work
     with pytest.raises(ValueError, match=r"shape mismatch|Incompatible shapes"):
         xp.broadcast_arrays(a, b)
 
     # arrays with shape ((5, 6, 4)) and ((6, 5)) are passed
-    # to np.broadcast_arrays; hence it will not work
+    # to xp.broadcast_arrays; hence it will not work
     a = xp.ones((4, 5, 6))
     b = xp.ones((5, 6))
 
     with pytest.raises(ValueError, match=r"shape mismatch|Incompatible shapes"):
         glass.arraytools.broadcast_first(a, b)
 
-    # plain np.broadcast_arrays will work
+    # plain xp.broadcast_arrays will work
     a_a, b_a = xp.broadcast_arrays(a, b)
 
     assert a_a.shape == (4, 5, 6)
     assert b_a.shape == (4, 5, 6)
 
 
-def test_broadcast_leading_axes() -> None:
+def test_broadcast_leading_axes(xp: ModuleType) -> None:
     a_in = 0
-    b_in = np.zeros((4, 10))
-    c_in = np.zeros((3, 1, 5, 6))
+    b_in = xp.zeros((4, 10))
+    c_in = xp.zeros((3, 1, 5, 6))
 
     dims, *rest = glass.arraytools.broadcast_leading_axes(
         (a_in, 0),
