@@ -20,6 +20,7 @@ ALL_PYTHON = [
     "3.11",
     "3.12",
     "3.13",
+    "3.14",
 ]
 ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
