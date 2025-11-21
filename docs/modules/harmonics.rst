@@ -17,3 +17,10 @@ General
 -------
 
 .. autofunction:: multalm
+
+
+Spherical harmonic transforms
+-----------------------------
+
+.. autofunction:: transform
+.. autofunction:: inverse_transform

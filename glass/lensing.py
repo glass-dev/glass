@@ -39,12 +39,12 @@ import numpy as np
 import array_api_compat
 
 import glass._array_api_utils as _utils
+import glass.harmonics
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    import glass
     from glass._types import ComplexArray, FloatArray
     from glass.cosmology import Cosmology
 
@@ -279,7 +279,9 @@ def from_convergence(  # noqa: PLR0913
         lmax = 3 * nside - 1
 
     # compute alm
-    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
+    alm = glass.harmonics.transform(
+        kappa, lmax=lmax, polarised_input=False, use_pixel_weights=True
+    )
 
     # mode number; all conversions are factors of this
     ell = np.arange(lmax + 1)
@@ -293,7 +295,7 @@ def from_convergence(  # noqa: PLR0913
 
     # if potential is requested, compute map and add to output
     if potential:
-        psi = hp.alm2map(alm, nside, lmax=lmax)
+        psi = glass.harmonics.inverse_transform(alm, nside=nside, lmax=lmax)
         results += (psi,)
 
     # if no spin-weighted maps are requested, stop here
@@ -310,7 +312,9 @@ def from_convergence(  # noqa: PLR0913
 
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
-        alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
+        alpha = glass.harmonics.inverse_transform(
+            [alm, blm], nside=nside, spin=1, lmax=lmax
+        )
         alpha = alpha[0] + 1j * alpha[1]
         results += (alpha,)
 
@@ -328,7 +332,9 @@ def from_convergence(  # noqa: PLR0913
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    gamma = glass.harmonics.inverse_transform(
+        [alm, blm], nside=nside, spin=2, lmax=lmax
+    )
     gamma = gamma[0] + 1j * gamma[1]
     results += (gamma,)
 
@@ -370,7 +376,9 @@ def shear_from_convergence(
         lmax = 3 * nside - 1
 
     # compute alm
-    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
+    alm = glass.harmonics.transform(
+        kappa, lmax=lmax, polarised_input=False, use_pixel_weights=True
+    )
 
     # zero B-modes
     blm = np.zeros_like(alm)
@@ -390,7 +398,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return glass.harmonics.inverse_transform([alm, blm], nside=nside, spin=2, lmax=lmax)
 
 
 class MultiPlaneConvergence:
