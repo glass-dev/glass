@@ -508,7 +508,7 @@ def test_lognormal_fields(xp: ModuleType) -> None:
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra( mocker: MockerFixture, xp: ModuleType) -> None:
+def test_compute_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
