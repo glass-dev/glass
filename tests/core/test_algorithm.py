@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass._array_comparison as _compare
 import glass.algorithm
 
 if TYPE_CHECKING:
@@ -13,9 +12,14 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import UnifiedGenerator
+    from tests.conftest import Compare
 
 
-def test_nnls(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_nnls(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Unit tests for glass.algorithm.nnls."""
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in nnls are not immutable, so do not support jax")
@@ -37,7 +41,7 @@ def test_nnls(xp: ModuleType, urng: UnifiedGenerator) -> None:
         x,
         tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps,
     )
-    _compare.assert_allclose(res, b, rtol=0.0, atol=1e-10)
+    compare.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
 
@@ -52,7 +56,11 @@ def test_nnls(xp: ModuleType, urng: UnifiedGenerator) -> None:
         glass.algorithm.nnls(a.T, b)
 
 
-def test_cov_clip(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_cov_clip(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # prepare a random matrix
     m = urng.random((4, 4))
 
@@ -70,10 +78,10 @@ def test_cov_clip(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     # make sure all eigenvalues are positive
     h = xp.max(xp.linalg.eigvalsh(a))
-    _compare.assert_allclose(xp.linalg.eigvalsh(cov), h)
+    compare.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
-def test_nearcorr(xp: ModuleType) -> None:
+def test_nearcorr(compare: type[Compare], xp: ModuleType) -> None:
     # from Higham (2002)
     a = xp.asarray(
         [
@@ -91,11 +99,11 @@ def test_nearcorr(xp: ModuleType) -> None:
     )
 
     x = glass.algorithm.nearcorr(a)
-    _compare.assert_allclose(x, b, atol=0.0001)
+    compare.assert_allclose(x, b, atol=0.0001)
 
     # explicit tolerance
     x = glass.algorithm.nearcorr(a, tol=1e-10)
-    _compare.assert_allclose(x, b, atol=0.0001)
+    compare.assert_allclose(x, b, atol=0.0001)
 
     # no iterations
     with pytest.warns(
@@ -103,7 +111,7 @@ def test_nearcorr(xp: ModuleType) -> None:
         match="Nearest correlation matrix not found in 0 iterations",
     ):
         x = glass.algorithm.nearcorr(a, niter=0)
-    _compare.assert_allclose(x, a)
+    compare.assert_allclose(x, a)
 
     # non-square matrix should raise
     with pytest.raises(ValueError, match="non-square matrix"):
@@ -118,9 +126,10 @@ def test_nearcorr(xp: ModuleType) -> None:
 
 
 def test_cov_nearest(
-    xp: ModuleType,
-    urng: UnifiedGenerator,
+    compare: type[Compare],
     mocker: MockerFixture,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
 ) -> None:
     # prepare a random matrix
     m = urng.random((4, 4))
@@ -143,7 +152,7 @@ def test_cov_nearest(
 
     # make sure nearcorr was called with correct input
     nearcorr.assert_called_once()
-    _compare.assert_array_almost_equal_nulp(
+    compare.assert_array_almost_equal_nulp(
         nearcorr.call_args_list[0].args[0],
         xp.divide(a, norm),
     )

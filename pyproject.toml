@@ -181,6 +181,7 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
+    "tests",
 ], known-third-party = [
     "jax",
 ], section-order = [

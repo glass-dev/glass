@@ -4,14 +4,15 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass._array_comparison as _compare
 import glass.harmonics
 
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from tests.conftest import Compare
 
-def test_multalm(xp: ModuleType) -> None:
+
+def test_multalm(compare: type[Compare], xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in multalm are not immutable, so do not support jax")
@@ -25,9 +26,9 @@ def test_multalm(xp: ModuleType) -> None:
     result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    _compare.assert_allclose(result, expected_result)
+    compare.assert_allclose(result, expected_result)
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        _compare.assert_allclose(alm_copy, result)
+        compare.assert_allclose(alm_copy, result)
 
     # multiple with 1s
 
@@ -35,7 +36,7 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.ones(3)
 
     result = glass.harmonics.multalm(alm, bl)
-    _compare.assert_allclose(result, alm)
+    compare.assert_allclose(result, alm)
 
     # multiple with 0s
 
@@ -44,7 +45,7 @@ def test_multalm(xp: ModuleType) -> None:
     result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    _compare.assert_allclose(result, expected_result)
+    compare.assert_allclose(result, expected_result)
 
     # empty arrays
 
@@ -52,4 +53,4 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.asarray([])
 
     result = glass.harmonics.multalm(alm, bl)
-    _compare.assert_allclose(result, alm)
+    compare.assert_allclose(result, alm)

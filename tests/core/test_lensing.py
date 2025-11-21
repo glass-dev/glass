@@ -8,16 +8,16 @@ import numpy as np
 import pytest
 
 import glass
-import glass._array_comparison as _compare
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
+    from tests.conftest import Compare
 
 
-def test_from_convergence(rng: np.random.Generator) -> None:
+def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> None:
     """Add unit tests for :func:`glass.from_convergence`."""
     # l_max = 100  # noqa: ERA001
     n_side = 32
@@ -28,30 +28,30 @@ def test_from_convergence(rng: np.random.Generator) -> None:
     # check with all False
 
     results = glass.from_convergence(kappa)
-    _compare.assert_array_equal(results, ())
+    compare.assert_array_equal(results, ())
 
     # check all combinations of potential, deflection, shear being True
 
     results = glass.from_convergence(kappa, potential=True)
-    _compare.assert_array_equal(len(results), 1)
+    compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, deflection=True)
-    _compare.assert_array_equal(len(results), 1)
+    compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, shear=True)
-    _compare.assert_array_equal(len(results), 1)
+    compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, potential=True, deflection=True)
-    _compare.assert_array_equal(len(results), 2)
+    compare.assert_array_equal(len(results), 2)
 
     results = glass.from_convergence(kappa, potential=True, shear=True)
-    _compare.assert_array_equal(len(results), 2)
+    compare.assert_array_equal(len(results), 2)
 
     results = glass.from_convergence(kappa, deflection=True, shear=True)
-    _compare.assert_array_equal(len(results), 2)
+    compare.assert_array_equal(len(results), 2)
 
     results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
-    _compare.assert_array_equal(len(results), 3)
+    compare.assert_array_equal(len(results), 3)
 
 
 def test_shear_from_convergence() -> None:
@@ -59,14 +59,15 @@ def test_shear_from_convergence() -> None:
 
 
 def test_multi_plane_matrix(
-    shells: list[glass.RadialWindow],
+    compare: type[Compare],
     cosmo: Cosmology,
     rng: np.random.Generator,
+    shells: list[glass.RadialWindow],
 ) -> None:
     mat = glass.multi_plane_matrix(shells, cosmo)
 
-    _compare.assert_array_equal(mat, np.tril(mat))
-    _compare.assert_array_equal(np.triu(mat, 1), 0)
+    compare.assert_array_equal(mat, np.tril(mat))
+    compare.assert_array_equal(np.triu(mat, 1), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -77,19 +78,20 @@ def test_multi_plane_matrix(
         if convergence.kappa is not None:
             kappas.append(convergence.kappa.copy())
 
-    _compare.assert_allclose(mat @ deltas, kappas)
+    compare.assert_allclose(mat @ deltas, kappas)
 
 
 def test_multi_plane_weights(
-    shells: list[glass.RadialWindow],
+    compare: type[Compare],
     cosmo: Cosmology,
     rng: np.random.Generator,
+    shells: list[glass.RadialWindow],
 ) -> None:
     w_in = np.eye(len(shells))
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    _compare.assert_array_equal(w_out, np.triu(w_out, 1))
-    _compare.assert_array_equal(np.tril(w_out), 0)
+    compare.assert_array_equal(w_out, np.triu(w_out, 1))
+    compare.assert_array_equal(np.tril(w_out), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -103,11 +105,11 @@ def test_multi_plane_weights(
 
     wmat = glass.multi_plane_weights(weights, shells, cosmo)
 
-    _compare.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    compare.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
+def test_deflect_nsew(compare: type[Compare], xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
     d = 5.0
     r = math.radians(d)
 
@@ -121,19 +123,19 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
 
     # north
     lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
-    _compare.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
+    compare.assert_allclose([lon, lat], [0.0, d], atol=1e-15)
 
     # south
     lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
-    _compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
+    compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    _compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    _compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # At least one input is an array
     lon, lat = glass.deflect(
@@ -141,22 +143,22 @@ def test_deflect_nsew(xp: ModuleType, usecomplex: bool) -> None:  # noqa: FBT001
         xp.asarray(0.0),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    _compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     lon, lat = glass.deflect(
         xp.asarray([0.0, 0.0]),
         xp.asarray([0.0, 0.0]),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    _compare.assert_allclose(lon, xp.asarray([d, d]), atol=1e-15)
-    _compare.assert_allclose(lat, 0.0, atol=1e-15)
+    compare.assert_allclose(lon, xp.asarray([d, d]), atol=1e-15)
+    compare.assert_allclose(lat, 0.0, atol=1e-15)
 
     # No inputs are arrays and xp not provided
     with pytest.raises(TypeError, match="Unrecognized array input"):
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 
 
-def test_deflect_many(rng: np.random.Generator) -> None:
+def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
     n = 1000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
@@ -171,4 +173,4 @@ def test_deflect_many(rng: np.random.Generator) -> None:
 
     dotp = x * x_ + y * y_ + z * z_
 
-    _compare.assert_allclose(dotp, np.cos(abs_alpha))
+    compare.assert_allclose(dotp, np.cos(abs_alpha))
