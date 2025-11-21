@@ -19,6 +19,16 @@ def assert_allclose(
     np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol)
 
 
+def assert_array_almost_equal_nulp(
+    actual: AnyArray,
+    desired: AnyArray,
+    *,
+    nulp: int = 1,
+) -> None:
+    """Compare two arrays relatively to their spacing."""
+    np.testing.assert_array_almost_equal_nulp(actual, desired, nulp=nulp)
+
+
 def assert_array_equal(
     actual: AnyArray,
     desired: AnyArray,
@@ -33,3 +43,11 @@ def assert_array_less(
 ) -> None:
     """Raise an AssertionError if two array objects are not ordered by less than."""
     np.testing.assert_array_less(actual, desired)
+
+
+def assert_equal(
+    actual: AnyArray,
+    desired: AnyArray,
+) -> None:
+    """Raises an AssertionError if two objects are not equal."""
+    np.testing.assert_equal(actual, desired)

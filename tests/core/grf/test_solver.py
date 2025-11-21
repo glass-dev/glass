@@ -99,7 +99,7 @@ def test_monopole(cl: NDArray[np.float64], rng: np.random.Generator) -> None:
     assert gl[0] == gl0
     np.testing.assert_raises(
         AssertionError,
-        np.testing.assert_allclose,
+        _compare.assert_allclose,
         cl_out[0],
         cl[0],
     )

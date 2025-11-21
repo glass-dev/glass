@@ -164,7 +164,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         gamma1,
         gamma2,
     )
-    np.testing.assert_equal(shear, [])
+    _compare.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
@@ -185,7 +185,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         gamma2,
         reduced_shear=False,
     )
-    np.testing.assert_equal(shear, [])
+    _compare.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),

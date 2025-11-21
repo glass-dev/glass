@@ -29,7 +29,7 @@ def test_multalm(xp: ModuleType) -> None:
     _compare.assert_allclose(result, expected_result)
     np.testing.assert_raises(
         AssertionError,
-        np.testing.assert_allclose,
+        _compare.assert_allclose,
         alm_copy,
         result,
     )

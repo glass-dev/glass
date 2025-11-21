@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass._array_comparison as _compare
@@ -144,7 +143,7 @@ def test_cov_nearest(
 
     # make sure nearcorr was called with correct input
     nearcorr.assert_called_once()
-    np.testing.assert_array_almost_equal_nulp(
+    _compare.assert_array_almost_equal_nulp(
         nearcorr.call_args_list[0].args[0],
         xp.divide(a, norm),
     )
