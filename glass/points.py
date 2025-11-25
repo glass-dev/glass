@@ -47,6 +47,7 @@ import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.shells
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -67,7 +68,7 @@ ARCMIN2_SPHERE = 60**6 // 100 / np.pi
 def effective_bias(
     z: FloatArray,
     bz: FloatArray,
-    w: glass.RadialWindow,
+    w: glass.shells.RadialWindow,
 ) -> float | DoubleArray:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
