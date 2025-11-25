@@ -14,9 +14,10 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
+    from tests.conftest import Compare
 
 
-def test_redshifts(xp: ModuleType, mocker: MockerFixture) -> None:
+def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in redshifts are not immutable, so do not support jax")
     # create a mock radial window function
@@ -35,7 +36,7 @@ def test_redshifts(xp: ModuleType, mocker: MockerFixture) -> None:
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
             "Arrays in redshifts_from_nz are not immutable, so do not support jax",
@@ -146,7 +147,7 @@ def test_redshifts_from_nz(xp: ModuleType, urng: UnifiedGenerator) -> None:
         )
 
 
-def test_galaxy_shear(rng: np.random.Generator) -> None:
+def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
@@ -163,7 +164,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         gamma1,
         gamma2,
     )
-    np.testing.assert_equal(shear, [])
+    compare.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
@@ -184,7 +185,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         gamma2,
         reduced_shear=False,
     )
-    np.testing.assert_equal(shear, [])
+    compare.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
@@ -203,7 +204,11 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
     assert np.shape(shear) == (512,)
 
 
-def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_gaussian_phz(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # test sampling
 
     # case: zero variance
@@ -213,13 +218,13 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     phz = glass.gaussian_phz(z, sigma_0)
 
-    np.testing.assert_array_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # test with rng
 
     phz = glass.gaussian_phz(z, sigma_0, rng=urng)
 
-    np.testing.assert_array_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # case: truncated normal
 
@@ -262,7 +267,7 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    np.testing.assert_array_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # case: scalar redshift, array sigma_0
 
@@ -273,7 +278,7 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    np.testing.assert_array_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # case: array redshift, array sigma_0
 
@@ -284,7 +289,7 @@ def test_gaussian_phz(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (11, 10)
-    np.testing.assert_array_equal(xp.broadcast_to(z, (11, 10)), phz)
+    compare.assert_array_equal(xp.broadcast_to(z, (11, 10)), phz)
 
     # shape mismatch
 

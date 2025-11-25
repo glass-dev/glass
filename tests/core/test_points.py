@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, IntArray, UnifiedGenerator
+    from tests.conftest import Compare
 
 
 def catpos(
@@ -43,7 +44,11 @@ def catpos(
     return lon, lat, cnt
 
 
-def test_effective_bias(xp: ModuleType, mocker: MockerFixture) -> None:
+def test_effective_bias(
+    compare: type[Compare],
+    mocker: MockerFixture,
+    xp: ModuleType,
+) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = xp.linspace(0, 2, 100)
@@ -51,69 +56,77 @@ def test_effective_bias(xp: ModuleType, mocker: MockerFixture) -> None:
 
     z = xp.linspace(0, 1, 10)
     bz = xp.zeros((10,))
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
+    compare.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
     z = xp.zeros((10,))
     bz = xp.full_like(z, 0.5)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
+    compare.assert_allclose(glass.effective_bias(z, bz, w), 0.0)
 
     z = xp.linspace(0, 1, 10)
     bz = xp.full_like(z, 0.5)
 
-    np.testing.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
+    compare.assert_allclose(glass.effective_bias(z, bz, w), 0.25)
 
 
-def test_linear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_linear_bias(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # test with 0 delta
 
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
+    compare.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
+    compare.assert_allclose(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with original implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.linear_bias(delta, b), b * delta)
+    compare.assert_allclose(glass.linear_bias(delta, b), b * delta)
 
 
-def test_loglinear_bias(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_loglinear_bias(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # test with 0 delta
 
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
+    compare.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    np.testing.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
+    compare.assert_allclose(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with numpy implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    np.testing.assert_allclose(
+    compare.assert_allclose(
         glass.loglinear_bias(delta, b),
         xp.expm1(b * xp.log1p(delta)),
     )
 
 
-def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR0915
+def test_positions_from_delta(compare: type[Compare], rng: np.random.Generator) -> None:  # noqa: PLR0915
     # create maps that saturate the batching in the function
     nside = 128
     npix = healpix.nside2npix(nside)
@@ -175,8 +188,8 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
     )
 
     assert isinstance(cnt, int)
-    np.testing.assert_allclose(lon, [])
-    np.testing.assert_allclose(lat, [])
+    compare.assert_allclose(lon, [])
+    compare.assert_allclose(lat, [])
 
     # case: large delta
 
@@ -247,7 +260,7 @@ def test_positions_from_delta(rng: np.random.Generator) -> None:  # noqa: PLR091
         next(glass.positions_from_delta(ngal, delta, bias, vis, bias_model=0))
 
 
-def test_uniform_positions(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_uniform_positions(urng: UnifiedGenerator, xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy":
         pytest.skip(
             "Arrays in uniform_positions are not immutable, so do not support jax",
@@ -294,7 +307,11 @@ def test_uniform_positions(xp: ModuleType, urng: UnifiedGenerator) -> None:
     assert lon.shape == lat.shape == (xp.sum(cnt),)
 
 
-def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_position_weights(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Unit tests for glass.points.position_weights."""
     for bshape in None, (), (100,), (100, 1):
         for cshape in (100,), (100, 50), (100, 3, 2):
@@ -317,10 +334,10 @@ def test_position_weights(xp: ModuleType, urng: UnifiedGenerator) -> None:
                     )
                 expected = bias * expected
 
-            np.testing.assert_allclose(weights, expected)
+            compare.assert_allclose(weights, expected)
 
 
-def test_displace_arg_complex(xp: ModuleType) -> None:
+def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
     """Test displace function with complex-valued displacement."""
     d = 5.0  # deg
     r = d / 180 * xp.pi
@@ -331,22 +348,22 @@ def test_displace_arg_complex(xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray(r + 0j))
-    assert np.allclose([lon, lat], [0.0, d])
+    compare.assert_allclose([lon, lat], [0.0, d])
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-r + 0j))
-    assert np.allclose([lon, lat], [0.0, -d])
+    compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray(1j * r))
-    assert np.allclose([lon, lat], [-d, 0.0])
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-1j * r))
-    assert np.allclose([lon, lat], [d, 0.0])
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
-def test_displace_arg_real(xp: ModuleType) -> None:
+def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
     """Test displace function with real-valued argument."""
     d = 5.0  # deg
     r = d / 180 * xp.pi
@@ -357,28 +374,32 @@ def test_displace_arg_real(xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray([r, 0]))
-    assert np.allclose([lon, lat], [0.0, d])
+    compare.assert_allclose([lon, lat], [0.0, d])
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray([-r, 0]))
-    assert np.allclose([lon, lat], [0.0, -d])
+    compare.assert_allclose([lon, lat], [0.0, -d], atol=1e-15)
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, r]))
-    assert np.allclose([lon, lat], [-d, 0.0])
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, -r]))
-    assert np.allclose([lon, lat], [d, 0.0])
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
 
-def test_displace_abs(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_displace_abs(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Check that points are displaced by the correct angular distance."""
     n = 1000
     abs_alpha = urng.uniform(0, 2 * xp.pi, size=n)
     arg_alpha = urng.uniform(-xp.pi, xp.pi, size=n)
 
-    lon_ = urng.uniform(-np.pi, np.pi, size=n) / xp.pi * 180
+    lon_ = urng.uniform(-xp.pi, xp.pi, size=n) / xp.pi * 180
     lat_ = xp.asin(urng.uniform(-1, 1, size=n)) / xp.pi * 180
 
     lon, lat = glass.displace(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
@@ -389,10 +410,14 @@ def test_displace_abs(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
     cos_a = xp.cos(th) * xp.cos(th_) + xp.cos(delt) * xp.sin(th) * xp.sin(th_)
 
-    assert np.allclose(cos_a, xp.cos(abs_alpha))
+    compare.assert_allclose(cos_a, xp.cos(abs_alpha))
 
 
-def test_displacement(xp: ModuleType, urng: UnifiedGenerator) -> None:
+def test_displacement(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Check that displacement of points is computed correctly."""
     # unit changes for displacements
     deg5 = xp.asarray(5.0) / 180 * xp.pi
@@ -422,11 +447,7 @@ def test_displacement(xp: ModuleType, urng: UnifiedGenerator) -> None:
     # test each displacement individually
     for from_lon, from_lat, to_lon, to_lat, alpha in data:
         alpha_ = glass.displacement(from_lon, from_lat, to_lon, to_lat)
-        assert np.allclose(alpha_, alpha), (
-            f"displacement from ({from_lon}, {from_lat}) to ({to_lon}, {to_lat})"
-            f"\ndistance: expected {xp.abs(alpha)}, got {xp.abs(alpha_)}"
-            f"\ndirection: expected {xp.angle(alpha)}, got {xp.angle(alpha_)}"
-        )
+        compare.assert_allclose(alpha_, alpha)
 
     # test on an array
     alpha = glass.displacement(

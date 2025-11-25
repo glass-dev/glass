@@ -12,6 +12,8 @@ import glass
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from tests.conftest import Compare
+
 # check if available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
@@ -22,7 +24,11 @@ filename = "MyFile.Fits"
 cls_file = "Cls.npz"
 
 
-def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> None:
+def test_read_write_cls(
+    compare: type[Compare],
+    rng: np.random.Generator,
+    tmp_path: pathlib.Path,
+) -> None:
     cls = rng.normal(size=(10, 10))
     glass.save_cls(tmp_path / cls_file, cls)
 
@@ -32,12 +38,12 @@ def test_read_write_cls(rng: np.random.Generator, tmp_path: pathlib.Path) -> Non
         values = npz["values"]
         split = npz["split"]
 
-    np.testing.assert_array_equal(values, np.concatenate(cls))
-    np.testing.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
-    np.testing.assert_array_equal(cls, np.split(values, split))
+    compare.assert_array_equal(values, np.concatenate(cls))
+    compare.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
+    compare.assert_array_equal(cls, np.split(values, split))
 
     npz = glass.load_cls(tmp_path / cls_file)
-    np.testing.assert_array_equal(npz, cls)
+    compare.assert_array_equal(npz, cls)
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")

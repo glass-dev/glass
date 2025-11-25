@@ -23,23 +23,15 @@ jobs:
     if: github.event.pull_request.draft == false
     name: Regression test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version:
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
-          - "3.14"
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.14
 
       - name: Cache nox
         uses: actions/cache@v4
@@ -53,10 +45,9 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run regression test
-        run: >-
-          uv run nox -s regression_tests-${{ matrix.python-version }} --
-          "$BASE_REF" "$HEAD_REF"
+        run: uv run nox -s regression_tests -- "$BASE_REF" "$HEAD_REF"
         env:
+          ARRAY_BACKEND: all
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
           FORCE_COLOR: 1

@@ -28,6 +28,11 @@ ARRAY_BACKENDS = {
 }
 BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
+SHARED_BENCHMARK_FLAGS = [
+    "--benchmark-columns=mean,stddev,rounds",
+    "--benchmark-sort=name",
+    "--benchmark-timer=time.process_time",
+]
 
 
 def _check_revision_count(
@@ -72,12 +77,8 @@ def lint(session: nox.Session) -> None:
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
-@nox_uv.session(
-    python=ALL_PYTHON,
-    uv_groups=["test"],
-)
-def tests(session: nox.Session) -> None:
-    """Run the unit tests."""
+def _setup_array_backend(session: nox.Session) -> None:
+    """Installs the requested array_backend."""
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
         session.install(ARRAY_BACKENDS["array_api_strict"])
@@ -86,21 +87,47 @@ def tests(session: nox.Session) -> None:
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
 
-    session.run("pytest", *session.posargs, env=os.environ)
+
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
+def tests(session: nox.Session) -> None:
+    """Run the unit tests."""
+    _setup_array_backend(session)
+    session.run("pytest", *session.posargs)
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
-    session.posargs.append("--cov")
-    tests(session)
+    _setup_array_backend(session)
+    session.run(
+        "pytest",
+        "--cov",
+        *session.posargs,
+        env=os.environ,
+    )
 
 
-@nox.session(python=ALL_PYTHON)
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+)
 def coverage_benchmarks(session: nox.Session) -> None:
     """Run tests and compute coverage for the benchmark tests."""
-    session.posargs.extend([BENCH_TESTS_LOC, "--cov"])
-    tests(session)
+    _setup_array_backend(session)
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        "--cov",
+        *SHARED_BENCHMARK_FLAGS,
+        *session.posargs,
+        env=os.environ,
+    )
 
 
 @nox_uv.session(
@@ -115,7 +142,7 @@ def doctests(session: nox.Session) -> None:
             "--doctest-plus",
             "--doctest-plus-generate-diff=overwrite",
             "glass",
-        ]
+        ],
     )
     session.run("pytest", *session.posargs)
 
@@ -125,7 +152,7 @@ def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
     if session.posargs:
         if "html" in session.posargs:
-            print("Generating HTML for the example notebooks")
+            session.log("Generating HTML for the example notebooks")
             session.run(
                 "jupyter",
                 "nbconvert",
@@ -135,7 +162,7 @@ def examples(session: nox.Session) -> None:
                 "examples/**/*.ipynb",
             )
         else:
-            print("Unsupported argument to examples")
+            session.log("Unsupported argument to examples")
     else:
         session.run(
             "jupyter",
@@ -163,10 +190,12 @@ def docs(session: nox.Session) -> None:
         if "serve" in session.posargs:
             port = 8001
 
-            print(f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit")
+            session.log(
+                f"Launching docs at http://localhost:{port}/ - use Ctrl-C to quit",
+            )
             session.run("python", "-m", "http.server", f"{port}", "-d", "_build/html")
         else:
-            print("Unsupported argument to docs")
+            session.log("Unsupported argument to docs")
 
 
 @nox_uv.session(
@@ -191,7 +220,6 @@ def version(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=ALL_PYTHON,
     uv_no_install_project=True,
     uv_only_groups=["test"],
 )
@@ -210,7 +238,6 @@ def benchmarks(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=ALL_PYTHON,
     uv_no_install_project=True,
     uv_only_groups=["test"],
 )
@@ -223,33 +250,29 @@ def regression_tests(session: nox.Session) -> None:
     _check_revision_count(session.posargs, expected_count=2)
     before_revision, after_revision = session.posargs
 
+    _setup_array_backend(session)
+
     # make sure benchmark directory is clean
     benchmark_dir = pathlib.Path(".benchmarks")
     if benchmark_dir.exists():
         session.log(f"Deleting previous benchmark directory: {benchmark_dir}")
         shutil.rmtree(benchmark_dir)
 
-    shared_benchmark_flags = [
-        "--benchmark-timer=time.process_time",
-        "--benchmark-columns=mean,stddev,rounds",
-        "--benchmark-sort=name",
-    ]
-
-    print(f"Generating prior benchmark from revision {before_revision}")
+    session.log(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
         "--benchmark-autosave",
-        *shared_benchmark_flags,
+        *SHARED_BENCHMARK_FLAGS,
     )
 
-    print(f"Comparing {before_revision} benchmark to revision {after_revision}")
+    session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=mean:10%",
-        *shared_benchmark_flags,
+        *SHARED_BENCHMARK_FLAGS,
     )

@@ -182,6 +182,7 @@ lint.ignore = [
 ]
 lint.isort = {known-first-party = [
     "glass",
+    "tests",
 ], known-third-party = [
     "jax",
 ], section-order = [
@@ -221,8 +222,6 @@ lint.per-file-ignores = {"__init__.py" = [
     "TRY003", # raise-vanilla-args
 ], "glass/grf/_*" = [
     "SLF001", # private-member-access
-], "noxfile.py" = [
-    "T201", # print
 ], "tests/benchmarks/*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package
