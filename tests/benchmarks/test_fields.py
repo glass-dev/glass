@@ -195,14 +195,20 @@ def test_cls2cov(
 
 
 @pytest.mark.stable
-def test_generate_grf_positional_args_only(
+@pytest.mark.parametrize("use_rng", [False, True])
+@pytest.mark.parametrize("ncorr", [None, 1])
+def test_generate_grf(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
+    use_rng: bool,  # noqa: FBT001
+    ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+        pytest.skip(
+            "glass.fields._generate_grf has not yet been ported to the array-api"
+        )
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
 
@@ -210,7 +216,12 @@ def test_generate_grf_positional_args_only(
     nside = 4
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields._generate_grf(gls, nside)
+        generator = glass.fields._generate_grf(
+            gls,
+            nside,
+            rng=urng if use_rng else None,  # type: ignore[arg-type]
+            ncorr=ncorr,
+        )
         return _consume_generator(generator)
 
     gaussian_fields = benchmark(function_to_benchmark)
