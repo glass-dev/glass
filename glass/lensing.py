@@ -47,6 +47,7 @@ if TYPE_CHECKING:
 
     from glass._types import ComplexArray, FloatArray
     from glass.cosmology import Cosmology
+    from glass.shells import RadialWindow
 
 
 @overload
@@ -426,7 +427,7 @@ class MultiPlaneConvergence:
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
 
-    def add_window(self, delta: FloatArray, w: glass.RadialWindow) -> None:
+    def add_window(self, delta: FloatArray, w: RadialWindow) -> None:
         """
         Add a mass plane from a window function to the convergence.
 
@@ -540,7 +541,7 @@ class MultiPlaneConvergence:
 
 
 def multi_plane_matrix(
-    shells: Sequence[glass.RadialWindow],
+    shells: Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> FloatArray:
     """
@@ -568,7 +569,7 @@ def multi_plane_matrix(
 
 def multi_plane_weights(
     weights: FloatArray,
-    shells: Sequence[glass.RadialWindow],
+    shells: Sequence[RadialWindow],
     cosmo: Cosmology,
 ) -> FloatArray:
     """

@@ -18,6 +18,7 @@ import array_api_extra as xpx
 
 import glass.grf
 import glass.harmonics
+import glass.shells
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -672,7 +673,9 @@ def effective_cls(
     return out
 
 
-def gaussian_fields(shells: Sequence[glass.RadialWindow]) -> Sequence[glass.grf.Normal]:
+def gaussian_fields(
+    shells: Sequence[glass.shells.RadialWindow],
+) -> Sequence[glass.grf.Normal]:
     """
     Create Gaussian random fields for radial windows *shells*.
 
@@ -690,7 +693,7 @@ def gaussian_fields(shells: Sequence[glass.RadialWindow]) -> Sequence[glass.grf.
 
 
 def lognormal_fields(
-    shells: Sequence[glass.RadialWindow],
+    shells: Sequence[glass.shells.RadialWindow],
     shift: Callable[[float], float] | None = None,
 ) -> Sequence[glass.grf.Lognormal]:
     """

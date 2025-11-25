@@ -4,7 +4,6 @@ import math
 from typing import TYPE_CHECKING
 
 import healpy as hp
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -14,8 +13,10 @@ import glass.harmonics
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from tests.conftest import Compare
 
-def test_multalm(xp: ModuleType) -> None:
+
+def test_multalm(compare: type[Compare], xp: ModuleType) -> None:
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in multalm are not immutable, so do not support jax")
@@ -29,13 +30,9 @@ def test_multalm(xp: ModuleType) -> None:
     result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    np.testing.assert_allclose(result, expected_result)
-    np.testing.assert_raises(
-        AssertionError,
-        np.testing.assert_allclose,
-        alm_copy,
-        result,
-    )
+    compare.assert_allclose(result, expected_result)
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        compare.assert_allclose(alm_copy, result)
 
     # multiple with 1s
 
@@ -43,7 +40,7 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.ones(3)
 
     result = glass.harmonics.multalm(alm, bl)
-    np.testing.assert_allclose(result, alm)
+    compare.assert_allclose(result, alm)
 
     # multiple with 0s
 
@@ -52,7 +49,7 @@ def test_multalm(xp: ModuleType) -> None:
     result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    np.testing.assert_allclose(result, expected_result)
+    compare.assert_allclose(result, expected_result)
 
     # empty arrays
 
@@ -60,10 +57,10 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.asarray([])
 
     result = glass.harmonics.multalm(alm, bl)
-    np.testing.assert_allclose(result, alm)
+    compare.assert_allclose(result, alm)
 
 
-def test_transform(xp: ModuleType) -> None:
+def test_transform(compare: type[Compare], xp: ModuleType) -> None:
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
         pytest.skip("transform depends on healpy which is not Array API compatible")
 
@@ -85,10 +82,10 @@ def test_transform(xp: ModuleType) -> None:
         polarised_input=False,
     )
 
-    np.testing.assert_allclose(alm_result, alm_expected, rtol=1e-15)
+    compare.assert_allclose(alm_result, alm_expected, rtol=1e-15)
 
 
-def test_inverse_transform(xp: ModuleType) -> None:
+def test_inverse_transform(compare: type[Compare], xp: ModuleType) -> None:
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
         pytest.skip("transform depends on healpy which is not Array API compatible")
 
@@ -113,7 +110,7 @@ def test_inverse_transform(xp: ModuleType) -> None:
 
     assert hasattr(map_result, "ndim")
     assert map_result.ndim == 1
-    np.testing.assert_array_equal(map_result, 1.0)
+    compare.assert_array_equal(map_result, 1.0)
 
     # valid spin transform
 
