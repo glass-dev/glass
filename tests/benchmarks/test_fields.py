@@ -3,6 +3,8 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+import healpy as hp
+import numpy as np
 import pytest
 
 import glass.fields
@@ -190,6 +192,30 @@ def test_cls2cov(
         atol=1e-6,
     )
     np.testing.assert_allclose(cov[:, 2], 0)
+
+
+@pytest.mark.stable
+def test_generate_grf_positional_args_only(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+) -> None:
+    """Benchmarks for glass.fields._generate_grf with positional arguments only."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields._multalm has not yet been ported to the array-api")
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+
+    gls = [urng.random(1_000)]
+    nside = 4
+
+    def function_to_benchmark() -> list[Any]:
+        generator = glass.fields._generate_grf(gls, nside)
+        return _consume_generator(generator)
+
+    gaussian_fields = benchmark(function_to_benchmark)
+
+    assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
 
 @pytest.mark.unstable
