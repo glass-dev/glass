@@ -16,18 +16,18 @@ if TYPE_CHECKING:
 def test_getcl_lmax_0(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax of 0."""
+    scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
-        for i in range(benchmark_scale_factor)
+        for i in range(scale_factor)
         for j in range(i, -1, -1)
     ]
 
-    random_i = randrange(benchmark_scale_factor)
-    random_j = randrange(benchmark_scale_factor)
+    random_i = randrange(scale_factor)
+    random_j = randrange(scale_factor)
 
     # check slicing
     result = benchmark(
@@ -45,21 +45,21 @@ def test_getcl_lmax_0(
 def test_getcl_lmax_larger_than_cls(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax larger than the length of cl."""
+    scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls = [
         xp.asarray([i, j], dtype=xp.float64)
-        for i in range(benchmark_scale_factor)
+        for i in range(scale_factor)
         for j in range(i, -1, -1)
     ]
 
-    random_i = randrange(benchmark_scale_factor)
-    random_j = randrange(benchmark_scale_factor)
+    random_i = randrange(scale_factor)
+    random_j = randrange(scale_factor)
 
     # check padding
-    lmax = benchmark_scale_factor + 50
+    lmax = scale_factor + 50
     result = benchmark(
         glass.fields.getcl,
         cls,

@@ -16,14 +16,13 @@ if TYPE_CHECKING:
 def test_multalm(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
 ) -> None:
     """Benchmarks for glass.harmonics.multalm."""
+    scale_factor = 100_000
     # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in multalm are not immutable, so do not support jax")
 
-    scale_factor = benchmark_scale_factor * 100
     # check output values and shapes
 
     alm = xp.arange(scale_factor * 5, dtype=xp.float64)

@@ -240,8 +240,3 @@ def shells() -> list[glass.RadialWindow]:
         glass.RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 4.0),
         glass.RadialWindow(np.array([4.0, 5.0, 6.0]), np.array([0.0, 1.0, 0.0]), 5.0),
     ]
-
-
-@pytest.fixture(scope="session")
-def benchmark_scale_factor() -> int:
-    return 1_000

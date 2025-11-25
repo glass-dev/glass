@@ -15,11 +15,10 @@ if TYPE_CHECKING:
 def test_broadcast_leading_axes(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
 ) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
     # Ensure we don't use too much memory
-    scale_factor = min(benchmark_scale_factor, 10)
+    scale_factor = 10
 
     a_in = 0
     b_shape = (scale_factor * 4, 10)
@@ -49,10 +48,9 @@ def test_broadcast_leading_axes(
 def test_cumulative_trapezoid_1d(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
-    scaled_length = benchmark_scale_factor * 10
+    scaled_length = 10_000
     f = xp.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
@@ -65,10 +63,9 @@ def test_cumulative_trapezoid_1d(
 def test_cumulative_trapezoid_2d(
     xp: ModuleType,
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
-    scaled_length = benchmark_scale_factor * 5
+    scaled_length = 5_000
     f = xp.stack(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
             xp.arange(scaled_length + 1)[1:],
