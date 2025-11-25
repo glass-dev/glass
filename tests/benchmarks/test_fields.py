@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-from random import randrange
+import random
 from typing import TYPE_CHECKING
-
-import numpy as np
 
 import glass.fields
 
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
 def test_getcl_lmax_0(
-    xp: ModuleType,
     benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    xp: ModuleType,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax of 0."""
     scale_factor = 1_000
@@ -26,8 +26,8 @@ def test_getcl_lmax_0(
         for j in range(i, -1, -1)
     ]
 
-    random_i = randrange(scale_factor)
-    random_j = randrange(scale_factor)
+    random_i = random.randrange(scale_factor)
+    random_j = random.randrange(scale_factor)
 
     # check slicing
     result = benchmark(
@@ -39,12 +39,13 @@ def test_getcl_lmax_0(
     )
     expected = xp.asarray([max(random_i, random_j)], dtype=xp.float64)
     assert result.size == 1
-    np.testing.assert_allclose(result, expected)
+    compare.assert_allclose(result, expected)
 
 
 def test_getcl_lmax_larger_than_cls(
-    xp: ModuleType,
     benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    xp: ModuleType,
 ) -> None:
     """Benchmarks for glass.fields.getcl with lmax larger than the length of cl."""
     scale_factor = 1_000
@@ -55,8 +56,8 @@ def test_getcl_lmax_larger_than_cls(
         for j in range(i, -1, -1)
     ]
 
-    random_i = randrange(scale_factor)
-    random_j = randrange(scale_factor)
+    random_i = random.randrange(scale_factor)
+    random_j = random.randrange(scale_factor)
 
     # check padding
     lmax = scale_factor + 50
@@ -69,4 +70,4 @@ def test_getcl_lmax_larger_than_cls(
     )
     expected = xp.zeros((lmax - 1,), dtype=xp.float64)
     assert result.size == lmax + 1
-    np.testing.assert_allclose(result[2:], expected)
+    compare.assert_allclose(result[2:], expected)

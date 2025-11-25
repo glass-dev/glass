@@ -52,6 +52,7 @@ def test_cumulative_trapezoid_1d(
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 10_000
+
     f = xp.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
@@ -68,6 +69,7 @@ def test_cumulative_trapezoid_2d(
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 5_000
+
     f = xp.stack(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
             xp.arange(scaled_length + 1)[1:],

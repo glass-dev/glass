@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass.harmonics
@@ -10,12 +9,14 @@ import glass.harmonics
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
 def test_multalm(
-    xp: ModuleType,
     benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    xp: ModuleType,
 ) -> None:
     """Benchmarks for glass.harmonics.multalm."""
     scale_factor = 100_000
@@ -30,7 +31,7 @@ def test_multalm(
 
     result = benchmark(glass.harmonics.multalm, alm, bl)
 
-    np.testing.assert_allclose(
+    compare.assert_allclose(
         result[:5],
         xp.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
     )
