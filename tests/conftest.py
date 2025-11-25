@@ -244,4 +244,4 @@ def shells() -> list[glass.RadialWindow]:
 
 @pytest.fixture(scope="session")
 def benchmark_scale_factor() -> int:
-    return 1000
+    return 1_000
