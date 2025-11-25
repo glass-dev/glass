@@ -101,7 +101,6 @@ def test_iternorm_specify_size(
             ]
             for _ in range(10_000)
         ]
-
     array_in = [xp.asarray(arr) for arr in list_input]
     expected_result = [
         1,
@@ -124,6 +123,24 @@ def test_iternorm_specify_size(
     assert j == expected_result[0]
     assert a.shape == expected_result[1]
     assert s.shape == expected_result[2]
+
+
+@pytest.mark.stable
+def test_iternorm_k_0(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
+    """Benchmarks for glass.iternorm with k set to 0."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
+
+    k = 0
+    array_in = [xp.asarray([x]) for x in xp.ones(10_000)]
+
+    results = benchmark(_generate_and_consume_iternorm, k, array_in)
+
+    j, a, s = results[0]
+    assert j is None
+    assert a.shape == (0,)
+    np.testing.assert_allclose(xp.asarray(s), 1.0)
 
 
 @pytest.mark.unstable
