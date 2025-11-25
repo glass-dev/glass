@@ -64,7 +64,7 @@ def test_iternorm_no_size(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     # check output shapes and types
 
     k = 2
-    array_in = [xp.asarray(x) for x in xp.arange(10_000)]
+    array_in = [xp.asarray(x) for x in xp.arange(10_000, dtype=xp.float64)]
 
     results = benchmark(_generate_and_consume_iternorm, k, array_in)
     j, a, s = results[0]
@@ -101,7 +101,7 @@ def test_iternorm_specify_size(
             ]
             for _ in range(10_000)
         ]
-    array_in = [xp.asarray(arr) for arr in list_input]
+    array_in = [xp.asarray(arr, dtype=xp.float64) for arr in list_input]
     expected_result = [
         1,
         (3, 2),
@@ -133,7 +133,7 @@ def test_iternorm_k_0(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
         pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
 
     k = 0
-    array_in = [xp.asarray([x]) for x in xp.ones(10_000)]
+    array_in = [xp.stack([x]) for x in xp.ones(10_000, dtype=xp.float64)]
 
     results = benchmark(_generate_and_consume_iternorm, k, array_in)
 
