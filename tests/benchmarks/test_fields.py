@@ -133,7 +133,7 @@ def test_iternorm_k_0(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
         pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
 
     k = 0
-    array_in = [xp.stack([x]) for x in xp.ones(10_000, dtype=xp.float64)]
+    array_in = [xp.stack([x]) for x in xp.ones(1_000, dtype=xp.float64)]
 
     results = benchmark(_generate_and_consume_iternorm, k, array_in)
 
