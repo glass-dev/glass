@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 def _generate_and_consume_iternorm(
     k: int,
     array_in: list[FloatArray],
+    *,
+    size: int | tuple[int, ...] = (),
 ) -> list[tuple[int | None, FloatArray, FloatArray]]:
     """
     Generate and consume iternorm for benchmarking purposes.
@@ -41,6 +43,7 @@ def _generate_and_consume_iternorm(
     generator = glass.fields.iternorm(
         k,
         (x for x in array_in),
+        size,
     )
     try:
         # Consume in a loop, as we expect users to
@@ -51,6 +54,7 @@ def _generate_and_consume_iternorm(
     return output
 
 
+@pytest.mark.stable
 def test_iternorm_no_size(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     """Benchmarks for glass.iternorm with default value for size."""
     # Call jax version of iternorm once jax version is written
@@ -70,6 +74,56 @@ def test_iternorm_no_size(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     assert s.shape == ()
     assert s.dtype == xp.float64
     assert s.shape == ()
+
+
+@pytest.mark.stable
+@pytest.mark.parametrize("num_dimensions", [1, 2])
+def test_iternorm_specify_size(
+    xp: ModuleType,
+    benchmark: BenchmarkFixture,
+    num_dimensions: int,
+) -> None:
+    """Benchmarks for glass.iternorm with size specified."""
+    # Call jax version of iternorm once jax version is written
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
+
+    k = 2
+    size = (3,)
+    if num_dimensions == 1:
+        list_input = [[1.0, 0.5, 0.5] for _ in range(10_000)]
+    elif num_dimensions == 2:
+        list_input = [
+            [
+                [1.0, 0.5, 0.5],  # type: ignore[list-item]
+                [0.5, 0.2, 0.1],  # type: ignore[list-item]
+                [0.5, 0.1, 0.2],  # type: ignore[list-item]
+            ]
+            for _ in range(10_000)
+        ]
+
+    array_in = [xp.asarray(arr) for arr in list_input]
+    expected_result = [
+        1,
+        (3, 2),
+        (3,),
+    ]
+
+    # check output shapes and types
+
+    results = benchmark(_generate_and_consume_iternorm, k, array_in, size=size)
+    result1 = results[0]
+    result2 = results[1]
+
+    assert result1 != result2
+    assert isinstance(result1, tuple)
+    assert len(result1) == 3
+
+    j, a, s = result1
+    assert isinstance(j, int)
+    assert j == expected_result[0]
+    assert a.shape == expected_result[1]
+    assert s.shape == expected_result[2]
 
 
 @pytest.mark.unstable
