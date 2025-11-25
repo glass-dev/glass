@@ -225,8 +225,8 @@ lint.per-file-ignores = {"__init__.py" = [
     "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
-    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
-    "SLF001", # Private member accessed (in tests we want to access private members)
+    "S311", # suspicious-non-cryptographic-random-usage
+    "SLF001", # private-member-access
 ], "tests/conftest.py" = [
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
