@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from glass._types import FloatArray, UnifiedGenerator
+    from glass._types import UnifiedGenerator
 
 
 def _consume_generator(
@@ -49,7 +49,7 @@ def test_iternorm_no_size(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     k = 2
     array_in = [xp.asarray(x) for x in xp.arange(10_000, dtype=xp.float64)]
 
-    def function_to_benchmark() -> list[tuple[int | None, FloatArray, FloatArray]]:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.fields.iternorm(
             k,
             (x for x in array_in),
@@ -98,7 +98,7 @@ def test_iternorm_specify_size(
         (3,),
     ]
 
-    def function_to_benchmark() -> list[tuple[int | None, FloatArray, FloatArray]]:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.fields.iternorm(
             k,
             (x for x in array_in),
@@ -133,7 +133,7 @@ def test_iternorm_k_0(xp: ModuleType, benchmark: BenchmarkFixture) -> None:
     k = 0
     array_in = [xp.stack([x]) for x in xp.ones(1_000, dtype=xp.float64)]
 
-    def function_to_benchmark() -> list[tuple[int | None, FloatArray, FloatArray]]:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.fields.iternorm(
             k,
             (x for x in array_in),
@@ -164,7 +164,7 @@ def test_cls2cov(
     nl, nf, nc = 3, 2, 2
     array_in = [urng.random(3) for _ in range(1_000)]
 
-    def function_to_benchmark() -> list[tuple[int | None, FloatArray, FloatArray]]:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.fields.cls2cov(
             array_in,
             nl,
