@@ -27,9 +27,9 @@ import numpy as np
 
 import array_api_compat
 
-import glass
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.shells
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 
 def redshifts(
     n: int | FloatArray,
-    w: glass.RadialWindow,
+    w: glass.shells.RadialWindow,
     *,
     rng: UnifiedGenerator | None = None,
 ) -> FloatArray:

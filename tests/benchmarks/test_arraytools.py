@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import glass.arraytools
 
 if TYPE_CHECKING:
@@ -11,10 +9,12 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
+    from tests.conftest import Compare
+
 
 def test_broadcast_leading_axes(
-    xp: ModuleType,
     benchmark: BenchmarkFixture,
+    xp: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
     # Ensure we don't use too much memory
@@ -46,8 +46,9 @@ def test_broadcast_leading_axes(
 
 
 def test_cumulative_trapezoid_1d(
-    xp: ModuleType,
     benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    xp: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 10_000
@@ -57,12 +58,13 @@ def test_cumulative_trapezoid_1d(
     expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    np.testing.assert_allclose(ct[:4], xp.asarray(expected_first_4_out))
+    compare.assert_allclose(ct[:4], xp.asarray(expected_first_4_out))
 
 
 def test_cumulative_trapezoid_2d(
-    xp: ModuleType,
     benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    xp: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 5_000
@@ -77,5 +79,5 @@ def test_cumulative_trapezoid_2d(
     expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    np.testing.assert_allclose(ct[0, :4], xp.asarray(expected_first_4_out))
-    np.testing.assert_allclose(ct[1, :4], xp.asarray(expected_first_4_out))
+    compare.assert_allclose(ct[0, :4], xp.asarray(expected_first_4_out))
+    compare.assert_allclose(ct[1, :4], xp.asarray(expected_first_4_out))
