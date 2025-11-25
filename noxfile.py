@@ -219,7 +219,6 @@ def version(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=ALL_PYTHON,
     uv_no_install_project=True,
     uv_only_groups=["test"],
 )
@@ -238,7 +237,6 @@ def benchmarks(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=ALL_PYTHON,
     uv_no_install_project=True,
     uv_only_groups=["test"],
 )
