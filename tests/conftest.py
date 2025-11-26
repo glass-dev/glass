@@ -18,9 +18,9 @@ with contextlib.suppress(ImportError):
     import glass.jax
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Generator
     from types import ModuleType
-    from typing import Any, Generator
+    from typing import Any
 
     from cosmology import Cosmology
 
@@ -297,6 +297,7 @@ def compare() -> type[Compare]:
 
 
 class GeneratorConsumer:
+    """Helper class for fully consuming genertors in tests."""
 
     @staticmethod
     def consume(
@@ -316,7 +317,7 @@ class GeneratorConsumer:
         except ValueError:
             pass
         return output
-    
+
 
 @pytest.fixture(scope="session")
 def generator_consumer() -> type[GeneratorConsumer]:

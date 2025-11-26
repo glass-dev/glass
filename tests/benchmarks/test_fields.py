@@ -4,7 +4,6 @@ import random
 from typing import TYPE_CHECKING
 
 import healpy as hp
-import numpy as np
 import pytest
 
 import glass.fields
@@ -40,7 +39,7 @@ def test_iternorm_no_size(
             k,
             (x for x in array_in),
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     results = benchmark(function_to_benchmark)
     j, a, s = results[0]
@@ -91,7 +90,7 @@ def test_iternorm_specify_size(
             (x for x in array_in),
             size,
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     # check output shapes and types
 
@@ -130,7 +129,7 @@ def test_iternorm_k_0(
             k,
             (x for x in array_in),
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     results = benchmark(function_to_benchmark)
 
@@ -165,7 +164,7 @@ def test_cls2cov(
             nf,
             nc,
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     covs = benchmark(function_to_benchmark)
     cov = covs[0]
@@ -199,9 +198,7 @@ def test_generate_grf(
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-        pytest.skip(
-            f"glass.fields._generate_grf not yet ported for {xp.__name__}"
-        )
+        pytest.skip(f"glass.fields._generate_grf not yet ported for {xp.__name__}")
 
     gls = [urng.random(1_000)]
     nside = 4
@@ -213,7 +210,7 @@ def test_generate_grf(
             rng=urng if use_rng else None,  # type: ignore[arg-type]
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     gaussian_fields = benchmark(function_to_benchmark)
 
@@ -259,7 +256,7 @@ def test_generate(
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)  # type: ignore[arg-type]
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     result = benchmark(function_to_benchmark)
 
