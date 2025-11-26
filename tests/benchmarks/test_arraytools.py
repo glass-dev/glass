@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from tests.conftest import Compare
 
 
-@pytest.mark.stable
+@pytest.mark.unstable
 def test_broadcast_leading_axes(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
