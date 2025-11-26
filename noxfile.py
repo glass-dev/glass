@@ -268,10 +268,24 @@ def regression_tests(session: nox.Session) -> None:
 
     session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
+    session.log("Running stable regression tests")
     session.run(
         "pytest",
         BENCH_TESTS_LOC,
+        "-m",
+        "stable",
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=mean:10%",
+        *SHARED_BENCHMARK_FLAGS,
+    )
+
+    session.log("Running unstable regression tests")
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        "-m",
+        "unstable",
+        "--benchmark-compare=0001",
+        "--benchmark-compare-fail=mean:0.001",
         *SHARED_BENCHMARK_FLAGS,
     )
