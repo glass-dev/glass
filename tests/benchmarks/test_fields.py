@@ -3,6 +3,8 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+import pytest
+
 import glass.fields
 
 if TYPE_CHECKING:
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
+@pytest.mark.unstable
 def test_getcl_lmax_0(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
@@ -42,6 +45,7 @@ def test_getcl_lmax_0(
     compare.assert_allclose(result, expected)
 
 
+@pytest.mark.unstable
 def test_getcl_lmax_larger_than_cls(
     benchmark: BenchmarkFixture,
     compare: type[Compare],

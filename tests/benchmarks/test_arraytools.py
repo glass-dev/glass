@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
+
 import glass.arraytools
 
 if TYPE_CHECKING:
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
     from tests.conftest import Compare
 
 
+@pytest.mark.stable
 def test_broadcast_leading_axes(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
@@ -45,6 +48,7 @@ def test_broadcast_leading_axes(
     assert c_out.shape == (c_shape[0], b_shape[0], c_shape[2], c_shape[3])
 
 
+@pytest.mark.unstable
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
@@ -62,6 +66,7 @@ def test_cumulative_trapezoid_1d(
     compare.assert_allclose(ct[:4], xp.asarray(expected_first_4_out))
 
 
+@pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,
     compare: type[Compare],

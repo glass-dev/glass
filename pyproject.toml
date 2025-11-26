@@ -154,6 +154,10 @@ filterwarnings = [
     "ignore::DeprecationWarning",
 ]
 log_cli_level = "DEBUG"
+markers = [
+    "stable: marks tests as expected to be stable (i.e. check regression using percentage)",
+    "unstable: mark tests as expected to be unstable (i.e. check regression using absolute time)",
+]
 minversion = "6.0"
 testpaths = [
     "tests/core",
