@@ -275,7 +275,7 @@ def regression_tests(session: nox.Session) -> None:
         "-m",
         "stable",
         "--benchmark-compare=0001",
-        "--benchmark-compare-fail=mean:10%",
+        "--benchmark-compare-fail=mean:5%",
         *SHARED_BENCHMARK_FLAGS,
     )
 
@@ -286,6 +286,6 @@ def regression_tests(session: nox.Session) -> None:
         "-m",
         "unstable",
         "--benchmark-compare=0001",
-        "--benchmark-compare-fail=mean:0.0005",
+        "--benchmark-compare-fail=mean:0.0005",  # Absolute time comparison in seconds
         *SHARED_BENCHMARK_FLAGS,
     )
