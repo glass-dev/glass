@@ -210,7 +210,7 @@ def test_generate_grf(
             "glass.fields._generate_grf has not yet been ported to the array-api"
         )
     if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+        pytest.skip("Arrays in _generate_grf are not immutable, so do not support jax")
 
     gls = [urng.random(1_000)]
     nside = 4
@@ -227,6 +227,53 @@ def test_generate_grf(
     gaussian_fields = benchmark(function_to_benchmark)
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
+
+
+def _nth_triangular_number(n: int) -> int:
+    return int((n * (n + 1)) / 2)
+
+
+@pytest.mark.stable
+@pytest.mark.parametrize(
+    ("ncorr", "expected_len"),
+    [
+        (None, 4),
+        (1, 2),
+    ],
+)
+def test_generate(
+    benchmark: BenchmarkFixture,
+    xp: ModuleType,
+    expected_len: int,
+    ncorr: int | None,
+) -> None:
+    """Benchmarks for glass.fields.generate."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip("glass.fields.generate has not yet been ported to the array-api")
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Arrays in generate are not immutable, so do not support jax")
+
+    n = 100
+    fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
+    fields[1] = lambda x, var: x**2  # noqa: ARG005
+    gls = [xp.ones(10) for _ in range(_nth_triangular_number(n))]
+    nside = 16
+
+    def function_to_benchmark() -> list[Any]:
+        generator = glass.fields.generate(
+            fields,  # type: ignore[arg-type]
+            gls,
+            nside=nside,
+            ncorr=ncorr,
+        )
+        return _consume_generator(generator)  # type: ignore[arg-type]
+
+    result = benchmark(function_to_benchmark)
+
+    assert len(result) == expected_len
+    for field in result:
+        assert field.shape == (hp.nside2npix(nside),)
+    np.testing.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
 @pytest.mark.unstable
