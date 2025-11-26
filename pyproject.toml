@@ -155,6 +155,10 @@ filterwarnings = [
     "ignore::DeprecationWarning",
 ]
 log_cli_level = "DEBUG"
+markers = [
+    "stable: marks tests as expected to be stable (i.e. check regression using percentage)",
+    "unstable: mark tests as expected to be unstable (i.e. check regression using absolute time)",
+]
 minversion = "6.0"
 testpaths = [
     "tests/core",
@@ -227,6 +231,8 @@ lint.per-file-ignores = {"__init__.py" = [
     "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
+    "S311", # suspicious-non-cryptographic-random-usage
+    "SLF001", # private-member-access
 ], "tests/conftest.py" = [
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
