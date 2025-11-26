@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
-@pytest.mark.stable
+@pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
