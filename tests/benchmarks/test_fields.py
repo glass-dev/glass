@@ -35,10 +35,7 @@ def test_iternorm_no_size(
     array_in = [xp.asarray(x) for x in xp.arange(10_000, dtype=xp.float64)]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.iternorm(
-            k,
-            (x for x in array_in),
-        )
+        generator = glass.fields.iternorm(k, iter(array_in))
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     results = benchmark(function_to_benchmark)
@@ -85,11 +82,7 @@ def test_iternorm_specify_size(
     ]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.iternorm(
-            k,
-            (x for x in array_in),
-            size,
-        )
+        generator = glass.fields.iternorm(k, iter(array_in), size)
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     # check output shapes and types
@@ -125,10 +118,7 @@ def test_iternorm_k_0(
     array_in = [xp.stack([x]) for x in xp.ones(1_000, dtype=xp.float64)]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.iternorm(
-            k,
-            (x for x in array_in),
-        )
+        generator = glass.fields.iternorm(k, iter(array_in))
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     results = benchmark(function_to_benchmark)
@@ -188,7 +178,7 @@ def test_cls2cov(
 @pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
-def test_generate_grf(
+def test_generate_grf(  # noqa: PLR0913
     xp: ModuleType,
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
@@ -217,10 +207,6 @@ def test_generate_grf(
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
 
-def _nth_triangular_number(n: int) -> int:
-    return int((n * (n + 1)) / 2)
-
-
 @pytest.mark.stable
 @pytest.mark.parametrize(
     ("ncorr", "expected_len"),
@@ -229,7 +215,7 @@ def _nth_triangular_number(n: int) -> int:
         (1, 2),
     ],
 )
-def test_generate(
+def test_generate(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
@@ -238,15 +224,14 @@ def test_generate(
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields.generate."""
-    if xp.__name__ == "array_api_strict":
-        pytest.skip("glass.fields.generate has not yet been ported to the array-api")
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in generate are not immutable, so do not support jax")
+    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+        pytest.skip(f"glass.fields.generate not yet ported for {xp.__name__}")
 
     n = 100
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
-    gls = [xp.ones(10) for _ in range(_nth_triangular_number(n))]
+    nth_triangular_number = int((n * (n + 1)) / 2)
+    gls = [xp.ones(10) for _ in range(nth_triangular_number)]
     nside = 16
 
     def function_to_benchmark() -> list[Any]:

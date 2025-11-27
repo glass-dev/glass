@@ -228,7 +228,6 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "tests/benchmarks/*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package
-    "PLR0913", # too-many-arguments
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "S311", # suspicious-non-cryptographic-random-usage

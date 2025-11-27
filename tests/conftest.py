@@ -309,13 +309,10 @@ class GeneratorConsumer:
         The resulting generator will be consumed an any ValueError
         exceptions swallowed.
         """
-        output = []
-        try:
+        output: list[Any] = []
+        with contextlib.suppress(ValueError):
             # Consume in a loop, as we expect users to
-            for result in generator:
-                output.append(result)  # noqa: PERF402
-        except ValueError:
-            pass
+            output.extend(iter(generator))
         return output
 
 
