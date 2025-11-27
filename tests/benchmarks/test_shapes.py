@@ -25,7 +25,7 @@ def test_ellipticity_ryden04(
         pytest.skip(
             "Arrays in ellipticity_ryden04 are not immutable, so do not support jax",
         )
-    size = (100, 100)
+    size = (1000, 1000)
 
     # single ellipticity
 
@@ -58,6 +58,31 @@ def test_ellipticity_gaussian(
 
     eps = benchmark(
         glass.ellipticity_gaussian,
+        count,
+        sigma,
+    )
+
+    assert eps.shape == (n * array_length,)
+
+
+@pytest.mark.stable
+def test_ellipticity_intnorm(
+    benchmark: BenchmarkFixture,
+    xp: ModuleType,
+) -> None:
+    """Benchmark for glass.shapes.ellipticity_intnorm."""
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(
+            "Arrays in ellipticity_intnorm are not immutable, so do not support jax",
+        )
+
+    array_length = 10
+    n = 1_000_000
+    count = xp.full(array_length, fill_value=n)
+    sigma = xp.full(array_length, fill_value=0.256)
+
+    eps = benchmark(
+        glass.ellipticity_intnorm,
         count,
         sigma,
     )
