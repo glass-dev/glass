@@ -87,13 +87,13 @@ jobs:
         if: matrix.python-version == '3.13'
         run: >-
           uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }} -o ${{
-          env.BENCH_COV_NAME }}
+          env.BENCH_COV_NAME }}.xml
 
       - name: Generate XML report for core tests
         run: >-
           uv run coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
-          matrix.python-version }}.xml;
+          matrix.python-version }}.xml
 
       - name: Upload benchmark coverage to Coveralls
         if: matrix.python-version == '3.13'
