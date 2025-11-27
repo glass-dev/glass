@@ -101,16 +101,18 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     NotImplementedError
         If the array backend is not supported.
     """
+    seed = 42
+
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
-        return glass.jax.Generator(seed=42)
+        return glass.jax.Generator(seed=seed)
 
     if xp.__name__ == "numpy":
-        return xp.random.default_rng()  # type: ignore[no-any-return]
+        return xp.random.default_rng(seed=seed)  # type: ignore[no-any-return]
 
     if xp.__name__ == "array_api_strict":
-        return Generator(seed=42)
+        return Generator(seed=seed)
 
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)

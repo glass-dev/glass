@@ -36,6 +36,8 @@ if TYPE_CHECKING:
 #   all (try finding every supported array library available in the environment)
 ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
 
+SEED = 42
+
 # Change jax logger to only log ERROR or worse
 logging.getLogger("jax").setLevel(logging.ERROR)
 
@@ -144,14 +146,12 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
     """
-    seed = 42
-    backend = xp.__name__
-    if backend == "jax.numpy":
-        return glass.jax.Generator(seed=seed)
-    if backend == "numpy":
-        return np.random.default_rng(seed=seed)
-    if backend == "array_api_strict":
-        return _utils.Generator(seed=seed)
+    if xp.__name__ == "jax.numpy":
+        return glass.jax.Generator(seed=SEED)
+    if xp.__name__ == "numpy":
+        return np.random.default_rng(seed=SEED)
+    if xp.__name__ == "array_api_strict":
+        return _utils.Generator(seed=SEED)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
@@ -163,7 +163,7 @@ def rng() -> np.random.Generator:
 
     Use `urng` for array API tests.
     """
-    return np.random.default_rng(seed=42)
+    return np.random.default_rng(seed=SEED)
 
 
 @pytest.fixture(scope="session")
