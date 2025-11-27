@@ -22,7 +22,7 @@ def test_radialwindow(
     """Benchmark for shells.RadialWindow."""
     # check zeff is computed when not provided
     arr_length = 100_000
-    expected_zeff = 66666.0
+    expected_zeff = 66_666.0
 
     wa = xp.arange(arr_length)
     za = xp.arange(arr_length)
