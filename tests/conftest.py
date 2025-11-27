@@ -18,7 +18,9 @@ with contextlib.suppress(ImportError):
     import glass.jax
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from types import ModuleType
+    from typing import Any
 
     from cosmology import Cosmology
 
@@ -292,3 +294,29 @@ class Compare:
 def compare() -> type[Compare]:
     """Fixture for array comparison utility."""
     return Compare
+
+
+class GeneratorConsumer:
+    """Helper class for fully consuming genertors in tests."""
+
+    @staticmethod
+    def consume(
+        generator: Generator[Any],
+    ) -> list[Any]:
+        """
+        Generate and consume a generator returned by a given functions.
+
+        The resulting generator will be consumed an any ValueError
+        exceptions swallowed.
+        """
+        output: list[Any] = []
+        with contextlib.suppress(ValueError):
+            # Consume in a loop, as we expect users to
+            output.extend(iter(generator))
+        return output
+
+
+@pytest.fixture(scope="session")
+def generator_consumer() -> type[GeneratorConsumer]:
+    """Fixture for generator-consuming utility."""
+    return GeneratorConsumer
