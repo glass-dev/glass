@@ -355,7 +355,7 @@ def _generate_grf(
         If all gls are empty.
     """
     if rng is None:
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(42)
 
     # number of gls and number of fields
     ngls = len(gls)
