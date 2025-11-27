@@ -1,5 +1,5 @@
 import contextlib
-import importlib
+import importlib.util
 
 import numpy as np
 import pytest
@@ -13,6 +13,7 @@ with contextlib.suppress(ImportError):
 # check if available for testing
 HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
 HAVE_JAX = importlib.util.find_spec("jax") is not None
+SEED = 42
 
 
 def test_rng_dispatcher_numpy() -> None:
@@ -38,7 +39,7 @@ def test_rng_dispatcher_array_api_strict() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_init() -> None:
-    rng = _utils.Generator(42)
+    rng = _utils.Generator(SEED)
     assert isinstance(rng, _utils.Generator)
 
 
@@ -47,7 +48,7 @@ def test_random() -> None:
     import array_api_strict
     from array_api_strict._array_object import Array
 
-    rng = _utils.Generator(42)
+    rng = _utils.Generator(SEED)
     rvs = rng.random(size=10_000)
     assert rvs.shape == (10_000,)
     assert array_api_strict.min(rvs) >= 0.0
@@ -59,7 +60,7 @@ def test_random() -> None:
 def test_normal() -> None:
     from array_api_strict._array_object import Array
 
-    rng = _utils.Generator(42)
+    rng = _utils.Generator(SEED)
     rvs = rng.normal(1, 2, size=10_000)
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, Array)
@@ -69,7 +70,7 @@ def test_normal() -> None:
 def test_standard_normal() -> None:
     from array_api_strict._array_object import Array
 
-    rng = _utils.Generator(42)
+    rng = _utils.Generator(SEED)
     rvs = rng.standard_normal(size=10_000)
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, Array)
@@ -79,7 +80,7 @@ def test_standard_normal() -> None:
 def test_poisson() -> None:
     from array_api_strict._array_object import Array
 
-    rng = _utils.Generator(42)
+    rng = _utils.Generator(SEED)
     rvs = rng.poisson(lam=1, size=10_000)
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, Array)
@@ -90,7 +91,7 @@ def test_uniform() -> None:
     import array_api_strict
     from array_api_strict._array_object import Array
 
-    rng = _utils.Generator(42)
+    rng = _utils.Generator(SEED)
     rvs = rng.uniform(size=10_000)
     assert rvs.shape == (10_000,)
     assert array_api_strict.min(rvs) >= 0.0
