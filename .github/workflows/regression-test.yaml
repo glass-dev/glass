@@ -8,8 +8,6 @@ on:
       - glass/**
       - noxfile.py
       - pyproject.toml
-      - tests/benchmarks/**
-      - tests/conftest.py
     branches:
       - main
     types:

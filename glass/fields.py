@@ -16,6 +16,7 @@ from transformcl import cltovar
 import array_api_compat
 import array_api_extra as xpx
 
+import glass._array_api_utils as _utils
 import glass.grf
 import glass.harmonics
 import glass.shells
@@ -355,7 +356,7 @@ def _generate_grf(
         If all gls are empty.
     """
     if rng is None:
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(42)
 
     # number of gls and number of fields
     ngls = len(gls)
@@ -624,6 +625,7 @@ def effective_cls(
 
     """
     xp = array_api_compat.array_namespace(*cls, weights1, weights2, use_compat=False)
+    uxpx = _utils.XPAdditions(xp)
 
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))
@@ -645,9 +647,9 @@ def effective_cls(
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations
     pairs = (
-        combinations_with_replacement(np.ndindex(shape1[1:]), 2)
+        combinations_with_replacement(uxpx.ndindex(shape1[1:]), 2)
         if weights2 is weights1
-        else product(np.ndindex(shape1[1:]), np.ndindex(shape2[1:]))
+        else product(uxpx.ndindex(shape1[1:]), uxpx.ndindex(shape2[1:]))
     )
 
     # create the output array: axes for all input axes plus lmax+1

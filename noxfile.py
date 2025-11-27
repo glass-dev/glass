@@ -114,7 +114,6 @@ def coverage(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=ALL_PYTHON,
     uv_groups=["test"],
 )
 def coverage_benchmarks(session: nox.Session) -> None:
