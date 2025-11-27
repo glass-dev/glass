@@ -85,10 +85,10 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Generate XML report for benchmark tests
+        if: matrix.python-version == '3.13'
         run: >-
-          uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
-          matrix.python-version }} -o ${{ env.BENCH_COV_NAME }}-${{
-          matrix.python-version }}.xml
+          uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }} -o ${{
+          env.BENCH_COV_NAME }}
 
       - name: Generate XML report for core tests
         run: >-
@@ -97,11 +97,12 @@ jobs:
           matrix.python-version }}.xml;
 
       - name: Upload benchmark coverage to Coveralls
+        if: matrix.python-version == '3.13'
         uses: coverallsapp/github-action@v2
         with:
           base-path: glass/
-          file: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}.xml
-          flag-name: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
+          file: ${{ env.BENCH_COV_NAME }}.xml
+          flag-name: ${{ env.BENCH_COV_NAME }}
           parallel: true
 
       - name: Upload core coverage to Coveralls
