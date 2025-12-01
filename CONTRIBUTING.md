@@ -19,7 +19,7 @@ The developer installation of _GLASS_ comes with several optional dependencies -
 These options can be used with `uv` in the following way
 
 ```bash
-uv sync --all-extras --group docs --group test
+uv sync --all-extras --all-groups
 ```
 
 ## Tooling
