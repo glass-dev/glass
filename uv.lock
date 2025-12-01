@@ -1056,6 +1056,36 @@ wheels = [
 ]
 
 [[package]]
+name = "ducc0"
+version = "0.39.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.3.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/03/2c/e40f40969b40b49586ba3dfd60aaca8e34872e57ab2d396fcbc494218972/ducc0-0.39.1.tar.gz", hash = "sha256:38eda188733d43c3602726e28bc9928d3117cdc23b5c1e7d89fdc26004a1d847", size = 347867, upload-time = "2025-10-18T11:43:11.372Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/d5/054943c06ab31b7f81eccb23877ba0c33348f9b10c672bd357092ab23296/ducc0-0.39.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:24db44d67d091d0063fbe964a71d5e44f90ca0f9a54b62cc7b57724b2dd88791", size = 2738099, upload-time = "2025-10-18T11:42:01.854Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/18/9da0c289bf77be8cf068d05d1bf08466f5b1e75b70e119767c290c515336/ducc0-0.39.1-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:03fb3322a2cac7f993baa7877742d0b1dac1c412718888a60123dd96226f2418", size = 4514349, upload-time = "2025-10-18T11:42:06.154Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/d8/ad9d7f3a412bf163d12bb6fe3470057a0b7124eb5392e3d2cf9d9f48d8bb/ducc0-0.39.1-cp310-cp310-win_amd64.whl", hash = "sha256:2012802d522795cbca6e36e423374e7a646ef602cb0491927874334948d46901", size = 1692784, upload-time = "2025-10-18T11:42:09.343Z" },
+    { url = "https://files.pythonhosted.org/packages/50/d2/74e4cf7dee7eb7702411ff44c3f49b09136bd79e4cc300a36a79ef8fbb4b/ducc0-0.39.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:e85e1946f565fa8ad52c79937305bbfc724b95558d2cdd18dc3055e6967eab8d", size = 2739509, upload-time = "2025-10-18T11:42:12.405Z" },
+    { url = "https://files.pythonhosted.org/packages/36/e2/f22ec65d1d1d75b0503add90349ba6802b4aba7ee7fbce854583ff7e01f6/ducc0-0.39.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c6f6e6efa3531cfbcee8f32051daf3bae0605a8fbe387f68b8a4952bee38e038", size = 4515351, upload-time = "2025-10-18T11:42:15.845Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/77/2652034e333c53003b7eb9fa3023500aad24699e34b261d200f4b88d5182/ducc0-0.39.1-cp311-cp311-win_amd64.whl", hash = "sha256:b684040726bc7c6165ea094cc7380fd5c6e02a053386c58c1fcdc9653615bbe0", size = 1694523, upload-time = "2025-10-18T11:42:18.697Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/b2/35da5746b40368011aec0ae2306e3738b7b4908977269f8424c32c2154a7/ducc0-0.39.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:a266412975fe764045ad718b50b4a6db14e9b4d762f07f644a8fdc36ef833dbf", size = 2741147, upload-time = "2025-10-18T11:42:21.742Z" },
+    { url = "https://files.pythonhosted.org/packages/49/3e/9dd2c531902779acf4fd21739b46902c7069f2f110250bd049ef45c39ca9/ducc0-0.39.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4e41b5e8b923f9d9b1a5a6b411d7b2b653b86c464c9867dc2044726853051006", size = 4537768, upload-time = "2025-10-18T11:42:25.397Z" },
+    { url = "https://files.pythonhosted.org/packages/8f/3c/7e18ebd7274afaa6f50f0b6122344fed55375d927b0a89f498c406400843/ducc0-0.39.1-cp312-cp312-win_amd64.whl", hash = "sha256:8977861917b4bd93752ded11f46ec7da960be60c8ab57e7a2dea0ef3aacc31ae", size = 1696197, upload-time = "2025-10-18T11:42:27.65Z" },
+    { url = "https://files.pythonhosted.org/packages/65/d4/3c73ca5859b938fd6a71804aacd3adc36fe88df24c8b7c561a39d9df67d0/ducc0-0.39.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:e73ebf0796d732c5a1b7eee7fbf2d6dc738795ef1e2a12617832e0c199347489", size = 2740969, upload-time = "2025-10-18T11:42:30.387Z" },
+    { url = "https://files.pythonhosted.org/packages/90/94/4c19dc3515052bcb0085ab4817569fcbbd659fe3b743b129df3269e9fec1/ducc0-0.39.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:2cb5c0d976bbba71ec56d21e846c679b701007a437a6821bcc17be658d31be26", size = 4538022, upload-time = "2025-10-18T11:42:34.129Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/a8/cec454f2810387b7ef4ae0c7b0f7894e8b88d2f38c3f07ebe11106489787/ducc0-0.39.1-cp313-cp313-win_amd64.whl", hash = "sha256:99b084bcc2f027b3b4167eb6ae3700be06a83559dd77a425d1331a3a3ddd7a38", size = 1696244, upload-time = "2025-10-18T11:42:36.778Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/a2/3cb410feb6d397157be1ea5894662659b30b91c4f3b5ec9c1a63593150d8/ducc0-0.39.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:f123a46f4ecc870618ac7e5a377a4a0e449a580dc190510021f9b8153ed4f06f", size = 2742701, upload-time = "2025-10-18T11:42:39.373Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/93/3410837faf16bb20ab80d86c76c96ba5d7e8adcfcb98433e00cb1f012814/ducc0-0.39.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9d33c94ef4d043b669ff8dfac3443b3438c7786762cd39d07e8ee80b60198d1d", size = 4539448, upload-time = "2025-10-18T11:42:43.403Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/99/1a00c7391a30c60177990ab088407ab328896e56ec71df17847e65edbec8/ducc0-0.39.1-cp314-cp314-win_amd64.whl", hash = "sha256:0e2dc28e9045e1e248da583ff21859c2de26f6c7c08116f4c29f25c454005c90", size = 1738498, upload-time = "2025-10-18T11:42:54.229Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/fb/56d77e097892bdd1e5e4428bb5bf03a5494a1a8bfe83975b4f0c53b22ea9/ducc0-0.39.1-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:30eb5bda0cd3b47b1c05920a90b3d4f29eae8de9237a3b5c08925889f504caa1", size = 2763230, upload-time = "2025-10-18T11:42:46.375Z" },
+    { url = "https://files.pythonhosted.org/packages/15/d7/a481c05e7305ade21135de57f7d13e62e37a0986a1f3418f9d109aa16329/ducc0-0.39.1-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fd94dee2e2bceacfc6cddc70281c8812ddf69577f666abfc9d2fa69e05e65a88", size = 4534838, upload-time = "2025-10-18T11:42:49.641Z" },
+    { url = "https://files.pythonhosted.org/packages/62/85/e2348c851e895f0d4f073f3b3d08886e7acb2b7038483ece8f94204f8786/ducc0-0.39.1-cp314-cp314t-win_amd64.whl", hash = "sha256:2feb88fa58c593952e4a5f97b9522db2e8f5dbb17ea4c2b32470e325808bf427", size = 1755357, upload-time = "2025-10-18T11:42:51.91Z" },
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1266,6 +1296,7 @@ source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
     { name = "array-api-extra" },
+    { name = "ducc0" },
     { name = "healpix" },
     { name = "healpy" },
     { name = "transformcl" },
@@ -1346,6 +1377,7 @@ requires-dist = [
     { name = "camb", marker = "extra == 'examples'" },
     { name = "cosmology-api", marker = "extra == 'examples'" },
     { name = "cosmology-compat-camb", marker = "extra == 'examples'" },
+    { name = "ducc0", specifier = ">=0.39.1" },
     { name = "glass-ext-camb", marker = "extra == 'examples'" },
     { name = "healpix", specifier = ">=2022.11.1" },
     { name = "healpy", specifier = ">=1.15.0" },
