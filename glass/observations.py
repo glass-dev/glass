@@ -31,6 +31,7 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
+import healpix
 import healpy as hp
 import numpy as np
 
@@ -85,7 +86,7 @@ def vmap_galactic_ecliptic(
         msg = "ecliptic stripe must be a pair of numbers"
         raise TypeError(msg)
 
-    m = np.ones(hp.nside2npix(nside))
+    m = np.ones(healpix.nside2npix(nside))
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpix
 import healpy as hp
 import numpy as np
 import pytest
@@ -336,13 +337,13 @@ def test_generate_grf(compare: type[Compare]) -> None:
 
     gaussian_fields = list(glass.fields._generate_grf(gls, nside))
 
-    assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
+    assert gaussian_fields[0].shape == (healpix.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
     rng = np.random.default_rng(seed=seed)
     gaussian_fields = list(glass.fields._generate_grf(gls, nside, rng=rng))
 
-    assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
+    assert gaussian_fields[0].shape == (healpix.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
     rng = np.random.default_rng(seed=seed)
@@ -350,7 +351,7 @@ def test_generate_grf(compare: type[Compare]) -> None:
         glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng),
     )
 
-    assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
+    assert new_gaussian_fields[0].shape == (healpix.nside2npix(nside),)
 
     compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
@@ -379,7 +380,7 @@ def test_generate(compare: type[Compare]) -> None:
     # check output shape
 
     nside = 16
-    npix = hp.nside2npix(nside)
+    npix = healpix.nside2npix(nside)
     gls = [np.ones(10), np.ones(10), np.ones(10)]
 
     result = list(glass.generate(fields, gls, nside=nside))
