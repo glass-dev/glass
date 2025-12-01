@@ -332,19 +332,20 @@ def test_generate_grf(compare: type[Compare]) -> None:
     gls = [np.array([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
+    seed = 42
 
     gaussian_fields = list(glass.fields._generate_grf(gls, nside))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = np.random.default_rng(seed=42)
+    rng = np.random.default_rng(seed=seed)
     gaussian_fields = list(glass.fields._generate_grf(gls, nside, rng=rng))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = np.random.default_rng(seed=42)
+    rng = np.random.default_rng(seed=seed)
     new_gaussian_fields = list(
         glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng),
     )

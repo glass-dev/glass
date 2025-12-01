@@ -237,7 +237,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     """
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(42)
 
     # get the bias model
     if isinstance(bias_model, str):

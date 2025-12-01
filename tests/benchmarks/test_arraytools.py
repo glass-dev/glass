@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
+
 import glass.arraytools
 
 if TYPE_CHECKING:
@@ -12,23 +14,16 @@ if TYPE_CHECKING:
     from tests.conftest import Compare
 
 
+@pytest.mark.unstable
 def test_broadcast_leading_axes(
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
     xp: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
     # Ensure we don't use too much memory
-    scale_factor = min(benchmark_scale_factor, 10)
-
     a_in = 0
-    b_shape = (scale_factor * 4, 10)
-    c_shape = (
-        scale_factor * 30,
-        1,
-        scale_factor * 5,
-        scale_factor * 6,
-    )
+    b_shape = (4, 10)
+    c_shape = (30, 1, 5, 6)
     b_in = xp.zeros(b_shape)
     c_in = xp.zeros(c_shape)
 
@@ -46,14 +41,15 @@ def test_broadcast_leading_axes(
     assert c_out.shape == (c_shape[0], b_shape[0], c_shape[2], c_shape[3])
 
 
+@pytest.mark.unstable
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
-    scaled_length = benchmark_scale_factor * 10
+    scaled_length = 10_000
+
     f = xp.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
@@ -63,14 +59,15 @@ def test_cumulative_trapezoid_1d(
     compare.assert_allclose(ct[:4], xp.asarray(expected_first_4_out))
 
 
+@pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,
-    benchmark_scale_factor: int,
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
-    scaled_length = benchmark_scale_factor * 5
+    scaled_length = 5_000
+
     f = xp.stack(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
             xp.arange(scaled_length + 1)[1:],

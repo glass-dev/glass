@@ -18,7 +18,9 @@ with contextlib.suppress(ImportError):
     import glass.jax
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from types import ModuleType
+    from typing import Any
 
     from cosmology import Cosmology
 
@@ -33,6 +35,8 @@ if TYPE_CHECKING:
 #   a particular array library (numpy, jax, array_api_strict, ...)
 #   all (try finding every supported array library available in the environment)
 ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
+
+SEED = 42
 
 # Change jax logger to only log ERROR or worse
 logging.getLogger("jax").setLevel(logging.ERROR)
@@ -142,14 +146,12 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
     """
-    seed = 42
-    backend = xp.__name__
-    if backend == "jax.numpy":
-        return glass.jax.Generator(seed=seed)
-    if backend == "numpy":
-        return np.random.default_rng(seed=seed)
-    if backend == "array_api_strict":
-        return _utils.Generator(seed=seed)
+    if xp.__name__ == "jax.numpy":
+        return glass.jax.Generator(seed=SEED)
+    if xp.__name__ == "numpy":
+        return np.random.default_rng(seed=SEED)
+    if xp.__name__ == "array_api_strict":
+        return _utils.Generator(seed=SEED)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
@@ -161,7 +163,7 @@ def rng() -> np.random.Generator:
 
     Use `urng` for array API tests.
     """
-    return np.random.default_rng(seed=42)
+    return np.random.default_rng(seed=SEED)
 
 
 @pytest.fixture(scope="session")
@@ -242,12 +244,6 @@ def shells() -> list[glass.RadialWindow]:
     ]
 
 
-@pytest.fixture(scope="session")
-def benchmark_scale_factor() -> int:
-    """Scaling factor to increase the problem size for benchmarks."""
-    return 10_000
-
-
 class Compare:
     """
     Helper class for array comparisons in tests.
@@ -298,3 +294,29 @@ class Compare:
 def compare() -> type[Compare]:
     """Fixture for array comparison utility."""
     return Compare
+
+
+class GeneratorConsumer:
+    """Helper class for fully consuming genertors in tests."""
+
+    @staticmethod
+    def consume(
+        generator: Generator[Any],
+    ) -> list[Any]:
+        """
+        Generate and consume a generator returned by a given functions.
+
+        The resulting generator will be consumed an any ValueError
+        exceptions swallowed.
+        """
+        output: list[Any] = []
+        with contextlib.suppress(ValueError):
+            # Consume in a loop, as we expect users to
+            output.extend(iter(generator))
+        return output
+
+
+@pytest.fixture(scope="session")
+def generator_consumer() -> type[GeneratorConsumer]:
+    """Fixture for generator-consuming utility."""
+    return GeneratorConsumer

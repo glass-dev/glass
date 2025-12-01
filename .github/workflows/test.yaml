@@ -69,12 +69,11 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Run benchmark tests with all backends and generate coverage report
-        run: >-
-          uv run nox -s coverage_benchmarks-${{ matrix.python-version }}
-          --verbose
+        if: matrix.python-version == '3.13'
+        run: uv run nox -s coverage_benchmarks --verbose
         env:
           ARRAY_BACKEND: all
-          COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
+          COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}
           FORCE_COLOR: 1
 
       - name: Run core tests with all backends and generate coverage report
@@ -85,23 +84,24 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Generate XML report for benchmark tests
+        if: matrix.python-version == '3.13'
         run: >-
-          uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }}-${{
-          matrix.python-version }} -o ${{ env.BENCH_COV_NAME }}-${{
-          matrix.python-version }}.xml
+          uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }} -o ${{
+          env.BENCH_COV_NAME }}.xml
 
       - name: Generate XML report for core tests
         run: >-
           uv run coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
-          matrix.python-version }}.xml;
+          matrix.python-version }}.xml
 
       - name: Upload benchmark coverage to Coveralls
+        if: matrix.python-version == '3.13'
         uses: coverallsapp/github-action@v2
         with:
           base-path: glass/
-          file: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}.xml
-          flag-name: ${{ env.BENCH_COV_NAME }}-${{ matrix.python-version }}
+          file: ${{ env.BENCH_COV_NAME }}.xml
+          flag-name: ${{ env.BENCH_COV_NAME }}
           parallel: true
 
       - name: Upload core coverage to Coveralls
@@ -121,10 +121,9 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           carryforward:
-            ${{ env.BENCH_COV_NAME }}-3.10,${{ env.BENCH_COV_NAME }}-3.11,${{
-            env.BENCH_COV_NAME }}-3.12,${{ env.BENCH_COV_NAME }}-3.13,${{
-            env.CORE_COV_NAME }}-3.10,${{ env.CORE_COV_NAME }}-3.11,${{
-            env.CORE_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.13
+            ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.10,${{
+            env.CORE_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.12,${{
+            env.CORE_COV_NAME }}-3.13
           parallel-finished: true
 
   build:
