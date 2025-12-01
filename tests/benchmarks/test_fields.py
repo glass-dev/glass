@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-import healpy as hp
+import healpix
 import pytest
 
 import glass.fields
@@ -204,7 +204,7 @@ def test_generate_grf(  # noqa: PLR0913
 
     gaussian_fields = benchmark(function_to_benchmark)
 
-    assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
+    assert gaussian_fields[0].shape == (healpix.nside2npix(nside),)
 
 
 @pytest.mark.stable
@@ -247,7 +247,7 @@ def test_generate(  # noqa: PLR0913
 
     assert len(result) == expected_len
     for field in result:
-        assert field.shape == (hp.nside2npix(nside),)
+        assert field.shape == (healpix.nside2npix(nside),)
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
