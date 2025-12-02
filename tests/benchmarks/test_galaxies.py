@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
+@pytest.mark.stable
 def test_redshifts(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
@@ -32,6 +33,7 @@ def test_redshifts(
     assert xp.max(z) <= 1.0
 
 
+@pytest.mark.stable
 def test_redshifts_from_nz(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
