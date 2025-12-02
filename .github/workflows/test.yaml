@@ -33,6 +33,7 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -69,7 +70,7 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Run benchmark tests with all backends and generate coverage report
-        if: matrix.python-version == '3.13'
+        if: matrix.python-version == '3.14'
         run: uv run nox -s coverage_benchmarks --verbose
         env:
           ARRAY_BACKEND: all
@@ -84,7 +85,7 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Generate XML report for benchmark tests
-        if: matrix.python-version == '3.13'
+        if: matrix.python-version == '3.14'
         run: >-
           uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }} -o ${{
           env.BENCH_COV_NAME }}.xml
@@ -96,7 +97,7 @@ jobs:
           matrix.python-version }}.xml
 
       - name: Upload benchmark coverage to Coveralls
-        if: matrix.python-version == '3.13'
+        if: matrix.python-version == '3.14'
         uses: coverallsapp/github-action@v2
         with:
           base-path: glass/
@@ -123,7 +124,7 @@ jobs:
           carryforward:
             ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.10,${{
             env.CORE_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.12,${{
-            env.CORE_COV_NAME }}-3.13
+            env.CORE_COV_NAME }}-3.13,${{ env.CORE_COV_NAME }}-3.14
           parallel-finished: true
 
   build:
@@ -139,7 +140,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: 3.13
+          python-version: 3.14
 
       - name: Install only dev dependencies
         run: uv sync --only-dev
@@ -162,7 +163,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: 3.13
+          python-version: 3.14
 
       - name: Install dependencies
         run: |-
