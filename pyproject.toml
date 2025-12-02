@@ -65,11 +65,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "array-api-compat",
-    "array-api-extra",
-    "healpix",
-    "healpy",
-    "transformcl",
+    "array-api-compat>=1.12.0",
+    "array-api-extra>=0.9.0",
+    "healpix>=2022.11.1",
+    "healpy>=1.15.0",
+    "transformcl>=2022.8.9",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [

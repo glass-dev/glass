@@ -1320,17 +1320,17 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "array-api-compat" },
-    { name = "array-api-extra" },
+    { name = "array-api-compat", specifier = ">=1.12.0" },
+    { name = "array-api-extra", specifier = ">=0.9.0" },
     { name = "camb", marker = "extra == 'examples'" },
     { name = "cosmology-api", marker = "extra == 'examples'" },
     { name = "cosmology-compat-camb", marker = "extra == 'examples'" },
     { name = "glass-ext-camb", marker = "extra == 'examples'" },
-    { name = "healpix" },
-    { name = "healpy" },
+    { name = "healpix", specifier = ">=2022.11.1" },
+    { name = "healpy", specifier = ">=1.15.0" },
     { name = "jupyter", marker = "extra == 'examples'" },
     { name = "matplotlib", marker = "extra == 'examples'" },
-    { name = "transformcl" },
+    { name = "transformcl", specifier = ">=2022.8.9" },
 ]
 provides-extras = ["examples"]
 
