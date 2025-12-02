@@ -1320,17 +1320,17 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "array-api-compat", specifier = ">=1.12.0" },
-    { name = "array-api-extra", specifier = ">=0.9.0" },
+    { name = "array-api-compat" },
+    { name = "array-api-extra" },
     { name = "camb", marker = "extra == 'examples'" },
     { name = "cosmology-api", marker = "extra == 'examples'" },
     { name = "cosmology-compat-camb", marker = "extra == 'examples'" },
     { name = "glass-ext-camb", marker = "extra == 'examples'" },
-    { name = "healpix", specifier = ">=2022.11.1" },
-    { name = "healpy", specifier = ">=1.15.0" },
+    { name = "healpix" },
+    { name = "healpy" },
     { name = "jupyter", marker = "extra == 'examples'" },
     { name = "matplotlib", marker = "extra == 'examples'" },
-    { name = "transformcl", specifier = ">=2022.8.9" },
+    { name = "transformcl" },
 ]
 provides-extras = ["examples"]
 
@@ -1574,7 +1574,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
