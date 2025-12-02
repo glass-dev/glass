@@ -11,6 +11,8 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
+    from glass._types import UnifiedGenerator
+
 
 @pytest.mark.stable
 def test_redshifts(
@@ -59,3 +61,37 @@ def test_redshifts_from_nz(
     assert xp.min(redshifts) >= 0.0
     assert xp.max(redshifts) <= 1.0
     assert xp.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+
+
+@pytest.mark.stable
+@pytest.mark.parametrize("reduced_shear", [True, False])
+def test_galaxy_shear(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+    reduced_shear: bool,  # noqa: FBT001
+) -> None:
+    """Benchmark for galaxies.galaxy_shear."""
+    scale_factor = 100
+    # check shape of the output
+
+    size = (12 * scale_factor,)
+    kappa = urng.normal(size=size)
+    gamma1 = urng.normal(size=size)
+    gamma2 = urng.normal(size=size)
+
+    gal_size = (512 * scale_factor,)
+    gal_lon = urng.normal(size=gal_size)
+    gal_lat = urng.normal(size=gal_size)
+    gal_eps = urng.normal(size=gal_size)
+
+    shear = benchmark(
+        glass.galaxy_shear,
+        gal_lon,
+        gal_lat,
+        gal_eps,
+        kappa,
+        gamma1,
+        gamma2,
+        reduced_shear=reduced_shear,
+    )
+    assert shear.shape == gal_size
