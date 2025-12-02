@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from glass._types import FloatArray, UnifiedGenerator
 
 
+@pytest.mark.stable
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
@@ -86,6 +87,7 @@ def test_multi_plane_matrix(
     compare.assert_allclose(actual_convergence.kappa, expected_kappa)
 
 
+@pytest.mark.stable
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
