@@ -18,14 +18,14 @@ if TYPE_CHECKING:
     from glass._types import FloatArray, UnifiedGenerator
 
 
-def test_multi_plane_matrix_add_window(
+def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
     cosmo: Cosmology,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Benchmarks for MultiPlaneConvergence.add_window with a multi_plane_matrix."""
+    """Benchmarks for add_window and add_plane with a multi_plane_matrix."""
     if xp.__name__ == "array_api_strict":
         pytest.skip(f"glass.fields.generate not yet ported for {xp.__name__}")
 
@@ -86,14 +86,14 @@ def test_multi_plane_matrix_add_window(
     compare.assert_allclose(actual_convergence.kappa, expected_kappa)
 
 
-def test_multi_plane_weights_add_window(
+def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
     cosmo: Cosmology,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Benchmarks for MultiPlaneConvergence.add_window with a multi_plane_weights."""
+    """Benchmarks for add_window and add_plane with a multi_plane_weights."""
     if xp.__name__ == "array_api_strict":
         pytest.skip(f"glass.fields.generate not yet ported for {xp.__name__}")
 
