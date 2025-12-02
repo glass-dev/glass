@@ -44,7 +44,7 @@ def test_multi_plane_matrix_add_window(
     compare.assert_array_equal(mat, xp.tril(mat))
     compare.assert_array_equal(xp.triu(mat, 1), 0)
 
-    def setup_shells_and_delta() -> tuple[
+    def setup_shells_and_deltas() -> tuple[
         tuple[
             glass.lensing.MultiPlaneConvergence,
             zip[tuple[glass.RadialWindow, FloatArray]],
@@ -55,7 +55,7 @@ def test_multi_plane_matrix_add_window(
         convergence = glass.lensing.MultiPlaneConvergence(cosmo)
         return (convergence, zip(shells, deltas, strict=False)), {}
 
-    def function_to_benchmark(
+    def multi_plane_matrix_add_window(
         convergence: type[glass.lensing.MultiPlaneConvergence],
         zipped: tuple[list[type[glass.RadialWindow]], FloatArray],
     ) -> type[glass.lensing.MultiPlaneConvergence]:
@@ -65,9 +65,80 @@ def test_multi_plane_matrix_add_window(
         return convergence
 
     actual_convergence = benchmark.pedantic(
-        function_to_benchmark,
-        setup=setup_shells_and_delta,
+        multi_plane_matrix_add_window,
+        setup=setup_shells_and_deltas,
         rounds=500,
+    )
+
+    # This was generated on the first run of this test rather than calculated
+    expected_kappa = [
+        3427039.750252,
+        3431185.04507,
+        3492292.408525,
+        3415536.190037,
+        3421145.593983,
+        3411650.553902,
+        3432103.932316,
+        3343221.577821,
+        3441975.126385,
+        3462143.319128,
+    ]
+    compare.assert_allclose(actual_convergence.kappa, expected_kappa)
+
+
+def test_multi_plane_weights_add_window(
+    benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    cosmo: Cosmology,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Benchmarks for MultiPlaneConvergence.add_window with a multi_plane_weights."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip(f"glass.fields.generate not yet ported for {xp.__name__}")
+
+    # Use this over the fixture to allow us to add many more windows
+    shells = [
+        glass.RadialWindow(
+            xp.arange(i, i + 3, dtype=xp.float64),
+            xp.asarray([0.0, 1.0, 0.0]),
+            float(i + 1),
+        )
+        for i in range(1000)
+    ]
+    w_in = xp.eye(len(shells))
+    deltas = urng.random((len(shells), 10))
+    weights = urng.random((len(shells), 3))
+
+    w_out = glass.multi_plane_weights(w_in, shells, cosmo)
+
+    compare.assert_array_equal(w_out, xp.triu(w_out, 1))
+    compare.assert_array_equal(xp.tril(w_out), 0)
+
+    def setup_shells_deltas_and_weights() -> tuple[
+        tuple[
+            glass.lensing.MultiPlaneConvergence,
+            zip[tuple[glass.RadialWindow, FloatArray, FloatArray]],
+        ],
+        dict[Never, Never],
+    ]:
+        """Run setup a generator with zip before each benchmark run."""
+        convergence = glass.lensing.MultiPlaneConvergence(cosmo)
+        return (convergence, zip(shells, deltas, weights, strict=False)), {}
+
+    def multi_plane_weights_add_window(
+        convergence: type[glass.lensing.MultiPlaneConvergence],
+        zipped: tuple[list[type[glass.RadialWindow]], FloatArray, FloatArray],
+    ) -> type[glass.lensing.MultiPlaneConvergence]:
+        """Call add_window repeatedly, to be benchmarked."""
+        for shell, delta, _ in zipped:
+            convergence.add_window(delta, shell)  # type: ignore[call-arg,arg-type]
+        return convergence
+
+    actual_convergence = benchmark.pedantic(
+        multi_plane_weights_add_window,
+        setup=setup_shells_deltas_and_weights,
+        rounds=1,
     )
 
     # This was generated on the first run of this test rather than calculated
