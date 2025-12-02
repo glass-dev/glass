@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass
+import glass.galaxies
+import glass.shells
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -29,7 +30,7 @@ def test_redshifts(
     w = glass.shells.RadialWindow(za, wa)
 
     # sample redshifts (scalar)
-    z = benchmark(glass.redshifts, 13 * scale_factor, w)
+    z = benchmark(glass.galaxies.redshifts, 13 * scale_factor, w)
     assert z.shape == (13 * scale_factor,)
     assert xp.min(z) >= 0.0
     assert xp.max(z) <= 1.0
@@ -52,7 +53,7 @@ def test_redshifts_from_nz(
 
     # sample redshifts (scalar)
     redshifts = benchmark(
-        glass.redshifts_from_nz,
+        glass.galaxies.redshifts_from_nz,
         13 * scale_factor,
         za,
         wa,
@@ -68,11 +69,13 @@ def test_redshifts_from_nz(
 def test_galaxy_shear(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
+    xp: ModuleType,
     reduced_shear: bool,  # noqa: FBT001
 ) -> None:
     """Benchmark for galaxies.galaxy_shear."""
+    if xp.__name__ == "array_api_strict":
+        pytest.skip(f"glass.galaxies.galaxy_shear not yet ported for {xp.__name__}")
     scale_factor = 100
-    # check shape of the output
 
     size = (12 * scale_factor,)
     kappa = urng.normal(size=size)
@@ -85,7 +88,7 @@ def test_galaxy_shear(
     gal_eps = urng.normal(size=gal_size)
 
     shear = benchmark(
-        glass.galaxy_shear,
+        glass.galaxies.galaxy_shear,
         gal_lon,
         gal_lat,
         gal_eps,
