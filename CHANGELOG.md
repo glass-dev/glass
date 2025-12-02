@@ -4,28 +4,45 @@
 
 All functional changes to the project are documented in this file.
 
+## [2025.3] (2 Dec 2025)
+
+* gh-323: add `uv` support in `nox` and CI (#801)
+* gh-410: Port straightforward functions in `observations` (#677)
+* gh-417: Improve type rendering in the documentation (#746)
+* gh-683: rewrite dispatch mechanism for GRF transformations (#697)
+* gh-700: remove `typing-extensions` dependency (#701)
+* gh-705: add displace() and displacement() (#708)
+* gh-720: add warning if `nearcorr` has no convergence (#757)
+* gh-721: Port RNG functions in `shapes.py` (#722)
+* gh-723: Port RNG functions in `galaxies.py` (#724)
+* gh-731: create spherical harmonic utilities module (#761)
+* gh-734: Port points.uniform_positions (#736)
+* gh-747: Force nox to default to 3.13 (#748)
+* gh-793: remove `inplace` option to `multalm` (#797)
+* gh-836: consistent setting of seed throughout (#837)
+
 ## [2025.2] (21 Oct 2025)
 
-- gh-578: mutable argument should be empty list rather than `None` (#579)
-- gh-552: add docs on all-contributors (#565)
-- gh-573: add keyword `rng` to functions in notebooks (#574)
-- gh-583: fix flakiness of `test_generate` (#584)
-- gh-575: bring back inv_triangle_number (#577)
-- gh-572: make `multalm` private (#576)
-- gh-487: reorder alms in \_generate_grf to glass ordering (#533)
-- gh-568: convert `_weight` funcs to classes for `_windows` funcs (#589)
-- gh-495: allow `zeff` to be computed automatically (#590)
-- gh-566: add example on galaxy redshift distributions (#567)
-- gh-616: use `position_weights()` in galaxy redshift example (#617)
 - gh-124: use `cosmology.api` over the `cosmology` package (#537)
+- gh-407: Port functions in fields.py (#642)
+- gh-408: porting straightforward functions in `shells` (#643)
+- gh-409: Port straightforward functions in `points` (#663)
+- gh-487: reorder alms in \_generate_grf to glass ordering (#533)
+- gh-495: allow `zeff` to be computed automatically (#590)
+- gh-552: add docs on all-contributors (#565)
+- gh-566: add example on galaxy redshift distributions (#567)
+- gh-568: convert `_weight` funcs to classes for `_windows` funcs (#589)
+- gh-572: make `multalm` private (#576)
+- gh-573: add keyword `rng` to functions in notebooks (#574)
+- gh-575: bring back inv_triangle_number (#577)
+- gh-578: mutable argument should be empty list rather than `None` (#579)
+- gh-583: fix flakiness of `test_generate` (#584)
+- gh-616: use `position_weights()` in galaxy redshift example (#617)
 - gh-621: bump `array-api-strict` version to `2024.12` (#625)
+- gh-633: switch to `dependency-groups` (#634)
 - gh-639: fix compute_gaussian_spectra() for empty spectra (#640)
 - gh-652: make `array-api-strict` an official dependency (#653)
-- gh-407: Port functions in fields.py (#642)
-- gh-633: switch to `dependency-groups` (#634)
-- gh-408: porting straightforward functions in `shells` (#643)
 - gh-667: Make JAX an optional dependency as intended (#672)
-- gh-409: Port straightforward functions in `points` (#663)
 - gh-691: rename envvar to `ARRAY_BACKEND` (#692)
 - gh-693: Add script to generate release notes (#694)
 
@@ -203,6 +220,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2025.3]: https://github.com/glass-dev/glass/compare/v2025.2...v2025.3
 [2025.2]: https://github.com/glass-dev/glass/compare/v2025.1...v2025.2
 [2025.1]: https://github.com/glass-dev/glass/compare/v2024.2...v2025.1
 [2024.2]: https://github.com/glass-dev/glass/compare/v2024.1...v2024.2
