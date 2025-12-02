@@ -26,7 +26,7 @@ These notes document the changes between individual *GLASS* releases.
 * Added: utilities to perform benchmarking and regression tests for performance.
   This will prove vital as we move towards full Array API support.
 
-* Changed: The following functions now require either an array as input or ``xp`` to be 
+* Changed: The following functions now require either an array as input or ``xp`` to be
   explicitly passed — :func:`glass.ellipticity_gaussian`,
   :func:`glass.ellipticity_intnorm`, :func:`glass.ellipticity_ryden04`,
   :func:`glass.triaxial_axis_ratio`.
