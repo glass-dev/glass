@@ -45,7 +45,7 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.3
+    rev: v0.14.7
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -60,11 +60,11 @@ repos:
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.6.2
+    rev: v3.7.3
     hooks:
       - id: prettier
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
+    rev: v0.46.0
     hooks:
       - id: markdownlint-fix
         args:
@@ -74,18 +74,18 @@ repos:
     hooks:
       - id: forbid-tabs
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.8
+    rev: v1.7.9
     hooks:
       - id: actionlint
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.0
     hooks:
       - id: mypy
         additional_dependencies:
           - numpy~=2.3.4
           - jaxtyping~=0.3.3
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
+    rev: 0.8.2
     hooks:
       - id: nbstripout
         args:
