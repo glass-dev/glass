@@ -13,6 +13,8 @@ These notes document the changes between individual *GLASS* releases.
 
 * Rewrote the internal mechanism by which GRF transformations are computed.
 
+* Added Python 3.14 support.
+
 * Added: a new :mod:`glass.harmonics` module containing spherical harmonic
   utilities.
 

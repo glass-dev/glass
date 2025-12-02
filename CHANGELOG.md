@@ -20,6 +20,7 @@ All functional changes to the project are documented in this file.
 - gh-747: Force nox to default to 3.13 (#748)
 - gh-793: remove `inplace` option to `multalm` (#797)
 - gh-836: consistent setting of seed throughout (#837)
+- gh-661: Add Python 3.14 support (#662)
 
 ## [2025.2] (21 Oct 2025)
 
