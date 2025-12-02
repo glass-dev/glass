@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 @pytest.mark.stable
 def test_redshifts(
     benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     """Benchmark for galaxies.redhsifts."""
@@ -30,7 +31,7 @@ def test_redshifts(
     w = glass.shells.RadialWindow(za, wa)
 
     # sample redshifts (scalar)
-    z = benchmark(glass.galaxies.redshifts, 13 * scale_factor, w)
+    z = benchmark(glass.galaxies.redshifts, 13 * scale_factor, w, rng=urng)
     assert z.shape == (13 * scale_factor,)
     assert xp.min(z) >= 0.0
     assert xp.max(z) <= 1.0
@@ -39,6 +40,7 @@ def test_redshifts(
 @pytest.mark.stable
 def test_redshifts_from_nz(
     benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     """Benchmark for galaxies.redshifts_from_nz."""
@@ -57,6 +59,7 @@ def test_redshifts_from_nz(
         13 * scale_factor,
         za,
         wa,
+        rng=urng,
     )
     assert redshifts.shape == (13 * scale_factor,)
     assert xp.min(redshifts) >= 0.0
@@ -98,3 +101,29 @@ def test_galaxy_shear(
         reduced_shear=reduced_shear,
     )
     assert shear.shape == gal_size
+
+
+@pytest.mark.stable
+def test_gaussian_phz(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Benchmarks for galaxies.gaussian_phz."""
+    scaled_length = 10_000
+
+    z = xp.linspace(0, 1, scaled_length)
+    sigma_0 = xp.ones(scaled_length)
+
+    phz = benchmark(
+        glass.gaussian_phz,
+        z,
+        sigma_0,
+        lower=0.5,
+        upper=1.5,
+        rng=urng,
+    )
+
+    assert phz.shape == (scaled_length,)
+    assert xp.all(phz >= 0.5)
+    assert xp.all(phz <= 1.5)
