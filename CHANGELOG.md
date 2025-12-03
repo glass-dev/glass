@@ -4,6 +4,24 @@
 
 All functional changes to the project are documented in this file.
 
+## [2025.3] (2 Dec 2025)
+
+- gh-323: add `uv` support in `nox` and CI (#801)
+- gh-410: Port straightforward functions in `observations` (#677)
+- gh-417: Improve type rendering in the documentation (#746)
+- gh-683: rewrite dispatch mechanism for GRF transformations (#697)
+- gh-700: remove `typing-extensions` dependency (#701)
+- gh-705: add displace() and displacement() (#708)
+- gh-720: add warning if `nearcorr` has no convergence (#757)
+- gh-721: Port RNG functions in `shapes.py` (#722)
+- gh-723: Port RNG functions in `galaxies.py` (#724)
+- gh-731: create spherical harmonic utilities module (#761)
+- gh-734: Port points.uniform_positions (#736)
+- gh-747: Force nox to default to 3.13 (#748)
+- gh-793: remove `inplace` option to `multalm` (#797)
+- gh-836: consistent setting of seed throughout (#837)
+- gh-661: Add Python 3.14 support (#662)
+
 ## [2025.2] (21 Oct 2025)
 
 - gh-578: mutable argument should be empty list rather than `None` (#579)
@@ -203,6 +221,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2025.3]: https://github.com/glass-dev/glass/compare/v2025.2...v2025.3
 [2025.2]: https://github.com/glass-dev/glass/compare/v2025.1...v2025.2
 [2025.1]: https://github.com/glass-dev/glass/compare/v2024.2...v2025.1
 [2024.2]: https://github.com/glass-dev/glass/compare/v2024.1...v2024.2

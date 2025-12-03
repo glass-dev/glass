@@ -4,6 +4,51 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2025.3 (2 Dec 2025)
+--------------------
+
+* Ported functions within the following modules to the Array API —
+  :mod:`glass.observations`, :mod:`glass.lensing`, :mod:`glass.galaxies`,
+  :mod:`glass.shapes`, :mod:`glass.points`.
+
+* Rewrote the internal mechanism by which GRF transformations are computed.
+
+* Added Python 3.14 support.
+
+* Added: a new :mod:`glass.harmonics` module containing spherical harmonic
+  utilities.
+
+* Added: new functions for displacing points on the sphere:
+  :func:`glass.displace` and :func:`glass.displacement`.
+
+* Added: ``array-api-compat`` as a dependency.
+
+* Added: ``uv`` support.
+
+* Added: utilities to perform benchmarking and regression tests for performance.
+  This will prove vital as we move towards full Array API support.
+
+* Deprecated: :func:`glass.deflect` in favour of :func:`glass.displace`.
+
+* Fixed: internal functions that should have a consistent setting of the random
+  seed.
+
+* Fixed: :func:`glass.algorithm.nearcorr` to communicate to the user if there are
+  insufficient iterations.
+
+* Fixed: ``pytest`` can now be run without having all array backends installed.
+
+* Fixed: ``nox`` now runs in the latest *supported* Python version only
+
+* Improved error messages when not passing in arrays to certain functions.
+
+* Improved rendering of array types in the documentation.
+
+* Removed: ``typing-extensions`` as a dependency.
+
+* Removed: the ``inplace`` kwarg to :func:`glass.harmonics.multalm`.
+
+
 2025.2 (21 Oct 2025)
 --------------------
 
