@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass.galaxies
-import glass.shells
+import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -21,17 +20,17 @@ def test_redshifts(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Benchmark for galaxies.redhsifts."""
+    """Benchmark for galaxies.redshifts."""
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in redshifts are not immutable, so do not support jax")
     scale_factor = 1_000
     # create a mock radial window function
     za = xp.linspace(0.0, 1.0, 20 * scale_factor)
     wa = xp.exp(-0.5 * (za - 0.5) ** 2 / 0.1**2)
-    w = glass.shells.RadialWindow(za, wa)
+    w = glass.RadialWindow(za, wa)
 
     # sample redshifts (scalar)
-    z = benchmark(glass.galaxies.redshifts, 13 * scale_factor, w, rng=urng)
+    z = benchmark(glass.redshifts, 13 * scale_factor, w, rng=urng)
     assert z.shape == (13 * scale_factor,)
     assert xp.min(z) >= 0.0
     assert xp.max(z) <= 1.0
@@ -55,7 +54,7 @@ def test_redshifts_from_nz(
 
     # sample redshifts (scalar)
     redshifts = benchmark(
-        glass.galaxies.redshifts_from_nz,
+        glass.redshifts_from_nz,
         13 * scale_factor,
         za,
         wa,
@@ -77,7 +76,7 @@ def test_galaxy_shear(
 ) -> None:
     """Benchmark for galaxies.galaxy_shear."""
     if xp.__name__ == "array_api_strict":
-        pytest.skip(f"glass.galaxies.galaxy_shear not yet ported for {xp.__name__}")
+        pytest.skip(f"glass.galaxy_shear not yet ported for {xp.__name__}")
     scale_factor = 100
 
     size = (12 * scale_factor,)
@@ -91,7 +90,7 @@ def test_galaxy_shear(
     gal_eps = urng.normal(size=gal_size)
 
     shear = benchmark(
-        glass.galaxies.galaxy_shear,
+        glass.galaxy_shear,
         gal_lon,
         gal_lat,
         gal_eps,
