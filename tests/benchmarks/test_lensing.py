@@ -27,7 +27,7 @@ def test_multi_plane_matrix(
     xp: ModuleType,
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_matrix."""
-    if xp.__name__ == "array_api_strict":
+    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
         pytest.skip(
             f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}"
         )
