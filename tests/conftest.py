@@ -137,7 +137,7 @@ def uxpx(xp: ModuleType) -> _utils.XPAdditions:
     return _utils.XPAdditions(xp)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def urng(xp: ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface.
