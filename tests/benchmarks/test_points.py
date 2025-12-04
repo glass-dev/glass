@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import FloatArray, IntArray
+    from tests.conftest import Compare
 
 
 def catpos(
@@ -129,3 +130,41 @@ def test_uniform_positions(
     assert cnt.__array_namespace__() == xp
     assert cnt.shape == shape_ngal
     assert lon.shape == lat.shape == (xp.sum(cnt),)
+
+
+@pytest.mark.parametrize(
+    ("r_to_alpha", "expected_lon", "expected_lat"),
+    [
+        (lambda r: r + 0j, 0.0, 5.0),
+        (lambda r: -r + 0j, 0.0, -5.0),
+        (lambda r: 1j * r, -5.0, 0.0),
+        (lambda r: -1j * r, 5.0, 0.0),
+    ],
+)
+def test_displace_arg_complex(  # noqa: PLR0913
+    benchmark: BenchmarkFixture,
+    compare: type[Compare],
+    xp: ModuleType,
+    r_to_alpha: Callable[[float], complex],
+    expected_lon: float,
+    expected_lat: float,
+) -> None:
+    """Benchmark for glass.displace with complex values."""
+    scale_length = 100_000
+
+    d = 5.0  # deg
+    r = d / 180 * xp.pi
+
+    # displace the origin so everything is easy
+    lon0 = xp.asarray(xp.zeros(scale_length, dtype=xp.float64))
+    lat0 = xp.asarray(xp.zeros(scale_length, dtype=xp.float64))
+    alpha = xp.asarray(r_to_alpha(r))
+
+    lon, lat = benchmark(
+        glass.displace,
+        lon0,
+        lat0,
+        alpha,
+    )
+    compare.assert_allclose(lon, expected_lon, atol=1e-15)
+    compare.assert_allclose(lat, expected_lat, atol=1e-15)
