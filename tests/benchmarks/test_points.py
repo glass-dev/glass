@@ -95,3 +95,37 @@ def test_positions_from_delta(  # noqa: PLR0913
     assert cnt.shape == (3 * scaling_length, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
+
+
+@pytest.mark.stable
+def test_uniform_positions(
+    benchmark: BenchmarkFixture,
+    generator_consumer: GeneratorConsumer,
+    xp: ModuleType,
+) -> None:
+    """Benchmarks for glass.uniform_positionsuniform_positions."""
+    if xp.__name__ in {"jax.numpy"}:
+        pytest.skip(
+            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}"
+        )
+
+    scaling_factor = 12
+    shape_ngal = (int(scaling_factor / 2), 2)
+
+    ngal = xp.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
+    ngal = xp.reshape(
+        xp.arange(1e-3, 1e-3 * scaling_factor + 1e-3, 1e-3),
+        shape=shape_ngal,
+    )
+
+    def function_to_benchmark() -> list[Any]:
+        generator = glass.uniform_positions(ngal)
+        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+
+    pos = benchmark(function_to_benchmark)
+
+    lon, lat, cnt = catpos(pos, xp=xp)
+    assert not isinstance(cnt, int)
+    assert cnt.__array_namespace__() == xp
+    assert cnt.shape == shape_ngal
+    assert lon.shape == lat.shape == (xp.sum(cnt),)
