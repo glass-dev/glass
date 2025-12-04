@@ -23,6 +23,7 @@ def test_redshifts(
     """Benchmark for galaxies.redshifts."""
     if xp.__name__ == "jax.numpy":
         pytest.skip("Arrays in redshifts are not immutable, so do not support jax")
+
     scale_factor = 1_000
     # create a mock radial window function
     za = xp.linspace(0.0, 1.0, 20 * scale_factor)
@@ -47,6 +48,7 @@ def test_redshifts_from_nz(
         pytest.skip(
             "Arrays in redshifts_from_nz are not immutable, so do not support jax",
         )
+
     scale_factor = 1_000
     # create a mock radial window function
     za = xp.linspace(0.0, 1.0, 20 * scale_factor)
