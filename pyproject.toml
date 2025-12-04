@@ -105,7 +105,6 @@ report = {exclude_also = [
     "@overload",
     "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
     "if TYPE_CHECKING:",
-    "raise NotImplementedError",
 ], omit = [
     "glass/_types.py",  # typing-only module
     "glass/_version.py",  # not being tracked anyway
