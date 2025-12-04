@@ -36,7 +36,10 @@ def test_iternorm_no_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.fields.iternorm(k, iter(array_in))
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(  # type: ignore[no-any-return]
+            generator,
+            valid_exception="covariance matrix is not positive definite",
+        )
 
     results = benchmark(function_to_benchmark)
     j, a, s = results[0]
@@ -83,7 +86,10 @@ def test_iternorm_specify_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.fields.iternorm(k, iter(array_in), size)
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(  # type: ignore[no-any-return]
+            generator,
+            valid_exception="covariance matrix is not positive definite",
+        )
 
     # check output shapes and types
 
@@ -241,7 +247,10 @@ def test_generate(  # noqa: PLR0913
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(  # type: ignore[no-any-return]
+            generator,
+            valid_exception="covariance matrix is not positive definite",
+        )
 
     result = benchmark(function_to_benchmark)
 
