@@ -106,8 +106,8 @@ report = {exclude_also = [
     "if TYPE_CHECKING:",
     "raise NotImplementedError",
 ], omit = [
-    "glass/_types.py",
-    "glass/_version.py",
+    "glass/_types.py",  # typing-only module
+    "glass/_version.py",  # not being tracked anyway
 ], skip_covered = true, sort = "cover"}
 run = {branch = true, parallel = true, source = [
     "glass",
