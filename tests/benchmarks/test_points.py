@@ -135,17 +135,23 @@ def test_uniform_positions(
 @pytest.mark.parametrize(
     ("r_to_alpha", "expected_lon", "expected_lat"),
     [
+        # Complex
         (lambda r: r + 0j, 0.0, 5.0),
         (lambda r: -r + 0j, 0.0, -5.0),
         (lambda r: 1j * r, -5.0, 0.0),
         (lambda r: -1j * r, 5.0, 0.0),
+        # Real
+        (lambda r: [r, 0], 0.0, 5.0),
+        (lambda r: [-r, 0], 0.0, -5.0),
+        (lambda r: [0, r], -5.0, 0.0),
+        (lambda r: [0, -r], 5.0, 0.0),
     ],
 )
-def test_displace_arg_complex(  # noqa: PLR0913
+def test_displace(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: type[Compare],
     xp: ModuleType,
-    r_to_alpha: Callable[[float], complex],
+    r_to_alpha: Callable[[float], complex | list[float]],
     expected_lon: float,
     expected_lat: float,
 ) -> None:
