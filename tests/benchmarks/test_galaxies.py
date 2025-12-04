@@ -79,8 +79,8 @@ def test_galaxy_shear(
     """Benchmark for galaxies.galaxy_shear."""
     if xp.__name__ == "array_api_strict":
         pytest.skip(f"glass.galaxy_shear not yet ported for {xp.__name__}")
-    scale_factor = 100
 
+    scale_factor = 100
     size = (12 * scale_factor,)
     kappa = urng.normal(size=size)
     gamma1 = urng.normal(size=size)
