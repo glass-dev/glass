@@ -166,6 +166,7 @@ def iternorm(
         a_np = np.asarray(a, copy=True)
         einsum_result_np = np.einsum("...i,...i", a_np, a_np)
         s = x[..., 0] - xp.asarray(einsum_result_np, copy=True)
+        print(s)  # noqa: T201
         if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
