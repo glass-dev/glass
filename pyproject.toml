@@ -102,6 +102,7 @@ Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
 report = {exclude_also = [
+    "@overload",
     "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
     "if TYPE_CHECKING:",
     "raise NotImplementedError",
