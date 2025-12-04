@@ -106,8 +106,8 @@ report = {exclude_also = [
     "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
     "if TYPE_CHECKING:",
 ], omit = [
-    "glass/_types.py",  # typing-only module
-    "glass/_version.py",  # not being tracked anyway
+    "_types.py", # typing-only module
+    "_version.py", # not being tracked anyway
 ], precision = 2, show_missing = true, skip_covered = true, skip_empty = true, sort = "cover"}
 run = {branch = true, parallel = true, source = [
     "glass",
