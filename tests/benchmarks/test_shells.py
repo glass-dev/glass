@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass.shells
+import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -27,6 +27,6 @@ def test_radialwindow(
     wa = xp.arange(arr_length)
     za = xp.arange(arr_length)
 
-    w = benchmark(glass.shells.RadialWindow, za, wa)
+    w = benchmark(glass.RadialWindow, za, wa)
 
     compare.assert_allclose(w.zeff, expected_zeff)
