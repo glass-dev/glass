@@ -39,8 +39,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@v2
 
   publish-pypi:
-    if: >-
-      github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs: dist
     runs-on: ubuntu-latest
     environment:
