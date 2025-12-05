@@ -50,7 +50,7 @@ jobs:
         with:
           key:
             tests-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('noxfile.py')
-            }}-${{ env.pythonLocation }}
+            }}-${{ matrix.python-version }}
           path: .nox
 
       - name: Install only dev dependencies
