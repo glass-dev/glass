@@ -37,7 +37,7 @@ jobs:
         with:
           key:
             regression-${{ hashFiles('pyproject.toml') }}-${{
-            hashFiles('noxfile.py') }}-${{ env.pythonLocation }}
+            hashFiles('noxfile.py') }}
           path: .nox
 
       - name: Install only dev dependencies
