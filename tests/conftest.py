@@ -4,7 +4,6 @@ import contextlib
 import importlib.metadata
 import logging
 import os
-from types import ModuleType
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -20,6 +19,7 @@ with contextlib.suppress(ImportError):
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from types import ModuleType
     from typing import Any
 
     from cosmology import Cosmology
@@ -91,32 +91,29 @@ def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     jax.config.update("jax_enable_x64", val=True)
 
 
-def _determine_array_backends() -> None:
-    """Import the requested backend. If no backend passed, use numpy by default."""
-    if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
-        _import_and_add_numpy(xp_available_backends)
-    elif ARRAY_BACKEND == "array_api_strict":
-        _import_and_add_array_api_strict(xp_available_backends)
-    elif ARRAY_BACKEND == "jax":
-        _import_and_add_jax(xp_available_backends)
-    # if all, try importing every backend
-    elif ARRAY_BACKEND == "all":
-        with contextlib.suppress(ImportError):
-            _import_and_add_numpy(xp_available_backends)
-
-        with contextlib.suppress(ImportError):
-            _import_and_add_array_api_strict(xp_available_backends)
-
-        with contextlib.suppress(ImportError):
-            _import_and_add_jax(xp_available_backends)
-    else:
-        msg = f"unsupported array backend: {ARRAY_BACKEND}"
-        raise ValueError(msg)
-
-
 # a dictionary with all array backends to test
 xp_available_backends: dict[str, ModuleType] = {}
-_determine_array_backends()
+
+# Import the requested backend. If no backend passed, use numpy by default.
+if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
+    _import_and_add_numpy(xp_available_backends)
+elif ARRAY_BACKEND == "array_api_strict":
+    _import_and_add_array_api_strict(xp_available_backends)
+elif ARRAY_BACKEND == "jax":
+    _import_and_add_jax(xp_available_backends)
+# if all, try importing every backend
+elif ARRAY_BACKEND == "all":
+    with contextlib.suppress(ImportError):
+        _import_and_add_numpy(xp_available_backends)
+
+    with contextlib.suppress(ImportError):
+        _import_and_add_array_api_strict(xp_available_backends)
+
+    with contextlib.suppress(ImportError):
+        _import_and_add_jax(xp_available_backends)
+else:
+    msg = f"unsupported array backend: {ARRAY_BACKEND}"
+    raise ValueError(msg)
 
 
 # Pytest fixtures
@@ -127,12 +124,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
 
     Access array library functions using `xp.` in tests.
     """
-    if isinstance(request.param, ModuleType):
-        return request.param
-    if isinstance(request.param, str):
-        return xp_available_backends[request.param]
-    msg = "Unsupported type passed for fixture 'xp'"
-    raise ValueError(msg)
+    return request.param  # type: ignore[no-any-return]
 
 
 @pytest.fixture(scope="session")

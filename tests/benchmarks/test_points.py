@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 import glass
+import tests.conftest
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -17,6 +19,9 @@ if TYPE_CHECKING:
 
     from glass._types import FloatArray, IntArray, UnifiedGenerator
     from tests.conftest import Compare
+
+# check if available for testing
+HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 def catpos(
@@ -199,22 +204,36 @@ def _benchmark_displacement(
 
 
 @pytest.mark.stable
-@pytest.mark.parametrize("xp", ["numpy", "array_api_strict"], indirect=True)
+@pytest.mark.parametrize(
+    "xp",
+    [
+        xp
+        for name, xp in tests.conftest.xp_available_backends.items()
+        if name != "jax.numpy"
+    ],
+)
 def test_displacement(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
     xp: ModuleType,  # noqa: ARG001
 ) -> None:
-    """Benchmarks for glass.displacement."""
+    """Benchmark for glass.displacement with all backends, but jax."""
     _benchmark_displacement(benchmark, urng)
 
 
 @pytest.mark.unstable
-@pytest.mark.parametrize("xp", ["jax.numpy"], indirect=True)
+@pytest.mark.parametrize(
+    "xp",
+    [
+        xp
+        for name, xp in tests.conftest.xp_available_backends.items()
+        if name == "jax.numpy"
+    ],
+)
 def test_displacement_jax(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
     xp: ModuleType,  # noqa: ARG001
 ) -> None:
-    """Benchmarks for glass.displacement."""
+    """Benchmark for glass.displacement with jax."""
     _benchmark_displacement(benchmark, urng)
