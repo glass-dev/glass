@@ -94,7 +94,7 @@ def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
 # a dictionary with all array backends to test
 xp_available_backends: dict[str, ModuleType] = {}
 
-# Import the requested backend. If no backend passed, use numpy by default.
+# if no backend passed, use numpy by default
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     _import_and_add_numpy(xp_available_backends)
 elif ARRAY_BACKEND == "array_api_strict":
