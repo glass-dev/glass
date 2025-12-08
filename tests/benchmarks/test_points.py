@@ -176,19 +176,45 @@ def test_displace(  # noqa: PLR0913
     compare.assert_allclose(lat, expected_lat, atol=1e-15)
 
 
-def test_displacement(
+def _benchmark_displacement(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
 ) -> None:
-    """Benchmark for glass.displacement."""
+    """Benchmark logic for glass.displacement."""
     scale_factor = 100
 
     # test on an array
+    from_lon = urng.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
+    from_lat = urng.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
+    to_lon = urng.uniform(-180.0, 180.0, size=5 * scale_factor)
+    to_lat = urng.uniform(-90.0, 90.0, size=5 * scale_factor)
     alpha = benchmark(
         glass.displacement,
-        urng.uniform(-180.0, 180.0, size=(20 * scale_factor, 1)),
-        urng.uniform(-90.0, 90.0, size=(20 * scale_factor, 1)),
-        urng.uniform(-180.0, 180.0, size=5 * scale_factor),
-        urng.uniform(-90.0, 90.0, size=5 * scale_factor),
+        from_lon,
+        from_lat,
+        to_lon,
+        to_lat,
     )
     assert alpha.shape == (20 * scale_factor, 5 * scale_factor)
+
+
+@pytest.mark.stable
+@pytest.mark.parametrize("xp", ["numpy", "array_api_strict"], indirect=True)
+def test_displacement(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+    xp: ModuleType,  # noqa: ARG001
+) -> None:
+    """Benchmarks for glass.displacement."""
+    _benchmark_displacement(benchmark, urng)
+
+
+@pytest.mark.unstable
+@pytest.mark.parametrize("xp", ["jax.numpy"], indirect=True)
+def test_displacement_jax(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+    xp: ModuleType,  # noqa: ARG001
+) -> None:
+    """Benchmarks for glass.displacement."""
+    _benchmark_displacement(benchmark, urng)
