@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
     from cosmology import Cosmology
 
-    from glass._types import AnyArray, FloatArray, UnifiedGenerator
+    from glass._types import AnyArray, FloatArray, IntArray, UnifiedGenerator
 
 
 # Handling of array backends, inspired by-
@@ -320,3 +320,39 @@ class GeneratorConsumer:
 def generator_consumer() -> type[GeneratorConsumer]:
     """Fixture for generator-consuming utility."""
     return GeneratorConsumer
+
+
+class DataTransformer:
+    """Helper class for transforming various data structures into others."""
+
+    @staticmethod
+    def catpos(
+        pos: Generator[
+            tuple[
+                FloatArray,
+                FloatArray,
+                IntArray,
+            ]
+        ],
+        *,
+        xp: ModuleType,
+    ) -> tuple[
+        FloatArray,
+        FloatArray,
+        IntArray,
+    ]:
+        """Concatenate an array of pos into three arrays lon, lat and count."""
+        lon = xp.empty(0)
+        lat = xp.empty(0)
+        cnt: IntArray = 0
+        for lo, la, co in pos:
+            lon = xp.concat([lon, lo])
+            lat = xp.concat([lat, la])
+            cnt = cnt + co
+        return lon, lat, cnt
+
+
+@pytest.fixture(scope="session")
+def data_transformer() -> type[DataTransformer]:
+    """Fixture for generator-consuming utility."""
+    return DataTransformer
