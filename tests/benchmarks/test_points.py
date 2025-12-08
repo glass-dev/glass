@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -10,44 +9,14 @@ import glass
 import tests.conftest
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable
     from types import ModuleType
     from typing import Any
 
-    from conftest import GeneratorConsumer
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from glass._types import FloatArray, IntArray, UnifiedGenerator
-    from tests.conftest import Compare
-
-# check if available for testing
-HAVE_JAX = importlib.util.find_spec("jax") is not None
-
-
-def catpos(
-    pos: Generator[
-        tuple[
-            FloatArray,
-            FloatArray,
-            IntArray,
-        ]
-    ],
-    *,
-    xp: ModuleType,
-) -> tuple[
-    FloatArray,
-    FloatArray,
-    IntArray,
-]:
-    """Concatenate an array of pos into three arrays lon, lat and count."""
-    lon = xp.empty(0)
-    lat = xp.empty(0)
-    cnt: IntArray = 0
-    for lo, la, co in pos:
-        lon = xp.concat([lon, lo])
-        lat = xp.concat([lat, la])
-        cnt = cnt + co
-    return lon, lat, cnt
+    from glass._types import UnifiedGenerator
+    from tests.conftest import Compare, DataTransformer, GeneratorConsumer
 
 
 @pytest.mark.stable
@@ -61,6 +30,7 @@ def catpos(
 @pytest.mark.parametrize("remove_monopole", [True, False])
 def test_positions_from_delta(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
+    data_transformer: DataTransformer,
     generator_consumer: GeneratorConsumer,
     xp: ModuleType,
     bias: float,
@@ -91,11 +61,11 @@ def test_positions_from_delta(  # noqa: PLR0913
             remove_monopole=remove_monopole,
             bias_model=bias_model,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = catpos(pos, xp=np)
+    lon, lat, cnt = data_transformer.catpos(pos, xp=np)
 
     assert isinstance(cnt, xp.ndarray)
     assert cnt.shape == (3 * scaling_length, 2)
@@ -106,6 +76,7 @@ def test_positions_from_delta(  # noqa: PLR0913
 @pytest.mark.stable
 def test_uniform_positions(
     benchmark: BenchmarkFixture,
+    data_transformer: DataTransformer,
     generator_consumer: GeneratorConsumer,
     xp: ModuleType,
 ) -> None:
@@ -126,11 +97,11 @@ def test_uniform_positions(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.uniform_positions(ngal)
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = catpos(pos, xp=xp)
+    lon, lat, cnt = data_transformer.catpos(pos, xp=xp)
     assert not isinstance(cnt, int)
     assert cnt.__array_namespace__() == xp
     assert cnt.shape == shape_ngal
