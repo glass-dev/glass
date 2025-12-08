@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from conftest import GeneratorConsumer
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from glass._types import FloatArray, IntArray
+    from glass._types import FloatArray, IntArray, UnifiedGenerator
     from tests.conftest import Compare
 
 
@@ -174,3 +174,21 @@ def test_displace(  # noqa: PLR0913
     )
     compare.assert_allclose(lon, expected_lon, atol=1e-15)
     compare.assert_allclose(lat, expected_lat, atol=1e-15)
+
+
+def test_displacement(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+) -> None:
+    """Benchmark for glass.displacement."""
+    scale_factor = 100
+
+    # test on an array
+    alpha = benchmark(
+        glass.displacement,
+        urng.uniform(-180.0, 180.0, size=(20 * scale_factor, 1)),
+        urng.uniform(-90.0, 90.0, size=(20 * scale_factor, 1)),
+        urng.uniform(-180.0, 180.0, size=5 * scale_factor),
+        urng.uniform(-90.0, 90.0, size=5 * scale_factor),
+    )
+    assert alpha.shape == (20 * scale_factor, 5 * scale_factor)
