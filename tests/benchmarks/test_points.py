@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import glass
-from tests.conftest import xp_available_backends
+import tests.conftest
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -177,7 +177,11 @@ def _benchmark_displacement(
 @pytest.mark.stable
 @pytest.mark.parametrize(
     "xp",
-    [xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
+    [
+        xp
+        for name, xp in tests.conftest.xp_available_backends.items()
+        if name != "jax.numpy"
+    ],
 )
 def test_displacement(
     benchmark: BenchmarkFixture,
@@ -191,7 +195,11 @@ def test_displacement(
 @pytest.mark.unstable
 @pytest.mark.parametrize(
     "xp",
-    [xp for name, xp in xp_available_backends.items() if name == "jax.numpy"],
+    [
+        xp
+        for name, xp in tests.conftest.xp_available_backends.items()
+        if name == "jax.numpy"
+    ],
 )
 def test_displacement_jax(
     benchmark: BenchmarkFixture,
