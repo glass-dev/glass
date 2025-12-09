@@ -117,7 +117,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     vis = np.ones(npix)
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -146,7 +147,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     # case: None vis
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, None), xp=np
+        glass.positions_from_delta(ngal, delta, bias, None),
+        xp=np,
     )
 
     assert isinstance(cnt, int)
@@ -191,7 +193,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     vis = np.ones(12)
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, np.ndarray)
@@ -207,7 +210,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     vis = np.ones(12)
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, np.ndarray)
@@ -223,7 +227,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     vis = np.ones(12)
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, np.ndarray)
@@ -236,7 +241,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     vis[: vis.size // 2] = 0.0
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis), xp=np
+        glass.positions_from_delta(ngal, delta, bias, vis),
+        xp=np,
     )
 
     assert isinstance(cnt, np.ndarray)
@@ -274,7 +280,8 @@ def test_uniform_positions(
     # test with rng
 
     lon, lat, cnt = data_transformer.catpos(
-        glass.uniform_positions(ngal, rng=urng, xp=xp), xp=xp
+        glass.uniform_positions(ngal, rng=urng, xp=xp),
+        xp=xp,
     )
 
     assert isinstance(cnt, int)

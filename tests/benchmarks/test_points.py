@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import glass
-import tests.conftest
+from tests.conftest import xp_available_backends
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -40,7 +40,7 @@ def test_positions_from_delta(  # noqa: PLR0913
     """Benchmarks for glass.positions_from_delta."""
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
         pytest.skip(
-            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}"
+            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}",
         )
     # create maps that saturate the batching in the function
     nside = 128
@@ -83,7 +83,7 @@ def test_uniform_positions(
     """Benchmarks for glass.uniform_positionsuniform_positions."""
     if xp.__name__ in {"jax.numpy"}:
         pytest.skip(
-            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}"
+            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}",
         )
 
     scaling_factor = 12
@@ -177,11 +177,7 @@ def _benchmark_displacement(
 @pytest.mark.stable
 @pytest.mark.parametrize(
     "xp",
-    [
-        xp
-        for name, xp in tests.conftest.xp_available_backends.items()
-        if name != "jax.numpy"
-    ],
+    [xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
 )
 def test_displacement(
     benchmark: BenchmarkFixture,
@@ -195,11 +191,7 @@ def test_displacement(
 @pytest.mark.unstable
 @pytest.mark.parametrize(
     "xp",
-    [
-        xp
-        for name, xp in tests.conftest.xp_available_backends.items()
-        if name == "jax.numpy"
-    ],
+    [xp for name, xp in xp_available_backends.items() if name == "jax.numpy"],
 )
 def test_displacement_jax(
     benchmark: BenchmarkFixture,
