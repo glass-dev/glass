@@ -26,17 +26,18 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: 3.13
+          python-version: 3.14
 
       - name: Cache nox
         uses: actions/cache@v4
         with:
           key:
             regression-${{ hashFiles('pyproject.toml') }}-${{
-            hashFiles('noxfile.py') }}-${{ env.pythonLocation }}
+            hashFiles('noxfile.py') }}
           path: .nox
 
       - name: Install only dev dependencies

@@ -72,7 +72,7 @@ def test_cumulative_trapezoid_2d(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
             xp.arange(scaled_length + 1)[1:],
             xp.arange(scaled_length + 1)[1:],
-        ]
+        ],
     )
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 

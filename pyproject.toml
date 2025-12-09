@@ -59,6 +59,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Topic :: Scientific/Engineering :: Physics",
     "Typing :: Typed",
@@ -101,11 +102,14 @@ Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
 report = {exclude_also = [
-    "class \\w+\\(Protocol(\\[(\\w+, )*\\w+\\])?\\):", # protocol classes
-    "if TYPE_CHECKING:", # type-checking imports
+    "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
+    "@overload\\n",
+    "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
+    "if TYPE_CHECKING:",
 ], omit = [
-    "glass/_version.py",
-], skip_covered = true, sort = "cover"}
+    "_types.py", # typing-only module
+    "_version.py", # not being tracked anyway
+], precision = 2, show_missing = true, skip_covered = true, skip_empty = true, sort = "cover"}
 run = {branch = true, parallel = true, source = [
     "glass",
 ]}
