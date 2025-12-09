@@ -116,6 +116,11 @@ else:
     raise ValueError(msg)
 
 
+def _filtered_backends(*backends: str) -> list[ModuleType]:
+    """Return a list of imported array backends filtered by name."""
+    return [xp for name, xp in xp_available_backends.items() if name in backends]
+
+
 # Pytest fixtures
 @pytest.fixture(params=xp_available_backends.values(), scope="session")
 def xp(request: pytest.FixtureRequest) -> ModuleType:
@@ -123,6 +128,19 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
     Fixture for array backend.
 
     Access array library functions using `xp.` in tests.
+    """
+    return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture(
+    params=_filtered_backends("numpy", "array_api_strict"),
+    scope="session",
+)
+def xp_no_jax(request: pytest.FixtureRequest) -> ModuleType:
+    """
+    Fixture for array backend, excluding jax.
+
+    Access array library functions using `xp_no_jax.` in tests.
     """
     return request.param  # type: ignore[no-any-return]
 
@@ -137,6 +155,18 @@ def uxpx(xp: ModuleType) -> _utils.XPAdditions:
     return _utils.XPAdditions(xp)
 
 
+def _select_urng(xp: ModuleType) -> UnifiedGenerator:
+    """Given an array backend `xp`, returns the matching rng."""
+    if xp.__name__ == "jax.numpy":
+        return glass.jax.Generator(seed=SEED)
+    if xp.__name__ == "numpy":
+        return np.random.default_rng(seed=SEED)
+    if xp.__name__ == "array_api_strict":
+        return _utils.Generator(seed=SEED)
+    msg = "the array backend in not supported"
+    raise NotImplementedError(msg)
+
+
 @pytest.fixture
 def urng(xp: ModuleType) -> UnifiedGenerator:
     """
@@ -146,14 +176,32 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
     """
-    if xp.__name__ == "jax.numpy":
-        return glass.jax.Generator(seed=SEED)
-    if xp.__name__ == "numpy":
-        return np.random.default_rng(seed=SEED)
-    if xp.__name__ == "array_api_strict":
-        return _utils.Generator(seed=SEED)
-    msg = "the array backend in not supported"
-    raise NotImplementedError(msg)
+    return _select_urng(xp)
+
+
+@pytest.fixture
+def urng_no_jax(xp_no_jax: ModuleType) -> UnifiedGenerator:
+    """
+    Fixture for a unified RNG interface, excluding jax.
+
+    Access the relevant RNG using `urng_no_jax.` in tests.
+    """
+    return _select_urng(xp_no_jax)
+
+
+@pytest.fixture(
+    params=_filtered_backends("jax.numpy"),
+    scope="session",
+)
+def jax_rng(request: pytest.FixtureRequest) -> UnifiedGenerator:
+    """
+    Fixture for a jax RNG interface.
+
+    Using this fixture instead of importing directly in a test
+    allows a test to be ignored without being marked as skipped
+    if jax is not present in the env.
+    """
+    return _select_urng(request.param)
 
 
 @pytest.fixture(scope="session")
