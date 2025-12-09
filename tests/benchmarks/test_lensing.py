@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass.lensing
+import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -28,9 +28,7 @@ def test_multi_plane_matrix(
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_matrix."""
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-        pytest.skip(
-            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}"
-        )
+        pytest.skip(f"glass.multi_plane_matrix not yet ported for {xp.__name__}")
 
     # Use this over the fixture to allow us to add many more windows
     shells = [
@@ -49,19 +47,19 @@ def test_multi_plane_matrix(
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
-            glass.lensing.MultiPlaneConvergence,
+            glass.MultiPlaneConvergence,
             zip[tuple[glass.RadialWindow, FloatArray]],
         ],
         dict[Never, Never],
     ]:
         """Run setup a generator with zip before each benchmark run."""
-        convergence = glass.lensing.MultiPlaneConvergence(cosmo)
+        convergence = glass.MultiPlaneConvergence(cosmo)
         return (convergence, zip(shells, deltas, strict=False)), {}
 
     def multi_plane_matrix_add_window(
-        convergence: type[glass.lensing.MultiPlaneConvergence],
+        convergence: type[glass.MultiPlaneConvergence],
         zipped: tuple[list[type[glass.RadialWindow]], FloatArray],
-    ) -> type[glass.lensing.MultiPlaneConvergence]:
+    ) -> type[glass.MultiPlaneConvergence]:
         """Call add_window repeatedly, to be benchmarked."""
         for shell, delta in zipped:
             convergence.add_window(delta, shell)  # type: ignore[arg-type,call-arg]
@@ -88,9 +86,7 @@ def test_multi_plane_weights(
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_weights."""
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-        pytest.skip(
-            f"glass.lensing.multi_plane_weights not yet ported for {xp.__name__}"
-        )
+        pytest.skip(f"glass.multi_plane_weights not yet ported for {xp.__name__}")
 
     # Use this over the fixture to allow us to add many more windows
     shells = [
@@ -112,19 +108,19 @@ def test_multi_plane_weights(
 
     def setup_shells_deltas_and_weights() -> tuple[
         tuple[
-            glass.lensing.MultiPlaneConvergence,
+            glass.MultiPlaneConvergence,
             zip[tuple[glass.RadialWindow, FloatArray, FloatArray]],
         ],
         dict[Never, Never],
     ]:
         """Run setup a generator with zip before each benchmark run."""
-        convergence = glass.lensing.MultiPlaneConvergence(cosmo)
+        convergence = glass.MultiPlaneConvergence(cosmo)
         return (convergence, zip(shells, deltas, weights, strict=False)), {}
 
     def multi_plane_weights_add_window(
-        convergence: type[glass.lensing.MultiPlaneConvergence],
+        convergence: type[glass.MultiPlaneConvergence],
         zipped: tuple[list[type[glass.RadialWindow]], FloatArray, FloatArray],
-    ) -> type[glass.lensing.MultiPlaneConvergence]:
+    ) -> type[glass.MultiPlaneConvergence]:
         """Call add_window repeatedly, to be benchmarked."""
         for shell, delta, _ in zipped:
             convergence.add_window(delta, shell)  # type: ignore[arg-type,call-arg]

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass.shapes
+import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -20,7 +20,7 @@ def test_ellipticity_ryden04(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Benchmark for glass.shapes.ellipticity_ryden04."""
+    """Benchmark for glass.ellipticity_ryden04."""
     if xp.__name__ == "jax.numpy":
         pytest.skip(
             "Arrays in ellipticity_ryden04 are not immutable, so do not support jax",
@@ -34,9 +34,7 @@ def test_ellipticity_ryden04(
     gamma = urng.random(size)
     sigma_gamma = urng.random(size)
 
-    e = benchmark(
-        glass.shapes.ellipticity_ryden04, mu, sigma, gamma, sigma_gamma, size=size
-    )
+    e = benchmark(glass.ellipticity_ryden04, mu, sigma, gamma, sigma_gamma, size=size)
     assert e.shape == size
 
 
@@ -45,7 +43,7 @@ def test_ellipticity_gaussian(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
 ) -> None:
-    """Benchmark for glass.shapes.ellipticity_guassian."""
+    """Benchmark for glass.ellipticity_guassian."""
     if xp.__name__ == "jax.numpy":
         pytest.skip(
             "Arrays in ellipticity_gaussian are not immutable, so do not support jax",
@@ -70,7 +68,7 @@ def test_ellipticity_intnorm(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
 ) -> None:
-    """Benchmark for glass.shapes.ellipticity_intnorm."""
+    """Benchmark for glass.ellipticity_intnorm."""
     if xp.__name__ == "jax.numpy":
         pytest.skip(
             "Arrays in ellipticity_intnorm are not immutable, so do not support jax",
