@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
-    from tests.conftest import Compare, DataTransformer
+    from tests.fixtures.helper_classes import Compare, DataTransformer
 
 
 def test_effective_bias(

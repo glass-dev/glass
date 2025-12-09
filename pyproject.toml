@@ -237,10 +237,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
 ], "tests/conftest.py" = [
-    "D100", # undocumented-public-module
-    "D103", # TODO: undocumented-public-function
-    "INP001", # implicit-namespace-package
-    "PLC0415", # import-outside-top-level
+    "INP001", # implicit-namespace-package,
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
@@ -251,6 +248,8 @@ lint.per-file-ignores = {"__init__.py" = [
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "SLF001", # private-member-access
+], "tests/fixtures/*" = [
+    "INP001", # implicit-namespace-package,
 ]}
 lint.select = [
     "ALL",
