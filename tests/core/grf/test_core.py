@@ -7,12 +7,17 @@ import pytest
 import glass.grf
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
 
     from pytest_mock import MockerFixture
 
 
-def test_corr_unknown(xp: ModuleType) -> None:
+@pytest.mark.parametrize(
+    "corr_func",
+    [glass.grf.corr, glass.grf.icorr, glass.grf.dcorr],
+)
+def test_corr_unknown(xp: ModuleType, corr_func: Callable) -> None:
     class Unknown:
         def corr(self, _other, _x):  # type: ignore[no-untyped-def]
             return NotImplemented
@@ -27,14 +32,9 @@ def test_corr_unknown(xp: ModuleType) -> None:
     t2 = Unknown()
     x = xp.zeros(10)
 
+    # Use the parameterized function
     with pytest.raises(NotImplementedError, match="Unknown"):
-        glass.grf.corr(t1, t2, x)
-
-    with pytest.raises(NotImplementedError, match="Unknown"):
-        glass.grf.icorr(t1, t2, x)
-
-    with pytest.raises(NotImplementedError, match="Unknown"):
-        glass.grf.dcorr(t1, t2, x)
+        corr_func(t1, t2, x)
 
 
 def test_compute(mocker: MockerFixture, xp: ModuleType) -> None:
