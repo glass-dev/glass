@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import healpix
 import pytest
 
+import glass
 import glass.fields
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ def test_iternorm_no_size(
     array_in = [xp.asarray(x) for x in xp.arange(10_000, dtype=xp.float64)]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.iternorm(k, iter(array_in))
+        generator = glass.iternorm(k, iter(array_in))
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     results = benchmark(function_to_benchmark)
@@ -82,7 +83,7 @@ def test_iternorm_specify_size(
     ]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.iternorm(k, iter(array_in), size)
+        generator = glass.iternorm(k, iter(array_in), size)
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     # check output shapes and types
@@ -118,7 +119,7 @@ def test_iternorm_k_0(
     array_in = [xp.stack([x]) for x in xp.ones(1_000, dtype=xp.float64)]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.iternorm(k, iter(array_in))
+        generator = glass.iternorm(k, iter(array_in))
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
 
     results = benchmark(function_to_benchmark)
@@ -148,7 +149,7 @@ def test_cls2cov(
     array_in = [urng.random(3) for _ in range(1_000)]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.cls2cov(
+        generator = glass.cls2cov(
             array_in,
             nl,
             nf,
@@ -223,9 +224,9 @@ def test_generate(  # noqa: PLR0913
     expected_len: int,
     ncorr: int | None,
 ) -> None:
-    """Benchmarks for glass.fields.generate."""
+    """Benchmarks for glass.generate."""
     if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-        pytest.skip(f"glass.fields.generate not yet ported for {xp.__name__}")
+        pytest.skip(f"glass.generate not yet ported for {xp.__name__}")
 
     n = 100
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
@@ -235,7 +236,7 @@ def test_generate(  # noqa: PLR0913
     nside = 16
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields.generate(
+        generator = glass.generate(
             fields,  # type: ignore[arg-type]
             gls,
             nside=nside,
@@ -257,7 +258,7 @@ def test_getcl_lmax_0(
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
-    """Benchmarks for glass.fields.getcl with lmax of 0."""
+    """Benchmarks for glass.getcl with lmax of 0."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls = [
@@ -271,7 +272,7 @@ def test_getcl_lmax_0(
 
     # check slicing
     result = benchmark(
-        glass.fields.getcl,
+        glass.getcl,
         cls,
         random_i,
         random_j,
@@ -288,7 +289,7 @@ def test_getcl_lmax_larger_than_cls(
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
-    """Benchmarks for glass.fields.getcl with lmax larger than the length of cl."""
+    """Benchmarks for glass.getcl with lmax larger than the length of cl."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls = [
@@ -303,7 +304,7 @@ def test_getcl_lmax_larger_than_cls(
     # check padding
     lmax = scale_factor + 50
     result = benchmark(
-        glass.fields.getcl,
+        glass.getcl,
         cls,
         random_i,
         random_j,

@@ -9,7 +9,7 @@ import glass.arraytools
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_broadcast_first(xp: ModuleType) -> None:

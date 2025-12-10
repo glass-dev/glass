@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.unstable
@@ -72,7 +72,7 @@ def test_cumulative_trapezoid_2d(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
             xp.arange(scaled_length + 1)[1:],
             xp.arange(scaled_length + 1)[1:],
-        ]
+        ],
     )
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
