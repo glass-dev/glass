@@ -229,27 +229,23 @@ lint.per-file-ignores = {"__init__.py" = [
     "TRY003", # raise-vanilla-args
 ], "glass/grf/_*" = [
     "SLF001", # private-member-access
+], "tests/*" = [
+    "INP001", # implicit-namespace-package
 ], "tests/benchmarks/*" = [
     "D100", # undocumented-public-module
-    "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
-], "tests/conftest.py" = [
-    "INP001", # implicit-namespace-package
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
-    "INP001", # implicit-namespace-package
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "SLF001", # private-member-access
-], "tests/fixtures/*" = [
-    "INP001", # implicit-namespace-package
 ]}
 lint.select = [
     "ALL",
