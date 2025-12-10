@@ -17,22 +17,17 @@ if TYPE_CHECKING:
 @pytest.mark.stable
 def test_ellipticity_ryden04(
     benchmark: BenchmarkFixture,
-    urng: UnifiedGenerator,
-    xp: ModuleType,
+    urngb: UnifiedGenerator,
 ) -> None:
     """Benchmark for glass.ellipticity_ryden04."""
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_ryden04 are not immutable, so do not support jax",
-        )
     size = (1000, 1000)
 
     # single ellipticity
 
-    mu = urng.random(size) * -1.0
-    sigma = urng.random(size)
-    gamma = urng.random(size)
-    sigma_gamma = urng.random(size)
+    mu = urngb.random(size) * -1.0
+    sigma = urngb.random(size)
+    gamma = urngb.random(size)
+    sigma_gamma = urngb.random(size)
 
     e = benchmark(glass.ellipticity_ryden04, mu, sigma, gamma, sigma_gamma, size=size)
     assert e.shape == size
@@ -41,18 +36,13 @@ def test_ellipticity_ryden04(
 @pytest.mark.stable
 def test_ellipticity_gaussian(
     benchmark: BenchmarkFixture,
-    xp: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmark for glass.ellipticity_guassian."""
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_gaussian are not immutable, so do not support jax",
-        )
-
     array_length = 10
     n = 1_000_000
-    count = xp.full(array_length, fill_value=n)
-    sigma = xp.full(array_length, fill_value=0.256)
+    count = xpb.full(array_length, fill_value=n)
+    sigma = xpb.full(array_length, fill_value=0.256)
 
     eps = benchmark(
         glass.ellipticity_gaussian,
@@ -66,18 +56,13 @@ def test_ellipticity_gaussian(
 @pytest.mark.stable
 def test_ellipticity_intnorm(
     benchmark: BenchmarkFixture,
-    xp: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmark for glass.ellipticity_intnorm."""
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_intnorm are not immutable, so do not support jax",
-        )
-
     array_length = 10
     n = 1_000_000
-    count = xp.full(array_length, fill_value=n)
-    sigma = xp.full(array_length, fill_value=0.256)
+    count = xpb.full(array_length, fill_value=n)
+    sigma = xpb.full(array_length, fill_value=0.256)
 
     eps = benchmark(
         glass.ellipticity_intnorm,
