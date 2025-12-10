@@ -17,15 +17,15 @@ if TYPE_CHECKING:
 @pytest.mark.unstable
 def test_broadcast_leading_axes(
     benchmark: BenchmarkFixture,
-    xp: ModuleType,
+    xp_benchmarks: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.broadcast_leading_axes."""
     # Ensure we don't use too much memory
     a_in = 0
     b_shape = (4, 10)
     c_shape = (30, 1, 5, 6)
-    b_in = xp.zeros(b_shape)
-    c_in = xp.zeros(c_shape)
+    b_in = xp_benchmarks.zeros(b_shape)
+    c_in = xp_benchmarks.zeros(c_shape)
 
     dims, *rest = benchmark(
         glass.arraytools.broadcast_leading_axes,
@@ -45,39 +45,39 @@ def test_broadcast_leading_axes(
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    xp: ModuleType,
+    xp_benchmarks: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 10_000
 
-    f = xp.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
-    x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
+    f = xp_benchmarks.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
+    x = xp_benchmarks.arange(scaled_length)  # [0, 1, 2, 3,...]
 
     expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    compare.assert_allclose(ct[:4], xp.asarray(expected_first_4_out))
+    compare.assert_allclose(ct[:4], xp_benchmarks.asarray(expected_first_4_out))
 
 
 @pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    xp: ModuleType,
+    xp_benchmarks: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 5_000
 
-    f = xp.stack(
+    f = xp_benchmarks.stack(
         [  # [[1, 2, 3, 4,...], [1, 2, 3, 4,...]]
-            xp.arange(scaled_length + 1)[1:],
-            xp.arange(scaled_length + 1)[1:],
+            xp_benchmarks.arange(scaled_length + 1)[1:],
+            xp_benchmarks.arange(scaled_length + 1)[1:],
         ],
     )
-    x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
+    x = xp_benchmarks.arange(scaled_length)  # [0, 1, 2, 3,...]
 
     expected_first_4_out = [0.0, 1.5, 4.0, 7.5]
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    compare.assert_allclose(ct[0, :4], xp.asarray(expected_first_4_out))
-    compare.assert_allclose(ct[1, :4], xp.asarray(expected_first_4_out))
+    compare.assert_allclose(ct[0, :4], xp_benchmarks.asarray(expected_first_4_out))
+    compare.assert_allclose(ct[1, :4], xp_benchmarks.asarray(expected_first_4_out))

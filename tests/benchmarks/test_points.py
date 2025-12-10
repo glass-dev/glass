@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 
 import glass
-import tests.fixtures.array_backends
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -36,15 +35,16 @@ def test_positions_from_delta(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     data_transformer: DataTransformer,
     generator_consumer: GeneratorConsumer,
-    xp: ModuleType,
+    xp_benchmarks: ModuleType,
     bias: float,
     bias_model: str | Callable[[int], int],
     remove_monopole: bool,  # noqa: FBT001
 ) -> None:
     """Benchmarks for glass.positions_from_delta."""
-    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+    if xp_benchmarks.__name__ == "array_api_strict":
         pytest.skip(
-            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}",
+            "glass.lensing.multi_plane_matrix not yet ported for "
+            f"{xp_benchmarks.__name__}",
         )
     # create maps that saturate the batching in the function
     nside = 128
@@ -52,9 +52,9 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     scaling_length = 1
 
-    ngal = xp.asarray([1e-3, 2e-3])
-    delta = xp.zeros((3 * scaling_length, 1, npix))
-    vis = xp.ones(npix)
+    ngal = xp_benchmarks.asarray([1e-3, 2e-3])
+    delta = xp_benchmarks.zeros((3 * scaling_length, 1, npix))
+    vis = xp_benchmarks.ones(npix)
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.positions_from_delta(
@@ -71,7 +71,7 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     lon, lat, cnt = data_transformer.catpos(pos, xp=np)
 
-    assert isinstance(cnt, xp.ndarray)
+    assert isinstance(cnt, xp_benchmarks.ndarray)
     assert cnt.shape == (3 * scaling_length, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -82,20 +82,15 @@ def test_uniform_positions(
     benchmark: BenchmarkFixture,
     data_transformer: DataTransformer,
     generator_consumer: GeneratorConsumer,
-    xp: ModuleType,
+    xp_benchmarks: ModuleType,
 ) -> None:
     """Benchmarks for glass.uniform_positionsuniform_positions."""
-    if xp.__name__ in {"jax.numpy"}:
-        pytest.skip(
-            f"glass.lensing.multi_plane_matrix not yet ported for {xp.__name__}",
-        )
-
     scaling_factor = 12
     shape_ngal = (int(scaling_factor / 2), 2)
 
-    ngal = xp.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
-    ngal = xp.reshape(
-        xp.arange(1e-3, 1e-3 * scaling_factor + 1e-3, 1e-3),
+    ngal = xp_benchmarks.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
+    ngal = xp_benchmarks.reshape(
+        xp_benchmarks.arange(1e-3, 1e-3 * scaling_factor + 1e-3, 1e-3),
         shape=shape_ngal,
     )
 
@@ -105,11 +100,11 @@ def test_uniform_positions(
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = data_transformer.catpos(pos, xp=xp)
+    lon, lat, cnt = data_transformer.catpos(pos, xp=xp_benchmarks)
     assert not isinstance(cnt, int)
-    assert cnt.__array_namespace__() == xp
+    assert cnt.__array_namespace__() == xp_benchmarks
     assert cnt.shape == shape_ngal
-    assert lon.shape == lat.shape == (xp.sum(cnt),)
+    assert lon.shape == lat.shape == (xp_benchmarks.sum(cnt),)
 
 
 @pytest.mark.parametrize(
@@ -130,7 +125,7 @@ def test_uniform_positions(
 def test_displace(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    xp: ModuleType,
+    xp_benchmarks: ModuleType,
     r_to_alpha: Callable[[float], complex | list[float]],
     expected_lon: float,
     expected_lat: float,
@@ -139,12 +134,16 @@ def test_displace(  # noqa: PLR0913
     scale_length = 100_000
 
     d = 5.0  # deg
-    r = d / 180 * xp.pi
+    r = d / 180 * xp_benchmarks.pi
 
     # displace the origin so everything is easy
-    lon0 = xp.asarray(xp.zeros(scale_length, dtype=xp.float64))
-    lat0 = xp.asarray(xp.zeros(scale_length, dtype=xp.float64))
-    alpha = xp.asarray(r_to_alpha(r))
+    lon0 = xp_benchmarks.asarray(
+        xp_benchmarks.zeros(scale_length, dtype=xp_benchmarks.float64)
+    )
+    lat0 = xp_benchmarks.asarray(
+        xp_benchmarks.zeros(scale_length, dtype=xp_benchmarks.float64)
+    )
+    alpha = xp_benchmarks.asarray(r_to_alpha(r))
 
     lon, lat = benchmark(
         glass.displace,
@@ -156,18 +155,19 @@ def test_displace(  # noqa: PLR0913
     compare.assert_allclose(lat, expected_lat, atol=1e-15)
 
 
-def _benchmark_displacement(
+@pytest.mark.stable
+def test_displacement(
     benchmark: BenchmarkFixture,
-    urng: UnifiedGenerator,
+    urng_benchmarks: UnifiedGenerator,
 ) -> None:
-    """Benchmark logic for glass.displacement."""
+    """Benchmark for glass.displacement."""
     scale_factor = 100
 
     # test on an array
-    from_lon = urng.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
-    from_lat = urng.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
-    to_lon = urng.uniform(-180.0, 180.0, size=5 * scale_factor)
-    to_lat = urng.uniform(-90.0, 90.0, size=5 * scale_factor)
+    from_lon = urng_benchmarks.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
+    from_lat = urng_benchmarks.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
+    to_lon = urng_benchmarks.uniform(-180.0, 180.0, size=5 * scale_factor)
+    to_lat = urng_benchmarks.uniform(-90.0, 90.0, size=5 * scale_factor)
     alpha = benchmark(
         glass.displacement,
         from_lon,
@@ -176,39 +176,3 @@ def _benchmark_displacement(
         to_lat,
     )
     assert alpha.shape == (20 * scale_factor, 5 * scale_factor)
-
-
-@pytest.mark.stable
-@pytest.mark.parametrize(
-    "xp",
-    [
-        xp
-        for name, xp in tests.fixtures.array_backends.xp_available_backends.items()
-        if name != "jax.numpy"
-    ],
-)
-def test_displacement(
-    benchmark: BenchmarkFixture,
-    urng: UnifiedGenerator,
-    xp: ModuleType,  # noqa: ARG001
-) -> None:
-    """Benchmark for glass.displacement with all backends, but jax."""
-    _benchmark_displacement(benchmark, urng)
-
-
-@pytest.mark.unstable
-@pytest.mark.parametrize(
-    "xp",
-    [
-        xp
-        for name, xp in tests.fixtures.array_backends.xp_available_backends.items()
-        if name == "jax.numpy"
-    ],
-)
-def test_displacement_jax(
-    benchmark: BenchmarkFixture,
-    urng: UnifiedGenerator,
-    xp: ModuleType,  # noqa: ARG001
-) -> None:
-    """Benchmark for glass.displacement with jax."""
-    _benchmark_displacement(benchmark, urng)

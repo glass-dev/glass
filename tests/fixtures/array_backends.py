@@ -112,6 +112,18 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
     return request.param  # type: ignore[no-any-return]
 
 
+@pytest.fixture(
+    params=[xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
+    scope="session",
+)
+def xp_benchmarks(request: pytest.FixtureRequest) -> ModuleType:
+    """
+    Fixture for array backend.
+    Access array library functions using `xp.` in tests.
+    """
+    return request.param  # type: ignore[no-any-return]
+
+
 @pytest.fixture(scope="session")
 def uxpx(xp: ModuleType) -> _utils.XPAdditions:
     """

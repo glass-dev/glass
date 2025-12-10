@@ -22,6 +22,18 @@ if TYPE_CHECKING:
 SEED = 42
 
 
+def _select_urng(xp: ModuleType) -> UnifiedGenerator:
+    """Given an array backend `xp`, returns the matching rng."""
+    if xp.__name__ == "jax.numpy":
+        return glass.jax.Generator(seed=SEED)
+    if xp.__name__ == "numpy":
+        return np.random.default_rng(seed=SEED)
+    if xp.__name__ == "array_api_strict":
+        return _utils.Generator(seed=SEED)
+    msg = "the array backend in not supported"
+    raise NotImplementedError(msg)
+
+
 @pytest.fixture(scope="session")
 def rng() -> np.random.Generator:
     """
@@ -41,11 +53,14 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
     """
-    if xp.__name__ == "jax.numpy":
-        return glass.jax.Generator(seed=SEED)
-    if xp.__name__ == "numpy":
-        return np.random.default_rng(seed=SEED)
-    if xp.__name__ == "array_api_strict":
-        return _utils.Generator(seed=SEED)
-    msg = "the array backend is not supported"
-    raise NotImplementedError(msg)
+    return _select_urng(xp)
+
+
+@pytest.fixture
+def urng_benchmarks(xp_benchmarks: ModuleType) -> UnifiedGenerator:
+    """
+    Fixture for a unified RNG interface to be used in benchmarks.
+    Access the relevant RNG using `urng_benchmarks.` in tests.
+    Must be used with the `xp_benchmarks` fixture.
+    """
+    return _select_urng(xp_benchmarks)
