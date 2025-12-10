@@ -231,10 +231,10 @@ lint.per-file-ignores = {"__init__.py" = [
     "SLF001", # private-member-access
 ], "tests/*" = [
     "INP001", # implicit-namespace-package
+    "S101", # assert
 ], "tests/benchmarks/*" = [
     "D100", # undocumented-public-module
     "PLR2004", # magic-value-comparison
-    "S101", # assert
     "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
 ], "tests/core/*" = [
@@ -244,7 +244,6 @@ lint.per-file-ignores = {"__init__.py" = [
     "D103", # TODO: undocumented-public-function
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
-    "S101", # assert
     "SLF001", # private-member-access
 ]}
 lint.select = [
