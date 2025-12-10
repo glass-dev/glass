@@ -32,7 +32,6 @@ def test_corr_unknown(xp: ModuleType, corr_func: Callable) -> None:
     t2 = Unknown()
     x = xp.zeros(10)
 
-    # Use the parameterized function
     with pytest.raises(NotImplementedError, match="Unknown"):
         corr_func(t1, t2, x)
 
