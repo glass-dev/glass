@@ -81,7 +81,11 @@ def test_cov_clip(
     compare.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
-def test_nearcorr(compare: type[Compare], xp: ModuleType) -> None:
+@pytest.mark.parametrize("tol", [None, 1e-10])
+def test_nearcorr_correctness(
+    compare: type[Compare], xp: ModuleType, tol: float | None
+) -> None:
+    """Test glass.algorithm.nearcorr against the known result from Higham (2002)."""
     # from Higham (2002)
     a = xp.asarray(
         [
@@ -98,31 +102,37 @@ def test_nearcorr(compare: type[Compare], xp: ModuleType) -> None:
         ],
     )
 
-    x = glass.algorithm.nearcorr(a)
+    x = glass.algorithm.nearcorr(a, tol=tol)
     compare.assert_allclose(x, b, atol=0.0001)
 
-    # explicit tolerance
-    x = glass.algorithm.nearcorr(a, tol=1e-10)
-    compare.assert_allclose(x, b, atol=0.0001)
 
-    # no iterations
-    with pytest.warns(
-        UserWarning,
-        match="Nearest correlation matrix not found in 0 iterations",
-    ):
-        x = glass.algorithm.nearcorr(a, niter=0)
-    compare.assert_allclose(x, a)
+@pytest.mark.parametrize("niter", [0, 1])
+def test_nearcorr_no_convergence(
+    compare: type[Compare], xp: ModuleType, niter: int
+) -> None:
+    """Test that a UserWarning is raised when the solution does not converge."""
+    a = xp.asarray(
+        [
+            [1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ],
+    )
 
-    # non-square matrix should raise
+    match_msg = f"Nearest correlation matrix not found in {niter} iterations"
+    with pytest.warns(UserWarning, match=match_msg):
+        x = glass.algorithm.nearcorr(a, niter=niter)
+
+    # should be unchanged
+    if niter == 0:
+        compare.assert_allclose(x, a)
+
+
+def test_nearcorr_non_square(xp: ModuleType) -> None:
+    """Test that a ValueError is raised for non-square input matrices."""
+    # Assert: Check for the specific ValueError
     with pytest.raises(ValueError, match="non-square matrix"):
         glass.algorithm.nearcorr(xp.zeros((4, 3)))
-
-    # no convergence
-    with pytest.warns(
-        UserWarning,
-        match="Nearest correlation matrix not found in 1 iterations",
-    ):
-        x = glass.algorithm.nearcorr(a, niter=1)
 
 
 def test_cov_nearest(
