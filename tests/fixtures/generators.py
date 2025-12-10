@@ -57,12 +57,12 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
 
 @pytest.fixture
-def urng_benchmarks(xp_benchmarks: ModuleType) -> UnifiedGenerator:
+def urngb(xpb: ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface to be used in benchmarks.
 
-    Access the relevant RNG using `urng_benchmarks.` in tests.
+    Access the relevant RNG using `urngb.` in tests.
 
-    Must be used with the `xp_benchmarks` fixture.
+    Must be used with the `xpb` fixture.
     """
-    return _select_urng(xp_benchmarks)
+    return _select_urng(xpb)

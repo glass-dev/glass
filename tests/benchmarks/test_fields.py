@@ -23,14 +23,11 @@ if TYPE_CHECKING:
 def test_iternorm_no_size(
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with default value for size."""
     k = 2
-    array_in = [
-        xp_benchmarks.asarray(x)
-        for x in xp_benchmarks.arange(10_000, dtype=xp_benchmarks.float64)
-    ]
+    array_in = [xpb.asarray(x) for x in xpb.arange(10_000, dtype=xpb.float64)]
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
@@ -42,7 +39,7 @@ def test_iternorm_no_size(
     assert isinstance(j, int)
     assert a.shape == (k,)
     assert s.shape == ()
-    assert s.dtype == xp_benchmarks.float64
+    assert s.dtype == xpb.float64
     assert s.shape == ()
 
 
@@ -51,7 +48,7 @@ def test_iternorm_no_size(
 def test_iternorm_specify_size(
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
     num_dimensions: int,
 ) -> None:
     """Benchmarks for glass.iternorm with size specified."""
@@ -68,9 +65,7 @@ def test_iternorm_specify_size(
             ]
             for _ in range(10_000)
         ]
-    array_in = [
-        xp_benchmarks.asarray(arr, dtype=xp_benchmarks.float64) for arr in list_input
-    ]
+    array_in = [xpb.asarray(arr, dtype=xpb.float64) for arr in list_input]
     expected_result = [
         1,
         (3, 2),
@@ -103,14 +98,11 @@ def test_iternorm_k_0(
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with k set to 0."""
     k = 0
-    array_in = [
-        xp_benchmarks.stack([x])
-        for x in xp_benchmarks.ones(1_000, dtype=xp_benchmarks.float64)
-    ]
+    array_in = [xpb.stack([x]) for x in xpb.ones(1_000, dtype=xpb.float64)]
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
@@ -121,7 +113,7 @@ def test_iternorm_k_0(
     j, a, s = results[0]
     assert j is None
     assert a.shape == (0,)
-    compare.assert_allclose(xp_benchmarks.asarray(s), 1.0)
+    compare.assert_allclose(xpb.asarray(s), 1.0)
 
 
 @pytest.mark.stable
@@ -129,14 +121,14 @@ def test_cls2cov(
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
-    urng_benchmarks: UnifiedGenerator,
-    xp_benchmarks: ModuleType,
+    urngb: UnifiedGenerator,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.cls2cov."""
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
-    array_in = [urng_benchmarks.random(3) for _ in range(1_000)]
+    array_in = [urngb.random(3) for _ in range(1_000)]
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.cls2cov(
@@ -151,11 +143,11 @@ def test_cls2cov(
     cov = covs[0]
 
     assert cov.shape == (nl, nc + 1)
-    assert cov.dtype == xp_benchmarks.float64
+    assert cov.dtype == xpb.float64
 
     compare.assert_allclose(
         cov[:, 0],
-        xp_benchmarks.asarray([0.348684, 0.047089, 0.487811]),
+        xpb.asarray([0.348684, 0.047089, 0.487811]),
         atol=1e-6,
     )
     compare.assert_allclose(
@@ -170,27 +162,25 @@ def test_cls2cov(
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(  # noqa: PLR0913
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
-    urng_benchmarks: UnifiedGenerator,
+    urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
-    if xp_benchmarks.__name__ == "array_api_strict":
-        pytest.skip(
-            f"glass.fields._generate_grf not yet ported for {xp_benchmarks.__name__}"
-        )
+    if xpb.__name__ == "array_api_strict":
+        pytest.skip(f"glass.fields._generate_grf not yet ported for {xpb.__name__}")
 
-    gls = [urng_benchmarks.random(1_000)]
+    gls = [urngb.random(1_000)]
     nside = 4
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.fields._generate_grf(
             gls,
             nside,
-            rng=urng_benchmarks if use_rng else None,  # type: ignore[arg-type]
+            rng=urngb if use_rng else None,  # type: ignore[arg-type]
             ncorr=ncorr,
         )
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
@@ -212,19 +202,19 @@ def test_generate(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
     expected_len: int,
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.generate."""
-    if xp_benchmarks.__name__ == "array_api_strict":
-        pytest.skip(f"glass.generate not yet ported for {xp_benchmarks.__name__}")
+    if xpb.__name__ == "array_api_strict":
+        pytest.skip(f"glass.generate not yet ported for {xpb.__name__}")
 
     n = 100
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
     nth_triangular_number = int((n * (n + 1)) / 2)
-    gls = [xp_benchmarks.ones(10) for _ in range(nth_triangular_number)]
+    gls = [xpb.ones(10) for _ in range(nth_triangular_number)]
     nside = 16
 
     def function_to_benchmark() -> list[Any]:
@@ -248,13 +238,13 @@ def test_generate(  # noqa: PLR0913
 def test_getcl_lmax_0(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.getcl with lmax of 0."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls = [
-        xp_benchmarks.asarray([i, j], dtype=xp_benchmarks.float64)
+        xpb.asarray([i, j], dtype=xpb.float64)
         for i in range(scale_factor)
         for j in range(i, -1, -1)
     ]
@@ -270,9 +260,7 @@ def test_getcl_lmax_0(
         random_j,
         lmax=0,
     )
-    expected = xp_benchmarks.asarray(
-        [max(random_i, random_j)], dtype=xp_benchmarks.float64
-    )
+    expected = xpb.asarray([max(random_i, random_j)], dtype=xpb.float64)
     assert result.size == 1
     compare.assert_allclose(result, expected)
 
@@ -281,13 +269,13 @@ def test_getcl_lmax_0(
 def test_getcl_lmax_larger_than_cls(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.getcl with lmax larger than the length of cl."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls = [
-        xp_benchmarks.asarray([i, j], dtype=xp_benchmarks.float64)
+        xpb.asarray([i, j], dtype=xpb.float64)
         for i in range(scale_factor)
         for j in range(i, -1, -1)
     ]
@@ -304,6 +292,6 @@ def test_getcl_lmax_larger_than_cls(
         random_j,
         lmax=lmax,
     )
-    expected = xp_benchmarks.zeros((lmax - 1,), dtype=xp_benchmarks.float64)
+    expected = xpb.zeros((lmax - 1,), dtype=xpb.float64)
     assert result.size == lmax + 1
     compare.assert_allclose(result[2:], expected)

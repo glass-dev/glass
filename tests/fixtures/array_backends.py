@@ -116,7 +116,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
     params=[xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
     scope="session",
 )
-def xp_benchmarks(request: pytest.FixtureRequest) -> ModuleType:
+def xpb(request: pytest.FixtureRequest) -> ModuleType:
     """
     Fixture for array backend.
 

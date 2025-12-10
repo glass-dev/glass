@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -35,16 +36,15 @@ def test_positions_from_delta(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     data_transformer: DataTransformer,
     generator_consumer: GeneratorConsumer,
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
     bias: float,
     bias_model: str | Callable[[int], int],
     remove_monopole: bool,  # noqa: FBT001
 ) -> None:
     """Benchmarks for glass.positions_from_delta."""
-    if xp_benchmarks.__name__ == "array_api_strict":
+    if xpb.__name__ == "array_api_strict":
         pytest.skip(
-            "glass.lensing.multi_plane_matrix not yet ported for "
-            f"{xp_benchmarks.__name__}",
+            f"glass.lensing.multi_plane_matrix not yet ported for {xpb.__name__}",
         )
     # create maps that saturate the batching in the function
     nside = 128
@@ -52,9 +52,9 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     scaling_length = 1
 
-    ngal = xp_benchmarks.asarray([1e-3, 2e-3])
-    delta = xp_benchmarks.zeros((3 * scaling_length, 1, npix))
-    vis = xp_benchmarks.ones(npix)
+    ngal = xpb.asarray([1e-3, 2e-3])
+    delta = xpb.zeros((3 * scaling_length, 1, npix))
+    vis = xpb.ones(npix)
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.positions_from_delta(
@@ -71,7 +71,7 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     lon, lat, cnt = data_transformer.catpos(pos, xp=np)
 
-    assert isinstance(cnt, xp_benchmarks.ndarray)
+    assert isinstance(cnt, xpb.ndarray)
     assert cnt.shape == (3 * scaling_length, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -82,15 +82,15 @@ def test_uniform_positions(
     benchmark: BenchmarkFixture,
     data_transformer: DataTransformer,
     generator_consumer: GeneratorConsumer,
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.uniform_positionsuniform_positions."""
     scaling_factor = 12
     shape_ngal = (int(scaling_factor / 2), 2)
 
-    ngal = xp_benchmarks.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
-    ngal = xp_benchmarks.reshape(
-        xp_benchmarks.arange(1e-3, 1e-3 * scaling_factor + 1e-3, 1e-3),
+    ngal = xpb.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
+    ngal = xpb.reshape(
+        xpb.arange(1e-3, 1e-3 * scaling_factor + 1e-3, 1e-3),
         shape=shape_ngal,
     )
 
@@ -100,11 +100,11 @@ def test_uniform_positions(
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = data_transformer.catpos(pos, xp=xp_benchmarks)
+    lon, lat, cnt = data_transformer.catpos(pos, xp=xpb)
     assert not isinstance(cnt, int)
-    assert cnt.__array_namespace__() == xp_benchmarks
+    assert cnt.__array_namespace__() == xpb
     assert cnt.shape == shape_ngal
-    assert lon.shape == lat.shape == (xp_benchmarks.sum(cnt),)
+    assert lon.shape == lat.shape == (xpb.sum(cnt),)
 
 
 @pytest.mark.parametrize(
@@ -125,7 +125,7 @@ def test_uniform_positions(
 def test_displace(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    xp_benchmarks: ModuleType,
+    xpb: ModuleType,
     r_to_alpha: Callable[[float], complex | list[float]],
     expected_lon: float,
     expected_lat: float,
@@ -134,16 +134,12 @@ def test_displace(  # noqa: PLR0913
     scale_length = 100_000
 
     d = 5.0  # deg
-    r = d / 180 * xp_benchmarks.pi
+    r = d / 180 * math.pi
 
     # displace the origin so everything is easy
-    lon0 = xp_benchmarks.asarray(
-        xp_benchmarks.zeros(scale_length, dtype=xp_benchmarks.float64)
-    )
-    lat0 = xp_benchmarks.asarray(
-        xp_benchmarks.zeros(scale_length, dtype=xp_benchmarks.float64)
-    )
-    alpha = xp_benchmarks.asarray(r_to_alpha(r))
+    lon0 = xpb.asarray(xpb.zeros(scale_length, dtype=xpb.float64))
+    lat0 = xpb.asarray(xpb.zeros(scale_length, dtype=xpb.float64))
+    alpha = xpb.asarray(r_to_alpha(r))
 
     lon, lat = benchmark(
         glass.displace,
@@ -158,16 +154,16 @@ def test_displace(  # noqa: PLR0913
 @pytest.mark.stable
 def test_displacement(
     benchmark: BenchmarkFixture,
-    urng_benchmarks: UnifiedGenerator,
+    urngb: UnifiedGenerator,
 ) -> None:
     """Benchmark for glass.displacement."""
     scale_factor = 100
 
     # test on an array
-    from_lon = urng_benchmarks.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
-    from_lat = urng_benchmarks.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
-    to_lon = urng_benchmarks.uniform(-180.0, 180.0, size=5 * scale_factor)
-    to_lat = urng_benchmarks.uniform(-90.0, 90.0, size=5 * scale_factor)
+    from_lon = urngb.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
+    from_lat = urngb.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
+    to_lon = urngb.uniform(-180.0, 180.0, size=5 * scale_factor)
+    to_lat = urngb.uniform(-90.0, 90.0, size=5 * scale_factor)
     alpha = benchmark(
         glass.displacement,
         from_lon,
