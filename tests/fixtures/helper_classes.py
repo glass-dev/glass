@@ -110,7 +110,7 @@ class GeneratorConsumer:
     def consume(
         generator: Generator[Any],
         *,
-        valid_exception: str = "No exception should have been thrown",
+        valid_exception: str = "",
     ) -> list[Any]:
         """
         Generate and consume a generator returned by a given functions.
