@@ -60,7 +60,9 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 def urng_benchmarks(xp_benchmarks: ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface to be used in benchmarks.
+
     Access the relevant RNG using `urng_benchmarks.` in tests.
+
     Must be used with the `xp_benchmarks` fixture.
     """
     return _select_urng(xp_benchmarks)

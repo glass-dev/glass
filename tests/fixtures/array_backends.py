@@ -119,6 +119,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
 def xp_benchmarks(request: pytest.FixtureRequest) -> ModuleType:
     """
     Fixture for array backend.
+
     Access array library functions using `xp.` in tests.
     """
     return request.param  # type: ignore[no-any-return]
