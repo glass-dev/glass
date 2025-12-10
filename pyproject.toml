@@ -212,7 +212,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "F401", # unused-import
 ], "docs/*" = [
     "D100", # undocumented-public-module
-    "INP001", # implicit-namespace-package,
+    "INP001", # implicit-namespace-package
 ], "examples/*" = [
     "ANN001", # missing-type-function-argument
     "ANN002", # missing-type-args
@@ -229,24 +229,19 @@ lint.per-file-ignores = {"__init__.py" = [
     "TRY003", # raise-vanilla-args
 ], "glass/grf/_*" = [
     "SLF001", # private-member-access
+], "tests/*" = [
+    "INP001", # implicit-namespace-package
 ], "tests/benchmarks/*" = [
     "D100", # undocumented-public-module
-    "INP001", # implicit-namespace-package
     "PLR2004", # magic-value-comparison
     "S101", # assert
     "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
-], "tests/conftest.py" = [
-    "D100", # undocumented-public-module
-    "D103", # TODO: undocumented-public-function
-    "INP001", # implicit-namespace-package
-    "PLC0415", # import-outside-top-level
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
-    "INP001", # implicit-namespace-package
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
     "S101", # assert

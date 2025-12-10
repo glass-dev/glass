@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import glass
-import tests.conftest
+import tests.fixtures.array_backends
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -16,7 +16,11 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import UnifiedGenerator
-    from tests.conftest import Compare, DataTransformer, GeneratorConsumer
+    from tests.fixtures.helper_classes import (
+        Compare,
+        DataTransformer,
+        GeneratorConsumer,
+    )
 
 
 @pytest.mark.stable
@@ -179,7 +183,7 @@ def _benchmark_displacement(
     "xp",
     [
         xp
-        for name, xp in tests.conftest.xp_available_backends.items()
+        for name, xp in tests.fixtures.array_backends.xp_available_backends.items()
         if name != "jax.numpy"
     ],
 )
@@ -197,7 +201,7 @@ def test_displacement(
     "xp",
     [
         xp
-        for name, xp in tests.conftest.xp_available_backends.items()
+        for name, xp in tests.fixtures.array_backends.xp_available_backends.items()
         if name == "jax.numpy"
     ],
 )

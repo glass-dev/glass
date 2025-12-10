@@ -13,7 +13,7 @@ import glass.harmonics
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_multalm(compare: type[Compare], xp: ModuleType) -> None:

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> None:

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.unstable
