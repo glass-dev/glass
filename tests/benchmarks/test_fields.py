@@ -127,14 +127,11 @@ def test_cls2cov(
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
-    urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.cls2cov."""
-    # check output values and shape
-
     nl, nf, nc = 3, 2, 2
-    array_in = [urngb.random(3) for _ in range(1_000)]
+    array_in = [xpb.arange(i + 1.0, i + 4.0, dtype=xpb.float32) for i in range(1_000)]
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.cls2cov(
@@ -151,16 +148,8 @@ def test_cls2cov(
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    compare.assert_allclose(
-        cov[:, 0],
-        xpb.asarray([0.348684, 0.047089, 0.487811]),
-        atol=1e-6,
-    )
-    compare.assert_allclose(
-        cov[:, 1],
-        [0.38057, 0.393032, 0.064057],
-        atol=1e-6,
-    )
+    compare.assert_allclose(cov[:, 0], xpb.asarray([0.5, 1.0, 1.5]))
+    compare.assert_allclose(cov[:, 1], 0)
     compare.assert_allclose(cov[:, 2], 0)
 
 

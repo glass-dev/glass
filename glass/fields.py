@@ -213,12 +213,15 @@ def cls2cov(
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and np.any(xp.less(cl, 0)):
+            if i == 0 and xp.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
             n = cl.size
-            cov[:n, i] = cl
-            cov[n:, i] = 0
+            # It is more performant not to copy. However, this can leave the array
+            # passed to `at` in an unknown state. Therefore, we must copy into a
+            # temporary array before updating cov.
+            temp_cov = xpx.at(cov)[:n, i].set(cl, copy=True)
+            cov = xpx.at(temp_cov)[n:, i].set(0)
         cov /= 2
         yield cov
 
