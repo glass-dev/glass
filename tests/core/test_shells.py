@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     import glass._array_api_utils as _utils
     from glass.cosmology import Cosmology
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_distance_weight(

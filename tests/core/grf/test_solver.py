@@ -10,7 +10,7 @@ import glass.grf
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.fixture(scope="session")
