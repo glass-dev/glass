@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import UnifiedGenerator
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_nnls(

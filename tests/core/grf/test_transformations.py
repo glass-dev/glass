@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from tests.conftest import Compare
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_normal(compare: type[Compare], urng: UnifiedGenerator) -> None:
