@@ -40,6 +40,7 @@ import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from types import ModuleType
 
     from glass._types import FloatArray
@@ -47,8 +48,8 @@ if TYPE_CHECKING:
 
 def vmap_galactic_ecliptic(
     nside: int,
-    galactic: tuple[float, float] = (30, 90),
-    ecliptic: tuple[float, float] = (20, 80),
+    galactic: Sequence[float] = (30, 90),
+    ecliptic: Sequence[float] = (20, 80),
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
