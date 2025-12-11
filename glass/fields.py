@@ -888,8 +888,10 @@ def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:
     """
     n = nfields_from_nspectra(len(spectra))
 
-    comb = list(spectra_indices(n))
-    return [spectra[comb.index((i + k, i))] for k in range(n) for i in range(n - k)]
+    comb = {
+        tuple(idx_tuple): pos for pos, idx_tuple in enumerate(spectra_indices(n))
+    }
+    return [spectra[comb[(i + k, i)]] for k in range(n) for i in range(n - k)]
 
 
 def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
