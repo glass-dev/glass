@@ -77,7 +77,7 @@ def solve(  # noqa: PLR0912, PLR0913
 
     See Also
     --------
-    glass.grf.compute : Direct computation for band-limited spectra.
+    :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
     if t2 is None:

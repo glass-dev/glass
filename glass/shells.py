@@ -609,7 +609,7 @@ def partition(
     where :math:`\lambda` is a multiplier to enforce the integral
     constraints.
 
-    The :func:`glass.partition()` function implements a number of methods to
+    The :func:`glass.partition` function implements a number of methods to
     obtain a solution:
 
     If ``method="nnls"`` (the default), obtain a partition from a
