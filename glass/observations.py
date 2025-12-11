@@ -40,7 +40,6 @@ import glass._array_api_utils as _utils
 import glass.arraytools
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from types import ModuleType
 
     from glass._types import FloatArray
