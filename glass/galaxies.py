@@ -18,6 +18,7 @@ Functions
 """  # noqa: D400
 
 from __future__ import annotations
+
 import math
 import warnings
 from typing import TYPE_CHECKING
