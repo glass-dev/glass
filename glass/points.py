@@ -38,6 +38,7 @@ Displacing points
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any
 
 import healpix
@@ -62,7 +63,7 @@ if TYPE_CHECKING:
     )
 
 
-ARCMIN2_SPHERE = 60**6 // 100 / np.pi
+ARCMIN2_SPHERE = 60**6 // 100 / math.pi
 
 
 def effective_bias(
