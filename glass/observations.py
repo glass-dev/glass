@@ -48,8 +48,8 @@ if TYPE_CHECKING:
 
 def vmap_galactic_ecliptic(
     nside: int,
-    galactic: Sequence[float] = (30, 90),
-    ecliptic: Sequence[float] = (20, 80),
+    galactic: tuple[float, ...] = (30, 90),
+    ecliptic: tuple[float, ...] = (20, 80),
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
