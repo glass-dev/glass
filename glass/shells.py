@@ -813,7 +813,7 @@ def partition_restrict(
     uxpx = _utils.XPAdditions(xp)
 
     parts = []
-    for _, w in enumerate(shells):
+    for w in shells:
         zr, fr = restrict(z, fz, w)
         parts.append(uxpx.trapezoid(fr, zr, axis=-1))
     return xp.stack(parts)

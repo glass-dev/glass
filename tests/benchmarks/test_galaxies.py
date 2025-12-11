@@ -58,7 +58,7 @@ def test_redshifts_from_nz(
     assert redshifts.shape == (13 * scale_factor,)
     assert xpb.min(redshifts) >= 0.0
     assert xpb.max(redshifts) <= 1.0
-    assert xpb.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert xpb.all((redshifts >= 0) & (redshifts <= 1))
 
 
 @pytest.mark.stable
