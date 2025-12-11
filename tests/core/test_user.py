@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 # check if available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
-delta = 0.001  # Number of points in arrays
-my_max = 1000  # Typically number of galaxies in loop
+delta = 1e-3      # Number of points in arrays
+my_max = 1_000    # Typically number of galaxies in loop
 except_int = 750  # Where test exception occurs in loop
 filename = "MyFile.Fits"
 cls_file = "Cls.npz"

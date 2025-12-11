@@ -20,7 +20,7 @@ def test_ellipticity_ryden04(
     urngb: UnifiedGenerator,
 ) -> None:
     """Benchmark for glass.ellipticity_ryden04."""
-    size = (1000, 1000)
+    size = (1_000, 1_000)
 
     # single ellipticity
 
