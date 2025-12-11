@@ -164,7 +164,7 @@ def compute(
 
     See Also
     --------
-    glass.grf.solve: Iterative solver for non-band-limited spectra.
+    :func:`glass.grf.solve`: Iterative solver for non-band-limited spectra.
 
     """
     if t2 is None:

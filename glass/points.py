@@ -209,7 +209,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias_model
         The bias model to apply. If a string, refers to a function in
         the :mod:`~glass.points` module, e.g. ``'linear'`` for
-        :func:`glass.linear_bias()` or ``'glass.loglinear'`` for
+        :func:`glass.linear_bias` or ``'loglinear'`` for
         :func:`glass.loglinear_bias`.
     remove_monopole
         If true, the monopole of the density contrast

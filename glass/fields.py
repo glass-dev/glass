@@ -282,7 +282,7 @@ def discretized_cls(
     return gls
 
 
-@deprecated("use glass.solve_gaussian_spectra() instead")
+@deprecated("use :func:`glass.solve_gaussian_spectra` instead")
 def lognormal_gls(
     cls: AnyArray,
     shift: float = 1.0,
@@ -411,7 +411,7 @@ def _generate_grf(
         yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
-@deprecated("use glass.generate() instead")
+@deprecated("use :func:`glass.generate` instead")
 def generate_gaussian(
     gls: AnyArray,
     nside: int,
@@ -424,7 +424,7 @@ def generate_gaussian(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -464,7 +464,7 @@ def generate_gaussian(
     yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
 
-@deprecated("use glass.generate() instead")
+@deprecated("use :func:`glass.generate` instead")
 def generate_lognormal(
     gls: AnyArray,
     nside: int,
@@ -478,7 +478,7 @@ def generate_lognormal(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     Parameters
     ----------

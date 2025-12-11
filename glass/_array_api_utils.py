@@ -1,6 +1,6 @@
 """
 Array API Utilities for glass.
-============================
+==============================
 
 This module provides utility functions and classes for working with multiple array
 backends in the glass project, including NumPy, JAX, and array-api-strict. It includes
