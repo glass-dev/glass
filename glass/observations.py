@@ -78,10 +78,10 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
-    if np.ndim(galactic) != 1 or len(galactic) != 2:
+    if len(galactic) != 2:
         msg = "galactic stripe must be a pair of numbers"
         raise TypeError(msg)
-    if np.ndim(ecliptic) != 1 or len(ecliptic) != 2:
+    if len(ecliptic) != 2:
         msg = "ecliptic stripe must be a pair of numbers"
         raise TypeError(msg)
 

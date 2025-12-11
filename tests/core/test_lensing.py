@@ -168,7 +168,7 @@ def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
     arg_alpha = rng.uniform(-math.pi, math.pi, size=n)
 
     lon_ = np.degrees(rng.uniform(-math.pi, math.pi, size=n))
-    lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
+    lat_ = np.degrees(np.asin(rng.uniform(-1, 1, size=n)))
 
     lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 
