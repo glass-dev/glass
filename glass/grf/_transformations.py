@@ -33,9 +33,7 @@ class Normal:
         x: AnyArray,
         /,
     ) -> AnyArray | NotImplementedType:
-        if type(other) is Normal:
-            return x
-        return NotImplemented
+        return x if type(other) is Normal else NotImplemented
 
     def icorr(
         self,
@@ -43,9 +41,7 @@ class Normal:
         x: AnyArray,
         /,
     ) -> AnyArray | NotImplementedType:
-        if type(other) is Normal:
-            return x
-        return NotImplemented
+        return x if type(other) is Normal else NotImplemented
 
     def dcorr(
         self,
@@ -53,9 +49,7 @@ class Normal:
         x: AnyArray,
         /,
     ) -> AnyArray | NotImplementedType:
-        if type(other) is Normal:
-            return 1.0 + (0 * x)
-        return NotImplemented
+        return 1.0 + (0 * x) if type(other) is Normal else NotImplemented
 
 
 @dataclass
@@ -99,10 +93,7 @@ class Lognormal:
         if type(other) is Lognormal:
             return self.lamda * other.lamda * xp.expm1(x)
 
-        if type(other) is Normal:
-            return self.lamda * x
-
-        return NotImplemented
+        return self.lamda * x if type(other) is Normal else NotImplemented
 
     def icorr(
         self,
@@ -115,10 +106,7 @@ class Lognormal:
         if type(other) is Lognormal:
             return xp.log1p(x / (self.lamda * other.lamda))
 
-        if type(other) is Normal:
-            return x / self.lamda
-
-        return NotImplemented
+        return x / self.lamda if type(other) is Normal else NotImplemented
 
     def dcorr(
         self,
@@ -131,10 +119,7 @@ class Lognormal:
         if type(other) is Lognormal:
             return self.lamda * other.lamda * xp.exp(x)
 
-        if type(other) is Normal:
-            return self.lamda + (0.0 * x)
-
-        return NotImplemented
+        return self.lamda + (0.0 * x) if type(other) is Normal else NotImplemented
 
 
 @dataclass

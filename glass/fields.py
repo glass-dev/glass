@@ -888,7 +888,7 @@ def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:
     """
     n = nfields_from_nspectra(len(spectra))
 
-    comb = [(i, j) for i, j in spectra_indices(n)]
+    comb = list(spectra_indices(n))
     return [spectra[comb.index((i + k, i))] for k in range(n) for i in range(n - k)]
 
 
@@ -978,11 +978,8 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     # recover the number of fields from the number of spectra
     n = nfields_from_nspectra(len(spectra))
 
-    if lmax is None:  # noqa: SIM108
-        # maximum length in input spectra
-        k = max((cl.size for cl in spectra), default=0)
-    else:
-        k = lmax + 1
+    # first case: maximum length in input spectra
+    k = max((cl.size for cl in spectra), default=0) if lmax is None else lmax + 1
 
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
