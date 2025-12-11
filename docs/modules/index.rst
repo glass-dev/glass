@@ -6,5 +6,6 @@ Modules
    :maxdepth: 2
 
    algorithm
+   arraytools
    grf
    harmonics
