@@ -23,27 +23,27 @@ def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
     cosmo: Cosmology,
-    urng: UnifiedGenerator,
-    xp: ModuleType,
+    urngb: UnifiedGenerator,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_matrix."""
-    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-        pytest.skip(f"glass.multi_plane_matrix not yet ported for {xp.__name__}")
+    if xpb.__name__ == "array_api_strict":
+        pytest.skip(f"glass.multi_plane_matrix not yet ported for {xpb.__name__}")
 
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
-            xp.arange(i, i + 3, dtype=xp.float64),
-            xp.asarray([0.0, 1.0, 0.0]),
+            xpb.arange(i, i + 3, dtype=xpb.float64),
+            xpb.asarray([0.0, 1.0, 0.0]),
             float(i + 1),
         )
-        for i in range(1000)
+        for i in range(1_000)
     ]
     mat = glass.multi_plane_matrix(shells, cosmo)
-    deltas = urng.random((len(shells), 10))
+    deltas = urngb.random((len(shells), 10))
 
-    compare.assert_array_equal(mat, xp.tril(mat))
-    compare.assert_array_equal(xp.triu(mat, 1), 0)
+    compare.assert_array_equal(mat, xpb.tril(mat))
+    compare.assert_array_equal(xpb.triu(mat, 1), 0)
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
@@ -81,30 +81,30 @@ def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
     cosmo: Cosmology,
-    urng: UnifiedGenerator,
-    xp: ModuleType,
+    urngb: UnifiedGenerator,
+    xpb: ModuleType,
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_weights."""
-    if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-        pytest.skip(f"glass.multi_plane_weights not yet ported for {xp.__name__}")
+    if xpb.__name__ == "array_api_strict":
+        pytest.skip(f"glass.multi_plane_weights not yet ported for {xpb.__name__}")
 
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
-            xp.arange(i, i + 3, dtype=xp.float64),
-            xp.asarray([0.0, 1.0, 0.0]),
+            xpb.arange(i, i + 3, dtype=xpb.float64),
+            xpb.asarray([0.0, 1.0, 0.0]),
             float(i + 1),
         )
         for i in range(500)
     ]
-    w_in = xp.eye(len(shells))
-    deltas = urng.random((len(shells), 10))
-    weights = urng.random((len(shells), 3))
+    w_in = xpb.eye(len(shells))
+    deltas = urngb.random((len(shells), 10))
+    weights = urngb.random((len(shells), 3))
 
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    compare.assert_array_equal(w_out, xp.triu(w_out, 1))
-    compare.assert_array_equal(xp.tril(w_out), 0)
+    compare.assert_array_equal(w_out, xpb.triu(w_out, 1))
+    compare.assert_array_equal(xpb.tril(w_out), 0)
 
     def setup_shells_deltas_and_weights() -> tuple[
         tuple[

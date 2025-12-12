@@ -163,7 +163,7 @@ def test_deflect_nsew(
 
 
 def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
-    n = 1000
+    n = 1_000
     abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
     arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
 

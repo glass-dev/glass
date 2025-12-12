@@ -103,7 +103,7 @@ def test_nearcorr_correctness(
     )
 
     x = glass.algorithm.nearcorr(a, tol=tol)
-    compare.assert_allclose(x, b, atol=0.0001)
+    compare.assert_allclose(x, b, atol=1e-4)
 
 
 @pytest.mark.parametrize("niter", [0, 1])

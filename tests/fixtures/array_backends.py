@@ -52,7 +52,7 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
 
 def _import_and_add_numpy(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add numpy to the backends dictionary."""
-    _check_version("numpy", "2.1.0")
+    _check_version("numpy", "2.3.5")
     xp_available_backends["numpy"] = np
 
 
@@ -62,7 +62,7 @@ def _import_and_add_array_api_strict(
     """Add array_api_strict to the backends dictionary."""
     import array_api_strict  # noqa: PLC0415
 
-    _check_version("array_api_strict", "2.0.0")
+    _check_version("array_api_strict", "2.4.1")
     xp_available_backends["array_api_strict"] = array_api_strict
     array_api_strict.set_array_api_strict_flags(api_version="2024.12")
 
@@ -71,7 +71,7 @@ def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add jax to the backends dictionary."""
     import jax  # noqa: PLC0415
 
-    _check_version("jax", "0.4.32")
+    _check_version("jax", "0.8.1")
     xp_available_backends["jax.numpy"] = jax.numpy
     # enable 64 bit numbers
     jax.config.update("jax_enable_x64", val=True)
@@ -104,6 +104,19 @@ else:
 
 @pytest.fixture(params=xp_available_backends.values(), scope="session")
 def xp(request: pytest.FixtureRequest) -> ModuleType:
+    """
+    Fixture for array backend.
+
+    Access array library functions using `xp.` in tests.
+    """
+    return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture(
+    params=[xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
+    scope="session",
+)
+def xpb(request: pytest.FixtureRequest) -> ModuleType:
     """
     Fixture for array backend.
 

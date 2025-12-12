@@ -6,8 +6,8 @@ import logging
 logging.getLogger("jax").setLevel(logging.ERROR)
 
 pytest_plugins = [
-    "tests.fixtures.array_backends",
-    "tests.fixtures.domain",
-    "tests.fixtures.generators",
-    "tests.fixtures.helper_classes",
+    "fixtures.array_backends",
+    "fixtures.domain",
+    "fixtures.generators",
+    "fixtures.helper_classes",
 ]
