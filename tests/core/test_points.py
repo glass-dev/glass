@@ -197,7 +197,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert hasattr(cnt, "sum")
     assert cnt.shape == (2,)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -214,7 +213,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert hasattr(cnt, "sum")
     assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -231,7 +229,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert hasattr(cnt, "sum")
     assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -245,7 +242,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert hasattr(cnt, "sum")
     assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
