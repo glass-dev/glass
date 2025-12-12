@@ -131,7 +131,7 @@ def test_cls2cov(
 ) -> None:
     """Benchmarks for glass.cls2cov."""
     nl, nf, nc = 3, 2, 2
-    array_in = [xpb.arange(i + 1.0, i + 4.0, dtype=xpb.float32) for i in range(1_000)]
+    array_in = [xpb.arange(i + 1.0, i + 4.0) for i in range(1_000)]
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.cls2cov(
@@ -148,8 +148,8 @@ def test_cls2cov(
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    compare.assert_allclose(cov[:, 0], xpb.asarray([0.5, 1.0, 1.5]))
-    compare.assert_allclose(cov[:, 1], 0)
+    compare.assert_allclose(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
+    compare.assert_allclose(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
     compare.assert_allclose(cov[:, 2], 0)
 
 
