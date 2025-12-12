@@ -187,7 +187,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     # case: multi-dimensional ngal
 
-    ngal = np.array([1e-3, 2e-3])
+    ngal = np.asarray([1e-3, 2e-3])
     delta = np.zeros(12)
     bias = 0.8
     vis = np.ones(12)
@@ -197,7 +197,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (2,)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -214,14 +213,13 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
 
     # case: multi-dimensional broadcasting
 
-    ngal = np.array([1e-3, 2e-3])
+    ngal = np.asarray([1e-3, 2e-3])
     delta = np.zeros((3, 1, 12))
     bias = 0.8
     vis = np.ones(12)
@@ -231,7 +229,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
@@ -245,7 +242,6 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, np.ndarray)
     assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)

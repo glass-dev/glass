@@ -98,7 +98,6 @@ always_use_bars_union = True
 autodoc_type_aliases = {
     "AnyArray": "AnyArray",
     "ComplexArray": "ComplexArray",
-    "DoubleArray": "DoubleArray",
     "FloatArray": "FloatArray",
     "IntArray": "IntArray",
     "UnifiedGenerator": "UnifiedGenerator",

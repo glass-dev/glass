@@ -38,6 +38,7 @@ Displacing points
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any
 
 import healpix
@@ -55,21 +56,20 @@ if TYPE_CHECKING:
 
     from glass._types import (
         ComplexArray,
-        DoubleArray,
         FloatArray,
         IntArray,
         UnifiedGenerator,
     )
 
 
-ARCMIN2_SPHERE = 60**6 // 100 / np.pi
+ARCMIN2_SPHERE = 60**6 // 100 / math.pi
 
 
 def effective_bias(
     z: FloatArray,
     bz: FloatArray,
     w: glass.shells.RadialWindow,
-) -> float | DoubleArray:
+) -> float | FloatArray:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -310,7 +310,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
-            q = np.cumsum(n[stop : stop + step])
+            q = np.cumulative_sum(n[stop : stop + step])
             # does this group of pixels fill the batch?
             if size + q[-1] < min(batch, count):
                 # no, we need the next group of pixels to fill the batch
