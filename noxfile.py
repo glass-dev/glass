@@ -32,6 +32,8 @@ SHARED_BENCHMARK_FLAGS = [
     "--benchmark-columns=mean,stddev,rounds",
     "--benchmark-sort=name",
     "--benchmark-timer=time.process_time",
+    "--benchmark-calibration-precision=1000",
+    "--benchmark-max-time=5.0",
 ]
 
 
