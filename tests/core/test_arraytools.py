@@ -80,7 +80,7 @@ def test_ndinterp(compare: type[Compare], xp: ModuleType) -> None:
     assert y.shape == (2, 2)
     compare.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
-    # test nd interpolation in final axis
+    # test n-dimensional interpolation in final axis
 
     yq = xp.asarray([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
 
@@ -103,7 +103,7 @@ def test_ndinterp(compare: type[Compare], xp: ModuleType) -> None:
         atol=1e-15,
     )
 
-    # test nd interpolation in middle axis
+    # test n-dimensional interpolation in middle axis
 
     yq = xp.asarray(
         [[[1.1], [1.2], [1.3], [1.4], [1.5]], [[2.1], [2.2], [2.3], [2.4], [2.5]]],

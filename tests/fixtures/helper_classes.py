@@ -104,7 +104,7 @@ def data_transformer() -> type[DataTransformer]:
 
 
 class GeneratorConsumer:
-    """Helper class for fully consuming genertors in tests."""
+    """Helper class for fully consuming generators in tests."""
 
     @staticmethod
     def consume(

@@ -38,7 +38,7 @@ def test_ellipticity_gaussian(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for glass.ellipticity_guassian."""
+    """Benchmark for glass.ellipticity_gaussian."""
     array_length = 10
     n = 1_000_000
     count = xpb.full(array_length, fill_value=n)
