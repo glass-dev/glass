@@ -205,8 +205,8 @@ def galaxy_shear(  # noqa: PLR0913
     g = np.empty(size, dtype=complex)
 
     # get the lensing maps at galaxy position
-    for i in range(0, size, 10000):
-        s = slice(i, i + 10000)
+    for i in range(0, size, 10_000):
+        s = slice(i, i + 10_000)
         ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
         k[s] = kappa[ipix]
         np.real(g)[s] = gamma1[ipix]

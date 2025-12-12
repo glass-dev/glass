@@ -26,8 +26,8 @@ def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
 
     # many axis ratios
 
-    q = glass.triaxial_axis_ratio(0.8, 0.4, size=1000, xp=xp)
-    assert q.shape == (1000,)
+    q = glass.triaxial_axis_ratio(0.8, 0.4, size=1_000, xp=xp)
+    assert q.shape == (1_000,)
 
     # explicit shape
 
@@ -51,7 +51,7 @@ def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
     # random parameters and check that projection is
     # between largest and smallest possible value
 
-    sorted_uniform_rnd = xp.sort(urng.uniform(0, 1, size=(2, 1000)), axis=0)
+    sorted_uniform_rnd = xp.sort(urng.uniform(0, 1, size=(2, 1_000)), axis=0)
     zeta = sorted_uniform_rnd[0, :]
     xi = sorted_uniform_rnd[1, :]
     qmin = xp.min(xp.stack([zeta, xi, xi / zeta]), axis=0)
@@ -83,8 +83,8 @@ def test_ellipticity_ryden04(urng: UnifiedGenerator, xp: ModuleType) -> None:
 
     # many ellipticities
 
-    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1000, xp=xp)
-    assert e.shape == (1000,)
+    e = glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056, size=1_000, xp=xp)
+    assert e.shape == (1_000,)
 
     # explicit shape
 

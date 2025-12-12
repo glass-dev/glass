@@ -398,7 +398,7 @@ def test_displace_abs(
     xp: ModuleType,
 ) -> None:
     """Check that points are displaced by the correct angular distance."""
-    n = 1000
+    n = 1_000
     abs_alpha = urng.uniform(0, 2 * xp.pi, size=n)
     arg_alpha = urng.uniform(-xp.pi, xp.pi, size=n)
 

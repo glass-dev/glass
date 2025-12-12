@@ -306,7 +306,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
             cmask = 1
 
         # sample the map in batches
-        step = 1000
+        step = 1_000
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
