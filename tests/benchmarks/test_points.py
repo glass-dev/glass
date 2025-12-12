@@ -50,10 +50,8 @@ def test_positions_from_delta(  # noqa: PLR0913
     nside = 128
     npix = 12 * nside * nside
 
-    scaling_length = 1
-
     ngal = xpb.asarray([1e-3, 2e-3])
-    delta = xpb.zeros((3 * scaling_length, 1, npix))
+    delta = xpb.zeros((3, 1, npix))
     vis = xpb.ones(npix)
 
     def function_to_benchmark() -> list[Any]:
@@ -72,7 +70,7 @@ def test_positions_from_delta(  # noqa: PLR0913
     lon, lat, cnt = data_transformer.catpos(pos, xp=np)
 
     assert isinstance(cnt, xpb.ndarray)
-    assert cnt.shape == (3 * scaling_length, 2)
+    assert cnt.shape == (3, 2)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
 
