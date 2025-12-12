@@ -331,7 +331,7 @@ def _generate_grf(
     realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
-    The ``gls`` array must contain the angular power power spectra of the
+    The ``gls`` array must contain the angular power spectra of the
     Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     Parameters
@@ -434,7 +434,7 @@ def generate_gaussian(
     realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
-    The ``gls`` array must contain the angular power power spectra of the
+    The ``gls`` array must contain the angular power spectra of the
     Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     Parameters
@@ -830,7 +830,7 @@ def generate(
     The random fields are sampled from Gaussian random fields using the
     transformations in *fields*.
 
-    The *gls* array must contain the angular power power spectra of the
+    The *gls* array must contain the angular power spectra of the
     Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     The optional number *ncorr* limits how many realised fields are
