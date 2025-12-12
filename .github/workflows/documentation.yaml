@@ -55,3 +55,4 @@ jobs:
           fail_on_error: true
           filter_mode: nofilter
           reporter: github-pr-review
+          vale_flags: --glob='!.nox/*'
