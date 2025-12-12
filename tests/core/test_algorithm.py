@@ -99,11 +99,11 @@ def test_nearcorr(compare: type[Compare], xp: ModuleType) -> None:
     )
 
     x = glass.algorithm.nearcorr(a)
-    compare.assert_allclose(x, b, atol=0.0001)
+    compare.assert_allclose(x, b, atol=1e-4)
 
     # explicit tolerance
     x = glass.algorithm.nearcorr(a, tol=1e-10)
-    compare.assert_allclose(x, b, atol=0.0001)
+    compare.assert_allclose(x, b, atol=1e-4)
 
     # no iterations
     with pytest.warns(

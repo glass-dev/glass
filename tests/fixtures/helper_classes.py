@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -110,6 +109,8 @@ class GeneratorConsumer:
     @staticmethod
     def consume(
         generator: Generator[Any],
+        *,
+        valid_exception: str = "",
     ) -> list[Any]:
         """
         Generate and consume a generator returned by a given functions.
@@ -118,9 +119,11 @@ class GeneratorConsumer:
         exceptions swallowed.
         """
         output: list[Any] = []
-        with contextlib.suppress(ValueError):
+        try:
             # Consume in a loop, as we expect users to
             output.extend(iter(generator))
+        except ValueError as e:
+            assert str(e) == valid_exception  # noqa: PT017
         return output
 
 

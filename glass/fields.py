@@ -954,7 +954,7 @@ def lognormal_shift_hilbert2011(z: float) -> float:
         Lognormal shift.
 
     """
-    return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
+    return z * (8e-3 + z * (2.9e-2 + z * (-7.9e-3 + z * 6.5e-4)))
 
 
 def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:

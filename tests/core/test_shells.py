@@ -82,7 +82,7 @@ def test_density_weight(compare: type[Compare], cosmo: Cosmology) -> None:
 def test_tophat_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.tophat_windows`."""
     zb = xp.asarray([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
-    dz = 0.005
+    dz = 5e-3
 
     ws = glass.tophat_windows(zb, dz)
 
@@ -202,7 +202,7 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
 def test_restrict(uxpx: _utils.XPAdditions, xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
-    z = xp.linspace(0.0, 5.0, 1000)
+    z = xp.linspace(0.0, 5.0, 1_000)
     f = xp.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
 
     # window for restriction
@@ -268,11 +268,11 @@ def test_partition(
         glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
     ]
 
-    z = xp.linspace(0.0, 5.0, 1000)
+    z = xp.linspace(0.0, 5.0, 1_000)
     k = 1.0 + xp.reshape(xp.arange(6.0), (3, 2, 1))
     fz = xp.exp(-z / k)
 
-    assert fz.shape == (3, 2, 1000)
+    assert fz.shape == (3, 2, 1_000)
 
     part = glass.partition(z, fz, shells, method=method)
 
@@ -384,7 +384,7 @@ def test_combine(
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.combine`."""
-    z = xp.linspace(0.0, 5.0, 1000)
+    z = xp.linspace(0.0, 5.0, 1_000)
     weights = xp.asarray(
         [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183],
     )
