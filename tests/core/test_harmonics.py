@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 import healpy as hp
 import pytest
+import healpix
 
 import array_api_extra as xpx
 
@@ -70,7 +71,7 @@ def test_transform(compare: type[Compare], xp: ModuleType) -> None:
     nside = 8
 
     # create an unpolarised map where every pixel is the same
-    simple_map = xp.full(hp.nside2npix(nside), constant)
+    simple_map = xp.full(healpix.nside2npix(nside), constant)
 
     a00 = math.sqrt(4 * xp.pi) * constant
     # the alm array for lmax=0 has size 1, so it only contains a_00
