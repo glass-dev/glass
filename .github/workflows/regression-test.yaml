@@ -43,7 +43,7 @@ jobs:
       - name: Install only dev dependencies
         run: uv sync --only-dev
 
-      - name: Run regression tests
+      - name: Run regression test
         run: uv run nox -s regression_tests -- "$BASE_REF" "$HEAD_REF"
         env:
           ARRAY_BACKEND: all
