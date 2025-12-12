@@ -19,6 +19,7 @@ dev = [
 docs = [
     "array-api-strict",
     "cosmology.api",
+    "docutils",
     "furo",
     "ipython",
     "jax",
