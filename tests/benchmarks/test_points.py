@@ -47,7 +47,7 @@ def test_positions_from_delta(  # noqa: PLR0913
             f"glass.lensing.multi_plane_matrix not yet ported for {xpb.__name__}",
         )
     # create maps that saturate the batching in the function
-    nside = 4
+    nside = 256
     npix = 12 * nside * nside
 
     ngal = xpb.asarray([1e-3, 2e-3])
