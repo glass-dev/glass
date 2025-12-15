@@ -53,6 +53,7 @@ def test_redshifts_from_nz(
         za,
         wa,
         rng=urngb,
+        warn=False,
     )
     assert redshifts.shape == (13 * scale_factor,)
     assert xpb.min(redshifts) >= 0.0

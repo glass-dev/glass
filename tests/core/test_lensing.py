@@ -163,12 +163,12 @@ def test_deflect_nsew(
 
 
 def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
-    n = 1000
-    abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
-    arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
+    n = 1_000
+    abs_alpha = rng.uniform(0, 2 * math.pi, size=n)
+    arg_alpha = rng.uniform(-math.pi, math.pi, size=n)
 
-    lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
-    lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
+    lon_ = np.degrees(rng.uniform(-math.pi, math.pi, size=n))
+    lat_ = np.degrees(np.asin(rng.uniform(-1, 1, size=n)))
 
     lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 

@@ -403,8 +403,8 @@ def _generate_grf(
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        alm[:n].real += alm[:n].imag
-        alm[:n].imag[:] = 0
+        np.real(alm[:n])[:] += np.imag(alm[:n])
+        np.imag(alm[:n])[:] = 0
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -581,7 +581,7 @@ def spectra_indices(n: int) -> IntArray:
 
     """
     i, j = np.tril_indices(n)
-    return np.transpose([i, i - j])
+    return np.asarray([i, i - j]).T
 
 
 def effective_cls(
@@ -952,7 +952,7 @@ def lognormal_shift_hilbert2011(z: float) -> float:
         Lognormal shift.
 
     """
-    return z * (0.008 + z * (0.029 + z * (-0.0079 + z * 0.00065)))
+    return z * (8e-3 + z * (2.9e-2 + z * (-7.9e-3 + z * 6.5e-4)))
 
 
 def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:

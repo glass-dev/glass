@@ -19,6 +19,7 @@ Functions
 
 from __future__ import annotations
 
+import math
 import warnings
 from typing import TYPE_CHECKING
 
@@ -204,12 +205,12 @@ def galaxy_shear(  # noqa: PLR0913
     g = np.empty(size, dtype=complex)
 
     # get the lensing maps at galaxy position
-    for i in range(0, size, 10000):
-        s = slice(i, i + 10000)
+    for i in range(0, size, 10_000):
+        s = slice(i, i + 10_000)
         ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
         k[s] = kappa[ipix]
-        g.real[s] = gamma1[ipix]
-        g.imag[s] = gamma2[ipix]
+        np.real(g)[s] = gamma1[ipix]
+        np.imag(g)[s] = gamma2[ipix]
 
     if reduced_shear:
         # compute reduced shear in place
@@ -305,7 +306,7 @@ def gaussian_phz(  # noqa: PLR0913
     if lower is None and upper is not None:
         lower_arr = xp.zeros_like(upper_arr, dtype=xp.float64)
     if upper is None and lower is not None:
-        upper_arr = xp.full_like(lower_arr, fill_value=np.inf, dtype=xp.float64)
+        upper_arr = xp.full_like(lower_arr, fill_value=math.inf, dtype=xp.float64)
 
     sigma = xp.add(1, z_arr) * sigma_0_arr
     dims = sigma.shape

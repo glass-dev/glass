@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 # check if available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
-delta = 0.001  # Number of points in arrays
-my_max = 1000  # Typically number of galaxies in loop
+delta = 1e-3  # Number of points in arrays
+my_max = 1_000  # Typically number of galaxies in loop
 except_int = 750  # Where test exception occurs in loop
 filename = "MyFile.Fits"
 cls_file = "Cls.npz"
@@ -38,8 +38,8 @@ def test_read_write_cls(
         values = npz["values"]
         split = npz["split"]
 
-    compare.assert_array_equal(values, np.concatenate(cls))
-    compare.assert_array_equal(split, np.cumsum([len(cl) for cl in cls[:-1]]))
+    compare.assert_array_equal(values, np.concat(cls))
+    compare.assert_array_equal(split, np.cumulative_sum([len(cl) for cl in cls[:-1]]))
     compare.assert_array_equal(cls, np.split(values, split))
 
     npz = glass.load_cls(tmp_path / cls_file)
