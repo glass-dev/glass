@@ -70,7 +70,7 @@ def test_positions_from_delta(  # noqa: PLR0913
     lon, lat, cnt = data_transformer.catpos(pos, xp=np)
 
     assert isinstance(cnt, xpb.ndarray)
-    assert cnt.shape == (9, 2)
+    assert cnt.shape == (9, 10)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
 
