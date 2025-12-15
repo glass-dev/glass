@@ -212,10 +212,15 @@ def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
     assert cov2.dtype == xp.float64
     assert cov3.dtype == xp.float64
 
-    # cov1|2|3 reuse the same data, so should all equal the third result
-    compare.assert_allclose(cov1[:, 0], xp.asarray([0.45, 0.25, 0.15]))
-    compare.assert_allclose(cov1, cov2)
-    compare.assert_allclose(cov2, cov3)
+    # Jax enforces the creation of a copy rather than the reuse of memory.
+    if xp.__name__ != "jax.numpy":
+        # cov1|2|3 reuse the same data, so should all equal the third result
+        compare.assert_allclose(cov1[:, 0], xp.asarray([0.45, 0.25, 0.15]))
+        compare.assert_allclose(cov1, cov2)
+        compare.assert_allclose(cov2, cov3)
+    else:
+        compare.assert_allclose(cov1, cov1_copy)
+        compare.assert_allclose(cov2, cov2_copy)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
     compare.assert_allclose(cov1_copy[:, 0], xp.asarray([0.5, 0.25, 0.15]))
