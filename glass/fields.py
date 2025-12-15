@@ -403,8 +403,8 @@ def _generate_grf(
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        alm[:n].real += alm[:n].imag
-        alm[:n].imag[:] = 0
+        np.real(alm[:n])[:] += np.imag(alm[:n])
+        np.imag(alm[:n])[:] = 0
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -581,7 +581,7 @@ def spectra_indices(n: int) -> IntArray:
 
     """
     i, j = np.tril_indices(n)
-    return np.transpose([i, i - j])
+    return np.asarray([i, i - j]).T
 
 
 def effective_cls(

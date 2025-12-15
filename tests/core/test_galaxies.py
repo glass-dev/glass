@@ -157,9 +157,9 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
     )
 
     shear = glass.galaxy_shear(
-        np.array([]),
-        np.array([]),
-        np.array([]),
+        np.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
         kappa,
         gamma1,
         gamma2,
@@ -172,14 +172,14 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
         rng.normal(size=(512,)),
     )
     shear = glass.galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
-    assert np.shape(shear) == (512,)
+    assert shear.shape == (512,)
 
     # shape with no reduced shear
 
     shear = glass.galaxy_shear(
-        np.array([]),
-        np.array([]),
-        np.array([]),
+        np.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
         kappa,
         gamma1,
         gamma2,
@@ -201,7 +201,7 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
         gamma2,
         reduced_shear=False,
     )
-    assert np.shape(shear) == (512,)
+    assert shear.shape == (512,)
 
 
 def test_gaussian_phz(
