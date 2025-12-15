@@ -37,7 +37,7 @@ def test_multi_plane_matrix(
             xpb.asarray([0.0, 1.0, 0.0]),
             float(i + 1),
         )
-        for i in range(1000)
+        for i in range(1_000)
     ]
     mat = glass.multi_plane_matrix(shells, cosmo)
     deltas = urngb.random((len(shells), 10))
