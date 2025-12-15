@@ -47,8 +47,8 @@ def cosmo() -> Cosmology:  # noqa: D103
             :math:`x_M(z) = d_M(z)/d_H`
             """
             if z2 is None:
-                return np.array(z) * 1_000
-            return (np.array(z2) - np.array(z)) * 1_000
+                return np.asarray(z) * 1_000
+            return (np.asarray(z2) - np.asarray(z)) * 1_000
 
         def rho_m_z(self, z: FloatArray) -> FloatArray:
             """Redshift-dependent matter density in Msol Mpc-3."""
@@ -84,9 +84,19 @@ def cosmo() -> Cosmology:  # noqa: D103
 @pytest.fixture(scope="session")
 def shells() -> list[glass.RadialWindow]:  # noqa: D103
     return [
-        glass.RadialWindow(np.array([0.0, 1.0, 2.0]), np.array([0.0, 1.0, 0.0]), 1.0),
-        glass.RadialWindow(np.array([1.0, 2.0, 3.0]), np.array([0.0, 1.0, 0.0]), 2.0),
-        glass.RadialWindow(np.array([2.0, 3.0, 4.0]), np.array([0.0, 1.0, 0.0]), 3.0),
-        glass.RadialWindow(np.array([3.0, 4.0, 5.0]), np.array([0.0, 1.0, 0.0]), 4.0),
-        glass.RadialWindow(np.array([4.0, 5.0, 6.0]), np.array([0.0, 1.0, 0.0]), 5.0),
+        glass.RadialWindow(
+            np.asarray([0.0, 1.0, 2.0]), np.asarray([0.0, 1.0, 0.0]), 1.0
+        ),
+        glass.RadialWindow(
+            np.asarray([1.0, 2.0, 3.0]), np.asarray([0.0, 1.0, 0.0]), 2.0
+        ),
+        glass.RadialWindow(
+            np.asarray([2.0, 3.0, 4.0]), np.asarray([0.0, 1.0, 0.0]), 3.0
+        ),
+        glass.RadialWindow(
+            np.asarray([3.0, 4.0, 5.0]), np.asarray([0.0, 1.0, 0.0]), 4.0
+        ),
+        glass.RadialWindow(
+            np.asarray([4.0, 5.0, 6.0]), np.asarray([0.0, 1.0, 0.0]), 5.0
+        ),
     ]
