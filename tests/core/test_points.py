@@ -405,9 +405,9 @@ def test_displace_abs(
 
     th = (90.0 - lat) / 180 * xp.pi
     th_ = (90.0 - lat_) / 180 * xp.pi
-    delt = (lon - lon_) / 180 * xp.pi
+    delta = (lon - lon_) / 180 * xp.pi
 
-    cos_a = xp.cos(th) * xp.cos(th_) + xp.cos(delt) * xp.sin(th) * xp.sin(th_)
+    cos_a = xp.cos(th) * xp.cos(th_) + xp.cos(delta) * xp.sin(th) * xp.sin(th_)
 
     compare.assert_allclose(cos_a, xp.cos(abs_alpha))
 
