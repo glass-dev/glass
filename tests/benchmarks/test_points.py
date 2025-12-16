@@ -46,7 +46,6 @@ def test_positions_from_delta(  # noqa: PLR0913
         pytest.skip(
             f"glass.lensing.multi_plane_matrix not yet ported for {xpb.__name__}",
         )
-    # create maps that saturate the batching in the function
     nside = 48
     npix = 12 * nside * nside
 
@@ -73,8 +72,6 @@ def test_positions_from_delta(  # noqa: PLR0913
     assert cnt.shape == (9, 10)
     assert lon.shape == (cnt.sum(),)
     assert lat.shape == (cnt.sum(),)
-
-    # assert False
 
 
 @pytest.mark.stable
