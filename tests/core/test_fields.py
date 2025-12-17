@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
 
 import healpy as hp
@@ -15,6 +16,8 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from tests.fixtures.helper_classes import Compare
+
+HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 @pytest.fixture(scope="session")
@@ -139,13 +142,57 @@ def test_iternorm(xp: ModuleType) -> None:
     assert s.shape == (3,)
 
 
-def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
+@pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
+def test_cls2cov_jax(compare: type[Compare], jnp: ModuleType) -> None:
+    nl, nf, nc = 3, 3, 2
+
+    generator = glass.cls2cov(
+        [
+            jnp.asarray(arr)
+            for arr in [
+                [1.0, 0.5, 0.3],
+                [0.8, 0.4, 0.2],
+                [0.7, 0.6, 0.1],
+                [0.9, 0.5, 0.3],
+                [0.6, 0.3, 0.2],
+                [0.8, 0.7, 0.4],
+            ]
+        ],
+        nl,
+        nf,
+        nc,
+    )
+
+    cov1 = jnp.asarray(next(generator), copy=False)
+    cov2 = jnp.asarray(next(generator), copy=False)
+    cov3 = next(generator)
+
+    assert cov1.shape == (nl, nc + 1)
+    assert cov2.shape == (nl, nc + 1)
+    assert cov3.shape == (nl, nc + 1)
+
+    assert cov1.dtype == jnp.float64
+    assert cov2.dtype == jnp.float64
+    assert cov3.dtype == jnp.float64
+
+    # cov1 has the expected value for the first iteration (different to cov1_copy)
+    compare.assert_allclose(cov1[:, 0], jnp.asarray([0.5, 0.25, 0.15]))
+
+    # The copies should not be equal
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        compare.assert_allclose(cov1, cov2)
+
+    with pytest.raises(AssertionError, match="Not equal to tolerance"):
+        compare.assert_allclose(cov2, cov3)
+
+
+def test_cls2cov_no_jax(compare: type[Compare], xpb: ModuleType) -> None:
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],
+        [xpb.asarray([1.0, 0.5, 0.3]), None, xpb.asarray([0.7, 0.6, 0.1])],
         nl,
         nf,
         nc,
@@ -153,9 +200,9 @@ def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
     cov = next(generator)
 
     assert cov.shape == (nl, nc + 1)
-    assert cov.dtype == xp.float64
+    assert cov.dtype == xpb.float64
 
-    compare.assert_allclose(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    compare.assert_allclose(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
     compare.assert_allclose(cov[:, 1], 0)
     compare.assert_allclose(cov[:, 2], 0)
 
@@ -163,7 +210,7 @@ def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
 
     generator = glass.cls2cov(
         [
-            xp.asarray(arr)
+            xpb.asarray(arr)
             for arr in [
                 [-1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
@@ -183,7 +230,7 @@ def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
 
     generator = glass.cls2cov(
         [
-            xp.asarray(arr)
+            xpb.asarray(arr)
             for arr in [
                 [1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
@@ -198,32 +245,27 @@ def test_cls2cov(compare: type[Compare], xp: ModuleType) -> None:
         nc,
     )
 
-    cov1 = xp.asarray(next(generator), copy=False)
-    cov1_copy = xp.asarray(cov1, copy=True)
-    cov2 = xp.asarray(next(generator), copy=False)
-    cov2_copy = xp.asarray(cov2, copy=True)
+    cov1 = xpb.asarray(next(generator), copy=False)
+    cov1_copy = xpb.asarray(cov1, copy=True)
+    cov2 = xpb.asarray(next(generator), copy=False)
+    cov2_copy = xpb.asarray(cov2, copy=True)
     cov3 = next(generator)
 
     assert cov1.shape == (nl, nc + 1)
     assert cov2.shape == (nl, nc + 1)
     assert cov3.shape == (nl, nc + 1)
 
-    assert cov1.dtype == xp.float64
-    assert cov2.dtype == xp.float64
-    assert cov3.dtype == xp.float64
+    assert cov1.dtype == xpb.float64
+    assert cov2.dtype == xpb.float64
+    assert cov3.dtype == xpb.float64
 
-    # Jax enforces the creation of a copy rather than the reuse of memory.
-    if xp.__name__ != "jax.numpy":
-        # cov1|2|3 reuse the same data, so should all equal the third result
-        compare.assert_allclose(cov1[:, 0], xp.asarray([0.45, 0.25, 0.15]))
-        compare.assert_allclose(cov1, cov2)
-        compare.assert_allclose(cov2, cov3)
-    else:
-        compare.assert_allclose(cov1, cov1_copy)
-        compare.assert_allclose(cov2, cov2_copy)
+    # cov1|2|3 reuse the same data, so should all equal the third result
+    compare.assert_allclose(cov1[:, 0], xpb.asarray([0.45, 0.25, 0.15]))
+    compare.assert_allclose(cov1, cov2)
+    compare.assert_allclose(cov2, cov3)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    compare.assert_allclose(cov1_copy[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    compare.assert_allclose(cov1_copy[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
