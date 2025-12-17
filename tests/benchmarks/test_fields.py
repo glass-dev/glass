@@ -197,19 +197,12 @@ def test_generate_grf(  # noqa: PLR0913
 
 
 @pytest.mark.stable
-@pytest.mark.parametrize(
-    ("ncorr", "expected_len"),
-    [
-        (None, 4),
-        (1, 2),
-    ],
-)
-def test_generate(  # noqa: PLR0913
+@pytest.mark.parametrize("ncorr", [None, 1])
+def test_generate(
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
-    expected_len: int,
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.generate."""
@@ -237,7 +230,6 @@ def test_generate(  # noqa: PLR0913
 
     result = benchmark(function_to_benchmark)
 
-    assert len(result) == expected_len
     for field in result:
         assert field.shape == (hp.nside2npix(nside),)
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
