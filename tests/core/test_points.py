@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import healpix
@@ -339,7 +340,7 @@ def test_position_weights(
 def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
     """Test displace function with complex-valued displacement."""
     d = 5.0  # deg
-    r = d / 180 * xp.pi
+    r = d / 180 * math.pi
 
     # displace the origin so everything is easy
     lon0 = xp.asarray(0.0)
@@ -365,7 +366,7 @@ def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
 def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
     """Test displace function with real-valued argument."""
     d = 5.0  # deg
-    r = d / 180 * xp.pi
+    r = d / 180 * math.pi
 
     # displace the origin so everything is easy
     lon0 = xp.asarray(0.0)
@@ -395,17 +396,17 @@ def test_displace_abs(
 ) -> None:
     """Check that points are displaced by the correct angular distance."""
     n = 1_000
-    abs_alpha = urng.uniform(0, 2 * xp.pi, size=n)
-    arg_alpha = urng.uniform(-xp.pi, xp.pi, size=n)
+    abs_alpha = urng.uniform(0, 2 * math.pi, size=n)
+    arg_alpha = urng.uniform(-math.pi, math.pi, size=n)
 
-    lon_ = urng.uniform(-xp.pi, xp.pi, size=n) / xp.pi * 180
-    lat_ = xp.asin(urng.uniform(-1, 1, size=n)) / xp.pi * 180
+    lon_ = urng.uniform(-math.pi, math.pi, size=n) / math.pi * 180
+    lat_ = xp.asin(urng.uniform(-1, 1, size=n)) / math.pi * 180
 
     lon, lat = glass.displace(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
 
-    th = (90.0 - lat) / 180 * xp.pi
-    th_ = (90.0 - lat_) / 180 * xp.pi
-    delta = (lon - lon_) / 180 * xp.pi
+    th = (90.0 - lat) / 180 * math.pi
+    th_ = (90.0 - lat_) / 180 * math.pi
+    delta = (lon - lon_) / 180 * math.pi
 
     cos_a = xp.cos(th) * xp.cos(th_) + xp.cos(delta) * xp.sin(th) * xp.sin(th_)
 
@@ -419,11 +420,11 @@ def test_displacement(
 ) -> None:
     """Check that displacement of points is computed correctly."""
     # unit changes for displacements
-    deg5 = xp.asarray(5.0) / 180 * xp.pi
+    deg5 = xp.asarray(5.0) / 180 * math.pi
     north = xp.exp(xp.asarray(1j * 0.0))
-    east = xp.exp(xp.asarray(1j * (xp.pi / 2)))
-    south = xp.exp(xp.asarray(1j * xp.pi))
-    west = xp.exp(xp.asarray(1j * (3 * xp.pi / 2)))
+    east = xp.exp(xp.asarray(1j * (math.pi / 2)))
+    south = xp.exp(xp.asarray(1j * math.pi))
+    west = xp.exp(xp.asarray(1j * (3 * math.pi / 2)))
 
     zero = xp.asarray(0.0)
     five = xp.asarray(5.0)
