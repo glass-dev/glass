@@ -13,10 +13,6 @@ if TYPE_CHECKING:
 
 
 def test_multalm(compare: type[Compare], xp: ModuleType) -> None:
-    # Call jax version of iternorm once jax version is written
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in multalm are not immutable, so do not support jax")
-
     # check output values and shapes
 
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
