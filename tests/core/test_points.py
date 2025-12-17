@@ -464,7 +464,6 @@ def test_displacement_zerodist(
     xp: ModuleType,
 ) -> None:
     """Check that zero displacement is computed correctly."""
-
     lon = urng.uniform(-180.0, 180.0, size=100)
     lat = urng.uniform(-90.0, 90.0, size=100)
 
@@ -480,7 +479,6 @@ def test_displacement_consistent(
     xp: ModuleType,
 ) -> None:
     """Check displacement is consistent with displace."""
-
     n = 1000
 
     # magnitude and angle of displacement we want to achieve
@@ -509,7 +507,6 @@ def test_displacement_random(
     xp: ModuleType,
 ) -> None:
     """Check displacement for random points."""
-
     n = 1000
 
     # magnitude and angle of displacement we want to achieve
@@ -523,19 +520,22 @@ def test_displacement_random(
     # rotation matrix that moves (0, 0, 1) to theta and phi
     zero = xp.zeros(n)
     one = xp.ones(n)
-    rot = xp.asarray(
-        [
-            [xp.cos(phi), xp.sin(phi), zero],
-            [-xp.sin(phi), xp.cos(phi), zero],
-            [zero, zero, one],
-        ]
-    ).T @ xp.asarray(
-        [
-            [xp.cos(theta), zero, -xp.sin(theta)],
-            [zero, one, zero],
-            [xp.sin(theta), zero, xp.cos(theta)],
-        ]
-    ).T
+    rot = (
+        xp.asarray(
+            [
+                [xp.cos(phi), xp.sin(phi), zero],
+                [-xp.sin(phi), xp.cos(phi), zero],
+                [zero, zero, one],
+            ]
+        ).T
+        @ xp.asarray(
+            [
+                [xp.cos(theta), zero, -xp.sin(theta)],
+                [zero, one, zero],
+                [xp.sin(theta), zero, xp.cos(theta)],
+            ]
+        ).T
+    )
 
     # meta-check that rotation works by rotating (0, 0, 1) to theta and phi
     u = xp.asarray(
@@ -552,15 +552,18 @@ def test_displacement_random(
     compare.assert_allclose(xp.atan2(u[:, 1], u[:, 0]), phi)
 
     # build the displaced points near (0, 0, 1) and rotate near theta and phi
-    v = rot @ xp.asarray(
-        [
+    v = (
+        rot
+        @ xp.asarray(
             [
-                xp.sin(r) * xp.cos(xp.pi - x),
-                xp.sin(r) * xp.sin(xp.pi - x),
-                xp.cos(r),
+                [
+                    xp.sin(r) * xp.cos(xp.pi - x),
+                    xp.sin(r) * xp.sin(xp.pi - x),
+                    xp.cos(r),
+                ]
             ]
-        ]
-    ).T
+        ).T
+    )
 
     # compute displaced theta and phi
     theta_d = xp.atan2(xp.hypot(v[:, 0, 0], v[:, 1, 0]), v[:, 2, 0])
