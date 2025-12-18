@@ -498,7 +498,7 @@ def displace(
     #              cosθ cos|α| + sinθ sin|α| cosγ)
     # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
 
-    t = xp.asarray(lat) / 180 * xp.pi
+    t = xp.asarray(lat) / 180 * math.pi
     ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
 
     a = xp.hypot(alpha1, alpha2)  # abs(alpha)
