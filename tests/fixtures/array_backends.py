@@ -7,7 +7,6 @@ https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/sci
 
 from __future__ import annotations
 
-import contextlib
 import importlib.metadata
 import os
 from typing import TYPE_CHECKING
@@ -81,22 +80,12 @@ def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
 xp_available_backends: dict[str, ModuleType] = {}
 
 # if no backend passed, use numpy by default
-if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
+if not ARRAY_BACKEND or ARRAY_BACKEND in {"numpy", "all"}:
     _import_and_add_numpy(xp_available_backends)
-elif ARRAY_BACKEND == "array_api_strict":
+elif ARRAY_BACKEND in {"array_api_strict", "all"}:
     _import_and_add_array_api_strict(xp_available_backends)
-elif ARRAY_BACKEND == "jax":
+elif ARRAY_BACKEND in {"jax", "all"}:
     _import_and_add_jax(xp_available_backends)
-# if all, try importing every backend
-elif ARRAY_BACKEND == "all":
-    with contextlib.suppress(ImportError):
-        _import_and_add_numpy(xp_available_backends)
-
-    with contextlib.suppress(ImportError):
-        _import_and_add_array_api_strict(xp_available_backends)
-
-    with contextlib.suppress(ImportError):
-        _import_and_add_jax(xp_available_backends)
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
