@@ -27,6 +27,7 @@ import healpix
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
@@ -144,10 +145,12 @@ def redshifts_from_nz(
         cdf /= cdf[-1]
 
         # sample redshifts and store result
-        redshifts[total : total + count_out[k]] = uxpx.interp(
-            rng.uniform(0, 1, size=int(count_out[k])),
-            cdf,
-            z_out_slice,
+        redshifts = xpx.at(redshifts)[total : total + count_out[k]].set(
+            uxpx.interp(
+                rng.uniform(0, 1, size=int(count_out[k])),
+                cdf,
+                z_out_slice,
+            )
         )
         total += count_out[k]  # type: ignore[assignment]
 

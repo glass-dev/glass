@@ -18,8 +18,6 @@ if TYPE_CHECKING:
 
 
 def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in redshifts are not immutable, so do not support jax")
     # create a mock radial window function
     w = mocker.Mock()
     w.za = xp.linspace(0.0, 1.0, 20)
@@ -37,11 +35,6 @@ def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
 
 
 def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in redshifts_from_nz are not immutable, so do not support jax",
-        )
-
     # test sampling
 
     redshifts = glass.redshifts_from_nz(
