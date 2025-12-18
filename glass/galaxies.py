@@ -221,9 +221,8 @@ def galaxy_shear(  # noqa: PLR0913
         upper_bound = min(size, i + 10_000)
         s = slice(i, upper_bound)
         ipix = xp.asarray(healpix.ang2pix(nside, lon[s], lat[s], lonlat=True))
-        k[s] = kappa[ipix]
-        xp.real(g)[s] = gamma1[ipix]
-        xp.imag(g)[s] = gamma2[ipix]
+        k = xpx.at(k)[s].set(kappa[ipix])
+        g = xpx.at(g)[s].set(gamma1[ipix] + 1j * gamma2[ipix])
 
     if reduced_shear:
         # compute reduced shear in place
