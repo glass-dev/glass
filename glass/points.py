@@ -498,7 +498,7 @@ def displace(
     #              cosθ cos|α| + sinθ sin|α| cosγ)
     # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
 
-    t = xp.asarray(lat) / 180 * xp.pi
+    t = xp.asarray(lat) / 180 * math.pi
     ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
 
     a = xp.hypot(alpha1, alpha2)  # abs(alpha)
@@ -511,7 +511,7 @@ def displace(
 
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - d / xp.pi * 180, tp / xp.pi * 180
+    return lon - d / math.pi * 180, tp / math.pi * 180
 
 
 def displacement(
@@ -551,9 +551,9 @@ def displacement(
         use_compat=False,
     )
 
-    a = (90.0 - to_lat) / 180 * xp.pi
-    b = (90.0 - from_lat) / 180 * xp.pi
-    g = (from_lon - to_lon) / 180 * xp.pi
+    a = (90.0 - to_lat) / 180 * math.pi
+    b = (90.0 - from_lat) / 180 * math.pi
+    g = (from_lon - to_lon) / 180 * math.pi
 
     sa, ca = xp.sin(a), xp.cos(a)
     sb, cb = xp.sin(b), xp.cos(b)
