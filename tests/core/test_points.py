@@ -521,30 +521,33 @@ def test_displacement_random(
     # rotation matrix that moves (0, 0, 1) to theta and phi
     zero = xp.zeros(n)
     one = xp.ones(n)
-    rot = xp.stack(
-        [
-            xp.cos(phi), -xp.sin(phi), zero,
-            xp.sin(phi), xp.cos(phi), zero,
-            zero, zero, one,
-        ],
-        axis=1,
-    ).reshape(n, 3, 3) @ xp.stack(
+    rot_y = xp.stack(
         [
             xp.cos(theta), zero, xp.sin(theta),
             zero, one, zero,
             -xp.sin(theta), zero, xp.cos(theta),
         ],
         axis=1,
-    ).reshape(n, 3, 3)  # fmt: skip
+    )  # fmt: skip
+    rot_z = xp.stack(
+        [
+            xp.cos(phi), -xp.sin(phi), zero,
+            xp.sin(phi), xp.cos(phi), zero,
+            zero, zero, one,
+        ],
+        axis=1,
+    )  # fmt: skip
+    rot = xp.reshape(rot_z, (n, 3, 3)) @ xp.reshape(rot_y, (n, 3, 3))
 
     # meta-check that rotation works by rotating (0, 0, 1) to theta and phi
-    u = xp.asarray(
+    u = xp.stack(
         [
             xp.sin(theta) * xp.cos(phi),
             xp.sin(theta) * xp.sin(phi),
             xp.cos(theta),
-        ]
-    ).T
+        ],
+        axis=1,
+    )
     compare.assert_allclose(rot @ xp.asarray([0, 0, 1]), u)
 
     # meta-check that recovering theta and phi from vector works
