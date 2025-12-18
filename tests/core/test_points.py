@@ -249,7 +249,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     # test TypeError
 
-    with pytest.raises(TypeError, match="bias_model must be string or callable"):
+    with pytest.raises(TypeError, match="bias_model must be callable"):
         next(glass.positions_from_delta(ngal, delta, bias, vis, bias_model=0))
 
 
