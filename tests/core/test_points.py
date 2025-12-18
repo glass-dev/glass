@@ -469,7 +469,7 @@ def test_displacement_zerodist(
 
     compare.assert_allclose(
         glass.displacement(lon, lat, lon, lat),
-        xp.zeros(100, complex),
+        xp.zeros(100, dtype=complex),
     )
 
 
@@ -490,7 +490,7 @@ def test_displacement_consistent(
     from_lat = xp.asin(urng.uniform(-1.0, 1.0, size=n)) / xp.pi * 180.0
 
     # compute the intended displacement
-    alpha_in = r * np.exp(1j * x)
+    alpha_in = r * xp.exp(1j * x)
 
     # displace random points
     to_lon, to_lat = glass.displace(from_lon, from_lat, alpha_in)
@@ -520,22 +520,21 @@ def test_displacement_random(
     # rotation matrix that moves (0, 0, 1) to theta and phi
     zero = xp.zeros(n)
     one = xp.ones(n)
-    rot = (
-        xp.asarray(
-            [
-                [xp.cos(phi), xp.sin(phi), zero],
-                [-xp.sin(phi), xp.cos(phi), zero],
-                [zero, zero, one],
-            ]
-        ).T
-        @ xp.asarray(
-            [
-                [xp.cos(theta), zero, -xp.sin(theta)],
-                [zero, one, zero],
-                [xp.sin(theta), zero, xp.cos(theta)],
-            ]
-        ).T
-    )
+    rot = xp.stack(
+        [
+            xp.cos(phi), -xp.sin(phi), zero,
+            xp.sin(phi), xp.cos(phi), zero,
+            zero, zero, one,
+        ],
+        axis=1,
+    ).reshape(n, 3, 3) @ xp.stack(
+        [
+            xp.cos(theta), zero, xp.sin(theta),
+            zero, one, zero,
+            -xp.sin(theta), zero, xp.cos(theta),
+        ],
+        axis=1,
+    ).reshape(n, 3, 3)  # fmt: skip
 
     # meta-check that rotation works by rotating (0, 0, 1) to theta and phi
     u = xp.asarray(
