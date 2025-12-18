@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     ("bias", "bias_model"),
     [
         (None, lambda x: x),
-        (0.8, "linear"),
+        (0.8, glass.linear_bias),
     ],
 )
 @pytest.mark.parametrize("remove_monopole", [True, False])
@@ -38,7 +38,7 @@ def test_positions_from_delta(  # noqa: PLR0913
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
     bias: float,
-    bias_model: str | Callable[[int], int],
+    bias_model: Callable[[int], int],
     remove_monopole: bool,  # noqa: FBT001
 ) -> None:
     """Benchmarks for glass.positions_from_delta."""
