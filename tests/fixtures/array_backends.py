@@ -80,11 +80,16 @@ def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
 xp_available_backends: dict[str, ModuleType] = {}
 
 # if no backend passed, use numpy by default
-if not ARRAY_BACKEND or ARRAY_BACKEND in {"numpy", "all"}:
+if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     _import_and_add_numpy(xp_available_backends)
-elif ARRAY_BACKEND in {"array_api_strict", "all"}:
+elif ARRAY_BACKEND == "array_api_strict":
     _import_and_add_array_api_strict(xp_available_backends)
-elif ARRAY_BACKEND in {"jax", "all"}:
+elif ARRAY_BACKEND == "jax":
+    _import_and_add_jax(xp_available_backends)
+# if all, try importing every backend
+elif ARRAY_BACKEND == "all":
+    _import_and_add_numpy(xp_available_backends)
+    _import_and_add_array_api_strict(xp_available_backends)
     _import_and_add_jax(xp_available_backends)
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
