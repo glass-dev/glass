@@ -470,7 +470,7 @@ def test_displacement_zerodist(
 
     compare.assert_allclose(
         glass.displacement(lon, lat, lon, lat),
-        xp.zeros(100, dtype=complex),
+        xp.zeros(100),
     )
 
 
@@ -548,7 +548,7 @@ def test_displacement_random(
         ],
         axis=1,
     )
-    compare.assert_allclose(rot @ xp.asarray([0, 0, 1]), u)
+    compare.assert_allclose(rot @ xp.asarray([0.0, 0.0, 1.0]), u)
 
     # meta-check that recovering theta and phi from vector works
     compare.assert_allclose(xp.atan2(xp.hypot(u[:, 0], u[:, 1]), u[:, 2]), theta)
