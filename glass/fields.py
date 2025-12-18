@@ -424,7 +424,7 @@ def generate_gaussian(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -478,7 +478,7 @@ def generate_lognormal(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     Parameters
     ----------
