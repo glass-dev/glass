@@ -92,7 +92,7 @@ def solve(  # noqa: PLR0912, PLR0913
         gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
     else:
         gl = np.zeros(n)
-    gl[: len(initial)] = initial[:n]  # type: ignore[arg-type,index]
+        gl[: len(initial)] = initial[:n]  # type: ignore[arg-type,index]
 
     if monopole is not None:
         gl[0] = monopole
