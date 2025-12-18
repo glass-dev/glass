@@ -555,22 +555,20 @@ def test_displacement_random(
     compare.assert_allclose(xp.atan2(u[:, 1], u[:, 0]), phi)
 
     # build the displaced points near (0, 0, 1) and rotate near theta and phi
-    v = (
-        rot
-        @ xp.asarray(
-            [
-                [
-                    xp.sin(r) * xp.cos(xp.pi - x),
-                    xp.sin(r) * xp.sin(xp.pi - x),
-                    xp.cos(r),
-                ]
-            ]
-        ).T
+    v = xp.stack(
+        [
+            xp.sin(r) * xp.cos(xp.pi - x),
+            xp.sin(r) * xp.sin(xp.pi - x),
+            xp.cos(r),
+        ],
+        axis=1,
     )
+    v = rot @ xp.reshape(v, (n, 3, 1))
+    v = xp.reshape(v, (n, 3))
 
     # compute displaced theta and phi
-    theta_d = xp.atan2(xp.hypot(v[:, 0, 0], v[:, 1, 0]), v[:, 2, 0])
-    phi_d = xp.atan2(v[:, 1, 0], v[:, 0, 0])
+    theta_d = xp.atan2(xp.hypot(v[:, 0], v[:, 1]), v[:, 2])
+    phi_d = xp.atan2(v[:, 1], v[:, 0])
 
     # compute longitude and latitude
     from_lon = phi / xp.pi * 180.0
