@@ -82,8 +82,9 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          - numpy~=2.3.4
-          - jaxtyping~=0.3.3
+          - array-api-strict~=2.4.1
+          - jaxtyping~=0.3.4
+          - numpy~=2.2.6
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.2
     hooks:
