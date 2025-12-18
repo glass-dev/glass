@@ -257,11 +257,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = (
-            np.copy(delta[k])
-            if bias is None
-            else bias_model(delta[k], bias[k])
-        )
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
 
         # remove monopole if asked to
         if remove_monopole:
