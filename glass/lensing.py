@@ -415,7 +415,7 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: FloatArray = 0.0
+        self.delta3: FloatArray | None = None
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
         self.xp: ModuleType | None = None
@@ -436,7 +436,11 @@ class MultiPlaneConvergence:
         if self.xp is None:
             self.xp = input_xp
             self.uxpx = _utils.XPAdditions(xp=self.xp)
-            self.delta3 = self.xp.asarray(self.delta3)
+            self.delta3 = (
+                self.xp.asarray(0.0)
+                if self.delta3 is None
+                else self.xp.asarray(self.delta3)
+            )
         elif self.xp != input_xp:
             raise ValueError("Multiple array backends found")
 
