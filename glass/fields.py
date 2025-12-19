@@ -29,12 +29,12 @@ if TYPE_CHECKING:
 
 
 try:
-    from warnings import deprecated  # type:ignore[attr-defined]
+    from warnings import deprecated
 except ImportError:
     if TYPE_CHECKING:
         from glass._types import P, R
 
-    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type:ignore[no-redef]
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps  # noqa: PLC0415
         from warnings import warn  # noqa: PLC0415
