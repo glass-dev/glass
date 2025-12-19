@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
 
 import pytest
@@ -9,10 +10,14 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
 
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
+
+
+HAVE_NUMPY = importlib.util.find_spec("numpy") is not None
 
 
 class MockCosmology:
@@ -85,6 +90,12 @@ class MockCosmology:
     ) -> FloatArray:
         """Transverse comoving distance :math:`d_M(z)` in Mpc."""
         return self.hubble_distance * self.xm(z, z2)
+
+
+@pytest.fixture(scope="session")
+def generate_cosmo() -> Callable[[ModuleType], Cosmology]:
+    """Return a callable to generate a mock cosmology object."""
+    return lambda xp: MockCosmology(xp=xp)
 
 
 @pytest.fixture(scope="session")

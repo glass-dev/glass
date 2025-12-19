@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import math
 from typing import TYPE_CHECKING
 
@@ -10,11 +11,41 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
 
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
     from tests.fixtures.helper_classes import Compare
+
+
+HAVE_NUMPY = importlib.util.find_spec("numpy") is not None
+HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
+HAVE_JAX = importlib.util.find_spec("jax") is not None
+
+
+@pytest.mark.skipif(
+    not (HAVE_NUMPY and (HAVE_ARRAY_API_STRICT or HAVE_JAX)),
+    reason="test requires at least two array backends",
+)
+def test_multi_plane_convergence(
+    generate_cosmo: Callable[[ModuleType], Cosmology],
+) -> None:
+    """Unit tests for lensing.MultiPlaneConvergence."""
+    import numpy as np
+
+    if HAVE_ARRAY_API_STRICT:
+        import jax.numpy as xp
+    elif HAVE_JAX:
+        import array_api_strict as xp
+
+    convergence = glass.MultiPlaneConvergence(generate_cosmo(xp))
+    np_arr = np.zeros(2)
+    xp_arr = xp.zeros(2)
+    convergence._set_xp(np_arr)
+
+    with pytest.raises(ValueError, match="Multiple array backends found"):
+        convergence._set_xp(xp_arr)
 
 
 def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> None:
