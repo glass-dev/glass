@@ -421,7 +421,17 @@ class MultiPlaneConvergence:
         self.xp: ModuleType | None = None
 
     def _set_xp(self, *arrays: AnyArray) -> None:
-        """Sets the array backend for class objects."""
+        """
+        Sets the array backend for class objects.
+
+        Raises a ValueError if the provided arrays use an array backend
+        different to that which has already been set.
+
+        Parameters
+        ----------
+        arrays
+            Arrays to use to determine array backend.
+        """
         input_xp = array_api_compat.array_namespace(*arrays, use_compat=False)
         if self.xp is None:
             self.xp = input_xp
