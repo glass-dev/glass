@@ -109,7 +109,7 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
         return glass.jax.Generator(seed=seed)
 
     if xp.__name__ == "numpy":
-        return xp.random.default_rng(seed=seed)  # type: ignore[no-any-return]
+        return xp.random.default_rng(seed=seed)
 
     if xp.__name__ == "array_api_strict":
         return Generator(seed=seed)
@@ -171,7 +171,7 @@ class Generator:
             Array of random floats.
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def normal(
         self,
@@ -241,7 +241,7 @@ class Generator:
             Array of samples from the standard normal distribution.
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def uniform(
         self,
@@ -538,7 +538,7 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/649
         """
         if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
+            return self.xp.linalg.lstsq(a, b, rcond=rcond)
 
         if self.xp.__name__ == "array_api_strict":
             np = import_numpy(self.xp.__name__)
@@ -672,13 +672,13 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/671
         """
         if self.xp.__name__ == "numpy":
-            return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+            return self.xp.vectorize(pyfunc, otypes=otypes)
 
         if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(self.xp.__name__)
 
-            return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+            return np.vectorize(pyfunc, otypes=otypes)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
@@ -755,12 +755,12 @@ class XPAdditions:
 
         """
         if self.xp.__name__ == "numpy":
-            return self.xp.ndindex(shape)  # type: ignore[no-any-return]
+            return self.xp.ndindex(shape)
 
         if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
             np = import_numpy(self.xp.__name__)
 
-            return np.ndindex(shape)  # type: ignore[no-any-return]
+            return np.ndindex(shape)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

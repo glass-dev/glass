@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def _relerr(dx: AnyArray, x: AnyArray) -> float:
     """Compute the relative error max(|dx/x|)."""
     q = np.divide(dx, x, where=(dx != 0), out=np.zeros_like(dx))
-    return np.fabs(q).max()  # type: ignore[no-any-return]
+    return np.fabs(q).max()
 
 
 def solve(  # noqa: PLR0912, PLR0913

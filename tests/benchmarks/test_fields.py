@@ -31,7 +31,7 @@ def test_iternorm_no_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )
@@ -62,9 +62,9 @@ def test_iternorm_specify_size(
     elif num_dimensions == 2:
         list_input = [
             [
-                [1.0, 0.5, 0.5],  # type: ignore[list-item]
-                [0.5, 0.2, 0.1],  # type: ignore[list-item]
-                [0.5, 0.1, 0.2],  # type: ignore[list-item]
+                [1.0, 0.5, 0.5],
+                [0.5, 0.2, 0.1],
+                [0.5, 0.1, 0.2],
             ]
             for _ in range(10_000)
         ]
@@ -77,7 +77,7 @@ def test_iternorm_specify_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in), size)
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )
@@ -112,7 +112,7 @@ def test_iternorm_k_0(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     results = benchmark(function_to_benchmark)
 
@@ -140,7 +140,7 @@ def test_cls2cov(
             nf,
             nc,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     covs = benchmark(function_to_benchmark)
     cov = covs[0]
@@ -175,10 +175,10 @@ def test_generate_grf(  # noqa: PLR0913
         generator = glass.fields._generate_grf(
             gls,
             nside,
-            rng=urngb if use_rng else None,  # type: ignore[arg-type]
+            rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     gaussian_fields = benchmark(function_to_benchmark)
 
@@ -207,12 +207,12 @@ def test_generate(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.generate(
-            fields,  # type: ignore[arg-type]
+            fields,
             gls,
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )

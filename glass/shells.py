@@ -245,9 +245,9 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        uxpx = _utils.XPAdditions(self.xp)  # type: ignore[arg-type]
+        uxpx = _utils.XPAdditions(self.xp)
         if self.za.size > 0:
-            return uxpx.trapezoid(  # type: ignore[return-value]
+            return uxpx.trapezoid(
                 self.za * self.wa,
                 self.za,
             ) / uxpx.trapezoid(self.wa, self.za)
@@ -777,7 +777,7 @@ def partition_nnls(
 
     x = xp.stack(
         [
-            glass.algorithm.nnls(r, y[(*i, ...)])  # type: ignore[arg-type]
+            glass.algorithm.nnls(r, y[(*i, ...)])
             for i in itertools.product(*(range(d) for d in dims))
         ],
         axis=0,

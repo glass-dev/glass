@@ -34,7 +34,7 @@ except ImportError:
     if TYPE_CHECKING:
         from glass._types import P, R
 
-    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore[no-redef]
+    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps  # noqa: PLC0415
         from warnings import warn  # noqa: PLC0415
@@ -114,7 +114,7 @@ def iternorm(
 
     """
     # Convert to list here to allow determining the namespace
-    first = next(cov)  # type: ignore[call-overload]
+    first = next(cov)
     xp = first.__array_namespace__()
 
     n = (size,) if isinstance(size, int) else size
@@ -1057,7 +1057,7 @@ def regularized_spectra(
     elif method == "nearest":
         from glass.algorithm import cov_nearest as cov_method  # noqa: PLC0415
     else:
-        msg = f"unknown method '{method}'"  # type: ignore[unreachable]
+        msg = f"unknown method '{method}'"
         raise ValueError(msg)
 
     # get the cov matrix from spectra
