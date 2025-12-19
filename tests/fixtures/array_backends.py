@@ -7,7 +7,6 @@ https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/sci
 
 from __future__ import annotations
 
-import contextlib
 import importlib.metadata
 import os
 from typing import TYPE_CHECKING
@@ -89,14 +88,9 @@ elif ARRAY_BACKEND == "jax":
     _import_and_add_jax(xp_available_backends)
 # if all, try importing every backend
 elif ARRAY_BACKEND == "all":
-    with contextlib.suppress(ImportError):
-        _import_and_add_numpy(xp_available_backends)
-
-    with contextlib.suppress(ImportError):
-        _import_and_add_array_api_strict(xp_available_backends)
-
-    with contextlib.suppress(ImportError):
-        _import_and_add_jax(xp_available_backends)
+    _import_and_add_numpy(xp_available_backends)
+    _import_and_add_array_api_strict(xp_available_backends)
+    _import_and_add_jax(xp_available_backends)
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
@@ -113,14 +107,28 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
 
 
 @pytest.fixture(
-    params=[xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
+    params=[
+        xp
+        for name, xp in xp_available_backends.items()
+        if name not in {"array-api-strict", "jax.numpy"}
+    ],
     scope="session",
 )
 def xpb(request: pytest.FixtureRequest) -> ModuleType:
     """
-    Fixture for array backend.
+    Fixture for array backend to be used in benchmarks.
 
-    Access array library functions using `xp.` in tests.
+    Access array library functions using `xpb.` in tests.
+
+    We are excluding array-api-strict and jax for two reasons
+    1. Our use of array-api-strict is not for its performance but
+       for checking our interface with array libraries. Additionally,
+       users are unlikely to use array-api-strict with glass.
+       Therefore, it is not worth benchmarking with array-api-strict.
+    2. We did not previously support jax, therefore it does
+       not _yet_ make sense to regression test jax as there is
+       nothing to compare against, since jax is not supported by
+       the older versions of glass.
     """
     return request.param  # type: ignore[no-any-return]
 
