@@ -64,11 +64,15 @@ class MockCosmology:
         z2: FloatArray | None = None,
     ) -> FloatArray:
         """Comoving distance :math:`d_c(z)` in Mpc."""
-        return self.xm(z) / 1_000 if z2 is None else self.xm(z, z2) / 1_000
+        return (
+            self.xp.divide(self.xm(z), 1_000.0)
+            if z2 is None
+            else self.xp.divide(self.xm(z, z2), 1_000.0)
+        )
 
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
-        return 1_000 * (1 / (dc + self.xp.finfo(float).eps))
+        return 1_000 * (1 / (dc + self.xp.finfo(self.xp.float64).eps))
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""
