@@ -10,6 +10,8 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
 
@@ -82,21 +84,21 @@ def cosmo() -> Cosmology:  # noqa: D103
 
 
 @pytest.fixture(scope="session")
-def shells() -> list[glass.RadialWindow]:  # noqa: D103
+def shells(xp: ModuleType) -> list[glass.RadialWindow]:  # noqa: D103
     return [
         glass.RadialWindow(
-            np.asarray([0.0, 1.0, 2.0]), np.asarray([0.0, 1.0, 0.0]), 1.0
+            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 1.0
         ),
         glass.RadialWindow(
-            np.asarray([1.0, 2.0, 3.0]), np.asarray([0.0, 1.0, 0.0]), 2.0
+            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 2.0
         ),
         glass.RadialWindow(
-            np.asarray([2.0, 3.0, 4.0]), np.asarray([0.0, 1.0, 0.0]), 3.0
+            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 3.0
         ),
         glass.RadialWindow(
-            np.asarray([3.0, 4.0, 5.0]), np.asarray([0.0, 1.0, 0.0]), 4.0
+            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 4.0
         ),
         glass.RadialWindow(
-            np.asarray([4.0, 5.0, 6.0]), np.asarray([0.0, 1.0, 0.0]), 5.0
+            xp.asarray([4.0, 5.0, 6.0]), xp.asarray([0.0, 1.0, 0.0]), 5.0
         ),
     ]

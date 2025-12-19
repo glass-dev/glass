@@ -37,6 +37,7 @@ import healpy as hp
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 
@@ -44,7 +45,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    from glass._types import ComplexArray, FloatArray
+    from glass._types import AnyArray, ComplexArray, FloatArray
     from glass.cosmology import Cosmology
     from glass.shells import RadialWindow
 
@@ -414,9 +415,20 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: FloatArray = np.asarray(0.0)
+        self.delta3: FloatArray = 0.0
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
+        self.xp: ModuleType | None = None
+
+    def _set_xp(self, *arrays: AnyArray) -> None:
+        """Sets the array backend for closs objects."""
+        input_xp = array_api_compat.array_namespace(*arrays, use_compat=False)
+        if self.xp is None:
+            self.xp = input_xp
+            self.uxpx = _utils.XPAdditions(xp=self.xp)
+            self.delta3 = self.xp.asarray(self.delta3)
+        elif self.xp != input_xp:
+            raise ValueError("Multiple array backends found")
 
     def add_window(self, delta: FloatArray, w: RadialWindow) -> None:
         """
@@ -433,8 +445,12 @@ class MultiPlaneConvergence:
             The window function.
 
         """
+        self._set_xp(delta, w.wa, w.za, w.za)
+
         zsrc = w.zeff
-        lens_weight = float(np.trapezoid(w.wa, w.za) / np.interp(zsrc, w.za, w.wa))
+        lens_weight = float(
+            self.uxpx.trapezoid(w.wa, w.za) / self.uxpx.interp(zsrc, w.za, w.wa)
+        )
 
         self.add_plane(delta, zsrc, lens_weight)
 
@@ -462,6 +478,8 @@ class MultiPlaneConvergence:
             If the source redshift is not increasing.
 
         """
+        self._set_xp(delta, zsrc)
+
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
             raise ValueError(msg)
@@ -496,8 +514,8 @@ class MultiPlaneConvergence:
 
         # create kappa planes on first iteration
         if self.kappa2 is None:
-            self.kappa2 = np.zeros_like(delta)
-            self.kappa3 = np.zeros_like(delta)
+            self.kappa2 = self.xp.zeros_like(delta)  # type: ignore[union-attr]
+            self.kappa3 = self.xp.zeros_like(delta)  # type: ignore[union-attr]
 
         # cycle convergence planes
         # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
@@ -506,9 +524,10 @@ class MultiPlaneConvergence:
         self.kappa2, self.kappa3 = self.kappa3, self.kappa2
 
         # compute next convergence plane in place of last
+        t = self.xp.asarray(t)  # type: ignore[union-attr]
         self.kappa3 *= 1 - t
         self.kappa3 += t * self.kappa2
-        self.kappa3 += f * delta2
+        self.kappa3 += self.xp.asarray(f * delta2)  # type: ignore[union-attr]
 
     @property
     def zsrc(self) -> float | FloatArray:
@@ -550,11 +569,13 @@ def multi_plane_matrix(
         The matrix of lensing contributions.
 
     """
+    xp = shells[0].xp
+
     mpc = MultiPlaneConvergence(cosmo)
-    wmat = np.eye(len(shells))
+    wmat = xp.eye(len(shells))  # type: ignore[union-attr]
     for i, w in enumerate(shells):
-        mpc.add_window(wmat[i].copy(), w)
-        wmat[i, :] = mpc.kappa
+        mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)  # type: ignore[union-attr]
+        wmat = xpx.at(wmat)[i, :].set(mpc.kappa)
     return wmat
 
 
@@ -593,16 +614,18 @@ def multi_plane_weights(
         If the shape of *weights* does not match the number of shells.
 
     """
+    xp = array_api_compat.array_namespace(weights, use_compat=False)
+
     # ensure shape of weights ends with the number of shells
     shape = weights.shape
     if not shape or shape[0] != len(shells):
         msg = "shape mismatch between weights and shells"
         raise ValueError(msg)
     # normalise weights
-    weights = weights / np.sum(weights, axis=0)
+    weights = weights / xp.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
-    return np.matmul(mat.T, weights)
+    return xp.matmul(mat.T, weights)
 
 
 def deflect(

@@ -12,7 +12,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import FloatArray
+    from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
     from tests.fixtures.helper_classes import Compare
 
@@ -61,22 +61,25 @@ def test_shear_from_convergence() -> None:
 def test_multi_plane_matrix(
     compare: type[Compare],
     cosmo: Cosmology,
-    rng: np.random.Generator,
     shells: list[glass.RadialWindow],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
 ) -> None:
     mat = glass.multi_plane_matrix(shells, cosmo)
 
-    compare.assert_array_equal(mat, np.tril(mat))
-    compare.assert_array_equal(np.triu(mat, 1), 0)
+    compare.assert_array_equal(mat, xp.tril(mat))
+    compare.assert_array_equal(xp.triu(mat, k=1), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
-    deltas = rng.random((len(shells), 10))
+    deltas = urng.random((len(shells), 10))
     kappas = []
-    for shell, delta in zip(shells, deltas, strict=False):
+    for i in range(len(shells)):
+        shell = shells[i]
+        delta = deltas[i, ...]
         convergence.add_window(delta, shell)
         if convergence.kappa is not None:
-            kappas.append(convergence.kappa.copy())
+            kappas.append(xp.asarray(convergence.kappa, copy=True))
 
     compare.assert_allclose(mat @ deltas, kappas)
 
@@ -84,28 +87,35 @@ def test_multi_plane_matrix(
 def test_multi_plane_weights(
     compare: type[Compare],
     cosmo: Cosmology,
-    rng: np.random.Generator,
+    urng: UnifiedGenerator,
     shells: list[glass.RadialWindow],
+    xp: ModuleType,
 ) -> None:
-    w_in = np.eye(len(shells))
+    uxpx = glass._array_api_utils.XPAdditions(xp=xp)
+
+    w_in = xp.eye(len(shells))
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    compare.assert_array_equal(w_out, np.triu(w_out, 1))
-    compare.assert_array_equal(np.tril(w_out), 0)
+    compare.assert_array_equal(w_out, xp.triu(w_out, k=1))
+    compare.assert_array_equal(xp.tril(w_out), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
-    deltas = rng.random((len(shells), 10))
-    weights = rng.random((len(shells), 3))
+    deltas = urng.random((len(shells), 10))
+    weights = urng.random((len(shells), 3))
     kappa = 0
-    for shell, delta, weight in zip(shells, deltas, weights, strict=False):
+    for i in range(min(len(shells), deltas.shape[0], weights.shape[0])):
+        shell = shells[i]
+        delta = deltas[i, :]
+        weight = weights[i, :]
         convergence.add_window(delta, shell)
-        kappa = kappa + weight[..., None] * convergence.kappa
-    kappa /= weights.sum(axis=0)[..., None]
+        assert convergence.kappa is not None
+        kappa = kappa + weight[..., xp.newaxis] * convergence.kappa
+    kappa /= xp.sum(weights, axis=0)[..., xp.newaxis]
 
     wmat = glass.multi_plane_weights(weights, shells, cosmo)
 
-    compare.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    compare.assert_allclose(uxpx.einsum("ij,ik", wmat, deltas), kappa)
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
