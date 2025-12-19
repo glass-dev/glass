@@ -8,10 +8,10 @@ import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
+    from typing import Never
 
     from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
-    from typing_extensions import Never
 
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology

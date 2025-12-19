@@ -137,6 +137,7 @@ enable_error_code = [
     "truthy-bool",
 ]
 explicit_package_bases = true
+python_version = "3.14"
 strict = true
 warn_unreachable = true
 
@@ -175,6 +176,7 @@ show-fixes = true
 src = [
     "glass",
 ]
+target-version = "py314"
 lint.allowed-confusables = [
     "α",
     "γ",

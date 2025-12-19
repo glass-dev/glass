@@ -5,9 +5,6 @@ ci:
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
 
-default_language_version:
-  python: python3.10
-
 exclude: ^uv.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
