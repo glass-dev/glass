@@ -213,12 +213,12 @@ def cls2cov(
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and np.any(xp.less(cl, 0)):
+            if i == 0 and xp.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = cl.size
-            cov[:n, i] = cl
-            cov[n:, i] = 0
+            n = cl.shape[0]
+            cov = xpx.at(cov)[:n, i].set(cl)
+            cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
         yield cov
 
@@ -424,7 +424,7 @@ def generate_gaussian(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -478,7 +478,7 @@ def generate_lognormal(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     Parameters
     ----------

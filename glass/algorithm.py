@@ -235,7 +235,7 @@ def cov_nearest(
 
     Divides *cov* along rows and columns by the square root of the
     diagonal, then computes the nearest valid correlation matrix using
-    :func:`nearcorr`, before scaling rows and columns back.  The
+    :func:`glass.nearcorr`, before scaling rows and columns back.  The
     diagonal of the input is hence unchanged.
 
     Parameters
@@ -243,7 +243,7 @@ def cov_nearest(
     cov
         A square matrix (or a stack of matrices).
     tol
-        Tolerance for convergence, see :func:`nearcorr`.
+        Tolerance for convergence, see :func:`glass.nearcorr`.
     niter
         Maximum number of iterations.
 
