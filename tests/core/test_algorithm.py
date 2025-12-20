@@ -32,8 +32,8 @@ def test_nnls(
     res = glass.algorithm.nnls(a, y)
     assert xp.linalg.vector_norm((a @ res) - y) < 1e-7
 
-    a = urng.uniform(low=-10, high=10, size=[50, 10])
-    b = xp.abs(urng.uniform(low=-2, high=2, size=[10]))
+    a = urng.uniform(low=-10, high=10, size=(50, 10))
+    b = xp.abs(urng.uniform(low=-2, high=2, size=(10,)))
     b[::2] = 0
     x = a @ b
     res = glass.algorithm.nnls(
