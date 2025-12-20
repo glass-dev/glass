@@ -991,7 +991,7 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]
+        cov[: cl.size, i, j] = cov[: cl.size, j, i] = np.reshape(cl, -1)[:k]
 
     return cov
 
