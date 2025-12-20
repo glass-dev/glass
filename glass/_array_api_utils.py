@@ -297,7 +297,7 @@ class XPAdditions:
     def trapezoid(
         self,
         y: AnyArray,
-        x: AnyArray = None,
+        x: AnyArray | None = None,
         dx: float = 1.0,
         axis: int = -1,
     ) -> AnyArray:

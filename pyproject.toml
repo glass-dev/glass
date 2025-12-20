@@ -243,7 +243,11 @@ overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
 
-[tool.ty]
+# [tool.ty]
+# src.include = [
+#     "glass",
+#     "tests",
+# ]
 
 [[tool.ty.overrides]]
 include = [
@@ -251,7 +255,6 @@ include = [
 ]
 rules.invalid-argument-type = "ignore"
 rules.invalid-assignment = "ignore"
-rules.invalid-parameter-default = "ignore"
 rules.invalid-return-type = "ignore"
 rules.possibly-missing-attribute = "ignore"
 rules.unresolved-import = "ignore"
@@ -280,7 +283,3 @@ include = [
 rules.invalid-assignment = "ignore"
 rules.invalid-return-type = "ignore"
 rules.unsupported-operator = "ignore"
-src.include = [
-    "glass",
-    "tests",
-]
