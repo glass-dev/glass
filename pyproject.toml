@@ -256,8 +256,7 @@ include = [
 rules.invalid-argument-type = "ignore"
 rules.invalid-assignment = "ignore"
 rules.invalid-return-type = "ignore"
-# rules.possibly-missing-attribute = "ignore"
-rules.unresolved-import = "ignore"
+# rules.unresolved-import = "ignore"
 rules.unsupported-operator = "ignore"
 
 [[tool.ty.overrides]]

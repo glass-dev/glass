@@ -13,7 +13,8 @@ import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from typing import Unpack
+
+    from typing_extensions import Unpack
 
     from glass._types import AnyArray, FloatArray, IntArray
 
