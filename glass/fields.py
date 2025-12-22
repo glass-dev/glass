@@ -279,7 +279,7 @@ def discretized_cls(
                 n = min(len(cl), len(pw))
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
-    return gls
+    return gls  # ty: ignore[invalid-return-type]
 
 
 @deprecated("use glass.solve_gaussian_spectra() instead")
@@ -539,7 +539,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.size))
-    return cl
+    return cl  # ty: ignore[invalid-return-type]
 
 
 def enumerate_spectra(
@@ -751,7 +751,7 @@ def compute_gaussian_spectra(
     for i, j, cl in enumerate_spectra(spectra):
         gl = glass.grf.compute(cl, fields[i], fields[j]) if cl.size > 0 else 0 * cl
         gls.append(gl)
-    return gls
+    return gls  # ty: ignore[invalid-return-type]
 
 
 def solve_gaussian_spectra(
@@ -809,7 +809,7 @@ def solve_gaussian_spectra(
         else:
             gl = 0 * cl  # makes a copy of the empty array
         gls.append(gl)
-    return gls
+    return gls  # ty: ignore[invalid-return-type]
 
 
 def generate(
@@ -1067,4 +1067,4 @@ def regularized_spectra(
     cov = cov_method(cov, **method_kwargs)
 
     # return regularised spectra from cov matrix array
-    return [cov[:, i, j] for i, j in spectra_indices(cov.shape[-1])]
+    return [cov[:, i, j] for i, j in spectra_indices(cov.shape[-1])]  # ty: ignore[invalid-return-type]

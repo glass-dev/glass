@@ -79,7 +79,7 @@ def load_cls(
     with np.load(filename) as npz:
         values = npz["values"]
         split = npz["split"]
-    return np.split(values, split)
+    return np.split(values, split)  # ty: ignore[invalid-return-type]
 
 
 class _FitsWriter:

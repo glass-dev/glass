@@ -254,7 +254,6 @@ include = [
     "glass/**",
 ]
 rules.invalid-argument-type = "ignore"
-rules.invalid-return-type = "ignore"
 rules.unsupported-operator = "ignore"
 
 [[tool.ty.overrides]]
