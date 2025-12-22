@@ -261,7 +261,7 @@ def discretized_cls(
     """
     if ncorr is not None:
         n = nfields_from_nspectra(len(cls))
-        cls = [ # ty: ignore[invalid-assignment]
+        cls = [  # ty: ignore[invalid-assignment]
             cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
             for j in range(i + 1)

@@ -30,7 +30,9 @@ def _size(
     return (size,) if isinstance(size, int) else size
 
 
-def trapezoid(y: Array, x: Array | None = None, dx: Array | float = 1.0, axis: int = -1) -> Array:
+def trapezoid(
+    y: Array, x: Array | None = None, dx: Array | float = 1.0, axis: int = -1
+) -> Array:
     """Wrapper for jax.scipy.integrate.trapezoid."""
     return jax.scipy.integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 

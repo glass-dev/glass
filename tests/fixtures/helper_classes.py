@@ -93,7 +93,7 @@ class DataTransformer:
         for lo, la, co in pos:
             lon = xp.concat([lon, lo])
             lat = xp.concat([lat, la])
-            cnt = cnt + co # ty: ignore[unsupported-operator]
+            cnt = cnt + co  # ty: ignore[unsupported-operator]
         return lon, lat, cnt
 
 

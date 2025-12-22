@@ -242,22 +242,22 @@ trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
+# https://github.com/pappasam/toml-sort/issues/94
+overrides."tool.ty".first = [
+    "rules",
+    "src",
+]
 
 [tool.ty]
+rules.invalid-argument-type = "ignore"
 src.include = [
     "glass",
     "tests",
 ]
-rules.invalid-argument-type = "ignore"
 
 [[tool.ty.overrides]]
 include = [
     "glass/**",
-]
-rules.unsupported-operator = "ignore"
-
-[[tool.ty.overrides]]
-include = [
     "tests/core/**",
 ]
 rules.unsupported-operator = "ignore"
