@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from conftest import Compare, GeneratorConsumer
+    from conftest import Compare, GeneratorConsumer  # ty: ignore[unresolved-import]
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import UnifiedGenerator

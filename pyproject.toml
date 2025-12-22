@@ -261,7 +261,6 @@ include = [
     "tests/benchmarks/**",
 ]
 rules.invalid-argument-type = "ignore"
-rules.unresolved-import = "ignore"
 
 [[tool.ty.overrides]]
 include = [
