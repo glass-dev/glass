@@ -273,7 +273,7 @@ def ellipticity_gaussian(
         e *= sigma_broadcasted[k]
         r = xp.abs(e) > 1
         while xp.count_nonzero(r) > 0:
-            e[r] = _populate_random_complex_array(xp.count_nonzero(r), rng)
+            e[r] = _populate_random_complex_array(xp.count_nonzero(r), rng) # ty: ignore[invalid-assignment]
             e[r] *= sigma_broadcasted[k]
             r = xp.abs(e) > 1
         eps[i : i + count_broadcasted[k]] = e
