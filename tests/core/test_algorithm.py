@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import array_api_extra as xpx
+
 import glass.algorithm
 
 if TYPE_CHECKING:
@@ -21,9 +23,6 @@ def test_nnls(
     xp: ModuleType,
 ) -> None:
     """Unit tests for glass.algorithm.nnls."""
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in nnls are not immutable, so do not support jax")
-
     # check output
 
     a = xp.reshape(xp.arange(25.0), (-1, 5))
@@ -34,7 +33,7 @@ def test_nnls(
 
     a = urng.uniform(low=-10, high=10, size=(50, 10))
     b = xp.abs(urng.uniform(low=-2, high=2, size=(10,)))
-    b[::2] = 0
+    b = xpx.at(b)[::2].set(0)
     x = a @ b
     res = glass.algorithm.nnls(
         a,
