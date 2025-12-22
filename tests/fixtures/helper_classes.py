@@ -89,11 +89,11 @@ class DataTransformer:
         """Concatenate an array of pos into three arrays lon, lat and count."""
         lon = xp.empty(0)
         lat = xp.empty(0)
-        cnt: IntArray = 0
+        cnt: IntArray = 0  # ty: ignore[invalid-assignment]
         for lo, la, co in pos:
             lon = xp.concat([lon, lo])
             lat = xp.concat([lat, la])
-            cnt = cnt + co
+            cnt = cnt + co # ty: ignore[unsupported-operator]
         return lon, lat, cnt
 
 

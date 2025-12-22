@@ -243,37 +243,21 @@ overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
 
-# [tool.ty]
-# src.include = [
-#     "glass",
-#     "tests",
-# ]
+[tool.ty]
+src.include = [
+    "glass",
+    "tests",
+]
+rules.invalid-argument-type = "ignore"
 
 [[tool.ty.overrides]]
 include = [
     "glass/**",
 ]
-rules.invalid-argument-type = "ignore"
 rules.unsupported-operator = "ignore"
-
-[[tool.ty.overrides]]
-include = [
-    "tests/benchmarks/**",
-]
-rules.invalid-argument-type = "ignore"
 
 [[tool.ty.overrides]]
 include = [
     "tests/core/**",
 ]
-rules.invalid-argument-type = "ignore"
-# rules.possibly-missing-attribute = "ignore"
-rules.unsupported-operator = "ignore"
-
-[[tool.ty.overrides]]
-include = [
-    "tests/fixtures/**",
-]
-rules.invalid-assignment = "ignore"
-rules.invalid-return-type = "ignore"
 rules.unsupported-operator = "ignore"

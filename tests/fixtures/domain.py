@@ -64,7 +64,7 @@ def cosmo() -> Cosmology:  # noqa: D103
 
         def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
             """Inverse function for the comoving distance in Mpc."""
-            return 1_000 * (1 / (dc + np.finfo(float).eps))
+            return 1_000 * (1 / (dc + np.finfo(float).eps)) # ty: ignore[unsupported-operator]
 
         def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
             """Matter density parameter at redshift z."""
@@ -78,7 +78,7 @@ def cosmo() -> Cosmology:  # noqa: D103
             """Transverse comoving distance :math:`d_M(z)` in Mpc."""
             return self.hubble_distance * self.xm(z, z2)
 
-    return MockCosmology()
+    return MockCosmology()  # ty: ignore[invalid-return-type]
 
 
 @pytest.fixture(scope="session")
