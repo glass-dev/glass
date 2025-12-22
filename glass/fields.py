@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import sys
 import warnings
 from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
@@ -27,10 +28,9 @@ if TYPE_CHECKING:
 
     from glass._types import AnyArray, ComplexArray, FloatArray, IntArray, T
 
-
-try:
+if sys.version_info >= (3, 13):
     from warnings import deprecated
-except ImportError:
+else:
     if TYPE_CHECKING:
         from glass._types import P, R
 

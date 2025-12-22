@@ -256,7 +256,7 @@ include = [
 rules.invalid-argument-type = "ignore"
 rules.invalid-assignment = "ignore"
 rules.invalid-return-type = "ignore"
-rules.unresolved-import = "ignore"
+# rules.unresolved-import = "ignore"
 rules.unsupported-operator = "ignore"
 
 [[tool.ty.overrides]]
@@ -271,7 +271,7 @@ include = [
     "tests/core/**",
 ]
 rules.invalid-argument-type = "ignore"
-# rules.no-matching-overload = "ignore"
+rules.no-matching-overload = "ignore"
 rules.possibly-missing-attribute = "ignore"
 rules.unsupported-operator = "ignore"
 
