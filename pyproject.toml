@@ -244,9 +244,8 @@ overrides."tool.coverage.paths.source".inline_arrays = false
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
 
 [tool.ty]
-src.include = [
-    "glass",
-    "tests",
+src.exclude = [
+    "examples",
 ]
 rules.invalid-argument-type = "ignore"
 
