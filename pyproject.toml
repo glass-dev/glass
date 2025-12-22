@@ -137,6 +137,7 @@ enable_error_code = [
     "truthy-bool",
 ]
 explicit_package_bases = true
+python_version = "3.14"
 strict = true
 warn_unreachable = true
 
