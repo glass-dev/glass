@@ -136,8 +136,8 @@ def redshifts_from_nz(
 
     # go through extra dimensions; also works if dims is empty
     for k in uxpx.ndindex(dims):
-        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out  
-        z_out_slice = z_out[(*k, ...)] if k != () else z_out  
+        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
+        z_out_slice = z_out[(*k, ...)] if k != () else z_out
 
         # compute the CDF of each galaxy population
         cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
