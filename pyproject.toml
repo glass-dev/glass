@@ -267,8 +267,7 @@ include = [
     "tests/core/**",
 ]
 rules.invalid-argument-type = "ignore"
-rules.no-matching-overload = "ignore"
-rules.possibly-missing-attribute = "ignore"
+# rules.possibly-missing-attribute = "ignore"
 rules.unsupported-operator = "ignore"
 
 [[tool.ty.overrides]]

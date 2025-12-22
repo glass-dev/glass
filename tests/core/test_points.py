@@ -199,8 +199,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     )
 
     assert cnt.shape == (2,)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
+    assert lat.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
 
     # case: multi-dimensional delta
 
@@ -215,8 +215,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     )
 
     assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
+    assert lat.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
 
     # case: multi-dimensional broadcasting
 
@@ -231,8 +231,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     )
 
     assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
+    assert lat.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
 
     # case: only the southern hemisphere is visible
 
@@ -244,8 +244,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     )
 
     assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert lon.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
+    assert lat.shape == (cnt.sum(),)  # ty: ignore[possibly-missing-attribute]
 
     # test TypeError
 

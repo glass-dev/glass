@@ -76,7 +76,7 @@ def test_multi_plane_matrix(
     for shell, delta in zip(shells, deltas, strict=False):
         convergence.add_window(delta, shell)
         if convergence.kappa is not None:
-            kappas.append(convergence.kappa.copy())
+            kappas.append(convergence.kappa.copy())  # ty: ignore[possibly-missing-attribute]
 
     compare.assert_allclose(mat @ deltas, kappas)
 
