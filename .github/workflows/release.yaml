@@ -17,25 +17,6 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
 
-      - name: Replace stable version with the release version
-        if: github.event_name == 'release' && github.event.action == 'published'
-        run: |-
-          # store the release tag
-          tag="${{ github.ref_name }}"
-
-          # regex patterns
-          badge_pattern="s#(readthedocs\.org/projects/glass/badge/\?version=)stable#\1${tag}#g"
-          url_pattern="s#(glass\.readthedocs\.io.*?)/stable#\1/${tag}#g"
-
-          # perform the replacements
-          sed --in-place --regexp-extended \
-            --expression "$badge_pattern" \
-            --expression "$url_pattern" \
-            ${{ github.workspace }}/README.md
-
-          # store the tag since the git checkout is now dirty
-          echo "SETUPTOOLS_SCM_PRETEND_VERSION=${tag}" >> "$GITHUB_ENV"
-
       - uses: hynek/build-and-inspect-python-package@v2
 
   publish-pypi:
