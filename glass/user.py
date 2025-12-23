@@ -53,7 +53,7 @@ def save_cls(
         Angular matter power spectra in *GLASS* ordering.
 
     """
-    split = np.cumulative_sum([len(cl) for cl in cls[:-1]])  # type: ignore[arg-type]
+    split = np.cumulative_sum([len(cl) for cl in cls[:-1]])
     values = np.concatenate(cls)
     np.savez(filename, values=values, split=split)
 
@@ -79,7 +79,7 @@ def load_cls(
     with np.load(filename) as npz:
         values = npz["values"]
         split = npz["split"]
-    return np.split(values, split)
+    return np.split(values, split)  # ty: ignore[invalid-return-type]
 
 
 class _FitsWriter:

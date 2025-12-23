@@ -130,8 +130,8 @@ def gaussian_nz(
     mean = xp.asarray(mean, dtype=xp.float64)
     sigma = xp.asarray(sigma, dtype=xp.float64)
 
-    mean = xp.reshape(mean, mean.shape + (1,) * z.ndim)  # type: ignore[union-attr]
-    sigma = xp.reshape(sigma, sigma.shape + (1,) * z.ndim)  # type: ignore[union-attr]
+    mean = xp.reshape(mean, mean.shape + (1,) * z.ndim)
+    sigma = xp.reshape(sigma, sigma.shape + (1,) * z.ndim)
 
     nz = xp.exp(-(((z - mean) / sigma) ** 2) / 2)
     nz /= uxpx.trapezoid(nz, z, axis=-1)[..., xp.newaxis]
