@@ -77,13 +77,13 @@ def solve(  # noqa: PLR0912, PLR0913
 
     See Also
     --------
-    glass.grf.compute : Direct computation for band-limited spectra.
+    :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
     if t2 is None:
         t2 = t1
 
-    n = len(cl)
+    n = len(cl)  # type: ignore[arg-type]
     if pad < 0:
         msg = "pad must be a positive integer"
         raise ValueError(msg)
@@ -92,7 +92,7 @@ def solve(  # noqa: PLR0912, PLR0913
         gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
     else:
         gl = np.zeros(n)
-        gl[: len(initial)] = initial[:n]
+        gl[: len(initial)] = initial[:n]  # type: ignore[arg-type]
 
     if monopole is not None:
         gl[0] = monopole

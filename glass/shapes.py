@@ -24,6 +24,7 @@ Utilities
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import array_api_compat
@@ -98,7 +99,7 @@ def triaxial_axis_ratio(
     cos2_theta = rng.uniform(low=-1.0, high=1.0, size=size)
     cos2_theta *= cos2_theta
     sin2_theta = 1 - cos2_theta
-    cos2_phi = xp.cos(rng.uniform(low=0.0, high=2 * xp.pi, size=size))
+    cos2_phi = xp.cos(rng.uniform(low=0.0, high=2 * math.pi, size=size))
     cos2_phi *= cos2_phi
     sin2_phi = 1 - cos2_phi
 
@@ -194,10 +195,10 @@ def ellipticity_ryden04(  # noqa: PLR0913
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
     while xp.any(bad := eps > 0):
-        eps[bad] = rng.normal(mu[bad], sigma[bad])  #  type: ignore[index]
+        eps[bad] = rng.normal(mu[bad], sigma[bad])  #  type: ignore[assignment,index]
     gam = rng.normal(gamma, sigma_gamma, size=size)
     while xp.any(bad := (gam < 0) | (gam > 1)):
-        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])  #  type: ignore[index]
+        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])  #  type: ignore[assignment,index]
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -xp.expm1(eps)
@@ -207,7 +208,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     q = triaxial_axis_ratio(zeta, xi, rng=rng)
 
     # assemble ellipticity with random complex phase
-    e = xp.exp(1j * rng.uniform(0, 2 * xp.pi, size=q.shape))
+    e = xp.exp(1j * rng.uniform(0, 2 * math.pi, size=q.shape))
     e *= (1 - q) / (1 + q)
 
     # return the ellipticity

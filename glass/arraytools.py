@@ -13,7 +13,8 @@ import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from typing import Unpack
+
+    from typing_extensions import Unpack
 
     from glass._types import AnyArray, FloatArray, IntArray
 
@@ -186,8 +187,8 @@ def trapezoid_product(
     x, _ = f
     for x_, _ in ff:
         x = uxpx.union1d(
-            x[(x >= x_[0]) & (x <= x_[-1])],
-            x_[(x_ >= x[0]) & (x_ <= x[-1])],
+            x[(x >= x_[0]) & (x <= x_[-1])],  # type: ignore[index]
+            x_[(x_ >= x[0]) & (x_ <= x[-1])],  # type: ignore[index]
         )
     y = uxpx.interp(x, *f)
     for f_ in ff:

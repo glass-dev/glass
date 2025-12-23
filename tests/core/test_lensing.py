@@ -76,7 +76,7 @@ def test_multi_plane_matrix(
     for shell, delta in zip(shells, deltas, strict=False):
         convergence.add_window(delta, shell)
         if convergence.kappa is not None:
-            kappas.append(convergence.kappa.copy())
+            kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
 
     compare.assert_allclose(mat @ deltas, kappas)
 
@@ -164,11 +164,11 @@ def test_deflect_nsew(
 
 def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
     n = 1_000
-    abs_alpha = rng.uniform(0, 2 * np.pi, size=n)
-    arg_alpha = rng.uniform(-np.pi, np.pi, size=n)
+    abs_alpha = rng.uniform(0, 2 * math.pi, size=n)
+    arg_alpha = rng.uniform(-math.pi, math.pi, size=n)
 
-    lon_ = np.degrees(rng.uniform(-np.pi, np.pi, size=n))
-    lat_ = np.degrees(np.arcsin(rng.uniform(-1, 1, size=n)))
+    lon_ = np.degrees(rng.uniform(-math.pi, math.pi, size=n))
+    lat_ = np.degrees(np.asin(rng.uniform(-1, 1, size=n)))
 
     lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 

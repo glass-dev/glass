@@ -19,6 +19,7 @@ Functions
 
 from __future__ import annotations
 
+import math
 import warnings
 from typing import TYPE_CHECKING
 
@@ -135,8 +136,8 @@ def redshifts_from_nz(
 
     # go through extra dimensions; also works if dims is empty
     for k in uxpx.ndindex(dims):
-        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
-        z_out_slice = z_out[(*k, ...)] if k != () else z_out
+        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out  # type: ignore[arg-type]
+        z_out_slice = z_out[(*k, ...)] if k != () else z_out  # type: ignore[arg-type]
 
         # compute the CDF of each galaxy population
         cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
@@ -208,15 +209,15 @@ def galaxy_shear(  # noqa: PLR0913
         s = slice(i, i + 10_000)
         ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
         k[s] = kappa[ipix]
-        g.real[s] = gamma1[ipix]
-        g.imag[s] = gamma2[ipix]
+        np.real(g)[s] = gamma1[ipix]
+        np.imag(g)[s] = gamma2[ipix]
 
     if reduced_shear:
         # compute reduced shear in place
         g /= 1 - k
 
         # compute lensed ellipticities
-        g = (eps + g) / (1 + g.conj() * eps)
+        g = (eps + g) / (1 + g.conj() * eps)  # type: ignore[assignment]
     else:
         # simple sum of shears
         g += eps
@@ -305,7 +306,7 @@ def gaussian_phz(  # noqa: PLR0913
     if lower is None and upper is not None:
         lower_arr = xp.zeros_like(upper_arr, dtype=xp.float64)
     if upper is None and lower is not None:
-        upper_arr = xp.full_like(lower_arr, fill_value=np.inf, dtype=xp.float64)
+        upper_arr = xp.full_like(lower_arr, fill_value=math.inf, dtype=xp.float64)
 
     sigma = xp.add(1, z_arr) * sigma_0_arr
     dims = sigma.shape

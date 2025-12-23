@@ -423,7 +423,7 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: FloatArray = np.array(0.0)
+        self.delta3: FloatArray = np.asarray(0.0)
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
 
@@ -603,7 +603,7 @@ def multi_plane_weights(
 
     """
     # ensure shape of weights ends with the number of shells
-    shape = np.shape(weights)
+    shape = weights.shape
     if not shape or shape[0] != len(shells):
         msg = "shape mismatch between weights and shells"
         raise ValueError(msg)
@@ -627,7 +627,7 @@ def deflect(
     Apply deflections to positions.
 
     .. deprecated:: >2025.2
-       Use :func:`displace` instead.
+       Use :func:`glass.displace` instead.
 
     Takes an array of :term:`deflection` values and applies them
     to the given positions.

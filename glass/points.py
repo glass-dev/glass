@@ -38,6 +38,7 @@ Displacing points
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any
 
 import healpix
@@ -55,21 +56,20 @@ if TYPE_CHECKING:
 
     from glass._types import (
         ComplexArray,
-        DoubleArray,
         FloatArray,
         IntArray,
         UnifiedGenerator,
     )
 
 
-ARCMIN2_SPHERE = 60**6 // 100 / np.pi
+ARCMIN2_SPHERE = 60**6 // 100 / math.pi
 
 
 def effective_bias(
     z: FloatArray,
     bz: FloatArray,
     w: glass.shells.RadialWindow,
-) -> float | DoubleArray:
+) -> float | FloatArray:
     r"""
     Effective bias parameter from a redshift-dependent bias function.
 
@@ -162,7 +162,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias: float | FloatArray | None = None,
     vis: FloatArray | None = None,
     *,
-    bias_model: str | Callable[..., Any] = "linear",
+    bias_model: Callable[..., Any] = linear_bias,
     remove_monopole: bool = False,
     batch: int = 1_000_000,
     rng: np.random.Generator | None = None,
@@ -207,10 +207,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         Visibility map for the observed points. This is multiplied with
         the full sky number count map, and must hence be of compatible shape.
     bias_model
-        The bias model to apply. If a string, refers to a function in
-        the :mod:`~glass.points` module, e.g. ``'linear'`` for
-        :func:`glass.linear_bias()` or ``'glass.loglinear'`` for
-        :func:`glass.loglinear_bias`.
+        The bias model to apply. For examples, :func:`glass.linear_bias`
+        or :func:`glass.loglinear_bias`.
     remove_monopole
         If true, the monopole of the density contrast
         after biasing is fixed to zero.
@@ -239,13 +237,9 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     if rng is None:
         rng = np.random.default_rng(42)
 
-    # get the bias model
-    if isinstance(bias_model, str):
-        bias_model_callable = globals()[f"{bias_model}_bias"]
-    elif not callable(bias_model):
-        raise TypeError("bias_model must be string or callable")
-    else:
-        bias_model_callable = bias_model
+    # ensure bias_model is a function
+    if not callable(bias_model):
+        raise TypeError("bias_model must be callable")
 
     # broadcast inputs to common shape of extra dimensions
     inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
@@ -263,11 +257,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     # iterate the leading dimensions
     for k in np.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = (
-            np.copy(delta[k])
-            if bias is None
-            else bias_model_callable(delta[k], bias[k])
-        )
+        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
 
         # remove monopole if asked to
         if remove_monopole:
@@ -310,7 +300,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
-            q = np.cumsum(n[stop : stop + step])
+            q = np.cumulative_sum(n[stop : stop + step])
             # does this group of pixels fill the batch?
             if size + q[-1] < min(batch, count):
                 # no, we need the next group of pixels to fill the batch
@@ -498,7 +488,7 @@ def displace(
     #              cosθ cos|α| + sinθ sin|α| cosγ)
     # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
 
-    t = xp.asarray(lat) / 180 * xp.pi
+    t = xp.asarray(lat) / 180 * math.pi
     ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
 
     a = xp.hypot(alpha1, alpha2)  # abs(alpha)
@@ -511,7 +501,7 @@ def displace(
 
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - d / xp.pi * 180, tp / xp.pi * 180
+    return lon - d / math.pi * 180, tp / math.pi * 180
 
 
 def displacement(
@@ -551,9 +541,9 @@ def displacement(
         use_compat=False,
     )
 
-    a = (90.0 - to_lat) / 180 * xp.pi
-    b = (90.0 - from_lat) / 180 * xp.pi
-    g = (from_lon - to_lon) / 180 * xp.pi
+    a = (90.0 - to_lat) / 180 * math.pi
+    b = (90.0 - from_lat) / 180 * math.pi
+    g = (from_lon - to_lon) / 180 * math.pi
 
     sa, ca = xp.sin(a), xp.cos(a)
     sb, cb = xp.sin(b), xp.cos(b)
