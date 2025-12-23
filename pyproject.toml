@@ -1,6 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
+    "hatch-fancy-pypi-readme",
     "hatch-vcs",
     "hatchling",
 ]
@@ -73,6 +74,7 @@ dependencies = [
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
+    "readme",
     "version",
 ]
 license = "MIT"
@@ -91,7 +93,6 @@ optional-dependencies = {examples = [
     "jupyter",
     "matplotlib",
 ]}
-readme = "README.md"
 requires-python = ">=3.10"
 
 [project.urls]
@@ -128,6 +129,20 @@ build.targets.sdist.exclude = [
     "tests/*",
 ]
 version.source = "vcs"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = "/stable"
+replacement = "/v$HFPR_VERSION"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = "version=stable"
+replacement = "version=v$HFPR_VERSION"
 
 [tool.mypy]
 disallow_untyped_decorators = false
@@ -260,4 +275,8 @@ spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
+overrides."tool.hatch".first = [
+    "build",
+    "version",
+]
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
