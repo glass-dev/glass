@@ -27,8 +27,10 @@
 [![All Contributors](https://img.shields.io/github/all-contributors/glass-dev/glass?color=ee8449&style=flat-square)](#contributors)
 
 This is the core library for GLASS, the Generator for Large Scale Structure. For
-more information, see the full [documentation]. There are a number of [examples]
-to get you started.
+more information, see the full
+[documentation](https://glass.readthedocs.io/stable). There are a number of
+[examples](https://glass.readthedocs.io/stable/examples.html) to get you
+started.
 
 ## Installation
 
@@ -84,14 +86,11 @@ archivePrefix = {arXiv},
 The best way to get help about the code is currently to get in touch.
 
 If you would like to start a discussion with the wider GLASS community about
-e.g. a design decision or API change, you can use our [Discussions] page.
+e.g. a design decision or API change, you can use our
+[Discussions](https://github.com/orgs/glass-dev/discussions) page.
 
-We also have a public [Slack workspace] for discussions about the project.
-
-[documentation]: https://glass.readthedocs.io/stable
-[examples]: https://glass.readthedocs.io/stable/examples.html
-[Discussions]: https://github.com/orgs/glass-dev/discussions
-[Slack workspace]: https://glass-dev.github.io/slack
+We also have a public [Slack workspace](https://glass-dev.github.io/slack) for
+discussions about the project.
 
 ## Contributors
 
