@@ -5,9 +5,6 @@ ci:
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
 
-default_language_version:
-  python: python3.14
-
 exclude: ^uv.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -82,8 +79,9 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          - numpy~=2.3.4
-          - jaxtyping~=0.3.3
+          - array-api-strict~=2.4.1
+          - jaxtyping~=0.3.4
+          - numpy~=2.2.6
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.2
     hooks:

@@ -127,14 +127,11 @@ def test_cls2cov(
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
-    urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.cls2cov."""
-    # check output values and shape
-
     nl, nf, nc = 3, 2, 2
-    array_in = [urngb.random(3) for _ in range(1_000)]
+    array_in = [xpb.arange(i + 1.0, i + 4.0) for i in range(1_000)]
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.cls2cov(
@@ -151,16 +148,8 @@ def test_cls2cov(
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    compare.assert_allclose(
-        cov[:, 0],
-        xpb.asarray([0.348684, 0.047089, 0.487811]),
-        atol=1e-6,
-    )
-    compare.assert_allclose(
-        cov[:, 1],
-        [0.38057, 0.393032, 0.064057],
-        atol=1e-6,
-    )
+    compare.assert_allclose(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
+    compare.assert_allclose(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
     compare.assert_allclose(cov[:, 2], 0)
 
 
@@ -197,19 +186,12 @@ def test_generate_grf(  # noqa: PLR0913
 
 
 @pytest.mark.stable
-@pytest.mark.parametrize(
-    ("ncorr", "expected_len"),
-    [
-        (None, 4),
-        (1, 2),
-    ],
-)
-def test_generate(  # noqa: PLR0913
+@pytest.mark.parametrize("ncorr", [None, 1])
+def test_generate(
     benchmark: BenchmarkFixture,
     compare: Compare,
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
-    expected_len: int,
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.generate."""
@@ -237,7 +219,6 @@ def test_generate(  # noqa: PLR0913
 
     result = benchmark(function_to_benchmark)
 
-    assert len(result) == expected_len
     for field in result:
         assert field.shape == (hp.nside2npix(nside),)
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)

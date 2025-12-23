@@ -50,7 +50,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
         xp.asarray([1, 0, 0, 0, 0]),
         warn=False,
     )
-    assert xp.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert xp.all((redshifts >= 0) & (redshifts <= 1))
 
     redshifts = glass.redshifts_from_nz(
         10,
@@ -58,7 +58,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
         xp.asarray([0, 0, 1, 0, 0]),
         warn=False,
     )
-    assert xp.all((1 <= redshifts) & (redshifts <= 3))  # noqa: SIM300
+    assert xp.all((redshifts >= 1) & (redshifts <= 3))
 
     redshifts = glass.redshifts_from_nz(
         10,
@@ -66,7 +66,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
         xp.asarray([0, 0, 0, 0, 1]),
         warn=False,
     )
-    assert xp.all((3 <= redshifts) & (redshifts <= 4))  # noqa: SIM300
+    assert xp.all((redshifts >= 3) & (redshifts <= 4))
 
     redshifts = glass.redshifts_from_nz(
         10,
@@ -98,7 +98,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
     redshifts = glass.redshifts_from_nz(count, z, nz, warn=False)
 
     assert redshifts.shape == (count,)
-    assert xp.all((0 <= redshifts) & (redshifts <= 1))  # noqa: SIM300
+    assert xp.all((redshifts >= 0) & (redshifts <= 1))
 
     # case: extra dimensions from count
 
@@ -157,9 +157,9 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
     )
 
     shear = glass.galaxy_shear(
-        np.array([]),
-        np.array([]),
-        np.array([]),
+        np.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
         kappa,
         gamma1,
         gamma2,
@@ -172,14 +172,14 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
         rng.normal(size=(512,)),
     )
     shear = glass.galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
-    assert np.shape(shear) == (512,)
+    assert shear.shape == (512,)
 
     # shape with no reduced shear
 
     shear = glass.galaxy_shear(
-        np.array([]),
-        np.array([]),
-        np.array([]),
+        np.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
         kappa,
         gamma1,
         gamma2,
@@ -201,7 +201,7 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
         gamma2,
         reduced_shear=False,
     )
-    assert np.shape(shear) == (512,)
+    assert shear.shape == (512,)
 
 
 def test_gaussian_phz(

@@ -6,6 +6,7 @@ import warnings
 from typing import TYPE_CHECKING
 
 import array_api_compat
+import array_api_extra as xpx
 
 if TYPE_CHECKING:
     from glass._types import FloatArray
@@ -81,7 +82,7 @@ def nnls(
         m = int(index[~q][xp.argmax(w[~q])])
         if w[m] <= tol:
             break
-        q[m] = True
+        q = xpx.at(q)[m].set(True)
         while True:
             # Use `xp.task`` here instead of `a[:,q]` to mask the inner arrays, because
             # array-api requires a masking index to be the sole index, which would
@@ -94,10 +95,10 @@ def nnls(
             if not xp.any(t):
                 break
             alpha = -xp.min(xq[t] / (xq[t] - sq[t]))
-            x[q] += alpha * (sq - xq)
-            q[x <= 0] = False
-        x[q] = sq
-        x[~q] = 0
+            x = xpx.at(x)[q].add(alpha * (sq - xq))
+            q = xpx.at(q)[x <= 0].set(False)
+        x = xpx.at(x)[q].set(sq)
+        x = xpx.at(x)[~q].set(0)
     return x
 
 
@@ -234,7 +235,7 @@ def cov_nearest(
 
     Divides *cov* along rows and columns by the square root of the
     diagonal, then computes the nearest valid correlation matrix using
-    :func:`nearcorr`, before scaling rows and columns back.  The
+    :func:`glass.nearcorr`, before scaling rows and columns back.  The
     diagonal of the input is hence unchanged.
 
     Parameters
@@ -242,7 +243,7 @@ def cov_nearest(
     cov
         A square matrix (or a stack of matrices).
     tol
-        Tolerance for convergence, see :func:`nearcorr`.
+        Tolerance for convergence, see :func:`glass.nearcorr`.
     niter
         Maximum number of iterations.
 

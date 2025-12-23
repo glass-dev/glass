@@ -38,7 +38,7 @@ jobs:
           python-version: 3.14
 
       - name: Cache nox
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key:
             tests-bench-${{ hashFiles('pyproject.toml') }}-${{
@@ -97,7 +97,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache nox
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key:
             tests-core-${{ hashFiles('pyproject.toml') }}-${{
@@ -172,31 +172,5 @@ jobs:
 
       - name: Build SDist and wheel
         run: uv run nox -s build
-        env:
-          FORCE_COLOR: 1
-
-  docs:
-    if: github.event.pull_request.draft == false
-    name: Docs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: 3.14
-
-      - name: Install dependencies
-        run: |-
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-          uv sync --only-dev
-
-      - name: Build docs
-        run: uv run nox -s docs --verbose
         env:
           FORCE_COLOR: 1

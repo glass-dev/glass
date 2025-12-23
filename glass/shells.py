@@ -609,7 +609,7 @@ def partition(
     where :math:`\lambda` is a multiplier to enforce the integral
     constraints.
 
-    The :func:`glass.partition()` function implements a number of methods to
+    The :func:`glass.partition` function implements a number of methods to
     obtain a solution:
 
     If ``method="nnls"`` (the default), obtain a partition from a
@@ -813,7 +813,7 @@ def partition_restrict(
     uxpx = _utils.XPAdditions(xp)
 
     parts = []
-    for _, w in enumerate(shells):
+    for w in shells:
         zr, fr = restrict(z, fz, w)
         parts.append(uxpx.trapezoid(fr, zr, axis=-1))
     return xp.stack(parts)

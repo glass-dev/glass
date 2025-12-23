@@ -9,6 +9,7 @@ __all__ = [
     "RadialWindow",
     "VolumeWeight",
     "algorithm",
+    "arraytools",
     "check_posdef_spectra",
     "cls2cov",
     "combine",
@@ -78,7 +79,7 @@ with contextlib.suppress(ModuleNotFoundError):
     from ._version import __version__
 
 # modules
-from glass import algorithm, grf, harmonics
+from glass import algorithm, arraytools, grf, harmonics
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,

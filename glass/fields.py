@@ -213,12 +213,12 @@ def cls2cov(
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and np.any(xp.less(cl, 0)):
+            if i == 0 and xp.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = cl.size
-            cov[:n, i] = cl
-            cov[n:, i] = 0
+            n = cl.shape[0]
+            cov = xpx.at(cov)[:n, i].set(cl)
+            cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
         yield cov
 
@@ -260,7 +260,7 @@ def discretized_cls(
 
     """
     if ncorr is not None:
-        n = nfields_from_nspectra(len(cls))
+        n = nfields_from_nspectra(len(cls))  # type: ignore[arg-type]
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
@@ -272,11 +272,11 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if len(cl) > 0:
+        if len(cl) > 0:  # type: ignore[arg-type]
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl), len(pw))
+                n = min(len(cl), len(pw))  # type: ignore[arg-type]
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
@@ -308,7 +308,7 @@ def lognormal_gls(
         The Gaussian angular power spectra for a lognormal random field.
 
     """
-    n = nfields_from_nspectra(len(cls))
+    n = nfields_from_nspectra(len(cls))  # type: ignore[arg-type]
     fields = [glass.grf.Lognormal(shift) for _ in range(n)]
     return solve_gaussian_spectra(fields, cls)
 
@@ -331,7 +331,7 @@ def _generate_grf(
     realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
-    The ``gls`` array must contain the angular power power spectra of the
+    The ``gls`` array must contain the angular power spectra of the
     Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     Parameters
@@ -359,7 +359,7 @@ def _generate_grf(
         rng = np.random.default_rng(42)
 
     # number of gls and number of fields
-    ngls = len(gls)
+    ngls = len(gls)  # type: ignore[arg-type]
     ngrf = nfields_from_nspectra(ngls)
 
     # number of correlated fields if not specified
@@ -367,7 +367,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls), default=0)
+    n = max((len(gl) for gl in gls), default=0)  # type: ignore[arg-type]
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -403,8 +403,8 @@ def _generate_grf(
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        alm[:n].real += alm[:n].imag
-        alm[:n].imag[:] = 0
+        np.real(alm[:n])[:] += np.imag(alm[:n])
+        np.imag(alm[:n])[:] = 0
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -424,7 +424,7 @@ def generate_gaussian(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     A generator that iteratively samples HEALPix maps of Gaussian random fields
     with the given angular power spectra ``gls`` and resolution parameter
@@ -434,7 +434,7 @@ def generate_gaussian(
     realised fields are correlated. This saves memory, as only `ncorr` previous
     fields need to be kept.
 
-    The ``gls`` array must contain the angular power power spectra of the
+    The ``gls`` array must contain the angular power spectra of the
     Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     Parameters
@@ -459,7 +459,7 @@ def generate_gaussian(
         If all gls are empty.
 
     """
-    n = nfields_from_nspectra(len(gls))
+    n = nfields_from_nspectra(len(gls))  # type: ignore[arg-type]
     fields = [glass.grf.Normal() for _ in range(n)]
     yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
@@ -478,7 +478,7 @@ def generate_lognormal(
 
     .. deprecated:: 2025.1
 
-       Use :func:`glass.generate()` instead.
+       Use :func:`glass.generate` instead.
 
     Parameters
     ----------
@@ -499,7 +499,7 @@ def generate_lognormal(
         The lognormal random fields.
 
     """
-    n = nfields_from_nspectra(len(gls))
+    n = nfields_from_nspectra(len(gls))  # type: ignore[arg-type]
     fields = [glass.grf.Lognormal(shift) for _ in range(n)]
     yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
@@ -581,7 +581,7 @@ def spectra_indices(n: int) -> IntArray:
 
     """
     i, j = np.tril_indices(n)
-    return np.transpose([i, i - j])
+    return np.asarray([i, i - j]).T
 
 
 def effective_cls(
@@ -628,7 +628,7 @@ def effective_cls(
     uxpx = _utils.XPAdditions(xp)
 
     # this is the number of fields
-    n = nfields_from_nspectra(len(cls))
+    n = nfields_from_nspectra(len(cls))  # type: ignore[arg-type]
 
     # find lmax if not given
     if lmax is None:
@@ -743,7 +743,7 @@ def compute_gaussian_spectra(
 
     """
     n = len(fields)
-    if len(spectra) != n * (n + 1) // 2:
+    if len(spectra) != n * (n + 1) // 2:  # type: ignore[arg-type]
         msg = "mismatch between number of fields and spectra"
         raise ValueError(msg)
 
@@ -778,7 +778,7 @@ def solve_gaussian_spectra(
 
     """
     n = len(fields)
-    if len(spectra) != n * (n + 1) // 2:
+    if len(spectra) != n * (n + 1) // 2:  # type: ignore[arg-type]
         msg = "mismatch between number of fields and spectra"
         raise ValueError(msg)
 
@@ -830,7 +830,7 @@ def generate(
     The random fields are sampled from Gaussian random fields using the
     transformations in *fields*.
 
-    The *gls* array must contain the angular power power spectra of the
+    The *gls* array must contain the angular power spectra of the
     Gaussian random fields in :ref:`standard order <twopoint_order>`.
 
     The optional number *ncorr* limits how many realised fields are
@@ -858,7 +858,7 @@ def generate(
 
     """
     n = len(fields)
-    if len(gls) != n * (n + 1) // 2:
+    if len(gls) != n * (n + 1) // 2:  # type: ignore[arg-type]
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
@@ -888,8 +888,8 @@ def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:
     """
     n = nfields_from_nspectra(len(spectra))
 
-    comb = [(i, j) for i, j in spectra_indices(n)]
-    return [spectra[comb.index((i + k, i))] for k in range(n) for i in range(n - k)]
+    comb = {tuple(idx_tuple): pos for pos, idx_tuple in enumerate(spectra_indices(n))}
+    return [spectra[comb[(i + k, i)]] for k in range(n) for i in range(n - k)]
 
 
 def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
@@ -912,7 +912,7 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
     n = nfields_from_nspectra(len(spectra))
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
-    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
+    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]  # type: ignore[arg-type]
 
 
 def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
@@ -976,13 +976,10 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
 
     """
     # recover the number of fields from the number of spectra
-    n = nfields_from_nspectra(len(spectra))
+    n = nfields_from_nspectra(len(spectra))  # type: ignore[arg-type]
 
-    if lmax is None:  # noqa: SIM108
-        # maximum length in input spectra
-        k = max((cl.size for cl in spectra), default=0)
-    else:
-        k = lmax + 1
+    # first case: maximum length in input spectra
+    k = max((cl.size for cl in spectra), default=0) if lmax is None else lmax + 1
 
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
@@ -994,7 +991,7 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]
+        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
 
     return cov
 
