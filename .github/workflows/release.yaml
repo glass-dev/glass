@@ -16,26 +16,27 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-      - name: Replace stable version with the release version
+      - name: Extract version for PyPI
         if: github.event_name == 'release' && github.event.action == 'published'
+        run: VERSION="${{ github.ref_name }}"
+
+      - name: Set up uv
+        if: github.event_name == 'workflow_dispatch'
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+
+      - name: Extract version for TestPyPI
+        if: github.event_name == 'workflow_dispatch'
         run: |-
-          # store the release tag
-          tag="${{ github.ref_name }}"
+          RAW_VERSION=$(python -m hatchling version)
+          VERSION=$(echo "$RAW_VERSION" | cut -d+ -f1)
 
-          # regex patterns
-          badge_pattern="s#(readthedocs\.org/projects/glass/badge/\?version=)stable#\1${tag}#g"
-          url_pattern="s#(glass\.readthedocs\.io.*?)/stable#\1/${tag}#g"
-
-          # perform the replacements
-          sed --in-place --regexp-extended \
-            --expression "$badge_pattern" \
-            --expression "$url_pattern" \
-            ${{ github.workspace }}/README.md
-
-          # store the tag since the git checkout is now dirty
-          echo "SETUPTOOLS_SCM_PRETEND_VERSION=${tag}" >> "$GITHUB_ENV"
-
+      - name: Set build version
+        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> $GITHUB_ENV
       - uses: hynek/build-and-inspect-python-package@v2
 
   publish-pypi:
@@ -78,11 +79,6 @@ jobs:
 
       - name: List distributions to be deployed
         run: ls -l dist/
-
-      - name: Extract version
-        run: |-
-          VERSION=$(echo ls dist/*.whl | head -1 | cut -d- -f2 | cut -d+ -f1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Publish to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
