@@ -38,10 +38,6 @@ doctest = [
 lint = [
     "pre-commit",
 ]
-release = [
-    "hatch-vcs",
-    "hatchling",
-]
 test = [
     "cosmology.api",
     "fitsio",
