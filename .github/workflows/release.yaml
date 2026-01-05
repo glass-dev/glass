@@ -32,6 +32,7 @@ jobs:
       - name: Extract version for TestPyPI
         if: github.event_name == 'workflow_dispatch'
         run: |-
+          uv sync --only-group release
           RAW_VERSION=$(python -m hatchling version)
           VERSION=$(echo "$RAW_VERSION" | cut -d+ -f1)
 
