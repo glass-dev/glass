@@ -11,6 +11,8 @@ build = [
 ]
 dev = [
     "coverage[toml]",
+    "hatch-vcs",
+    "hatchling",
     "nox",
     "nox-uv",
     {include-group = "build"},
@@ -37,10 +39,6 @@ doctest = [
 ]
 lint = [
     "pre-commit",
-]
-release = [
-    "hatch-vcs",
-    "hatchling",
 ]
 test = [
     "cosmology.api",
