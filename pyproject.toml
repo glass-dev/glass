@@ -11,6 +11,8 @@ build = [
 ]
 dev = [
     "coverage[toml]",
+    "hatch-vcs",
+    "hatchling",
     "nox",
     "nox-uv",
     {include-group = "build"},

@@ -32,7 +32,7 @@ jobs:
       - name: Extract version for TestPyPI
         if: github.event_name == 'workflow_dispatch'
         run: |-
-          uv sync --only-group release
+          uv sync --only-dev
           RAW_VERSION=$(uv run hatchling version)
           VERSION=$(echo "$RAW_VERSION" | cut -d+ -f1)
 
@@ -61,6 +61,8 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
 
   publish-test-pypi:
     if: github.event_name == 'workflow_dispatch'
@@ -86,3 +88,4 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true
+          verbose: true
