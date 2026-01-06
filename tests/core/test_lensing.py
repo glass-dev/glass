@@ -199,7 +199,9 @@ def test_deflect_nsew(
     compare.assert_allclose(lat, 0.0, atol=1e-15)
 
     # No inputs are arrays and xp not provided
-    with pytest.raises(TypeError, match="Unrecognized array input"):
+    with pytest.raises(
+        TypeError, match="array_namespace requires at least one non-scalar array input"
+    ):
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 
 

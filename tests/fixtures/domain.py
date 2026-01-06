@@ -114,18 +114,28 @@ def cosmob(xpb: ModuleType) -> Cosmology:
 def shells(xp: ModuleType) -> list[glass.RadialWindow]:  # noqa: D103
     return [
         glass.RadialWindow(
-            xp.asarray([0.0, 1.0, 2.0]), xp.asarray([0.0, 1.0, 0.0]), 1.0
+            np.asarray([0.0, 1.0, 2.0]),
+            np.asarray([0.0, 1.0, 0.0]),
+            1.0,
         ),
         glass.RadialWindow(
-            xp.asarray([1.0, 2.0, 3.0]), xp.asarray([0.0, 1.0, 0.0]), 2.0
+            np.asarray([1.0, 2.0, 3.0]),
+            np.asarray([0.0, 1.0, 0.0]),
+            2.0,
         ),
         glass.RadialWindow(
-            xp.asarray([2.0, 3.0, 4.0]), xp.asarray([0.0, 1.0, 0.0]), 3.0
+            np.asarray([2.0, 3.0, 4.0]),
+            np.asarray([0.0, 1.0, 0.0]),
+            3.0,
         ),
         glass.RadialWindow(
-            xp.asarray([3.0, 4.0, 5.0]), xp.asarray([0.0, 1.0, 0.0]), 4.0
+            np.asarray([3.0, 4.0, 5.0]),
+            np.asarray([0.0, 1.0, 0.0]),
+            4.0,
         ),
         glass.RadialWindow(
-            xp.asarray([4.0, 5.0, 6.0]), xp.asarray([0.0, 1.0, 0.0]), 5.0
+            np.asarray([4.0, 5.0, 6.0]),
+            np.asarray([0.0, 1.0, 0.0]),
+            5.0,
         ),
     ]
