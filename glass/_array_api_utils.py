@@ -348,45 +348,6 @@ class XPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def union1d(self, ar1: AnyArray, ar2: AnyArray) -> AnyArray:
-        """
-        Compute the set union of two 1D arrays.
-
-        Parameters
-        ----------
-        ar1
-            First input array.
-        ar2
-            Second input array.
-
-        Returns
-        -------
-            The union of the two arrays.
-
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
-        Notes
-        -----
-        See https://github.com/glass-dev/glass/issues/647
-        """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.union1d(ar1, ar2)
-
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            ar1_np = np.asarray(ar1, copy=True)
-            ar2_np = np.asarray(ar2, copy=True)
-            result_np = np.union1d(ar1_np, ar2_np)
-            return self.xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
-
     def interp(  # noqa: PLR0913
         self,
         x: AnyArray,
