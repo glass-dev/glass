@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: 3.14
 
-      - name: Extract version for TestPyPI
+      - name: Set build version for TestPyPI
         if: github.event_name == 'workflow_dispatch'
         run: |-
           uv sync --only-dev
