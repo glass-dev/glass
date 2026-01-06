@@ -156,7 +156,266 @@ def loglinear_bias(
     return xp.expm1(delta_g)
 
 
-def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
+def _broadcast_inputs(
+    bias: float | FloatArray | None,
+    delta: FloatArray,
+    ngal: float | FloatArray,
+    vis: FloatArray | None,
+) -> tuple[
+    float | FloatArray | None,
+    FloatArray,
+    tuple[int, ...],
+    float | FloatArray,
+    FloatArray | None,
+]:
+    """
+    Broadcast inputs to common shape of extra dimensions.
+
+    Figure out how many "populations" of objects we are
+    dealing with, by broadcasting all inputs together.
+
+    Parameters
+    ----------
+    bias
+        Bias parameter, is passed as an argument to the bias model.
+    delta
+        Map of the input density contrast. This is fed into the bias
+        model to produce the density contrast for sampling.
+    ngal
+        Number density, expected number of points per arcmin2.
+    vis
+        Visibility map for the observed points. This is multiplied with
+        the full sky number count map, and must hence be of compatible shape.
+
+    Returns
+    -------
+        _description_
+    """
+    inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
+    if bias is not None:
+        inputs.append((bias, 0))
+    if vis is not None:
+        inputs.append((vis, 1))
+    dims, *rest = glass.arraytools.broadcast_leading_axes(*inputs)
+    ngal, delta, *rest = rest
+    if bias is not None:
+        bias, *rest = rest
+    if vis is not None:
+        vis, *rest = rest
+
+    return bias, delta, dims, ngal, vis
+
+
+def _compute_density_contrast(
+    bias: float | FloatArray | None,
+    bias_model: Callable[..., Any],
+    delta: FloatArray,
+    k: tuple[int, ...],
+) -> FloatArray:
+    """
+    Compute density contrast from bias model, or copy.
+
+    Applies the bias model to ``delta``.
+
+    Parameters
+    ----------
+    bias
+        Bias parameter, is passed as an argument to the bias model.
+    bias_model
+        The bias model to apply. For examples, :func:`glass.linear_bias`
+        or :func:`glass.loglinear_bias`.
+    delta
+        Map of the input density contrast. This is fed into the bias
+        model to produce the density contrast for sampling.
+    k
+        _description_
+
+    Returns
+    -------
+        _description_
+    """
+    return np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index]
+
+
+def _compute_expected_count(
+    k: tuple[int, ...],
+    n: FloatArray,
+    ngal: float | FloatArray,
+    *,
+    remove_monopole: bool,
+) -> FloatArray:
+    """
+    Computes the expected number of objects per pixel.
+
+    Parameters
+    ----------
+    k
+        _description_
+    n
+        _description_
+    ngal
+        Number density, expected number of points per arcmin2.
+    remove_monopole
+        If true, the monopole of the density contrast
+        after biasing is fixed to zero.
+
+    Returns
+    -------
+        _description_
+    """
+    # remove monopole if asked to
+    if remove_monopole:
+        n -= np.mean(n, keepdims=True)
+
+    # turn into number count, modifying the array in place
+    n += 1
+    n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
+    return n
+
+
+def _apply_visibility(
+    k: tuple[int, ...],
+    n: FloatArray,
+    vis: FloatArray | None,
+) -> FloatArray:
+    """
+    Apply visibility if given.
+
+    Parameters
+    ----------
+    k
+        _description_
+    n
+        _description_
+    vis
+        Visibility map for the observed points. This is multiplied with
+        the full sky number count map, and must hence be of compatible shape.
+
+    Returns
+    -------
+        _description_
+    """
+    if vis is not None:
+        n *= vis[k]
+    return n
+
+
+def _sample_number_galaxies(
+    n: FloatArray,
+    rng: np.random.Generator,
+) -> IntArray:
+    """
+    Sample the actual number of galaxies in each
+    pixel from the Poisson distribution.
+
+    Parameters
+    ----------
+    n
+        _description_
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Returns
+    -------
+        _description_
+    """
+    # clip number density at zero
+    np.clip(n, 0, None, out=n)  # type: ignore[arg-type,type-var]
+
+    # sample actual number in each pixel
+    return rng.poisson(n)
+
+
+def _sample_galaxies_per_pixel(
+    batch: int,
+    dims: tuple[int, ...],
+    k: tuple[int, ...],
+    n: FloatArray,
+    rng: np.random.Generator,
+) -> Generator[
+    tuple[
+        FloatArray,
+        FloatArray,
+        int | IntArray,
+    ]
+]:
+    """
+    Sample the individual galaxies in each pixel,
+    randomly distributed over sub pixels, in batches.
+
+    Parameters
+    ----------
+    batch
+        Maximum number of positions to yield in one batch.
+    dims
+        _description_
+    k
+        _description_
+    n
+        _description_
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Yields
+    ------
+    lon
+        Columns of longitudes for the sampled points.
+    lat
+        Columns of latitudes for the sampled points.
+    count
+        The number of sampled points  If multiple populations are sampled, an
+        array of counts in the shape of the extra dimensions is returned.
+    """
+    # total number of points
+    count = n.sum()  # type: ignore[union-attr]
+    # don't go through pixels if there are no points
+    if count == 0:
+        return
+
+    # for converting randomly sampled positions to HEALPix indices
+    npix = n.shape[-1]
+    nside = healpix.npix2nside(npix)
+
+    # create a mask to report the count in the right axis
+    cmask: int | IntArray
+    if dims:
+        cmask = np.zeros(dims, dtype=int)
+        cmask[k] = 1
+    else:
+        cmask = 1
+
+    # sample the map in batches
+    step = 1_000
+    start, stop, size = 0, 0, 0
+    while count:
+        # tally this group of pixels
+        q = np.cumulative_sum(n[stop : stop + step])
+        # does this group of pixels fill the batch?
+        if size + q[-1] < min(batch, count):
+            # no, we need the next group of pixels to fill the batch
+            stop += step
+            size += q[-1]
+        else:
+            # how many pixels from this group do we need?
+            stop += int(np.searchsorted(q, batch - size, side="right"))
+            # if the first pixel alone is too much, use it anyway
+            if stop == start:
+                stop += 1
+            # sample this batch of pixels
+            ipix = np.repeat(np.arange(start, stop), n[start:stop])  # type: ignore[arg-type]
+            lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
+            # next batch
+            start, size = stop, 0
+            # keep track of remaining number of points
+            count -= ipix.size
+            # yield the batch
+            yield lon, lat, ipix.size * cmask
+
+    # make sure that the correct number of pixels was sampled
+    assert np.sum(n[stop:]) == 0  # noqa: S101
+
+
+def positions_from_delta(  # noqa: PLR0913
     ngal: float | FloatArray,
     delta: FloatArray,
     bias: float | FloatArray | None = None,
@@ -241,89 +500,19 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     if not callable(bias_model):
         raise TypeError("bias_model must be callable")
 
-    # broadcast inputs to common shape of extra dimensions
-    inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
-    if bias is not None:
-        inputs.append((bias, 0))
-    if vis is not None:
-        inputs.append((vis, 1))
-    dims, *rest = glass.arraytools.broadcast_leading_axes(*inputs)
-    ngal, delta, *rest = rest
-    if bias is not None:
-        bias, *rest = rest
-    if vis is not None:
-        vis, *rest = rest
+    bias, delta, dims, ngal, vis = _broadcast_inputs(bias, delta, ngal, vis)
 
     # iterate the leading dimensions
     for k in np.ndindex(dims):
-        # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
+        n = _compute_density_contrast(bias, bias_model, delta, k)
 
-        # remove monopole if asked to
-        if remove_monopole:
-            n -= np.mean(n, keepdims=True)
+        n = _compute_expected_count(k, n, ngal, remove_monopole=remove_monopole)
 
-        # turn into number count, modifying the array in place
-        n += 1
-        n *= ARCMIN2_SPHERE / n.size * ngal[k]
+        n = _apply_visibility(k, n, vis)
 
-        # apply visibility if given
-        if vis is not None:
-            n *= vis[k]
+        n = _sample_number_galaxies(n, rng)
 
-        # clip number density at zero
-        np.clip(n, 0, None, out=n)
-
-        # sample actual number in each pixel
-        n = rng.poisson(n)
-
-        # total number of points
-        count = n.sum()
-        # don't go through pixels if there are no points
-        if count == 0:
-            continue
-
-        # for converting randomly sampled positions to HEALPix indices
-        npix = n.shape[-1]
-        nside = healpix.npix2nside(npix)
-
-        # create a mask to report the count in the right axis
-        cmask: int | IntArray
-        if dims:
-            cmask = np.zeros(dims, dtype=int)
-            cmask[k] = 1
-        else:
-            cmask = 1
-
-        # sample the map in batches
-        step = 1_000
-        start, stop, size = 0, 0, 0
-        while count:
-            # tally this group of pixels
-            q = np.cumulative_sum(n[stop : stop + step])
-            # does this group of pixels fill the batch?
-            if size + q[-1] < min(batch, count):
-                # no, we need the next group of pixels to fill the batch
-                stop += step
-                size += q[-1]
-            else:
-                # how many pixels from this group do we need?
-                stop += int(np.searchsorted(q, batch - size, side="right"))
-                # if the first pixel alone is too much, use it anyway
-                if stop == start:
-                    stop += 1
-                # sample this batch of pixels
-                ipix = np.repeat(np.arange(start, stop), n[start:stop])
-                lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
-                # next batch
-                start, size = stop, 0
-                # keep track of remaining number of points
-                count -= ipix.size
-                # yield the batch
-                yield lon, lat, ipix.size * cmask
-
-        # make sure that the correct number of pixels was sampled
-        assert np.sum(n[stop:]) == 0  # noqa: S101
+        yield from _sample_galaxies_per_pixel(batch, dims, k, n, rng)
 
 
 def uniform_positions(
