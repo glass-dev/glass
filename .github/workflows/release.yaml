@@ -21,7 +21,7 @@ jobs:
 
       - name: Extract version for PyPI
         if: github.event_name == 'release' && github.event.action == 'published'
-        run: VERSION="${{ github.ref_name }}"
+        run: echo "VERSION=${{ github.ref_name }}" >> "$GITHUB_ENV"
 
       - name: Set up uv
         if: github.event_name == 'workflow_dispatch'
@@ -34,10 +34,11 @@ jobs:
         run: |-
           uv sync --only-dev
           RAW_VERSION=$(uv run hatchling version)
-          VERSION=$(echo "$RAW_VERSION" | cut -d+ -f1)
+          echo "VERSION=$(echo "$RAW_VERSION" | cut -d+ -f1)" >> "$GITHUB_ENV"
 
       - name: Set build version
-        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> $GITHUB_ENV
+        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> "$GITHUB_ENV"
+
       - uses: hynek/build-and-inspect-python-package@v2
 
   publish-pypi:
