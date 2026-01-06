@@ -29,8 +29,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |-
           uv sync --only-dev
-          RAW_VERSION=$(uv run hatchling version)
-          VERSION=$(echo "$RAW_VERSION" | cut -d+ -f1)
+          VERSION=$(uv run hatchling version | cut -d+ -f1)
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - uses: hynek/build-and-inspect-python-package@v2
