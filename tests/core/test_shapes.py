@@ -17,7 +17,8 @@ def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
     # Pass floats without xp
 
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         glass.triaxial_axis_ratio(0.8, 0.4)
 
@@ -71,7 +72,8 @@ def test_ellipticity_ryden04(urng: UnifiedGenerator, xp: ModuleType) -> None:
     # Pass floats without xp
 
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
 
@@ -142,7 +144,8 @@ def test_ellipticity_gaussian(
     # Pass floats without xp
 
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         glass.ellipticity_gaussian(n, 0.256)
 
@@ -188,7 +191,8 @@ def test_ellipticity_intnorm(
     # Pass non-arrays without xp
 
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         glass.ellipticity_intnorm(n, 0.256)
 
