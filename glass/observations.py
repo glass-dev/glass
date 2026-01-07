@@ -49,6 +49,8 @@ def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, ...] = (30, 90),
     ecliptic: tuple[float, ...] = (20, 80),
+    *,
+    xp: ModuleType = np,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -89,7 +91,7 @@ def vmap_galactic_ecliptic(
     m[hp.query_strip(nside, *galactic)] = 0
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m[hp.query_strip(nside, *ecliptic)] = 0
-    return hp.Rotator(coord="CE").rotate_map_pixel(m)
+    return xp.asarray(hp.Rotator(coord="CE").rotate_map_pixel(m))
 
 
 def gaussian_nz(
