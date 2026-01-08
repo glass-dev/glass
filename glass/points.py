@@ -234,7 +234,9 @@ def _compute_density_contrast(
     -------
         The density contrast after biasing.
     """
-    return np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index]
+    xp = array_api_compat.array_namespace(delta, bias, use_compat=False)
+
+    return xp.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index]
 
 
 def _compute_expected_count(
@@ -263,9 +265,11 @@ def _compute_expected_count(
     -------
         Expected number of objects per pixel.
     """
+    xp = array_api_compat.array_namespace(n, ngal, use_compat=False)
+
     # remove monopole if asked to
     if remove_monopole:
-        n -= np.mean(n, keepdims=True)
+        n -= xp.mean(n, keepdims=True)
 
     # turn into number count, modifying the array in place
     n += 1
@@ -319,8 +323,10 @@ def _sample_number_galaxies(
     -------
         The sampled number of galaxies per pixel.
     """
+    xp = n.__array_namespace__()
+
     # clip number density at zero
-    np.clip(n, 0, None, out=n)  # type: ignore[arg-type,type-var]
+    xp.clip(n, 0, None, out=n)  # type: ignore[arg-type,type-var]
 
     # sample actual number in each pixel
     return rng.poisson(n)
@@ -366,8 +372,10 @@ def _sample_galaxies_per_pixel(
         The number of sampled points  If multiple populations are sampled, an
         array of counts in the shape of the extra dimensions is returned.
     """
+    xp = n.__array_namespace__()
+
     # total number of points
-    count = n.sum()  # type: ignore[union-attr]
+    count = xp.sum(n)  # type: ignore[union-attr]
     # don't go through pixels if there are no points
     if count == 0:
         return
@@ -379,7 +387,7 @@ def _sample_galaxies_per_pixel(
     # create a mask to report the count in the right axis
     cmask: int | IntArray
     if dims:
-        cmask = np.zeros(dims, dtype=int)
+        cmask = xp.zeros(dims, dtype=int)
         cmask[k] = 1
     else:
         cmask = 1
@@ -389,7 +397,7 @@ def _sample_galaxies_per_pixel(
     start, stop, size = 0, 0, 0
     while count:
         # tally this group of pixels
-        q = np.cumulative_sum(n[stop : stop + step])
+        q = xp.cumulative_sum(n[stop : stop + step])
         # does this group of pixels fill the batch?
         if size + q[-1] < min(batch, count):
             # no, we need the next group of pixels to fill the batch
@@ -397,12 +405,12 @@ def _sample_galaxies_per_pixel(
             size += q[-1]
         else:
             # how many pixels from this group do we need?
-            stop += int(np.searchsorted(q, batch - size, side="right"))
+            stop += int(xp.searchsorted(q, batch - size, side="right"))
             # if the first pixel alone is too much, use it anyway
             if stop == start:
                 stop += 1
             # sample this batch of pixels
-            ipix = np.repeat(np.arange(start, stop), n[start:stop])  # type: ignore[arg-type]
+            ipix = xp.repeat(xp.arange(start, stop), n[start:stop])  # type: ignore[arg-type]
             lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
             # next batch
             start, size = stop, 0
@@ -412,7 +420,7 @@ def _sample_galaxies_per_pixel(
             yield lon, lat, ipix.size * cmask
 
     # make sure that the correct number of pixels was sampled
-    assert np.sum(n[stop:]) == 0  # noqa: S101
+    assert xp.sum(n[stop:]) == 0  # noqa: S101
 
 
 def positions_from_delta(  # noqa: PLR0913
