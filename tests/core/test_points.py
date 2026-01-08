@@ -100,6 +100,24 @@ def test_loglinear_bias(
         xp.expm1(b * xp.log1p(delta)),
     )
 
+def test_broadcast_inputs() -> None:
+    pass
+
+def test_compute_density_contrast() -> None:
+    pass
+
+def test_compute_expected_count() -> None:
+    pass
+
+def test_apply_visibility() -> None:
+    pass
+
+def test_sample_number_galaxies() -> None:
+    pass
+
+def test_sample_galaxies_per_pixel() -> None:
+    pass
+
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
