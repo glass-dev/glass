@@ -58,7 +58,7 @@ class Compare:
     @staticmethod
     def assert_equal(actual: AnyArray, desired: AnyArray) -> None:
         """Check if two objects are not equal."""
-        np.testing.assert_equal(actual, desired)
+        np.testing.assert_equal(np.asarray(actual), np.asarray(desired))
 
 
 @pytest.fixture(scope="session")

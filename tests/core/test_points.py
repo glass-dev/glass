@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass.points
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -100,20 +101,50 @@ def test_loglinear_bias(
         xp.expm1(b * xp.log1p(delta)),
     )
 
-def test_broadcast_inputs() -> None:
-    pass
+
+def test_broadcast_inputs(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    bias_in = 0.8
+    delta_in = xp.zeros(12)
+    ngal_in = xp.asarray([1e-3, 2e-3])
+    vis_in = xp.ones(12)
+
+    bias, delta, dims, ngal, vis = glass.points._broadcast_inputs(
+        bias_in,
+        delta_in,
+        ngal_in,
+        vis_in,
+    )
+
+    assert dims == ngal_in.shape
+    assert bias.shape == dims
+    assert xp.all(bias == bias_in)
+    assert delta.shape[0] == dims[0]
+    assert delta.shape[1] == delta_in.shape[0]
+    compare.assert_equal(delta, xp.zeros_like(delta))
+    compare.assert_equal(ngal, ngal_in)
+    assert vis.shape[0] == dims[0]
+    assert vis.shape[1] == vis_in.shape[0]
+    compare.assert_equal(vis, xp.ones_like(vis))
+
 
 def test_compute_density_contrast() -> None:
     pass
 
+
 def test_compute_expected_count() -> None:
     pass
+
 
 def test_apply_visibility() -> None:
     pass
 
+
 def test_sample_number_galaxies() -> None:
     pass
+
 
 def test_sample_galaxies_per_pixel() -> None:
     pass
