@@ -360,7 +360,7 @@ def ellipticity_intnorm(
             xp.asarray(1.0, dtype=e.dtype),
         )
 
-        eps[i : i + count_broadcasted[k]] = e
+        eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
     return eps

@@ -167,11 +167,6 @@ def test_ellipticity_intnorm(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_intnorm are not immutable, so do not support jax",
-        )
-
     n = 1_000_000
 
     eps = glass.ellipticity_intnorm(n, 0.256, xp=xp)
