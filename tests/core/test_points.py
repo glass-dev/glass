@@ -11,7 +11,9 @@ import glass
 import glass.points
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
+    from typing import Any
 
     from numpy.typing import NDArray
     from pytest_mock import MockerFixture
@@ -130,8 +132,35 @@ def test_broadcast_inputs(
     compare.assert_equal(vis, xp.ones_like(vis))
 
 
-def test_compute_density_contrast() -> None:
-    pass
+@pytest.mark.parametrize(
+    "bias_model",
+    [
+        glass.linear_bias,
+        glass.loglinear_bias,
+    ],
+)
+def test_compute_density_contrast(
+    bias_model: Callable[..., Any],
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    import array_api_strict
+    xp = array_api_strict
+
+    bias = xp.asarray([0.8, 0.8])
+    bias_model = glass.linear_bias
+    delta = xp.zeros((2, 12))
+    k = (0,)
+
+    n = glass.points._compute_density_contrast(
+        bias,
+        bias_model,
+        delta,
+        k,
+    )
+
+    assert n.shape[0] == delta.shape[1]
+    compare.assert_equal(n, xp.zeros_like(n))
 
 
 def test_compute_expected_count() -> None:

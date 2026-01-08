@@ -236,7 +236,8 @@ def _compute_density_contrast(
     """
     xp = array_api_compat.array_namespace(delta, bias, use_compat=False)
 
-    return xp.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index]
+    idx = (*k, ...)
+    return xp.copy(delta[idx]) if bias is None else bias_model(delta[idx], bias[idx])  # type: ignore[index]
 
 
 def _compute_expected_count(
