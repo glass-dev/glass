@@ -228,7 +228,7 @@ def _compute_density_contrast(
         Map of the input density contrast. This is fed into the bias
         model to produce the density contrast for sampling.
     k
-        _description_
+        Indices for the extra dimensions.
 
     Returns
     -------
@@ -250,9 +250,9 @@ def _compute_expected_count(
     Parameters
     ----------
     k
-        _description_
+        Indices for the extra dimensions.
     n
-        _description_
+        Number density.
     ngal
         Number density, expected number of points per arcmin2.
     remove_monopole
@@ -284,9 +284,9 @@ def _apply_visibility(
     Parameters
     ----------
     k
-        _description_
+        Indices for the extra dimensions.
     n
-        _description_
+        Number density.
     vis
         Visibility map for the observed points. This is multiplied with
         the full sky number count map, and must hence be of compatible shape.
@@ -311,7 +311,7 @@ def _sample_number_galaxies(
     Parameters
     ----------
     n
-        _description_
+        Number density.
     rng
         Random number generator. If not given, a default RNG is used.
 
@@ -348,11 +348,11 @@ def _sample_galaxies_per_pixel(
     batch
         Maximum number of positions to yield in one batch.
     dims
-        _description_
+        Shape of the extra dimensions.
     k
-        _description_
+        Indices for the extra dimensions.
     n
-        _description_
+        Number density.
     rng
         Random number generator. If not given, a default RNG is used.
 
