@@ -189,7 +189,7 @@ def _broadcast_inputs(
 
     Returns
     -------
-        _description_
+        The broadcasted inputs.
     """
     inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
     if bias is not None:
@@ -232,7 +232,7 @@ def _compute_density_contrast(
 
     Returns
     -------
-        _description_
+        The density contrast after biasing.
     """
     return np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])  # type: ignore[index]
 
@@ -261,7 +261,7 @@ def _compute_expected_count(
 
     Returns
     -------
-        _description_
+        Expected number of objects per pixel.
     """
     # remove monopole if asked to
     if remove_monopole:
@@ -293,7 +293,7 @@ def _apply_visibility(
 
     Returns
     -------
-        _description_
+        The visibility-applied number count map.
     """
     if vis is not None:
         n *= vis[k]
@@ -317,7 +317,7 @@ def _sample_number_galaxies(
 
     Returns
     -------
-        _description_
+        The sampled number of galaxies per pixel.
     """
     # clip number density at zero
     np.clip(n, 0, None, out=n)  # type: ignore[arg-type,type-var]
