@@ -9,7 +9,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import Compare
+    from conftest import Compare  # ty: ignore[unresolved-import]
     from pytest_benchmark.fixture import BenchmarkFixture
     from typing_extensions import Never
 
@@ -61,7 +61,7 @@ def test_multi_plane_matrix(
     ) -> type[glass.MultiPlaneConvergence]:
         """Call add_window repeatedly, to be benchmarked."""
         for shell, delta in zipped:
-            convergence.add_window(delta, shell)  # type: ignore[arg-type,call-arg]
+            convergence.add_window(delta, shell)  # ty: ignore[missing-argument]
         return convergence
 
     actual_convergence = benchmark.pedantic(
@@ -122,7 +122,7 @@ def test_multi_plane_weights(
     ) -> type[glass.MultiPlaneConvergence]:
         """Call add_window repeatedly, to be benchmarked."""
         for shell, delta, _ in zipped:
-            convergence.add_window(delta, shell)  # type: ignore[arg-type,call-arg]
+            convergence.add_window(delta, shell)  # ty: ignore[missing-argument]
         return convergence
 
     actual_convergence = benchmark.pedantic(

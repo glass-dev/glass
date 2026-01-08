@@ -661,10 +661,10 @@ def deflect(
     uxpx = _utils.XPAdditions(xp)
 
     alpha = xp.asarray(alpha)
-    if xp.isdtype(alpha.dtype, "complex floating"):  # type: ignore[union-attr]
+    if xp.isdtype(alpha.dtype, "complex floating"):
         alpha1, alpha2 = xp.real(alpha), xp.imag(alpha)
     else:
-        alpha1, alpha2 = alpha  # type: ignore[misc]
+        alpha1, alpha2 = alpha
 
     # we know great-circle navigation:
     # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def _relerr(dx: AnyArray, x: AnyArray) -> float:
     """Compute the relative error max(|dx/x|)."""
     q = np.divide(dx, x, where=(dx != 0), out=np.zeros_like(dx))
-    return np.fabs(q).max()  # type: ignore[no-any-return]
+    return np.fabs(q).max()
 
 
 def solve(  # noqa: PLR0912, PLR0913
@@ -83,7 +83,7 @@ def solve(  # noqa: PLR0912, PLR0913
     if t2 is None:
         t2 = t1
 
-    n = len(cl)  # type: ignore[arg-type]
+    n = len(cl)
     if pad < 0:
         msg = "pad must be a positive integer"
         raise ValueError(msg)
@@ -92,7 +92,7 @@ def solve(  # noqa: PLR0912, PLR0913
         gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
     else:
         gl = np.zeros(n)
-        gl[: len(initial)] = initial[:n]  # type: ignore[arg-type]
+        gl[: len(initial)] = initial[:n]
 
     if monopole is not None:
         gl[0] = monopole

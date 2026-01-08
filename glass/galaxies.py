@@ -136,8 +136,8 @@ def redshifts_from_nz(
 
     # go through extra dimensions; also works if dims is empty
     for k in uxpx.ndindex(dims):
-        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out  # type: ignore[arg-type]
-        z_out_slice = z_out[(*k, ...)] if k != () else z_out  # type: ignore[arg-type]
+        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
+        z_out_slice = z_out[(*k, ...)] if k != () else z_out
 
         # compute the CDF of each galaxy population
         cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
@@ -149,7 +149,7 @@ def redshifts_from_nz(
             cdf,
             z_out_slice,
         )
-        total += count_out[k]  # type: ignore[assignment]
+        total += count_out[k]
 
     assert total == redshifts.size  # noqa: S101
 
@@ -217,7 +217,7 @@ def galaxy_shear(  # noqa: PLR0913
         g /= 1 - k
 
         # compute lensed ellipticities
-        g = (eps + g) / (1 + g.conj() * eps)  # type: ignore[assignment]
+        g = (eps + g) / (1 + g.conj() * eps)
     else:
         # simple sum of shears
         g += eps
