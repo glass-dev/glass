@@ -42,7 +42,7 @@ def _populate_random_complex_array(
     length: int,
     rng: UnifiedGenerator,
 ) -> ComplexArray:
-    return rng.standard_normal(length) + (1.0j * rng.standard_normal(length))
+    return rng.standard_normal((length,)) + (1.0j * rng.standard_normal((length,)))
 
 
 def triaxial_axis_ratio(
@@ -274,10 +274,12 @@ def ellipticity_gaussian(
         e *= sigma_broadcasted[k]
         r = xp.abs(e) > 1
         while xp.count_nonzero(r) > 0:
-            e[r] = _populate_random_complex_array(xp.count_nonzero(r), rng)
-            e[r] *= sigma_broadcasted[k]
+            e = xpx.at(e)[r].set(
+                _populate_random_complex_array(xp.count_nonzero(r), rng)
+            )
+            e = xpx.at(e)[r].multiply(sigma_broadcasted[k])
             r = xp.abs(e) > 1
-        eps[i : i + count_broadcasted[k]] = e
+        eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
     return eps
