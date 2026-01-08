@@ -64,11 +64,6 @@ def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
 
 
 def test_ellipticity_ryden04(urng: UnifiedGenerator, xp: ModuleType) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_ryden04 are not immutable, so do not support jax",
-        )
-
     # Pass floats without xp
 
     with pytest.raises(

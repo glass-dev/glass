@@ -28,6 +28,7 @@ import math
 from typing import TYPE_CHECKING
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 
@@ -195,10 +196,10 @@ def ellipticity_ryden04(  # noqa: PLR0913
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
     while xp.any(bad := eps > 0):
-        eps[bad] = rng.normal(mu[bad], sigma[bad])  #  type: ignore[assignment,index]
+        eps = xpx.at(eps)[bad].set(rng.normal(mu[bad], sigma[bad]))  #  type: ignore[index]
     gam = rng.normal(gamma, sigma_gamma, size=size)
     while xp.any(bad := (gam < 0) | (gam > 1)):
-        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])  #  type: ignore[assignment,index]
+        gam = xpx.at(gam)[bad].set(rng.normal(gamma[bad], sigma_gamma[bad]))  #  type: ignore[index]
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -xp.expm1(eps)
