@@ -82,14 +82,21 @@ class DataTransformer:
         IntArray,
     ]:
         """Concatenate an array of pos into three arrays lon, lat and count."""
-        lon = xp.empty(0)
-        lat = xp.empty(0)
-        cnt: IntArray = 0
+        lons = []
+        lats = []
+        counts = []
+
         for lo, la, co in pos:
-            lon = xp.concat([lon, lo])
-            lat = xp.concat([lat, la])
-            cnt = cnt + co
-        return lon, lat, cnt
+            lons.append(lo)
+            lats.append(la)
+            counts.append(co)
+
+        return (
+            xp.concat(lons),
+            xp.concat(lats),
+            # could be scalar or array so cannot use concat
+            xp.sum(xp.stack(xp.asarray(counts)))
+        )
 
 
 @pytest.fixture(scope="session")

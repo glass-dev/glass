@@ -108,9 +108,6 @@ def test_broadcast_inputs(
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
-    import array_api_strict
-    xp = array_api_strict
-
     bias_in = 0.8
     delta_in = xp.zeros((3, 1, 12))
     ngal_in = xp.asarray([1e-3, 2e-3])
@@ -208,21 +205,24 @@ def test_sample_number_galaxies(
 
 
 def test_sample_galaxies_per_pixel(
+    data_transformer: DataTransformer,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
+    import array_api_strict
+    xp = array_api_strict
+
     batch = 1000000
     dims = (3, 2)
     k = (1, 1)
     n = xp.asarray([0, 0, 0, 0, 0, 0, 24822, 24681, 24763, 24387, 24946, 24845])
 
-    lat, lon, count = glass.points._sample_galaxies_per_pixel(
-        batch,
-        dims,
-        k,
-        n,
-        urng,
+    lon, lat, cnt = data_transformer.catpos(
+        glass.points._sample_galaxies_per_pixel(batch, dims, k, n, urng),
+        xp=xp
     )
+
+    print()
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
@@ -245,7 +245,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # test with rng
@@ -255,7 +255,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # case: Nons bias and callable bias model
@@ -265,7 +265,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # case: None vis
@@ -275,7 +275,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # case: remove monopole
@@ -285,7 +285,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # case: negative delta
@@ -295,7 +295,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     compare.assert_allclose(lon, [])
     compare.assert_allclose(lat, [])
 
@@ -306,7 +306,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # case: multi-dimensional ngal
@@ -381,6 +381,9 @@ def test_uniform_positions(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
+    import array_api_strict
+    xp = array_api_strict
+
     if xp.__name__ == "jax.numpy":
         pytest.skip(
             "Arrays in uniform_positions are not immutable, so do not support jax",
@@ -407,7 +410,7 @@ def test_uniform_positions(
         xp=xp,
     )
 
-    assert isinstance(cnt, int)
+    assert type(cnt) is not np.int64
     assert lon.shape == lat.shape == (cnt,)
 
     # case: 1-D array input
@@ -416,7 +419,7 @@ def test_uniform_positions(
 
     lon, lat, cnt = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert not isinstance(cnt, int)
+    assert type(cnt) is not np.int64
     assert cnt.__array_namespace__() == xp
     assert cnt.shape == (3,)
     assert lon.shape == lat.shape == (xp.sum(cnt),)
@@ -427,7 +430,7 @@ def test_uniform_positions(
 
     lon, lat, cnt = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert not isinstance(cnt, int)
+    assert type(cnt) is not np.int64
     assert cnt.__array_namespace__() == xp
     assert cnt.shape == (3, 2)
     assert lon.shape == lat.shape == (xp.sum(cnt),)

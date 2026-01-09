@@ -45,6 +45,7 @@ import healpix
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
@@ -236,8 +237,11 @@ def _compute_density_contrast(
     """
     xp = array_api_compat.array_namespace(delta, bias, use_compat=False)
 
-    idx = (*k, ...)
-    return xp.copy(delta[idx]) if bias is None else bias_model(delta[idx], bias[idx])  # type: ignore[index]
+    return (
+        xp.copy(delta[(*k, ...)])
+        if bias is None
+        else bias_model(delta[(*k, ...)], bias[(*k, ...)])
+    )
 
 
 def _compute_expected_count(
@@ -301,7 +305,7 @@ def _apply_visibility(
         The visibility-applied number count map.
     """
     if vis is not None:
-        n *= vis[k]
+        n = n * vis[(*k, ...)]
     return n
 
 
@@ -327,7 +331,7 @@ def _sample_number_galaxies(
     xp = n.__array_namespace__()
 
     # clip number density at zero
-    xp.clip(n, 0, None, out=n)
+    n = xp.clip(n, min=0.0)
 
     # sample actual number in each pixel
     return rng.poisson(n)
@@ -388,13 +392,13 @@ def _sample_galaxies_per_pixel(
     # create a mask to report the count in the right axis
     cmask: int | IntArray
     if dims:
-        cmask = xp.zeros(dims, dtype=int)
-        cmask[k] = 1  # type: ignore[index]
+        cmask = xp.zeros(dims, dtype=xp.int64)
+        cmask = xpx.at(cmask)[k].set(1)
     else:
         cmask = 1
 
     # sample the map in batches
-    step = 1_000
+    step = min(1_000, npix)
     start, stop, size = 0, 0, 0
     while count:
         # tally this group of pixels
@@ -406,7 +410,7 @@ def _sample_galaxies_per_pixel(
             size += q[-1]
         else:
             # how many pixels from this group do we need?
-            stop += int(xp.searchsorted(q, batch - size, side="right"))
+            stop += int(xp.searchsorted(q, xp.asarray(batch - size), side="right"))
             # if the first pixel alone is too much, use it anyway
             if stop == start:
                 stop += 1
