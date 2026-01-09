@@ -119,6 +119,9 @@ def test_uniform_positions(
         (lambda r: [0, -r], 5.0, 0.0),
     ],
 )
+@pytest.mark.skipif(
+    not hasattr(glass, "displace"), reason="test requires glass.displace"
+)
 def test_displace(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: type[Compare],
@@ -128,10 +131,6 @@ def test_displace(  # noqa: PLR0913
     expected_lat: float,
 ) -> None:
     """Benchmark for glass.displace with complex values."""
-    glass.displace = pytest.importorskip(
-        "glass.displace", reason="tests require glass.displace"
-    )
-
     scale_length = 100_000
 
     d = 5.0  # deg
@@ -153,15 +152,14 @@ def test_displace(  # noqa: PLR0913
 
 
 @pytest.mark.stable
+@pytest.mark.skipif(
+    not hasattr(glass, "displacement"), reason="test requires glass.displacement"
+)
 def test_displacement(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
 ) -> None:
     """Benchmark for glass.displacement."""
-    glass.displacement = pytest.importorskip(
-        "glass.displacement", reason="tests require glass.displacement"
-    )
-
     scale_factor = 100
 
     # test on an array
