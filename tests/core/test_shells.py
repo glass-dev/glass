@@ -343,20 +343,20 @@ def test_redshift_grid(xp: ModuleType) -> None:
 
 def test_distance_grid(compare: type[Compare], cosmo: Cosmology) -> None:
     """Add unit tests for :func:`glass.distance_grid`."""
-    zmin = 0
-    zmax = 1
+    zmin = 0.0
+    zmax = 1.0
 
     # check num input
 
     num = 5
     x = glass.distance_grid(cosmo, zmin, zmax, num=5)
-    assert len(x) == num + 1
+    assert x.shape[0] == num + 1
 
     # check dz input
 
     dx = 0.2
     x = glass.distance_grid(cosmo, zmin, zmax, dx=dx)
-    assert len(x) == math.ceil((zmax - zmin) / dx) + 1
+    assert x.shape[0] == math.ceil((zmax - zmin) / dx) + 1
 
     # check decrease in distance
 
