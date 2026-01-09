@@ -187,14 +187,27 @@ def test_apply_visibility(
     n = 24751.77674965 * xp.ones(12)
     vis = xp.tile(xp.repeat([0.0, 1.0], 6), (3, 2, 1))
 
+    n = glass.points._apply_visibility(
+        k,
+        n,
+        vis,
+    )
+
 
 def test_sample_number_galaxies(
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     n = xp.repeat([0.0, 24751.77674965], 6)
 
+    n = glass.points._sample_number_galaxies(
+        n,
+        urng,
+    )
+
 
 def test_sample_galaxies_per_pixel(
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     batch = 1000000
@@ -202,6 +215,13 @@ def test_sample_galaxies_per_pixel(
     k = (1, 1)
     n = xp.asarray([0, 0, 0, 0, 0, 0, 24822, 24681, 24763, 24387, 24946, 24845])
 
+    lat, lon, count = glass.points._sample_galaxies_per_pixel(
+        batch,
+        dims,
+        k,
+        n,
+        urng,
+    )
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
