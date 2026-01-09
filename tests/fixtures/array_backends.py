@@ -61,7 +61,7 @@ def _import_and_add_array_api_strict(
     """Add array_api_strict to the backends dictionary."""
     import array_api_strict  # noqa: PLC0415
 
-    _check_version("array_api_strict", "2.4.1")
+    _check_version("array_api_strict", "2.3.1")
     xp_available_backends["array_api_strict"] = array_api_strict
     array_api_strict.set_array_api_strict_flags(api_version="2024.12")
 
