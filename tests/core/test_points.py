@@ -144,9 +144,6 @@ def test_compute_density_contrast(
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
-    import array_api_strict
-    xp = array_api_strict
-
     bias = xp.asarray([0.8, 0.8])
     bias_model = glass.linear_bias
     delta = xp.zeros((2, 12))
@@ -163,8 +160,25 @@ def test_compute_density_contrast(
     compare.assert_equal(n, xp.zeros_like(n))
 
 
-def test_compute_expected_count() -> None:
-    pass
+@pytest.mark.parametrize("remove_monopole", [False, True])
+def test_compute_expected_count(
+    xp: ModuleType,
+    *,
+    remove_monopole: bool,
+) -> None:
+    k = (1,)
+    n_in = xp.zeros(12)
+    ngal = xp.asarray([1e-3, 2e-3])
+
+    n = glass.points._compute_expected_count(
+        k,
+        n_in,
+        ngal,
+        remove_monopole=remove_monopole,
+    )
+
+    assert n.shape == n_in.shape
+    assert xp.all(n == n[0])
 
 
 def test_apply_visibility() -> None:
