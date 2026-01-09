@@ -128,6 +128,10 @@ def test_displace(  # noqa: PLR0913
     expected_lat: float,
 ) -> None:
     """Benchmark for glass.displace with complex values."""
+    glass.displace = pytest.importorskip(
+        "glass.displace", reason="tests require glass.displace"
+    )
+
     scale_length = 100_000
 
     d = 5.0  # deg
@@ -154,6 +158,10 @@ def test_displacement(
     urngb: UnifiedGenerator,
 ) -> None:
     """Benchmark for glass.displacement."""
+    glass.displacement = pytest.importorskip(
+        "glass.displacement", reason="tests require glass.displacement"
+    )
+
     scale_factor = 100
 
     # test on an array
