@@ -8,9 +8,12 @@ import numpy as np
 import pytest
 
 import glass
+import glass.points
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
+    from typing import Any
 
     from numpy.typing import NDArray
     from pytest_mock import MockerFixture
@@ -99,6 +102,81 @@ def test_loglinear_bias(
         glass.loglinear_bias(delta, b),
         xp.expm1(b * xp.log1p(delta)),
     )
+
+
+def test_broadcast_inputs(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    bias_in = 0.8
+    delta_in = xp.zeros(12)
+    ngal_in = xp.asarray([1e-3, 2e-3])
+    vis_in = xp.ones(12)
+
+    bias, delta, dims, ngal, vis = glass.points._broadcast_inputs(
+        bias_in,
+        delta_in,
+        ngal_in,
+        vis_in,
+    )
+
+    assert dims == ngal_in.shape
+    assert bias.shape == dims
+    assert xp.all(bias == bias_in)
+    assert delta.shape[0] == dims[0]
+    assert delta.shape[1] == delta_in.shape[0]
+    compare.assert_equal(delta, xp.zeros_like(delta))
+    compare.assert_equal(ngal, ngal_in)
+    assert vis.shape[0] == dims[0]
+    assert vis.shape[1] == vis_in.shape[0]
+    compare.assert_equal(vis, xp.ones_like(vis))
+
+
+@pytest.mark.parametrize(
+    "bias_model",
+    [
+        glass.linear_bias,
+        glass.loglinear_bias,
+    ],
+)
+def test_compute_density_contrast(
+    bias_model: Callable[..., Any],
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    import array_api_strict
+    xp = array_api_strict
+
+    bias = xp.asarray([0.8, 0.8])
+    bias_model = glass.linear_bias
+    delta = xp.zeros((2, 12))
+    k = (0,)
+
+    n = glass.points._compute_density_contrast(
+        bias,
+        bias_model,
+        delta,
+        k,
+    )
+
+    assert n.shape[0] == delta.shape[1]
+    compare.assert_equal(n, xp.zeros_like(n))
+
+
+def test_compute_expected_count() -> None:
+    pass
+
+
+def test_apply_visibility() -> None:
+    pass
+
+
+def test_sample_number_galaxies() -> None:
+    pass
+
+
+def test_sample_galaxies_per_pixel() -> None:
+    pass
 
 
 def test_positions_from_delta(  # noqa: PLR0915
