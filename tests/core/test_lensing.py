@@ -159,7 +159,8 @@ def test_deflect_nsew(
 
     # No inputs are arrays and xp not provided
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 

@@ -327,7 +327,7 @@ def _sample_number_galaxies(
     xp = n.__array_namespace__()
 
     # clip number density at zero
-    xp.clip(n, 0, None, out=n)  # type: ignore[arg-type,type-var]
+    xp.clip(n, 0, None, out=n)
 
     # sample actual number in each pixel
     return rng.poisson(n)
@@ -376,7 +376,7 @@ def _sample_galaxies_per_pixel(
     xp = n.__array_namespace__()
 
     # total number of points
-    count = xp.sum(n)  # type: ignore[union-attr]
+    count = xp.sum(n)
     # don't go through pixels if there are no points
     if count == 0:
         return
@@ -389,7 +389,7 @@ def _sample_galaxies_per_pixel(
     cmask: int | IntArray
     if dims:
         cmask = xp.zeros(dims, dtype=int)
-        cmask[k] = 1
+        cmask[k] = 1  # type: ignore[index]
     else:
         cmask = 1
 
@@ -411,7 +411,7 @@ def _sample_galaxies_per_pixel(
             if stop == start:
                 stop += 1
             # sample this batch of pixels
-            ipix = xp.repeat(xp.arange(start, stop), n[start:stop])  # type: ignore[arg-type]
+            ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
             lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
             # next batch
             start, size = stop, 0

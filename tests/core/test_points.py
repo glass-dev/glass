@@ -364,7 +364,8 @@ def test_uniform_positions(
     # Pass non-arrays without xp
 
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         next(glass.uniform_positions(ngal))
 
