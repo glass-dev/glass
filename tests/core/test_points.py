@@ -109,9 +109,9 @@ def test_broadcast_inputs(
     xp: ModuleType,
 ) -> None:
     bias_in = 0.8
-    delta_in = xp.zeros(12)
+    delta_in = xp.zeros((3, 1, 12))
     ngal_in = xp.asarray([1e-3, 2e-3])
-    vis_in = xp.ones(12)
+    vis_in = xp.repeat([0.0, 1.0], 6)
 
     bias, delta, dims, ngal, vis = glass.points._broadcast_inputs(
         bias_in,
@@ -120,16 +120,15 @@ def test_broadcast_inputs(
         vis_in,
     )
 
-    assert dims == ngal_in.shape
-    assert bias.shape == dims
+    assert dims == (3, 2)
+    assert bias.shape == dims  # type: ignore[union-attr]
     assert xp.all(bias == bias_in)
-    assert delta.shape[0] == dims[0]
-    assert delta.shape[1] == delta_in.shape[0]
+    assert delta.shape[:-1] == dims
     compare.assert_equal(delta, xp.zeros_like(delta))
-    compare.assert_equal(ngal, ngal_in)
-    assert vis.shape[0] == dims[0]
-    assert vis.shape[1] == vis_in.shape[0]
-    compare.assert_equal(vis, xp.ones_like(vis))
+    assert ngal.shape == dims  # type: ignore[union-attr]
+    compare.assert_equal(ngal[0], ngal_in)  # type: ignore[index]
+    assert vis.shape == delta.shape  # type: ignore[union-attr]
+    compare.assert_equal(vis[0, 0], vis_in)  # type: ignore[index]
 
 
 @pytest.mark.parametrize(
@@ -144,10 +143,10 @@ def test_compute_density_contrast(
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
-    bias = xp.asarray([0.8, 0.8])
+    bias = 0.8 * xp.ones((3, 2))
     bias_model = glass.linear_bias
-    delta = xp.zeros((2, 12))
-    k = (0,)
+    delta = xp.zeros((3, 2, 12))
+    k = (1, 1)
 
     n = glass.points._compute_density_contrast(
         bias,
@@ -166,9 +165,9 @@ def test_compute_expected_count(
     *,
     remove_monopole: bool,
 ) -> None:
-    k = (1,)
+    k = (1, 1)
     n_in = xp.zeros(12)
-    ngal = xp.asarray([1e-3, 2e-3])
+    ngal = xp.tile([1e-3, 2e-3], (3, 1))
 
     n = glass.points._compute_expected_count(
         k,
@@ -181,16 +180,27 @@ def test_compute_expected_count(
     assert xp.all(n == n[0])
 
 
-def test_apply_visibility() -> None:
-    pass
+def test_apply_visibility(
+    xp: ModuleType,
+) -> None:
+    k = (1, 1)
+    n = 24751.77674965 * xp.ones(12)
+    vis = xp.tile(xp.repeat([0.0, 1.0], 6), (3, 2, 1))
 
 
-def test_sample_number_galaxies() -> None:
-    pass
+def test_sample_number_galaxies(
+    xp: ModuleType,
+) -> None:
+    n = xp.repeat([0.0, 24751.77674965], 6)
 
 
-def test_sample_galaxies_per_pixel() -> None:
-    pass
+def test_sample_galaxies_per_pixel(
+    xp: ModuleType,
+) -> None:
+    batch = 1000000
+    dims = (3, 2)
+    k = (1, 1)
+    n = xp.asarray([0, 0, 0, 0, 0, 0, 24822, 24681, 24763, 24387, 24946, 24845])
 
 
 def test_positions_from_delta(  # noqa: PLR0915
