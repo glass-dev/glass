@@ -72,4 +72,4 @@ def test_cumulative_trapezoid_2d(
     x = xpb.arange(scaled_length)  # [0, 1, 2, 3,...]
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
-    assert ct.shape == (scaled_length,)
+    assert ct.shape == (2, scaled_length)
