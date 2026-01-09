@@ -108,10 +108,13 @@ def test_broadcast_inputs(
     compare: type[Compare],
     xp: ModuleType,
 ) -> None:
+    import array_api_strict
+    xp = array_api_strict
+
     bias_in = 0.8
     delta_in = xp.zeros((3, 1, 12))
     ngal_in = xp.asarray([1e-3, 2e-3])
-    vis_in = xp.repeat([0.0, 1.0], 6)
+    vis_in = xp.repeat(xp.asarray([0.0, 1.0]), 6)
 
     bias, delta, dims, ngal, vis = glass.points._broadcast_inputs(
         bias_in,
@@ -123,12 +126,11 @@ def test_broadcast_inputs(
     assert dims == (3, 2)
     assert bias.shape == dims  # type: ignore[union-attr]
     assert xp.all(bias == bias_in)
-    assert delta.shape[:-1] == dims
-    compare.assert_equal(delta, xp.zeros_like(delta))
+    compare.assert_array_equal(delta, xp.zeros_like(delta))
     assert ngal.shape == dims  # type: ignore[union-attr]
-    compare.assert_equal(ngal[0], ngal_in)  # type: ignore[index]
+    compare.assert_array_equal(ngal[0, :], ngal_in)  # type: ignore[index]
     assert vis.shape == delta.shape  # type: ignore[union-attr]
-    compare.assert_equal(vis[0, 0], vis_in)  # type: ignore[index]
+    compare.assert_array_equal(vis[0, 0, :], vis_in)  # type: ignore[index]
 
 
 @pytest.mark.parametrize(
@@ -155,8 +157,8 @@ def test_compute_density_contrast(
         k,
     )
 
-    assert n.shape[0] == delta.shape[1]
-    compare.assert_equal(n, xp.zeros_like(n))
+    assert n.shape[0] == delta.shape[-1]
+    compare.assert_array_equal(n, xp.zeros_like(n))
 
 
 @pytest.mark.parametrize("remove_monopole", [False, True])
@@ -167,7 +169,7 @@ def test_compute_expected_count(
 ) -> None:
     k = (1, 1)
     n_in = xp.zeros(12)
-    ngal = xp.tile([1e-3, 2e-3], (3, 1))
+    ngal = xp.tile(xp.asarray([1e-3, 2e-3]), (3, 1))
 
     n = glass.points._compute_expected_count(
         k,
@@ -184,21 +186,20 @@ def test_apply_visibility(
     xp: ModuleType,
 ) -> None:
     k = (1, 1)
-    n = 24751.77674965 * xp.ones(12)
-    vis = xp.tile(xp.repeat([0.0, 1.0], 6), (3, 2, 1))
+    n_in = 24751.77674965 * xp.ones(12)
+    vis = xp.tile(xp.repeat(xp.asarray([0.0, 1.0]), 6), (3, 2, 1))
 
     n = glass.points._apply_visibility(
         k,
-        n,
+        n_in,
         vis,
     )
-
 
 def test_sample_number_galaxies(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    n = xp.repeat([0.0, 24751.77674965], 6)
+    n = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
     n = glass.points._sample_number_galaxies(
         n,
