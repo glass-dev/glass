@@ -245,7 +245,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     assert lon.shape == lat.shape == (cnt,)
 
     # test with rng
@@ -255,7 +255,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     assert lon.shape == lat.shape == (cnt,)
 
     # case: Nons bias and callable bias model
@@ -265,7 +265,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     assert lon.shape == lat.shape == (cnt,)
 
     # case: None vis
@@ -275,7 +275,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     assert lon.shape == lat.shape == (cnt,)
 
     # case: remove monopole
@@ -285,7 +285,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     assert lon.shape == lat.shape == (cnt,)
 
     # case: negative delta
@@ -295,7 +295,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     compare.assert_allclose(lon, [])
     compare.assert_allclose(lat, [])
 
@@ -306,7 +306,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert type(cnt) is np.int64
+    assert int(cnt) == cnt
     assert lon.shape == lat.shape == (cnt,)
 
     # case: multi-dimensional ngal

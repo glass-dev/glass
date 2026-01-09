@@ -91,11 +91,17 @@ class DataTransformer:
             lats.append(la)
             counts.append(co)
 
+        if not lons:
+            return (
+                xp.empty((0,), dtype=xp.float64),
+                xp.empty((0,), dtype=xp.float64),
+                xp.zeros((), dtype=xp.int64),
+            )
+
         return (
             xp.concat(lons),
             xp.concat(lats),
-            # could be scalar or array so cannot use concat
-            xp.sum(xp.stack(xp.asarray(counts)))
+            xp.sum(xp.stack(counts)) if counts else xp.asarray(0),
         )
 
 
