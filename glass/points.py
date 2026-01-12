@@ -269,7 +269,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # remove monopole if asked to
         if remove_monopole:
-            n  = n - xp.mean(n, keepdims=True)
+            n = n - xp.mean(n, keepdims=True)
 
         # turn into number count, modifying the array in place
         n = n + 1
