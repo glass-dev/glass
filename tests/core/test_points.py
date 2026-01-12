@@ -117,74 +117,74 @@ def test_positions_from_delta(  # noqa: PLR0915
     bias = 0.8
     vis = np.ones(npix)
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # test with rng
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis, rng=rng),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # case: Nons bias and callable bias model
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # case: None vis
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, None),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # case: remove monopole
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # case: negative delta
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
+    assert isinstance(count, int)
     compare.assert_allclose(lon, [])
     compare.assert_allclose(lat, [])
 
     # case: large delta
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis),
         xp=np,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # case: multi-dimensional ngal
 
@@ -193,14 +193,14 @@ def test_positions_from_delta(  # noqa: PLR0915
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
         xp=np,
     )
 
-    assert cnt.shape == (2,)
-    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert count.shape == (2,)
+    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
 
     # case: multi-dimensional delta
 
@@ -209,14 +209,14 @@ def test_positions_from_delta(  # noqa: PLR0915
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
         xp=np,
     )
 
-    assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert count.shape == (3, 2)
+    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
 
     # case: multi-dimensional broadcasting
 
@@ -225,27 +225,27 @@ def test_positions_from_delta(  # noqa: PLR0915
     bias = 0.8
     vis = np.ones(12)
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
         xp=np,
     )
 
-    assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert count.shape == (3, 2)
+    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
 
     # case: only the southern hemisphere is visible
 
     vis[: vis.size // 2] = 0.0
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
         xp=np,
     )
 
-    assert cnt.shape == (3, 2)
-    assert lon.shape == (cnt.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (cnt.sum(),)  # type: ignore[union-attr]
+    assert count.shape == (3, 2)
+    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
 
     # test TypeError
 
@@ -262,7 +262,7 @@ def test_uniform_positions(
 
     ngal: float | FloatArray = 1e-3
 
-    lon, lat, cnt = data_transformer.catpos(glass.uniform_positions(ngal, xp=xp), xp=xp)
+    lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal, xp=xp), xp=xp)
 
     # Pass non-arrays without xp
 
@@ -274,35 +274,35 @@ def test_uniform_positions(
 
     # test with rng
 
-    lon, lat, cnt = data_transformer.catpos(
+    lon, lat, count = data_transformer.catpos(
         glass.uniform_positions(ngal, rng=urng, xp=xp),
         xp=xp,
     )
 
-    assert isinstance(cnt, int)
-    assert lon.shape == lat.shape == (cnt,)
+    assert isinstance(count, int)
+    assert lon.shape == lat.shape == (count,)
 
     # case: 1-D array input
 
     ngal = xp.asarray([1e-3, 2e-3, 3e-3])
 
-    lon, lat, cnt = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
+    lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert not isinstance(cnt, int)
-    assert cnt.__array_namespace__() == xp
-    assert cnt.shape == (3,)
-    assert lon.shape == lat.shape == (xp.sum(cnt),)
+    assert not isinstance(count, int)
+    assert count.__array_namespace__() == xp
+    assert count.shape == (3,)
+    assert lon.shape == lat.shape == (xp.sum(count),)
 
     # case: 2-D array input
 
     ngal = xp.asarray([[1e-3, 2e-3], [3e-3, 4e-3], [5e-3, 6e-3]])
 
-    lon, lat, cnt = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
+    lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert not isinstance(cnt, int)
-    assert cnt.__array_namespace__() == xp
-    assert cnt.shape == (3, 2)
-    assert lon.shape == lat.shape == (xp.sum(cnt),)
+    assert not isinstance(count, int)
+    assert count.__array_namespace__() == xp
+    assert count.shape == (3, 2)
+    assert lon.shape == lat.shape == (xp.sum(count),)
 
 
 def test_position_weights(

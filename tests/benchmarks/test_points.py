@@ -66,12 +66,12 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = data_transformer.catpos(pos, xp=np)
+    lon, lat, count = data_transformer.catpos(pos, xp=np)
 
-    assert isinstance(cnt, xpb.ndarray)
-    assert cnt.shape == (9, 10)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert isinstance(count, xpb.ndarray)
+    assert count.shape == (9, 10)
+    assert lon.shape == (count.sum(),)
+    assert lat.shape == (count.sum(),)
 
 
 @pytest.mark.stable
@@ -97,11 +97,11 @@ def test_uniform_positions(
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = data_transformer.catpos(pos, xp=xpb)
-    assert not isinstance(cnt, int)
-    assert cnt.__array_namespace__() == xpb
-    assert cnt.shape == shape_ngal
-    assert lon.shape == lat.shape == (xpb.sum(cnt),)
+    lon, lat, count = data_transformer.catpos(pos, xp=xpb)
+    assert not isinstance(count, int)
+    assert count.__array_namespace__() == xpb
+    assert count.shape == shape_ngal
+    assert lon.shape == lat.shape == (xpb.sum(count),)
 
 
 @pytest.mark.parametrize(
