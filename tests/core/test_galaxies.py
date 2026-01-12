@@ -164,7 +164,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         gamma1,
         gamma2,
     )
-    assert not shear
+    assert shear.size == 0
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
@@ -185,7 +185,7 @@ def test_galaxy_shear(rng: np.random.Generator) -> None:
         gamma2,
         reduced_shear=False,
     )
-    assert not shear
+    assert shear.size == 0
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
