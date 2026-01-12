@@ -38,6 +38,7 @@ Displacing points
 
 from __future__ import annotations
 
+import itertools
 import math
 from typing import TYPE_CHECKING, Any
 
@@ -166,7 +167,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias_model: Callable[..., Any] = linear_bias,
     remove_monopole: bool = False,
     batch: int = 1_000_000,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[
     tuple[
         FloatArray,
@@ -238,7 +239,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng(42)
+        rng = _utils.rng_dispatcher(xp=xp)
 
     # ensure bias_model is a function
     if not callable(bias_model):
@@ -258,12 +259,12 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         vis, *rest = rest
 
     # iterate the leading dimensions
-    for k in xp.ndindex(dims):
+    for k in itertools.product(*map(range, dims)):
         # compute density contrast from bias model, or copy
         n = (
-            xp.copy(delta[(*k, ...)])
+            delta[(*k, ...)]  # type: ignore[arg-type]
             if bias is None
-            else bias_model(delta[(*k, ...)], bias[(*k, ...)])
+            else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type]
         )
 
         # remove monopole if asked to
@@ -271,12 +272,12 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
             n -= xp.mean(n, keepdims=True)
 
         # turn into number count, modifying the array in place
-        n += 1
+        n = n + 1
         n *= ARCMIN2_SPHERE / n.size * ngal[k]
 
         # apply visibility if given
         if vis is not None:
-            n *= vis[(*k, ...)]
+            n *= vis[(*k, ...)]  # type: ignore[arg-type]
 
         # clip number density at zero
         n = xp.clip(n, min=0.0)
@@ -303,11 +304,11 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
             cmask = 1
 
         # sample the map in batches
-        step = min(1_000, npix)
+        step = 1_000
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
-            q = xp.cumulative_sum(n[stop : stop + step])
+            q = xp.cumulative_sum(n[stop : min(npix, stop + step)])
             # does this group of pixels fill the batch?
             if size + q[-1] < min(batch, count):
                 # no, we need the next group of pixels to fill the batch
@@ -321,7 +322,15 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                     stop += 1
                 # sample this batch of pixels
                 ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
-                lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
+                lon, lat = (
+                    xp.asarray(angle)
+                    for angle in healpix.randang(
+                        nside,
+                        ipix,
+                        lonlat=True,
+                        rng=_utils.rng_dispatcher(xp=np),
+                    )
+                )
                 # next batch
                 start, size = stop, 0
                 # keep track of remaining number of points
