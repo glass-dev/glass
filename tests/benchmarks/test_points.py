@@ -98,7 +98,6 @@ def test_uniform_positions(
     pos = benchmark(function_to_benchmark)
 
     lon, lat, count = data_transformer.catpos(pos, xp=xpb)
-    assert not isinstance(count, int)
     assert count.__array_namespace__() == xpb
     assert count.shape == shape_ngal
     assert lon.shape == lat.shape == (xpb.sum(count),)
