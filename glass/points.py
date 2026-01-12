@@ -262,7 +262,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     for k in itertools.product(*map(range, dims)):
         # compute density contrast from bias model, or copy
         n = (
-            delta[(*k, ...)]  # type: ignore[arg-type]
+            xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
             if bias is None
             else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type]
         )
