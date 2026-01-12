@@ -234,6 +234,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         If the bias model is not a string or callable.
 
     """
+    xp = array_api_compat.array_namespace(ngal, delta, bias, vis, use_compat=False)
+
     # get default RNG if not given
     if rng is None:
         rng = np.random.default_rng(42)
@@ -256,13 +258,17 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         vis, *rest = rest
 
     # iterate the leading dimensions
-    for k in np.ndindex(dims):
+    for k in xp.ndindex(dims):
         # compute density contrast from bias model, or copy
-        n = np.copy(delta[k]) if bias is None else bias_model(delta[k], bias[k])
+        n = (
+            xp.copy(delta[(*k, ...)])
+            if bias is None
+            else bias_model(delta[(*k, ...)], bias[(*k, ...)])
+        )
 
         # remove monopole if asked to
         if remove_monopole:
-            n -= np.mean(n, keepdims=True)
+            n -= xp.mean(n, keepdims=True)
 
         # turn into number count, modifying the array in place
         n += 1
@@ -270,16 +276,16 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # apply visibility if given
         if vis is not None:
-            n *= vis[k]
+            n *= vis[(*k, ...)]
 
         # clip number density at zero
-        np.clip(n, 0, None, out=n)
+        n = xp.clip(n, min=0.0)
 
         # sample actual number in each pixel
         n = rng.poisson(n)
 
         # total number of points
-        count = n.sum()
+        count = xp.sum(n)
         # don't go through pixels if there are no points
         if count == 0:
             continue
@@ -291,17 +297,17 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         # create a mask to report the count in the right axis
         cmask: int | IntArray
         if dims:
-            cmask = np.zeros(dims, dtype=int)
-            cmask[k] = 1
+            cmask = xp.zeros(dims, dtype=xp.int64)
+            cmask = xpx.at(cmask)[k].set(1)
         else:
             cmask = 1
 
         # sample the map in batches
-        step = 1_000
+        step = min(1_000, npix)
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
-            q = np.cumulative_sum(n[stop : stop + step])
+            q = xp.cumulative_sum(n[stop : stop + step])
             # does this group of pixels fill the batch?
             if size + q[-1] < min(batch, count):
                 # no, we need the next group of pixels to fill the batch
@@ -309,12 +315,12 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 size += q[-1]
             else:
                 # how many pixels from this group do we need?
-                stop += int(np.searchsorted(q, batch - size, side="right"))
+                stop += int(xp.searchsorted(q, xp.asarray(batch - size), side="right"))
                 # if the first pixel alone is too much, use it anyway
                 if stop == start:
                     stop += 1
                 # sample this batch of pixels
-                ipix = np.repeat(np.arange(start, stop), n[start:stop])
+                ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
                 lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
                 # next batch
                 start, size = stop, 0
@@ -324,7 +330,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 yield lon, lat, ipix.size * cmask
 
         # make sure that the correct number of pixels was sampled
-        assert np.sum(n[stop:]) == 0  # noqa: S101
+        assert xp.sum(n[stop:]) == 0  # noqa: S101
 
 
 def uniform_positions(
