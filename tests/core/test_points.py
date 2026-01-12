@@ -122,7 +122,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # test with rng
@@ -132,7 +132,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: Nons bias and callable bias model
@@ -142,7 +142,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: None vis
@@ -152,7 +152,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: remove monopole
@@ -162,7 +162,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: negative delta
@@ -172,7 +172,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     compare.assert_allclose(lon, [])
     compare.assert_allclose(lat, [])
 
@@ -183,7 +183,7 @@ def test_positions_from_delta(  # noqa: PLR0915
         xp=np,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: multi-dimensional ngal
@@ -279,7 +279,7 @@ def test_uniform_positions(
         xp=xp,
     )
 
-    assert isinstance(count, int)
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: 1-D array input
