@@ -117,6 +117,9 @@ def test_uniform_positions(
         (lambda r: [0, -r], 5.0, 0.0),
     ],
 )
+@pytest.mark.skipif(
+    not hasattr(glass, "displace"), reason="test requires glass.displace"
+)
 def test_displace(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     compare: type[Compare],
@@ -147,6 +150,9 @@ def test_displace(  # noqa: PLR0913
 
 
 @pytest.mark.stable
+@pytest.mark.skipif(
+    not hasattr(glass, "displacement"), reason="test requires glass.displacement"
+)
 def test_displacement(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
