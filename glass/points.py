@@ -45,6 +45,7 @@ import healpix
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
@@ -388,7 +389,7 @@ def uniform_positions(
         count: int | IntArray
         if dims:
             count = xp.zeros(dims, dtype=xp.int64)
-            count[k] = ngal_sphere[k]
+            count = xpx.at(count)[k].set(ngal_sphere[k])
         else:
             count = int(ngal_sphere[k])
 

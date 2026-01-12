@@ -258,11 +258,6 @@ def test_uniform_positions(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in uniform_positions are not immutable, so do not support jax",
-        )
-
     # case: scalar input
 
     ngal: float | FloatArray = 1e-3
@@ -272,7 +267,8 @@ def test_uniform_positions(
     # Pass non-arrays without xp
 
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         next(glass.uniform_positions(ngal))
 
