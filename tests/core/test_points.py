@@ -381,14 +381,6 @@ def test_uniform_positions(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    import array_api_strict
-    xp = array_api_strict
-
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in uniform_positions are not immutable, so do not support jax",
-        )
-
     # case: scalar input
 
     ngal: float | FloatArray = 1e-3
