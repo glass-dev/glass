@@ -292,7 +292,6 @@ def test_uniform_positions(
 
     lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert not isinstance(count, int)
     assert count.__array_namespace__() == xp
     assert count.shape == (3,)
     assert lon.shape == lat.shape == (xp.sum(count),)
@@ -303,7 +302,6 @@ def test_uniform_positions(
 
     lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert not isinstance(count, int)
     assert count.__array_namespace__() == xp
     assert count.shape == (3, 2)
     assert lon.shape == lat.shape == (xp.sum(count),)
