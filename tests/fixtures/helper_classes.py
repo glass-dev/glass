@@ -87,22 +87,20 @@ class DataTransformer:
         counts = []
 
         for lo, la, co in pos:
-            lons.append(lo)
-            lats.append(la)
-            counts.append(co)
+            lons.append(xp.asarray(lo))
+            lats.append(xp.asarray(la))
+            counts.append(xp.asarray(co))
 
-        if not lons:
-            return (
-                xp.empty((0,), dtype=xp.float64),
-                xp.empty((0,), dtype=xp.float64),
-                xp.zeros((), dtype=xp.int64),
-            )
+        if lons:
+            lon = xp.concat(lons, axis=0)
+            lat = xp.concat(lats, axis=0)
+            count = xp.sum(xp.stack(counts, axis=0), axis=0)
+        else:
+            lon = xp.empty(0)
+            lat = xp.empty(0)
+            count = xp.asarray(0)
 
-        return (
-            xp.concat(lons),
-            xp.concat(lats),
-            xp.sum(xp.stack(counts)) if counts else xp.asarray(0),
-        )
+        return lon, lat, count
 
 
 @pytest.fixture(scope="session")
