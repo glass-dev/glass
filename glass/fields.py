@@ -25,7 +25,14 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
     from typing import Literal
 
-    from glass._types import AnyArray, ComplexArray, FloatArray, IntArray, T
+    from glass._types import (
+        AnyArray,
+        ComplexArray,
+        FloatArray,
+        IntArray,
+        T,
+        UnifiedGenerator,
+    )
 
 
 try:
@@ -318,7 +325,7 @@ def _generate_grf(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[FloatArray]:
     """
     Iteratively sample Gaussian random fields (internal use).
@@ -356,7 +363,7 @@ def _generate_grf(
         If all gls are empty.
     """
     if rng is None:
-        rng = np.random.default_rng(42)
+        rng = _utils.rng_dispatcher(xp=np)
 
     # number of gls and number of fields
     ngls = len(gls)  # type: ignore[arg-type]
@@ -386,7 +393,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))
+        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[arg-type,call-arg]
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
