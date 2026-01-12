@@ -38,6 +38,7 @@ Displacing points
 
 from __future__ import annotations
 
+import itertools
 import math
 from typing import TYPE_CHECKING, Any
 
@@ -238,9 +239,9 @@ def _compute_density_contrast(
     xp = array_api_compat.array_namespace(delta, bias, use_compat=False)
 
     return (
-        xp.copy(delta[(*k, ...)])
+        xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
         if bias is None
-        else bias_model(delta[(*k, ...)], bias[(*k, ...)])
+        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type,index]
     )
 
 
@@ -274,10 +275,10 @@ def _compute_expected_count(
 
     # remove monopole if asked to
     if remove_monopole:
-        n -= xp.mean(n, keepdims=True)
+        n = n - xp.mean(n, keepdims=True)
 
     # turn into number count, modifying the array in place
-    n += 1
+    n = n + 1
     n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
     return n
 
@@ -305,13 +306,13 @@ def _apply_visibility(
         The visibility-applied number count map.
     """
     if vis is not None:
-        n = n * vis[(*k, ...)]
+        n *= vis[(*k, ...)]  # type: ignore[arg-type]
     return n
 
 
 def _sample_number_galaxies(
     n: FloatArray,
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
 ) -> IntArray:
     """
     Sample the actual number of galaxies in each
@@ -342,7 +343,6 @@ def _sample_galaxies_per_pixel(
     dims: tuple[int, ...],
     k: tuple[int, ...],
     n: FloatArray,
-    rng: np.random.Generator,
 ) -> Generator[
     tuple[
         FloatArray,
@@ -364,8 +364,6 @@ def _sample_galaxies_per_pixel(
         Indices for the extra dimensions.
     n
         Number density.
-    rng
-        Random number generator. If not given, a default RNG is used.
 
     Yields
     ------
@@ -398,11 +396,11 @@ def _sample_galaxies_per_pixel(
         cmask = 1
 
     # sample the map in batches
-    step = min(1_000, npix)
+    step = 1_000
     start, stop, size = 0, 0, 0
     while count:
         # tally this group of pixels
-        q = xp.cumulative_sum(n[stop : stop + step])
+        q = xp.cumulative_sum(n[stop : min(npix, stop + step)])
         # does this group of pixels fill the batch?
         if size + q[-1] < min(batch, count):
             # no, we need the next group of pixels to fill the batch
@@ -416,7 +414,15 @@ def _sample_galaxies_per_pixel(
                 stop += 1
             # sample this batch of pixels
             ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
-            lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
+            lon, lat = (
+                xp.asarray(angle)
+                for angle in healpix.randang(
+                    nside,
+                    ipix,
+                    lonlat=True,
+                    rng=_utils.rng_dispatcher(xp=np),
+                )
+            )
             # next batch
             start, size = stop, 0
             # keep track of remaining number of points
@@ -437,7 +443,7 @@ def positions_from_delta(  # noqa: PLR0913
     bias_model: Callable[..., Any] = linear_bias,
     remove_monopole: bool = False,
     batch: int = 1_000_000,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[
     tuple[
         FloatArray,
@@ -505,9 +511,11 @@ def positions_from_delta(  # noqa: PLR0913
         If the bias model is not a string or callable.
 
     """
+    xp = array_api_compat.array_namespace(ngal, delta, bias, vis, use_compat=False)
+
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng(42)
+        rng = _utils.rng_dispatcher(xp=xp)
 
     # ensure bias_model is a function
     if not callable(bias_model):
@@ -516,7 +524,7 @@ def positions_from_delta(  # noqa: PLR0913
     bias, delta, dims, ngal, vis = _broadcast_inputs(bias, delta, ngal, vis)
 
     # iterate the leading dimensions
-    for k in np.ndindex(dims):
+    for k in itertools.product(*map(range, dims)):
         n = _compute_density_contrast(bias, bias_model, delta, k)
 
         n = _compute_expected_count(k, n, ngal, remove_monopole=remove_monopole)
@@ -525,7 +533,7 @@ def positions_from_delta(  # noqa: PLR0913
 
         n = _sample_number_galaxies(n, rng)
 
-        yield from _sample_galaxies_per_pixel(batch, dims, k, n, rng)
+        yield from _sample_galaxies_per_pixel(batch, dims, k, n)
 
 
 def uniform_positions(

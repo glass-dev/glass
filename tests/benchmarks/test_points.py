@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
@@ -66,12 +65,12 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, count = data_transformer.catpos(pos, xp=np)
+    lon, lat, count = data_transformer.catpos(pos, xp=xpb)
 
     assert isinstance(count, xpb.ndarray)
     assert count.shape == (9, 10)
-    assert lon.shape == (count.sum(),)
-    assert lat.shape == (count.sum(),)
+    assert lon.shape == (xpb.sum(count),)
+    assert lat.shape == (xpb.sum(count),)
 
 
 @pytest.mark.stable
@@ -98,7 +97,6 @@ def test_uniform_positions(
     pos = benchmark(function_to_benchmark)
 
     lon, lat, count = data_transformer.catpos(pos, xp=xpb)
-    assert not isinstance(count, int)
     assert count.__array_namespace__() == xpb
     assert count.shape == shape_ngal
     assert lon.shape == lat.shape == (xpb.sum(count),)

@@ -4,8 +4,9 @@ import math
 from typing import TYPE_CHECKING
 
 import healpix
-import numpy as np
 import pytest
+
+import array_api_extra as xpx
 
 import glass
 import glass.points
@@ -15,10 +16,9 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from numpy.typing import NDArray
     from pytest_mock import MockerFixture
 
-    from glass._types import FloatArray, UnifiedGenerator
+    from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import Compare, DataTransformer
 
 
@@ -192,6 +192,7 @@ def test_apply_visibility(
         vis,
     )
 
+
 def test_sample_number_galaxies(
     urng: UnifiedGenerator,
     xp: ModuleType,
@@ -206,10 +207,10 @@ def test_sample_number_galaxies(
 
 def test_sample_galaxies_per_pixel(
     data_transformer: DataTransformer,
-    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     import array_api_strict
+
     xp = array_api_strict
 
     batch = 1000000
@@ -218,16 +219,15 @@ def test_sample_galaxies_per_pixel(
     n = xp.asarray([0, 0, 0, 0, 0, 0, 24822, 24681, 24763, 24387, 24946, 24845])
 
     lon, lat, count = data_transformer.catpos(
-        glass.points._sample_galaxies_per_pixel(batch, dims, k, n, urng),
-        xp=xp
+        glass.points._sample_galaxies_per_pixel(batch, dims, k, n), xp=xp
     )
 
-    print()
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
     data_transformer: DataTransformer,
-    rng: np.random.Generator,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
 ) -> None:
     # create maps that saturate the batching in the function
     nside = 128
@@ -235,14 +235,14 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     # case: single-dimensional input
 
-    ngal: float | NDArray[np.float64] = 1e-3
-    delta = np.zeros(npix)
+    ngal = 1e-3
+    delta = xp.zeros(npix)
     bias = 0.8
-    vis = np.ones(npix)
+    vis = xp.ones(npix)
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
-        xp=np,
+        xp=xp,
     )
 
     assert int(count) == count
@@ -251,8 +251,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     # test with rng
 
     lon, lat, count = data_transformer.catpos(
-        glass.positions_from_delta(ngal, delta, bias, vis, rng=rng),
-        xp=np,
+        glass.positions_from_delta(ngal, delta, bias, vis, rng=urng),
+        xp=xp,
     )
 
     assert int(count) == count
@@ -262,7 +262,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, None, vis, bias_model=lambda x: x),
-        xp=np,
+        xp=xp,
     )
 
     assert int(count) == count
@@ -272,7 +272,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, None),
-        xp=np,
+        xp=xp,
     )
 
     assert int(count) == count
@@ -282,7 +282,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis, remove_monopole=True),
-        xp=np,
+        xp=xp,
     )
 
     assert int(count) == count
@@ -291,8 +291,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     # case: negative delta
 
     lon, lat, count = data_transformer.catpos(
-        glass.positions_from_delta(ngal, np.linspace(-1, -1, npix), None, vis),
-        xp=np,
+        glass.positions_from_delta(ngal, xp.linspace(-1, -1, npix), None, vis),
+        xp=xp,
     )
 
     assert int(count) == count
@@ -302,8 +302,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     # case: large delta
 
     lon, lat, count = data_transformer.catpos(
-        glass.positions_from_delta(ngal, rng.normal(100, 1, size=(npix,)), bias, vis),
-        xp=np,
+        glass.positions_from_delta(ngal, urng.normal(100, 1, size=(npix,)), bias, vis),
+        xp=xp,
     )
 
     assert int(count) == count
@@ -311,64 +311,64 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     # case: multi-dimensional ngal
 
-    ngal = np.asarray([1e-3, 2e-3])
-    delta = np.zeros(12)
+    ngal = xp.asarray([1e-3, 2e-3])
+    delta = xp.zeros(12)
     bias = 0.8
-    vis = np.ones(12)
+    vis = xp.ones(12)
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
-        xp=np,
+        xp=xp,
     )
 
     assert count.shape == (2,)
-    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lon.shape == (xp.sum(count),)
+    assert lat.shape == (xp.sum(count),)
 
     # case: multi-dimensional delta
 
     ngal = 1e-3
-    delta = np.zeros((3, 2, 12))
+    delta = xp.zeros((3, 2, 12))
     bias = 0.8
-    vis = np.ones(12)
+    vis = xp.ones(12)
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
-        xp=np,
+        xp=xp,
     )
 
     assert count.shape == (3, 2)
-    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lon.shape == (xp.sum(count),)
+    assert lat.shape == (xp.sum(count),)
 
     # case: multi-dimensional broadcasting
 
-    ngal = np.asarray([1e-3, 2e-3])
-    delta = np.zeros((3, 1, 12))
+    ngal = xp.asarray([1e-3, 2e-3])
+    delta = xp.zeros((3, 1, 12))
     bias = 0.8
-    vis = np.ones(12)
+    vis = xp.ones(12)
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
-        xp=np,
+        xp=xp,
     )
 
     assert count.shape == (3, 2)
-    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lon.shape == (xp.sum(count),)
+    assert lat.shape == (xp.sum(count),)
 
     # case: only the southern hemisphere is visible
 
-    vis[: vis.size // 2] = 0.0
+    vis = xpx.at(vis)[: vis.size // 2].set(0.0)
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
-        xp=np,
+        xp=xp,
     )
 
     assert count.shape == (3, 2)
-    assert lon.shape == (count.sum(),)  # type: ignore[union-attr]
-    assert lat.shape == (count.sum(),)  # type: ignore[union-attr]
+    assert lon.shape == (xp.sum(count),)
+    assert lat.shape == (xp.sum(count),)
 
     # test TypeError
 
@@ -383,9 +383,12 @@ def test_uniform_positions(
 ) -> None:
     # case: scalar input
 
-    ngal: float | FloatArray = 1e-3
+    ngal = 1e-3
 
-    lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal, xp=xp), xp=xp)
+    lon, lat, count = data_transformer.catpos(
+        glass.uniform_positions(ngal, xp=xp),
+        xp=xp,
+    )
 
     # Pass non-arrays without xp
 
@@ -402,7 +405,7 @@ def test_uniform_positions(
         xp=xp,
     )
 
-    assert type(count) is not np.int64
+    assert int(count) == count
     assert lon.shape == lat.shape == (count,)
 
     # case: 1-D array input
@@ -411,7 +414,6 @@ def test_uniform_positions(
 
     lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert type(count) is not np.int64
     assert count.__array_namespace__() == xp
     assert count.shape == (3,)
     assert lon.shape == lat.shape == (xp.sum(count),)
@@ -422,7 +424,6 @@ def test_uniform_positions(
 
     lon, lat, count = data_transformer.catpos(glass.uniform_positions(ngal), xp=xp)
 
-    assert type(count) is not np.int64
     assert count.__array_namespace__() == xp
     assert count.shape == (3, 2)
     assert lon.shape == lat.shape == (xp.sum(count),)
