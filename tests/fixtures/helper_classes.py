@@ -55,11 +55,6 @@ class Compare:
         """Check if two array objects are not ordered by less than."""
         np.testing.assert_array_less(actual, desired)
 
-    @staticmethod
-    def assert_equal(actual: AnyArray, desired: AnyArray) -> None:
-        """Check if two objects are not equal."""
-        np.testing.assert_equal(actual, desired)
-
 
 @pytest.fixture(scope="session")
 def compare() -> type[Compare]:
