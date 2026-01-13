@@ -275,7 +275,7 @@ def ellipticity_gaussian(
         r = xp.abs(e) > 1
         while xp.count_nonzero(r) > 0:
             e = xpx.at(e)[r].set(
-                _populate_random_complex_array(xp.count_nonzero(r), rng)
+                _populate_random_complex_array(xp.count_nonzero(r), rng),
             )
             e = xpx.at(e)[r].multiply(sigma_broadcasted[k])
             r = xp.abs(e) > 1
