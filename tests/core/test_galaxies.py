@@ -147,7 +147,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
         )
 
 
-def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
+def test_galaxy_shear(rng: np.random.Generator) -> None:
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
@@ -164,7 +164,7 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
         gamma1,
         gamma2,
     )
-    compare.assert_equal(shear, [])
+    assert shear.size == 0
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
@@ -185,7 +185,7 @@ def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
         gamma2,
         reduced_shear=False,
     )
-    compare.assert_equal(shear, [])
+    assert shear.size == 0
 
     gal_lon, gal_lat, gal_eps = (
         rng.normal(size=(512,)),
