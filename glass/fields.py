@@ -219,11 +219,11 @@ def cls2cov(
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
-        for i, cl in enumerate(cls[begin:end][: nc + 1]):
+        for i, cl in enumerate(cls[begin:end][: min(end - begin, nc + 1)]):
             if i == 0 and xp.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = cl.shape[0]
+            n = cl.size
             cov = xpx.at(cov)[:n, i].set(cl)
             cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
@@ -368,7 +368,7 @@ def _generate_grf(
         rng = _utils.rng_dispatcher(xp=xp)
 
     # number of gls and number of fields
-    ngls = len(gls)  # type: ignore[arg-type]
+    ngls = gls.shape[0]
     ngrf = nfields_from_nspectra(ngls)
 
     # number of correlated fields if not specified
@@ -376,7 +376,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls), default=0)  # type: ignore[arg-type]
+    n = max((gl.size for gl in gls), default=0)  # type: ignore[arg-type]
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -384,9 +384,9 @@ def _generate_grf(
     # generates the covariance matrix for the iterative sampler
     cov = cls2cov(gls, n, ngrf, ncorr)
 
-    # working arrays for the iterative sampling
-    z = xp.zeros(n * (n + 1) // 2, dtype=xp.complex128)
-    y = xp.zeros((n * (n + 1) // 2, ncorr), dtype=xp.complex128)
+    # list elements can be updated/replaced even if the arrays are immutable
+    num_complex = n * (n + 1) // 2
+    y_cols = [xp.zeros(num_complex, dtype=xp.complex128) for _ in range(ncorr)]
 
     # generate the conditional normal distribution for iterative sampling
     conditional_dist = iternorm(ncorr, cov, size=n)
@@ -395,7 +395,9 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), xp.float64, z.view(xp.float64))  # type: ignore[call-arg]
+        reals = rng.standard_normal(num_complex, dtype=xp.float64)
+        imags = rng.standard_normal(num_complex, dtype=xp.float64)
+        z = xp.astype(reals, xp.complex128) + (1j * xp.astype(imags, xp.complex128))
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
@@ -403,17 +405,18 @@ def _generate_grf(
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += glass.harmonics.multalm(y[:, i], a[:, i])
+            alm += glass.harmonics.multalm(y_cols[i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
-            y[:, j] = z
+            y_cols[j] = z
 
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        xp.real(alm[:n])[:] += xp.imag(alm[:n])
-        xp.imag(alm[:n])[:] = 0
+        alm_m0 = alm[:n]
+        fixed_m0 = xp.astype(xp.real(alm_m0) + xp.imag(alm_m0), xp.complex128)
+        alm = xp.concat([fixed_m0, alm[n:]])
 
         # transform alm to maps
         # can be performed in place on the temporary alm array

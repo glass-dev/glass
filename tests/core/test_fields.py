@@ -384,6 +384,9 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
 
 
 def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
+    import array_api_strict
+    xp = array_api_strict
+
     gls = xp.asarray([1.0, 0.5, 0.1])
     nside = 4
     ncorr = 1
