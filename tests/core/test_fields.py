@@ -383,8 +383,8 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
     assert result.shape == (1, 1, 15)
 
 
-def test_generate_grf(compare: type[Compare]) -> None:
-    gls = [np.asarray([1.0, 0.5, 0.1])]
+def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
+    gls = xp.asarray([1.0, 0.5, 0.1])
     nside = 4
     ncorr = 1
 
@@ -393,13 +393,13 @@ def test_generate_grf(compare: type[Compare]) -> None:
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = _utils.rng_dispatcher(xp=np)
+    rng = _utils.rng_dispatcher(xp=xp)
     gaussian_fields = list(glass.fields._generate_grf(gls, nside, rng=rng))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = _utils.rng_dispatcher(xp=np)
+    rng = _utils.rng_dispatcher(xp=xp)
     new_gaussian_fields = list(
         glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng),
     )
@@ -422,19 +422,19 @@ def test_generate_lognormal(xp: ModuleType) -> None:
         glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate(compare: type[Compare], xp: ModuleType) -> None:
+def test_generate(compare: type[Compare]) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
 
     with pytest.raises(ValueError, match="mismatch between number of fields and gls"):
-        list(glass.generate(fields, [xp.ones(10), xp.ones(10)], nside=16))
+        list(glass.generate(fields, [np.ones(10), np.ones(10)], nside=16))
 
     # check output shape
 
     nside = 16
     npix = hp.nside2npix(nside)
-    gls = [xp.ones(10), xp.ones(10), xp.ones(10)]
+    gls = [np.ones(10), np.ones(10), np.ones(10)]
 
     result = list(glass.generate(fields, gls, nside=nside))
 
