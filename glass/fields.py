@@ -384,9 +384,8 @@ def _generate_grf(
     # generates the covariance matrix for the iterative sampler
     cov = cls2cov(gls, n, ngrf, ncorr)
 
-    # list elements can be updated/replaced even if the arrays are immutable
-    num_complex = n * (n + 1) // 2
-    y_cols = [xp.zeros(num_complex, dtype=xp.complex128) for _ in range(ncorr)]
+    # working arrays for the iterative sampling
+    y = xp.zeros((n * (n + 1) // 2, ncorr), dtype=xp.complex128)
 
     # generate the conditional normal distribution for iterative sampling
     conditional_dist = iternorm(ncorr, cov, size=n)
@@ -394,10 +393,9 @@ def _generate_grf(
     # sample the fields from the conditional distribution
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
-        # sample real and imaginary parts, then view as complex number
-        reals = rng.standard_normal(num_complex, dtype=xp.float64)
-        imags = rng.standard_normal(num_complex, dtype=xp.float64)
-        z = xp.astype(reals, xp.complex128) + (1j * xp.astype(imags, xp.complex128))
+        z = rng.standard_normal(n * (n + 1) // 2) + 1j * rng.standard_normal(
+            n * (n + 1) // 2
+        )
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
@@ -405,11 +403,11 @@ def _generate_grf(
 
         # add the mean of the conditional distribution
         for i in range(ncorr):
-            alm += glass.harmonics.multalm(y_cols[i], a[:, i])
+            alm += glass.harmonics.multalm(y[:, i], a[:, i])
 
         # store the standard normal in y array at the indicated index
         if j is not None:
-            y_cols[j] = z
+            y[:, j] = z
 
         alm = _glass_to_healpix_alm(alm)
 
@@ -420,7 +418,9 @@ def _generate_grf(
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
-        yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
+        yield xp.asarray(
+            hp.alm2map(np.asarray(alm), nside, pixwin=False, pol=False, inplace=True)
+        )
 
 
 @deprecated("use glass.generate() instead")
@@ -941,10 +941,12 @@ def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
         alm in HEALPix order.
 
     """
+    xp = alm.__array_namespace__()
+
     n = _inv_triangle_number(alm.size)
-    ell = np.arange(n)
+    ell = xp.arange(n)
     out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
-    return np.concatenate(out)
+    return xp.concat(out)
 
 
 def lognormal_shift_hilbert2011(z: float) -> float:
