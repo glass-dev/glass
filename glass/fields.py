@@ -30,6 +30,7 @@ if TYPE_CHECKING:
         ComplexArray,
         FloatArray,
         IntArray,
+        ModuleType,
         T,
         UnifiedGenerator,
     )
@@ -573,7 +574,7 @@ def enumerate_spectra(
         yield i, j, cl
 
 
-def spectra_indices(n: int) -> IntArray:
+def spectra_indices(n: int, *, xp: ModuleType = np) -> IntArray:
     """
     Return an array of indices in :ref:`standard order <twopoint_order>`
     for a set of two-point functions for *n* fields.  Each row is a pair
@@ -590,8 +591,8 @@ def spectra_indices(n: int) -> IntArray:
            [2, 0]])
 
     """
-    i, j = np.tril_indices(n)
-    return np.asarray([i, i - j]).T
+    i, j = xp.tril_indices(n)
+    return xp.asarray([i, i - j]).T
 
 
 def effective_cls(
