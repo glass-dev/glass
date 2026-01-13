@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 import glass
@@ -9,6 +10,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from numpy.typing import NDArray
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
@@ -89,7 +91,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
 
     # case: no extra dimensions
 
-    count = 10
+    count: int | NDArray[np.float64] = 10
     z = xp.linspace(0, 1, 100)
     nz = z * (1 - z)
 
@@ -145,32 +147,29 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
         )
 
 
-def test_galaxy_shear(
-    urng: UnifiedGenerator,
-    xp: ModuleType,
-) -> None:
+def test_galaxy_shear(compare: type[Compare], rng: np.random.Generator) -> None:
     # check shape of the output
 
     kappa, gamma1, gamma2 = (
-        urng.normal(size=(12,)),
-        urng.normal(size=(12,)),
-        urng.normal(size=(12,)),
+        rng.normal(size=(12,)),
+        rng.normal(size=(12,)),
+        rng.normal(size=(12,)),
     )
 
     shear = glass.galaxy_shear(
-        xp.asarray([]),
-        xp.asarray([]),
-        xp.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
         kappa,
         gamma1,
         gamma2,
     )
-    assert shear.size == 0
+    compare.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
-        urng.normal(size=(512,)),
-        urng.normal(size=(512,)),
-        urng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
     )
     shear = glass.galaxy_shear(gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2)
     assert shear.shape == (512,)
@@ -178,20 +177,20 @@ def test_galaxy_shear(
     # shape with no reduced shear
 
     shear = glass.galaxy_shear(
-        xp.asarray([]),
-        xp.asarray([]),
-        xp.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
+        np.asarray([]),
         kappa,
         gamma1,
         gamma2,
         reduced_shear=False,
     )
-    assert shear.size == 0
+    compare.assert_equal(shear, [])
 
     gal_lon, gal_lat, gal_eps = (
-        urng.normal(size=(512,)),
-        urng.normal(size=(512,)),
-        urng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
+        rng.normal(size=(512,)),
     )
     shear = glass.galaxy_shear(
         gal_lon,
