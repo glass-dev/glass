@@ -196,28 +196,38 @@ def galaxy_shear(  # noqa: PLR0913
         (lensed ellipticities).
 
     """
-    nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
+    xp = array_api_compat.array_namespace(
+        lon,
+        lat,
+        eps,
+        kappa,
+        gamma1,
+        gamma2,
+        use_compat=False,
+    )
 
-    size = np.broadcast(lon, lat, eps).size
+    nside = healpix.npix2nside(xp.broadcast_arrays(kappa, gamma1, gamma2)[0].shape[-1])
+
+    size = xp.broadcast_arrays(lon, lat, eps)[0].size
 
     # output arrays
-    k = np.empty(size)
-    g = np.empty(size, dtype=complex)
+    k = xp.empty(size)
+    g = xp.empty(size, dtype=xp.complex128)
 
     # get the lensing maps at galaxy position
     for i in range(0, size, 10_000):
-        s = slice(i, i + 10_000)
-        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
+        s = slice(i, min(size, i + 10_000))
+        ipix = xp.asarray(healpix.ang2pix(nside, lon[s], lat[s], lonlat=True))
         k[s] = kappa[ipix]
-        np.real(g)[s] = gamma1[ipix]
-        np.imag(g)[s] = gamma2[ipix]
+        xp.real(g)[s] = gamma1[ipix]
+        xp.imag(g)[s] = gamma2[ipix]
 
     if reduced_shear:
         # compute reduced shear in place
         g /= 1 - k
 
         # compute lensed ellipticities
-        g = (eps + g) / (1 + g.conj() * eps)  # type: ignore[assignment]
+        g = (eps + g) / (1 + xp.conj(g) * eps)  # type: ignore[assignment]
     else:
         # simple sum of shears
         g += eps
