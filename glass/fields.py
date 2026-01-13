@@ -362,8 +362,10 @@ def _generate_grf(
     ValueError
         If all gls are empty.
     """
+    xp = gls.__array_namespace__()
+
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=np)
+        rng = np.random.default_rng(42)
 
     # number of gls and number of fields
     ngls = len(gls)  # type: ignore[arg-type]
@@ -424,7 +426,7 @@ def generate_gaussian(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[FloatArray]:
     """
     Sample Gaussian random fields from Cls iteratively.
@@ -478,7 +480,7 @@ def generate_lognormal(
     shift: float = 1.0,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[FloatArray]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
@@ -825,7 +827,7 @@ def generate(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Iterator[AnyArray]:
     """
     Sample random fields from Gaussian angular power spectra.

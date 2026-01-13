@@ -283,7 +283,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         n = xp.clip(n, min=0.0)
 
         # sample actual number in each pixel
-        n = rng.poisson(n)
+        n = rng.poisson(n)  # type: ignore[arg-type]
 
         # total number of points
         count = xp.sum(n)
