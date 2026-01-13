@@ -407,14 +407,12 @@ def _generate_grf(
 
         # store the standard normal in y array at the indicated index
         if j is not None:
-            y[:, j] = z
+            y = xpx.at(y)[:, j].set(z)
 
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        alm_m0 = alm[:n]
-        fixed_m0 = xp.astype(xp.real(alm_m0) + xp.imag(alm_m0), xp.complex128)
-        alm = xp.concat([fixed_m0, alm[n:]])
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
