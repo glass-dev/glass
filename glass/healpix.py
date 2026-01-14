@@ -157,4 +157,6 @@ def randang(
 
 
 class Rotator:
-    pass
+
+    def rotate_map_pixel(self):
+        pass
