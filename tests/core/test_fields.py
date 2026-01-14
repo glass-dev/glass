@@ -3,12 +3,12 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import numpy as np
 import pytest
 
 import glass
 import glass.fields
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType

@@ -4,10 +4,24 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpy  # noqa: F401
+
 import healpix
 
 if TYPE_CHECKING:
-    from glass._types import IntArray, UnifiedGenerator, FloatArray
+    from glass._types import FloatArray, IntArray, UnifiedGenerator
+
+
+def alm2map():
+    pass
+
+
+def alm2map_spin():
+    pass
+
+
+def almxfl():
+    pass
 
 
 def ang2pix(
@@ -63,6 +77,14 @@ def ang2vec(
     return healpix.ang2vec(theta, phi, lonlat=lonlat)
 
 
+def get_nside():
+    pass
+
+
+def map2alm():
+    pass
+
+
 def npix2nside(npix: int) -> int:
     """Give the nside parameter for the given number of pixels.
 
@@ -95,6 +117,14 @@ def nside2npix(nside: int) -> int:
     return healpix.nside2npix(nside)
 
 
+def pixwin():
+    pass
+
+
+def query_strip():
+    pass
+
+
 def randang(
     nside: int,
     ipix: IntArray,
@@ -124,3 +154,7 @@ def randang(
 
     """
     return healpix.randang(nside, ipix, nest=nest, lonlat=lonlat, rng=rng)
+
+
+class Rotator:
+    pass

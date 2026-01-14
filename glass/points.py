@@ -48,8 +48,8 @@ import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
-from glass import healpix
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -286,7 +286,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # for converting randomly sampled positions to HEALPix indices
         npix = n.shape[-1]
-        nside = healpix.npix2nside(npix)
+        nside = hp.npix2nside(npix)
 
         # create a mask to report the count in the right axis
         cmask: int | IntArray
@@ -315,7 +315,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                     stop += 1
                 # sample this batch of pixels
                 ipix = np.repeat(np.arange(start, stop), n[start:stop])
-                lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
+                lon, lat = hp.randang(nside, ipix, lonlat=True, rng=rng)
                 # next batch
                 start, size = stop, 0
                 # keep track of remaining number of points

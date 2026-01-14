@@ -33,12 +33,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, overload
 
-import healpy as hp
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

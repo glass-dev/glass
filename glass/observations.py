@@ -31,13 +31,13 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
