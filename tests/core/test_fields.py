@@ -282,12 +282,12 @@ def test_lognormal_gls(xp: ModuleType) -> None:
 
     # empty cls
 
-    assert glass.lognormal_gls([], shift) == []
+    assert glass.lognormal_gls(xp.asarray([]), shift) == []
 
     # check output shape
 
-    assert len(glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)) == 1
-    assert len(glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)[0]) == 5
+    assert len(glass.lognormal_gls(xp.linspace(1, 5, 5), shift)) == 1
+    assert len(glass.lognormal_gls(xp.linspace(1, 5, 5), shift)[0]) == 5
 
     inp = [xp.linspace(1, 6, 5), xp.linspace(1, 5, 4), xp.linspace(1, 4, 3)]
     out = glass.lognormal_gls(inp, shift)
@@ -301,7 +301,7 @@ def test_lognormal_gls(xp: ModuleType) -> None:
 def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
     # empty cls
 
-    result = glass.discretized_cls([])
+    result = glass.discretized_cls(xp.asarray([]))
     assert result == []
 
     # power spectra truncated at lmax + 1 if lmax provided
@@ -363,7 +363,7 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="shape mismatch between fields and weights1"):
-        glass.effective_cls([], xp.ones((3, 1)))
+        glass.effective_cls(xp.asarray([]), xp.ones((3, 1)))
 
     # check with only weights1
 
@@ -417,12 +417,12 @@ def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
 
 def test_generate_gaussian(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
+        glass.generate_gaussian(xp.asarray([1.0, 0.5, 0.1]), 4)
 
 
 def test_generate_lognormal(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
+        glass.generate_lognormal(xp.asarray([1.0, 0.5, 0.1]), 4)
 
 
 def test_generate(compare: type[Compare], xp: ModuleType) -> None:
@@ -513,7 +513,7 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra = xp.arange(tn).reshape(tn, 1)
+    spectra = xp.reshape(xp.arange(tn), (tn, 1))
 
     # this is the expected order of indices
     indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
