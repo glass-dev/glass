@@ -1,4 +1,4 @@
-"""_summary_."""
+"""_summary_.."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import healpix
 
 if TYPE_CHECKING:
-    from glass._types import IntArray, UnifiedGenerator
+    from glass._types import IntArray, UnifiedGenerator, FloatArray
 
 
 def ang2pix(
@@ -17,21 +17,81 @@ def ang2pix(
     *,
     nest: bool = False,
     lonlat: bool = False,
-):
+) -> IntArray:
+    """Converts the angle to HEALPix pixel numbers.
+
+    Parameters
+    ----------
+    nside
+        The HEALPix nside parameter of the map.
+    theta
+        Angular coordinates of a point on the sphere.
+    phi
+        Angular coordinates of a point on the sphere.
+    nest
+        If True return the map in NEST ordering.
+    lonlat
+        If True, automatically adjust latitudes to be within [-90, 90] range.
+
+    Returns
+    -------
+        The HEALPix pixel numbers.
+
+    """
     return healpix.ang2pix(nside, theta, phi, nest=nest, lonlat=lonlat)
 
 
-def ang2vec(theta: float, phi: float, *, lonlat: bool = False):
+def ang2vec(
+    theta: float, phi: float, *, lonlat: bool = False
+) -> tuple[FloatArray, FloatArray, FloatArray]:
+    """Convert angles to 3D position vector.
+
+    Parameters
+    ----------
+    theta
+        Angular coordinates of a point on the sphere.
+    phi
+        Angular coordinates of a point on the sphere.
+    lonlat
+        If True, automatically adjust latitudes to be within [-90, 90] range.
+
+    Returns
+    -------
+        A normalised 3-vector pointing in the same direction as ``ang``.
+
+    """
     return healpix.ang2vec(theta, phi, lonlat=lonlat)
 
 
 def npix2nside(npix: int) -> int:
-    """_summary_."""
+    """Give the nside parameter for the given number of pixels.
+
+    Parameters
+    ----------
+    npix
+        The number of pixels.
+
+    Returns
+    -------
+        The HEALPix nside parameter of the map.
+
+    """
     return healpix.npix2nside(npix)
 
 
 def nside2npix(nside: int) -> int:
-    """_summary_."""
+    """Give the number of pixels for the given nside.
+
+    Parameters
+    ----------
+    nside
+        The HEALPix nside parameter of the map.
+
+    Returns
+    -------
+        The number of pixels.
+
+    """
     return healpix.nside2npix(nside)
 
 
@@ -42,6 +102,25 @@ def randang(
     nest: bool = False,
     lonlat: bool = False,
     rng: UnifiedGenerator | None = None,
-):
-    """Sample random spherical coordinates from the given HEALPix pixels."""
+) -> tuple[FloatArray, FloatArray]:
+    """Sample random spherical coordinates from the given HEALPix pixels.
+
+    Parameters
+    ----------
+    nside
+        The HEALPix nside parameter of the map.
+    ipix
+        HEALPix pixel number.
+    nest
+        If True return the map in NEST ordering.
+    lonlat
+        If True, automatically adjust latitudes to be within [-90, 90] range.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Returns
+    -------
+        A tuple ``theta, phi`` of mathematical coordinates.
+
+    """
     return healpix.randang(nside, ipix, nest=nest, lonlat=lonlat, rng=rng)
