@@ -55,11 +55,6 @@ class Compare:
         """Check if two array objects are not ordered by less than."""
         np.testing.assert_array_less(actual, desired)
 
-    @staticmethod
-    def assert_equal(actual: AnyArray, desired: AnyArray) -> None:
-        """Check if two objects are not equal."""
-        np.testing.assert_equal(actual, desired)
-
 
 @pytest.fixture(scope="session")
 def compare() -> type[Compare]:
@@ -87,14 +82,25 @@ class DataTransformer:
         IntArray,
     ]:
         """Concatenate an array of pos into three arrays lon, lat and count."""
-        lon = xp.empty(0)
-        lat = xp.empty(0)
-        cnt: IntArray = 0
+        lons = []
+        lats = []
+        counts = []
+
         for lo, la, co in pos:
-            lon = xp.concat([lon, lo])
-            lat = xp.concat([lat, la])
-            cnt = cnt + co
-        return lon, lat, cnt
+            lons.append(xp.asarray(lo))
+            lats.append(xp.asarray(la))
+            counts.append(xp.asarray(co))
+
+        if lons:
+            lon = xp.concat(lons, axis=0)
+            lat = xp.concat(lats, axis=0)
+            count = xp.sum(xp.stack(counts, axis=0), axis=0)
+        else:
+            lon = xp.empty(0)
+            lat = xp.empty(0)
+            count = xp.asarray(0)
+
+        return lon, lat, count
 
 
 @pytest.fixture(scope="session")
