@@ -23,7 +23,6 @@ import math
 import warnings
 from typing import TYPE_CHECKING
 
-import healpix
 import numpy as np
 
 import array_api_compat
@@ -31,6 +30,7 @@ import array_api_compat
 import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.shells
+from glass import healpix
 
 if TYPE_CHECKING:
     from types import ModuleType

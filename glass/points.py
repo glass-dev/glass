@@ -41,7 +41,6 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any
 
-import healpix
 import numpy as np
 
 import array_api_compat
@@ -50,6 +49,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.shells
+from glass import healpix
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
