@@ -4,6 +4,7 @@ import importlib.util
 from typing import TYPE_CHECKING
 
 import healpy as hp
+import numpy as np
 import pytest
 
 import glass
@@ -16,8 +17,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from tests.fixtures.helper_classes import Compare
-
-    from glass._types import UnifiedGenerator
 
 HAVE_JAX = importlib.util.find_spec("jax") is not None
 
@@ -277,7 +276,7 @@ def test_cls2cov_no_jax(compare: type[Compare], xpb: ModuleType) -> None:
         compare.assert_allclose(cov2_copy, cov3)
 
 
-def test_lognormal_gls(xp: ModuleType) -> None:
+def test_lognormal_gls() -> None:
     shift = 2
 
     # empty cls
@@ -286,10 +285,10 @@ def test_lognormal_gls(xp: ModuleType) -> None:
 
     # check output shape
 
-    assert len(glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)) == 1
-    assert len(glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)[0]) == 5
+    assert len(glass.lognormal_gls([np.linspace(1, 5, 5)], shift)) == 1
+    assert len(glass.lognormal_gls([np.linspace(1, 5, 5)], shift)[0]) == 5
 
-    inp = [xp.linspace(1, 6, 5), xp.linspace(1, 5, 4), xp.linspace(1, 4, 3)]
+    inp = [np.linspace(1, 6, 5), np.linspace(1, 5, 4), np.linspace(1, 4, 3)]
     out = glass.lognormal_gls(inp, shift)
 
     assert len(out) == 3
@@ -298,7 +297,7 @@ def test_lognormal_gls(xp: ModuleType) -> None:
     assert len(out[2]) == 3
 
 
-def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
+def test_discretized_cls(compare: type[Compare]) -> None:
     # empty cls
 
     result = glass.discretized_cls([])
@@ -307,7 +306,7 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
     # power spectra truncated at lmax + 1 if lmax provided
 
     result = glass.discretized_cls(
-        [xp.arange(10), xp.arange(10), xp.arange(10)],
+        [np.arange(10), np.arange(10), np.arange(10)],
         lmax=5,
     )
 
@@ -317,11 +316,11 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="invalid number of spectra:"):
-        glass.discretized_cls([xp.arange(10), xp.arange(10)], ncorr=1)
+        glass.discretized_cls([np.arange(10), np.arange(10)], ncorr=1)
 
     # ncorr not None
 
-    cls = [xp.arange(10), xp.arange(10), xp.arange(10)]
+    cls = [np.arange(10), np.arange(10), np.arange(10)]
     ncorr = 0
     result = glass.discretized_cls(cls, ncorr=ncorr)
 
@@ -335,13 +334,11 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
 
     pw = hp.pixwin(nside, lmax=7)
 
-    result = glass.discretized_cls(
-        [xp.asarray([]), xp.ones(10), xp.ones(10)], nside=nside
-    )
+    result = glass.discretized_cls([[], np.ones(10), np.ones(10)], nside=nside)
 
     for cl in result:
         n = min(len(cl), len(pw))
-        expected = xp.ones(n) * pw[:n] ** 2
+        expected = np.ones(n) * pw[:n] ** 2
         compare.assert_allclose(cl[:n], expected)
 
 
@@ -425,19 +422,19 @@ def test_generate_lognormal(xp: ModuleType) -> None:
         glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate(compare: type[Compare], xp: ModuleType) -> None:
+def test_generate(compare: type[Compare]) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
 
     with pytest.raises(ValueError, match="mismatch between number of fields and gls"):
-        list(glass.generate(fields, [xp.ones(10), xp.ones(10)], nside=16))
+        list(glass.generate(fields, [np.ones(10), np.ones(10)], nside=16))
 
     # check output shape
 
     nside = 16
     npix = hp.nside2npix(nside)
-    gls = [xp.ones(10), xp.ones(10), xp.ones(10)]
+    gls = [np.ones(10), np.ones(10), np.ones(10)]
 
     result = list(glass.generate(fields, gls, nside=nside))
 
@@ -508,12 +505,12 @@ def test_nfields_from_nspectra(not_triangle_numbers: list[int]) -> None:
             glass.nfields_from_nspectra(t)
 
 
-def test_enumerate_spectra(xp: ModuleType) -> None:
+def test_enumerate_spectra() -> None:
     n = 100
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra = xp.arange(tn).reshape(tn, 1)
+    spectra = np.arange(tn).reshape(tn, 1)
 
     # this is the expected order of indices
     indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
@@ -654,12 +651,12 @@ def test_healpix_to_glass_spectra(compare: type[Compare]) -> None:
     compare.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
-def test_glass_to_healpix_alm(compare: type[Compare], xp: ModuleType) -> None:
-    inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
+def test_glass_to_healpix_alm(compare: type[Compare]) -> None:
+    inp = np.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
     compare.assert_array_equal(
         out,
-        xp.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
+        np.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
 
 
@@ -673,8 +670,8 @@ def test_lognormal_shift_hilbert2011(compare: type[Compare]) -> None:
     compare.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
-def test_cov_from_spectra(compare: type[Compare], xp: ModuleType) -> None:
-    spectra = xp.asarray(
+def test_cov_from_spectra(compare: type[Compare]) -> None:
+    spectra = np.asarray(
         [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
@@ -759,10 +756,10 @@ def test_cov_from_spectra(compare: type[Compare], xp: ModuleType) -> None:
     )
 
 
-def test_check_posdef_spectra(xp: ModuleType) -> None:
+def test_check_posdef_spectra() -> None:
     # posdef spectra
     assert glass.check_posdef_spectra(
-        xp.asarray(
+        np.asarray(
             [
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 1.0],
@@ -772,7 +769,7 @@ def test_check_posdef_spectra(xp: ModuleType) -> None:
     )
     # semidef spectra
     assert glass.check_posdef_spectra(
-        xp.asarray(
+        np.asarray(
             [
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 0.0],
@@ -782,7 +779,7 @@ def test_check_posdef_spectra(xp: ModuleType) -> None:
     )
     # indef spectra
     assert not glass.check_posdef_spectra(
-        xp.asarray(
+        np.asarray(
             [
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 1.0],
@@ -794,9 +791,9 @@ def test_check_posdef_spectra(xp: ModuleType) -> None:
 
 def test_regularized_spectra(
     mocker: MockerFixture,
-    urng: UnifiedGenerator,
+    rng: np.random.Generator,
 ) -> None:
-    spectra = urng.random(size=(6, 101))
+    spectra = rng.random(size=(6, 101))
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")

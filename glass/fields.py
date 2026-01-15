@@ -124,7 +124,6 @@ def iternorm(
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
     xp = first.__array_namespace__()
-    uxpx = _utils.XPAdditions(xp)
 
     n = (size,) if isinstance(size, int) else size
 
@@ -172,7 +171,9 @@ def iternorm(
             j = (j - 1) % k
 
         # compute new standard deviation
-        s = x[..., 0] - uxpx.einsum("...i,...i", a, a)
+        a_np = np.asarray(a, copy=True)
+        einsum_result_np = np.einsum("...i,...i", a_np, a_np)
+        s = x[..., 0] - xp.asarray(einsum_result_np, copy=True)
         if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
@@ -266,12 +267,10 @@ def discretized_cls(
         If the length of the Cls array is not a triangle number.
 
     """
-    xp = cls.__array_namespace__()
-
     if ncorr is not None:
         n = nfields_from_nspectra(len(cls))  # type: ignore[arg-type]
         cls = [
-            cls[i * (i + 1) // 2 + j] if j <= ncorr else xp.asarray([])
+            cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
             for j in range(i + 1)
         ]
@@ -991,8 +990,6 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
         Covariance matrix from the given spectra.
 
     """
-    xp = spectra.__array_namespace__()
-
     # recover the number of fields from the number of spectra
     n = nfields_from_nspectra(len(spectra))  # type: ignore[arg-type]
 
@@ -1002,14 +999,13 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
     # missing entries are zero, which is the default value
-    cov = xp.zeros((k, n, n))
+    cov = np.zeros((k, n, n))
 
     # fill the matrix up by going through the spectra in order
     # skip over entries that are None
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov = xpx.at(cov)[: cl.size, i, j].set()
         cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
 
     return cov
