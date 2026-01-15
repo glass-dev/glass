@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 import healpy as hp
 import numpy as np
+import ragged
 from transformcl import cltovar
 
 import array_api_compat
@@ -184,7 +185,7 @@ def iternorm(
 
 
 def cls2cov(
-    cls: AnyArray,
+    cls: list[AnyArray],
     nl: int,
     nf: int,
     nc: int,
@@ -214,6 +215,8 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
+    cls = ragged.asarray(cls)
+
     xp = array_api_compat.array_namespace(*cls, use_compat=False)
 
     cov = xp.zeros((nl, nc + 1))
@@ -221,7 +224,7 @@ def cls2cov(
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: min(end - begin, nc + 1)]):
-            if i == 0 and xp.any(xp.less(cl, 0)):
+            if i == 0 and xp.any(xp.less(cl, ragged.asarray(0))):
                 msg = "negative values in cl"
                 raise ValueError(msg)
             n = cl.size
@@ -363,7 +366,7 @@ def _generate_grf(
     ValueError
         If all gls are empty.
     """
-    xp = gls.__array_namespace__()
+    xp = array_api_compat.array_namespace(*gls, use_compat=False)
 
     if rng is None:
         rng = _utils.rng_dispatcher(xp=xp)
@@ -383,7 +386,7 @@ def _generate_grf(
         raise ValueError(msg)
 
     # generates the covariance matrix for the iterative sampler
-    cov = cls2cov(gls, n, ngrf, ncorr)
+    cov = cls2cov(gls, n, ngrf, ncorr)  # type: ignore[arg-type]
 
     # working arrays for the iterative sampling
     y = xp.zeros((n * (n + 1) // 2, ncorr), dtype=xp.complex128)
@@ -868,15 +871,13 @@ def generate(
         Sampled random fields.
 
     """
-    xp = array_api_compat.array_namespace(*gls, use_compat=False)
-
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:  # type: ignore[arg-type]
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
     variances = (cltovar(getcl(gls, i, i)) for i in range(n))
-    grf = _generate_grf(xp.asarray(gls), nside, ncorr=ncorr, rng=rng)
+    grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
         yield t(x, var)
