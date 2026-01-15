@@ -51,6 +51,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -239,7 +240,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # ensure bias_model is a function
     if not callable(bias_model):
@@ -328,7 +329,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                         nside,
                         ipix,
                         lonlat=True,
-                        rng=_utils.rng_dispatcher(xp=np),
+                        rng=_rng.rng_dispatcher(xp=np),
                     )
                 )
                 # next batch
@@ -383,7 +384,7 @@ def uniform_positions(
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     ngal = xp.asarray(ngal)
 

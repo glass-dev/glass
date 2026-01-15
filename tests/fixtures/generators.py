@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-import glass._array_api_utils as _utils
+from glass import _rng
 
 with contextlib.suppress(ImportError):
     # only import if jax is available
@@ -29,7 +29,7 @@ def _select_urng(xp: ModuleType) -> UnifiedGenerator:
     if xp.__name__ == "numpy":
         return np.random.default_rng(seed=SEED)
     if xp.__name__ == "array_api_strict":
-        return _utils.Generator(seed=SEED)
+        return _rng.Generator(seed=SEED)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
