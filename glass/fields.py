@@ -994,7 +994,7 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     xp = spectra.__array_namespace__()
 
     # recover the number of fields from the number of spectra
-    n = nfields_from_nspectra(spectra.shape[0])  # type: ignore[arg-type]
+    n = nfields_from_nspectra(len(spectra))  # type: ignore[arg-type]
 
     # first case: maximum length in input spectra
     k = max((cl.size for cl in spectra), default=0) if lmax is None else lmax + 1
@@ -1009,8 +1009,8 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov = xpx.at(cov)[: cl.size, i, j].set(xp.reshape(cl, -1)[:k])
-        cov = xpx.at(cov)[: cl.size, j, i].set(xp.reshape(cl, -1)[:k])
+        cov = xpx.at(cov)[: cl.size, i, j].set()
+        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
 
     return cov
 
