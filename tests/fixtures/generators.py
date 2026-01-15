@@ -19,17 +19,15 @@ if TYPE_CHECKING:
 
     from glass._types import UnifiedGenerator
 
-SEED = 42
-
 
 def _select_urng(xp: ModuleType) -> UnifiedGenerator:
     """Given an array backend `xp`, returns the matching rng."""
     if xp.__name__ == "jax.numpy":
-        return glass.jax.Generator(seed=SEED)
+        return glass.jax.Generator(seed=_rng.SEED)
     if xp.__name__ == "numpy":
-        return np.random.default_rng(seed=SEED)
+        return np.random.default_rng(seed=_rng.SEED)
     if xp.__name__ == "array_api_strict":
-        return _rng.Generator(seed=SEED)
+        return _rng.Generator(seed=_rng.SEED)
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
 
@@ -41,7 +39,7 @@ def rng() -> np.random.Generator:
 
     Use `urng` for array API tests.
     """
-    return np.random.default_rng(seed=SEED)
+    return np.random.default_rng(seed=_rng.SEED)
 
 
 @pytest.fixture

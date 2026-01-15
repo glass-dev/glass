@@ -5,9 +5,8 @@ jax = pytest.importorskip("jax", reason="tests require jax")
 import jax.numpy as jnp  # noqa: E402
 from jax.typing import ArrayLike  # noqa: E402
 
+from glass._rng import SEED  # noqa: E402
 from glass.jax import Generator  # noqa: E402
-
-SEED = 42
 
 
 def test_init() -> None:

@@ -20,6 +20,7 @@ import glass._array_api_utils as _utils
 import glass.grf
 import glass.harmonics
 import glass.shells
+from glass._rng import SEED
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -356,7 +357,7 @@ def _generate_grf(
         If all gls are empty.
     """
     if rng is None:
-        rng = np.random.default_rng(42)
+        rng = np.random.default_rng(SEED)
 
     # number of gls and number of fields
     ngls = len(gls)  # type: ignore[arg-type]

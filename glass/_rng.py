@@ -22,6 +22,9 @@ if TYPE_CHECKING:
     from glass._types import FloatArray, UnifiedGenerator
 
 
+SEED = 42
+
+
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.
@@ -40,18 +43,16 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     NotImplementedError
         If the array backend is not supported.
     """
-    seed = 42
-
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
-        return glass.jax.Generator(seed=seed)
+        return glass.jax.Generator(seed=SEED)
 
     if xp.__name__ == "numpy":
-        return xp.random.default_rng(seed=seed)  # type: ignore[no-any-return]
+        return xp.random.default_rng(seed=SEED)  # type: ignore[no-any-return]
 
     if xp.__name__ == "array_api_strict":
-        return Generator(seed=seed)
+        return Generator(seed=SEED)
 
     msg = "the array backend in not supported"
     raise NotImplementedError(msg)
@@ -69,7 +70,7 @@ class Generator:
 
     def __init__(
         self,
-        seed: int | bool | AArray | None = None,  # noqa: FBT001
+        seed: int | bool | AArray = SEED,  # noqa: FBT001
     ) -> None:
         """
         Initialize the Generator.
