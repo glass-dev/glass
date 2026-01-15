@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import healpy  # noqa: F401
+import numpy as np
 
 import healpix
 
@@ -153,10 +154,18 @@ def randang(
         A tuple ``theta, phi`` of mathematical coordinates.
 
     """
-    return healpix.randang(nside, ipix, nest=nest, lonlat=lonlat, rng=rng)
+    xp = ipix.__array_namespace__()
+    return xp.asarray(
+        healpix.randang(
+            nside,
+            np.asarray(ipix),
+            nest=nest,
+            lonlat=lonlat,
+            rng=rng,
+        )
+    )
 
 
 class Rotator:
-
     def rotate_map_pixel(self):
         pass
