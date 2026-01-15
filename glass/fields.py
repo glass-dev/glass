@@ -23,6 +23,7 @@ import glass.shells
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
+    from types import ModuleType
     from typing import Literal
 
     from glass._types import (
@@ -30,7 +31,6 @@ if TYPE_CHECKING:
         ComplexArray,
         FloatArray,
         IntArray,
-        ModuleType,
         T,
         UnifiedGenerator,
     )
@@ -377,7 +377,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((gl.size for gl in gls), default=0)  # type: ignore[arg-type]
+    n = max((gl.size for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
