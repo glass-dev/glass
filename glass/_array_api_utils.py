@@ -29,6 +29,8 @@ if TYPE_CHECKING:
 
     from glass._types import AnyArray, FloatArray, UnifiedGenerator
 
+SEED = 42
+
 
 class CompatibleBackendNotFoundError(Exception):
     """
@@ -83,12 +85,14 @@ def default_xp() -> ModuleType:
     return import_numpy()
 
 
-def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
+def rng_dispatcher(*, seed: int | AArray = SEED, xp: ModuleType) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.
 
     Parameters
     ----------
+    seed
+        Seed for the random number generator.
     xp
         The array library backend to use for array operations.
 
@@ -101,8 +105,6 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     NotImplementedError
         If the array backend is not supported.
     """
-    seed = 42
-
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
@@ -128,10 +130,7 @@ class Generator:
 
     __slots__ = ("axp", "nxp", "rng")
 
-    def __init__(
-        self,
-        seed: int | bool | AArray | None = None,  # noqa: FBT001
-    ) -> None:
+    def __init__(self, *, seed: int | AArray = SEED) -> None:
         """
         Initialize the Generator.
 
@@ -146,7 +145,7 @@ class Generator:
 
         self.axp = array_api_strict
         self.nxp = numpy
-        self.rng = self.nxp.random.default_rng(seed=seed)
+        self.rng = rng_dispatcher(seed=seed, xp=self.nxp)
 
     def random(
         self,
@@ -171,7 +170,7 @@ class Generator:
             Array of random floats.
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type,call-arg]
 
     def normal(
         self,
@@ -216,7 +215,7 @@ class Generator:
         -------
             Array of samples from the Poisson distribution.
         """
-        return self.axp.asarray(self.rng.poisson(lam, size))
+        return self.axp.asarray(self.rng.poisson(lam, size))  # type: ignore[arg-type]
 
     def standard_normal(
         self,
@@ -241,7 +240,7 @@ class Generator:
             Array of samples from the standard normal distribution.
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type,call-arg]
 
     def uniform(
         self,
@@ -265,7 +264,7 @@ class Generator:
         -------
             Array of samples from the uniform distribution.
         """
-        return self.axp.asarray(self.rng.uniform(low, high, size))
+        return self.axp.asarray(self.rng.uniform(low, high, size))  # type: ignore[arg-type]
 
 
 class XPAdditions:
