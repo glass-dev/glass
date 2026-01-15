@@ -207,7 +207,7 @@ def galaxy_shear(  # noqa: PLR0913
     # get the lensing maps at galaxy position
     for i in range(0, size, 10_000):
         s = slice(i, i + 10_000)
-        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True)
+        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=np)
         k[s] = kappa[ipix]
         np.real(g)[s] = gamma1[ipix]
         np.imag(g)[s] = gamma2[ipix]

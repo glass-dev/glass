@@ -280,9 +280,6 @@ class XPAdditions:
     for details.
     """
 
-    xp: ModuleType
-    backend: str
-
     def __init__(self, xp: ModuleType) -> None:
         """
         Initialize XPAdditions with the given array namespace.

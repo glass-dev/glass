@@ -67,6 +67,8 @@ def vmap_galactic_ecliptic(
         The location of the galactic plane in the respective coordinate system.
     ecliptic
         The location of the ecliptic plane in the respective coordinate system.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------

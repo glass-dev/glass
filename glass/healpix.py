@@ -1,28 +1,138 @@
-"""_summary_.."""
+"""Wrapper for HEALPix operations to be Array API compatible."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import healpy  # noqa: F401
+import healpix
+import healpy
 import numpy as np
 
-import healpix
+import array_api_compat
 
 if TYPE_CHECKING:
-    from glass._types import FloatArray, IntArray, UnifiedGenerator
+    from collections.abc import Sequence
+    from types import ModuleType
+
+    from glass._types import ComplexArray, FloatArray, IntArray, UnifiedGenerator
 
 
-def alm2map():
-    pass
+def alm2map(  # noqa: PLR0913
+    alms: ComplexArray,
+    nside: int,
+    *,
+    inplace: bool = False,
+    lmax: int | None = None,
+    pixwin: bool = False,
+    pol: bool = True,
+) -> FloatArray:
+    """
+    Computes a HEALPix map given the alm.
+
+    Parameters
+    ----------
+    alms
+        A complex array or a sequence of complex arrays.
+    nside
+        The nside of the output map.
+    inplace
+        If True, input alms may be modified by pixel window function and beam smoothing.
+    lmax
+        Explicitly define lmax.
+    pixwin
+        Smooth the alm using the pixel window functions.
+    pol
+        If True, assumes input alms are TEB.
+
+    Returns
+    -------
+        A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
+
+    """
+    xp = alms.__array_namespace__()
+
+    return xp.asarray(
+        healpy.alm2map(
+            np.asarray(alms),
+            nside,
+            inplace=inplace,
+            lmax=lmax,
+            pixwin=pixwin,
+            pol=pol,
+        )
+    )
 
 
-def alm2map_spin():
-    pass
+def alm2map_spin(
+    alms: FloatArray,
+    nside: int,
+    spin: int,
+    lmax: int,
+) -> FloatArray:
+    """
+    Computes maps from a set of 2 spinned alm.
+
+    Parameters
+    ----------
+    alms
+        List of 2 alms.
+    nside
+        Requested nside of the output map.
+    spin
+        Spin of the alms.
+    lmax
+        Maximum l of the power spectrum.
+
+    Returns
+    -------
+        List of 2 out maps in RING scheme as arrays.
+
+    """
+    xp = alms.__array_namespace__()
+
+    return xp.asarray(
+        healpy.alm2map_spin(
+            np.asarray(alms),
+            nside,
+            spin,
+            lmax,
+        ),
+    )
 
 
-def almxfl():
-    pass
+def almxfl(
+    alm: FloatArray,
+    fl: FloatArray,
+    *,
+    inplace: bool = False,
+) -> FloatArray:
+    """
+    Multiply alm by a function of l. The function is assumed to be zero where
+    not defined.
+
+    Parameters
+    ----------
+    alm
+        The alm to multiply.
+    fl
+        The function (at l=0..fl.size-1) by which alm must be multiplied.
+    inplace
+        If True, modify the given alm, otherwise make a copy before multiplying.
+
+    Returns
+    -------
+        The modified alm, either a new array or a reference to input alm.
+
+    """
+    xp = array_api_compat.get_namespace(alm, fl, use_compat=False)
+
+    return xp.asarray(
+        healpy.almxfl(
+            np.asarray(alm),
+            np.asarray(fl),
+            inplace=inplace,
+        )
+    )
 
 
 def ang2pix(
@@ -30,10 +140,11 @@ def ang2pix(
     theta: float,
     phi: float,
     *,
-    nest: bool = False,
     lonlat: bool = False,
+    xp: ModuleType = np,
 ) -> IntArray:
-    """Converts the angle to HEALPix pixel numbers.
+    """
+    Converts the angle to HEALPix pixel numbers.
 
     Parameters
     ----------
@@ -43,23 +154,35 @@ def ang2pix(
         Angular coordinates of a point on the sphere.
     phi
         Angular coordinates of a point on the sphere.
-    nest
-        If True return the map in NEST ordering.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------
         The HEALPix pixel numbers.
 
     """
-    return healpix.ang2pix(nside, theta, phi, nest=nest, lonlat=lonlat)
+    return xp.asarray(
+        healpix.ang2pix(
+            nside,
+            theta,
+            phi,
+            lonlat=lonlat,
+        )
+    )
 
 
 def ang2vec(
-    theta: float, phi: float, *, lonlat: bool = False
+    theta: float,
+    phi: float,
+    *,
+    lonlat: bool = False,
+    xp: ModuleType = np,
 ) -> tuple[FloatArray, FloatArray, FloatArray]:
-    """Convert angles to 3D position vector.
+    """
+    Convert angles to 3D position vector.
 
     Parameters
     ----------
@@ -69,25 +192,82 @@ def ang2vec(
         Angular coordinates of a point on the sphere.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------
         A normalised 3-vector pointing in the same direction as ``ang``.
 
     """
-    return healpix.ang2vec(theta, phi, lonlat=lonlat)
+    return xp.asarray(
+        healpix.ang2vec(
+            theta,
+            phi,
+            lonlat=lonlat,
+        )
+    )
 
 
-def get_nside():
-    pass
+def get_nside(m: FloatArray) -> int:
+    """
+    Return the nside of the given map.
+
+    Parameters
+    ----------
+    m
+        The map to get the nside from.
+
+    Returns
+    -------
+        The healpix nside parameter of the map.
+
+    """
+    return healpy.get_nside(np.asarray(m))
 
 
-def map2alm():
-    pass
+def map2alm(
+    maps: FloatArray,
+    *,
+    lmax: int | None = None,
+    pol: bool = True,
+    use_pixel_weights: bool = False,
+) -> FloatArray:
+    """
+    Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
+
+    Parameters
+    ----------
+    maps
+        The input map or a list of n input maps. Must be in ring ordering.
+    lmax
+        Maximum l of the power spectrum.
+    pol
+        If True, assumes input maps are TQU.
+    use_pixel_weights
+        If True, use pixel by pixel weighting, healpy will automatically
+        download the weights, if needed.
+
+    Returns
+    -------
+        alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
+
+    """
+    xp = maps.__array_namespace__()
+
+    return xp.asarray(
+        healpy.map2alm(
+            np.asarray(maps),
+            lmax=lmax,
+            pol=pol,
+            use_pixel_weights=use_pixel_weights,
+        )
+    )
 
 
 def npix2nside(npix: int) -> int:
-    """Give the nside parameter for the given number of pixels.
+    """
+    Give the nside parameter for the given number of pixels.
 
     Parameters
     ----------
@@ -103,7 +283,8 @@ def npix2nside(npix: int) -> int:
 
 
 def nside2npix(nside: int) -> int:
-    """Give the number of pixels for the given nside.
+    """
+    Give the number of pixels for the given nside.
 
     Parameters
     ----------
@@ -118,23 +299,80 @@ def nside2npix(nside: int) -> int:
     return healpix.nside2npix(nside)
 
 
-def pixwin():
-    pass
+def pixwin(
+    nside: int,
+    *,
+    lmax: int | None = None,
+    pol: bool = False,
+    xp: ModuleType = np,
+) -> FloatArray:
+    """
+    Return the pixel window function for the given nside.
+
+    Parameters
+    ----------
+    nside
+        The nside for which to return the pixel window function.
+    lmax
+        If True, return also the polar pixel window.
+    pol
+        Maximum l of the power spectrum.
+    xp
+        The array library backend to use for array operations.
+
+    Returns
+    -------
+        The temperature pixel window function.
+
+    """
+    return xp.asarray(
+        healpy.pixwin(
+            nside,
+            lmax=lmax,
+            pol=pol,
+        )
+    )
 
 
-def query_strip():
-    pass
+def query_strip(
+    nside: int,
+    thetas: tuple[float, float],
+    xp: ModuleType = np,
+) -> IntArray:
+    """
+    Returns pixels whose centers lie within the colatitude range defined by thetas.
+
+    Parameters
+    ----------
+    nside
+        The nside of the HEALPix map.
+    thetas
+        Colatitudes in radians.
+    xp
+        The array library backend to use for array operations.
+
+    Returns
+    -------
+        The pixels which lie within the given strip.
+
+    """
+    return xp.asarray(
+        healpy.query_strip(
+            nside,
+            *thetas,
+        )
+    )
 
 
 def randang(
     nside: int,
     ipix: IntArray,
     *,
-    nest: bool = False,
     lonlat: bool = False,
     rng: UnifiedGenerator | None = None,
-) -> tuple[FloatArray, FloatArray]:
-    """Sample random spherical coordinates from the given HEALPix pixels.
+) -> FloatArray:
+    """
+    Sample random spherical coordinates from the given HEALPix pixels.
 
     Parameters
     ----------
@@ -142,8 +380,6 @@ def randang(
         The HEALPix nside parameter of the map.
     ipix
         HEALPix pixel number.
-    nest
-        If True return the map in NEST ordering.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
     rng
@@ -155,11 +391,11 @@ def randang(
 
     """
     xp = ipix.__array_namespace__()
+
     return xp.asarray(
         healpix.randang(
             nside,
             np.asarray(ipix),
-            nest=nest,
             lonlat=lonlat,
             rng=rng,
         )
@@ -167,5 +403,40 @@ def randang(
 
 
 class Rotator:
-    def rotate_map_pixel(self):
-        pass
+    """Rotation operator, including astronomical coordinate systems."""
+
+    def __init__(
+        self,
+        coord: Sequence[str] | None = None,
+        xp: ModuleType = np,
+    ) -> None:
+        """Create a rotator with given parameters.
+
+        Parameters
+        ----------
+        coord
+            A string or a tuple of 1 or 2 strings or a sequence of tuple.
+        xp
+            The array library backend to use for array operations.
+
+        """
+        self.coord = coord
+        self.xp = xp
+
+    def rotate_map_pixel(self, m: FloatArray) -> FloatArray:
+        """
+        Rotate a HEALPix map to a new reference frame in pixel space.
+
+        Parameters
+        ----------
+        m
+            Input map, 1 map is considered I, 2 maps:[Q,U], 3 maps:[I,Q,U].
+
+        Returns
+        -------
+            Map in the new reference frame
+
+        """
+        return self.xp.asarray(
+            healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m))
+        )

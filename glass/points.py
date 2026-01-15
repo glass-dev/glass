@@ -365,6 +365,8 @@ def uniform_positions(
         Number density, expected number of positions per arcmin2.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations.
 
     Yields
     ------
