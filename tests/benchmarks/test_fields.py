@@ -175,7 +175,7 @@ def test_generate_grf(  # noqa: PLR0913
         generator = glass.fields._generate_grf(
             gls,
             nside,
-            rng=urngb if use_rng else None,  # type: ignore[arg-type]
+            rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
         return generator_consumer.consume(generator)  # type: ignore[no-any-return]
