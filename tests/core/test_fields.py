@@ -194,7 +194,11 @@ def test_cls2cov_no_jax(compare: type[Compare], xpb: ModuleType) -> None:
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [xpb.asarray([1.0, 0.5, 0.3]), None, xpb.asarray([0.7, 0.6, 0.1])],
+        [
+            xpb.asarray([1.0, 0.5, 0.3]),
+            xpb.asarray([1.0]),
+            xpb.asarray([0.7, 0.6, 0.1]),
+        ],
         nl,
         nf,
         nc,

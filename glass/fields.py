@@ -10,6 +10,7 @@ from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
 import numpy as np
+import ragged
 from transformcl import cltovar
 
 import array_api_compat
@@ -219,14 +220,16 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
+    cls = ragged.asarray(cls)
+
     xp = array_api_compat.array_namespace(*cls, use_compat=False)
 
     cov = xp.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
-        for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and xp.any(xp.less(cl, 0)):
+        for i, cl in enumerate(cls[begin:end][: min(end - begin, nc + 1)]):
+            if i == 0 and xp.any(xp.less(cl, ragged.asarray(0))):
                 msg = "negative values in cl"
                 raise ValueError(msg)
             n = cl.shape[0]
@@ -367,8 +370,9 @@ def _generate_grf(
     ------
     ValueError
         If all gls are empty.
-
     """
+    xp = array_api_compat.array_namespace(*gls, use_compat=False)
+
     if rng is None:
         rng = _rng.rng_dispatcher(xp=np)
 
@@ -387,7 +391,7 @@ def _generate_grf(
         raise ValueError(msg)
 
     # generates the covariance matrix for the iterative sampler
-    cov = cls2cov(gls, n, ngrf, ncorr)
+    cov = cls2cov(gls, n, ngrf, ncorr)  # type: ignore[arg-type]
 
     # working arrays for the iterative sampling
     z = np.zeros(n * (n + 1) // 2, dtype=np.complex128)
