@@ -64,11 +64,11 @@ def alm2map(  # noqa: PLR0913
 
 
 def alm2map_spin(
-    alms: FloatArray,
+    alms: Sequence[FloatArray],
     nside: int,
     spin: int,
     lmax: int,
-) -> FloatArray:
+) -> list[FloatArray]:
     """
     Computes maps from a set of 2 spinned alm.
 
@@ -88,16 +88,11 @@ def alm2map_spin(
         List of 2 out maps in RING scheme as arrays.
 
     """
-    xp = alms.__array_namespace__()
+    xp = array_api_compat.get_namespace(*alms, use_compat=False)
 
-    return xp.asarray(
-        healpy.alm2map_spin(
-            np.asarray(alms),
-            nside,
-            spin,
-            lmax,
-        ),
-    )
+    inputs = [np.asarray(alm) for alm in alms]
+    outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
+    return [xp.asarray(out) for out in outputs]
 
 
 def almxfl(
@@ -220,7 +215,7 @@ def get_nside(m: FloatArray) -> int:
 
     Returns
     -------
-        The healpix nside parameter of the map.
+        The HEALPix nside parameter of the map.
 
     """
     return healpy.get_nside(np.asarray(m))
@@ -370,7 +365,7 @@ def randang(
     *,
     lonlat: bool = False,
     rng: UnifiedGenerator | None = None,
-) -> FloatArray:
+) -> tuple[FloatArray, FloatArray]:
     """
     Sample random spherical coordinates from the given HEALPix pixels.
 
@@ -392,14 +387,13 @@ def randang(
     """
     xp = ipix.__array_namespace__()
 
-    return xp.asarray(
-        healpix.randang(
-            nside,
-            np.asarray(ipix),
-            lonlat=lonlat,
-            rng=rng,
-        )
+    theta, phi = healpix.randang(
+        nside,
+        np.asarray(ipix),
+        lonlat=lonlat,
+        rng=rng,
     )
+    return xp.asarray(theta), xp.asarray(phi)
 
 
 class Rotator:

@@ -175,8 +175,8 @@ def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
 
     lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 
-    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True)
-    x, y, z = hp.ang2vec(lon, lat, lonlat=True)
+    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=np)
+    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=np)
 
     dotp = x * x_ + y * y_ + z * z_
 

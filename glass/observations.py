@@ -34,6 +34,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
@@ -47,8 +48,8 @@ if TYPE_CHECKING:
 
 def vmap_galactic_ecliptic(
     nside: int,
-    galactic: tuple[float, ...] = (30, 90),
-    ecliptic: tuple[float, ...] = (20, 80),
+    galactic: tuple[float, float] = (30, 90),
+    ecliptic: tuple[float, float] = (20, 80),
     *,
     xp: ModuleType = np,
 ) -> FloatArray:
@@ -89,11 +90,11 @@ def vmap_galactic_ecliptic(
         msg = "ecliptic stripe must be a pair of numbers"
         raise TypeError(msg)
 
-    m = np.ones(hp.nside2npix(nside))
-    m[hp.query_strip(nside, *galactic)] = 0
+    m = xp.ones(hp.nside2npix(nside))
+    m = xpx.at(m)[hp.query_strip(nside, galactic, xp=xp)].set(0)
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)
-    m[hp.query_strip(nside, *ecliptic)] = 0
-    return xp.asarray(hp.Rotator(coord="CE").rotate_map_pixel(m))
+    m = xpx.at(m)[hp.query_strip(nside, ecliptic, xp=xp)].set(0)
+    return hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m)
 
 
 def gaussian_nz(

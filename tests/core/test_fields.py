@@ -331,7 +331,7 @@ def test_discretized_cls(compare: type[Compare]) -> None:
 
     nside = 4
 
-    pw = hp.pixwin(nside, lmax=7)
+    pw = hp.pixwin(nside, lmax=7, xp=np)
 
     result = glass.discretized_cls([[], np.ones(10), np.ones(10)], nside=nside)
 

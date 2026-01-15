@@ -322,14 +322,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                     stop += 1
                 # sample this batch of pixels
                 ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
-                lon, lat = (
-                    xp.asarray(angle)
-                    for angle in hp.randang(
-                        nside,
-                        ipix,
-                        lonlat=True,
-                        rng=_utils.rng_dispatcher(xp=np),
-                    )
+                lon, lat = hp.randang(
+                    nside, ipix, lonlat=True, rng=_utils.rng_dispatcher(xp=np)
                 )
                 # next batch
                 start, size = stop, 0

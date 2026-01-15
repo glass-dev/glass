@@ -268,7 +268,7 @@ def discretized_cls(
         ]
 
     if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax)
+        pw = hp.pixwin(nside, lmax=lmax, xp=np)
 
     gls = []
     for cl in cls:
