@@ -91,9 +91,23 @@ def vmap_galactic_ecliptic(
         raise TypeError(msg)
 
     m = xp.ones(hp.nside2npix(nside))
-    m = xpx.at(m)[hp.query_strip(nside, galactic, xp=xp)].set(0)
-    m = hp.Rotator(coord="GC").rotate_map_pixel(m)
-    m = xpx.at(m)[hp.query_strip(nside, ecliptic, xp=xp)].set(0)
+    m = xp.where(
+        xp.any(
+            xp.arange(m.shape[0])[:, None] == hp.query_strip(nside, galactic, xp=xp),
+            axis=1,
+        ),
+        m,
+        0,
+    )
+    m = hp.Rotator(coord="GC", xp=xp).rotate_map_pixel(m)
+    m = xp.where(
+        xp.any(
+            xp.arange(m.shape[0])[:, None] == hp.query_strip(nside, ecliptic, xp=xp),
+            axis=1,
+        ),
+        0,
+        m,
+    )
     return hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m)
 
 
