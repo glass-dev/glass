@@ -168,6 +168,7 @@ class Generator:
         Returns
         -------
             Array of random floats.
+
         """
         dtype = dtype if dtype is not None else self.nxp.float64
         return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type,call-arg]
@@ -193,6 +194,7 @@ class Generator:
         Returns
         -------
             Array of samples from the normal distribution.
+
         """
         return self.axp.asarray(self.rng.normal(loc, scale, size))
 
@@ -214,6 +216,7 @@ class Generator:
         Returns
         -------
             Array of samples from the Poisson distribution.
+
         """
         return self.axp.asarray(self.rng.poisson(lam, size))  # type: ignore[arg-type]
 
@@ -238,6 +241,7 @@ class Generator:
         Returns
         -------
             Array of samples from the standard normal distribution.
+
         """
         dtype = dtype if dtype is not None else self.nxp.float64
         return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type,call-arg]
@@ -263,6 +267,7 @@ class Generator:
         Returns
         -------
             Array of samples from the uniform distribution.
+
         """
         return self.axp.asarray(self.rng.uniform(low, high, size))  # type: ignore[arg-type]
 
