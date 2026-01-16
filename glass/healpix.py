@@ -321,11 +321,8 @@ def pixwin(
 
     """
     return xp.asarray(
-        healpy.pixwin(
-            nside,
-            lmax=lmax,
-            pol=pol,
-        )
+        healpy.pixwin(nside, lmax=lmax, pol=pol),
+        dtype=xp.float64,
     )
 
 
