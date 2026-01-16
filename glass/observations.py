@@ -34,7 +34,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 import array_api_compat
-import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
