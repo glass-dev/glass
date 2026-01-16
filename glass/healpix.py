@@ -9,7 +9,6 @@ import healpy
 import numpy as np
 
 import array_api_compat
-import array_api_extra as xpx
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
