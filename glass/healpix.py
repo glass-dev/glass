@@ -9,6 +9,7 @@ import healpy
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -335,7 +336,8 @@ def query_strip(
     xp: ModuleType = np,
 ) -> IntArray:
     """
-    Returns pixels whose centers lie within the colatitude range defined by thetas.
+    Computes a mask of the pixels whose centers lie within the colatitude range
+    defined by thetas.
 
     Parameters
     ----------
@@ -348,15 +350,13 @@ def query_strip(
 
     Returns
     -------
-        The pixels which lie within the given strip.
+        The mask of the pixels which lie within the given strip.
 
     """
-    return xp.asarray(
-        healpy.query_strip(
-            nside,
-            *thetas,
-        )
-    )
+    output = np.zeros(nside2npix(nside))
+    indices = healpy.query_strip(nside, *thetas)
+    output[indices] = 1
+    return xp.asarray(output, dtype=xp.int64)
 
 
 def randang(
