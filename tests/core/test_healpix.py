@@ -74,7 +74,7 @@ def test_query_strip(compare: type[Compare], xp: ModuleType) -> None:
     """
     Compare ``glass.healpix.query_strip`` against ``healpy.query_strip``.
 
-    The beahviour of ``query_strip`` has been changed subtly. Previously it
+    The behaviour of ``query_strip`` has been changed subtly. Previously it
     returned the indices of the pixels within the strip. Now it returns a mask
     array indicating which pixels are within the strip.
     """
