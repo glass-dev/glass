@@ -6,8 +6,8 @@ import healpix
 import healpy
 import numpy as np
 
-import glass.healpix as hp
 import glass._array_api_utils as _utils
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -132,6 +132,7 @@ def test_randang(
     new = hp.randang(
         healpix_inputs.nside, ipix, lonlat=True, rng=_utils.rng_dispatcher(xp=np)
     )
+    assert len(old) == len(new)
     compare.assert_array_equal(old[0], new[0])
     compare.assert_array_equal(old[1], new[1])
 
@@ -139,14 +140,15 @@ def test_randang(
 def test_rotate_map_pixel(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     """
     Compare ``glass.healpix.Rotator.rotate_map_pixel`` against
     ``healpy.Rotator.rotate_map_pixel``.
     """  # noqa: D205
-    m = xp.concat([xp.ones(88), xp.zeros(48), xp.ones(56)])
+    kappa = healpix_inputs.kappa(urng)
     compare.assert_array_equal(
-        healpy.Rotator(coord=healpix_inputs.coord).rotate_map_pixel(np.asarray(m)),
-        hp.Rotator(coord=healpix_inputs.coord, xp=xp).rotate_map_pixel(m),
+        healpy.Rotator(coord=healpix_inputs.coord).rotate_map_pixel(np.asarray(kappa)),
+        hp.Rotator(coord=healpix_inputs.coord, xp=xp).rotate_map_pixel(kappa),
     )
