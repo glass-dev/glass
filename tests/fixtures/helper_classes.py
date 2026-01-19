@@ -137,3 +137,19 @@ class GeneratorConsumer:
 def generator_consumer() -> type[GeneratorConsumer]:
     """Fixture for generator-consuming utility."""
     return GeneratorConsumer
+
+
+class HealpixInputs:
+    """Helper class for calculating inputs for HEALPix functions."""
+
+    coord: str = "CG"
+    lmax: int = 5
+    npix: int = 48
+    nside: int = 2
+    thetas: tuple[int, int] = (30, 90)
+
+
+@pytest.fixture(scope="session")
+def healpix_inputs() -> type[HealpixInputs]:
+    """Fixture for generating HEALPix inputs."""
+    return HealpixInputs

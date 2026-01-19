@@ -12,70 +12,84 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from tests.fixtures.helper_classes import Compare
-
-LMAX = 11
-NPIX = 192
-NSIDE = 4
-THETAS = (30, 90)
+    from tests.fixtures.helper_classes import Compare, HealpixInputs
 
 
 def test_alm2map() -> None:
     """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
-    pass
 
 
 def test_alm2map_spin() -> None:
     """Compare ``glass.healpix.alm2map_spin`` against ``healpy.alm2map_spin``."""
-    pass
 
 
 def test_almxfl() -> None:
     """Compare ``glass.healpix.almxfl`` against ``healpy.almxfl``."""
-    pass
 
 
 def test_ang2pix() -> None:
     """Compare ``glass.healpix.ang2pix`` against ``healpix.ang2pix``."""
-    pass
 
 
 def test_ang2vec() -> None:
     """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
-    pass
 
 
-def test_get_nside(urng: UnifiedGenerator) -> None:
+def test_get_nside(
+    urng: UnifiedGenerator,
+    healpix_inputs: type[HealpixInputs],
+) -> None:
     """Compare ``glass.healpix.get_nside`` against ``healpy.get_nside``."""
-    kappa = urng.normal(10, size=hp.nside2npix(NSIDE))
+    kappa = urng.normal(10, size=hp.nside2npix(healpix_inputs.nside))
     assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
-def test_map2alm(compare: type[Compare], urng: UnifiedGenerator) -> None:
+def test_map2alm(
+    compare: type[Compare], urng: UnifiedGenerator, healpix_inputs: type[HealpixInputs]
+) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
-    kappa = urng.normal(10, size=hp.nside2npix(NSIDE))
+    kappa = urng.normal(10, size=hp.nside2npix(healpix_inputs.nside))
     compare.assert_array_equal(
-        healpy.map2alm(np.asarray(kappa), lmax=LMAX, pol=False, use_pixel_weights=True),
-        hp.map2alm(kappa, lmax=LMAX, pol=False, use_pixel_weights=True),
+        healpy.map2alm(
+            np.asarray(kappa),
+            lmax=healpix_inputs.lmax,
+            pol=False,
+            use_pixel_weights=True,
+        ),
+        hp.map2alm(
+            kappa,
+            lmax=healpix_inputs.lmax,
+            pol=False,
+            use_pixel_weights=True,
+        ),
     )
 
 
-def test_npix2nside() -> None:
+def test_npix2nside(
+    healpix_inputs: type[HealpixInputs],
+) -> None:
     """Compare ``glass.healpix.npix2nside`` against ``healpix.npix2nside``."""
-    assert healpix.npix2nside(NPIX) == hp.npix2nside(NPIX)
+    assert healpix.npix2nside(healpix_inputs.npix) == hp.npix2nside(healpix_inputs.npix)
 
 
-def test_nside2npix() -> None:
+def test_nside2npix(
+    healpix_inputs: type[HealpixInputs],
+) -> None:
     """Compare ``glass.healpix.nside2npix`` against ``healpix.nside2npix``."""
-    assert healpix.nside2npix(NSIDE) == hp.nside2npix(NSIDE)
+    assert healpix.nside2npix(healpix_inputs.nside) == hp.nside2npix(
+        healpix_inputs.nside
+    )
 
 
 def test_pixwin() -> None:
     """Compare ``glass.healpix.pixwin`` against ``healpy.pixwin``."""
-    pass
 
 
-def test_query_strip(compare: type[Compare], xp: ModuleType) -> None:
+def test_query_strip(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    xp: ModuleType,
+) -> None:
     """
     Compare ``glass.healpix.query_strip`` against ``healpy.query_strip``.
 
@@ -83,25 +97,28 @@ def test_query_strip(compare: type[Compare], xp: ModuleType) -> None:
     returned the indices of the pixels within the strip. Now it returns a mask
     array indicating which pixels are within the strip.
     """
-    old = np.zeros(NPIX)
-    old[healpy.query_strip(NSIDE, *THETAS)] = 0
-    new = np.zeros(NPIX, dtype=np.int64)
-    new *= 1 - hp.query_strip(NSIDE, THETAS, xp=xp)
+    old = np.zeros(healpix_inputs.npix)
+    old[healpy.query_strip(healpix_inputs.nside, *healpix_inputs.thetas)] = 0
+    new = np.zeros(healpix_inputs.npix, dtype=np.int64)
+    new *= 1 - hp.query_strip(healpix_inputs.nside, healpix_inputs.thetas, xp=xp)
     compare.assert_array_equal(old, new)
 
 
 def test_randang() -> None:
     """Compare ``glass.healpix.randang`` against ``healpix.randang``."""
-    pass
 
 
-def test_rotate_map_pixel(compare: type[Compare], xp: ModuleType) -> None:
+def test_rotate_map_pixel(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    xp: ModuleType,
+) -> None:
     """
     Compare ``glass.healpix.Rotator.rotate_map_pixel`` against
     ``healpy.Rotator.rotate_map_pixel``.
     """  # noqa: D205
     m = xp.concat([xp.ones(88), xp.zeros(48), xp.ones(56)])
     compare.assert_array_equal(
-        healpy.Rotator(coord="CG").rotate_map_pixel(np.asarray(m)),
-        hp.Rotator(coord="CG", xp=xp).rotate_map_pixel(m),
+        healpy.Rotator(coord=healpix_inputs.coord).rotate_map_pixel(np.asarray(m)),
+        hp.Rotator(coord=healpix_inputs.coord, xp=xp).rotate_map_pixel(m),
     )
