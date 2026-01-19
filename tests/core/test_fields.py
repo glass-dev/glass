@@ -347,10 +347,6 @@ def test_discretized_cls(
 
 
 def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
-    # Call jax version of iternorm once jax version is written
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
-
     # empty cls
 
     result = glass.effective_cls([], xp.asarray([]))

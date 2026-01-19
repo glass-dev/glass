@@ -685,9 +685,9 @@ def effective_cls(
             for i1 in range(n)
             for i2 in range(n)
         )
-        out[j1 + j2 + (...,)] = cl
+        out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
-            out[j2 + j1 + (...,)] = cl
+            out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
     return out
 
 
