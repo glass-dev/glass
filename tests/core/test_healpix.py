@@ -18,9 +18,40 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare, HealpixInputs
 
 
-def test_alm2map() -> None:
+@pytest.mark.parametrize(
+    ("pixwin", "pol"),
+    [
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    ],
+)
+def test_alm2map(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    pixwin: bool,  # noqa: FBT001
+    pol: bool,  # noqa: FBT001
+    urng: UnifiedGenerator,
+) -> None:
     """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
-    pass  # noqa: PIE790
+    alm = healpix_inputs.alm(rng=urng)
+    compare.assert_array_equal(
+        healpy.alm2map(
+            np.asarray(alm),
+            healpix_inputs.nside,
+            lmax=healpix_inputs.lmax,
+            pixwin=pixwin,
+            pol=pol,
+        ),
+        hp.alm2map(
+            alm,
+            healpix_inputs.nside,
+            lmax=healpix_inputs.lmax,
+            pixwin=pixwin,
+            pol=pol,
+        ),
+    )
 
 
 def test_alm2map_spin() -> None:
@@ -50,8 +81,8 @@ def test_ang2pix(  # noqa: PLR0913
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.ang2pix`` against ``healpix.ang2pix``."""
-    thetas = healpix_inputs.longitudes(max_theta, urng)
-    phis = healpix_inputs.latitudes(max_phi, urng)
+    thetas = healpix_inputs.longitudes(max_theta, rng=urng)
+    phis = healpix_inputs.latitudes(max_phi, rng=urng)
     old = healpix.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat)
     new = hp.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat, xp=xp)
     compare.assert_array_equal(old, new)
@@ -74,8 +105,8 @@ def test_ang2vec(  # noqa: PLR0913
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
-    thetas = healpix_inputs.longitudes(max_theta, urng)
-    phis = healpix_inputs.latitudes(max_phi, urng)
+    thetas = healpix_inputs.longitudes(max_theta, rng=urng)
+    phis = healpix_inputs.latitudes(max_phi, rng=urng)
     old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
     new = hp.ang2vec(thetas, phis, lonlat=lonlat, xp=xp)
     for i in range(len(old)):
@@ -87,7 +118,7 @@ def test_get_nside(
     urng: UnifiedGenerator,
 ) -> None:
     """Compare ``glass.healpix.get_nside`` against ``healpy.get_nside``."""
-    kappa = healpix_inputs.kappa(urng)
+    kappa = healpix_inputs.kappa(rng=urng)
     assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
@@ -108,7 +139,7 @@ def test_map2alm(
     use_pixel_weights: bool,  # noqa: FBT001
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
-    kappa = healpix_inputs.kappa(urng)
+    kappa = healpix_inputs.kappa(rng=urng)
     compare.assert_array_equal(
         healpy.map2alm(
             np.asarray(kappa),
@@ -195,7 +226,7 @@ def test_randang(
     ``healpix.randang`` consumes the random numbers from RNG, changing its
     internal state. So the ``rng`` must be re-initialized before each call.
     """
-    ipix = healpix_inputs.ipix(urng, xp)
+    ipix = healpix_inputs.ipix(rng=urng, xp=xp)
     old = healpix.randang(
         healpix_inputs.nside, ipix, lonlat=lonlat, rng=_utils.rng_dispatcher(xp=np)
     )
@@ -219,7 +250,7 @@ def test_rotate_map_pixel(
     Compare ``glass.healpix.Rotator.rotate_map_pixel`` against
     ``healpy.Rotator.rotate_map_pixel``.
     """  # noqa: D205
-    kappa = healpix_inputs.kappa(urng)
+    kappa = healpix_inputs.kappa(rng=urng)
     compare.assert_array_equal(
         healpy.Rotator(coord=coord).rotate_map_pixel(np.asarray(kappa)),
         hp.Rotator(coord=coord, xp=xp).rotate_map_pixel(kappa),

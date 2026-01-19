@@ -144,32 +144,40 @@ class HealpixInputs:
     """Helper class for calculating inputs for HEALPix functions."""
 
     lmax: int = 11
-    npts: int = 100
+    npts: int = 250
     npix: int = 192
     nside: int = 4
 
     @staticmethod
-    def ipix(urng: UnifiedGenerator, xp: ModuleType) -> IntArray:
+    def alm(*, rng: UnifiedGenerator) -> FloatArray:
+        """Generate random alm coefficients."""
+        size = hp.Alm.getsize(HealpixInputs.lmax)
+        return rng.standard_normal(size) + 1.0j * rng.standard_normal(
+            size
+        )
+
+    @staticmethod
+    def ipix(*, rng: UnifiedGenerator, xp: ModuleType) -> IntArray:
         """Generate a list of HEALPix pixels."""
-        cnts = urng.poisson(
+        cnts = rng.poisson(
             HealpixInputs.npts / HealpixInputs.npix, size=HealpixInputs.npix
         )
         return xp.repeat(xp.arange(HealpixInputs.npix), cnts)
 
     @staticmethod
-    def kappa(urng: UnifiedGenerator) -> FloatArray:
+    def kappa(*, rng: UnifiedGenerator) -> FloatArray:
         """Generate a kappa map."""
-        return urng.normal(10, size=hp.nside2npix(HealpixInputs.nside))
+        return rng.normal(size=hp.nside2npix(HealpixInputs.nside))
 
     @staticmethod
-    def latitudes(max_phi: float, urng: UnifiedGenerator) -> FloatArray:
+    def latitudes(max_phi: float, *, rng: UnifiedGenerator) -> FloatArray:
         """Generate an array of latitudes."""
-        return urng.uniform(-max_phi, max_phi, size=HealpixInputs.npts)
+        return rng.uniform(-max_phi, max_phi, size=HealpixInputs.npts)
 
     @staticmethod
-    def longitudes(max_theta: float, urng: UnifiedGenerator) -> FloatArray:
+    def longitudes(max_theta: float, *, rng: UnifiedGenerator) -> FloatArray:
         """Generate an array of longitudes."""
-        return urng.uniform(-max_theta, max_theta, size=HealpixInputs.npts)
+        return rng.uniform(-max_theta, max_theta, size=HealpixInputs.npts)
 
 
 @pytest.fixture(scope="session")
