@@ -294,7 +294,10 @@ def test_lognormal_gls() -> None:
     assert len(out[2]) == 3
 
 
-def test_discretized_cls(compare: type[Compare]) -> None:
+def test_discretized_cls(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # empty cls
 
     result = glass.discretized_cls([])
@@ -303,39 +306,42 @@ def test_discretized_cls(compare: type[Compare]) -> None:
     # power spectra truncated at lmax + 1 if lmax provided
 
     result = glass.discretized_cls(
-        [np.arange(10), np.arange(10), np.arange(10)],
+        [xp.arange(10), xp.arange(10), xp.arange(10)],
         lmax=5,
     )
 
     for cl in result:
-        assert len(cl) == 6
+        assert cl.shape[0] == 6
 
     # check ValueError for triangle number
 
     with pytest.raises(ValueError, match="invalid number of spectra:"):
-        glass.discretized_cls([np.arange(10), np.arange(10)], ncorr=1)
+        glass.discretized_cls([xp.arange(10), xp.arange(10)], ncorr=1)
 
     # ncorr not None
 
-    cls: AngularPowerSpectra = [np.arange(10), np.arange(10), np.arange(10)]
+    cls: AngularPowerSpectra = [xp.arange(10), xp.arange(10), xp.arange(10)]
     ncorr = 0
     result = glass.discretized_cls(cls, ncorr=ncorr)
 
-    assert len(result[0]) == 10
-    assert len(result[1]) == 10
-    assert len(result[2]) == 0  # third correlation should be removed
+    assert result[0].shape[0] == 10
+    assert result[1].shape[0] == 10
+    assert result[2].shape[0] == 0  # third correlation should be removed
 
     # check if pixel window function was applied correctly with nside not None
 
     nside = 4
 
-    pw = hp.pixwin(nside, lmax=7, xp=np)
+    pw = hp.pixwin(nside, lmax=7, xp=xp)
 
-    result = glass.discretized_cls([[], np.ones(10), np.ones(10)], nside=nside)
+    result = glass.discretized_cls(
+        [xp.asarray([]), xp.ones(10), xp.ones(10)],
+        nside=nside,
+    )
 
     for cl in result:
-        n = min(len(cl), len(pw))
-        expected = np.ones(n) * pw[:n] ** 2  # type: ignore[operator]
+        n = min(cl.shape[0], pw.shape[0])
+        expected = xp.ones(n) * pw[:n] ** 2  # type: ignore[operator]
         compare.assert_allclose(cl[:n], expected)
 
 
