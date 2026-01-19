@@ -51,10 +51,21 @@ def test_get_nside(
     assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
+@pytest.mark.parametrize(
+    ("pol", "use_pixel_weights"),
+    [
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    ],
+)
 def test_map2alm(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
+    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
+    use_pixel_weights: bool,  # noqa: FBT001
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
     kappa = healpix_inputs.kappa(urng)
@@ -63,13 +74,13 @@ def test_map2alm(
             np.asarray(kappa),
             lmax=healpix_inputs.lmax,
             pol=False,
-            use_pixel_weights=True,
+            use_pixel_weights=use_pixel_weights,
         ),
         hp.map2alm(
             kappa,
             lmax=healpix_inputs.lmax,
             pol=False,
-            use_pixel_weights=True,
+            use_pixel_weights=use_pixel_weights,
         ),
     )
 
@@ -126,6 +137,7 @@ def test_query_strip(
     new = np.zeros(healpix_inputs.npix, dtype=np.int64)
     new *= 1 - hp.query_strip(healpix_inputs.nside, healpix_inputs.thetas, xp=xp)
     compare.assert_array_equal(old, new)
+
 
 @pytest.mark.parametrize("lonlat", [False, True])
 def test_randang(
