@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
+import pytest
 import healpix
 import healpy
 import numpy as np
@@ -89,9 +89,23 @@ def test_nside2npix(
     )
 
 
-def test_pixwin() -> None:
+@pytest.mark.parametrize("pol", [False, True])
+def test_pixwin(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    pol: bool,  # noqa: FBT001
+    xp: ModuleType,
+) -> None:
     """Compare ``glass.healpix.pixwin`` against ``healpy.pixwin``."""
-    pass  # noqa: PIE790
+    old = healpy.pixwin(healpix_inputs.nside, lmax=healpix_inputs.lmax, pol=pol)
+    new = hp.pixwin(healpix_inputs.nside, lmax=healpix_inputs.lmax, pol=pol, xp=xp)
+
+    # Normalize to tuple
+    old = old if isinstance(old, tuple) else (old,)
+    new = new if isinstance(new, tuple) else (new,)
+
+    for i in range(len(old)):
+        compare.assert_array_equal(old[i], new[i])
 
 
 def test_query_strip(

@@ -300,7 +300,7 @@ def pixwin(
     lmax: int | None = None,
     pol: bool = False,
     xp: ModuleType = np,
-) -> FloatArray:
+) -> tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
 
@@ -320,9 +320,11 @@ def pixwin(
         The temperature pixel window function.
 
     """
-    return xp.asarray(
-        healpy.pixwin(nside, lmax=lmax, pol=pol),
-        dtype=xp.float64,
+    output = healpy.pixwin(nside, lmax=lmax, pol=pol)
+    return (
+        tuple(xp.asarray(temp, dtype=xp.float64) for temp in output)
+        if pol
+        else xp.asarray(output, dtype=xp.float64)
     )
 
 
