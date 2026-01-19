@@ -28,10 +28,6 @@ def not_triangle_numbers() -> list[int]:
 
 
 def test_iternorm(xp: ModuleType) -> None:
-    # Call jax version of iternorm once jax version is written
-    if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
-
     # check output shapes and types
 
     k = 2

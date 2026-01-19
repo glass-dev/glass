@@ -126,6 +126,7 @@ def iternorm(
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
     xp = first.__array_namespace__()
+    uxpx = _utils.XPAdditions(xp)
 
     n = (size,) if isinstance(size, int) else size
 
@@ -173,9 +174,8 @@ def iternorm(
             j = (j - 1) % k
 
         # compute new standard deviation
-        a_np = np.asarray(a, copy=True)
-        einsum_result_np = np.einsum("...i,...i", a_np, a_np)
-        s = x[..., 0] - xp.asarray(einsum_result_np, copy=True)
+        einsum_result_np = uxpx.einsum("...i,...i", a, a)
+        s = x[..., 0] - einsum_result_np
         if xp.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
