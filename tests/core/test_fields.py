@@ -422,19 +422,22 @@ def test_generate_lognormal(xp: ModuleType) -> None:
         glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate(compare: type[Compare]) -> None:
+def test_generate(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
 
     with pytest.raises(ValueError, match="mismatch between number of fields and gls"):
-        list(glass.generate(fields, [np.ones(10), np.ones(10)], nside=16))
+        list(glass.generate(fields, [xp.ones(10), xp.ones(10)], nside=16))
 
     # check output shape
 
     nside = 16
     npix = hp.nside2npix(nside)
-    gls: AngularPowerSpectra = [np.ones(10), np.ones(10), np.ones(10)]
+    gls: AngularPowerSpectra = [xp.ones(10), xp.ones(10), xp.ones(10)]
 
     result = list(glass.generate(fields, gls, nside=nside))
 
