@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpy as hp
 import numpy as np
 import pytest
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from glass._types import AnyArray, FloatArray, IntArray
+    from glass._types import AnyArray, FloatArray, IntArray, UnifiedGenerator
 
 
 class Compare:
@@ -144,9 +145,23 @@ class HealpixInputs:
 
     coord: str = "CG"
     lmax: int = 5
+    npts: int = 1_000
     npix: int = 48
     nside: int = 2
     thetas: tuple[int, int] = (30, 90)
+
+    @staticmethod
+    def ipix(urng: UnifiedGenerator, xp: ModuleType) -> IntArray:
+        """Generate a list of HEALPix pixels."""
+        cnts = urng.poisson(
+            HealpixInputs.npts / HealpixInputs.npix, size=HealpixInputs.npix
+        )
+        return xp.repeat(xp.arange(HealpixInputs.npix), cnts)
+
+    @staticmethod
+    def kappa(urng: UnifiedGenerator) -> FloatArray:
+        """Generate a kappa map."""
+        return urng.normal(10, size=hp.nside2npix(HealpixInputs.nside))
 
 
 @pytest.fixture(scope="session")

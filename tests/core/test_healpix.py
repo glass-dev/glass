@@ -7,6 +7,7 @@ import healpy
 import numpy as np
 
 import glass.healpix as hp
+import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -17,38 +18,45 @@ if TYPE_CHECKING:
 
 def test_alm2map() -> None:
     """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
+    pass  # noqa: PIE790
 
 
 def test_alm2map_spin() -> None:
     """Compare ``glass.healpix.alm2map_spin`` against ``healpy.alm2map_spin``."""
+    pass  # noqa: PIE790
 
 
 def test_almxfl() -> None:
     """Compare ``glass.healpix.almxfl`` against ``healpy.almxfl``."""
+    pass  # noqa: PIE790
 
 
 def test_ang2pix() -> None:
     """Compare ``glass.healpix.ang2pix`` against ``healpix.ang2pix``."""
+    pass  # noqa: PIE790
 
 
 def test_ang2vec() -> None:
     """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
+    pass  # noqa: PIE790
 
 
 def test_get_nside(
-    urng: UnifiedGenerator,
     healpix_inputs: type[HealpixInputs],
+    urng: UnifiedGenerator,
 ) -> None:
     """Compare ``glass.healpix.get_nside`` against ``healpy.get_nside``."""
-    kappa = urng.normal(10, size=hp.nside2npix(healpix_inputs.nside))
+    kappa = healpix_inputs.kappa(urng)
     assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
 def test_map2alm(
-    compare: type[Compare], urng: UnifiedGenerator, healpix_inputs: type[HealpixInputs]
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    urng: UnifiedGenerator,
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
-    kappa = urng.normal(10, size=hp.nside2npix(healpix_inputs.nside))
+    kappa = healpix_inputs.kappa(urng)
     compare.assert_array_equal(
         healpy.map2alm(
             np.asarray(kappa),
@@ -83,6 +91,7 @@ def test_nside2npix(
 
 def test_pixwin() -> None:
     """Compare ``glass.healpix.pixwin`` against ``healpy.pixwin``."""
+    pass  # noqa: PIE790
 
 
 def test_query_strip(
@@ -104,8 +113,27 @@ def test_query_strip(
     compare.assert_array_equal(old, new)
 
 
-def test_randang() -> None:
-    """Compare ``glass.healpix.randang`` against ``healpix.randang``."""
+def test_randang(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    xp: ModuleType,
+    urng: UnifiedGenerator,
+) -> None:
+    """
+    Compare ``glass.healpix.randang`` against ``healpix.randang``.
+
+    ``healpix.randang`` consumes the random numbers from RNG, changing its
+    internal state. So the ``rng`` must be re-initialized before each call.
+    """
+    ipix = healpix_inputs.ipix(urng, xp)
+    old = healpix.randang(
+        healpix_inputs.nside, ipix, lonlat=True, rng=_utils.rng_dispatcher(xp=np)
+    )
+    new = hp.randang(
+        healpix_inputs.nside, ipix, lonlat=True, rng=_utils.rng_dispatcher(xp=np)
+    )
+    compare.assert_array_equal(old[0], new[0])
+    compare.assert_array_equal(old[1], new[1])
 
 
 def test_rotate_map_pixel(
