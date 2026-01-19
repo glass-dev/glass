@@ -143,10 +143,10 @@ def generator_consumer() -> type[GeneratorConsumer]:
 class HealpixInputs:
     """Helper class for calculating inputs for HEALPix functions."""
 
-    lmax: int = 5
-    npts: int = 1_000
-    npix: int = 48
-    nside: int = 2
+    lmax: int = 11
+    npts: int = 100
+    npix: int = 192
+    nside: int = 4
 
     @staticmethod
     def ipix(urng: UnifiedGenerator, xp: ModuleType) -> IntArray:
