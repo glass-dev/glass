@@ -143,7 +143,6 @@ def generator_consumer() -> type[GeneratorConsumer]:
 class HealpixInputs:
     """Helper class for calculating inputs for HEALPix functions."""
 
-    coord: str = "CG"
     lmax: int = 5
     npts: int = 1_000
     npix: int = 48

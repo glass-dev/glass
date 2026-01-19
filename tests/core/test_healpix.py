@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-import pytest
+
 import healpix
 import healpy
 import numpy as np
+import pytest
 
 import glass._array_api_utils as _utils
 import glass.healpix as hp
@@ -151,8 +152,10 @@ def test_randang(
     compare.assert_array_equal(old[1], new[1])
 
 
+@pytest.mark.parametrize("coord", ["CE", "GC"])
 def test_rotate_map_pixel(
     compare: type[Compare],
+    coord: str,
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
     xp: ModuleType,
@@ -163,6 +166,6 @@ def test_rotate_map_pixel(
     """  # noqa: D205
     kappa = healpix_inputs.kappa(urng)
     compare.assert_array_equal(
-        healpy.Rotator(coord=healpix_inputs.coord).rotate_map_pixel(np.asarray(kappa)),
-        hp.Rotator(coord=healpix_inputs.coord, xp=xp).rotate_map_pixel(kappa),
+        healpy.Rotator(coord=coord).rotate_map_pixel(np.asarray(kappa)),
+        hp.Rotator(coord=coord, xp=xp).rotate_map_pixel(kappa),
     )
