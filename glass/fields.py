@@ -800,6 +800,9 @@ def solve_gaussian_spectra(
         msg = "mismatch between number of fields and spectra"
         raise ValueError(msg)
 
+    if len(spectra) == 0:  # type: ignore[arg-type]
+        return []
+
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
         if cl.size > 0:
