@@ -673,17 +673,21 @@ def test_lognormal_shift_hilbert2011(compare: type[Compare]) -> None:
     compare.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
-def test_cov_from_spectra(compare: type[Compare]) -> None:
-    spectra: AngularPowerSpectra = np.asarray(
-        [
+def test_cov_from_spectra(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    spectra: AngularPowerSpectra = [
+        xp.asarray(x)
+        for x in [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
             [210, 211, 212, 213],
             [330, 331, 332, 333],
             [320, 321, 322, 323],
             [310, 311, 312, 313],
-        ],
-    )
+        ]
+    ]
 
     compare.assert_array_equal(
         glass.cov_from_spectra(spectra),

@@ -999,6 +999,8 @@ def cov_from_spectra(
         Covariance matrix from the given spectra.
 
     """
+    xp = array_api_compat.array_namespace(*spectra, use_compat=False)
+
     # recover the number of fields from the number of spectra
     n = nfields_from_nspectra(len(spectra))
 
@@ -1008,14 +1010,17 @@ def cov_from_spectra(
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
     # missing entries are zero, which is the default value
-    cov = np.zeros((k, n, n))
+    cov = xp.zeros((k, n, n), dtype=spectra[0].dtype)
 
     # fill the matrix up by going through the spectra in order
     # skip over entries that are None
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
+        size = min(k, cl.size)
+        cl_flat = xp.reshape(cl, (-1,))
+        cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
+        cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
     return cov
 
