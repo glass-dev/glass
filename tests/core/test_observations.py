@@ -18,8 +18,6 @@ if TYPE_CHECKING:
 
 def test_vmap_galactic_ecliptic(compare: type[Compare], xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.vmap_galactic_ecliptic`."""
-    n_side = 4
-
     # check shape
 
     vmap = glass.vmap_galactic_ecliptic(n_side, xp=xp)

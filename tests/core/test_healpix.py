@@ -48,26 +48,26 @@ def test_ang2vec() -> None:
 def test_get_nside(urng: UnifiedGenerator) -> None:
     """Compare ``glass.healpix.get_nside`` against ``healpy.get_nside``."""
     kappa = urng.normal(10, size=hp.nside2npix(NSIDE))
-    assert hp.get_nside(kappa) == healpy.get_nside(np.asarray(kappa))
+    assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
 def test_map2alm(compare: type[Compare], urng: UnifiedGenerator) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
     kappa = urng.normal(10, size=hp.nside2npix(NSIDE))
     compare.assert_array_equal(
-        hp.map2alm(kappa, lmax=LMAX, pol=False, use_pixel_weights=True),
         healpy.map2alm(np.asarray(kappa), lmax=LMAX, pol=False, use_pixel_weights=True),
+        hp.map2alm(kappa, lmax=LMAX, pol=False, use_pixel_weights=True),
     )
 
 
 def test_npix2nside() -> None:
     """Compare ``glass.healpix.npix2nside`` against ``healpix.npix2nside``."""
-    assert hp.npix2nside(NPIX) == healpix.npix2nside(NPIX)
+    assert healpix.npix2nside(NPIX) == hp.npix2nside(NPIX)
 
 
 def test_nside2npix() -> None:
     """Compare ``glass.healpix.nside2npix`` against ``healpix.nside2npix``."""
-    assert hp.nside2npix(NSIDE) == healpix.nside2npix(NSIDE)
+    assert healpix.nside2npix(NSIDE) == hp.nside2npix(NSIDE)
 
 
 def test_pixwin() -> None:
@@ -95,6 +95,13 @@ def test_randang() -> None:
     pass
 
 
-def test_rotator() -> None:
-    """Compare ``glass.healpix.Rotator`` against ``healpy.Rotator``."""
-    pass
+def test_rotate_map_pixel(compare: type[Compare], xp: ModuleType) -> None:
+    """
+    Compare ``glass.healpix.Rotator.rotate_map_pixel`` against
+    ``healpy.Rotator.rotate_map_pixel``.
+    """  # noqa: D205
+    m = xp.concat([xp.ones(88), xp.zeros(48), xp.ones(56)])
+    compare.assert_array_equal(
+        healpy.Rotator(coord="CG").rotate_map_pixel(np.asarray(m)),
+        hp.Rotator(coord="CG", xp=xp).rotate_map_pixel(m),
+    )
