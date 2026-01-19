@@ -127,10 +127,11 @@ def test_query_strip(
     new *= 1 - hp.query_strip(healpix_inputs.nside, healpix_inputs.thetas, xp=xp)
     compare.assert_array_equal(old, new)
 
-
+@pytest.mark.parametrize("lonlat", [False, True])
 def test_randang(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
+    lonlat: bool,  # noqa: FBT001
     xp: ModuleType,
     urng: UnifiedGenerator,
 ) -> None:
@@ -142,10 +143,10 @@ def test_randang(
     """
     ipix = healpix_inputs.ipix(urng, xp)
     old = healpix.randang(
-        healpix_inputs.nside, ipix, lonlat=True, rng=_utils.rng_dispatcher(xp=np)
+        healpix_inputs.nside, ipix, lonlat=lonlat, rng=_utils.rng_dispatcher(xp=np)
     )
     new = hp.randang(
-        healpix_inputs.nside, ipix, lonlat=True, rng=_utils.rng_dispatcher(xp=np)
+        healpix_inputs.nside, ipix, lonlat=lonlat, rng=_utils.rng_dispatcher(xp=np)
     )
     assert len(old) == len(new)
     compare.assert_array_equal(old[0], new[0])
