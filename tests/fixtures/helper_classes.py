@@ -161,6 +161,16 @@ class HealpixInputs:
         """Generate a kappa map."""
         return urng.normal(10, size=hp.nside2npix(HealpixInputs.nside))
 
+    @staticmethod
+    def latitudes(max_phi: float, urng: UnifiedGenerator) -> FloatArray:
+        """Generate an array of latitudes."""
+        return urng.uniform(-max_phi, max_phi, size=HealpixInputs.npts)
+
+    @staticmethod
+    def longitudes(max_theta: float, urng: UnifiedGenerator) -> FloatArray:
+        """Generate an array of longitudes."""
+        return urng.uniform(-max_theta, max_theta, size=HealpixInputs.npts)
+
 
 @pytest.fixture(scope="session")
 def healpix_inputs() -> type[HealpixInputs]:

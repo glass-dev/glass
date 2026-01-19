@@ -132,8 +132,8 @@ def almxfl(
 
 def ang2pix(
     nside: int,
-    theta: float,
-    phi: float,
+    theta: float | FloatArray,
+    phi: float | FloatArray,
     *,
     lonlat: bool = False,
     xp: ModuleType = np,

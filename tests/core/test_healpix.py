@@ -33,9 +33,28 @@ def test_almxfl() -> None:
     pass  # noqa: PIE790
 
 
-def test_ang2pix() -> None:
+@pytest.mark.parametrize(
+    ("lonlat", "max_phi", "max_theta"),
+    [
+        (False, math.pi, math.pi / 2),
+        (True, 180, 90),
+    ],
+)
+def test_ang2pix(  # noqa: PLR0913
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    lonlat: bool,  # noqa: FBT001
+    max_phi: float,
+    max_theta: float,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Compare ``glass.healpix.ang2pix`` against ``healpix.ang2pix``."""
-    pass  # noqa: PIE790
+    thetas = healpix_inputs.longitudes(max_theta, urng)
+    phis = healpix_inputs.latitudes(max_phi, urng)
+    old = healpix.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat)
+    new = hp.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat, xp=xp)
+    compare.assert_array_equal(old, new)
 
 
 @pytest.mark.parametrize(
@@ -55,8 +74,8 @@ def test_ang2vec(  # noqa: PLR0913
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
-    thetas = urng.uniform(-max_theta, max_theta, size=healpix_inputs.npts)
-    phis = urng.uniform(-max_phi, max_phi, size=healpix_inputs.npts)
+    thetas = healpix_inputs.longitudes(max_theta, urng)
+    phis = healpix_inputs.latitudes(max_phi, urng)
     old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
     new = hp.ang2vec(thetas, phis, lonlat=lonlat, xp=xp)
     for i in range(len(old)):
