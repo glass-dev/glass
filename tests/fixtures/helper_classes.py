@@ -147,7 +147,6 @@ class HealpixInputs:
     npts: int = 1_000
     npix: int = 48
     nside: int = 2
-    thetas: tuple[int, int] = (30, 90)
 
     @staticmethod
     def ipix(urng: UnifiedGenerator, xp: ModuleType) -> IntArray:

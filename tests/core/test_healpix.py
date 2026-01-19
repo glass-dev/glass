@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import healpix
@@ -37,9 +38,29 @@ def test_ang2pix() -> None:
     pass  # noqa: PIE790
 
 
-def test_ang2vec() -> None:
+@pytest.mark.parametrize(
+    ("lonlat", "max_phi", "max_theta"),
+    [
+        (False, math.pi, math.pi / 2),
+        (True, 180, 90),
+    ],
+)
+def test_ang2vec(  # noqa: PLR0913
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    lonlat: bool,  # noqa: FBT001
+    max_phi: float,
+    max_theta: float,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
-    pass  # noqa: PIE790
+    thetas = urng.uniform(-max_theta, max_theta, size=healpix_inputs.npts)
+    phis = urng.uniform(-max_phi, max_phi, size=healpix_inputs.npts)
+    old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
+    new = hp.ang2vec(thetas, phis, lonlat=lonlat, xp=xp)
+    for i in range(len(old)):
+        compare.assert_array_equal(old[i], new[i])
 
 
 def test_get_nside(
@@ -73,13 +94,13 @@ def test_map2alm(
         healpy.map2alm(
             np.asarray(kappa),
             lmax=healpix_inputs.lmax,
-            pol=False,
+            pol=pol,
             use_pixel_weights=use_pixel_weights,
         ),
         hp.map2alm(
             kappa,
             lmax=healpix_inputs.lmax,
-            pol=False,
+            pol=pol,
             use_pixel_weights=use_pixel_weights,
         ),
     )
@@ -120,9 +141,11 @@ def test_pixwin(
         compare.assert_array_equal(old[i], new[i])
 
 
+@pytest.mark.parametrize("thetas", [(20, 80), (30, 90)])
 def test_query_strip(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
+    thetas: tuple[int, int],
     xp: ModuleType,
 ) -> None:
     """
@@ -133,9 +156,9 @@ def test_query_strip(
     array indicating which pixels are within the strip.
     """
     old = np.zeros(healpix_inputs.npix)
-    old[healpy.query_strip(healpix_inputs.nside, *healpix_inputs.thetas)] = 0
+    old[healpy.query_strip(healpix_inputs.nside, *thetas)] = 0
     new = np.zeros(healpix_inputs.npix, dtype=np.int64)
-    new *= 1 - hp.query_strip(healpix_inputs.nside, healpix_inputs.thetas, xp=xp)
+    new *= 1 - hp.query_strip(healpix_inputs.nside, thetas, xp=xp)
     compare.assert_array_equal(old, new)
 
 

@@ -170,8 +170,8 @@ def ang2pix(
 
 
 def ang2vec(
-    theta: float,
-    phi: float,
+    theta: float | FloatArray,
+    phi: float | FloatArray,
     *,
     lonlat: bool = False,
     xp: ModuleType = np,
@@ -195,13 +195,12 @@ def ang2vec(
         A normalised 3-vector pointing in the same direction as ``ang``.
 
     """
-    return xp.asarray(
-        healpix.ang2vec(
-            theta,
-            phi,
-            lonlat=lonlat,
-        )
+    x, y, z = healpix.ang2vec(
+        theta,
+        phi,
+        lonlat=lonlat,
     )
+    return xp.asarray(x), xp.asarray(y), xp.asarray(z)
 
 
 def get_nside(m: FloatArray) -> int:
