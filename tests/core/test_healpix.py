@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import Compare
 
+LMAX = 11
 NPIX = 192
 NSIDE = 4
 THETAS = (30, 90)
@@ -50,9 +51,13 @@ def test_get_nside(urng: UnifiedGenerator) -> None:
     assert hp.get_nside(kappa) == healpy.get_nside(np.asarray(kappa))
 
 
-def test_map2alm() -> None:
+def test_map2alm(compare: type[Compare], urng: UnifiedGenerator) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
-    pass
+    kappa = urng.normal(10, size=hp.nside2npix(NSIDE))
+    compare.assert_array_equal(
+        hp.map2alm(kappa, lmax=LMAX, pol=False, use_pixel_weights=True),
+        healpy.map2alm(np.asarray(kappa), lmax=LMAX, pol=False, use_pixel_weights=True),
+    )
 
 
 def test_npix2nside() -> None:
