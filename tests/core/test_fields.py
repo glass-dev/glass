@@ -295,10 +295,7 @@ def test_lognormal_gls(xp: ModuleType) -> None:
     assert out[2].shape[0] == 3
 
 
-def test_discretized_cls(
-    compare: type[Compare],
-    xp: ModuleType,
-) -> None:
+def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
     # empty cls
 
     result = glass.discretized_cls([])
@@ -422,10 +419,7 @@ def test_generate_lognormal(xp: ModuleType) -> None:
         glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
 
 
-def test_generate(
-    compare: type[Compare],
-    xp: ModuleType,
-) -> None:
+def test_generate(compare: type[Compare], xp: ModuleType) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
@@ -463,10 +457,7 @@ def test_generate(
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl(
-    compare: type[Compare],
-    xp: ModuleType,
-) -> None:
+def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
     # make a mock Cls array with the index pairs as entries
     cls: AngularPowerSpectra = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -511,10 +502,7 @@ def test_nfields_from_nspectra(not_triangle_numbers: list[int]) -> None:
             glass.nfields_from_nspectra(t)
 
 
-def test_enumerate_spectra(
-    compare: type[Compare],
-    xp: ModuleType,
-) -> None:
+def test_enumerate_spectra(compare: type[Compare], xp: ModuleType) -> None:
     n = 100
     tn = n * (n + 1) // 2
 
@@ -769,36 +757,39 @@ def test_cov_from_spectra(
     )
 
 
-def test_check_posdef_spectra() -> None:
+def test_check_posdef_spectra(xp: ModuleType) -> None:
     # posdef spectra
     assert glass.check_posdef_spectra(
-        np.asarray(
-            [
+        [
+            xp.asarray(x)
+            for x in [
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 1.0],
                 [0.9, 0.9, 0.9],
-            ],
-        ),
+            ]
+        ]
     )
     # semidef spectra
     assert glass.check_posdef_spectra(
-        np.asarray(
-            [
+        [
+            xp.asarray(x)
+            for x in [
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 0.0],
                 [0.9, 1.0, 0.0],
-            ],
-        ),
+            ]
+        ]
     )
     # indef spectra
     assert not glass.check_posdef_spectra(
-        np.asarray(
-            [
+        [
+            xp.asarray(x)
+            for x in [
                 [1.0, 1.0, 1.0],
                 [1.0, 1.0, 1.0],
                 [1.1, 1.1, 1.1],
-            ],
-        ),
+            ]
+        ]
     )
 
 
