@@ -463,7 +463,10 @@ def test_generate(
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
+def test_getcl(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # make a mock Cls array with the index pairs as entries
     cls: AngularPowerSpectra = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -508,12 +511,15 @@ def test_nfields_from_nspectra(not_triangle_numbers: list[int]) -> None:
             glass.nfields_from_nspectra(t)
 
 
-def test_enumerate_spectra() -> None:
+def test_enumerate_spectra(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     n = 100
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra: AngularPowerSpectra = np.arange(tn).reshape(tn, 1)
+    spectra: AngularPowerSpectra = [xp.asarray(x) for x in range(tn)]
 
     # this is the expected order of indices
     indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
@@ -523,7 +529,7 @@ def test_enumerate_spectra() -> None:
 
     # go through expected indices and values and compare
     for k, (i, j) in enumerate(indices):
-        assert next(it) == (i, j, k)
+        compare.assert_allclose(next(it), (i, j, k))
 
     # make sure iterator is exhausted
     with pytest.raises(StopIteration):
