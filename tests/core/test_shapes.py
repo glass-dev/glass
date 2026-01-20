@@ -16,7 +16,10 @@ if TYPE_CHECKING:
 def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
     # Pass floats without xp
 
-    with pytest.raises(TypeError, match="Unrecognized array input"):
+    with pytest.raises(
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
+    ):
         glass.triaxial_axis_ratio(0.8, 0.4)
 
     # single axis ratio
@@ -61,14 +64,12 @@ def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
 
 
 def test_ellipticity_ryden04(urng: UnifiedGenerator, xp: ModuleType) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_ryden04 are not immutable, so do not support jax",
-        )
-
     # Pass floats without xp
 
-    with pytest.raises(TypeError, match="Unrecognized array input"):
+    with pytest.raises(
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
+    ):
         glass.ellipticity_ryden04(-1.85, 0.89, 0.222, 0.056)
 
     # single ellipticity
@@ -124,11 +125,6 @@ def test_ellipticity_gaussian(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_gaussian are not immutable, so do not support jax",
-        )
-
     n = 1_000_000
 
     eps = glass.ellipticity_gaussian(n, 0.256, xp=xp)
@@ -137,7 +133,10 @@ def test_ellipticity_gaussian(
 
     # Pass floats without xp
 
-    with pytest.raises(TypeError, match="Unrecognized array input"):
+    with pytest.raises(
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
+    ):
         glass.ellipticity_gaussian(n, 0.256)
 
     # test with rng
@@ -168,11 +167,6 @@ def test_ellipticity_intnorm(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    if xp.__name__ == "jax.numpy":
-        pytest.skip(
-            "Arrays in ellipticity_intnorm are not immutable, so do not support jax",
-        )
-
     n = 1_000_000
 
     eps = glass.ellipticity_intnorm(n, 0.256, xp=xp)
@@ -181,7 +175,10 @@ def test_ellipticity_intnorm(
 
     # Pass non-arrays without xp
 
-    with pytest.raises(TypeError, match="Unrecognized array input"):
+    with pytest.raises(
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
+    ):
         glass.ellipticity_intnorm(n, 0.256)
 
     # test with rng
