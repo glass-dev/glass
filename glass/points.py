@@ -377,7 +377,7 @@ def _sample_galaxies_per_pixel(
     count = xp.sum(n)
     # don't go through pixels if there are no points
     if count == 0:
-        continue
+        return
 
     # for converting randomly sampled positions to HEALPix indices
     npix = n.shape[-1]
