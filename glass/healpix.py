@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 def alm2map(  # noqa: PLR0913
-    alms: ComplexArray,
+    alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
     *,
     inplace: bool = False,
@@ -49,16 +49,12 @@ def alm2map(  # noqa: PLR0913
         A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
 
     """
-    xp = alms.__array_namespace__()
+    xp = array_api_compat.get_namespace(*alms, use_compat=False)
 
+    inputs = [np.asarray(alm) for alm in alms]
     return xp.asarray(
         healpy.alm2map(
-            np.asarray(alms),
-            nside,
-            inplace=inplace,
-            lmax=lmax,
-            pixwin=pixwin,
-            pol=pol,
+            inputs, nside, inplace=inplace, lmax=lmax, pixwin=pixwin, pol=pol
         )
     )
 

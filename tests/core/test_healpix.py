@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         (True, True),
     ],
 )
-def test_alm2map(
+def test_alm2map_individual(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
     pixwin: bool,  # noqa: FBT001
@@ -52,6 +52,46 @@ def test_alm2map(
             pol=pol,
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("pixwin", "pol"),
+    [
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    ],
+)
+def test_alm2map_sequence(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    pixwin: bool,  # noqa: FBT001
+    pol: bool,  # noqa: FBT001
+    urng: UnifiedGenerator,
+) -> None:
+    """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
+    import array_api_strict
+    xp = array_api_strict
+    urng = _utils.rng_dispatcher(xp=xp)
+    alm = healpix_inputs.alm(rng=urng)
+    blm = healpix_inputs.alm(rng=urng)
+    clm = healpix_inputs.alm(rng=urng)
+    old = healpy.alm2map(
+        [np.asarray(alm), np.asarray(blm), np.asarray(clm)],
+        healpix_inputs.nside,
+        lmax=healpix_inputs.lmax,
+        pixwin=pixwin,
+        pol=pol,
+    )
+    new = hp.alm2map(
+        [alm, blm, clm],
+        healpix_inputs.nside,
+        lmax=healpix_inputs.lmax,
+        pixwin=pixwin,
+        pol=pol,
+    )
+    compare.assert_array_equal(old, new)
 
 
 @pytest.mark.parametrize("spin", [1, 2])
