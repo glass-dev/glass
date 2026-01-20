@@ -152,7 +152,7 @@ class HealpixInputs:
     def alm(*, rng: UnifiedGenerator) -> FloatArray:
         """Generate random alm coefficients."""
         size = hp.Alm.getsize(HealpixInputs.lmax)
-        return rng.standard_normal(size) + 1j * rng.standard_normal(size)
+        return rng.standard_normal(size) + 1j * rng.standard_normal(size)  # ty: ignore[unsupported-operator]
 
     @staticmethod
     def fl(*, rng: UnifiedGenerator) -> FloatArray:

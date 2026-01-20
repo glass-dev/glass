@@ -171,7 +171,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))
+        return self.axp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload,too-many-positional-arguments]
 
     def normal(
         self,
@@ -196,7 +196,7 @@ class Generator:
             Array of samples from the normal distribution.
 
         """
-        return self.axp.asarray(self.rng.normal(loc, scale, size))
+        return self.axp.asarray(self.rng.normal(loc, scale, size))  # ty: ignore[no-matching-overload]
 
     def poisson(
         self,
@@ -218,7 +218,7 @@ class Generator:
             Array of samples from the Poisson distribution.
 
         """
-        return self.axp.asarray(self.rng.poisson(lam, size))
+        return self.axp.asarray(self.rng.poisson(lam, size))  # ty: ignore[no-matching-overload]
 
     def standard_normal(
         self,
@@ -244,7 +244,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload,too-many-positional-arguments]
 
     def uniform(
         self,
@@ -269,7 +269,7 @@ class Generator:
             Array of samples from the uniform distribution.
 
         """
-        return self.axp.asarray(self.rng.uniform(low, high, size))
+        return self.axp.asarray(self.rng.uniform(low, high, size))  # ty: ignore[no-matching-overload]
 
 
 class XPAdditions:

@@ -188,7 +188,7 @@ def trapezoid_product(
     x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = xpx.union1d(
+        x = xpx.union1d(  # ty: ignore[invalid-assignment]
             x[(x >= x_[0]) & (x <= x_[-1])],
             x_[(x_ >= x[0]) & (x_ <= x[-1])],
         )

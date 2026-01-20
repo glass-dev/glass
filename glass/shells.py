@@ -516,7 +516,7 @@ def restrict(
         left=0.0,
         right=0.0,
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
-    return zr, fr
+    return zr, fr  # ty: ignore[invalid-return-type]
 
 
 def partition(

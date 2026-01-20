@@ -390,7 +390,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return hp.alm2map_spin([alm, blm], nside, 2, lmax)  # ty: ignore[invalid-return-type]
 
 
 class MultiPlaneConvergence:

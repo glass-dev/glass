@@ -297,7 +297,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         cmask: int | IntArray
         if dims:
             cmask = xp.zeros(dims, dtype=xp.int64)
-            cmask = xpx.at(cmask)[k].set(1)
+            cmask = xpx.at(cmask)[k].set(1)  # ty: ignore[invalid-assignment]
         else:
             cmask = 1
 
@@ -400,7 +400,7 @@ def uniform_positions(
         count: int | IntArray
         if dims:
             count = xp.zeros(dims, dtype=xp.int64)
-            count = xpx.at(count)[k].set(ngal_sphere[k])
+            count = xpx.at(count)[k].set(ngal_sphere[k])  # ty: ignore[invalid-assignment]
         else:
             count = int(ngal_sphere[k])
 
