@@ -97,17 +97,9 @@ def alm2map_spin(
         List of 2 out maps in RING scheme as arrays.
 
     """
-    xp = (
-        array_api_compat.get_namespace(*alms, use_compat=False)
-        if isinstance(alms, Sequence)
-        else alms.__array_namespace__()
-    )
+    xp = array_api_compat.get_namespace(*alms, use_compat=False)
 
-    inputs = (
-        [np.asarray(m) for m in alms]
-        if isinstance(alms, Sequence)
-        else np.asarray(alms)
-    )
+    inputs = [np.asarray(alm) for alm in alms]
     outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
     return [xp.asarray(out) for out in outputs]
 
