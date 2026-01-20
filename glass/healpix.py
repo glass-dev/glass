@@ -175,8 +175,8 @@ def ang2pix(
     return xp.asarray(
         healpix.ang2pix(
             nside,
-            theta,
-            phi,
+            np.asarray(theta),
+            np.asarray(phi),
             lonlat=lonlat,
         ),
     )
@@ -209,8 +209,8 @@ def ang2vec(
 
     """
     x, y, z = healpix.ang2vec(
-        theta,
-        phi,
+        np.asarray(theta),
+        np.asarray(phi),
         lonlat=lonlat,
     )
     return xp.asarray(x), xp.asarray(y), xp.asarray(z)
@@ -334,7 +334,7 @@ def pixwin(
     """
     output = healpy.pixwin(nside, lmax=lmax, pol=pol)
     return (
-        tuple(xp.asarray(temp, dtype=xp.float64) for temp in output)
+        tuple(xp.asarray(out, dtype=xp.float64) for out in output)
         if pol
         else xp.asarray(output, dtype=xp.float64)
     )
