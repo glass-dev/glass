@@ -260,7 +260,11 @@ def map2alm(
         alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
 
     """
-    xp = array_api_compat.get_namespace(*maps, use_compat=False)
+    xp = (
+        array_api_compat.get_namespace(*maps, use_compat=False)
+        if isinstance(maps, Sequence)
+        else maps.__array_namespace__()
+    )
 
     inputs = (
         [np.asarray(m) for m in maps]
