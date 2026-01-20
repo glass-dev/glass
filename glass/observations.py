@@ -82,11 +82,11 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
-    if len(galactic) != 2: # type: ignore[unreachable]
-        msg = "galactic stripe must be a pair of numbers"
+    if len(galactic) != 2:
+        msg = "galactic stripe must be a pair of numbers" # type: ignore[unreachable]
         raise TypeError(msg)
-    if len(ecliptic) != 2: # type: ignore[unreachable]
-        msg = "ecliptic stripe must be a pair of numbers"
+    if len(ecliptic) != 2:
+        msg = "ecliptic stripe must be a pair of numbers" # type: ignore[unreachable]
         raise TypeError(msg)
 
     m = np.ones(hp.nside2npix(nside))
