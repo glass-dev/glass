@@ -31,13 +31,13 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -47,8 +47,8 @@ if TYPE_CHECKING:
 
 def vmap_galactic_ecliptic(
     nside: int,
-    galactic: tuple[float, ...] = (30, 90),
-    ecliptic: tuple[float, ...] = (20, 80),
+    galactic: tuple[float, float] = (30, 90),
+    ecliptic: tuple[float, float] = (20, 80),
     *,
     xp: ModuleType = np,
 ) -> FloatArray:
@@ -67,6 +67,8 @@ def vmap_galactic_ecliptic(
         The location of the galactic plane in the respective coordinate system.
     ecliptic
         The location of the ecliptic plane in the respective coordinate system.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -81,17 +83,17 @@ def vmap_galactic_ecliptic(
 
     """
     if len(galactic) != 2:
-        msg = "galactic stripe must be a pair of numbers"
+        msg = "galactic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
     if len(ecliptic) != 2:
-        msg = "ecliptic stripe must be a pair of numbers"
+        msg = "ecliptic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
 
     m = np.ones(hp.nside2npix(nside))
-    m[hp.query_strip(nside, *galactic)] = 0
-    m = hp.Rotator(coord="GC").rotate_map_pixel(m)
-    m[hp.query_strip(nside, *ecliptic)] = 0
-    return xp.asarray(hp.Rotator(coord="CE").rotate_map_pixel(m))
+    m *= 1 - hp.query_strip(nside, galactic, xp=np)
+    m = hp.Rotator(coord="GC").rotate_map_pixel(m)  # type: ignore[assignment]
+    m *= 1 - hp.query_strip(nside, ecliptic, xp=np)
+    return xp.asarray(hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m))
 
 
 def gaussian_nz(

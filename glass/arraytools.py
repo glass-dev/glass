@@ -59,6 +59,8 @@ def broadcast_leading_axes(
     ----------
     args
         The arrays and the number of axes to keep.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------

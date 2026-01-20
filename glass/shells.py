@@ -207,6 +207,8 @@ class RadialWindow:
         Weight array; the values (ordinates) of the window function.
     zeff
         Effective redshift of the window.
+    xp
+        The array library backend to use for array operations.
 
     """
 

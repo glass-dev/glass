@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 import pytest
 
 glass_harmonics = pytest.importorskip(
-    "glass.harmonics", reason="tests require glass.harmonics"
+    "glass.harmonics",
+    reason="tests require glass.harmonics",
 )
 
 
