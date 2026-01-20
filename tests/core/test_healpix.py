@@ -340,7 +340,6 @@ def test_randang(
         healpix_inputs.nside,
         ipix,
         lonlat=lonlat,
-        rng=_utils.rng_dispatcher(xp=np),
     )
     assert type(old) is type(new)
     assert len(old) == len(new)

@@ -11,6 +11,8 @@ import numpy as np
 
 import array_api_compat
 
+import glass._array_api_utils as _utils
+
 if TYPE_CHECKING:
     from types import ModuleType
 
@@ -374,10 +376,13 @@ def randang(
     ipix: IntArray,
     *,
     lonlat: bool = False,
-    rng: UnifiedGenerator | None = None,
 ) -> tuple[FloatArray, FloatArray]:
     """
     Sample random spherical coordinates from the given HEALPix pixels.
+
+    ``rng`` is no longer a parameter as we must use the NumPy backend otherwise
+    we run into a ``operand array with iterator write flag set is read-only``
+    error coming from ``_chp.ring2ang_uv(nside, ipix, u, v, u, v)``.
 
     Parameters
     ----------
@@ -387,8 +392,6 @@ def randang(
         HEALPix pixel number.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
-    rng
-        Random number generator. If not given, a default RNG is used.
 
     Returns
     -------
@@ -401,7 +404,7 @@ def randang(
         nside,
         np.asarray(ipix),
         lonlat=lonlat,
-        rng=rng,
+        rng=_utils.rng_dispatcher(xp=np)
     )
     return xp.asarray(theta), xp.asarray(phi)
 

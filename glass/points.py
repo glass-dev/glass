@@ -326,7 +326,6 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                     nside,
                     ipix,
                     lonlat=True,
-                    rng=_utils.rng_dispatcher(xp=np),
                 )
                 # next batch
                 start, size = stop, 0
