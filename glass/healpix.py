@@ -103,7 +103,11 @@ def alm2map_spin(
         else alms.__array_namespace__()
     )
 
-    inputs = [np.asarray(alm) for alm in alms]
+    inputs = (
+        [np.asarray(m) for m in alms]
+        if isinstance(alms, Sequence)
+        else np.asarray(alms)
+    )
     outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
     return [xp.asarray(out) for out in outputs]
 
