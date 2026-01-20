@@ -71,9 +71,6 @@ def test_alm2map_sequence(
     urng: UnifiedGenerator,
 ) -> None:
     """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
-    import array_api_strict
-    xp = array_api_strict
-    urng = _utils.rng_dispatcher(xp=xp)
     alm = healpix_inputs.alm(rng=urng)
     blm = healpix_inputs.alm(rng=urng)
     clm = healpix_inputs.alm(rng=urng)
@@ -105,7 +102,10 @@ def test_alm2map_spin(
     alm = healpix_inputs.alm(rng=urng)
     blm = healpix_inputs.alm(rng=urng)
     old = healpy.alm2map_spin(
-        [alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax
+        [alm, blm],
+        healpix_inputs.nside,
+        spin,
+        healpix_inputs.lmax,
     )
     new = hp.alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
     assert type(old) is type(new)
@@ -221,6 +221,7 @@ def test_map2alm_individual(
         ),
     )
 
+
 @pytest.mark.parametrize(
     ("pol", "use_pixel_weights"),
     [
@@ -256,6 +257,7 @@ def test_map2alm_sequence(
         ),
     )
 
+
 def test_npix2nside(
     healpix_inputs: type[HealpixInputs],
 ) -> None:
@@ -268,7 +270,7 @@ def test_nside2npix(
 ) -> None:
     """Compare ``glass.healpix.nside2npix`` against ``healpix.nside2npix``."""
     assert healpix.nside2npix(healpix_inputs.nside) == hp.nside2npix(
-        healpix_inputs.nside
+        healpix_inputs.nside,
     )
 
 
@@ -329,10 +331,16 @@ def test_randang(
     """
     ipix = healpix_inputs.ipix(rng=urng, xp=xp)
     old = healpix.randang(
-        healpix_inputs.nside, ipix, lonlat=lonlat, rng=_utils.rng_dispatcher(xp=np)
+        healpix_inputs.nside,
+        ipix,
+        lonlat=lonlat,
+        rng=_utils.rng_dispatcher(xp=np),
     )
     new = hp.randang(
-        healpix_inputs.nside, ipix, lonlat=lonlat, rng=_utils.rng_dispatcher(xp=np)
+        healpix_inputs.nside,
+        ipix,
+        lonlat=lonlat,
+        rng=_utils.rng_dispatcher(xp=np),
     )
     assert type(old) is type(new)
     assert len(old) == len(new)

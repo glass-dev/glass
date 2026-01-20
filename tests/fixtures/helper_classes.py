@@ -163,7 +163,8 @@ class HealpixInputs:
     def ipix(*, rng: UnifiedGenerator, xp: ModuleType) -> IntArray:
         """Generate a list of HEALPix pixels."""
         cnts = rng.poisson(
-            HealpixInputs.npts / HealpixInputs.npix, size=HealpixInputs.npix
+            HealpixInputs.npts / HealpixInputs.npix,
+            size=HealpixInputs.npix,
         )
         return xp.repeat(xp.arange(HealpixInputs.npix), cnts)
 

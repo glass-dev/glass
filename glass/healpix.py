@@ -58,8 +58,13 @@ def alm2map(  # noqa: PLR0913
     )
     return xp.asarray(
         healpy.alm2map(
-            inputs, nside, inplace=inplace, lmax=lmax, pixwin=pixwin, pol=pol
-        )
+            inputs,
+            nside,
+            inplace=inplace,
+            lmax=lmax,
+            pixwin=pixwin,
+            pol=pol,
+        ),
     )
 
 
@@ -126,7 +131,7 @@ def almxfl(
             np.asarray(alm),
             np.asarray(fl),
             inplace=inplace,
-        )
+        ),
     )
 
 
@@ -165,7 +170,7 @@ def ang2pix(
             theta,
             phi,
             lonlat=lonlat,
-        )
+        ),
     )
 
 
@@ -255,7 +260,7 @@ def map2alm(
         else np.asarray(maps)
     )
     return xp.asarray(
-        healpy.map2alm(inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights)
+        healpy.map2alm(inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights),
     )
 
 
@@ -429,5 +434,5 @@ class Rotator:
 
         """
         return self.xp.asarray(
-            healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m))
+            healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m)),
         )
