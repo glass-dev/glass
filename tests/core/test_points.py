@@ -3,12 +3,12 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import healpix
 import pytest
 
 import array_api_extra as xpx
 
 import glass
+import glass.healpix as hp
 import glass.points
 
 if TYPE_CHECKING:
@@ -231,7 +231,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 ) -> None:
     # create maps that saturate the batching in the function
     nside = 128
-    npix = healpix.nside2npix(nside)
+    npix = hp.nside2npix(nside)
 
     # case: single-dimensional input
 

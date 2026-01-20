@@ -9,7 +9,6 @@ from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import numpy as np
 from transformcl import cltovar
 
@@ -19,6 +18,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.grf
 import glass.harmonics
+import glass.healpix as hp
 import glass.shells
 
 if TYPE_CHECKING:
@@ -275,7 +275,7 @@ def discretized_cls(
         ]
 
     if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax)
+        pw = hp.pixwin(nside, lmax=lmax, xp=np)
 
     gls = []
     for cl in cls:
@@ -284,7 +284,7 @@ def discretized_cls(
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
                 n = min(len(cl), len(pw))  # type: ignore[arg-type]
-                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
+                cl = cl[:n] * pw[:n] ** 2  # type: ignore[operator] # noqa: PLW2901
         gls.append(cl)
     return gls
 

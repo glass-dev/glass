@@ -42,14 +42,12 @@ import itertools
 import math
 from typing import TYPE_CHECKING, Any
 
-import healpix
-import numpy as np
-
 import array_api_compat
 import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
 
 if TYPE_CHECKING:
@@ -205,8 +203,6 @@ def _broadcast_inputs(
     if vis is not None:
         vis, *rest = rest
 
-    return bias, delta, dims, ngal, vis
-
 
 def _compute_density_contrast(
     bias: float | FloatArray | None,
@@ -241,7 +237,7 @@ def _compute_density_contrast(
     return (
         xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
         if bias is None
-        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type,index]
+        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type]
     )
 
 
@@ -279,7 +275,7 @@ def _compute_expected_count(
 
     # turn into number count, modifying the array in place
     n = n + 1
-    n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
+    n *= ARCMIN2_SPHERE / n.size * ngal[k]
     return n
 
 
@@ -381,11 +377,11 @@ def _sample_galaxies_per_pixel(
     count = xp.sum(n)
     # don't go through pixels if there are no points
     if count == 0:
-        return
+        continue
 
     # for converting randomly sampled positions to HEALPix indices
     npix = n.shape[-1]
-    nside = healpix.npix2nside(npix)
+    nside = hp.npix2nside(npix)
 
     # create a mask to report the count in the right axis
     cmask: int | IntArray
@@ -414,14 +410,10 @@ def _sample_galaxies_per_pixel(
                 stop += 1
             # sample this batch of pixels
             ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
-            lon, lat = (
-                xp.asarray(angle)
-                for angle in healpix.randang(
-                    nside,
-                    ipix,
-                    lonlat=True,
-                    rng=_utils.rng_dispatcher(xp=np),
-                )
+            lon, lat = hp.randang(
+                nside,
+                ipix,
+                lonlat=True,
             )
             # next batch
             start, size = stop, 0
@@ -559,6 +551,8 @@ def uniform_positions(
         Number density, expected number of positions per arcmin2.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations.
 
     Yields
     ------

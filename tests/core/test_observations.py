@@ -3,11 +3,11 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import healpix
 import numpy as np
 import pytest
 
 import glass
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -23,13 +23,13 @@ def test_vmap_galactic_ecliptic(compare: type[Compare], xp: ModuleType) -> None:
     # check shape
 
     vmap = glass.vmap_galactic_ecliptic(n_side, xp=xp)
-    compare.assert_array_equal(vmap.shape[0], healpix.nside2npix(n_side))
+    compare.assert_array_equal(vmap.shape[0], hp.nside2npix(n_side))
 
     # Test without xp
 
     vmap = glass.vmap_galactic_ecliptic(n_side)
     assert vmap.__array_namespace__().__name__ == "numpy"
-    compare.assert_array_equal(vmap.shape[0], healpix.nside2npix(n_side))
+    compare.assert_array_equal(vmap.shape[0], hp.nside2npix(n_side))
 
     # no rotation
 
