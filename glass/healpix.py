@@ -49,7 +49,11 @@ def alm2map(  # noqa: PLR0913
         A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
 
     """
-    xp = array_api_compat.get_namespace(*alms, use_compat=False)
+    xp = (
+        array_api_compat.get_namespace(*alms, use_compat=False)
+        if isinstance(alms, Sequence)
+        else alms.__array_namespace__()
+    )
 
     inputs = (
         [np.asarray(alm) for alm in alms]
@@ -93,7 +97,11 @@ def alm2map_spin(
         List of 2 out maps in RING scheme as arrays.
 
     """
-    xp = array_api_compat.get_namespace(*alms, use_compat=False)
+    xp = (
+        array_api_compat.get_namespace(*alms, use_compat=False)
+        if isinstance(alms, Sequence)
+        else alms.__array_namespace__()
+    )
 
     inputs = [np.asarray(alm) for alm in alms]
     outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
