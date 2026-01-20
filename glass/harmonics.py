@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-import healpy as hp
-
 import array_api_compat
+
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from glass._types import ComplexArray, FloatArray
