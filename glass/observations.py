@@ -83,15 +83,15 @@ def vmap_galactic_ecliptic(
 
     """
     if len(galactic) != 2:
-        msg = "galactic stripe must be a pair of numbers"  # type: ignore[unreachable]
+        msg = "galactic stripe must be a pair of numbers"
         raise TypeError(msg)
     if len(ecliptic) != 2:
-        msg = "ecliptic stripe must be a pair of numbers"  # type: ignore[unreachable]
+        msg = "ecliptic stripe must be a pair of numbers"
         raise TypeError(msg)
 
     m = np.ones(hp.nside2npix(nside))
     m *= 1 - hp.query_strip(nside, galactic, xp=np)
-    m = hp.Rotator(coord="GC").rotate_map_pixel(m)  # type: ignore[assignment]
+    m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m *= 1 - hp.query_strip(nside, ecliptic, xp=np)
     return xp.asarray(hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m))
 

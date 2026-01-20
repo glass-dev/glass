@@ -208,9 +208,9 @@ def galaxy_shear(  # noqa: PLR0913
     for i in range(0, size, 10_000):
         s = slice(i, i + 10_000)
         ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=np)
-        k[s] = kappa[ipix]  # type: ignore[index]
-        np.real(g)[s] = gamma1[ipix]  # type: ignore[index]
-        np.imag(g)[s] = gamma2[ipix]  # type: ignore[index]
+        k[s] = kappa[ipix]
+        np.real(g)[s] = gamma1[ipix]
+        np.imag(g)[s] = gamma2[ipix]
 
     if reduced_shear:
         # compute reduced shear in place

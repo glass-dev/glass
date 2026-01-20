@@ -171,7 +171,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type,call-arg]
+        return self.axp.asarray(self.rng.random(size, dtype, out))
 
     def normal(
         self,
@@ -218,7 +218,7 @@ class Generator:
             Array of samples from the Poisson distribution.
 
         """
-        return self.axp.asarray(self.rng.poisson(lam, size))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
         self,
@@ -244,7 +244,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type,call-arg]
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))
 
     def uniform(
         self,
@@ -269,7 +269,7 @@ class Generator:
             Array of samples from the uniform distribution.
 
         """
-        return self.axp.asarray(self.rng.uniform(low, high, size))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.uniform(low, high, size))
 
 
 class XPAdditions:

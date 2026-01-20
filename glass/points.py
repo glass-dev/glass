@@ -260,9 +260,9 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     for k in itertools.product(*map(range, dims)):
         # compute density contrast from bias model, or copy
         n = (
-            xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
+            xp.asarray(delta[(*k, ...)], copy=True)
             if bias is None
-            else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type]
+            else bias_model(delta[(*k, ...)], bias[(*k, ...)])
         )
 
         # remove monopole if asked to
@@ -275,7 +275,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # apply visibility if given
         if vis is not None:
-            n *= vis[(*k, ...)]  # type: ignore[arg-type]
+            n *= vis[(*k, ...)]
 
         # clip number density at zero
         n = xp.clip(n, min=0.0)

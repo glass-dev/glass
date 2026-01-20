@@ -283,8 +283,8 @@ def discretized_cls(
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl), len(pw))  # type: ignore[arg-type]
-                cl = cl[:n] * pw[:n] ** 2  # type: ignore[operator] # noqa: PLW2901
+                n = min(len(cl), len(pw))
+                cl = cl[:n] * pw[:n] ** 2 # noqa: PLW2901
         gls.append(cl)
     return gls  # ty: ignore[invalid-return-type]
 
@@ -393,7 +393,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[arg-type,call-arg]
+        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
