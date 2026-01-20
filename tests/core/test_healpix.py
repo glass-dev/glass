@@ -310,7 +310,7 @@ def test_query_strip(
     """
     old = np.ones(healpix_inputs.npix)
     old[healpy.query_strip(healpix_inputs.nside, *thetas)] = 0
-    new = np.ones(healpix_inputs.npix, dtype=np.int64)
+    new = xp.ones(healpix_inputs.npix, dtype=xp.int64)
     new *= 1 - hp.query_strip(healpix_inputs.nside, thetas, xp=xp)
     compare.assert_array_equal(old, new)
 
