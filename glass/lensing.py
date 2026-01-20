@@ -33,13 +33,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, overload
 
-import healpy as hp
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.harmonics
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -328,7 +328,7 @@ def from_convergence(  # noqa: PLR0913
     fl = np.sqrt((ell - 1) * (ell + 2), where=(ell > 0), out=np.zeros(lmax + 1))
     fl /= 2
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
         fl *= pw2 / pw0
     hp.almxfl(alm, fl, inplace=True)
 
@@ -392,7 +392,7 @@ def shear_from_convergence(
 
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
         fl *= pw2 / pw0
 
     # apply correction to E-modes

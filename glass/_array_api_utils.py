@@ -29,6 +29,8 @@ if TYPE_CHECKING:
 
     from glass._types import AnyArray, FloatArray, UnifiedGenerator
 
+SEED = 42
+
 
 class CompatibleBackendNotFoundError(Exception):
     """
@@ -83,12 +85,14 @@ def default_xp() -> ModuleType:
     return import_numpy()
 
 
-def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
+def rng_dispatcher(*, seed: int | AArray = SEED, xp: ModuleType) -> UnifiedGenerator:
     """
     Dispatch a random number generator based on the provided array's backend.
 
     Parameters
     ----------
+    seed
+        Seed for the random number generator.
     xp
         The array library backend to use for array operations.
 
@@ -101,8 +105,6 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     NotImplementedError
         If the array backend is not supported.
     """
-    seed = 42
-
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
@@ -128,10 +130,7 @@ class Generator:
 
     __slots__ = ("axp", "nxp", "rng")
 
-    def __init__(
-        self,
-        seed: int | bool | AArray | None = None,  # noqa: FBT001
-    ) -> None:
+    def __init__(self, *, seed: int | AArray = SEED) -> None:
         """
         Initialize the Generator.
 
@@ -146,7 +145,7 @@ class Generator:
 
         self.axp = array_api_strict
         self.nxp = numpy
-        self.rng = self.nxp.random.default_rng(seed=seed)
+        self.rng = rng_dispatcher(seed=seed, xp=self.nxp)
 
     def random(
         self,
@@ -169,9 +168,10 @@ class Generator:
         Returns
         -------
             Array of random floats.
+
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type,call-arg]
 
     def normal(
         self,
@@ -194,6 +194,7 @@ class Generator:
         Returns
         -------
             Array of samples from the normal distribution.
+
         """
         return self.axp.asarray(self.rng.normal(loc, scale, size))
 
@@ -215,8 +216,9 @@ class Generator:
         Returns
         -------
             Array of samples from the Poisson distribution.
+
         """
-        return self.axp.asarray(self.rng.poisson(lam, size))
+        return self.axp.asarray(self.rng.poisson(lam, size))  # type: ignore[arg-type]
 
     def standard_normal(
         self,
@@ -239,9 +241,10 @@ class Generator:
         Returns
         -------
             Array of samples from the standard normal distribution.
+
         """
         dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type,call-arg]
 
     def uniform(
         self,
@@ -264,8 +267,9 @@ class Generator:
         Returns
         -------
             Array of samples from the uniform distribution.
+
         """
-        return self.axp.asarray(self.rng.uniform(low, high, size))
+        return self.axp.asarray(self.rng.uniform(low, high, size))  # type: ignore[arg-type]
 
 
 class XPAdditions:
@@ -279,9 +283,6 @@ class XPAdditions:
     This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
     for details.
     """
-
-    xp: ModuleType
-    backend: str
 
     def __init__(self, xp: ModuleType) -> None:
         """
@@ -343,45 +344,6 @@ class XPAdditions:
             y_np = np.asarray(y, copy=True)
             x_np = np.asarray(x, copy=True)
             result_np = np.trapezoid(y_np, x_np, dx=dx, axis=axis)
-            return self.xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
-
-    def union1d(self, ar1: AnyArray, ar2: AnyArray) -> AnyArray:
-        """
-        Compute the set union of two 1D arrays.
-
-        Parameters
-        ----------
-        ar1
-            First input array.
-        ar2
-            Second input array.
-
-        Returns
-        -------
-            The union of the two arrays.
-
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
-        Notes
-        -----
-        See https://github.com/glass-dev/glass/issues/647
-        """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.union1d(ar1, ar2)
-
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            ar1_np = np.asarray(ar1, copy=True)
-            ar2_np = np.asarray(ar2, copy=True)
-            result_np = np.union1d(ar1_np, ar2_np)
             return self.xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"

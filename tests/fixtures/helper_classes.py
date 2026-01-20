@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import healpy as hp
 import numpy as np
 import pytest
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from glass._types import AnyArray, FloatArray, IntArray
+    from glass._types import AnyArray, FloatArray, IntArray, UnifiedGenerator
 
 
 class Compare:
@@ -55,11 +56,6 @@ class Compare:
         """Check if two array objects are not ordered by less than."""
         np.testing.assert_array_less(actual, desired)
 
-    @staticmethod
-    def assert_equal(actual: AnyArray, desired: AnyArray) -> None:
-        """Check if two objects are not equal."""
-        np.testing.assert_equal(actual, desired)
-
 
 @pytest.fixture(scope="session")
 def compare() -> type[Compare]:
@@ -87,14 +83,25 @@ class DataTransformer:
         IntArray,
     ]:
         """Concatenate an array of pos into three arrays lon, lat and count."""
-        lon = xp.empty(0)
-        lat = xp.empty(0)
-        cnt: IntArray = 0
+        lons = []
+        lats = []
+        counts = []
+
         for lo, la, co in pos:
-            lon = xp.concat([lon, lo])
-            lat = xp.concat([lat, la])
-            cnt = cnt + co
-        return lon, lat, cnt
+            lons.append(xp.asarray(lo))
+            lats.append(xp.asarray(la))
+            counts.append(xp.asarray(co))
+
+        if lons:
+            lon = xp.concat(lons, axis=0)
+            lat = xp.concat(lats, axis=0)
+            count = xp.sum(xp.stack(counts, axis=0), axis=0)
+        else:
+            lon = xp.empty(0)
+            lat = xp.empty(0)
+            count = xp.asarray(0)
+
+        return lon, lat, count
 
 
 @pytest.fixture(scope="session")
@@ -131,3 +138,53 @@ class GeneratorConsumer:
 def generator_consumer() -> type[GeneratorConsumer]:
     """Fixture for generator-consuming utility."""
     return GeneratorConsumer
+
+
+class HealpixInputs:
+    """Helper class for calculating inputs for HEALPix functions."""
+
+    lmax: int = 11
+    npts: int = 250
+    npix: int = 192
+    nside: int = 4
+
+    @staticmethod
+    def alm(*, rng: UnifiedGenerator) -> FloatArray:
+        """Generate random alm coefficients."""
+        size = hp.Alm.getsize(HealpixInputs.lmax)
+        return rng.standard_normal(size) + 1j * rng.standard_normal(size)
+
+    @staticmethod
+    def fl(*, rng: UnifiedGenerator) -> FloatArray:
+        """Generate random function of l."""
+        return rng.standard_normal(HealpixInputs.lmax + 1)
+
+    @staticmethod
+    def ipix(*, rng: UnifiedGenerator, xp: ModuleType) -> IntArray:
+        """Generate a list of HEALPix pixels."""
+        cnts = rng.poisson(
+            HealpixInputs.npts / HealpixInputs.npix,
+            size=HealpixInputs.npix,
+        )
+        return xp.repeat(xp.arange(HealpixInputs.npix), cnts)
+
+    @staticmethod
+    def kappa(*, rng: UnifiedGenerator) -> FloatArray:
+        """Generate a kappa map."""
+        return rng.normal(size=hp.nside2npix(HealpixInputs.nside))
+
+    @staticmethod
+    def latitudes(max_phi: float, *, rng: UnifiedGenerator) -> FloatArray:
+        """Generate an array of latitudes."""
+        return rng.uniform(-max_phi, max_phi, size=HealpixInputs.npts)
+
+    @staticmethod
+    def longitudes(max_theta: float, *, rng: UnifiedGenerator) -> FloatArray:
+        """Generate an array of longitudes."""
+        return rng.uniform(-max_theta, max_theta, size=HealpixInputs.npts)
+
+
+@pytest.fixture(scope="session")
+def healpix_inputs() -> type[HealpixInputs]:
+    """Fixture for generating HEALPix inputs."""
+    return HealpixInputs
