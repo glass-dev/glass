@@ -54,9 +54,22 @@ def test_alm2map(
     )
 
 
-def test_alm2map_spin() -> None:
+@pytest.mark.parametrize("spin", [1, 2])
+def test_alm2map_spin(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    spin: int,
+    urng: UnifiedGenerator,
+) -> None:
     """Compare ``glass.healpix.alm2map_spin`` against ``healpy.alm2map_spin``."""
-    pass  # noqa: PIE790
+    alm = healpix_inputs.alm(rng=urng)
+    blm = healpix_inputs.alm(rng=urng)
+    old = healpy.alm2map_spin(
+        [alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax
+    )
+    new = hp.alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
+    for i in range(len(old)):
+        compare.assert_array_equal(old[i], new[i])
 
 
 def test_almxfl(
