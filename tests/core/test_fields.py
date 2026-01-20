@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import AngularPowerSpectra
+    from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import Compare
 
 HAVE_JAX = importlib.util.find_spec("jax") is not None
@@ -795,9 +796,9 @@ def test_check_posdef_spectra(xp: ModuleType) -> None:
 
 def test_regularized_spectra(
     mocker: MockerFixture,
-    rng: np.random.Generator,
+    urng: UnifiedGenerator,
 ) -> None:
-    spectra: AngularPowerSpectra = rng.random(size=(6, 101))
+    spectra: AngularPowerSpectra = [urng.random(101) for _ in range(6)]
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")
