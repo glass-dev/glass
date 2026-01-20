@@ -329,7 +329,7 @@ def from_convergence(  # noqa: PLR0913
 
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
-    gamma = gamma[0] + 1j * gamma[1]  # type: ignore[assignment]g
+    gamma = gamma[0] + 1j * gamma[1]  # type: ignore[assignment]
     results += (gamma,)
 
     # all done
