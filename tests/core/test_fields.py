@@ -338,7 +338,7 @@ def test_discretized_cls(compare: type[Compare]) -> None:
 
     for cl in result:
         n = min(len(cl), len(pw))
-        expected = np.ones(n) * pw[:n] ** 2 # type: ignore[operator]
+        expected = np.ones(n) * pw[:n] ** 2  # type: ignore[operator]
         compare.assert_allclose(cl[:n], expected)
 
 
