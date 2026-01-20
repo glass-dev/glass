@@ -16,7 +16,7 @@ import glass._array_api_utils as _utils
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import ComplexArray, FloatArray, IntArray, UnifiedGenerator
+    from glass._types import ComplexArray, FloatArray, IntArray
 
 
 def alm2map(  # noqa: PLR0913

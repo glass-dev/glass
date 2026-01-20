@@ -42,8 +42,6 @@ import itertools
 import math
 from typing import TYPE_CHECKING, Any
 
-import numpy as np
-
 import array_api_compat
 import array_api_extra as xpx
 
