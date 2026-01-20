@@ -222,7 +222,7 @@ def get_nside(m: FloatArray) -> int:
         The HEALPix nside parameter of the map.
 
     """
-    return healpy.get_nside(np.asarray(m))
+    return int(healpy.get_nside(np.asarray(m)))
 
 
 def map2alm(
@@ -278,7 +278,7 @@ def npix2nside(npix: int) -> int:
         The HEALPix nside parameter of the map.
 
     """
-    return healpix.npix2nside(npix)
+    return int(healpix.npix2nside(npix))
 
 
 def nside2npix(nside: int) -> int:
@@ -295,7 +295,7 @@ def nside2npix(nside: int) -> int:
         The number of pixels.
 
     """
-    return healpix.nside2npix(nside)
+    return int(healpix.nside2npix(nside))
 
 
 def pixwin(
