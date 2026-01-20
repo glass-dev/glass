@@ -155,6 +155,11 @@ class HealpixInputs:
         return rng.standard_normal(size) + 1.0j * rng.standard_normal(size)
 
     @staticmethod
+    def fl(*, rng: UnifiedGenerator) -> FloatArray:
+        """Generate random function of l."""
+        return rng.standard_normal(HealpixInputs.lmax + 1)
+
+    @staticmethod
     def ipix(*, rng: UnifiedGenerator, xp: ModuleType) -> IntArray:
         """Generate a list of HEALPix pixels."""
         cnts = rng.poisson(

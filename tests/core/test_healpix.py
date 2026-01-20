@@ -59,9 +59,18 @@ def test_alm2map_spin() -> None:
     pass  # noqa: PIE790
 
 
-def test_almxfl() -> None:
+def test_almxfl(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    urng: UnifiedGenerator,
+) -> None:
     """Compare ``glass.healpix.almxfl`` against ``healpy.almxfl``."""
-    pass  # noqa: PIE790
+    alm = healpix_inputs.alm(rng=urng)
+    fl = healpix_inputs.fl(rng=urng)
+    compare.assert_array_equal(
+        healpy.almxfl(alm, fl),
+        hp.almxfl(alm, fl),
+    )
 
 
 @pytest.mark.parametrize(
