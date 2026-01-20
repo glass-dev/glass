@@ -3,11 +3,11 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import pytest
 
 import glass
 import glass.fields
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType

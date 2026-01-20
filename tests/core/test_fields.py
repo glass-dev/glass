@@ -3,13 +3,13 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import numpy as np
 import pytest
 
 import glass
 import glass._array_api_utils as _utils
 import glass.fields
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -332,13 +332,13 @@ def test_discretized_cls(compare: type[Compare]) -> None:
 
     nside = 4
 
-    pw = hp.pixwin(nside, lmax=7)
+    pw = hp.pixwin(nside, lmax=7, xp=np)
 
     result = glass.discretized_cls([[], np.ones(10), np.ones(10)], nside=nside)
 
     for cl in result:
         n = min(len(cl), len(pw))
-        expected = np.ones(n) * pw[:n] ** 2
+        expected = np.ones(n) * pw[:n] ** 2  # type: ignore[operator]
         compare.assert_allclose(cl[:n], expected)
 
 

@@ -42,14 +42,12 @@ import itertools
 import math
 from typing import TYPE_CHECKING, Any
 
-import healpix
-import numpy as np
-
 import array_api_compat
 import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
 
 if TYPE_CHECKING:
@@ -293,7 +291,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
 
         # for converting randomly sampled positions to HEALPix indices
         npix = n.shape[-1]
-        nside = healpix.npix2nside(npix)
+        nside = hp.npix2nside(npix)
 
         # create a mask to report the count in the right axis
         cmask: int | IntArray
@@ -322,14 +320,10 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                     stop += 1
                 # sample this batch of pixels
                 ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
-                lon, lat = (
-                    xp.asarray(angle)
-                    for angle in healpix.randang(
-                        nside,
-                        ipix,
-                        lonlat=True,
-                        rng=_utils.rng_dispatcher(xp=np),
-                    )
+                lon, lat = hp.randang(
+                    nside,
+                    ipix,
+                    lonlat=True,
                 )
                 # next batch
                 start, size = stop, 0
@@ -365,6 +359,8 @@ def uniform_positions(
         Number density, expected number of positions per arcmin2.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations.
 
     Yields
     ------
