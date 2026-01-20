@@ -4,7 +4,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import glass.harmonics
+glass_harmonics = pytest.importorskip(
+    "glass.harmonics",
+    reason="tests require glass.harmonics",
+)
+
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -25,7 +29,7 @@ def test_multalm(
     alm = xpb.arange(scale_factor * 5, dtype=xpb.float64)
     bl = xpb.asarray(scale_factor * 3, dtype=xpb.float64)
 
-    result = benchmark(glass.harmonics.multalm, alm, bl)
+    result = benchmark(glass_harmonics.multalm, alm, bl)
 
     compare.assert_allclose(
         result[:5],
