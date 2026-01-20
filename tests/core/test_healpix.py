@@ -108,6 +108,8 @@ def test_alm2map_spin(
         [alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax
     )
     new = hp.alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
+    assert type(old) is type(new)
+    assert len(old) == len(new)
     for i in range(len(old)):
         compare.assert_array_equal(old[i], new[i])
 
@@ -171,6 +173,8 @@ def test_ang2vec(  # noqa: PLR0913
     phis = healpix_inputs.latitudes(max_phi, rng=urng)
     old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
     new = hp.ang2vec(thetas, phis, lonlat=lonlat, xp=xp)
+    assert type(old) is type(new)
+    assert len(old) == len(new)
     for i in range(len(old)):
         compare.assert_array_equal(old[i], new[i])
 
@@ -193,7 +197,7 @@ def test_get_nside(
         (True, True),
     ],
 )
-def test_map2alm(
+def test_map2alm_individual(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
@@ -217,6 +221,40 @@ def test_map2alm(
         ),
     )
 
+@pytest.mark.parametrize(
+    ("pol", "use_pixel_weights"),
+    [
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    ],
+)
+def test_map2alm_sequence(
+    compare: type[Compare],
+    healpix_inputs: type[HealpixInputs],
+    pol: bool,  # noqa: FBT001
+    urng: UnifiedGenerator,
+    use_pixel_weights: bool,  # noqa: FBT001
+) -> None:
+    """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
+    kappa1 = healpix_inputs.kappa(rng=urng)
+    kappa2 = healpix_inputs.kappa(rng=urng)
+    kappa3 = healpix_inputs.kappa(rng=urng)
+    compare.assert_array_equal(
+        healpy.map2alm(
+            [np.asarray(kappa1), np.asarray(kappa2), np.asarray(kappa3)],
+            lmax=healpix_inputs.lmax,
+            pol=pol,
+            use_pixel_weights=use_pixel_weights,
+        ),
+        hp.map2alm(
+            [kappa1, kappa2, kappa3],
+            lmax=healpix_inputs.lmax,
+            pol=pol,
+            use_pixel_weights=use_pixel_weights,
+        ),
+    )
 
 def test_npix2nside(
     healpix_inputs: type[HealpixInputs],

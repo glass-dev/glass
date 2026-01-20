@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 import healpix
@@ -11,7 +12,6 @@ import numpy as np
 import array_api_compat
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from types import ModuleType
 
     from glass._types import ComplexArray, FloatArray, IntArray, UnifiedGenerator
@@ -51,7 +51,11 @@ def alm2map(  # noqa: PLR0913
     """
     xp = array_api_compat.get_namespace(*alms, use_compat=False)
 
-    inputs = [np.asarray(alm) for alm in alms]
+    inputs = (
+        [np.asarray(alm) for alm in alms]
+        if isinstance(alms, Sequence)
+        else np.asarray(alms)
+    )
     return xp.asarray(
         healpy.alm2map(
             inputs, nside, inplace=inplace, lmax=lmax, pixwin=pixwin, pol=pol
@@ -217,7 +221,7 @@ def get_nside(m: FloatArray) -> int:
 
 
 def map2alm(
-    maps: FloatArray,
+    maps: FloatArray | Sequence[FloatArray],
     *,
     lmax: int | None = None,
     pol: bool = True,
@@ -243,15 +247,15 @@ def map2alm(
         alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
 
     """
-    xp = maps.__array_namespace__()
+    xp = array_api_compat.get_namespace(*maps, use_compat=False)
 
+    inputs = (
+        [np.asarray(m) for m in maps]
+        if isinstance(maps, Sequence)
+        else np.asarray(maps)
+    )
     return xp.asarray(
-        healpy.map2alm(
-            np.asarray(maps),
-            lmax=lmax,
-            pol=pol,
-            use_pixel_weights=use_pixel_weights,
-        )
+        healpy.map2alm(inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights)
     )
 
 
