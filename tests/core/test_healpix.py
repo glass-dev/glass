@@ -287,6 +287,7 @@ def test_pixwin(
     old = old if isinstance(old, tuple) else (old,)
     new = new if isinstance(new, tuple) else (new,)
 
+    assert len(old) == len(new)
     for i in range(len(old)):
         compare.assert_array_equal(old[i], new[i])
 
@@ -305,9 +306,9 @@ def test_query_strip(
     returned the indices of the pixels within the strip. Now it returns a mask
     array indicating which pixels are within the strip.
     """
-    old = np.zeros(healpix_inputs.npix)
+    old = np.ones(healpix_inputs.npix)
     old[healpy.query_strip(healpix_inputs.nside, *thetas)] = 0
-    new = np.zeros(healpix_inputs.npix, dtype=np.int64)
+    new = np.ones(healpix_inputs.npix, dtype=np.int64)
     new *= 1 - hp.query_strip(healpix_inputs.nside, thetas, xp=xp)
     compare.assert_array_equal(old, new)
 
@@ -333,9 +334,10 @@ def test_randang(
     new = hp.randang(
         healpix_inputs.nside, ipix, lonlat=lonlat, rng=_utils.rng_dispatcher(xp=np)
     )
+    assert type(old) is type(new)
     assert len(old) == len(new)
-    compare.assert_array_equal(old[0], new[0])
-    compare.assert_array_equal(old[1], new[1])
+    for i in range(len(old)):
+        compare.assert_array_equal(old[i], new[i])
 
 
 @pytest.mark.parametrize("coord", ["CE", "GC"])
