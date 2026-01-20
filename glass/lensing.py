@@ -311,7 +311,7 @@ def from_convergence(  # noqa: PLR0913
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
         alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
-        alpha = alpha[0] + 1j * alpha[1]
+        alpha = alpha[0] + 1j * alpha[1]  # type: ignore[assignment]
         results += (alpha,)
 
     # if no shear is requested, stop here
@@ -329,7 +329,7 @@ def from_convergence(  # noqa: PLR0913
 
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
-    gamma = gamma[0] + 1j * gamma[1]
+    gamma = gamma[0] + 1j * gamma[1]  # type: ignore[assignment]g
     results += (gamma,)
 
     # all done

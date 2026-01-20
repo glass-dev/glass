@@ -287,7 +287,7 @@ def test_pixwin(
 
     # Normalize to tuple
     old = old if isinstance(old, tuple) else (old,)
-    new = new if isinstance(new, tuple) else (new,)  # type: ignore[redunant-expr]
+    new = new if isinstance(new, tuple) else (new,)  # type: ignore[redundant-expr]
 
     assert len(old) == len(new)
     for i in range(len(old)):

@@ -284,7 +284,7 @@ def discretized_cls(
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
                 n = min(len(cl), len(pw))  # type: ignore[arg-type]
-                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901 # type: ignore[operator]
         gls.append(cl)
     return gls
 
