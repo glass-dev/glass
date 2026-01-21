@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from typing import ParamSpec, TypeAlias, TypeVar
 
     import numpy as np
@@ -23,6 +24,8 @@ if TYPE_CHECKING:
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
+
+    AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
 else:
     # Runtime fallbacks (for Sphinx / autodoc)
     # https://github.com/sphinx-doc/sphinx/issues/11991
@@ -31,3 +34,5 @@ else:
     FloatArray = Any
     IntArray = Any
     UnifiedGenerator = Any
+
+    AngularPowerSpectra = Any
