@@ -43,7 +43,7 @@ def _populate_random_complex_array(
     length: int,
     rng: UnifiedGenerator,
 ) -> ComplexArray:
-    return rng.standard_normal((length,)) + (1.0j * rng.standard_normal((length,)))
+    return rng.standard_normal((length,)) + (1j * rng.standard_normal((length,)))
 
 
 def triaxial_axis_ratio(

@@ -23,13 +23,13 @@ import math
 import warnings
 from typing import TYPE_CHECKING
 
-import healpix
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
 from glass import _rng
 
@@ -197,7 +197,7 @@ def galaxy_shear(  # noqa: PLR0913
         (lensed ellipticities).
 
     """
-    nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
+    nside = hp.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
 
     size = np.broadcast(lon, lat, eps).size
 
@@ -208,10 +208,10 @@ def galaxy_shear(  # noqa: PLR0913
     # get the lensing maps at galaxy position
     for i in range(0, size, 10_000):
         s = slice(i, i + 10_000)
-        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
-        k[s] = kappa[ipix]
-        np.real(g)[s] = gamma1[ipix]
-        np.imag(g)[s] = gamma2[ipix]
+        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=np)
+        k[s] = kappa[ipix]  # type: ignore[index]
+        np.real(g)[s] = gamma1[ipix]  # type: ignore[index]
+        np.imag(g)[s] = gamma2[ipix]  # type: ignore[index]
 
     if reduced_shear:
         # compute reduced shear in place

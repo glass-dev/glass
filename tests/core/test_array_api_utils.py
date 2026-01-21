@@ -38,61 +38,59 @@ def test_rng_dispatcher_array_api_strict() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_init() -> None:
-    rng = _rng.Generator(_rng.SEED)
+    rng = _rng.Generator()
     assert isinstance(rng, _rng.Generator)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_random() -> None:
     import array_api_strict
-    from array_api_strict._array_object import Array
 
-    rng = _rng.Generator(_rng.SEED)
+    rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.random(size=10_000)
     assert rvs.shape == (10_000,)
     assert array_api_strict.min(rvs) >= 0.0
     assert array_api_strict.max(rvs) < 1.0
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, array_api_strict._array_object.Array)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_normal() -> None:
-    from array_api_strict._array_object import Array
+    import array_api_strict
 
-    rng = _rng.Generator(_rng.SEED)
+    rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.normal(1, 2, size=10_000)
     assert rvs.shape == (10_000,)
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, array_api_strict._array_object.Array)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_standard_normal() -> None:
-    from array_api_strict._array_object import Array
+    import array_api_strict
 
-    rng = _rng.Generator(_rng.SEED)
+    rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.standard_normal(size=10_000)
     assert rvs.shape == (10_000,)
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, array_api_strict._array_object.Array)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_poisson() -> None:
-    from array_api_strict._array_object import Array
+    import array_api_strict
 
-    rng = _rng.Generator(_rng.SEED)
+    rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.poisson(lam=1, size=10_000)
     assert rvs.shape == (10_000,)
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, array_api_strict._array_object.Array)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_uniform() -> None:
     import array_api_strict
-    from array_api_strict._array_object import Array
 
-    rng = _rng.Generator(_rng.SEED)
+    rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.uniform(size=10_000)
     assert rvs.shape == (10_000,)
     assert array_api_strict.min(rvs) >= 0.0
     assert array_api_strict.max(rvs) < 1.0
-    assert isinstance(rvs, Array)
+    assert isinstance(rvs, array_api_strict._array_object.Array)

@@ -213,6 +213,7 @@ lint.isort = {known-first-party = [
     "glass",
     "tests",
 ], known-third-party = [
+    "healpix",
     "jax",
 ], section-order = [
     "future",
