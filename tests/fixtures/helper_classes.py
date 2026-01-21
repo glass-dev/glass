@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import healpy as hp
 import numpy as np
 import pytest
 
@@ -143,16 +142,18 @@ def generator_consumer() -> type[GeneratorConsumer]:
 class HealpixInputs:
     """Helper class for calculating inputs for HEALPix functions."""
 
+    alm_size: int = 78
     lmax: int = 11
-    npts: int = 250
     npix: int = 192
+    npts: int = 250
     nside: int = 4
 
     @staticmethod
     def alm(*, rng: UnifiedGenerator) -> FloatArray:
         """Generate random alm coefficients."""
-        size = hp.Alm.getsize(HealpixInputs.lmax)
-        return rng.standard_normal(size) + 1j * rng.standard_normal(size)
+        return rng.standard_normal(HealpixInputs.alm_size) + 1j * rng.standard_normal(
+            HealpixInputs.alm_size
+        )
 
     @staticmethod
     def fl(*, rng: UnifiedGenerator) -> FloatArray:
@@ -171,7 +172,7 @@ class HealpixInputs:
     @staticmethod
     def kappa(*, rng: UnifiedGenerator) -> FloatArray:
         """Generate a kappa map."""
-        return rng.normal(size=hp.nside2npix(HealpixInputs.nside))
+        return rng.normal(size=HealpixInputs.npix)
 
     @staticmethod
     def latitudes(max_phi: float, *, rng: UnifiedGenerator) -> FloatArray:
