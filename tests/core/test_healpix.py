@@ -8,8 +8,8 @@ import healpy
 import numpy as np
 import pytest
 
-import glass._array_api_utils as _utils
 import glass.healpix as hp
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -334,7 +334,7 @@ def test_randang(
         healpix_inputs.nside,
         ipix,
         lonlat=lonlat,
-        rng=_utils.rng_dispatcher(xp=np),
+        rng=_rng.rng_dispatcher(xp=np),
     )
     new = hp.randang(
         healpix_inputs.nside,

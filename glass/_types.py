@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from typing import ParamSpec, TypeAlias, TypeVar
 
     import numpy as np
@@ -9,8 +10,8 @@ if TYPE_CHECKING:
 
     from array_api_strict._array_object import Array as AArray
 
-    import glass._array_api_utils as _utils
     import glass.jax
+    from glass import _rng
 
     P = ParamSpec("P")
     R = TypeVar("R")
@@ -21,8 +22,10 @@ if TYPE_CHECKING:
     FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
     IntArray: TypeAlias = NDArray[np.int64] | JAXArray | AArray
     UnifiedGenerator: TypeAlias = (
-        np.random.Generator | glass.jax.Generator | _utils.Generator
+        np.random.Generator | glass.jax.Generator | _rng.Generator
     )
+
+    AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
 else:
     # Runtime fallbacks (for Sphinx / autodoc)
     # https://github.com/sphinx-doc/sphinx/issues/11991
@@ -31,3 +34,5 @@ else:
     FloatArray = Any
     IntArray = Any
     UnifiedGenerator = Any
+
+    AngularPowerSpectra = Any
