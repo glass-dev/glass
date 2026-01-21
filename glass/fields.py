@@ -20,6 +20,7 @@ import glass.grf
 import glass.harmonics
 import glass.healpix as hp
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -364,7 +365,7 @@ def _generate_grf(
         If all gls are empty.
     """
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=np)
+        rng = _rng.rng_dispatcher(xp=np)
 
     # number of gls and number of fields
     ngls = len(gls)

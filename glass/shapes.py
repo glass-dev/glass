@@ -31,6 +31,7 @@ import array_api_compat
 import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -90,7 +91,7 @@ def triaxial_axis_ratio(
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # get size from inputs if not explicitly provided
     if size is None:
@@ -179,7 +180,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # default size if not given
     if size is None:
@@ -261,7 +262,7 @@ def ellipticity_gaussian(
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # allocate flattened output array
     eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
@@ -326,7 +327,7 @@ def ellipticity_intnorm(
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
