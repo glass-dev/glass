@@ -25,7 +25,14 @@ if TYPE_CHECKING:
         np.random.Generator | glass.jax.Generator | _utils.Generator
     )
 
-    AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
+AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
+AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
+ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
+FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
+IntArray: TypeAlias = NDArray[np.int64] | JAXArray | AArray
+UnifiedGenerator: TypeAlias = (
+np.random.Generator | glass.jax.Generator | _utils.Generator
+)
 else:
     # Runtime fallbacks (for Sphinx / autodoc)
     # https://github.com/sphinx-doc/sphinx/issues/11991
