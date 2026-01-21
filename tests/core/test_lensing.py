@@ -32,13 +32,13 @@ def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> N
 
     # check all combinations of potential, deflection, shear being True
 
-    results = glass.from_convergence(kappa, potential=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, potential=True)
     compare.assert_array_equal(len(results), 1)
 
-    results = glass.from_convergence(kappa, deflection=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, deflection=True)
     compare.assert_array_equal(len(results), 1)
 
-    results = glass.from_convergence(kappa, shear=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, shear=True)
     compare.assert_array_equal(len(results), 1)
 
     results = glass.from_convergence(kappa, potential=True, deflection=True)  # ty: ignore[no-matching-overload]

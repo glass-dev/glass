@@ -48,14 +48,15 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
     from glass.shells import RadialWindow
 
+
 @overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[False] = False,
-    deflection: Literal[False] = False,
-    shear: Literal[False] = False,
+    potential: Literal[False],
+    deflection: Literal[False],
+    shear: Literal[False],
     discretized: bool = True,
 ) -> tuple[()]:
     # returns empty tuple
@@ -67,7 +68,7 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
+    potential: Literal[True],
     deflection: Literal[False] = False,
     shear: Literal[False] = False,
     discretized: bool = True,
@@ -82,7 +83,7 @@ def from_convergence(
     lmax: int | None = None,
     *,
     potential: Literal[False] = False,
-    deflection: Literal[True] = True,
+    deflection: Literal[True],
     shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[ComplexArray]:
@@ -97,7 +98,7 @@ def from_convergence(
     *,
     potential: Literal[False] = False,
     deflection: Literal[False] = False,
-    shear: Literal[True] = True,
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[ComplexArray]:
     # returns gamma
@@ -109,8 +110,8 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
-    deflection: Literal[True] = True,
+    potential: Literal[True],
+    deflection: Literal[True],
     shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[
@@ -126,9 +127,9 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
+    potential: Literal[True],
     deflection: Literal[False] = False,
-    shear: Literal[True] = True,
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[
     FloatArray,
@@ -144,8 +145,8 @@ def from_convergence(
     lmax: int | None = None,
     *,
     potential: Literal[False] = False,
-    deflection: Literal[True] = True,
-    shear: Literal[True] = True,
+    deflection: Literal[True],
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[
     ComplexArray,
@@ -160,9 +161,9 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
-    deflection: Literal[True] = True,
-    shear: Literal[True] = True,
+    potential: Literal[True],
+    deflection: Literal[True],
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[
     FloatArray,
