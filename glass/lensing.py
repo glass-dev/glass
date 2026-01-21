@@ -48,6 +48,19 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
     from glass.shells import RadialWindow
 
+@overload
+def from_convergence(
+    kappa: FloatArray,
+    lmax: int | None = None,
+    *,
+    potential: Literal[False] = False,
+    deflection: Literal[False] = False,
+    shear: Literal[False] = False,
+    discretized: bool = True,
+) -> tuple[()]:
+    # returns empty tuple
+    ...
+
 
 @overload
 def from_convergence(
