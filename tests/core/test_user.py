@@ -30,7 +30,7 @@ def test_read_write_cls(
     rng: np.random.Generator,
     tmp_path: pathlib.Path,
 ) -> None:
-    cls: AngularPowerSpectra = [rng.normal(size=(10,)) for i in range(10)]
+    cls: AngularPowerSpectra = [rng.normal(size=(10,)) for _ in range(10)]
     glass.save_cls(tmp_path / cls_file, cls)
 
     assert pathlib.Path.exists(tmp_path / cls_file)

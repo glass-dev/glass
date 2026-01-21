@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from conftest import Compare, GeneratorConsumer
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from glass._types import UnifiedGenerator
+    from glass._types import AngularPowerSpectra, UnifiedGenerator
 
 
 @pytest.mark.stable
@@ -168,7 +168,7 @@ def test_generate_grf(  # noqa: PLR0913
     if xpb.__name__ == "array_api_strict":
         pytest.skip(f"glass.fields._generate_grf not yet ported for {xpb.__name__}")
 
-    gls = urngb.random((1, 1_000))
+    gls: AngularPowerSpectra = [urngb.random((1, 1_000))]
     nside = 4
 
     def function_to_benchmark() -> list[Any]:
@@ -202,7 +202,7 @@ def test_generate(
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
     nth_triangular_number = int((n * (n + 1)) / 2)
-    gls = [xpb.ones(10) for _ in range(nth_triangular_number)]
+    gls: AngularPowerSpectra = [xpb.ones(10) for _ in range(nth_triangular_number)]
     nside = 16
 
     def function_to_benchmark() -> list[Any]:
@@ -233,7 +233,7 @@ def test_getcl_lmax_0(
     """Benchmarks for glass.getcl with lmax of 0."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
-    cls = [
+    cls: AngularPowerSpectra = [
         xpb.asarray([i, j], dtype=xpb.float64)
         for i in range(scale_factor)
         for j in range(i, -1, -1)
@@ -264,7 +264,7 @@ def test_getcl_lmax_larger_than_cls(
     """Benchmarks for glass.getcl with lmax larger than the length of cl."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
-    cls = [
+    cls: AngularPowerSpectra = [
         xpb.asarray([i, j], dtype=xpb.float64)
         for i in range(scale_factor)
         for j in range(i, -1, -1)
