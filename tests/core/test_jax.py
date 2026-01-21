@@ -1,11 +1,12 @@
-import jax.numpy as jnp
 import pytest
-from jax.typing import ArrayLike
-
-import glass._array_api_utils as _utils
-from glass.jax import Generator
 
 jax = pytest.importorskip("jax", reason="tests require jax")
+
+import jax.numpy as jnp  # noqa: E402
+from jax.typing import ArrayLike  # noqa: E402
+
+import glass._array_api_utils as _utils  # noqa: E402
+from glass.jax import Generator  # noqa: E402
 
 SEED = 42
 
