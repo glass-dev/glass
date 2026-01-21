@@ -31,6 +31,7 @@ import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -122,7 +123,7 @@ def redshifts_from_nz(
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
@@ -298,7 +299,7 @@ def gaussian_phz(  # noqa: PLR0913
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
     lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)

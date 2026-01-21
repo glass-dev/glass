@@ -21,12 +21,14 @@ import glass.grf
 import glass.harmonics
 import glass.healpix as hp
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
     from typing import Literal
 
     from glass._types import (
+        AngularPowerSpectra,
         AnyArray,
         ComplexArray,
         FloatArray,
@@ -183,7 +185,7 @@ def iternorm(
 
 
 def cls2cov(
-    cls: AnyArray,
+    cls: AngularPowerSpectra,
     nl: int,
     nf: int,
     nc: int,
@@ -231,12 +233,12 @@ def cls2cov(
 
 
 def discretized_cls(
-    cls: AnyArray,
+    cls: AngularPowerSpectra,
     *,
     lmax: int | None = None,
     ncorr: int | None = None,
     nside: int | None = None,
-) -> AnyArray:
+) -> AngularPowerSpectra:
     """
     Apply discretisation effects to angular power spectra.
 
@@ -268,7 +270,7 @@ def discretized_cls(
     """
     if ncorr is not None:
         n = nfields_from_nspectra(len(cls))
-        cls = [  # ty: ignore[invalid-assignment]
+        cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
             for j in range(i + 1)
@@ -286,14 +288,14 @@ def discretized_cls(
                 n = min(len(cl), len(pw))
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
-    return gls  # ty: ignore[invalid-return-type]
+    return gls
 
 
 @deprecated("use glass.solve_gaussian_spectra() instead")
 def lognormal_gls(
-    cls: AnyArray,
+    cls: AngularPowerSpectra,
     shift: float = 1.0,
-) -> AnyArray:
+) -> AngularPowerSpectra:
     """
     Compute Gaussian Cls for a lognormal random field.
 
@@ -321,7 +323,7 @@ def lognormal_gls(
 
 
 def _generate_grf(
-    gls: AnyArray,
+    gls: AngularPowerSpectra,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -363,7 +365,7 @@ def _generate_grf(
         If all gls are empty.
     """
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=np)
+        rng = _rng.rng_dispatcher(xp=np)
 
     # number of gls and number of fields
     ngls = len(gls)
@@ -420,7 +422,7 @@ def _generate_grf(
 
 @deprecated("use glass.generate() instead")
 def generate_gaussian(
-    gls: AnyArray,
+    gls: AngularPowerSpectra,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -473,7 +475,7 @@ def generate_gaussian(
 
 @deprecated("use glass.generate() instead")
 def generate_lognormal(
-    gls: AnyArray,
+    gls: AngularPowerSpectra,
     nside: int,
     shift: float = 1.0,
     *,
@@ -512,7 +514,7 @@ def generate_lognormal(
 
 
 def getcl(
-    cls: AnyArray,
+    cls: AngularPowerSpectra,
     i: int,
     j: int,
     lmax: int | None = None,
@@ -550,7 +552,7 @@ def getcl(
 
 
 def enumerate_spectra(
-    entries: Iterable[AnyArray],
+    entries: AngularPowerSpectra,
 ) -> Iterator[tuple[int, int, AnyArray]]:
     """
     Iterate over a set of two-point functions in :ref:`standard order
@@ -592,7 +594,7 @@ def spectra_indices(n: int) -> IntArray:
 
 
 def effective_cls(
-    cls: AnyArray,
+    cls: AngularPowerSpectra,
     weights1: FloatArray,
     weights2: FloatArray | None = None,
     *,
@@ -728,8 +730,8 @@ def lognormal_fields(
 
 def compute_gaussian_spectra(
     fields: Sequence[glass.grf.Transformation],
-    spectra: AnyArray,
-) -> AnyArray:
+    spectra: AngularPowerSpectra,
+) -> AngularPowerSpectra:
     """
     Compute a sequence of Gaussian angular power spectra.
 
@@ -758,13 +760,13 @@ def compute_gaussian_spectra(
     for i, j, cl in enumerate_spectra(spectra):
         gl = glass.grf.compute(cl, fields[i], fields[j]) if cl.size > 0 else 0 * cl
         gls.append(gl)
-    return gls  # ty: ignore[invalid-return-type]
+    return gls
 
 
 def solve_gaussian_spectra(
     fields: Sequence[glass.grf.Transformation],
-    spectra: AnyArray,
-) -> AnyArray:
+    spectra: AngularPowerSpectra,
+) -> AngularPowerSpectra:
     """
     Solve a sequence of Gaussian angular power spectra.
 
@@ -816,12 +818,12 @@ def solve_gaussian_spectra(
         else:
             gl = 0 * cl  # makes a copy of the empty array
         gls.append(gl)
-    return gls  # ty: ignore[invalid-return-type]
+    return gls
 
 
 def generate(
     fields: Sequence[glass.grf.Transformation],
-    gls: AnyArray,
+    gls: AngularPowerSpectra,
     nside: int,
     *,
     ncorr: int | None = None,
@@ -962,7 +964,11 @@ def lognormal_shift_hilbert2011(z: float) -> float:
     return z * (8e-3 + z * (2.9e-2 + z * (-7.9e-3 + z * 6.5e-4)))
 
 
-def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
+def cov_from_spectra(
+    spectra: AngularPowerSpectra,
+    *,
+    lmax: int | None = None,
+) -> AnyArray:
     """
     Construct covariance matrix from spectra.
 
@@ -1003,7 +1009,7 @@ def cov_from_spectra(spectra: AnyArray, *, lmax: int | None = None) -> AnyArray:
     return cov
 
 
-def check_posdef_spectra(spectra: AnyArray) -> bool:
+def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
     """
     Test whether angular power spectra are positive semi-definite.
 
@@ -1024,7 +1030,7 @@ def check_posdef_spectra(spectra: AnyArray) -> bool:
 
 
 def regularized_spectra(
-    spectra: AnyArray,
+    spectra: AngularPowerSpectra,
     *,
     lmax: int | None = None,
     method: Literal["nearest", "clip"] = "nearest",

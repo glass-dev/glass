@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-import glass._array_api_utils as _utils
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -22,7 +22,7 @@ def rng() -> np.random.Generator:
 
     Use `urng` for array API tests.
     """
-    return np.random.default_rng(seed=42)
+    return np.random.default_rng(seed=_rng.SEED)
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
     """
-    return _utils.rng_dispatcher(xp=xp)
+    return _rng.rng_dispatcher(xp=xp)
 
 
 @pytest.fixture
@@ -46,4 +46,4 @@ def urngb(xpb: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xpb` fixture.
     """
-    return _utils.rng_dispatcher(xp=xpb)
+    return _rng.rng_dispatcher(xp=xpb)
