@@ -36,6 +36,7 @@ np.random.Generator | glass.jax.Generator | _utils.Generator
 else:
     # Runtime fallbacks (for Sphinx / autodoc)
     # https://github.com/sphinx-doc/sphinx/issues/11991
+	AngularPowerSpectra = Any
     AnyArray = Any
     ComplexArray = Any
     FloatArray = Any
