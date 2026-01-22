@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 import glass.grf
 
 if TYPE_CHECKING:
-    import numpy as np
 
     from glass._types import FloatArray
     from tests.fixtures.helper_classes import Compare
