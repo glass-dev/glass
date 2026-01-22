@@ -412,10 +412,7 @@ def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
 
     compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
-    with pytest.raises(
-        TypeError,
-        match="array_namespace requires at least one non-scalar array input",
-    ):
+    with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([xp.asarray([])], nside))
 
 
