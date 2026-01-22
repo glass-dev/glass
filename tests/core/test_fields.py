@@ -681,7 +681,7 @@ def test_lognormal_shift_hilbert2011(compare: type[Compare]) -> None:
 
 
 def test_cov_from_spectra(compare: type[Compare]) -> None:
-    spectra: AngularPowerSpectra = [
+    spectra: AngularPowerSpectra = np.asarray(
         [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
@@ -690,7 +690,7 @@ def test_cov_from_spectra(compare: type[Compare]) -> None:
             [320, 321, 322, 323],
             [310, 311, 312, 313],
         ],
-    ]
+    )
 
     compare.assert_array_equal(
         glass.cov_from_spectra(spectra),
@@ -801,9 +801,9 @@ def test_check_posdef_spectra() -> None:
 
 def test_regularized_spectra(
     mocker: MockerFixture,
-    urng: np.random.Generator,
+    rng: np.random.Generator,
 ) -> None:
-    spectra: AngularPowerSpectra = [urng.random(size=(6, 101))]
+    spectra: AngularPowerSpectra = rng.random(size=(6, 101))
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")
