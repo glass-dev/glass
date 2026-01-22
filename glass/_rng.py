@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import AnyArray, DTypeLike, FloatArray, UnifiedGenerator
+    from glass._types import DTypeLike, FloatArray, IntArray, UnifiedGenerator
 
 
 SEED = 42
@@ -66,7 +66,7 @@ class Generator:
 
     def __init__(
         self,
-        seed: int | bool | AnyArray = SEED,  # noqa: FBT001
+        seed: int | bool | IntArray = SEED,  # noqa: FBT001
     ) -> None:
         """
         Initialize the Generator.
@@ -75,6 +75,7 @@ class Generator:
         ----------
         seed
             Seed for the random number generator.
+
         """
         import numpy  # noqa: ICN001, PLC0415
 
@@ -88,8 +89,8 @@ class Generator:
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: AnyArray | None = None,
-    ) -> AnyArray:
+        out: FloatArray | None = None,
+    ) -> FloatArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
 
@@ -105,6 +106,7 @@ class Generator:
         Returns
         -------
             Array of random floats.
+
         """
         dtype = dtype if dtype is not None else self.nxp.float64
         return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
@@ -114,7 +116,7 @@ class Generator:
         loc: float | FloatArray = 0.0,
         scale: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
-    ) -> AnyArray:
+    ) -> FloatArray:
         """
         Draw samples from a Normal distribution (mean=loc, stdev=scale).
 
@@ -130,14 +132,15 @@ class Generator:
         Returns
         -------
             Array of samples from the normal distribution.
+
         """
         return self.axp.asarray(self.rng.normal(loc, scale, size))
 
     def poisson(
         self,
-        lam: float | AnyArray,
+        lam: float | FloatArray,
         size: int | tuple[int, ...] | None = None,
-    ) -> AnyArray:
+    ) -> FloatArray:
         """
         Draw samples from a Poisson distribution.
 
@@ -151,6 +154,7 @@ class Generator:
         Returns
         -------
             Array of samples from the Poisson distribution.
+
         """
         return self.axp.asarray(self.rng.poisson(lam, size))
 
@@ -158,8 +162,8 @@ class Generator:
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: AnyArray | None = None,
-    ) -> AnyArray:
+        out: FloatArray | None = None,
+    ) -> FloatArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
@@ -175,16 +179,17 @@ class Generator:
         Returns
         -------
             Array of samples from the standard normal distribution.
+
         """
         dtype = dtype if dtype is not None else self.nxp.float64
         return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
 
     def uniform(
         self,
-        low: float | AnyArray = 0.0,
-        high: float | AnyArray = 1.0,
+        low: float | FloatArray = 0.0,
+        high: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
-    ) -> AnyArray:
+    ) -> FloatArray:
         """
         Draw samples from a Uniform distribution.
 
@@ -200,5 +205,6 @@ class Generator:
         Returns
         -------
             Array of samples from the uniform distribution.
+
         """
         return self.axp.asarray(self.rng.uniform(low, high, size))
