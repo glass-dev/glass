@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import glass
+import glass._array_api_utils as _utils
 import glass.healpix as hp
 
 if TYPE_CHECKING:
@@ -32,8 +33,6 @@ def test_multi_plane_convergence(
     generate_cosmo: Callable[[ModuleType], Cosmology],
 ) -> None:
     """Unit tests for lensing.MultiPlaneConvergence."""
-    import numpy as np
-
     if HAVE_ARRAY_API_STRICT:
         import jax.numpy as xp
     elif HAVE_JAX:
@@ -206,19 +205,25 @@ def test_deflect_nsew(
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 
 
-def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
+def test_deflect_many(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    uxpx = _utils.XPAdditions(xp=xp)
+
     n = 1_000
-    abs_alpha = rng.uniform(0, 2 * math.pi, size=n)
-    arg_alpha = rng.uniform(-math.pi, math.pi, size=n)
+    abs_alpha = urng.uniform(0, 2 * math.pi, size=n)
+    arg_alpha = urng.uniform(-math.pi, math.pi, size=n)
 
-    lon_ = np.degrees(rng.uniform(-math.pi, math.pi, size=n))
-    lat_ = np.degrees(np.asin(rng.uniform(-1, 1, size=n)))
+    lon_ = uxpx.degrees(urng.uniform(-math.pi, math.pi, size=n))
+    lat_ = uxpx.degrees(xp.asin(urng.uniform(-1, 1, size=n)))
 
-    lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
+    lon, lat = glass.deflect(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
 
-    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=np)
-    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=np)
+    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=xp)
+    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=xp)
 
     dotp = x * x_ + y * y_ + z * z_
 
-    compare.assert_allclose(dotp, np.cos(abs_alpha))
+    compare.assert_allclose(dotp, xp.cos(abs_alpha))
