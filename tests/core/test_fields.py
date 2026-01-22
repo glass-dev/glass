@@ -301,7 +301,7 @@ def test_lognormal_gls() -> None:
 def test_discretized_cls(compare: type[Compare]) -> None:
     # empty cls
 
-    result = glass.discretized_cls(np.asarray([]))
+    result = glass.discretized_cls([])
     assert result == []
 
     # power spectra truncated at lmax + 1 if lmax provided
@@ -336,7 +336,7 @@ def test_discretized_cls(compare: type[Compare]) -> None:
     pw = hp.pixwin(nside, lmax=7, xp=np)
 
     result = glass.discretized_cls(
-        [np.asarray([]), np.ones(10), np.ones(10)],
+        [[], np.ones(10), np.ones(10)],
         nside=nside,
     )
 
