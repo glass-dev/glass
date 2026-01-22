@@ -416,7 +416,7 @@ def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
         TypeError,
         match="array_namespace requires at least one non-scalar array input",
     ):
-        list(glass.fields._generate_grf(xp.asarray([]), nside))
+        list(glass.fields._generate_grf([xp.asarray([])], nside))
 
 
 def test_generate_gaussian(xp: ModuleType) -> None:
