@@ -398,7 +398,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         z = rng.standard_normal(n * (n + 1) // 2) + 1j * rng.standard_normal(
-            n * (n + 1) // 2
+            n * (n + 1) // 2,
         )
 
         # scale by standard deviation of the conditional distribution

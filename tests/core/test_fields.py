@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
     from pytest_mock import MockerFixture
 
-    from glass._types import AngularPowerSpectra, UnifiedGenerator
+    from glass._types import AngularPowerSpectra
     from tests.fixtures.helper_classes import Compare
 
 HAVE_JAX = importlib.util.find_spec("jax") is not None
@@ -336,7 +336,8 @@ def test_discretized_cls(compare: type[Compare]) -> None:
     pw = hp.pixwin(nside, lmax=7, xp=np)
 
     result = glass.discretized_cls(
-        [np.asarray([]), np.ones(10), np.ones(10)], nside=nside
+        [np.asarray([]), np.ones(10), np.ones(10)],
+        nside=nside,
     )
 
     for cl in result:
@@ -688,7 +689,7 @@ def test_cov_from_spectra(compare: type[Compare]) -> None:
             [330, 331, 332, 333],
             [320, 321, 322, 323],
             [310, 311, 312, 313],
-        ]
+        ],
     ]
 
     compare.assert_array_equal(
@@ -768,37 +769,40 @@ def test_cov_from_spectra(compare: type[Compare]) -> None:
 def test_check_posdef_spectra() -> None:
     # posdef spectra
     assert glass.check_posdef_spectra(
-        [
-            np.asarray([1.0, 1.0, 1.0]),
-            np.asarray([1.0, 1.0, 1.0]),
-            np.asarray([0.9, 0.9, 0.9]),
-        ]
+        np.asarray(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [0.9, 0.9, 0.9],
+            ],
+        ),
     )
     # semidef spectra
     assert glass.check_posdef_spectra(
-        [
-            np.asarray([1.0, 1.0, 1.0]),
-            np.asarray([1.0, 1.0, 0.0]),
-            np.asarray([0.9, 1.0, 0.0]),
-        ]
+        np.asarray(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 0.0],
+                [0.9, 1.0, 0.0],
+            ],
+        ),
     )
     # indef spectra
     assert not glass.check_posdef_spectra(
-        [
-            np.asarray([1.0, 1.0, 1.0]),
-            np.asarray([1.0, 1.0, 1.0]),
-            np.asarray([1.1, 1.1, 1.1]),
-        ]
+        np.asarray(
+            [
+                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0],
+                [1.1, 1.1, 1.1],
+            ],
+        ),
     )
 
 
 def test_regularized_spectra(
     mocker: MockerFixture,
-    urng: UnifiedGenerator,
+    urng: np.random.Generator,
 ) -> None:
-    import array_api_strict
-    xp = array_api_strict
-    urng = _rng.rng_dispatcher(xp=xp)
     spectra: AngularPowerSpectra = [urng.random(size=(6, 101))]
 
     # test method "nearest"
