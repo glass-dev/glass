@@ -159,7 +159,7 @@ def iternorm(
             denom = -s[..., xp.newaxis]
             m = xpx.at(m)[..., j, :].set(
                 xpx.apply_where(
-                    temp != 0,
+                    (temp != 0) & (denom != 0),
                     (temp, denom),
                     lambda x, y: x / y,
                     fill_value=0,
