@@ -326,8 +326,8 @@ def test_query_strip_none(
     with pytest.raises(
         TypeError,
         match=(
-            r"array_api_strict.float64 and array_api_strict.int64 cannot be "
-            r"type promoted together"
+            r"array_api_strict.float64 and array_api_strict.int64 "
+            "cannot be type promoted together"
         ),
     ):
         m *= 1 - hp.query_strip(healpix_inputs.nside, thetas, xp=ap)
