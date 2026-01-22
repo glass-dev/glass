@@ -2,36 +2,17 @@
 
 from __future__ import annotations
 
-import contextlib
 from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
-import glass._array_api_utils as _utils
-
-with contextlib.suppress(ImportError):
-    # only import if jax is available
-    import glass.jax
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-
-SEED = 42
-
-
-def _select_urng(xp: ModuleType) -> UnifiedGenerator:
-    """Given an array backend `xp`, returns the matching rng."""
-    if xp.__name__ == "jax.numpy":
-        return glass.jax.Generator(seed=SEED)
-    if xp.__name__ == "numpy":
-        return np.random.default_rng(seed=SEED)
-    if xp.__name__ == "array_api_strict":
-        return _utils.Generator(seed=SEED)
-    msg = "the array backend in not supported"
-    raise NotImplementedError(msg)
 
 
 @pytest.fixture(scope="session")
@@ -41,7 +22,7 @@ def rng() -> np.random.Generator:
 
     Use `urng` for array API tests.
     """
-    return np.random.default_rng(seed=SEED)
+    return np.random.default_rng(seed=_rng.SEED)
 
 
 @pytest.fixture
@@ -53,7 +34,7 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
     """
-    return _select_urng(xp)
+    return _rng.rng_dispatcher(xp=xp)
 
 
 @pytest.fixture
@@ -65,4 +46,4 @@ def urngb(xpb: ModuleType) -> UnifiedGenerator:
 
     Must be used with the `xpb` fixture.
     """
-    return _select_urng(xpb)
+    return _rng.rng_dispatcher(xp=xpb)

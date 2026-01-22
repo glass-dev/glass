@@ -4,11 +4,11 @@ import importlib.util
 import math
 from typing import TYPE_CHECKING
 
-import healpix
 import numpy as np
 import pytest
 
 import glass
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -54,7 +54,7 @@ def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> N
     n_side = 32
 
     # create a convergence map
-    kappa = rng.integers(10, size=healpix.nside2npix(n_side))
+    kappa = rng.integers(10, size=hp.nside2npix(n_side))
 
     # check with all False
 
@@ -200,7 +200,8 @@ def test_deflect_nsew(
 
     # No inputs are arrays and xp not provided
     with pytest.raises(
-        TypeError, match="array_namespace requires at least one non-scalar array input"
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
     ):
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 
@@ -215,8 +216,8 @@ def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
 
     lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
 
-    x_, y_, z_ = healpix.ang2vec(lon_, lat_, lonlat=True)
-    x, y, z = healpix.ang2vec(lon, lat, lonlat=True)
+    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=np)
+    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=np)
 
     dotp = x * x_ + y * y_ + z * z_
 
