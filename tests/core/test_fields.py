@@ -300,7 +300,7 @@ def test_lognormal_gls(xp: ModuleType) -> None:
 def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
     # empty cls
 
-    result = glass.discretized_cls([])
+    result = glass.discretized_cls(xp.asarray([]))
     assert result == []
 
     # power spectra truncated at lmax + 1 if lmax provided
@@ -334,7 +334,7 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
 
     pw = hp.pixwin(nside, lmax=7, xp=xp)
 
-    result = glass.discretized_cls([[], xp.ones(10), xp.ones(10)], nside=nside)
+    result = glass.discretized_cls([xp.asarray([]), xp.ones(10), xp.ones(10)], nside=nside)
 
     for cl in result:
         n = min(len(cl), len(pw))
@@ -532,7 +532,7 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 
 def test_spectra_indices(compare: type[Compare], xp: ModuleType) -> None:
     compare.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
-    compare.assert_array_equal(glass.spectra_indices(1), xp.asarray([0, 0]))
+    compare.assert_array_equal(glass.spectra_indices(1), xp.asarray([[0, 0]]))
     compare.assert_array_equal(
         glass.spectra_indices(2),
         xp.asarray([[0, 0], [1, 1], [1, 0]]),
