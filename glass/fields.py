@@ -521,7 +521,7 @@ def getcl(
     i: int,
     j: int,
     lmax: int | None = None,
-) -> AngularPowerSpectra:
+) -> FloatArray:
     """
     Return a specific angular power spectrum from an array in
     :ref:`standard order <twopoint_order>`.
