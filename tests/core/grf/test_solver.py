@@ -8,7 +8,6 @@ import pytest
 import glass.grf
 
 if TYPE_CHECKING:
-
     from glass._types import FloatArray
     from tests.fixtures.helper_classes import Compare
 
