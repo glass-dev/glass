@@ -317,9 +317,9 @@ def test_query_strip_float64(
 
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
 def test_query_strip_none(
+    ap: ModuleType,
     healpix_inputs: type[HealpixInputs],
     thetas: tuple[int, int],
-    ap: ModuleType,
 ) -> None:
     """Checks that ``query_strip`` fails for array-api-strict without dtype."""
     m = ap.ones(healpix_inputs.npix)
