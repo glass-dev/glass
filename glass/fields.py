@@ -269,7 +269,7 @@ def discretized_cls(
         If the length of the Cls array is not a triangle number.
 
     """
-    if len(cls) == 0:  # type: ignore[arg-type]
+    if len(cls) == 0:
         return []
 
     xp = array_api_compat.array_namespace(*cls, use_compat=False)
@@ -283,7 +283,7 @@ def discretized_cls(
         ]
 
     if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
+        pw: FloatArray = hp.pixwin(nside, lmax=lmax, xp=xp)
 
     gls = []
     for cl in cls:
@@ -800,7 +800,7 @@ def solve_gaussian_spectra(
         msg = "mismatch between number of fields and spectra"
         raise ValueError(msg)
 
-    if len(spectra) == 0:  # type: ignore[arg-type]
+    if len(spectra) == 0:
         return []
 
     gls = []

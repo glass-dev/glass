@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
@@ -16,8 +15,7 @@ if TYPE_CHECKING:
 
     from pytest_mock import MockerFixture
 
-    from glass._types import AngularPowerSpectra
-    from glass._types import UnifiedGenerator
+    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
     from tests.fixtures.helper_classes import Compare
 
 HAVE_JAX = importlib.util.find_spec("jax") is not None
@@ -331,7 +329,7 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
 
     nside = 4
 
-    pw = hp.pixwin(nside, lmax=7, xp=xp)
+    pw: FloatArray = hp.pixwin(nside, lmax=7, xp=xp)
 
     result = glass.discretized_cls(
         [xp.asarray([]), xp.ones(10), xp.ones(10)],
@@ -340,7 +338,7 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
 
     for cl in result:
         n = min(cl.shape[0], pw.shape[0])
-        expected = xp.ones(n) * pw[:n] ** 2  # type: ignore[operator]
+        expected = xp.ones(n) * pw[:n] ** 2
         compare.assert_allclose(cl[:n], expected)
 
 
@@ -406,8 +404,11 @@ def test_generate_grf(compare: type[Compare]) -> None:
 
     compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
-    with pytest.raises(ValueError, match="all gls are empty"):
-        list(glass.fields._generate_grf([np.asarray([])], nside))
+    with pytest.raises(
+        ValueError,
+        match="all gls are empty",
+    ):
+        list(glass.fields._generate_grf([xp.asarray([])], nside))
 
 
 def test_generate_gaussian(xp: ModuleType) -> None:
