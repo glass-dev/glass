@@ -168,7 +168,7 @@ def test_generate_grf(  # noqa: PLR0913
     if xpb.__name__ == "array_api_strict":
         pytest.skip(f"glass.fields._generate_grf not yet ported for {xpb.__name__}")
 
-    gls: AngularPowerSpectra = [urngb.random((1, 1_000))]
+    gls: AngularPowerSpectra = [urngb.random(1_000)]
     nside = 4
 
     def function_to_benchmark() -> list[Any]:
