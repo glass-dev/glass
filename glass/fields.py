@@ -997,7 +997,7 @@ def cov_from_spectra(
     n = nfields_from_nspectra(len(spectra))
 
     # first case: maximum length in input spectra
-    k = max((cl.size for cl in spectra), default=0) if lmax is None else lmax + 1
+    k = max((len(cl) for cl in spectra), default=0) if lmax is None else lmax + 1
 
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
@@ -1009,7 +1009,7 @@ def cov_from_spectra(
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
+        cov[: len(cl), i, j] = cov[: len(cl), j, i] = np.reshape(cl, (-1))[:k]  # type: ignore[union-attr]
 
     return cov
 
