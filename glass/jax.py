@@ -13,10 +13,10 @@ import jax.scipy
 import jax.typing
 
 if TYPE_CHECKING:
-    from jaxtyping import Integer, PRNGKeyArray, Shaped
+    from jaxtyping import PRNGKeyArray
     from typing_extensions import Self
 
-    from glass._types import AnyArray
+    from glass._types import AnyArray, DTypeLike, FloatArray
 
 
 def _size(
@@ -33,8 +33,11 @@ def _size(
 
 
 def trapezoid(
-    y: AnyArray, x: AnyArray = None, dx: AnyArray = 1.0, axis: int = -1
-) -> AnyArray:
+    y: AnyArray,
+    x: AnyArray | None = None,
+    dx: float | AnyArray = 1.0,
+    axis: int = -1,
+) -> FloatArray:
     """Wrapper for jax.scipy.integrate.trapezoid."""
     return jax.scipy.integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
@@ -89,44 +92,44 @@ class Generator:
     def random(
         self,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[AnyArray, ...] = float,
-    ) -> AnyArray:
+        dtype: DTypeLike = float,
+    ) -> FloatArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
         return jax.random.uniform(self.__key, _size(size), dtype)
 
     def normal(
         self,
-        loc: AnyArray | float = 0.0,
-        scale: AnyArray | float = 1.0,
+        loc: float | FloatArray = 0.0,
+        scale: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[AnyArray, ...] = float,
-    ) -> AnyArray:
+        dtype: DTypeLike = float,
+    ) -> FloatArray:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
         return loc + scale * jax.random.normal(self.__key, _size(size), dtype)
 
     def poisson(
         self,
-        lam: float,
+        lam: float | FloatArray,
         size: int | tuple[int, ...] | None = None,
-        dtype: Integer[AnyArray, ...] = int,
-    ) -> AnyArray:
+        dtype: DTypeLike = int,
+    ) -> FloatArray:
         """Draw samples from a Poisson distribution."""
         return jax.random.poisson(self.__key, lam, size, dtype)
 
     def standard_normal(
         self,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[AnyArray, ...] = float,
-    ) -> AnyArray:
+        dtype: DTypeLike = float,
+    ) -> FloatArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
         return jax.random.normal(self.__key, _size(size), dtype)
 
     def uniform(
         self,
-        low: float = 0,
-        high: float = 1,
+        low: float | FloatArray = 0.0,
+        high: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[AnyArray, ...] = float,
-    ) -> AnyArray:
+        dtype: DTypeLike = float,
+    ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
         return jax.random.uniform(self.__key, _size(size), dtype, low, high)
