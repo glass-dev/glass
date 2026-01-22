@@ -16,7 +16,7 @@ from glass import _rng
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import ComplexArray, FloatArray, IntArray
+    from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
 
 
 def alm2map(  # noqa: PLR0913
@@ -345,6 +345,8 @@ def pixwin(
 def query_strip(
     nside: int,
     thetas: tuple[float, float],
+    *,
+    dtype: DTypeLike | None = None,
     xp: ModuleType = np,
 ) -> IntArray:
     """
@@ -357,6 +359,8 @@ def query_strip(
         The nside of the HEALPix map.
     thetas
         Colatitudes in radians.
+    dtype
+        Desired data-type for the output array.
     xp
         The array library backend to use for array operations.
 
@@ -368,7 +372,11 @@ def query_strip(
     output = np.zeros(nside2npix(nside))
     indices = healpy.query_strip(nside, *thetas)
     output[indices] = 1
-    return xp.asarray(output, dtype=xp.int64)
+
+    # masks are usually integers, but this allows the user to override
+    if dtype is None:
+        return xp.asarray(output, dtype=xp.int64)
+    return xp.asarray(output, dtype=dtype)
 
 
 def randang(
@@ -401,7 +409,10 @@ def randang(
     xp = ipix.__array_namespace__()
 
     theta, phi = healpix.randang(
-        nside, np.asarray(ipix), lonlat=lonlat, rng=_rng.rng_dispatcher(xp=np)
+        nside,
+        np.asarray(ipix),
+        lonlat=lonlat,
+        rng=_rng.rng_dispatcher(xp=np),
     )
     return xp.asarray(theta), xp.asarray(phi)
 
@@ -411,6 +422,7 @@ class Rotator:
 
     def __init__(
         self,
+        *,
         coord: Sequence[str] | None = None,
         xp: ModuleType = np,
     ) -> None:
