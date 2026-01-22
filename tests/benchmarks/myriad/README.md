@@ -23,13 +23,17 @@ To simplify running benchmarks on myriad there are several scripts provided.
    our virtual environment...
 
    ```sh
-   python3 -m venv $GLASS_DIR/.venv # This only needs to be done once
+   python3 -m venv $GLASS_DIR/.venv
    source $GLASS_DIR/.venv/bin/activate
    python -m pip install -r $GLASS_DIR/tests/benchmarks/myriad/test-requirements.txt
    ```
 
-3. Now that our environment is setup, we can submit our regression test script
-   ([run_regression_test.sh](./run_regression_test.sh)) to the scheduler...
+3. Now that our environment is setup, before we can submit our regression test
+   script to the scheduler, we must make some changes to the submission script -
+   ([run_regression_test.sh](./run_regression_test.sh)). These changes will
+   include setting the path to the root of the glass repo in myriad and choosing
+   the BASE and the HEAD refs to be compared in the regression test. Once we
+   have done this, we can submit the job...
 
    ```sh
    qsub run_regresion_test.sh
