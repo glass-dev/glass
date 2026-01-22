@@ -364,8 +364,9 @@ def _generate_grf(
     ------
     ValueError
         If all gls are empty.
+
     """
-    xp = gls.__array_namespace__()
+    xp = array_api_compat.array_namespace(*gls, use_compat=False)
 
     if rng is None:
         rng = _rng.rng_dispatcher(xp=np)
