@@ -769,25 +769,25 @@ def test_check_posdef_spectra() -> None:
     # posdef spectra
     assert glass.check_posdef_spectra(
         [
-            [1.0, 1.0, 1.0],
-            [1.0, 1.0, 1.0],
-            [0.9, 0.9, 0.9],
+            np.asarray([1.0, 1.0, 1.0]),
+            np.asarray([1.0, 1.0, 1.0]),
+            np.asarray([0.9, 0.9, 0.9]),
         ]
     )
     # semidef spectra
     assert glass.check_posdef_spectra(
         [
-            [1.0, 1.0, 1.0],
-            [1.0, 1.0, 0.0],
-            [0.9, 1.0, 0.0],
+            np.asarray([1.0, 1.0, 1.0]),
+            np.asarray([1.0, 1.0, 0.0]),
+            np.asarray([0.9, 1.0, 0.0]),
         ]
     )
     # indef spectra
     assert not glass.check_posdef_spectra(
         [
-            [1.0, 1.0, 1.0],
-            [1.0, 1.0, 1.0],
-            [1.1, 1.1, 1.1],
+            np.asarray([1.0, 1.0, 1.0]),
+            np.asarray([1.0, 1.0, 1.0]),
+            np.asarray([1.1, 1.1, 1.1]),
         ]
     )
 
@@ -796,7 +796,10 @@ def test_regularized_spectra(
     mocker: MockerFixture,
     urng: UnifiedGenerator,
 ) -> None:
-    spectra: AngularPowerSpectra = urng.random(size=(6, 101))
+    import array_api_strict
+    xp = array_api_strict
+    urng = _rng.rng_dispatcher(xp=xp)
+    spectra: AngularPowerSpectra = [urng.random(size=(6, 101))]
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")

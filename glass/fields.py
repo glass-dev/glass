@@ -830,7 +830,7 @@ def generate(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
+    rng: np.random.Generator | None = None,
 ) -> Iterator[AnyArray]:
     """
     Sample random fields from Gaussian angular power spectra.
