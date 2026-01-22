@@ -36,5 +36,5 @@ To simplify running benchmarks on myriad there are several scripts provided.
    have done this, we can submit the job...
 
    ```sh
-   qsub run_regresion_test.sh
+   qsub $GLASS_DIR/tests/benchmarks/myriad/run_regresion_test.sh
    ```

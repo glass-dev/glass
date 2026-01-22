@@ -9,9 +9,6 @@
 # Request exclusive access to a node
 #$ -ac exclusive=true
 
-# Write o and e to same file to make it easier to read
-#$ -j oe
-
 # Set the name of the job.
 #$ -N glass_regression_test
 
