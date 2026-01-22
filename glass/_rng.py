@@ -15,11 +15,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import DTypeLike
-
-    from array_api_strict._array_object import Array as AArray
-
-    from glass._types import FloatArray, UnifiedGenerator
+    from glass._types import AnyArray, DTypeLike, FloatArray, UnifiedGenerator
 
 
 SEED = 42
@@ -70,7 +66,7 @@ class Generator:
 
     def __init__(
         self,
-        seed: int | bool | AArray = SEED,  # noqa: FBT001
+        seed: int | bool | AnyArray = SEED,  # noqa: FBT001
     ) -> None:
         """
         Initialize the Generator.
@@ -92,8 +88,8 @@ class Generator:
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: AArray | None = None,
-    ) -> AArray:
+        out: AnyArray | None = None,
+    ) -> AnyArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
 
@@ -118,7 +114,7 @@ class Generator:
         loc: float | FloatArray = 0.0,
         scale: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
-    ) -> AArray:
+    ) -> AnyArray:
         """
         Draw samples from a Normal distribution (mean=loc, stdev=scale).
 
@@ -139,9 +135,9 @@ class Generator:
 
     def poisson(
         self,
-        lam: float | AArray,
+        lam: float | AnyArray,
         size: int | tuple[int, ...] | None = None,
-    ) -> AArray:
+    ) -> AnyArray:
         """
         Draw samples from a Poisson distribution.
 
@@ -162,8 +158,8 @@ class Generator:
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: AArray | None = None,
-    ) -> AArray:
+        out: AnyArray | None = None,
+    ) -> AnyArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
@@ -185,10 +181,10 @@ class Generator:
 
     def uniform(
         self,
-        low: float | AArray = 0.0,
-        high: float | AArray = 1.0,
+        low: float | AnyArray = 0.0,
+        high: float | AnyArray = 1.0,
         size: int | tuple[int, ...] | None = None,
-    ) -> AArray:
+    ) -> AnyArray:
         """
         Draw samples from a Uniform distribution.
 

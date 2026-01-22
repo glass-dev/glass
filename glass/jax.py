@@ -10,16 +10,18 @@ import jax.dtypes
 import jax.numpy as jnp
 import jax.random
 import jax.scipy
-from jax.typing import ArrayLike
+import jax.typing
 
 if TYPE_CHECKING:
-    from jaxtyping import Array, Integer, PRNGKeyArray, Shaped
+    from jaxtyping import Integer, PRNGKeyArray, Shaped
     from typing_extensions import Self
+
+    from glass._types import AnyArray
 
 
 def _size(
     size: int | tuple[int, ...] | None,
-    *bcast: Array,
+    *bcast: AnyArray,
 ) -> tuple[int, ...]:
     """
     Return a size, which can be a single int or None, as a shape, which
@@ -30,7 +32,9 @@ def _size(
     return (size,) if isinstance(size, int) else size
 
 
-def trapezoid(y: Array, x: Array = None, dx: Array = 1.0, axis: int = -1) -> Array:
+def trapezoid(
+    y: AnyArray, x: AnyArray = None, dx: AnyArray = 1.0, axis: int = -1
+) -> AnyArray:
     """Wrapper for jax.scipy.integrate.trapezoid."""
     return jax.scipy.integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
@@ -45,7 +49,7 @@ class Generator:
     @classmethod
     def from_key(cls, key: PRNGKeyArray) -> Self:
         """Wrap a JAX random key."""
-        if not isinstance(key, ArrayLike) or not jax.dtypes.issubdtype(
+        if not isinstance(key, jax.typing.ArrayLike) or not jax.dtypes.issubdtype(
             key.dtype,
             jax.dtypes.prng_key,
         ):
@@ -56,19 +60,19 @@ class Generator:
         rng.lock = Lock()
         return rng
 
-    def __init__(self, seed: int | Array, *, impl: str | None = None) -> None:
+    def __init__(self, seed: int | AnyArray, *, impl: str | None = None) -> None:
         """Create a wrapper instance with a new key."""
         self.key = jax.random.key(seed, impl=impl)
         self.lock = Lock()
 
     @property
-    def __key(self) -> Array:
+    def __key(self) -> AnyArray:
         """Return next key for sampling while updating internal state."""
         with self.lock:
             self.key, key = jax.random.split(self.key)
         return key
 
-    def split(self, size: int | tuple[int, ...] | None = None) -> Array:
+    def split(self, size: int | tuple[int, ...] | None = None) -> AnyArray:
         """Split random key."""
         shape = _size(size)
         with self.lock:
@@ -85,18 +89,18 @@ class Generator:
     def random(
         self,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[Array, ...] = float,
-    ) -> Array:
+        dtype: Shaped[AnyArray, ...] = float,
+    ) -> AnyArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
         return jax.random.uniform(self.__key, _size(size), dtype)
 
     def normal(
         self,
-        loc: Array | float = 0.0,
-        scale: Array | float = 1.0,
+        loc: AnyArray | float = 0.0,
+        scale: AnyArray | float = 1.0,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[Array, ...] = float,
-    ) -> Array:
+        dtype: Shaped[AnyArray, ...] = float,
+    ) -> AnyArray:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
         return loc + scale * jax.random.normal(self.__key, _size(size), dtype)
 
@@ -104,16 +108,16 @@ class Generator:
         self,
         lam: float,
         size: int | tuple[int, ...] | None = None,
-        dtype: Integer[Array, ...] = int,
-    ) -> Array:
+        dtype: Integer[AnyArray, ...] = int,
+    ) -> AnyArray:
         """Draw samples from a Poisson distribution."""
         return jax.random.poisson(self.__key, lam, size, dtype)
 
     def standard_normal(
         self,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[Array, ...] = float,
-    ) -> Array:
+        dtype: Shaped[AnyArray, ...] = float,
+    ) -> AnyArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
         return jax.random.normal(self.__key, _size(size), dtype)
 
@@ -122,7 +126,7 @@ class Generator:
         low: float = 0,
         high: float = 1,
         size: int | tuple[int, ...] | None = None,
-        dtype: Shaped[Array, ...] = float,
-    ) -> Array:
+        dtype: Shaped[AnyArray, ...] = float,
+    ) -> AnyArray:
         """Draw samples from a Uniform distribution."""
         return jax.random.uniform(self.__key, _size(size), dtype, low, high)
