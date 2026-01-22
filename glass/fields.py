@@ -163,7 +163,7 @@ def iternorm(
                     (temp, denom),
                     lambda x, y: x / y,
                     fill_value=0,
-                    xp=xp
+                    xp=xp,
                 )
             )
 
