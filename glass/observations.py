@@ -45,12 +45,15 @@ if TYPE_CHECKING:
     from glass._types import FloatArray
 
 
+DEFAULT_XP = _utils.default_xp()
+
+
 def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
     *,
-    xp: ModuleType = np,
+    xp: ModuleType = DEFAULT_XP,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -218,7 +221,7 @@ def fixed_zbins(
     *,
     nbins: int | None = None,
     dz: float | None = None,
-    xp: ModuleType | None = None,
+    xp: ModuleType = DEFAULT_XP,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -249,8 +252,6 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
-    xp = _utils.default_xp() if xp is None else xp
-
     if nbins is not None and dz is None:
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:

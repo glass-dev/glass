@@ -11,12 +11,16 @@ import numpy as np
 
 import array_api_compat
 
+import glass._array_api_utils as _utils
 from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import ComplexArray, FloatArray, IntArray
+
+
+DEFAULT_XP = _utils.default_xp()
 
 
 def alm2map(  # noqa: PLR0913
@@ -147,7 +151,7 @@ def ang2pix(
     phi: float | FloatArray,
     *,
     lonlat: bool = False,
-    xp: ModuleType = np,
+    xp: ModuleType = DEFAULT_XP,
 ) -> IntArray:
     """
     Converts the angle to HEALPix pixel numbers.
@@ -185,7 +189,7 @@ def ang2vec(
     phi: float | FloatArray,
     *,
     lonlat: bool = False,
-    xp: ModuleType = np,
+    xp: ModuleType = DEFAULT_XP,
 ) -> tuple[FloatArray, FloatArray, FloatArray]:
     """
     Convert angles to 3D position vector.
@@ -313,7 +317,7 @@ def pixwin(
     *,
     lmax: int | None = None,
     pol: bool = False,
-    xp: ModuleType = np,
+    xp: ModuleType = DEFAULT_XP,
 ) -> tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
@@ -345,7 +349,7 @@ def pixwin(
 def query_strip(
     nside: int,
     thetas: tuple[float, float],
-    xp: ModuleType = np,
+    xp: ModuleType = DEFAULT_XP,
 ) -> IntArray:
     """
     Computes a mask of the pixels whose centers lie within the colatitude range
@@ -412,7 +416,7 @@ class Rotator:
     def __init__(
         self,
         coord: Sequence[str] | None = None,
-        xp: ModuleType = np,
+        xp: ModuleType = DEFAULT_XP,
     ) -> None:
         """Create a rotator with given parameters.
 
