@@ -296,7 +296,7 @@ def discretized_cls(
 def lognormal_gls(
     cls: AngularPowerSpectra,
     shift: float = 1.0,
-) -> AnyArray:
+) -> AngularPowerSpectra:
     """
     Compute Gaussian Cls for a lognormal random field.
 
@@ -523,7 +523,7 @@ def getcl(
     i: int,
     j: int,
     lmax: int | None = None,
-) -> FloatArray:
+) -> AngularPowerSpectra:
     """
     Return a specific angular power spectrum from an array in
     :ref:`standard order <twopoint_order>`.
@@ -1044,7 +1044,7 @@ def regularized_spectra(
     lmax: int | None = None,
     method: Literal["nearest", "clip"] = "nearest",
     **method_kwargs: float | None,
-) -> AnyArray:
+) -> AngularPowerSpectra:
     r"""
     Regularise a set of angular power spectra.
 
@@ -1070,6 +1070,10 @@ def regularized_spectra(
         from the provided spectra.
     method
         Regularisation method.
+
+    Returns
+    -------
+        Regularised angular power spectra.
 
     """
     # regularise the cov matrix using the chosen method
