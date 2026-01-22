@@ -62,7 +62,7 @@ class Generator:
     with array_api_strict.
     """
 
-    __slots__ = ("axp", "nxp", "rng")
+    __slots__ = ("ap", "np", "rng")
 
     def __init__(
         self,
@@ -81,9 +81,9 @@ class Generator:
 
         import array_api_strict  # noqa: PLC0415
 
-        self.axp = array_api_strict
-        self.nxp = numpy
-        self.rng = self.nxp.random.default_rng(seed=seed)
+        self.ap = array_api_strict
+        self.np = numpy
+        self.rng = self.np.random.default_rng(seed=seed)
 
     def random(
         self,
@@ -108,8 +108,8 @@ class Generator:
             Array of random floats.
 
         """
-        dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        dtype = dtype if dtype is not None else self.np.float64
+        return self.ap.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
 
     def normal(
         self,
@@ -134,7 +134,7 @@ class Generator:
             Array of samples from the normal distribution.
 
         """
-        return self.axp.asarray(self.rng.normal(loc, scale, size))
+        return self.ap.asarray(self.rng.normal(loc, scale, size))
 
     def poisson(
         self,
@@ -156,7 +156,7 @@ class Generator:
             Array of samples from the Poisson distribution.
 
         """
-        return self.axp.asarray(self.rng.poisson(lam, size))
+        return self.ap.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
         self,
@@ -181,8 +181,8 @@ class Generator:
             Array of samples from the standard normal distribution.
 
         """
-        dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        dtype = dtype if dtype is not None else self.np.float64
+        return self.ap.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
 
     def uniform(
         self,
@@ -207,4 +207,4 @@ class Generator:
             Array of samples from the uniform distribution.
 
         """
-        return self.axp.asarray(self.rng.uniform(low, high, size))
+        return self.ap.asarray(self.rng.uniform(low, high, size))

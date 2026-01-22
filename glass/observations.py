@@ -89,11 +89,11 @@ def vmap_galactic_ecliptic(
         msg = "ecliptic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
 
-    m = np.ones(hp.nside2npix(nside))
-    m *= 1 - hp.query_strip(nside, galactic, xp=np)
+    m = xp.ones(hp.nside2npix(nside))
+    m *= 1 - hp.query_strip(nside, galactic, dtype=xp.float64, xp=xp)
     m = hp.Rotator(coord="GC").rotate_map_pixel(m)  # type: ignore[assignment]
-    m *= 1 - hp.query_strip(nside, ecliptic, xp=np)
-    return xp.asarray(hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m))
+    m *= 1 - hp.query_strip(nside, ecliptic, dtype=xp.float64, xp=xp)
+    return hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m)
 
 
 def gaussian_nz(
