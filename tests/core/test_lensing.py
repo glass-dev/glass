@@ -48,13 +48,17 @@ def test_multi_plane_convergence(
         convergence._set_xp(xp_arr)
 
 
-def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> None:
+def test_from_convergence(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+) -> None:
     """Add unit tests for :func:`glass.from_convergence`."""
     # l_max = 100  # noqa: ERA001
     n_side = 32
 
     # create a convergence map
-    kappa = rng.integers(10, size=hp.nside2npix(n_side))
+    kappa = urng.random(hp.nside2npix(n_side))
+    kappa *= 10.0
 
     # check with all False
 

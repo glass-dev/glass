@@ -270,6 +270,8 @@ def from_convergence(  # noqa: PLR0913
         = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
 
     """
+    xp = kappa.__array_namespace__()
+
     # no output means no computation, return empty tuple
     if not (potential or deflection or shear):
         return ()
@@ -283,14 +285,16 @@ def from_convergence(  # noqa: PLR0913
     alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
     # mode number; all conversions are factors of this
-    ell = np.arange(lmax + 1)
+    ell = xp.arange(lmax + 1, dtype=xp.float64)
 
     # this tuple will be returned
     results: tuple[FloatArray | ComplexArray, ...] = ()
 
     # convert convergence to potential
-    fl = np.divide(-2, ell * (ell + 1), where=(ell > 0), out=np.zeros(lmax + 1))
-    hp.almxfl(alm, fl, inplace=True)
+    positive_ell = ell[ell > 0]
+    fl = xp.zeros(lmax + 1)
+    fl = xp.divide(-2.0, positive_ell * (positive_ell + 1))
+    alm = hp.almxfl(alm, fl)
 
     # if potential is requested, compute map and add to output
     if potential:
@@ -302,12 +306,12 @@ def from_convergence(  # noqa: PLR0913
         return results
 
     # zero B-modes for spin-weighted maps
-    blm = np.zeros_like(alm)
+    blm = xp.zeros_like(alm)
 
     # compute deflection alms in place
-    fl = np.sqrt(ell * (ell + 1))
+    fl = xp.sqrt(ell * (ell + 1))
     # missing spin-1 pixel window function here
-    hp.almxfl(alm, fl, inplace=True)
+    alm = hp.almxfl(alm, fl)
 
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
@@ -321,12 +325,16 @@ def from_convergence(  # noqa: PLR0913
 
     # compute shear alms in place
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
-    fl = np.sqrt((ell - 1) * (ell + 2), where=(ell > 0), out=np.zeros(lmax + 1))
+    positive_ell = ell[ell > 0]
+    fl = xp.zeros(lmax + 1)
+    fl = xpx.at(fl)[: positive_ell.size].set(
+        xp.sqrt((positive_ell - 1) * (positive_ell + 2))
+    )
     fl /= 2
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=xp)
         fl *= pw2 / pw0
-    hp.almxfl(alm, fl, inplace=True)
+    alm = hp.almxfl(alm, fl)
 
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
