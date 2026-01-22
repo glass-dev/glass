@@ -89,10 +89,6 @@ def test_from_convergence(
     compare.assert_array_equal(len(results), 3)
 
 
-def test_shear_from_convergence() -> None:
-    """Add unit tests for :func:`glass.shear_from_convergence`."""
-
-
 def test_multi_plane_matrix(
     compare: type[Compare],
     cosmo: Cosmology,
