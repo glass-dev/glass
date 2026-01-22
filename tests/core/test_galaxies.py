@@ -252,7 +252,10 @@ def test_gaussian_phz(
 
     # Pass floats without xp
 
-    with pytest.raises(TypeError, match="Unrecognized array input"):
+    with pytest.raises(
+        TypeError,
+        match="array_namespace requires at least one non-scalar array input",
+    ):
         glass.gaussian_phz(1.0, 0.0)
 
     # case: array redshift, scalar sigma_0

@@ -59,6 +59,8 @@ def broadcast_leading_axes(
     ----------
     args
         The arrays and the number of axes to keep.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -186,7 +188,7 @@ def trapezoid_product(
     x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = uxpx.union1d(
+        x = xpx.union1d(
             x[(x >= x_[0]) & (x <= x_[-1])],  # type: ignore[index]
             x_[(x_ >= x[0]) & (x_ <= x[-1])],  # type: ignore[index]
         )

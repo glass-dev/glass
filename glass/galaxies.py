@@ -23,14 +23,14 @@ import math
 import warnings
 from typing import TYPE_CHECKING
 
-import healpix
-
 import array_api_compat
 import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -122,7 +122,7 @@ def redshifts_from_nz(
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
@@ -208,7 +208,7 @@ def galaxy_shear(  # noqa: PLR0913
         use_compat=False,
     )
 
-    nside = healpix.npix2nside(xp.broadcast_arrays(kappa, gamma1, gamma2)[0].shape[-1])
+    nside = hp.npix2nside(xp.broadcast_arrays(kappa, gamma1, gamma2)[0].shape[-1])
 
     size = xp.broadcast_arrays(lon, lat, eps)[0].size
 
@@ -220,9 +220,9 @@ def galaxy_shear(  # noqa: PLR0913
     for i in range(0, size, 10_000):
         upper_bound = min(size, i + 10_000)
         s = slice(i, upper_bound)
-        ipix = xp.asarray(healpix.ang2pix(nside, lon[s], lat[s], lonlat=True))
-        k = xpx.at(k)[s].set(kappa[ipix])
-        g = xpx.at(g)[s].set(gamma1[ipix] + 1j * gamma2[ipix])
+        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=xp)
+        k = xpx.at(k)[s].set(kappa[ipix])  # type: ignore[index]
+        g = xpx.at(g)[s].set(gamma1[ipix] + 1j * gamma2[ipix])  # type: ignore[index]
 
     if reduced_shear:
         # compute reduced shear in place
@@ -310,7 +310,7 @@ def gaussian_phz(  # noqa: PLR0913
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
     lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)
