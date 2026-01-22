@@ -14,7 +14,7 @@ from glass import _rng
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import UnifiedGenerator
+    from glass._types import DTypeLike, UnifiedGenerator
     from tests.fixtures.helper_classes import Compare, HealpixInputs
 
 
@@ -294,8 +294,8 @@ def test_pixwin(
         compare.assert_array_equal(old[i], new[i])
 
 
-@pytest.mark.parametrize("thetas", [(20, 80), (30, 90)])
-def test_query_strip(
+@pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
+def test_query_strip_float64(
     compare: type[Compare],
     healpix_inputs: type[HealpixInputs],
     thetas: tuple[int, int],
@@ -310,9 +310,27 @@ def test_query_strip(
     """
     old = np.ones(healpix_inputs.npix)
     old[healpy.query_strip(healpix_inputs.nside, *thetas)] = 0
-    new = xp.ones(healpix_inputs.npix, dtype=xp.int64)
-    new *= 1 - hp.query_strip(healpix_inputs.nside, thetas, xp=xp)
+    new = xp.ones(healpix_inputs.npix)
+    new *= 1 - hp.query_strip(healpix_inputs.nside, thetas, dtype=xp.float64, xp=xp)
     compare.assert_array_equal(old, new)
+
+
+@pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
+def test_query_strip_none(
+    healpix_inputs: type[HealpixInputs],
+    thetas: tuple[int, int],
+    ap: ModuleType,
+) -> None:
+    """Checks that ``query_strip`` fails for array-api-strict without dtype."""
+    m = ap.ones(healpix_inputs.npix)
+    with pytest.raises(
+        TypeError,
+        match=(
+            r"array_api_strict.float64 and array_api_strict.int64 cannot be "
+            r"type promoted together"
+        ),
+    ):
+        m *= 1 - hp.query_strip(healpix_inputs.nside, thetas, xp=ap)
 
 
 @pytest.mark.parametrize("lonlat", [False, True])
