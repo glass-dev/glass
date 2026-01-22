@@ -269,26 +269,20 @@ def discretized_cls(
         If the length of the Cls array is not a triangle number.
 
     """
-    xp = (
-        np
-        if len(cls) == 0
-        else array_api_compat.array_namespace(*cls, use_compat=False)
-    )
-
     if ncorr is not None:
         n = nfields_from_nspectra(len(cls))
         cls = [
-            cls[i * (i + 1) // 2 + j] if j <= ncorr else xp.asarray([])
+            cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
             for i in range(n)
             for j in range(i + 1)
         ]
 
     if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
+        pw = hp.pixwin(nside, lmax=lmax, xp=np)
 
     gls = []
     for cl in cls:
-        if cl.size > 0:  # type: ignore[arg-type]
+        if len(cl) > 0:  # type: ignore[arg-type]
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
@@ -999,8 +993,6 @@ def cov_from_spectra(
         Covariance matrix from the given spectra.
 
     """
-    xp = array_api_compat.array_namespace(*spectra, use_compat=False)
-
     # recover the number of fields from the number of spectra
     n = nfields_from_nspectra(len(spectra))
 
@@ -1010,14 +1002,14 @@ def cov_from_spectra(
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
     # missing entries are zero, which is the default value
-    cov = xp.zeros((k, n, n))
+    cov = np.zeros((k, n, n))
 
     # fill the matrix up by going through the spectra in order
     # skip over entries that are None
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = xp.reshape(cl, (-1,))[:k]  # type: ignore[union-attr]
+        cov[: cl.size, i, j] = cov[: cl.size, j, i] = np.reshape(cl, (-1,))[:k]  # type: ignore[union-attr]
 
     return cov
 
