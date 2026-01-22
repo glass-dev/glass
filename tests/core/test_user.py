@@ -10,9 +10,7 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
-
-    from glass._types import AngularPowerSpectra
+    from glass._types import AngularPowerSpectra, FloatArray
     from tests.fixtures.helper_classes import Compare
 
 # check if available for testing
@@ -56,7 +54,7 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
 
     def _test_append(
         fits: fitsio.FITS,
-        data: list[NDArray[np.float64]],
+        data: list[FloatArray],
         names: list[str],
     ) -> None:
         """Write routine for FITS test cases."""
