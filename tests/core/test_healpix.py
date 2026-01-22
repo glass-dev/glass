@@ -14,7 +14,7 @@ from glass import _rng
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import DTypeLike, UnifiedGenerator
+    from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import Compare, HealpixInputs
 
 

@@ -409,7 +409,10 @@ def randang(
     xp = ipix.__array_namespace__()
 
     theta, phi = healpix.randang(
-        nside, np.asarray(ipix), lonlat=lonlat, rng=_rng.rng_dispatcher(xp=np)
+        nside,
+        np.asarray(ipix),
+        lonlat=lonlat,
+        rng=_rng.rng_dispatcher(xp=np),
     )
     return xp.asarray(theta), xp.asarray(phi)
 
