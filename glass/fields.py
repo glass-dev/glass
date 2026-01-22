@@ -395,7 +395,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[arg-type,call-arg]
+        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[call-arg]
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
