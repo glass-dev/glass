@@ -112,7 +112,7 @@ def redshifts_from_nz(
 
     """
     xp = array_api_compat.array_namespace(count, z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     if warn:
         warnings.warn(
@@ -136,7 +136,7 @@ def redshifts_from_nz(
     total = 0
 
     # go through extra dimensions; also works if dims is empty
-    for k in uxpx.ndindex(dims):
+    for k in uxpx.ndindex(dims, xp=xp):
         nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out  # type: ignore[arg-type]
         z_out_slice = z_out[(*k, ...)] if k != () else z_out  # type: ignore[arg-type]
 

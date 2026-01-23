@@ -146,10 +146,6 @@ def jnp() -> ModuleType:
 
 
 @pytest.fixture(scope="session")
-def uxpx(xp: ModuleType) -> _utils.XPAdditions:
-    """
-    Fixture for array backend.
-
-    Access array library functions using `xp.` in tests.
-    """
-    return _utils.XPAdditions(xp)
+def uxpx() -> _utils.XPAdditions:
+    """Fixture for extra array backend operations."""
+    return _utils.XPAdditions()

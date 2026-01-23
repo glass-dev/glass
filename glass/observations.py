@@ -129,7 +129,7 @@ def gaussian_nz(
 
     """
     xp = array_api_compat.array_namespace(z, mean, sigma, norm, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     mean = xp.asarray(mean, dtype=xp.float64)
     sigma = xp.asarray(sigma, dtype=xp.float64)
@@ -197,7 +197,7 @@ def smail_nz(
         norm,
         use_compat=False,
     )
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
     alpha = xp.asarray(alpha, dtype=xp.float64)[..., xp.newaxis]
@@ -292,7 +292,7 @@ def equal_dens_zbins(
 
     """
     xp = array_api_compat.array_namespace(z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     # compute the normalised cumulative distribution function
     # first compute the cumulative integral (by trapezoidal rule)
@@ -346,7 +346,7 @@ def tomo_nz_gausserr(
 
     """
     xp = array_api_compat.array_namespace(z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     # converting zbins into an array:
     zbins_arr = xp.asarray(zbins)
@@ -356,7 +356,7 @@ def tomo_nz_gausserr(
     z_upper = zbins_arr[:, 1, xp.newaxis]
 
     # we need a vectorised version of the error function:
-    erf = uxpx.vectorize(math.erf, otypes=(float,))
+    erf = uxpx.vectorize(math.erf, otypes=(float,), xp=xp)
 
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz

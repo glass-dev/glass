@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import itertools
 from functools import partial
 from typing import TYPE_CHECKING
 
@@ -143,10 +142,15 @@ def ndinterp(  # noqa: PLR0913
 
     """
     xp = array_api_compat.array_namespace(x, xq, fq, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
+
+    if xp.__name__ == "array_api_strict":
+        # this is required due to the use of partial below
+        # we should remove partial in favour of another method
+        xp = _utils.default_xp()
 
     return uxpx.apply_along_axis(
-        partial(uxpx.interp, x, xq),
+        partial(uxpx.interp, xp.asarray(x), xp.asarray(xq)),
         axis,
         fq,
         left=left,
@@ -178,12 +182,7 @@ def trapezoid_product(
 
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
-    xp = array_api_compat.array_namespace(
-        *f,
-        *tuple(itertools.chain(*ff)),
-        use_compat=False,
-    )
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     x: FloatArray
     x, _ = f

@@ -658,7 +658,7 @@ def deflect(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(lon, lat, alpha, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     alpha = xp.asarray(alpha)
     if xp.isdtype(alpha.dtype, "complex floating"):  # type: ignore[union-attr]

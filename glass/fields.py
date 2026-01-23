@@ -634,7 +634,7 @@ def effective_cls(
 
     """
     xp = array_api_compat.array_namespace(*cls, weights1, weights2, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))
@@ -656,9 +656,9 @@ def effective_cls(
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations
     pairs = (
-        combinations_with_replacement(uxpx.ndindex(shape1[1:]), 2)
+        combinations_with_replacement(uxpx.ndindex(shape1[1:], xp=xp), 2)
         if weights2 is weights1
-        else product(uxpx.ndindex(shape1[1:]), uxpx.ndindex(shape2[1:]))
+        else product(uxpx.ndindex(shape1[1:], xp=xp), uxpx.ndindex(shape2[1:], xp=xp))
     )
 
     # create the output array: axes for all input axes plus lmax+1

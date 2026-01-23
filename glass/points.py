@@ -102,8 +102,7 @@ def effective_bias(
         \;.
 
     """
-    xp = array_api_compat.array_namespace(z, bz, w.za, w.wa, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     norm = uxpx.trapezoid(w.wa, w.za)
     return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
@@ -376,7 +375,7 @@ def uniform_positions(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(ngal, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
+    uxpx = _utils.XPAdditions()
 
     # get default RNG if not given
     if rng is None:
@@ -391,7 +390,7 @@ def uniform_positions(
     dims = ngal_sphere.shape
 
     # sample each set of points
-    for k in uxpx.ndindex(dims):
+    for k in uxpx.ndindex(dims, xp=xp):
         size = (ngal_sphere[k],)
         # sample uniformly over the sphere
         lon = rng.uniform(-180, 180, size=size)
