@@ -530,14 +530,11 @@ def test_enumerate_spectra() -> None:
 
 def test_spectra_indices(compare: type[Compare], xp: ModuleType) -> None:
     compare.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
-    compare.assert_array_equal(glass.spectra_indices(1), xp.asarray([[0, 0]]))
-    compare.assert_array_equal(
-        glass.spectra_indices(2),
-        xp.asarray([[0, 0], [1, 1], [1, 0]]),
-    )
+    compare.assert_array_equal(glass.spectra_indices(1), [[0, 0]])
+    compare.assert_array_equal(glass.spectra_indices(2), [[0, 0], [1, 1], [1, 0]])
     compare.assert_array_equal(
         glass.spectra_indices(3),
-        xp.asarray([[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]]),
+        [[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]],
     )
 
 
