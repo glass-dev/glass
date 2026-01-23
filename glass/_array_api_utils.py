@@ -15,6 +15,7 @@ integration, interpolation, and linear algebra.
 """
 
 from __future__ import annotations
+
 import functools
 from typing import TYPE_CHECKING, Any
 
@@ -369,7 +370,7 @@ class XPAdditions:
 
     @staticmethod
     def apply_along_axis(
-        func_body: Callable[..., Any],
+        func: Callable[..., Any],
         func_inputs: tuple[Any, ...],
         axis: int,
         arr: AnyArray,
@@ -379,10 +380,15 @@ class XPAdditions:
         """
         Apply a function to 1-D slices along the given axis.
 
+        Rather than accepting a partial function as usual, the function and
+        its inputs are passed in separately for better compatibility.
+
         Parameters
         ----------
-        func1d
+        func
             Function to apply to 1-D slices.
+        func_inputs
+            All inputs to the func besides arr.
         axis
             Axis along which to apply the function.
         arr
@@ -416,8 +422,9 @@ class XPAdditions:
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(xp.__name__)
 
+            # Everything must be NumPy to avoid mismatches between array types
             inputs_np = (np.asarray(inp) for inp in func_inputs)
-            func1d = functools.partial(func_body, *inputs_np)
+            func1d = functools.partial(func, *inputs_np)
 
             return xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs),
