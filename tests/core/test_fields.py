@@ -387,8 +387,8 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
     assert result.shape == (1, 1, 15)
 
 
-def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
-    gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
+def test_generate_grf(compare: type[Compare]) -> None:
+    gls: AngularPowerSpectra = [np.asarray([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
 
@@ -397,13 +397,13 @@ def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = _rng.rng_dispatcher(xp=xp)
+    rng = _rng.rng_dispatcher(xp=np)
     gaussian_fields = list(glass.fields._generate_grf(gls, nside, rng=rng))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = _rng.rng_dispatcher(xp=xp)
+    rng = _rng.rng_dispatcher(xp=np)
     new_gaussian_fields = list(
         glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng),
     )
@@ -413,7 +413,7 @@ def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
     compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
     with pytest.raises(ValueError, match="all gls are empty"):
-        list(glass.fields._generate_grf([xp.asarray([])], nside))
+        list(glass.fields._generate_grf([np.asarray([])], nside))
 
 
 def test_generate_gaussian(xp: ModuleType) -> None:
