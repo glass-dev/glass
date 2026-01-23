@@ -370,6 +370,13 @@ class XPAdditions:
 
     @staticmethod
     def apply_along_axis(
+<<<<<<< HEAD
+||||||| 93e683d
+        self,
+        func1d: Callable[..., Any],
+=======
+        self,
+>>>>>>> main
         func: Callable[..., Any],
         func_inputs: tuple[Any, ...],
         axis: int,
