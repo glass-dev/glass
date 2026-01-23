@@ -415,7 +415,7 @@ class XPAdditions:
         xp = array_api_compat.array_namespace(arr, *func_inputs, use_compat=False)
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
-            func1d = functools.partial(func_body, *func_inputs)
+            func1d = functools.partial(func, *func_inputs)
             return xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
         if xp.__name__ == "array_api_strict":
