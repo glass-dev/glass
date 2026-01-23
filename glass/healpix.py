@@ -20,9 +20,6 @@ if TYPE_CHECKING:
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
 
 
-DEFAULT_XP = _utils.default_xp()
-
-
 def alm2map(  # noqa: PLR0913
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
@@ -151,7 +148,7 @@ def ang2pix(
     phi: float | FloatArray,
     *,
     lonlat: bool = False,
-    xp: ModuleType = DEFAULT_XP,
+    xp: ModuleType | None = None,
 ) -> IntArray:
     """
     Converts the angle to HEALPix pixel numbers.
@@ -174,6 +171,8 @@ def ang2pix(
         The HEALPix pixel numbers.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     return xp.asarray(
         healpix.ang2pix(
             nside,
@@ -189,7 +188,7 @@ def ang2vec(
     phi: float | FloatArray,
     *,
     lonlat: bool = False,
-    xp: ModuleType = DEFAULT_XP,
+    xp: ModuleType | None = None,
 ) -> tuple[FloatArray, FloatArray, FloatArray]:
     """
     Convert angles to 3D position vector.
@@ -210,6 +209,8 @@ def ang2vec(
         A normalised 3-vector pointing in the same direction as ``ang``.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     x, y, z = healpix.ang2vec(
         np.asarray(theta),
         np.asarray(phi),
@@ -317,7 +318,7 @@ def pixwin(
     *,
     lmax: int | None = None,
     pol: bool = False,
-    xp: ModuleType = DEFAULT_XP,
+    xp: ModuleType | None = None,
 ) -> tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
@@ -338,6 +339,8 @@ def pixwin(
         The temperature pixel window function.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     output = healpy.pixwin(nside, lmax=lmax, pol=pol)
     return (
         tuple(xp.asarray(out, dtype=xp.float64) for out in output)
@@ -351,7 +354,7 @@ def query_strip(
     thetas: tuple[float, float],
     *,
     dtype: DTypeLike | None = None,
-    xp: ModuleType = DEFAULT_XP,
+    xp: ModuleType | None = None,
 ) -> IntArray:
     """
     Computes a mask of the pixels whose centers lie within the colatitude range
@@ -373,6 +376,8 @@ def query_strip(
         The mask of the pixels which lie within the given strip.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     output = np.zeros(nside2npix(nside))
     indices = healpy.query_strip(nside, *thetas)
     output[indices] = 1
@@ -428,7 +433,7 @@ class Rotator:
         self,
         *,
         coord: Sequence[str] | None = None,
-        xp: ModuleType = DEFAULT_XP,
+        xp: ModuleType | None = None,
     ) -> None:
         """Create a rotator with given parameters.
 
@@ -440,6 +445,8 @@ class Rotator:
             The array library backend to use for array operations.
 
         """
+        xp = _utils.default_xp() if xp is None else xp
+
         self.coord = coord
         self.xp = xp
 

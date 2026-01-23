@@ -31,8 +31,6 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass._array_api_utils as _utils
@@ -45,15 +43,12 @@ if TYPE_CHECKING:
     from glass._types import FloatArray
 
 
-DEFAULT_XP = _utils.default_xp()
-
-
 def vmap_galactic_ecliptic(
     nside: int,
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
     *,
-    xp: ModuleType = DEFAULT_XP,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -85,6 +80,8 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     if len(galactic) != 2:
         msg = "galactic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
@@ -221,7 +218,7 @@ def fixed_zbins(
     *,
     nbins: int | None = None,
     dz: float | None = None,
-    xp: ModuleType = DEFAULT_XP,
+    xp: ModuleType | None = None,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -252,6 +249,8 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     if nbins is not None and dz is None:
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
     elif nbins is None and dz is not None:
