@@ -16,6 +16,7 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
+import functools
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -362,7 +363,8 @@ class XPAdditions:
 
     def apply_along_axis(
         self,
-        func1d: Callable[..., Any],
+        func: Callable[..., Any],
+        func_inputs: tuple[Any, ...],
         axis: int,
         arr: AnyArray,
         *args: object,
@@ -371,10 +373,15 @@ class XPAdditions:
         """
         Apply a function to 1-D slices along the given axis.
 
+        Rather than accepting a partial function as usual, the function and
+        its inputs are passed in separately for better compatibility.
+
         Parameters
         ----------
-        func1d
+        func
             Function to apply to 1-D slices.
+        func_inputs
+            All inputs to the func besides arr.
         axis
             Axis along which to apply the function.
         arr
@@ -399,11 +406,16 @@ class XPAdditions:
 
         """
         if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            func1d = functools.partial(func, *func_inputs)
             return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
         if self.xp.__name__ == "array_api_strict":
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(self.xp.__name__)
+
+            # Everything must be NumPy to avoid mismatches between array types
+            inputs_np = (np.asarray(inp) for inp in func_inputs)
+            func1d = functools.partial(func, *inputs_np)
 
             return self.xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs),
