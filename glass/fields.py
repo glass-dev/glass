@@ -152,20 +152,16 @@ def iternorm(
         # only need to update matrix A if there are correlations
         if j is not None:
             # compute new entries of matrix A
-            m = xpx.at(m)[..., :, j].set(0)
-            m = xpx.at(m)[..., j : j + 1, :].set(xp.matmul(a[..., xp.newaxis, :], m))
-            m = xpx.at(m)[..., j, j].set(xp.where(s != 0, -1, s))
-            temp = m[..., j, :]
-            denom = -s[..., xp.newaxis]
-            m = xpx.at(m)[..., j, :].set(
-                xpx.apply_where(
-                    temp != 0,
-                    (temp, denom),
-                    lambda x, y: x / y,
-                    fill_value=temp,
-                    xp=xp,
-                )
-            )
+            m[..., :, j] = 0
+            m[..., j : j + 1, :] = xp.matmul(a[..., xp.newaxis, :], m)
+            m[..., j, j] = xp.where(s != 0, -1, s)
+            # To ensure we don't divide by zero or nan we use a mask to only divide the
+            # appropriate values of m and s
+            m_j = m[..., j, :]
+            s_broadcast = xp.broadcast_to(s[..., xp.newaxis], m_j.shape)
+            mask = (m_j != 0) & (s_broadcast != 0) & ~xp.isnan(s_broadcast)
+            m_j[mask] = xp.divide(m_j[mask], -s_broadcast[mask])
+            m[..., j, :] = m_j
 
             # compute new vector a
             c = x[..., 1:, xp.newaxis]
