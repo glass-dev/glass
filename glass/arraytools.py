@@ -141,16 +141,10 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    xp = array_api_compat.array_namespace(x, xq, fq, use_compat=False)
     uxpx = _utils.XPAdditions()
 
-    if xp.__name__ == "array_api_strict":
-        # this is required due to the use of partial below
-        # we should remove partial in favour of another method
-        xp = _utils.default_xp()
-
     return uxpx.apply_along_axis(
-        partial(uxpx.interp, xp.asarray(x), xp.asarray(xq)),
+        partial(uxpx.interp, x, xq),
         axis,
         fq,
         left=left,
