@@ -239,7 +239,7 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        uxpx = _utils.XPAdditions()  # type: ignore[arg-type]
+        uxpx = _utils.XPAdditions()
         if self.za.size > 0:
             return uxpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
