@@ -222,11 +222,11 @@ def cls2cov(
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
-        for i, cl in enumerate(cls[begin:end][: min(end - begin, nc + 1)]):
+        for i, cl in enumerate(cls[begin:end][: nc + 1]):
             if i == 0 and xp.any(xp.less(cl, 0)):
                 msg = "negative values in cl"
                 raise ValueError(msg)
-            n = cl.size
+            n = cl.shape[0]
             cov = xpx.at(cov)[:n, i].set(cl)
             cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
@@ -380,7 +380,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((gl.size for gl in gls), default=0)
+    n = max((gl.shape[0] for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -575,7 +575,7 @@ def enumerate_spectra(
         yield i, j, cl
 
 
-def spectra_indices(n: int, *, xp: ModuleType = np) -> IntArray:
+def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
     """
     Return an array of indices in :ref:`standard order <twopoint_order>`
     for a set of two-point functions for *n* fields.  Each row is a pair
@@ -592,6 +592,8 @@ def spectra_indices(n: int, *, xp: ModuleType = np) -> IntArray:
            [2, 0]])
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     i, j = xp.tril_indices(n)
     return xp.asarray([i, i - j]).T
 
