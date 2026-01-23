@@ -15,7 +15,7 @@ integration, interpolation, and linear algebra.
 """
 
 from __future__ import annotations
-
+import functools
 from typing import TYPE_CHECKING, Any
 
 import array_api_compat
@@ -369,7 +369,8 @@ class XPAdditions:
 
     @staticmethod
     def apply_along_axis(
-        func1d: Callable[..., Any],
+        func_body: Callable[..., Any],
+        func_inputs: tuple[Any, ...],
         axis: int,
         arr: AnyArray,
         *args: object,
@@ -405,14 +406,18 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/651
 
         """
-        xp = arr.__array_namespace__()
+        xp = array_api_compat.array_namespace(arr, *func_inputs, use_compat=False)
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
+            func1d = functools.partial(func_body, *func_inputs)
             return xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
         if xp.__name__ == "array_api_strict":
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(xp.__name__)
+
+            inputs_np = (np.asarray(inp) for inp in func_inputs)
+            func1d = functools.partial(func_body, *inputs_np)
 
             return xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs),

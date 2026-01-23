@@ -144,7 +144,8 @@ def ndinterp(  # noqa: PLR0913
     uxpx = _utils.XPAdditions()
 
     return uxpx.apply_along_axis(
-        partial(uxpx.interp, x, xq),
+        uxpx.interp,
+        (x, xq),
         axis,
         fq,
         left=left,
