@@ -31,8 +31,6 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass._array_api_utils as _utils
@@ -50,7 +48,7 @@ def vmap_galactic_ecliptic(
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
     *,
-    xp: ModuleType = np,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -82,6 +80,8 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     if len(galactic) != 2:
         msg = "galactic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
