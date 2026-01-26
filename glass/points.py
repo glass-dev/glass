@@ -240,7 +240,7 @@ def _compute_density_contrast(
     return (
         xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
         if bias is None
-        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type]
+        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type,index]
     )
 
 
@@ -278,7 +278,7 @@ def _compute_expected_count(
 
     # turn into number count, modifying the array in place
     n = n + 1
-    n *= ARCMIN2_SPHERE / n.size * ngal[k]
+    n *= ARCMIN2_SPHERE / n.size * ngal[k] # type: ignore[index]
     return n
 
 

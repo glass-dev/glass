@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import count
 import math
 from typing import TYPE_CHECKING
 
@@ -180,6 +181,7 @@ def test_compute_expected_count(
 
 
 def test_apply_visibility(
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     k = (1, 1)
@@ -188,20 +190,28 @@ def test_apply_visibility(
 
     n = glass.points._apply_visibility(
         k,
-        n_in,
+        n_in.copy(),
         vis,
     )
 
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_array_equal(n[6:], n_in[6:])
+
 
 def test_sample_number_galaxies(
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    n = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
+    n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
     n = glass.points._sample_number_galaxies(
-        n,
+        n_in,
         urng,
+    )
+
+    compare.assert_array_equal(
+        n, xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
     )
 
 
@@ -209,19 +219,19 @@ def test_sample_galaxies_per_pixel(
     data_transformer: DataTransformer,
     xp: ModuleType,
 ) -> None:
-    import array_api_strict
-
-    xp = array_api_strict
-
     batch = 1000000
     dims = (3, 2)
     k = (1, 1)
-    n = xp.asarray([0, 0, 0, 0, 0, 0, 24822, 24681, 24763, 24387, 24946, 24845])
+    n = xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
 
     lon, lat, count = data_transformer.catpos(
         glass.points._sample_galaxies_per_pixel(batch, dims, k, n), xp=xp
     )
 
+    print()
+    assert count.shape == dims
+    assert count[k] == lon.shape
+    assert count[k] == lat.shape
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
