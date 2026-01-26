@@ -38,6 +38,9 @@ HEAD_REF="<some-git-commit-hash>"
 source "$BENCHMARKS_DIR/myriad/load_modules.sh"
 source "$GLASS_DIR/.venv/bin/activate"
 
+# Remove old benchmark results
+rm -rf "$BENCHMARKS_DIR/outputs"
+
 # Make sure to installation of glass already exists
 python -m pip uninstall glass -y
 
