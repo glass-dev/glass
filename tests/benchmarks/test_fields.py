@@ -159,9 +159,9 @@ def test_cls2cov(
 def test_generate_grf(
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
+    ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
-    ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
     gls: AngularPowerSpectra = [urngb.random(1_000)]
@@ -191,9 +191,6 @@ def test_generate(
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.generate."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.generate not yet ported for {xpb.__name__}")
-
     n = 100
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
