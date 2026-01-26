@@ -28,9 +28,8 @@ def not_triangle_numbers() -> list[int]:
 
 
 def test_iternorm(xp: ModuleType) -> None:
-    # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in iternorm are not immutable, so do not support jax")
+        pytest.skip(f"glass.iternorm not yet ported for {xp.__name__}")
 
     # check output shapes and types
 
@@ -344,9 +343,8 @@ def test_discretized_cls(compare: type[Compare]) -> None:
 
 
 def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
-    # Call jax version of iternorm once jax version is written
     if xp.__name__ == "jax.numpy":
-        pytest.skip("Arrays in effective_cls are not immutable, so do not support jax")
+        pytest.skip(f"glass.effective_cls not yet ported for {xp.__name__}")
 
     # empty cls
 
@@ -385,6 +383,9 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
 
 
 def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip(f"glass.fields._generate_grf not yet ported for {xp.__name__}")
+
     gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
