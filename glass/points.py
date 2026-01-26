@@ -204,6 +204,8 @@ def _broadcast_inputs(
     if vis is not None:
         vis, *rest = rest
 
+    return bias, delta, dims, ngal, vis
+
 
 def _compute_density_contrast(
     bias: float | FloatArray | None,
@@ -385,7 +387,6 @@ def _sample_galaxies_per_pixel(
     nside = hp.npix2nside(npix)
 
     # create a mask to report the count in the right axis
-    cmask: int | IntArray
     if dims:
         cmask = xp.zeros(dims, dtype=xp.int64)
         cmask = xpx.at(cmask)[k].set(1)
