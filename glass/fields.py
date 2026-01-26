@@ -940,10 +940,12 @@ def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
         alm in HEALPix order.
 
     """
+    xp = alm.__array_namespace__()
+
     n = _inv_triangle_number(alm.size)
-    ell = np.arange(n)
+    ell = xp.arange(n)
     out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
-    return np.concatenate(out)
+    return xp.concat(out)
 
 
 def lognormal_shift_hilbert2011(z: float) -> float:
