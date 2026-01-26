@@ -652,12 +652,12 @@ def test_healpix_to_glass_spectra(compare: type[Compare]) -> None:
     compare.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
-def test_glass_to_healpix_alm(compare: type[Compare], xp: ModuleType) -> None:
-    inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
+def test_glass_to_healpix_alm(compare: type[Compare]) -> None:
+    inp = np.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
     compare.assert_array_equal(
         out,
-        xp.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
+        np.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
 
 
