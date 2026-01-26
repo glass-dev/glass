@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from conftest import Compare, GeneratorConsumer
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from glass._types import UnifiedGenerator
+    from glass._types import AngularPowerSpectra, UnifiedGenerator
 
 
 @pytest.mark.stable
@@ -157,7 +157,6 @@ def test_cls2cov(
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(  # noqa: PLR0913
-    xpb: ModuleType,
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
     urngb: UnifiedGenerator,
@@ -165,10 +164,7 @@ def test_generate_grf(  # noqa: PLR0913
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.fields._generate_grf not yet ported for {xpb.__name__}")
-
-    gls = [urngb.random(1_000)]
+    gls: AngularPowerSpectra = [urngb.random(1_000)]
     nside = 4
 
     def function_to_benchmark() -> list[Any]:
