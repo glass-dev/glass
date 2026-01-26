@@ -9,12 +9,12 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
     from typing_extensions import Never
 
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.stable

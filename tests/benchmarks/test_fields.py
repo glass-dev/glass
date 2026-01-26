@@ -13,10 +13,10 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from conftest import Compare, GeneratorConsumer
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare, GeneratorConsumer
 
 
 @pytest.mark.stable
