@@ -31,7 +31,7 @@ def test_iternorm_no_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )
@@ -77,7 +77,7 @@ def test_iternorm_specify_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in), size)
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )
@@ -112,7 +112,7 @@ def test_iternorm_k_0(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     results = benchmark(function_to_benchmark)
 
@@ -140,7 +140,7 @@ def test_cls2cov(
             nf,
             nc,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     covs = benchmark(function_to_benchmark)
     cov = covs[0]
@@ -174,7 +174,7 @@ def test_generate_grf(
             rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     gaussian_fields = benchmark(function_to_benchmark)
 
@@ -205,8 +205,8 @@ def test_generate(
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(  # type: ignore[no-any-return]
-            generator,
+        return generator_consumer.consume(
+            generator,  # type: ignore[arg-type]
             valid_exception="covariance matrix is not positive definite",
         )
 
