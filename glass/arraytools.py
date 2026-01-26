@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-from functools import partial
 from typing import TYPE_CHECKING
 
 import array_api_compat
@@ -146,7 +145,8 @@ def ndinterp(  # noqa: PLR0913
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
-        partial(uxpx.interp, x, xq),
+        uxpx.interp,
+        (x, xq),
         axis,
         fq,
         left=left,

@@ -31,8 +31,6 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass._array_api_utils as _utils
@@ -50,7 +48,7 @@ def vmap_galactic_ecliptic(
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
     *,
-    xp: ModuleType = np,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -82,6 +80,8 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     if len(galactic) != 2:
         msg = "galactic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
@@ -89,11 +89,11 @@ def vmap_galactic_ecliptic(
         msg = "ecliptic stripe must be a pair of numbers"  # type: ignore[unreachable]
         raise TypeError(msg)
 
-    m = np.ones(hp.nside2npix(nside))
-    m *= 1 - hp.query_strip(nside, galactic, xp=np)
-    m = hp.Rotator(coord="GC").rotate_map_pixel(m)  # type: ignore[assignment]
-    m *= 1 - hp.query_strip(nside, ecliptic, xp=np)
-    return xp.asarray(hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m))
+    m = xp.ones(hp.nside2npix(nside))
+    m *= 1 - hp.query_strip(nside, galactic, dtype=xp.float64, xp=xp)
+    m = hp.Rotator(coord="GC", xp=xp).rotate_map_pixel(m)
+    m *= 1 - hp.query_strip(nside, ecliptic, dtype=xp.float64, xp=xp)
+    return hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m)
 
 
 def gaussian_nz(
