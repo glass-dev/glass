@@ -267,7 +267,9 @@ _GLASS_.
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
-> [!TIP] Benchmark tests should do minimal assertions on what is returned to
+> [!TIP]
+>
+> Benchmark tests should do minimal assertions on what is returned to
 > make sure that the function is working as expected. The main goal of benchmark
 > tests is to measure the performance of the function, and not to test its
 > correctness. In the event that benchmarks are testing for specific values the
@@ -306,11 +308,13 @@ the regression is genuine, the workflow should repeatedly fail. Regressions can
 be unavoidable sometimes, but every effort should be made to fix them before
 merging the pull request.
 
-> [!WARNING] A pull request that introduces a change such as the creation of a
-> new module or changes the name of an existing module may cause the regression
-> workflow to fail because the new module wouldn't exist in `main`. Extra
-> caution should be taken in this case. It is recommended to run the benchmark
-> tests manually and look at the table of values.
+> [!WARNING]
+>
+> A pull request that introduces a change such as the creation of a new module
+> or changes the name of an existing module may cause the regression workflow to
+> fail because the new module wouldn't exist in `main`. Extra caution should be
+> taken in this case. It is recommended to run the benchmark tests manually and
+> look at the table of values.
 
 ## Contributing workflow
 
