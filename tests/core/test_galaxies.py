@@ -10,7 +10,6 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from numpy.typing import NDArray
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
@@ -91,7 +90,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
 
     # case: no extra dimensions
 
-    count: int | NDArray[np.float64] = 10
+    count = 10
     z = xp.linspace(0, 1, 100)
     nz = z * (1 - z)
 
