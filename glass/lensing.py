@@ -292,8 +292,12 @@ def from_convergence(  # noqa: PLR0913
     results: tuple[FloatArray | ComplexArray, ...] = ()
 
     # convert convergence to potential
-    positive_ell = ell[ell > 0]
-    fl = xp.divide(-2.0, positive_ell * (positive_ell + 1))
+    fl = xpx.apply_where(
+        ell > 0,
+        ell,
+        lambda a: xp.divide(-2.0, a * (a + 1)),
+        fill_value=0,
+    )
     alm = hp.almxfl(alm, fl)
 
     # if potential is requested, compute map and add to output
@@ -325,10 +329,11 @@ def from_convergence(  # noqa: PLR0913
 
     # compute shear alms in place
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
-    positive_ell = ell[ell > 0]
-    fl = xp.zeros(lmax + 1)
-    fl = xpx.at(fl)[: positive_ell.size].set(
-        xp.sqrt((positive_ell - 1) * (positive_ell + 2))
+    fl = xpx.apply_where(
+        ell > 0,
+        ell,
+        lambda a: xp.sqrt((a - 1) * (a + 2)),
+        fill_value=0,
     )
     fl /= 2
     if discretized:
