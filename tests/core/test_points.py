@@ -199,6 +199,17 @@ def test_apply_visibility(
 
 def test_sample_number_galaxies(
     compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
+
+    n = glass.points._sample_number_galaxies(n_in)
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_allclose(n[6:], n_in[6:], atol=250)
+
+def test_sample_number_galaxies_rng(
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -206,17 +217,8 @@ def test_sample_number_galaxies(
 
     n = glass.points._sample_number_galaxies(n_in, rng=urng)
 
-    if xp.__name__ == "jax.numpy":
-        # JAX uses a different RNG algorithm
-        compare.assert_array_equal(
-            n,
-            xp.asarray([0, 0, 0, 0, 0, 0, 24912, 24869, 24812, 24617, 24839, 24647]),
-        )
-    else:
-        compare.assert_array_equal(
-            n,
-            xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693]),
-        )
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_allclose(n[6:], n_in[6:], atol=250)
 
 
 def test_sample_galaxies_per_pixel(

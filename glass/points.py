@@ -313,7 +313,7 @@ def _apply_visibility(
 def _sample_number_galaxies(
     n: FloatArray,
     *,
-    rng: UnifiedGenerator,
+    rng: UnifiedGenerator | None = None,
 ) -> IntArray:
     """
     Sample the actual number of galaxies in each
@@ -332,6 +332,10 @@ def _sample_number_galaxies(
 
     """
     xp = n.__array_namespace__()
+
+    # get default RNG if not given
+    if rng is None:
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # clip number density at zero
     n = xp.clip(n, min=0.0)
