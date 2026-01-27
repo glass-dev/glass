@@ -8,11 +8,11 @@ import numpy as np
 import pytest
 
 import glass
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    import glass._array_api_utils as _utils
     from glass.cosmology import Cosmology
     from tests.fixtures.helper_classes import Compare
 
@@ -199,7 +199,7 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
         glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_restrict(uxpx: _utils.XPAdditions, xp: ModuleType) -> None:
+def test_restrict(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1_000)
@@ -236,7 +236,6 @@ def test_restrict(uxpx: _utils.XPAdditions, xp: ModuleType) -> None:
 def test_partition(
     compare: type[Compare],
     method: str,
-    uxpx: _utils.XPAdditions,
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.partition`."""
@@ -380,7 +379,6 @@ def test_distance_grid(compare: type[Compare], cosmo: Cosmology) -> None:
 
 def test_combine(
     compare: type[Compare],
-    uxpx: _utils.XPAdditions,
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.combine`."""
