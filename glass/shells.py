@@ -223,6 +223,7 @@ class RadialWindow:
         This method allows the passing of a RadialWindow into the method
         array_api_compat.array_namespace::
 
+            >>> import numpy as np
             >>> rw = RadialWindow(np.zeros(10), np.zeros(10), 10)
             >>> array_api_compat.array_namespace(rw, use_compat=False)
             <module 'numpy' from '/path/to/numpy/__init__.py'>
