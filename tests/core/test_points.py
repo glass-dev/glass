@@ -480,7 +480,7 @@ def test_displacement_consistent(
     xp: ModuleType,
 ) -> None:
     """Check displacement is consistent with displace."""
-    n = 1000
+    n = 1_000
 
     # magnitude and angle of displacement we want to achieve
     r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
@@ -508,7 +508,7 @@ def test_displacement_random(
     xp: ModuleType,
 ) -> None:
     """Check displacement for random points."""
-    n = 1000
+    n = 1_000
 
     # magnitude and angle of displacement we want to achieve
     r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
