@@ -44,6 +44,7 @@ from glass._array_api_utils import xp_additions as uxpx
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
+    from typing import Any
 
     from glass._types import AnyArray, ComplexArray, FloatArray
     from glass.cosmology import Cosmology
@@ -431,31 +432,42 @@ class MultiPlaneConvergence:
         self.delta3: FloatArray | None = None
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
-        self.xp: ModuleType | None = None
 
-    def _set_xp(self, *arrays: AnyArray) -> None:
+    def __array_namespace__(self, **kwargs: Any) -> ModuleType:  # noqa: ANN401
         """
-        Sets the array backend for class objects.
+        Return the array backend of this RadialWindow's type bound values.
 
-        Raises a ValueError if the provided arrays use an array backend
-        different to that which has already been set.
+        This method allows the passing of a RadialWindow into the method
+        array_api_compat.array_namespace::
+
+            >>> mpc: MultiPlaneConvergence
+            ... Do something to setup mpc using numpy
+            >>> array_api_compat.array_namespace(mpc, use_compat=False)
+            <module 'numpy' from '/path/to/numpy/__init__.py'>
+
+        """
+        return array_api_compat.array_namespace(  # type: ignore[no-any-return]
+            self.delta3,
+            self.kappa2,
+            self.kappa3,
+            self.z2,
+            self.z3,
+            use_compat=False,
+        )
+
+    def __post_init__(self, *arrays: AnyArray) -> None:
+        """
+        Sets the default value of delta3 once the array backend is
+        known from inputs.
 
         Parameters
         ----------
         arrays
-            Arrays to use to determine array backend.
+            A squence of arrays from which the array backend should be determined
+
         """
-        input_xp = array_api_compat.array_namespace(*arrays, use_compat=False)
-        if self.xp is None:
-            self.xp = input_xp
-            self.uxpx = _utils.XPAdditions(xp=self.xp)
-            self.delta3 = (
-                self.xp.asarray(0.0)
-                if self.delta3 is None
-                else self.xp.asarray(self.delta3)
-            )
-        elif self.xp != input_xp:
-            raise ValueError("Multiple array backends found")
+        xp = array_api_compat.array_namespace(*arrays, use_compat=False)
+        self.delta3 = xp.asarray(0.0) if self.delta3 is None else self.delta3
 
     def add_window(self, delta: FloatArray, w: RadialWindow) -> None:
         """
@@ -472,12 +484,10 @@ class MultiPlaneConvergence:
             The window function.
 
         """
-        self._set_xp(delta, w.wa, w.za, w.za)
+        self.__post_init__(delta)
 
         zsrc = w.zeff
-        lens_weight = float(
-            self.uxpx.trapezoid(w.wa, w.za) / self.uxpx.interp(zsrc, w.za, w.wa)
-        )
+        lens_weight = float(uxpx.trapezoid(w.wa, w.za) / uxpx.interp(zsrc, w.za, w.wa))
 
         self.add_plane(delta, zsrc, lens_weight)
 
@@ -505,7 +515,9 @@ class MultiPlaneConvergence:
             If the source redshift is not increasing.
 
         """
-        self._set_xp(delta, zsrc)
+        self.__post_init__(delta, zsrc)
+
+        xp = array_api_compat.array_namespace(delta, self, zsrc, use_compat=False)
 
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
@@ -541,8 +553,8 @@ class MultiPlaneConvergence:
 
         # create kappa planes on first iteration
         if self.kappa2 is None:
-            self.kappa2 = self.xp.zeros_like(delta)  # type: ignore[union-attr]
-            self.kappa3 = self.xp.zeros_like(delta)  # type: ignore[union-attr]
+            self.kappa2 = xp.zeros_like(delta)
+            self.kappa3 = xp.zeros_like(delta)
 
         # cycle convergence planes
         # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
@@ -551,10 +563,10 @@ class MultiPlaneConvergence:
         self.kappa2, self.kappa3 = self.kappa3, self.kappa2
 
         # compute next convergence plane in place of last
-        t = self.xp.asarray(t)  # type: ignore[union-attr]
+        t = xp.asarray(t)
         self.kappa3 *= 1 - t
         self.kappa3 += t * self.kappa2
-        self.kappa3 += self.xp.asarray(f * delta2)  # type: ignore[union-attr]
+        self.kappa3 += xp.asarray(f * delta2)
 
     @property
     def zsrc(self) -> float | FloatArray:
@@ -596,12 +608,12 @@ def multi_plane_matrix(
         The matrix of lensing contributions.
 
     """
-    xp = shells[0].xp
+    xp = array_api_compat.array_namespace(*shells, use_compat=False)
 
     mpc = MultiPlaneConvergence(cosmo)
-    wmat = xp.eye(len(shells))  # type: ignore[union-attr]
+    wmat = xp.eye(len(shells))
     for i, w in enumerate(shells):
-        mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)  # type: ignore[union-attr]
+        mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)
         wmat = xpx.at(wmat)[i, :].set(mpc.kappa)
     return wmat
 
@@ -641,7 +653,7 @@ def multi_plane_weights(
         If the shape of *weights* does not match the number of shells.
 
     """
-    xp = array_api_compat.array_namespace(weights, use_compat=False)
+    xp = array_api_compat.array_namespace(weights, *shells, use_compat=False)
 
     # ensure shape of weights ends with the number of shells
     shape = weights.shape
