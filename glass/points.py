@@ -322,7 +322,7 @@ def _sample_number_galaxies(
     n
         Number density.
     rng
-        Random number generator. If not given, a default RNG is used.
+        Random number generator.
 
     Returns
     -------

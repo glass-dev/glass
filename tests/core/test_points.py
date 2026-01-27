@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from itertools import count
 import math
 from typing import TYPE_CHECKING
-
+from glass import _rng
 import pytest
 
 import array_api_extra as xpx
@@ -190,7 +189,7 @@ def test_apply_visibility(
 
     n = glass.points._apply_visibility(
         k,
-        n_in.copy(),
+        xp.asarray(n_in, copy=True),
         vis,
     )
 
@@ -203,6 +202,9 @@ def test_sample_number_galaxies(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
+    import jax.numpy as jnp
+    xp=jnp
+    urng = _rng.default_rng(xp=jnp)
     n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
     n = glass.points._sample_number_galaxies(
@@ -228,10 +230,15 @@ def test_sample_galaxies_per_pixel(
         glass.points._sample_galaxies_per_pixel(batch, dims, k, n), xp=xp
     )
 
-    print()
     assert count.shape == dims
-    assert count[k] == lon.shape
-    assert count[k] == lat.shape
+    assert count[k] == lon.shape[0]
+    assert count[k] == lat.shape[0]
+    assert tuple(int(i[0]) for i in xp.nonzero(count)) == k
+    assert xp.min(lon) >= 0
+    assert xp.max(lon) < 360
+    assert xp.min(lat) >= -90
+    assert xp.max(lat) <= 90
+
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
