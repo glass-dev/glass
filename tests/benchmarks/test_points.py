@@ -108,13 +108,13 @@ def test_uniform_positions(
         # Complex
         (lambda r: r + 0j, 0.0, 5.0),
         (lambda r: -r + 0j, 0.0, -5.0),
-        (lambda r: 1j * r, -5.0, 0.0),
-        (lambda r: -1j * r, 5.0, 0.0),
+        (lambda r: 1j * r, 5.0, 0.0),
+        (lambda r: -1j * r, -5.0, 0.0),
         # Real
         (lambda r: [r, 0], 0.0, 5.0),
         (lambda r: [-r, 0], 0.0, -5.0),
-        (lambda r: [0, r], -5.0, 0.0),
-        (lambda r: [0, -r], 5.0, 0.0),
+        (lambda r: [0, r], 5.0, 0.0),
+        (lambda r: [0, -r], -5.0, 0.0),
     ],
 )
 @pytest.mark.skipif(
