@@ -364,8 +364,10 @@ def _generate_grf(
         If all gls are empty.
 
     """
+    xp = array_api_compat.array_namespace(*gls, use_compat=False)
+
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=np)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # number of gls and number of fields
     ngls = len(gls)
@@ -376,7 +378,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls), default=0)  # type: ignore[arg-type]
+    n = max((gl.shape[0] for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -385,8 +387,8 @@ def _generate_grf(
     cov = cls2cov(gls, n, ngrf, ncorr)
 
     # working arrays for the iterative sampling
-    z = np.zeros(n * (n + 1) // 2, dtype=np.complex128)
-    y = np.zeros((n * (n + 1) // 2, ncorr), dtype=np.complex128)
+    z = xp.zeros(n * (n + 1) // 2, dtype=xp.complex128)
+    y = xp.zeros((n * (n + 1) // 2, ncorr), dtype=xp.complex128)
 
     # generate the conditional normal distribution for iterative sampling
     conditional_dist = iternorm(ncorr, cov, size=n)
@@ -395,7 +397,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[call-arg]
+        rng.standard_normal((n * (n + 1),)) + (1j * rng.standard_normal((n * (n + 1),)))
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
@@ -407,13 +409,12 @@ def _generate_grf(
 
         # store the standard normal in y array at the indicated index
         if j is not None:
-            y[:, j] = z
+            y = xpx.at(y)[:, j].set(z)
 
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        np.real(alm[:n])[:] += np.imag(alm[:n])
-        np.imag(alm[:n])[:] = 0
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n])[:] + xp.imag(alm[:n]) + 0j)
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
