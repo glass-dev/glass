@@ -592,7 +592,7 @@ def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
     """
     xp = _utils.default_xp() if xp is None else xp
 
-    i, j = xp.tril_indices(n)
+    i, j = np.tril_indices(n)
     return xp.asarray([i, i - j]).T
 
 
