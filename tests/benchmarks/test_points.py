@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
     from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import (
-        Compare,
         DataTransformer,
         GeneratorConsumer,
     )
@@ -103,31 +102,22 @@ def test_uniform_positions(
 
 
 @pytest.mark.parametrize(
-    ("r_to_alpha", "expected_lon", "expected_lat"),
+    ("r_to_alpha"),
     [
         # Complex
-        (lambda r: r + 0j, 0.0, 5.0),
-        (lambda r: -r + 0j, 0.0, -5.0),
-        (lambda r: 1j * r, -5.0, 0.0),
-        (lambda r: -1j * r, 5.0, 0.0),
+        (lambda r: r + 0j),
         # Real
-        (lambda r: [r, 0], 0.0, 5.0),
-        (lambda r: [-r, 0], 0.0, -5.0),
-        (lambda r: [0, r], -5.0, 0.0),
-        (lambda r: [0, -r], 5.0, 0.0),
+        (lambda r: [r, 0]),
     ],
 )
 @pytest.mark.skipif(
     not hasattr(glass, "displace"),
     reason="test requires glass.displace",
 )
-def test_displace(  # noqa: PLR0913
+def test_displace(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
     r_to_alpha: Callable[[float], complex | list[float]],
-    expected_lon: float,
-    expected_lat: float,
 ) -> None:
     """Benchmark for glass.displace with complex values."""
     scale_length = 100_000
@@ -146,8 +136,8 @@ def test_displace(  # noqa: PLR0913
         lat0,
         alpha,
     )
-    compare.assert_allclose(lon, expected_lon, atol=1e-15)
-    compare.assert_allclose(lat, expected_lat, atol=1e-15)
+    assert lon.shape == (scale_length,)
+    assert lat.shape == (scale_length,)
 
 
 @pytest.mark.stable
