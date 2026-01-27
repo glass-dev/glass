@@ -24,6 +24,7 @@ from glass import _rng
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
+    from types import ModuleType
     from typing import Literal
 
     from glass._types import (
@@ -295,7 +296,7 @@ def discretized_cls(
 def lognormal_gls(
     cls: AngularPowerSpectra,
     shift: float = 1.0,
-) -> AnyArray:
+) -> AngularPowerSpectra:
     """
     Compute Gaussian Cls for a lognormal random field.
 
@@ -363,6 +364,7 @@ def _generate_grf(
     ------
     ValueError
         If all gls are empty.
+
     """
     if rng is None:
         rng = _rng.rng_dispatcher(xp=np)
@@ -572,7 +574,7 @@ def enumerate_spectra(
         yield i, j, cl
 
 
-def spectra_indices(n: int) -> IntArray:
+def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
     """
     Return an array of indices in :ref:`standard order <twopoint_order>`
     for a set of two-point functions for *n* fields.  Each row is a pair
@@ -589,8 +591,10 @@ def spectra_indices(n: int) -> IntArray:
            [2, 0]])
 
     """
-    i, j = np.tril_indices(n)
-    return np.asarray([i, i - j]).T
+    xp = _utils.default_xp() if xp is None else xp
+
+    i, j = xp.tril_indices(n)
+    return xp.asarray([i, i - j]).T
 
 
 def effective_cls(
@@ -938,10 +942,12 @@ def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
         alm in HEALPix order.
 
     """
+    xp = alm.__array_namespace__()
+
     n = _inv_triangle_number(alm.size)
-    ell = np.arange(n)
+    ell = xp.arange(n)
     out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
-    return np.concatenate(out)
+    return xp.concat(out)
 
 
 def lognormal_shift_hilbert2011(z: float) -> float:
@@ -1035,7 +1041,7 @@ def regularized_spectra(
     lmax: int | None = None,
     method: Literal["nearest", "clip"] = "nearest",
     **method_kwargs: float | None,
-) -> AnyArray:
+) -> AngularPowerSpectra:
     r"""
     Regularise a set of angular power spectra.
 
@@ -1061,6 +1067,10 @@ def regularized_spectra(
         from the provided spectra.
     method
         Regularisation method.
+
+    Returns
+    -------
+        Regularised angular power spectra.
 
     """
     # regularise the cov matrix using the chosen method
