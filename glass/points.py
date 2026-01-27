@@ -532,9 +532,13 @@ def displacement(
 
     Parameters
     ----------
-    from_lon, from_lat
+    from_lon
         Points before displacement.
-    to_lon, to_lat
+    from_lat
+        Points before displacement.
+    to_lon
+        Points after displacement.
+    to_lat
         Points after displacement.
 
     Returns
