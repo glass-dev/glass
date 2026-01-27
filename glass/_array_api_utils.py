@@ -479,7 +479,8 @@ class XPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def radians(self, deg_arr: AnyArray) -> AnyArray:
+    @staticmethod
+    def radians(deg_arr: AnyArray) -> AnyArray:
         """
         Convert angles from degrees to radians.
 
@@ -510,7 +511,8 @@ class XPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def degrees(self, rad_arr: AnyArray) -> AnyArray:
+    @staticmethod
+    def degrees(rad_arr: AnyArray) -> AnyArray:
         """
         Convert angles from radians to degrees.
 
