@@ -281,7 +281,7 @@ def _compute_expected_count(
 
     # turn into number count, modifying the array in place
     n = n + 1
-    n *= ARCMIN2_SPHERE / n.size * ngal[k] # type: ignore[index]
+    n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
     return n
 
 
@@ -315,6 +315,7 @@ def _apply_visibility(
 
 def _sample_number_galaxies(
     n: FloatArray,
+    *,
     rng: UnifiedGenerator,
 ) -> IntArray:
     """
@@ -531,7 +532,7 @@ def positions_from_delta(  # noqa: PLR0913
 
         n = _apply_visibility(k, n, vis)
 
-        n = _sample_number_galaxies(n, rng)
+        n = _sample_number_galaxies(n, rng=rng)
 
         yield from _sample_galaxies_per_pixel(batch, dims, k, n)
 

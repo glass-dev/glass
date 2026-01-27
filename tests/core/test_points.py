@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from typing import TYPE_CHECKING
-from glass import _rng
+
 import pytest
 
 import array_api_extra as xpx
@@ -204,19 +204,18 @@ def test_sample_number_galaxies(
 ) -> None:
     n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
-    n = glass.points._sample_number_galaxies(
-        n_in,
-        urng,
-    )
+    n = glass.points._sample_number_galaxies(n_in, rng=urng)
 
     if xp.__name__ == "jax.numpy":
         # JAX uses a different RNG algorithm
         compare.assert_array_equal(
-            n, xp.asarray([0, 0, 0, 0, 0, 0, 24912, 24869, 24812, 24617, 24839, 24647])
+            n,
+            xp.asarray([0, 0, 0, 0, 0, 0, 24912, 24869, 24812, 24617, 24839, 24647]),
         )
     else:
         compare.assert_array_equal(
-            n, xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
+            n,
+            xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693]),
         )
 
 
@@ -230,7 +229,8 @@ def test_sample_galaxies_per_pixel(
     n = xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
 
     lon, lat, count = data_transformer.catpos(
-        glass.points._sample_galaxies_per_pixel(batch, dims, k, n), xp=xp
+        glass.points._sample_galaxies_per_pixel(batch, dims, k, n),
+        xp=xp,
     )
 
     assert count.shape == dims
