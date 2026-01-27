@@ -4,11 +4,11 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import ParamSpec, TypeAlias, TypeVar
 
+    import jaxtyping
     import numpy as np
-    from jaxtyping import Array as JAXArray
-    from numpy.typing import NDArray
 
-    from array_api_strict._array_object import Array as AArray
+    from array_api_strict._array_object import Array
+    from array_api_strict._dtypes import DType
 
     import glass.jax
     from glass import _rng
@@ -17,10 +17,11 @@ if TYPE_CHECKING:
     R = TypeVar("R")
     T = TypeVar("T")
 
-    AnyArray: TypeAlias = NDArray[Any] | JAXArray | AArray
-    ComplexArray: TypeAlias = NDArray[np.complex128] | JAXArray | AArray
-    FloatArray: TypeAlias = NDArray[np.float64] | JAXArray | AArray
-    IntArray: TypeAlias = NDArray[np.int64] | JAXArray | AArray
+    AnyArray: TypeAlias = np.typing.NDArray[Any] | jaxtyping.Array | Array
+    ComplexArray: TypeAlias = np.typing.NDArray[np.complex128] | jaxtyping.Array | Array
+    DTypeLike: TypeAlias = np.typing.DTypeLike | jaxtyping.DTypeLike | DType
+    FloatArray: TypeAlias = np.typing.NDArray[np.float64] | jaxtyping.Array | Array
+    IntArray: TypeAlias = np.typing.NDArray[np.int64] | jaxtyping.Array | Array
     UnifiedGenerator: TypeAlias = (
         np.random.Generator | glass.jax.Generator | _rng.Generator
     )
@@ -31,6 +32,7 @@ else:
     # https://github.com/sphinx-doc/sphinx/issues/11991
     AnyArray = Any
     ComplexArray = Any
+    DTypeLike = Any
     FloatArray = Any
     IntArray = Any
     UnifiedGenerator = Any

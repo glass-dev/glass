@@ -30,8 +30,8 @@ from typing import TYPE_CHECKING
 import array_api_compat
 import array_api_extra as xpx
 
-import glass._array_api_utils as _utils
 from glass import _rng
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -252,8 +252,6 @@ def ellipticity_gaussian(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
-
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
         xp.asarray(count),
@@ -270,7 +268,7 @@ def ellipticity_gaussian(
     # sample complex ellipticities
     # reject those where abs(e) > 0
     i = 0
-    for k in uxpx.ndindex(count_broadcasted.shape):
+    for k in uxpx.ndindex(count_broadcasted.shape, xp=xp):
         e = _populate_random_complex_array(count_broadcasted[k], rng)
         e *= sigma_broadcasted[k]
         r = xp.abs(e) > 1
@@ -323,8 +321,6 @@ def ellipticity_intnorm(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
-
     # default RNG if not provided
     if rng is None:
         rng = _rng.rng_dispatcher(xp=xp)
@@ -351,7 +347,7 @@ def ellipticity_intnorm(
 
     # sample complex ellipticities
     i = 0
-    for k in uxpx.ndindex(count_broadcasted.shape):
+    for k in uxpx.ndindex(count_broadcasted.shape, xp=xp):
         e = _populate_random_complex_array(count_broadcasted[k], rng)
         e *= sigma_eta[k]
         r = xp.hypot(xp.real(e), xp.imag(e))

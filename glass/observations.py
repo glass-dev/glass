@@ -31,13 +31,12 @@ import itertools
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -50,7 +49,7 @@ def vmap_galactic_ecliptic(
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
     *,
-    xp: ModuleType = np,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -82,6 +81,8 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
+    xp = _utils.default_xp() if xp is None else xp
+
     if len(galactic) != 2:
         msg = "galactic stripe must be a pair of numbers"
         raise TypeError(msg)
@@ -89,11 +90,11 @@ def vmap_galactic_ecliptic(
         msg = "ecliptic stripe must be a pair of numbers"
         raise TypeError(msg)
 
-    m = np.ones(hp.nside2npix(nside))
-    m *= 1 - hp.query_strip(nside, galactic, xp=np)
-    m = hp.Rotator(coord="GC").rotate_map_pixel(m)
-    m *= 1 - hp.query_strip(nside, ecliptic, xp=np)
-    return xp.asarray(hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m))
+    m = xp.ones(hp.nside2npix(nside))
+    m *= 1 - hp.query_strip(nside, galactic, dtype=xp.float64, xp=xp)
+    m = hp.Rotator(coord="GC", xp=xp).rotate_map_pixel(m)
+    m *= 1 - hp.query_strip(nside, ecliptic, dtype=xp.float64, xp=xp)
+    return hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m)
 
 
 def gaussian_nz(
@@ -129,7 +130,6 @@ def gaussian_nz(
 
     """
     xp = array_api_compat.array_namespace(z, mean, sigma, norm, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     mean = xp.asarray(mean, dtype=xp.float64)
     sigma = xp.asarray(sigma, dtype=xp.float64)
@@ -197,7 +197,6 @@ def smail_nz(
         norm,
         use_compat=False,
     )
-    uxpx = _utils.XPAdditions(xp)
 
     z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
     alpha = xp.asarray(alpha, dtype=xp.float64)[..., xp.newaxis]
@@ -292,8 +291,6 @@ def equal_dens_zbins(
 
     """
     xp = array_api_compat.array_namespace(z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
-
     # compute the normalised cumulative distribution function
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
@@ -346,8 +343,6 @@ def tomo_nz_gausserr(
 
     """
     xp = array_api_compat.array_namespace(z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
-
     # converting zbins into an array:
     zbins_arr = xp.asarray(zbins)
 
@@ -356,7 +351,7 @@ def tomo_nz_gausserr(
     z_upper = zbins_arr[:, 1, xp.newaxis]
 
     # we need a vectorised version of the error function:
-    erf = uxpx.vectorize(math.erf, otypes=(float,))
+    erf = uxpx.vectorize(math.erf, otypes=(float,), xp=xp)
 
     # compute the probabilities that redshifts z end up in each bin
     # then apply probability as weights to given nz

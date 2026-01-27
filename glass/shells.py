@@ -57,6 +57,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
@@ -207,15 +208,12 @@ class RadialWindow:
         Weight array; the values (ordinates) of the window function.
     zeff
         Effective redshift of the window.
-    xp
-        The array library backend to use for array operations.
 
     """
 
     za: FloatArray
     wa: FloatArray
     zeff: float = math.nan
-    xp: ModuleType | None = None
 
     def __post_init__(self) -> None:
         """
@@ -223,12 +221,6 @@ class RadialWindow:
         - Calculates the effective redshift if not given.
         - Determines xp from za and wa.
         """
-        if self.xp is None:
-            object.__setattr__(
-                self,
-                "xp",
-                array_api_compat.array_namespace(self.za, self.wa, use_compat=False),
-            )
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
@@ -248,7 +240,6 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        uxpx = _utils.XPAdditions(self.xp)
         if self.za.size > 0:
             return uxpx.trapezoid(
                 self.za * self.wa,
@@ -312,7 +303,6 @@ def tophat_windows(
         )
 
     xp = zbins.__array_namespace__()
-    uxpx = _utils.XPAdditions(xp)
 
     wht: Callable[[FloatArray], FloatArray]
     wht = weight if weight is not None else xp.ones_like
@@ -666,7 +656,6 @@ def partition_lstsq(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -737,7 +726,6 @@ def partition_nnls(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -812,7 +800,6 @@ def partition_restrict(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     parts = []
     for w in shells:
@@ -974,7 +961,6 @@ def combine(
         *(arr for shell in shells for arr in (shell.za, shell.wa)),
         use_compat=False,
     )
-    uxpx = _utils.XPAdditions(xp)
 
     return xp.sum(
         xp.stack(
