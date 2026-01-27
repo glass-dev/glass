@@ -267,8 +267,8 @@ _GLASS_.
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
+<!-- prettier-ignore -->
 > [!TIP]
->
 > Benchmark tests should do minimal assertions on what is returned to
 > make sure that the function is working as expected. The main goal of benchmark
 > tests is to measure the performance of the function, and not to test its
@@ -308,8 +308,8 @@ the regression is genuine, the workflow should repeatedly fail. Regressions can
 be unavoidable sometimes, but every effort should be made to fix them before
 merging the pull request.
 
+<!-- prettier-ignore -->
 > [!WARNING]
->
 > A pull request that introduces a change such as the creation of a new module
 > or changes the name of an existing module may cause the regression workflow to
 > fail because the new module wouldn't exist in `main`. Extra caution should be
