@@ -73,6 +73,7 @@ class Generator:
         """Return next key for sampling while updating internal state."""
         with self.lock:
             self.key, key = jax.random.split(self.key)
+            key.block_until_ready()
         return key
 
     def split(self, size: int | tuple[int, ...] | None = None) -> AnyArray:

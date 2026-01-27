@@ -202,9 +202,6 @@ def test_sample_number_galaxies(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    import jax.numpy as jnp
-    xp=jnp
-    urng = _rng.default_rng(xp=jnp)
     n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
     n = glass.points._sample_number_galaxies(
@@ -212,9 +209,15 @@ def test_sample_number_galaxies(
         urng,
     )
 
-    compare.assert_array_equal(
-        n, xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
-    )
+    if xp.__name__ == "jax.numpy":
+        # JAX uses a different RNG algorithm
+        compare.assert_array_equal(
+            n, xp.asarray([0, 0, 0, 0, 0, 0, 24912, 24869, 24812, 24617, 24839, 24647])
+        )
+    else:
+        compare.assert_array_equal(
+            n, xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
+        )
 
 
 def test_sample_galaxies_per_pixel(
