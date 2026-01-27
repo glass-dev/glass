@@ -33,12 +33,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, overload
 
-import healpy as hp
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -311,7 +311,7 @@ def from_convergence(  # noqa: PLR0913
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
         alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
-        alpha = alpha[0] + 1j * alpha[1]
+        alpha = alpha[0] + 1j * alpha[1]  # type: ignore[assignment]
         results += (alpha,)
 
     # if no shear is requested, stop here
@@ -323,13 +323,13 @@ def from_convergence(  # noqa: PLR0913
     fl = np.sqrt((ell - 1) * (ell + 2), where=(ell > 0), out=np.zeros(lmax + 1))
     fl /= 2
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
         fl *= pw2 / pw0
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
-    gamma = gamma[0] + 1j * gamma[1]
+    gamma = gamma[0] + 1j * gamma[1]  # type: ignore[assignment]
     results += (gamma,)
 
     # all done
@@ -383,7 +383,7 @@ def shear_from_convergence(
 
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True)
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
         fl *= pw2 / pw0
 
     # apply correction to E-modes
@@ -618,7 +618,7 @@ def deflect(
     Apply deflections to positions.
 
     .. deprecated:: >2025.2
-       Use :func:`displace` instead.
+       Use :func:`glass.displace` instead.
 
     Takes an array of :term:`deflection` values and applies them
     to the given positions.

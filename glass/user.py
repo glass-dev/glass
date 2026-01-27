@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from importlib.util import find_spec
     from os import PathLike
 
-    from glass._types import FloatArray
+    from glass._types import AngularPowerSpectra, FloatArray
 
     if find_spec("fitsio") is not None:
         import fitsio
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 def save_cls(
     filename: PathLike[str],
-    cls: FloatArray,
+    cls: AngularPowerSpectra,
 ) -> None:
     """
     Save a list of Cls to file.
@@ -53,14 +53,14 @@ def save_cls(
         Angular matter power spectra in *GLASS* ordering.
 
     """
-    split = np.cumulative_sum([len(cl) for cl in cls[:-1]])
+    split = np.cumulative_sum([len(cl) for cl in cls[:-1]])  # type: ignore[arg-type]
     values = np.concatenate(cls)
     np.savez(filename, values=values, split=split)
 
 
 def load_cls(
     filename: PathLike[str],
-) -> FloatArray:
+) -> AngularPowerSpectra:
     """
     Load a list of Cls from file.
 

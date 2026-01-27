@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-from functools import partial
 from typing import TYPE_CHECKING
 
 import array_api_compat
@@ -13,7 +12,8 @@ import glass._array_api_utils as _utils
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from typing import Unpack
+
+    from typing_extensions import Unpack
 
     from glass._types import AnyArray, FloatArray, IntArray
 
@@ -58,6 +58,8 @@ def broadcast_leading_axes(
     ----------
     args
         The arrays and the number of axes to keep.
+    xp
+        The array library backend to use for array operations.
 
     Returns
     -------
@@ -143,7 +145,8 @@ def ndinterp(  # noqa: PLR0913
     uxpx = _utils.XPAdditions(xp)
 
     return uxpx.apply_along_axis(
-        partial(uxpx.interp, x, xq),
+        uxpx.interp,
+        (x, xq),
         axis,
         fq,
         left=left,
@@ -185,9 +188,9 @@ def trapezoid_product(
     x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = uxpx.union1d(
-            x[(x >= x_[0]) & (x <= x_[-1])],
-            x_[(x_ >= x[0]) & (x_ <= x[-1])],
+        x = xpx.union1d(
+            x[(x >= x_[0]) & (x <= x_[-1])],  # type: ignore[index]
+            x_[(x_ >= x[0]) & (x_ <= x[-1])],  # type: ignore[index]
         )
     y = uxpx.interp(x, *f)
     for f_ in ff:

@@ -28,8 +28,10 @@ import math
 from typing import TYPE_CHECKING
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -41,7 +43,7 @@ def _populate_random_complex_array(
     length: int,
     rng: UnifiedGenerator,
 ) -> ComplexArray:
-    return rng.standard_normal(length) + (1.0j * rng.standard_normal(length))
+    return rng.standard_normal((length,)) + (1j * rng.standard_normal((length,)))
 
 
 def triaxial_axis_ratio(
@@ -89,7 +91,7 @@ def triaxial_axis_ratio(
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # get size from inputs if not explicitly provided
     if size is None:
@@ -178,7 +180,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # default size if not given
     if size is None:
@@ -195,10 +197,10 @@ def ellipticity_ryden04(  # noqa: PLR0913
     # first sample unbounded normal, then rejection sample truncation
     eps = rng.normal(mu, sigma, size=size)
     while xp.any(bad := eps > 0):
-        eps[bad] = rng.normal(mu[bad], sigma[bad])  #  type: ignore[index]
+        eps = xpx.at(eps)[bad].set(rng.normal(mu[bad], sigma[bad]))  #  type: ignore[index]
     gam = rng.normal(gamma, sigma_gamma, size=size)
     while xp.any(bad := (gam < 0) | (gam > 1)):
-        gam[bad] = rng.normal(gamma[bad], sigma_gamma[bad])  #  type: ignore[index]
+        gam = xpx.at(gam)[bad].set(rng.normal(gamma[bad], sigma_gamma[bad]))  #  type: ignore[index]
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -xp.expm1(eps)
@@ -260,7 +262,7 @@ def ellipticity_gaussian(
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # allocate flattened output array
     eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
@@ -273,10 +275,12 @@ def ellipticity_gaussian(
         e *= sigma_broadcasted[k]
         r = xp.abs(e) > 1
         while xp.count_nonzero(r) > 0:
-            e[r] = _populate_random_complex_array(xp.count_nonzero(r), rng)
-            e[r] *= sigma_broadcasted[k]
+            e = xpx.at(e)[r].set(
+                _populate_random_complex_array(xp.count_nonzero(r), rng),
+            )
+            e = xpx.at(e)[r].multiply(sigma_broadcasted[k])
             r = xp.abs(e) > 1
-        eps[i : i + count_broadcasted[k]] = e
+        eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
     return eps
@@ -323,7 +327,7 @@ def ellipticity_intnorm(
 
     # default RNG if not provided
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
@@ -357,7 +361,7 @@ def ellipticity_intnorm(
             xp.asarray(1.0, dtype=e.dtype),
         )
 
-        eps[i : i + count_broadcasted[k]] = e
+        eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
     return eps

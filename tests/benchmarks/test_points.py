@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
@@ -28,7 +27,7 @@ if TYPE_CHECKING:
     ("bias", "bias_model"),
     [
         (None, lambda x: x),
-        (0.8, "linear"),
+        (0.8, glass.linear_bias),
     ],
 )
 @pytest.mark.parametrize("remove_monopole", [True, False])
@@ -38,7 +37,7 @@ def test_positions_from_delta(  # noqa: PLR0913
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
     bias: float,
-    bias_model: str | Callable[[int], int],
+    bias_model: Callable[[int], int],
     remove_monopole: bool,  # noqa: FBT001
 ) -> None:
     """Benchmarks for glass.positions_from_delta."""
@@ -66,12 +65,12 @@ def test_positions_from_delta(  # noqa: PLR0913
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = data_transformer.catpos(pos, xp=np)
+    lon, lat, count = data_transformer.catpos(pos, xp=xpb)
 
-    assert isinstance(cnt, xpb.ndarray)
-    assert cnt.shape == (9, 10)
-    assert lon.shape == (cnt.sum(),)
-    assert lat.shape == (cnt.sum(),)
+    assert isinstance(count, xpb.ndarray)
+    assert count.shape == (9, 10)
+    assert lon.shape == (xpb.sum(count),)
+    assert lat.shape == (xpb.sum(count),)
 
 
 @pytest.mark.stable
@@ -97,11 +96,10 @@ def test_uniform_positions(
 
     pos = benchmark(function_to_benchmark)
 
-    lon, lat, cnt = data_transformer.catpos(pos, xp=xpb)
-    assert not isinstance(cnt, int)
-    assert cnt.__array_namespace__() == xpb
-    assert cnt.shape == shape_ngal
-    assert lon.shape == lat.shape == (xpb.sum(cnt),)
+    lon, lat, count = data_transformer.catpos(pos, xp=xpb)
+    assert count.__array_namespace__() == xpb
+    assert count.shape == shape_ngal
+    assert lon.shape == lat.shape == (xpb.sum(count),)
 
 
 @pytest.mark.parametrize(
@@ -118,6 +116,10 @@ def test_uniform_positions(
         (lambda r: [0, r], -5.0, 0.0),
         (lambda r: [0, -r], 5.0, 0.0),
     ],
+)
+@pytest.mark.skipif(
+    not hasattr(glass, "displace"),
+    reason="test requires glass.displace",
 )
 def test_displace(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
@@ -149,6 +151,10 @@ def test_displace(  # noqa: PLR0913
 
 
 @pytest.mark.stable
+@pytest.mark.skipif(
+    not hasattr(glass, "displacement"),
+    reason="test requires glass.displacement",
+)
 def test_displacement(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,

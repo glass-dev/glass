@@ -5,9 +5,6 @@ ci:
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
 
-default_language_version:
-  python: python3.14
-
 exclude: ^uv.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -45,7 +42,7 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.7
+    rev: v0.14.10
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -60,11 +57,11 @@ repos:
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.7.3
+    rev: v3.7.4
     hooks:
       - id: prettier
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.46.0
+    rev: v0.47.0
     hooks:
       - id: markdownlint-fix
         args:
@@ -74,16 +71,17 @@ repos:
     hooks:
       - id: forbid-tabs
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.9
+    rev: v1.7.10
     hooks:
       - id: actionlint
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.0
+    rev: v1.19.1
     hooks:
       - id: mypy
         additional_dependencies:
-          - numpy~=2.3.4
-          - jaxtyping~=0.3.3
+          - array-api-strict~=2.4.1
+          - jaxtyping~=0.3.4
+          - numpy~=2.2.6
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.2
     hooks:
@@ -97,3 +95,7 @@ repos:
         args:
           - --external-sources
           - --shell=bash
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.22
+    hooks:
+      - id: uv-lock

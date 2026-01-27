@@ -3,11 +3,11 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import healpix
 import numpy as np
 import pytest
 
 import glass
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -16,33 +16,39 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_vmap_galactic_ecliptic(compare: type[Compare]) -> None:
+def test_vmap_galactic_ecliptic(compare: type[Compare], xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.vmap_galactic_ecliptic`."""
     n_side = 4
 
     # check shape
 
+    vmap = glass.vmap_galactic_ecliptic(n_side, xp=xp)
+    compare.assert_array_equal(vmap.shape[0], hp.nside2npix(n_side))
+
+    # Test without xp
+
     vmap = glass.vmap_galactic_ecliptic(n_side)
-    compare.assert_array_equal(len(vmap), healpix.nside2npix(n_side))
+    assert vmap.__array_namespace__().__name__ == "numpy"
+    compare.assert_array_equal(vmap.shape[0], hp.nside2npix(n_side))
 
     # no rotation
 
-    vmap = glass.vmap_galactic_ecliptic(n_side, galactic=(0, 0), ecliptic=(0, 0))
-    compare.assert_array_equal(vmap, np.zeros_like(vmap))
+    vmap = glass.vmap_galactic_ecliptic(n_side, galactic=(0, 0), ecliptic=(0, 0), xp=xp)
+    compare.assert_array_equal(vmap, xp.zeros_like(vmap))
 
     # check errors raised
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, galactic=(1,))
+        glass.vmap_galactic_ecliptic(n_side, galactic=(1,), xp=xp)
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1,))
+        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1,), xp=xp)
 
     with pytest.raises(TypeError, match="galactic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, galactic=(1, 2, 3))
+        glass.vmap_galactic_ecliptic(n_side, galactic=(1, 2, 3), xp=xp)
 
     with pytest.raises(TypeError, match="ecliptic stripe must be a pair of numbers"):
-        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3))
+        glass.vmap_galactic_ecliptic(n_side, ecliptic=(1, 2, 3), xp=xp)
 
 
 def test_gaussian_nz(

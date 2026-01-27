@@ -52,6 +52,7 @@ import warnings
 from typing import TYPE_CHECKING
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.algorithm
@@ -206,6 +207,8 @@ class RadialWindow:
         Weight array; the values (ordinates) of the window function.
     zeff
         Effective redshift of the window.
+    xp
+        The array library backend to use for array operations.
 
     """
 
@@ -502,10 +505,9 @@ def restrict(
         msg = "z must be 1D arrays"
         raise ValueError(msg)
     xp = array_api_compat.array_namespace(z, f, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     z_ = z[xp.greater(z, w.za[0]) & xp.less(z, w.za[-1])]
-    zr = uxpx.union1d(w.za, z_)
+    zr = xpx.union1d(w.za, z_)
 
     fr = glass.arraytools.ndinterp(
         zr,
@@ -609,7 +611,7 @@ def partition(
     where :math:`\lambda` is a multiplier to enforce the integral
     constraints.
 
-    The :func:`glass.partition()` function implements a number of methods to
+    The :func:`glass.partition` function implements a number of methods to
     obtain a solution:
 
     If ``method="nnls"`` (the default), obtain a partition from a
@@ -672,7 +674,7 @@ def partition_lstsq(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = uxpx.union1d(zp, w.za)
+        zp = xpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
     *dims, _ = fz.shape
@@ -743,7 +745,7 @@ def partition_nnls(
     # compute the union of all given redshift grids
     zp = z
     for w in shells:
-        zp = uxpx.union1d(zp, w.za)
+        zp = xpx.union1d(zp, w.za)
 
     # get extra leading axes of fz
     *dims, _ = fz.shape

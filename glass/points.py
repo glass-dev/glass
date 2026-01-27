@@ -38,17 +38,18 @@ Displacing points
 
 from __future__ import annotations
 
+import itertools
 import math
 from typing import TYPE_CHECKING, Any
 
-import healpix
-import numpy as np
-
 import array_api_compat
+import array_api_extra as xpx
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -162,10 +163,10 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
     bias: float | FloatArray | None = None,
     vis: FloatArray | None = None,
     *,
-    bias_model: str | Callable[..., Any] = "linear",
+    bias_model: Callable[..., Any] = linear_bias,
     remove_monopole: bool = False,
     batch: int = 1_000_000,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[
     tuple[
         FloatArray,
@@ -207,10 +208,8 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         Visibility map for the observed points. This is multiplied with
         the full sky number count map, and must hence be of compatible shape.
     bias_model
-        The bias model to apply. If a string, refers to a function in
-        the :mod:`~glass.points` module, e.g. ``'linear'`` for
-        :func:`glass.linear_bias()` or ``'glass.loglinear'`` for
-        :func:`glass.loglinear_bias`.
+        The bias model to apply. For examples, :func:`glass.linear_bias`
+        or :func:`glass.loglinear_bias`.
     remove_monopole
         If true, the monopole of the density contrast
         after biasing is fixed to zero.
@@ -235,17 +234,15 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         If the bias model is not a string or callable.
 
     """
+    xp = array_api_compat.array_namespace(ngal, delta, bias, vis, use_compat=False)
+
     # get default RNG if not given
     if rng is None:
-        rng = np.random.default_rng(42)
+        rng = _rng.rng_dispatcher(xp=xp)
 
-    # get the bias model
-    if isinstance(bias_model, str):
-        bias_model_callable = globals()[f"{bias_model}_bias"]
-    elif not callable(bias_model):
-        raise TypeError("bias_model must be string or callable")
-    else:
-        bias_model_callable = bias_model
+    # ensure bias_model is a function
+    if not callable(bias_model):
+        raise TypeError("bias_model must be callable")
 
     # broadcast inputs to common shape of extra dimensions
     inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
@@ -261,47 +258,47 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         vis, *rest = rest
 
     # iterate the leading dimensions
-    for k in np.ndindex(dims):
+    for k in itertools.product(*map(range, dims)):
         # compute density contrast from bias model, or copy
         n = (
-            np.copy(delta[k])
+            xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
             if bias is None
-            else bias_model_callable(delta[k], bias[k])
+            else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type]
         )
 
         # remove monopole if asked to
         if remove_monopole:
-            n -= np.mean(n, keepdims=True)
+            n = n - xp.mean(n, keepdims=True)
 
         # turn into number count, modifying the array in place
-        n += 1
+        n = n + 1
         n *= ARCMIN2_SPHERE / n.size * ngal[k]
 
         # apply visibility if given
         if vis is not None:
-            n *= vis[k]
+            n *= vis[(*k, ...)]  # type: ignore[arg-type]
 
         # clip number density at zero
-        np.clip(n, 0, None, out=n)
+        n = xp.clip(n, min=0.0)
 
         # sample actual number in each pixel
         n = rng.poisson(n)
 
         # total number of points
-        count = n.sum()
+        count = xp.sum(n)
         # don't go through pixels if there are no points
         if count == 0:
             continue
 
         # for converting randomly sampled positions to HEALPix indices
         npix = n.shape[-1]
-        nside = healpix.npix2nside(npix)
+        nside = hp.npix2nside(npix)
 
         # create a mask to report the count in the right axis
         cmask: int | IntArray
         if dims:
-            cmask = np.zeros(dims, dtype=int)
-            cmask[k] = 1
+            cmask = xp.zeros(dims, dtype=xp.int64)
+            cmask = xpx.at(cmask)[k].set(1)
         else:
             cmask = 1
 
@@ -310,7 +307,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
         start, stop, size = 0, 0, 0
         while count:
             # tally this group of pixels
-            q = np.cumulative_sum(n[stop : stop + step])
+            q = xp.cumulative_sum(n[stop : min(npix, stop + step)])
             # does this group of pixels fill the batch?
             if size + q[-1] < min(batch, count):
                 # no, we need the next group of pixels to fill the batch
@@ -318,13 +315,17 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 size += q[-1]
             else:
                 # how many pixels from this group do we need?
-                stop += int(np.searchsorted(q, batch - size, side="right"))
+                stop += int(xp.searchsorted(q, xp.asarray(batch - size), side="right"))
                 # if the first pixel alone is too much, use it anyway
                 if stop == start:
                     stop += 1
                 # sample this batch of pixels
-                ipix = np.repeat(np.arange(start, stop), n[start:stop])
-                lon, lat = healpix.randang(nside, ipix, lonlat=True, rng=rng)
+                ipix = xp.repeat(xp.arange(start, stop), n[start:stop])
+                lon, lat = hp.randang(
+                    nside,
+                    ipix,
+                    lonlat=True,
+                )
                 # next batch
                 start, size = stop, 0
                 # keep track of remaining number of points
@@ -333,7 +334,7 @@ def positions_from_delta(  # noqa: PLR0912, PLR0913, PLR0915
                 yield lon, lat, ipix.size * cmask
 
         # make sure that the correct number of pixels was sampled
-        assert np.sum(n[stop:]) == 0  # noqa: S101
+        assert xp.sum(n[stop:]) == 0  # noqa: S101
 
 
 def uniform_positions(
@@ -359,6 +360,8 @@ def uniform_positions(
         Number density, expected number of positions per arcmin2.
     rng
         Random number generator. If not given, a default RNG is used.
+    xp
+        The array library backend to use for array operations.
 
     Yields
     ------
@@ -377,7 +380,7 @@ def uniform_positions(
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     ngal = xp.asarray(ngal)
 
@@ -398,7 +401,7 @@ def uniform_positions(
         count: int | IntArray
         if dims:
             count = xp.zeros(dims, dtype=xp.int64)
-            count[k] = ngal_sphere[k]  # type: ignore[index]
+            count = xpx.at(count)[k].set(ngal_sphere[k])
         else:
             count = int(ngal_sphere[k])
 

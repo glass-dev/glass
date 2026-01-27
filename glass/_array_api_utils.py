@@ -1,6 +1,6 @@
 """
 Array API Utilities for glass.
-============================
+==============================
 
 This module provides utility functions and classes for working with multiple array
 backends in the glass project, including NumPy, JAX, and array-api-strict. It includes
@@ -16,6 +16,7 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
+import functools
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -23,11 +24,8 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     import numpy as np
-    from numpy.typing import DTypeLike
 
-    from array_api_strict._array_object import Array as AArray
-
-    from glass._types import AnyArray, FloatArray, UnifiedGenerator
+    from glass._types import AnyArray
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -83,191 +81,6 @@ def default_xp() -> ModuleType:
     return import_numpy()
 
 
-def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
-    """
-    Dispatch a random number generator based on the provided array's backend.
-
-    Parameters
-    ----------
-    xp
-        The array library backend to use for array operations.
-
-    Returns
-    -------
-        The appropriate random number generator for the array's backend.
-
-    Raises
-    ------
-    NotImplementedError
-        If the array backend is not supported.
-    """
-    seed = 42
-
-    if xp.__name__ == "jax.numpy":
-        import glass.jax  # noqa: PLC0415
-
-        return glass.jax.Generator(seed=seed)
-
-    if xp.__name__ == "numpy":
-        return xp.random.default_rng(seed=seed)  # type: ignore[no-any-return]
-
-    if xp.__name__ == "array_api_strict":
-        return Generator(seed=seed)
-
-    msg = "the array backend in not supported"
-    raise NotImplementedError(msg)
-
-
-class Generator:
-    """
-    NumPy random number generator returning array_api_strict Array.
-
-    This class wraps NumPy's random number generator and returns arrays compatible
-    with array_api_strict.
-    """
-
-    __slots__ = ("axp", "nxp", "rng")
-
-    def __init__(
-        self,
-        seed: int | bool | AArray | None = None,  # noqa: FBT001
-    ) -> None:
-        """
-        Initialize the Generator.
-
-        Parameters
-        ----------
-        seed
-            Seed for the random number generator.
-        """
-        import numpy  # noqa: ICN001, PLC0415
-
-        import array_api_strict  # noqa: PLC0415
-
-        self.axp = array_api_strict
-        self.nxp = numpy
-        self.rng = self.nxp.random.default_rng(seed=seed)
-
-    def random(
-        self,
-        size: int | tuple[int, ...] | None = None,
-        dtype: DTypeLike | None = None,
-        out: AArray | None = None,
-    ) -> AArray:
-        """
-        Return random floats in the half-open interval [0.0, 1.0).
-
-        Parameters
-        ----------
-        size
-            Output shape.
-        dtype
-            Desired data type.
-        out
-            Optional output array.
-
-        Returns
-        -------
-            Array of random floats.
-        """
-        dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
-
-    def normal(
-        self,
-        loc: float | FloatArray = 0.0,
-        scale: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | None = None,
-    ) -> AArray:
-        """
-        Draw samples from a Normal distribution (mean=loc, stdev=scale).
-
-        Parameters
-        ----------
-        loc
-            Mean of the distribution.
-        scale
-            Standard deviation of the distribution.
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the normal distribution.
-        """
-        return self.axp.asarray(self.rng.normal(loc, scale, size))
-
-    def poisson(
-        self,
-        lam: float | AArray,
-        size: int | tuple[int, ...] | None = None,
-    ) -> AArray:
-        """
-        Draw samples from a Poisson distribution.
-
-        Parameters
-        ----------
-        lam
-            Expected number of events.
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the Poisson distribution.
-        """
-        return self.axp.asarray(self.rng.poisson(lam, size))
-
-    def standard_normal(
-        self,
-        size: int | tuple[int, ...] | None = None,
-        dtype: DTypeLike | None = None,
-        out: AArray | None = None,
-    ) -> AArray:
-        """
-        Draw samples from a standard Normal distribution (mean=0, stdev=1).
-
-        Parameters
-        ----------
-        size
-            Output shape.
-        dtype
-            Desired data type.
-        out
-            Optional output array.
-
-        Returns
-        -------
-            Array of samples from the standard normal distribution.
-        """
-        dtype = dtype if dtype is not None else self.nxp.float64
-        return self.axp.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
-
-    def uniform(
-        self,
-        low: float | AArray = 0.0,
-        high: float | AArray = 1.0,
-        size: int | tuple[int, ...] | None = None,
-    ) -> AArray:
-        """
-        Draw samples from a Uniform distribution.
-
-        Parameters
-        ----------
-        low
-            Lower bound of the distribution.
-        high
-            Upper bound of the distribution.
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the uniform distribution.
-        """
-        return self.axp.asarray(self.rng.uniform(low, high, size))
-
-
 class XPAdditions:
     """
     Additional functions missing from both array-api-strict and array-api-extra.
@@ -279,9 +92,6 @@ class XPAdditions:
     This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
     for details.
     """
-
-    xp: ModuleType
-    backend: str
 
     def __init__(self, xp: ModuleType) -> None:
         """
@@ -343,45 +153,6 @@ class XPAdditions:
             y_np = np.asarray(y, copy=True)
             x_np = np.asarray(x, copy=True)
             result_np = np.trapezoid(y_np, x_np, dx=dx, axis=axis)
-            return self.xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
-
-    def union1d(self, ar1: AnyArray, ar2: AnyArray) -> AnyArray:
-        """
-        Compute the set union of two 1D arrays.
-
-        Parameters
-        ----------
-        ar1
-            First input array.
-        ar2
-            Second input array.
-
-        Returns
-        -------
-            The union of the two arrays.
-
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
-        Notes
-        -----
-        See https://github.com/glass-dev/glass/issues/647
-        """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.union1d(ar1, ar2)
-
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            ar1_np = np.asarray(ar1, copy=True)
-            ar2_np = np.asarray(ar2, copy=True)
-            result_np = np.union1d(ar1_np, ar2_np)
             return self.xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"
@@ -592,7 +363,8 @@ class XPAdditions:
 
     def apply_along_axis(
         self,
-        func1d: Callable[..., Any],
+        func: Callable[..., Any],
+        func_inputs: tuple[Any, ...],
         axis: int,
         arr: AnyArray,
         *args: object,
@@ -601,10 +373,15 @@ class XPAdditions:
         """
         Apply a function to 1-D slices along the given axis.
 
+        Rather than accepting a partial function as usual, the function and
+        its inputs are passed in separately for better compatibility.
+
         Parameters
         ----------
-        func1d
+        func
             Function to apply to 1-D slices.
+        func_inputs
+            All inputs to the func besides arr.
         axis
             Axis along which to apply the function.
         arr
@@ -629,11 +406,16 @@ class XPAdditions:
 
         """
         if self.xp.__name__ in {"numpy", "jax.numpy"}:
+            func1d = functools.partial(func, *func_inputs)
             return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
         if self.xp.__name__ == "array_api_strict":
             # Import here to prevent users relying on numpy unless in this instance
             np = import_numpy(self.xp.__name__)
+
+            # Everything must be NumPy to avoid mismatches between array types
+            inputs_np = (np.asarray(inp) for inp in func_inputs)
+            func1d = functools.partial(func, *inputs_np)
 
             return self.xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs),

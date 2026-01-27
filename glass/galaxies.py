@@ -23,14 +23,15 @@ import math
 import warnings
 from typing import TYPE_CHECKING
 
-import healpix
 import numpy as np
 
 import array_api_compat
 
 import glass._array_api_utils as _utils
 import glass.arraytools
+import glass.healpix as hp
 import glass.shells
+from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -122,7 +123,7 @@ def redshifts_from_nz(
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
@@ -136,8 +137,8 @@ def redshifts_from_nz(
 
     # go through extra dimensions; also works if dims is empty
     for k in uxpx.ndindex(dims):
-        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
-        z_out_slice = z_out[(*k, ...)] if k != () else z_out
+        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out  # type: ignore[arg-type]
+        z_out_slice = z_out[(*k, ...)] if k != () else z_out  # type: ignore[arg-type]
 
         # compute the CDF of each galaxy population
         cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
@@ -196,7 +197,7 @@ def galaxy_shear(  # noqa: PLR0913
         (lensed ellipticities).
 
     """
-    nside = healpix.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
+    nside = hp.npix2nside(np.broadcast(kappa, gamma1, gamma2).shape[-1])
 
     size = np.broadcast(lon, lat, eps).size
 
@@ -207,17 +208,17 @@ def galaxy_shear(  # noqa: PLR0913
     # get the lensing maps at galaxy position
     for i in range(0, size, 10_000):
         s = slice(i, i + 10_000)
-        ipix = healpix.ang2pix(nside, lon[s], lat[s], lonlat=True)
-        k[s] = kappa[ipix]
-        np.real(g)[s] = gamma1[ipix]
-        np.imag(g)[s] = gamma2[ipix]
+        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=np)
+        k[s] = kappa[ipix]  # type: ignore[index]
+        np.real(g)[s] = gamma1[ipix]  # type: ignore[index]
+        np.imag(g)[s] = gamma2[ipix]  # type: ignore[index]
 
     if reduced_shear:
         # compute reduced shear in place
         g /= 1 - k
 
         # compute lensed ellipticities
-        g = (eps + g) / (1 + g.conj() * eps)
+        g = (eps + g) / (1 + g.conj() * eps)  # type: ignore[assignment]
     else:
         # simple sum of shears
         g += eps
@@ -298,7 +299,7 @@ def gaussian_phz(  # noqa: PLR0913
 
     # get default RNG if not given
     if rng is None:
-        rng = _utils.rng_dispatcher(xp=xp)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
     lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)
