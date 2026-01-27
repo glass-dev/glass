@@ -15,8 +15,6 @@ import numpy as np
 import packaging.version
 import pytest
 
-import glass._array_api_utils as _utils
-
 if TYPE_CHECKING:
     from types import ModuleType
 
@@ -143,13 +141,3 @@ def ap() -> ModuleType:
 def jnp() -> ModuleType:
     """Fixture for the jax.numpy array backend."""
     return xp_available_backends["jax.numpy"]
-
-
-@pytest.fixture(scope="session")
-def uxpx(xp: ModuleType) -> _utils.XPAdditions:
-    """
-    Fixture for array backend.
-
-    Access array library functions using `xp.` in tests.
-    """
-    return _utils.XPAdditions(xp)
