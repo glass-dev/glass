@@ -22,12 +22,12 @@ from typing import TYPE_CHECKING, Any
 import array_api_compat
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from types import ModuleType
 
     import numpy as np
 
-    from glass._types import AnyArray
+    from glass._types import AnyArray, DTypeLike
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -437,7 +437,7 @@ class XPAdditions:
     @staticmethod
     def vectorize(
         pyfunc: Callable[..., Any],
-        otypes: tuple[type[float]],
+        otypes: str | Sequence[DTypeLike],
         *,
         xp: ModuleType,
     ) -> Callable[..., Any]:
