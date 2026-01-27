@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import itertools
 from typing import TYPE_CHECKING
 
 import array_api_compat
 import array_api_extra as xpx
 
-import glass._array_api_utils as _utils
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -141,9 +140,6 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    xp = array_api_compat.array_namespace(x, xq, fq, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
-
     return uxpx.apply_along_axis(
         uxpx.interp,
         (x, xq),
@@ -178,13 +174,6 @@ def trapezoid_product(
 
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
-    xp = array_api_compat.array_namespace(
-        *f,
-        *tuple(itertools.chain(*ff)),
-        use_compat=False,
-    )
-    uxpx = _utils.XPAdditions(xp)
-
     x: FloatArray
     x, _ = f
     for x_, _ in ff:

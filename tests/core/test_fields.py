@@ -320,7 +320,7 @@ def test_discretized_cls(compare: type[Compare]) -> None:
 
     # ncorr not None
 
-    cls = [np.arange(10), np.arange(10), np.arange(10)]
+    cls: AngularPowerSpectra = [np.arange(10), np.arange(10), np.arange(10)]
     ncorr = 0
     result = glass.discretized_cls(cls, ncorr=ncorr)
 
@@ -363,7 +363,7 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
 
     # check with only weights1
 
-    cls = [xp.arange(15.0) for _ in range(3)]
+    cls: AngularPowerSpectra = [xp.arange(15.0) for _ in range(3)]
     weights1 = xp.ones((2, 1))
 
     result = glass.effective_cls(cls, weights1)
@@ -436,7 +436,7 @@ def test_generate(compare: type[Compare]) -> None:
 
     nside = 16
     npix = hp.nside2npix(nside)
-    gls = [np.ones(10), np.ones(10), np.ones(10)]
+    gls: AngularPowerSpectra = [np.ones(10), np.ones(10), np.ones(10)]
 
     result = list(glass.generate(fields, gls, nside=nside))
 
@@ -464,7 +464,7 @@ def test_generate(compare: type[Compare]) -> None:
 
 def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
     # make a mock Cls array with the index pairs as entries
-    cls = [
+    cls: AngularPowerSpectra = [
         xp.asarray([i, j], dtype=xp.float64)
         for i in range(10)
         for j in range(i, -1, -1)
@@ -512,7 +512,7 @@ def test_enumerate_spectra() -> None:
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra = np.arange(tn).reshape(tn, 1)
+    spectra: AngularPowerSpectra = np.arange(tn).reshape(tn, 1)
 
     # this is the expected order of indices
     indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
@@ -569,7 +569,7 @@ def test_compute_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra = [xp.zeros(10), xp.zeros(10), xp.zeros(10)]
+    spectra: AngularPowerSpectra = [xp.zeros(10), xp.zeros(10), xp.zeros(10)]
 
     gls = glass.compute_gaussian_spectra(fields, spectra)
 
@@ -589,7 +589,7 @@ def test_compute_gaussian_spectra_gh639(mocker: MockerFixture, xp: ModuleType) -
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra = [xp.zeros(10), xp.zeros(10), xp.zeros(0)]
+    spectra: AngularPowerSpectra = [xp.zeros(10), xp.zeros(10), xp.zeros(0)]
 
     gls = glass.compute_gaussian_spectra(fields, spectra)
 
@@ -608,7 +608,7 @@ def test_solve_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
     mock.return_value = (result, None, 3)
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra = [xp.zeros(5), xp.zeros(10), xp.zeros(15)]
+    spectra: AngularPowerSpectra = [xp.zeros(5), xp.zeros(10), xp.zeros(15)]
 
     gls = glass.solve_gaussian_spectra(fields, spectra)
 
@@ -653,12 +653,12 @@ def test_healpix_to_glass_spectra(compare: type[Compare]) -> None:
     compare.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
-def test_glass_to_healpix_alm(compare: type[Compare]) -> None:
-    inp = np.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
+def test_glass_to_healpix_alm(compare: type[Compare], xp: ModuleType) -> None:
+    inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33])
     out = glass.fields._glass_to_healpix_alm(inp)
     compare.assert_array_equal(
         out,
-        np.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
+        xp.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33]),
     )
 
 
@@ -673,7 +673,7 @@ def test_lognormal_shift_hilbert2011(compare: type[Compare]) -> None:
 
 
 def test_cov_from_spectra(compare: type[Compare]) -> None:
-    spectra = np.asarray(
+    spectra: AngularPowerSpectra = np.asarray(
         [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
@@ -795,7 +795,7 @@ def test_regularized_spectra(
     mocker: MockerFixture,
     rng: np.random.Generator,
 ) -> None:
-    spectra = rng.random(size=(6, 101))
+    spectra: AngularPowerSpectra = rng.random(size=(6, 101))
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")

@@ -19,13 +19,15 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING, Any
 
+import array_api_compat
+
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from types import ModuleType
 
     import numpy as np
 
-    from glass._types import AnyArray
+    from glass._types import AnyArray, DTypeLike
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -81,7 +83,7 @@ def default_xp() -> ModuleType:
     return import_numpy()
 
 
-class XPAdditions:
+class xp_additions:  # noqa: N801
     """
     Additional functions missing from both array-api-strict and array-api-extra.
 
@@ -93,21 +95,10 @@ class XPAdditions:
     for details.
     """
 
-    def __init__(self, xp: ModuleType) -> None:
-        """
-        Initialize XPAdditions with the given array namespace.
-
-        Parameters
-        ----------
-        xp
-            The array library backend to use for array operations.
-        """
-        self.xp = xp
-
+    @staticmethod
     def trapezoid(
-        self,
         y: AnyArray,
-        x: AnyArray = None,
+        x: AnyArray | None = None,
         dx: float = 1.0,
         axis: int = -1,
     ) -> AnyArray:
@@ -137,29 +128,32 @@ class XPAdditions:
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/646
+
         """
-        if self.xp.__name__ == "jax.numpy":
+        xp = array_api_compat.array_namespace(y, x, use_compat=False)
+
+        if xp.__name__ == "jax.numpy":
             import glass.jax  # noqa: PLC0415
 
             return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
 
-        if self.xp.__name__ == "numpy":
-            return self.xp.trapezoid(y, x=x, dx=dx, axis=axis)
+        if xp.__name__ == "numpy":
+            return xp.trapezoid(y, x=x, dx=dx, axis=axis)
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
 
             # Using design principle of scipy (i.e. copy, use np, copy back)
             y_np = np.asarray(y, copy=True)
             x_np = np.asarray(x, copy=True)
             result_np = np.trapezoid(y_np, x_np, dx=dx, axis=axis)
-            return self.xp.asarray(result_np, copy=True)
+            return xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
+    @staticmethod
     def interp(  # noqa: PLR0913
-        self,
         x: AnyArray,
         x_points: AnyArray,
         y_points: AnyArray,
@@ -197,9 +191,12 @@ class XPAdditions:
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/650
+
         """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.interp(
+        xp = array_api_compat.array_namespace(x, x_points, y_points, use_compat=False)
+
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.interp(
                 x,
                 x_points,
                 y_points,
@@ -208,8 +205,8 @@ class XPAdditions:
                 period=period,
             )
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
 
             # Using design principle of scipy (i.e. copy, use np, copy back)
             x_np = np.asarray(x, copy=True)
@@ -223,12 +220,13 @@ class XPAdditions:
                 right=right,
                 period=period,
             )
-            return self.xp.asarray(result_np, copy=True)
+            return xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def gradient(self, f: AnyArray) -> AnyArray:
+    @staticmethod
+    def gradient(f: AnyArray) -> AnyArray:
         """
         Return the gradient of an N-dimensional array.
 
@@ -249,23 +247,25 @@ class XPAdditions:
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/648
+
         """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.gradient(f)
+        xp = f.__array_namespace__()
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.gradient(f)
 
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
             # Using design principle of scipy (i.e. copy, use np, copy back)
             f_np = np.asarray(f, copy=True)
             result_np = np.gradient(f_np)
-            return self.xp.asarray(result_np, copy=True)
+            return xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
+    @staticmethod
     def linalg_lstsq(
-        self,
         a: AnyArray,
         b: AnyArray,
         rcond: float | None = None,
@@ -307,23 +307,27 @@ class XPAdditions:
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/649
-        """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        """
+        xp = array_api_compat.array_namespace(a, b, use_compat=False)
+
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
+
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
 
             # Using design principle of scipy (i.e. copy, use np, copy back)
             a_np = np.asarray(a, copy=True)
             b_np = np.asarray(b, copy=True)
             result_np = np.linalg.lstsq(a_np, b_np, rcond=rcond)
-            return tuple(self.xp.asarray(res, copy=True) for res in result_np)
+            return tuple(xp.asarray(res, copy=True) for res in result_np)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def einsum(self, subscripts: str, *operands: AnyArray) -> AnyArray:
+    @staticmethod
+    def einsum(subscripts: str, *operands: AnyArray) -> AnyArray:
         """
         Evaluate the Einstein summation convention on the operands.
 
@@ -346,23 +350,26 @@ class XPAdditions:
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/657
-        """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.einsum(subscripts, *operands)
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        """
+        xp = array_api_compat.array_namespace(*operands, use_compat=False)
+
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.einsum(subscripts, *operands)
+
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
 
             # Using design principle of scipy (i.e. copy, use np, copy back)
             operands_np = (np.asarray(op, copy=True) for op in operands)
             result_np = np.einsum(subscripts, *operands_np)
-            return self.xp.asarray(result_np, copy=True)
+            return xp.asarray(result_np, copy=True)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
+    @staticmethod
     def apply_along_axis(
-        self,
         func: Callable[..., Any],
         func_inputs: tuple[Any, ...],
         axis: int,
@@ -405,19 +412,21 @@ class XPAdditions:
         See https://github.com/glass-dev/glass/issues/651
 
         """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            func1d = functools.partial(func, *func_inputs)
-            return self.xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+        xp = array_api_compat.array_namespace(arr, *func_inputs, use_compat=False)
 
-        if self.xp.__name__ == "array_api_strict":
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            func1d = functools.partial(func, *func_inputs)
+            return xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+
+        if xp.__name__ == "array_api_strict":
             # Import here to prevent users relying on numpy unless in this instance
-            np = import_numpy(self.xp.__name__)
+            np = import_numpy(xp.__name__)
 
             # Everything must be NumPy to avoid mismatches between array types
             inputs_np = (np.asarray(inp) for inp in func_inputs)
             func1d = functools.partial(func, *inputs_np)
 
-            return self.xp.asarray(
+            return xp.asarray(
                 np.apply_along_axis(func1d, axis, arr, *args, **kwargs),
                 copy=True,
             )
@@ -425,10 +434,12 @@ class XPAdditions:
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
+    @staticmethod
     def vectorize(
-        self,
         pyfunc: Callable[..., Any],
-        otypes: tuple[type[float]],
+        otypes: str | Sequence[DTypeLike],
+        *,
+        xp: ModuleType,
     ) -> Callable[..., Any]:
         """
         Returns an object that acts like pyfunc, but takes arrays as input.
@@ -439,6 +450,8 @@ class XPAdditions:
             Python function to vectorize.
         otypes
             Output types.
+        xp
+            The array library backend to use for array operations.
 
         Returns
         -------
@@ -452,20 +465,22 @@ class XPAdditions:
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/671
-        """
-        if self.xp.__name__ == "numpy":
-            return self.xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
 
-        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
+        """
+        if xp.__name__ == "numpy":
+            return xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+
+        if xp.__name__ in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
-            np = import_numpy(self.xp.__name__)
+            np = import_numpy(xp.__name__)
 
             return np.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def radians(self, deg_arr: AnyArray) -> AnyArray:
+    @staticmethod
+    def radians(deg_arr: AnyArray) -> AnyArray:
         """
         Convert angles from degrees to radians.
 
@@ -482,25 +497,28 @@ class XPAdditions:
         ------
         NotImplementedError
             If the array backend is not supported.
+
         """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.radians(deg_arr)
+        xp = deg_arr.__array_namespace__()
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.radians(deg_arr)
 
-            return self.xp.asarray(np.radians(deg_arr))
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
+            return xp.asarray(np.radians(deg_arr))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def degrees(self, deg_arr: AnyArray) -> AnyArray:
+    @staticmethod
+    def degrees(rad_arr: AnyArray) -> AnyArray:
         """
         Convert angles from radians to degrees.
 
         Parameters
         ----------
-        deg_arr
+        rad_arr
             Array of angles in radians.
 
         Returns
@@ -511,24 +529,34 @@ class XPAdditions:
         ------
         NotImplementedError
             If the array backend is not supported.
+
         """
-        if self.xp.__name__ in {"numpy", "jax.numpy"}:
-            return self.xp.degrees(deg_arr)
+        xp = rad_arr.__array_namespace__()
 
-        if self.xp.__name__ == "array_api_strict":
-            np = import_numpy(self.xp.__name__)
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.degrees(rad_arr)
 
-            return self.xp.asarray(np.degrees(deg_arr))
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
+            return xp.asarray(np.degrees(rad_arr))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
-    def ndindex(self, shape: tuple[int, ...]) -> np.ndindex:
+    @staticmethod
+    def ndindex(shape: tuple[int, ...], *, xp: ModuleType) -> np.ndindex:
         """
         Wrapper for numpy.ndindex.
 
         See relevant docs for details:
         - NumPy, https://numpy.org/doc/2.2/reference/generated/numpy.ndindex.html
+
+        Parameters
+        ----------
+        shape
+            Shape of the array to index.
+        xp
+            The array library backend to use for array operations.
 
         Raises
         ------
@@ -536,12 +564,11 @@ class XPAdditions:
             If the array backend is not supported.
 
         """
-        if self.xp.__name__ == "numpy":
-            return self.xp.ndindex(shape)  # type: ignore[no-any-return]
+        if xp.__name__ == "numpy":
+            return xp.ndindex(shape)  # type: ignore[no-any-return]
 
-        if self.xp.__name__ in {"array_api_strict", "jax.numpy"}:
-            np = import_numpy(self.xp.__name__)
-
+        if xp.__name__ in {"array_api_strict", "jax.numpy"}:
+            np = import_numpy(xp.__name__)
             return np.ndindex(shape)  # type: ignore[no-any-return]
 
         msg = "the array backend in not supported"
