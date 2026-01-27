@@ -101,7 +101,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
 
     Access array library functions using `xp.` in tests.
     """
-    return request.param  # type: ignore[no-any-return]
+    return request.param
 
 
 @pytest.fixture(
@@ -128,7 +128,7 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
        nothing to compare against, since jax is not supported by
        the older versions of glass.
     """
-    return request.param  # type: ignore[no-any-return]
+    return request.param
 
 
 @pytest.fixture(scope="session")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import sys
 import warnings
 from collections.abc import Sequence
 from itertools import combinations_with_replacement, product
@@ -38,14 +39,13 @@ if TYPE_CHECKING:
         UnifiedGenerator,
     )
 
-
-try:
+if sys.version_info >= (3, 13):
     from warnings import deprecated
-except ImportError:
+else:
     if TYPE_CHECKING:
         from glass._types import P, R
 
-    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore[no-redef]
+    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:
         """Backport of Python's warnings.deprecated()."""
         from functools import wraps  # noqa: PLC0415
         from warnings import warn  # noqa: PLC0415
@@ -125,7 +125,7 @@ def iternorm(
 
     """
     # Convert to list here to allow determining the namespace
-    first = next(cov)  # type: ignore[call-overload]
+    first = next(cov)
     xp = first.__array_namespace__()
 
     n = (size,) if isinstance(size, int) else size
@@ -283,12 +283,12 @@ def discretized_cls(
 
     gls = []
     for cl in cls:
-        if len(cl) > 0:  # type: ignore[arg-type]
+        if len(cl) > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl), len(pw))  # type: ignore[arg-type]
-                cl = cl[:n] * pw[:n] ** 2  # type: ignore[operator] # noqa: PLW2901
+                n = min(len(cl), len(pw))
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
 
@@ -379,7 +379,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls), default=0)  # type: ignore[arg-type]
+    n = max((len(gl) for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -398,7 +398,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[call-arg]
+        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # ty: ignore[too-many-positional-arguments]
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
@@ -551,7 +551,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.size))
-    return cl
+    return cl  # ty: ignore[invalid-return-type]
 
 
 def enumerate_spectra(
@@ -924,7 +924,7 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
     n = nfields_from_nspectra(len(spectra))
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
-    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]  # type: ignore[arg-type]
+    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
 
 
 def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
@@ -1009,7 +1009,7 @@ def cov_from_spectra(
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
+        cov[: cl.size, i, j] = cov[: cl.size, j, i] = np.reshape(cl, -1)[:k]
 
     return cov
 
@@ -1079,7 +1079,7 @@ def regularized_spectra(
     elif method == "nearest":
         from glass.algorithm import cov_nearest as cov_method  # noqa: PLC0415
     else:
-        msg = f"unknown method '{method}'"  # type: ignore[unreachable]
+        msg = f"unknown method '{method}'"
         raise ValueError(msg)
 
     # get the cov matrix from spectra

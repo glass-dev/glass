@@ -434,19 +434,19 @@ def test_radial_window_immutable(xp: ModuleType) -> None:
         dataclasses.FrozenInstanceError,
         match="cannot assign to field 'za'",
     ):
-        w.za = za  # type: ignore[misc]
+        w.za = za  # ty: ignore[invalid-assignment]
 
     with pytest.raises(
         dataclasses.FrozenInstanceError,
         match="cannot assign to field 'wa'",
     ):
-        w.wa = wa  # type: ignore[misc]
+        w.wa = wa  # ty: ignore[invalid-assignment]
 
     with pytest.raises(
         dataclasses.FrozenInstanceError,
         match="cannot assign to field 'zeff'",
     ):
-        w.zeff = zeff  # type: ignore[misc]
+        w.zeff = zeff  # ty: ignore[invalid-assignment]
 
 
 def test_radial_window_zeff_none(compare: type[Compare], xp: ModuleType) -> None:

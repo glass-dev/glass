@@ -150,25 +150,6 @@ replacement = "/v$HFPR_VERSION"
 pattern = "version=stable"
 replacement = "version=v$HFPR_VERSION"
 
-[tool.mypy]
-disallow_untyped_decorators = false
-enable_error_code = [
-    "ignore-without-code",
-    "redundant-expr",
-    "truthy-bool",
-]
-explicit_package_bases = true
-python_version = "3.14"
-strict = true
-warn_unreachable = true
-
-[[tool.mypy.overrides]]
-disable_error_code = [
-    "arg-type",
-    "assignment",
-]
-module = "tests.core.*"
-
 [tool.pytest.ini_options]
 addopts = [
     "--strict-config",
@@ -288,3 +269,22 @@ overrides."tool.hatch".first = [
     "version",
 ]
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
+# https://github.com/pappasam/toml-sort/issues/94
+overrides."tool.ty".first = [
+    "rules",
+    "src",
+]
+
+[tool.ty]
+rules.invalid-argument-type = "ignore"
+src.include = [
+    "glass",
+    "tests",
+]
+
+[[tool.ty.overrides]]
+include = [
+    "glass/**",
+    "tests/core/**",
+]
+rules.unsupported-operator = "ignore"

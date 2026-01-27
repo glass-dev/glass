@@ -31,17 +31,17 @@ def test_from_key() -> None:
 
 def test_key() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    rngkey, outkey = jax.random.split(rng.key, 2)  # type: ignore[union-attr]
-    key = rng.split()  # type: ignore[union-attr]
-    assert jnp.all(rng.key == rngkey)  # type: ignore[union-attr]
+    rngkey, outkey = jax.random.split(rng.key, 2)  # ty: ignore[possibly-missing-attribute]
+    key = rng.split()  # ty: ignore[possibly-missing-attribute]
+    assert jnp.all(rng.key == rngkey)  # ty: ignore[possibly-missing-attribute]
     assert jnp.all(key == outkey)
 
 
 def test_spawn() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    key, *subkeys = jax.random.split(rng.key, 4)  # type: ignore[union-attr]
-    subrngs = rng.spawn(3)  # type: ignore[union-attr]
-    assert rng.key == key  # type: ignore[union-attr]
+    key, *subkeys = jax.random.split(rng.key, 4)  # ty: ignore[possibly-missing-attribute]
+    subrngs = rng.spawn(3)  # ty: ignore[possibly-missing-attribute]
+    assert rng.key == key  # ty: ignore[possibly-missing-attribute]
     assert isinstance(subrngs, list)
     assert len(subrngs) == 3
     for subrng, subkey in zip(subrngs, subkeys, strict=False):
@@ -51,9 +51,9 @@ def test_spawn() -> None:
 
 def test_random() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    key = rng.key  # type: ignore[union-attr]
+    key = rng.key  # ty: ignore[possibly-missing-attribute]
     rvs = rng.random(size=10_000)
-    assert rng.key != key  # type: ignore[union-attr]
+    assert rng.key != key  # ty: ignore[possibly-missing-attribute]
     assert rvs.shape == (10_000,)
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
@@ -62,36 +62,36 @@ def test_random() -> None:
 
 def test_normal() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    key = rng.key  # type: ignore[union-attr]
+    key = rng.key  # ty: ignore[possibly-missing-attribute]
     rvs = rng.normal(1, 2, size=10_000)
-    assert rng.key != key  # type: ignore[union-attr]
+    assert rng.key != key  # ty: ignore[possibly-missing-attribute]
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, ArrayLike)
 
 
 def test_standard_normal() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    key = rng.key  # type: ignore[union-attr]
+    key = rng.key  # ty: ignore[possibly-missing-attribute]
     rvs = rng.standard_normal(size=10_000)
-    assert rng.key != key  # type: ignore[union-attr]
+    assert rng.key != key  # ty: ignore[possibly-missing-attribute]
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, ArrayLike)
 
 
 def test_poisson() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    key = rng.key  # type: ignore[union-attr]
+    key = rng.key  # ty: ignore[possibly-missing-attribute]
     rvs = rng.poisson(lam=1, size=10_000)
-    assert rng.key != key  # type: ignore[union-attr]
+    assert rng.key != key  # ty: ignore[possibly-missing-attribute]
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, ArrayLike)
 
 
 def test_uniform() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
-    key = rng.key  # type: ignore[union-attr]
+    key = rng.key  # ty: ignore[possibly-missing-attribute]
     rvs = rng.uniform(size=10_000)
-    assert rng.key != key  # type: ignore[union-attr]
+    assert rng.key != key  # ty: ignore[possibly-missing-attribute]
     assert rvs.shape == (10_000,)
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0

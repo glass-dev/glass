@@ -13,7 +13,7 @@ glass_harmonics = pytest.importorskip(
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import Compare
+    from conftest import Compare  # ty: ignore[unresolved-import]
     from pytest_benchmark.fixture import BenchmarkFixture
 
 

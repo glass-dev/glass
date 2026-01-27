@@ -27,7 +27,7 @@ def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> N
 
     # check with all False
 
-    results = glass.from_convergence(kappa)
+    results = glass.from_convergence(kappa)  # ty: ignore[no-matching-overload]
     compare.assert_array_equal(results, ())
 
     # check all combinations of potential, deflection, shear being True
@@ -41,16 +41,16 @@ def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> N
     results = glass.from_convergence(kappa, shear=True)
     compare.assert_array_equal(len(results), 1)
 
-    results = glass.from_convergence(kappa, potential=True, deflection=True)
+    results = glass.from_convergence(kappa, potential=True, deflection=True)  # ty: ignore[no-matching-overload]
     compare.assert_array_equal(len(results), 2)
 
-    results = glass.from_convergence(kappa, potential=True, shear=True)
+    results = glass.from_convergence(kappa, potential=True, shear=True)  # ty: ignore[no-matching-overload]
     compare.assert_array_equal(len(results), 2)
 
-    results = glass.from_convergence(kappa, deflection=True, shear=True)
+    results = glass.from_convergence(kappa, deflection=True, shear=True)  # ty: ignore[no-matching-overload]
     compare.assert_array_equal(len(results), 2)
 
-    results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
+    results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)  # ty: ignore[no-matching-overload]
     compare.assert_array_equal(len(results), 3)
 
 
@@ -76,7 +76,7 @@ def test_multi_plane_matrix(
     for shell, delta in zip(shells, deltas, strict=False):
         convergence.add_window(delta, shell)
         if convergence.kappa is not None:
-            kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
+            kappas.append(convergence.kappa.copy())  # ty: ignore[possibly-missing-attribute]
 
     compare.assert_allclose(mat @ deltas, kappas)
 

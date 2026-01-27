@@ -54,7 +54,21 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
+    potential: Literal[False],
+    deflection: Literal[False],
+    shear: Literal[False],
+    discretized: bool = True,
+) -> tuple[()]:
+    # returns empty tuple
+    ...
+
+
+@overload
+def from_convergence(
+    kappa: FloatArray,
+    lmax: int | None = None,
+    *,
+    potential: Literal[True],
     deflection: Literal[False] = False,
     shear: Literal[False] = False,
     discretized: bool = True,
@@ -69,7 +83,7 @@ def from_convergence(
     lmax: int | None = None,
     *,
     potential: Literal[False] = False,
-    deflection: Literal[True] = True,
+    deflection: Literal[True],
     shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[ComplexArray]:
@@ -84,7 +98,7 @@ def from_convergence(
     *,
     potential: Literal[False] = False,
     deflection: Literal[False] = False,
-    shear: Literal[True] = True,
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[ComplexArray]:
     # returns gamma
@@ -96,8 +110,8 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
-    deflection: Literal[True] = True,
+    potential: Literal[True],
+    deflection: Literal[True],
     shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[
@@ -113,9 +127,9 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
+    potential: Literal[True],
     deflection: Literal[False] = False,
-    shear: Literal[True] = True,
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[
     FloatArray,
@@ -131,8 +145,8 @@ def from_convergence(
     lmax: int | None = None,
     *,
     potential: Literal[False] = False,
-    deflection: Literal[True] = True,
-    shear: Literal[True] = True,
+    deflection: Literal[True],
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[
     ComplexArray,
@@ -147,9 +161,9 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[True] = True,
-    deflection: Literal[True] = True,
-    shear: Literal[True] = True,
+    potential: Literal[True],
+    deflection: Literal[True],
+    shear: Literal[True],
     discretized: bool = True,
 ) -> tuple[
     FloatArray,
@@ -311,7 +325,7 @@ def from_convergence(  # noqa: PLR0913
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
         alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
-        alpha = alpha[0] + 1j * alpha[1]  # type: ignore[assignment]
+        alpha = alpha[0] + 1j * alpha[1]
         results += (alpha,)
 
     # if no shear is requested, stop here
@@ -329,7 +343,7 @@ def from_convergence(  # noqa: PLR0913
 
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
-    gamma = gamma[0] + 1j * gamma[1]  # type: ignore[assignment]
+    gamma = gamma[0] + 1j * gamma[1]
     results += (gamma,)
 
     # all done
@@ -390,7 +404,7 @@ def shear_from_convergence(
     hp.almxfl(alm, fl, inplace=True)
 
     # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
+    return hp.alm2map_spin([alm, blm], nside, 2, lmax)  # ty: ignore[invalid-return-type]
 
 
 class MultiPlaneConvergence:
@@ -660,10 +674,10 @@ def deflect(
         xp = array_api_compat.array_namespace(lon, lat, alpha, use_compat=False)
 
     alpha = xp.asarray(alpha)
-    if xp.isdtype(alpha.dtype, "complex floating"):  # type: ignore[union-attr]
+    if xp.isdtype(alpha.dtype, "complex floating"):
         alpha1, alpha2 = xp.real(alpha), xp.imag(alpha)
     else:
-        alpha1, alpha2 = alpha  # type: ignore[misc]
+        alpha1, alpha2 = alpha
 
     # we know great-circle navigation:
     # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
