@@ -252,7 +252,7 @@ def ellipticity_gaussian(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
@@ -323,7 +323,7 @@ def ellipticity_intnorm(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     # default RNG if not provided
     if rng is None:

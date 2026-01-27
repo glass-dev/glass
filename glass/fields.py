@@ -638,7 +638,7 @@ def effective_cls(
 
     """
     xp = array_api_compat.array_namespace(*cls, weights1, weights2, use_compat=False)
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))

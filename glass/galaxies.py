@@ -112,7 +112,7 @@ def redshifts_from_nz(
 
     """
     xp = array_api_compat.array_namespace(count, z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     if warn:
         warnings.warn(

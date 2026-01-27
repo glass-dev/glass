@@ -102,7 +102,7 @@ def effective_bias(
         \;.
 
     """
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     norm = uxpx.trapezoid(w.wa, w.za)
     return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
@@ -375,7 +375,7 @@ def uniform_positions(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(ngal, use_compat=False)
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     # get default RNG if not given
     if rng is None:

@@ -140,7 +140,7 @@ def ndinterp(  # noqa: PLR0913
         The interpolated array.
 
     """
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     return uxpx.apply_along_axis(
         uxpx.interp,
@@ -176,7 +176,7 @@ def trapezoid_product(
 
     """
     # Flatten ff into a 1D tuple of all ff inputs and then expand to get the namespace
-    uxpx = _utils.XPAdditions()
+    uxpx = _utils.XPAdditions
 
     x: FloatArray
     x, _ = f
