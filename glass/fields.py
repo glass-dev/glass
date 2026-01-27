@@ -126,26 +126,21 @@ def iternorm(
     # Convert to list here to allow determining the namespace
     first = next(cov)  # type: ignore[call-overload]
     xp = first.__array_namespace__()
-    uxpx = _utils.XPAdditions(xp)
 
     n = (size,) if isinstance(size, int) else size
 
-    m = xp.zeros((*n, k, k))
-    a = xp.zeros((*n, k))
-    s = xp.zeros((*n,))
+    m = np.zeros((*n, k, k))
+    a = np.zeros((*n, k))
+    s = np.zeros((*n,))
     q = (*n, k + 1)
     j = 0 if k > 0 else None
 
     # We must use cov_expanded here as cov has been consumed to determine the namespace
     for i, x in enumerate(itertools.chain([first], cov)):
-        # Ideally would be xp.asanyarray but this does not yet exist. The key difference
-        # between the two in numpy is that asanyarray maintains subclasses of NDArray
-        # whereas asarray will return the base class NDArray. Currently, we don't seem
-        # to pass a subclass of NDArray so this, so it might be okay
-        x = xp.asarray(x)  # noqa: PLW2901
+        x = np.asarray(x)  # noqa: PLW2901
         if x.shape != q:
             try:
-                x = xp.broadcast_to(x, q)  # noqa: PLW2901
+                x = np.broadcast_to(x, q)  # noqa: PLW2901
             except ValueError:
                 msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
                 raise TypeError(msg) from None
@@ -154,35 +149,33 @@ def iternorm(
         if j is not None:
             # compute new entries of matrix A
             m[..., :, j] = 0
-            m[..., j : j + 1, :] = xp.matmul(a[..., xp.newaxis, :], m)
-            m[..., j, j] = xp.where(s != 0, -1, s)
-            # To ensure we don't divide by zero or nan we use a mask to only divide the
-            # appropriate values of m and s
-            m_j = m[..., j, :]
-            s_broadcast = xp.broadcast_to(s[..., xp.newaxis], m_j.shape)
-            mask = (m_j != 0) & (s_broadcast != 0) & ~xp.isnan(s_broadcast)
-            m_j[mask] = xp.divide(m_j[mask], -s_broadcast[mask])
-            m[..., j, :] = m_j
+            m[..., j : j + 1, :] = np.matmul(a[..., np.newaxis, :], m)
+            m[..., j, j] = np.where(s != 0, -1, 0)
+            np.divide(
+                m[..., j, :],
+                -s[..., np.newaxis],
+                where=(m[..., j, :] != 0),
+                out=m[..., j, :],
+            )
 
             # compute new vector a
-            c = x[..., 1:, xp.newaxis]
-            a = xp.matmul(m[..., :j], c[..., k - j :, :])
-            a += xp.matmul(m[..., j:], c[..., : k - j, :])
-            a = xp.reshape(a, (*n, k))
+            c = x[..., 1:, np.newaxis]
+            a = np.matmul(m[..., :j], c[..., k - j :, :])
+            a += np.matmul(m[..., j:], c[..., : k - j, :])
+            a = np.reshape(a, (*n, k))
 
             # next rolling index
             j = (j - 1) % k
 
         # compute new standard deviation
-        einsum_result_np = uxpx.einsum("...i,...i", a, a)
-        s = x[..., 0] - einsum_result_np
-        if xp.any(s < 0):
+        s = x[..., 0] - np.einsum("...i,...i", a, a)
+        if np.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
-        s = xp.sqrt(s)
+        s = np.sqrt(s)
 
         # yield the next index, vector a, and standard deviation s
-        yield j, a, s
+        yield j, xp.asarray(a), xp.asarray(s)
 
 
 def cls2cov(
