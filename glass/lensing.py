@@ -284,7 +284,8 @@ def from_convergence(  # noqa: PLR0913
     # compute alm
     alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
-    # mode number; all conversions are factors of this
+    # mode number; all conversions are factors of this.
+    # Must be float to allow division later
     ell = xp.arange(lmax + 1, dtype=xp.float64)
 
     # this tuple will be returned
@@ -292,7 +293,6 @@ def from_convergence(  # noqa: PLR0913
 
     # convert convergence to potential
     positive_ell = ell[ell > 0]
-    fl = xp.zeros(lmax + 1)
     fl = xp.divide(-2.0, positive_ell * (positive_ell + 1))
     alm = hp.almxfl(alm, fl)
 
