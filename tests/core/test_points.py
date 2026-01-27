@@ -524,32 +524,20 @@ def test_displacement_random(
     one = xp.ones(n)
     rot_y = xp.stack(
         [
-            xp.cos(theta),
-            zero,
-            xp.sin(theta),
-            zero,
-            one,
-            zero,
-            -xp.sin(theta),
-            zero,
-            xp.cos(theta),
+            xp.cos(theta), zero, xp.sin(theta),
+            zero, one, zero,
+            -xp.sin(theta), zero, xp.cos(theta),
         ],
         axis=1,
-    )
+    )  # fmt: skip
     rot_z = xp.stack(
         [
-            xp.cos(phi),
-            -xp.sin(phi),
-            zero,
-            xp.sin(phi),
-            xp.cos(phi),
-            zero,
-            zero,
-            zero,
-            one,
+            xp.cos(phi), -xp.sin(phi), zero,
+            xp.sin(phi), xp.cos(phi), zero,
+            zero, zero, one,
         ],
         axis=1,
-    )
+    )  # fmt: skip
     rot = xp.reshape(rot_z, (n, 3, 3)) @ xp.reshape(rot_y, (n, 3, 3))
 
     # meta-check that rotation works by rotating (0, 0, 1) to theta and phi
