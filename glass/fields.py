@@ -398,7 +398,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))
+        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # ty: ignore[too-many-positional-arguments]
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
@@ -1089,4 +1089,4 @@ def regularized_spectra(
     cov = cov_method(cov, **method_kwargs)
 
     # return regularised spectra from cov matrix array
-    return [cov[:, i, j] for i, j in spectra_indices(cov.shape[-1])]  # ty: ignore[invalid-return-type]
+    return [cov[:, i, j] for i, j in spectra_indices(cov.shape[-1])]

@@ -511,7 +511,7 @@ def test_enumerate_spectra() -> None:
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra: AngularPowerSpectra = np.arange(tn).reshape(tn, 1)
+    spectra: AngularPowerSpectra = np.arange(tn).reshape(tn, 1)  # ty: ignore[invalid-assignment]
 
     # this is the expected order of indices
     indices = [(i, j) for i in range(n) for j in range(i, -1, -1)]
@@ -672,7 +672,7 @@ def test_lognormal_shift_hilbert2011(compare: type[Compare]) -> None:
 
 
 def test_cov_from_spectra(compare: type[Compare]) -> None:
-    spectra: AngularPowerSpectra = np.asarray(
+    spectra: AngularPowerSpectra = np.asarray(  # ty: ignore[invalid-assignment]
         [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
@@ -794,7 +794,7 @@ def test_regularized_spectra(
     mocker: MockerFixture,
     rng: np.random.Generator,
 ) -> None:
-    spectra: AngularPowerSpectra = rng.random(size=(6, 101))
+    spectra: AngularPowerSpectra = rng.random(size=(6, 101))  # ty: ignore[invalid-assignment]
 
     # test method "nearest"
     cov_nearest = mocker.spy(glass.algorithm, "cov_nearest")

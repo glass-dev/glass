@@ -109,7 +109,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.ap.asarray(self.rng.random(size, dtype, out))
+        return self.ap.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def normal(
         self,
@@ -182,7 +182,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.ap.asarray(self.rng.standard_normal(size, dtype, out))
+        return self.ap.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def uniform(
         self,
