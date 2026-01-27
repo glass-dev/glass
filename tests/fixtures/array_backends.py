@@ -42,6 +42,7 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
     ------
     ImportError
         If the installed version is not compliant with the array API standard.
+
     """
     lib_version = packaging.version.Version(importlib.metadata.version(lib))
     if lib_version < packaging.version.Version(array_api_compliant_version):
@@ -102,6 +103,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
     Fixture for array backend.
 
     Access array library functions using `xp.` in tests.
+
     """
     return request.param  # type: ignore[no-any-return]
 
@@ -129,6 +131,7 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
        not _yet_ make sense to regression test jax as there is
        nothing to compare against, since jax is not supported by
        the older versions of glass.
+
     """
     return request.param  # type: ignore[no-any-return]
 
@@ -151,5 +154,6 @@ def uxpx(xp: ModuleType) -> _utils.XPAdditions:
     Fixture for array backend.
 
     Access array library functions using `xp.` in tests.
+
     """
     return _utils.XPAdditions(xp)

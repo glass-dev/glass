@@ -191,6 +191,7 @@ def _broadcast_inputs(
     Returns
     -------
         The broadcasted inputs.
+
     """
     inputs: list[tuple[float | FloatArray, int]] = [(ngal, 0), (delta, 1)]
     if bias is not None:
@@ -234,6 +235,7 @@ def _compute_density_contrast(
     Returns
     -------
         The density contrast after biasing.
+
     """
     xp = array_api_compat.array_namespace(delta, bias, use_compat=False)
 
@@ -269,6 +271,7 @@ def _compute_expected_count(
     Returns
     -------
         Expected number of objects per pixel.
+
     """
     xp = array_api_compat.array_namespace(n, ngal, use_compat=False)
 
@@ -303,6 +306,7 @@ def _apply_visibility(
     Returns
     -------
         The visibility-applied number count map.
+
     """
     if vis is not None:
         n *= vis[(*k, ...)]  # type: ignore[arg-type]
@@ -327,6 +331,7 @@ def _sample_number_galaxies(
     Returns
     -------
         The sampled number of galaxies per pixel.
+
     """
     xp = n.__array_namespace__()
 
@@ -373,6 +378,7 @@ def _sample_galaxies_per_pixel(
     count
         The number of sampled points  If multiple populations are sampled, an
         array of counts in the shape of the extra dimensions is returned.
+
     """
     xp = n.__array_namespace__()
 

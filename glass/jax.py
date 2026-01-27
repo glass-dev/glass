@@ -26,6 +26,7 @@ def _size(
     """
     Return a size, which can be a single int or None, as a shape, which
     is a tuple of int.
+
     """
     if size is None:
         return jnp.broadcast_shapes(*map(jnp.shape, bcast)) if bcast else ()
