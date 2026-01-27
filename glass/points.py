@@ -514,7 +514,7 @@ def displace(
 
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon + d / xp.pi * 180, tp / xp.pi * 180
+    return lon + d / math.pi * 180, tp / math.pi * 180
 
 
 def displacement(
@@ -554,7 +554,7 @@ def displacement(
         use_compat=False,
     )
 
-    degrees = xp.pi / 180
+    degrees = math.pi / 180
 
     a = from_lat * degrees
     b = to_lat * degrees

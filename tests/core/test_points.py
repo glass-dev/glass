@@ -484,11 +484,11 @@ def test_displacement_consistent(
 
     # magnitude and angle of displacement we want to achieve
     r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
-    x = urng.uniform(-xp.pi, xp.pi, size=n)
+    x = urng.uniform(-math.pi, math.pi, size=n)
 
     # displace at random positions on the sphere
     from_lon = urng.uniform(-180.0, 180.0, size=n)
-    from_lat = xp.asin(urng.uniform(-1.0, 1.0, size=n)) / xp.pi * 180.0
+    from_lat = xp.asin(urng.uniform(-1.0, 1.0, size=n)) / math.pi * 180.0
 
     # compute the intended displacement
     alpha_in = r * xp.exp(1j * x)
@@ -512,11 +512,11 @@ def test_displacement_random(
 
     # magnitude and angle of displacement we want to achieve
     r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
-    x = urng.uniform(-xp.pi, xp.pi, size=n)
+    x = urng.uniform(-math.pi, math.pi, size=n)
 
     # displacement at random positions on the sphere
     theta = xp.acos(urng.uniform(-1.0, 1.0, size=n))
-    phi = urng.uniform(-xp.pi, xp.pi, size=n)
+    phi = urng.uniform(-math.pi, math.pi, size=n)
 
     # rotation matrix that moves (0, 0, 1) to theta and phi
     zero = xp.zeros(n)
@@ -557,8 +557,8 @@ def test_displacement_random(
     # build the displaced points near (0, 0, 1) and rotate near theta and phi
     v = xp.stack(
         [
-            xp.sin(r) * xp.cos(xp.pi - x),
-            xp.sin(r) * xp.sin(xp.pi - x),
+            xp.sin(r) * xp.cos(math.pi - x),
+            xp.sin(r) * xp.sin(math.pi - x),
             xp.cos(r),
         ],
         axis=1,
@@ -571,10 +571,10 @@ def test_displacement_random(
     phi_d = xp.atan2(v[:, 1], v[:, 0])
 
     # compute longitude and latitude
-    from_lon = phi / xp.pi * 180.0
-    from_lat = 90.0 - theta / xp.pi * 180.0
-    to_lon = phi_d / xp.pi * 180.0
-    to_lat = 90.0 - theta_d / xp.pi * 180.0
+    from_lon = phi / math.pi * 180.0
+    from_lat = 90.0 - theta / math.pi * 180.0
+    to_lon = phi_d / math.pi * 180.0
+    to_lat = 90.0 - theta_d / math.pi * 180.0
 
     # compute displacement and compare to input
     alpha_in = r * xp.exp(1j * x)
