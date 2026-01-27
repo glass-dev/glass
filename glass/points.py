@@ -554,11 +554,9 @@ def displacement(
         use_compat=False,
     )
 
-    degrees = math.pi / 180
-
-    a = from_lat * degrees
-    b = to_lat * degrees
-    g = (to_lon - from_lon) * degrees
+    a = uxpx.radians(from_lat)
+    b = uxpx.radians(to_lat)
+    g = uxpx.radians(to_lon - from_lon)
 
     sa, ca = xp.sin(a), xp.cos(a)
     sb, cb = xp.sin(b), xp.cos(b)
