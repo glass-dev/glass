@@ -37,8 +37,8 @@ import numpy as np
 
 import array_api_compat
 
-import glass._array_api_utils as _utils
 import glass.healpix as hp
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -658,7 +658,6 @@ def deflect(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(lon, lat, alpha, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     alpha = xp.asarray(alpha)
     if xp.isdtype(alpha.dtype, "complex floating"):  # type: ignore[union-attr]
