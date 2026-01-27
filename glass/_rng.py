@@ -109,7 +109,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.ap.asarray(self.rng.random(size, dtype, out))  # type: ignore[arg-type]
+        return self.ap.asarray(self.rng.random(size, dtype, out))
 
     def normal(
         self,
@@ -182,7 +182,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.ap.asarray(self.rng.standard_normal(size, dtype, out))  # type: ignore[arg-type]
+        return self.ap.asarray(self.rng.standard_normal(size, dtype, out))
 
     def uniform(
         self,

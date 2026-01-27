@@ -312,7 +312,7 @@ class xp_additions:  # noqa: N801
         xp = array_api_compat.array_namespace(a, b, use_compat=False)
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.linalg.lstsq(a, b, rcond=rcond)  # type: ignore[no-any-return]
+            return xp.linalg.lstsq(a, b, rcond=rcond)
 
         if xp.__name__ == "array_api_strict":
             np = import_numpy(xp.__name__)
@@ -468,7 +468,7 @@ class xp_additions:  # noqa: N801
 
         """
         if xp.__name__ == "numpy":
-            return xp.vectorize(pyfunc, otypes=otypes)  # type: ignore[no-any-return]
+            return xp.vectorize(pyfunc, otypes=otypes)
 
         if xp.__name__ in {"array_api_strict", "jax.numpy"}:
             # Import here to prevent users relying on numpy unless in this instance
@@ -565,11 +565,11 @@ class xp_additions:  # noqa: N801
 
         """
         if xp.__name__ == "numpy":
-            return xp.ndindex(shape)  # type: ignore[no-any-return]
+            return xp.ndindex(shape)
 
         if xp.__name__ in {"array_api_strict", "jax.numpy"}:
             np = import_numpy(xp.__name__)
-            return np.ndindex(shape)  # type: ignore[no-any-return]
+            return np.ndindex(shape)
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
