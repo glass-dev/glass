@@ -57,6 +57,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
@@ -239,7 +240,6 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        uxpx = _utils.XPAdditions
         if self.za.size > 0:
             return uxpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
@@ -303,7 +303,6 @@ def tophat_windows(
         )
 
     xp = zbins.__array_namespace__()
-    uxpx = _utils.XPAdditions
 
     wht: Callable[[FloatArray], FloatArray]
     wht = weight if weight is not None else xp.ones_like
@@ -657,7 +656,6 @@ def partition_lstsq(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = _utils.XPAdditions
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -728,7 +726,6 @@ def partition_nnls(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = _utils.XPAdditions
 
     # make sure nothing breaks
     sumtol = max(sumtol, 1e-4)
@@ -803,7 +800,6 @@ def partition_restrict(
 
     """
     xp = array_api_compat.array_namespace(z, fz, use_compat=False)
-    uxpx = _utils.XPAdditions
 
     parts = []
     for w in shells:
@@ -965,7 +961,6 @@ def combine(
         *(arr for shell in shells for arr in (shell.za, shell.wa)),
         use_compat=False,
     )
-    uxpx = _utils.XPAdditions
 
     return xp.sum(
         xp.stack(

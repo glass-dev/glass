@@ -83,7 +83,7 @@ def default_xp() -> ModuleType:
     return import_numpy()
 
 
-class XPAdditions:
+class xp_additions:  # noqa: N801
     """
     Additional functions missing from both array-api-strict and array-api-extra.
 

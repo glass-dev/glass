@@ -36,6 +36,7 @@ import array_api_compat
 import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -129,7 +130,6 @@ def gaussian_nz(
 
     """
     xp = array_api_compat.array_namespace(z, mean, sigma, norm, use_compat=False)
-    uxpx = _utils.XPAdditions
 
     mean = xp.asarray(mean, dtype=xp.float64)
     sigma = xp.asarray(sigma, dtype=xp.float64)
@@ -197,7 +197,6 @@ def smail_nz(
         norm,
         use_compat=False,
     )
-    uxpx = _utils.XPAdditions
 
     z_mode = xp.asarray(z_mode, dtype=xp.float64)[..., xp.newaxis]
     alpha = xp.asarray(alpha, dtype=xp.float64)[..., xp.newaxis]
@@ -292,8 +291,6 @@ def equal_dens_zbins(
 
     """
     xp = array_api_compat.array_namespace(z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions
-
     # compute the normalised cumulative distribution function
     # first compute the cumulative integral (by trapezoidal rule)
     # then normalise: the first z is at CDF = 0, the last z at CDF = 1
@@ -346,8 +343,6 @@ def tomo_nz_gausserr(
 
     """
     xp = array_api_compat.array_namespace(z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions
-
     # converting zbins into an array:
     zbins_arr = xp.asarray(zbins)
 

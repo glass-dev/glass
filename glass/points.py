@@ -45,11 +45,11 @@ from typing import TYPE_CHECKING, Any
 import array_api_compat
 import array_api_extra as xpx
 
-import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
 import glass.shells
 from glass import _rng
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -102,8 +102,6 @@ def effective_bias(
         \;.
 
     """
-    uxpx = _utils.XPAdditions
-
     norm = uxpx.trapezoid(w.wa, w.za)
     return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
@@ -375,7 +373,6 @@ def uniform_positions(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(ngal, use_compat=False)
-    uxpx = _utils.XPAdditions
 
     # get default RNG if not given
     if rng is None:

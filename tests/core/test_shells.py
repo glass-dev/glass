@@ -8,11 +8,11 @@ import numpy as np
 import pytest
 
 import glass
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    import glass._array_api_utils as _utils
     from glass.cosmology import Cosmology
     from tests.fixtures.helper_classes import Compare
 
@@ -201,8 +201,6 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
 
 def test_restrict(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.restrict`."""
-    uxpx = _utils.XPAdditions
-
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1_000)
     f = xp.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
@@ -243,8 +241,6 @@ def test_partition(
     """Add unit tests for :func:`glass.partition`."""
     if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
         pytest.skip(f"Arrays in {method} are not immutable, so do not support jax")
-
-    uxpx = _utils.XPAdditions
 
     shells = [
         glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
@@ -386,8 +382,6 @@ def test_combine(
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.combine`."""
-    uxpx = _utils.XPAdditions
-
     z = xp.linspace(0.0, 5.0, 1_000)
     weights = xp.asarray(
         [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183],

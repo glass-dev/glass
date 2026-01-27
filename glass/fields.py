@@ -21,6 +21,7 @@ import glass.harmonics
 import glass.healpix as hp
 import glass.shells
 from glass import _rng
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -638,8 +639,6 @@ def effective_cls(
 
     """
     xp = array_api_compat.array_namespace(*cls, weights1, weights2, use_compat=False)
-    uxpx = _utils.XPAdditions
-
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))
 

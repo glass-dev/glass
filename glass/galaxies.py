@@ -27,11 +27,11 @@ import numpy as np
 
 import array_api_compat
 
-import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
 import glass.shells
 from glass import _rng
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -112,7 +112,6 @@ def redshifts_from_nz(
 
     """
     xp = array_api_compat.array_namespace(count, z, nz, use_compat=False)
-    uxpx = _utils.XPAdditions
 
     if warn:
         warnings.warn(
