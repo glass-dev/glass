@@ -36,6 +36,7 @@ HEAD_REF="<some-git-commit-hash>"
 # Load modules and pre-installed python dependencies through venv
 # shellcheck source=/dev/null
 source "$BENCHMARKS_DIR/myriad/load_modules.sh"
+# shellcheck source=/dev/null
 source "$GLASS_DIR/.venv/bin/activate"
 
 # Remove old benchmark results
