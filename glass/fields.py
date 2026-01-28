@@ -6,11 +6,10 @@ import itertools
 import math
 import warnings
 from collections.abc import Sequence
-from itertools import combinations_with_replacement, product
 from typing import TYPE_CHECKING
 
 import numpy as np
-from transformcl import cltovar
+import transformcl
 
 import array_api_compat
 import array_api_extra as xpx
@@ -47,13 +46,13 @@ except ImportError:
 
     def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore[no-redef]
         """Backport of Python's warnings.deprecated()."""
-        from functools import wraps  # noqa: PLC0415
-        from warnings import warn  # noqa: PLC0415
+        import functools  # noqa: PLC0415
+        import warnings  # noqa: PLC0415
 
         def decorator(func: Callable[P, R], /) -> Callable[P, R]:
-            @wraps(func)
+            @functools.wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                warn(msg, category=DeprecationWarning, stacklevel=2)
+                warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
                 return func(*args, **kwargs)
 
             return wrapper
@@ -659,9 +658,11 @@ def effective_cls(
     # get the iterator over leading weight axes
     # auto-spectra do not repeat identical computations
     pairs = (
-        combinations_with_replacement(uxpx.ndindex(shape1[1:], xp=xp), 2)
+        itertools.combinations_with_replacement(uxpx.ndindex(shape1[1:], xp=xp), 2)
         if weights2 is weights1
-        else product(uxpx.ndindex(shape1[1:], xp=xp), uxpx.ndindex(shape2[1:], xp=xp))
+        else itertools.product(
+            uxpx.ndindex(shape1[1:], xp=xp), uxpx.ndindex(shape2[1:], xp=xp)
+        )
     )
 
     # create the output array: axes for all input axes plus lmax+1
@@ -874,7 +875,7 @@ def generate(
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
-    variances = (cltovar(getcl(gls, i, i)) for i in range(n))
+    variances = (transformcl.cltovar(getcl(gls, i, i)) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):

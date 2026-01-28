@@ -8,12 +8,12 @@
 # -- Project information -----------------------------------------------------
 
 import datetime
-from importlib import metadata
+import importlib
 
 project = "GLASS"
 author = "GLASS developers"
 copyright = f"2022-{datetime.date.today().year} {author}"  # noqa: A001, DTZ011
-version = metadata.version("glass")
+version = importlib.metadata.version("glass")
 release = version
 
 

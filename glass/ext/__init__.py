@@ -7,7 +7,7 @@ packages that provide a "glass" module.
 """
 
 import os.path
-from pkgutil import extend_path
+import pkgutil
 
 
 def _extend_path(path: list[str], name: str) -> list[str]:
@@ -31,7 +31,7 @@ def _extend_path(path: list[str], name: str) -> list[str]:
     return list(
         filter(
             os.path.isdir,
-            (os.path.join(p, _mod) for p in extend_path(path, _pkg)),  # noqa: PTH118
+            (os.path.join(p, _mod) for p in pkgutil.extend_path(path, _pkg)),  # noqa: PTH118
         ),
     )
 
