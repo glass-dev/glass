@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import math
 from typing import TYPE_CHECKING
 
@@ -16,11 +15,6 @@ if TYPE_CHECKING:
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
     from tests.fixtures.helper_classes import Compare
-
-
-HAVE_NUMPY = importlib.util.find_spec("numpy") is not None
-HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
-HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 def test_from_convergence(
