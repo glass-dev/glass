@@ -435,15 +435,11 @@ class MultiPlaneConvergence:
 
     def __array_namespace__(self, **kwargs: Any) -> ModuleType:  # noqa: ANN401
         """
-        Return the array backend of this RadialWindow's type bound values.
+        Return the array backend of this MultiPlaneConvergence's type bound values.
 
-        This method allows the passing of a RadialWindow into the method
-        array_api_compat.array_namespace::
-
-            >>> mpc: MultiPlaneConvergence
-            ... Do something to setup mpc using numpy
-            >>> array_api_compat.array_namespace(mpc, use_compat=False)
-            <module 'numpy' from '/path/to/numpy/__init__.py'>
+        This method allows the passing of a MultiPlaneConvergence into the method
+        array_api_compat.array_namespace such that the array backend of its
+        type-bound parameters (delta3, etc) is returned.
 
         """
         return array_api_compat.array_namespace(  # type: ignore[no-any-return]
