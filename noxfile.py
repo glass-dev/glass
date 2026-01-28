@@ -42,7 +42,8 @@ def _check_revision_count(
     *,
     expected_count: int,
 ) -> None:
-    """Check that the correct number of revisions have been provided.
+    """
+    Check that the correct number of revisions have been provided.
 
     Parameters
     ----------
@@ -57,6 +58,7 @@ def _check_revision_count(
         If no revisions are provided.
     ValueError
         If the number of provided revisions does not match the expected count.
+
     """
     if not session_posargs:
         msg = f"{expected_count} revision(s) not provided"
@@ -216,6 +218,7 @@ def version(session: nox.Session) -> None:
     The intent of this check is to ensure that the package
     is installed without any additional dependencies
     through optional dependencies nor dependency groups.
+
     """
     session.run("python", "-c", "import glass; print(glass.__version__)")
 
@@ -229,6 +232,7 @@ def benchmarks(session: nox.Session) -> None:
     Run the benchmark test for a specific revision.
 
     Note it is not possible to pass extra options to pytest.
+
     """
     _check_revision_count(session.posargs, expected_count=1)
     revision = session.posargs[0]
@@ -247,6 +251,7 @@ def regression_tests(session: nox.Session) -> None:
     Run regression benchmark tests between two revisions.
 
     Note it is not possible to pass extra options to pytest.
+
     """
     _check_revision_count(session.posargs, expected_count=2)
     before_revision, after_revision = session.posargs

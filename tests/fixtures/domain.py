@@ -45,6 +45,7 @@ def cosmo() -> Cosmology:  # noqa: D103
             Dimensionless transverse comoving distance.
 
             :math:`x_M(z) = d_M(z)/d_H`
+
             """
             if z2 is None:
                 return np.asarray(z) * 1_000
