@@ -45,11 +45,11 @@ from typing import TYPE_CHECKING, Any
 import array_api_compat
 import array_api_extra as xpx
 
-import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
 import glass.shells
 from glass import _rng
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -102,9 +102,6 @@ def effective_bias(
         \;.
 
     """
-    xp = array_api_compat.array_namespace(z, bz, w.za, w.wa, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
-
     norm = uxpx.trapezoid(w.wa, w.za)
     return glass.arraytools.trapezoid_product((z, bz), (w.za, w.wa)) / norm
 
@@ -376,7 +373,6 @@ def uniform_positions(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(ngal, use_compat=False)
-    uxpx = _utils.XPAdditions(xp)
 
     # get default RNG if not given
     if rng is None:
@@ -391,7 +387,7 @@ def uniform_positions(
     dims = ngal_sphere.shape
 
     # sample each set of points
-    for k in uxpx.ndindex(dims):
+    for k in uxpx.ndindex(dims, xp=xp):
         size = (ngal_sphere[k],)
         # sample uniformly over the sphere
         lon = rng.uniform(-180, 180, size=size)
@@ -514,7 +510,7 @@ def displace(
 
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - d / math.pi * 180, tp / math.pi * 180
+    return lon + d / math.pi * 180, tp / math.pi * 180
 
 
 def displacement(
@@ -532,9 +528,13 @@ def displacement(
 
     Parameters
     ----------
-    from_lon, from_lat
+    from_lon
         Points before displacement.
-    to_lon, to_lat
+    from_lat
+        Points before displacement.
+    to_lon
+        Points after displacement.
+    to_lat
         Points after displacement.
 
     Returns
@@ -554,16 +554,14 @@ def displacement(
         use_compat=False,
     )
 
-    a = (90.0 - to_lat) / 180 * math.pi
-    b = (90.0 - from_lat) / 180 * math.pi
-    g = (from_lon - to_lon) / 180 * math.pi
+    a = uxpx.radians(from_lat)
+    b = uxpx.radians(to_lat)
+    g = uxpx.radians(to_lon - from_lon)
 
     sa, ca = xp.sin(a), xp.cos(a)
     sb, cb = xp.sin(b), xp.cos(b)
     sg, cg = xp.sin(g), xp.cos(g)
 
-    r = xp.atan2(xp.hypot(sa * cb - ca * sb * cg, sb * sg), ca * cb + sa * sb * cg)
-    x = sb * ca - cb * sa * cg
-    y = sa * sg
-    z = xp.hypot(x, y)
-    return r * (x / z + 1j * y / z)
+    r = xp.atan2(xp.hypot(cb * sg, ca * sb - sa * cb * cg), sa * sb + ca * cb * cg)
+    x = xp.atan2(cb * sg, ca * sb - sa * cb * cg)
+    return r * xp.exp(1j * x)
