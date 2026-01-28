@@ -57,6 +57,7 @@ def _check_revision_count(
         If no revisions are provided.
     ValueError
         If the number of provided revisions does not match the expected count.
+
     """
     if not session_posargs:
         msg = f"{expected_count} revision(s) not provided"

@@ -12,7 +12,9 @@ import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
+    from typing import Any
 
     from pytest_mock import MockerFixture
 
@@ -100,6 +102,148 @@ def test_loglinear_bias(
         glass.loglinear_bias(delta, b),
         xp.expm1(b * xp.log1p(delta)),
     )
+
+
+def test_broadcast_inputs(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    bias_in = 0.8
+    delta_in = xp.zeros((3, 1, 12))
+    ngal_in = xp.asarray([1e-3, 2e-3])
+    vis_in = xp.repeat(xp.asarray([0.0, 1.0]), 6)
+
+    bias, delta, dims, ngal, vis = glass.points._broadcast_inputs(
+        bias_in,
+        delta_in,
+        ngal_in,
+        vis_in,
+    )
+
+    assert dims == (3, 2)
+    assert bias.shape == dims  # type: ignore[union-attr]
+    assert xp.all(bias == bias_in)
+    compare.assert_array_equal(delta, xp.zeros_like(delta))
+    assert ngal.shape == dims  # type: ignore[union-attr]
+    compare.assert_array_equal(ngal[0, :], ngal_in)  # type: ignore[index]
+    assert vis.shape == delta.shape  # type: ignore[union-attr]
+    compare.assert_array_equal(vis[0, 0, :], vis_in)  # type: ignore[index]
+
+
+@pytest.mark.parametrize(
+    "bias_model",
+    [
+        glass.linear_bias,
+        glass.loglinear_bias,
+    ],
+)
+def test_compute_density_contrast(
+    bias_model: Callable[..., Any],
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    bias = 0.8 * xp.ones((3, 2))
+    bias_model = glass.linear_bias
+    delta = xp.zeros((3, 2, 12))
+    k = (1, 1)
+
+    n = glass.points._compute_density_contrast(
+        bias,
+        bias_model,
+        delta,
+        k,
+    )
+
+    assert n.shape[0] == delta.shape[-1]
+    compare.assert_array_equal(n, xp.zeros_like(n))
+
+
+@pytest.mark.parametrize("remove_monopole", [False, True])
+def test_compute_expected_count(
+    xp: ModuleType,
+    *,
+    remove_monopole: bool,
+) -> None:
+    k = (1, 1)
+    n_in = xp.zeros(12)
+    ngal = xp.tile(xp.asarray([1e-3, 2e-3]), (3, 1))
+
+    n = glass.points._compute_expected_count(
+        k,
+        n_in,
+        ngal,
+        remove_monopole=remove_monopole,
+    )
+
+    assert n.shape == n_in.shape
+    assert xp.all(n == n[0])
+
+
+def test_apply_visibility(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    k = (1, 1)
+    n_in = 24751.77674965 * xp.ones(12)
+    vis = xp.tile(xp.repeat(xp.asarray([0.0, 1.0]), 6), (3, 2, 1))
+
+    n = glass.points._apply_visibility(
+        k,
+        xp.asarray(n_in, copy=True),
+        vis,
+    )
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_array_equal(n[6:], n_in[6:])
+
+
+def test_sample_number_galaxies(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
+
+    n = glass.points._sample_number_galaxies(n_in)
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_allclose(n[6:], n_in[6:], atol=250)
+
+
+def test_sample_number_galaxies_rng(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
+
+    n = glass.points._sample_number_galaxies(n_in, rng=urng)
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_allclose(n[6:], n_in[6:], atol=250)
+
+
+def test_sample_galaxies_per_pixel(
+    data_transformer: DataTransformer,
+    xp: ModuleType,
+) -> None:
+    batch = 1000000
+    dims = (3, 2)
+    k = (1, 1)
+    n = xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
+
+    lon, lat, count = data_transformer.catpos(
+        glass.points._sample_galaxies_per_pixel(batch, dims, k, n),
+        xp=xp,
+    )
+
+    assert count.shape == dims
+    assert count[k] == lon.shape[0]
+    assert count[k] == lat.shape[0]
+    assert tuple(int(i[0]) for i in xp.nonzero(count)) == k
+    assert xp.min(lon) >= 0
+    assert xp.max(lon) < 360
+    assert xp.min(lat) >= -90
+    assert xp.max(lat) <= 90
 
 
 def test_positions_from_delta(  # noqa: PLR0915

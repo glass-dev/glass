@@ -34,6 +34,7 @@ class CompatibleBackendNotFoundError(Exception):
     """
     Exception raised when an array library backend that
     implements a requested function, is not found.
+
     """
 
     def __init__(self, missing_backend: str, users_backend: str | None) -> None:
@@ -68,6 +69,7 @@ def import_numpy(backend: str | None = None) -> ModuleType:
     -----
     This is useful for explaining to the user why NumPy is required when their chosen
     backend does not implement a needed function.
+
     """
     try:
         import numpy  # noqa: ICN001, PLC0415
@@ -93,6 +95,7 @@ class xp_additions:  # noqa: N801
 
     This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
     for details.
+
     """
 
     @staticmethod
