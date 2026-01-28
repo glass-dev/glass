@@ -279,6 +279,16 @@ uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 
 ## Failure of the `Regression tests / Regression test` Workflow
 
+<!-- prettier-ignore -->
+> [!NOTE]
+> There are two types of benchmark tests in _GLASS_: `stable` and `unstable`.
+> These are marked using the `@pytest.mark.stable` and `@pytest.mark.unstable`
+> decorators respectively. The stable benchmarks are expected to have minimal
+> variance in their results across different runs, and are therefore measured in
+> percentage change during regression tests. The unstable benchmarks may have
+> higher variance, and are therefore measured in absolute time change during
+> regression tests.
+
 The regression tests are run in GitHub Actions for every pull request to ensure
 that new changes do not degrade the performances of _GLASS_. This workflow uses
 the `nox` command detailed above comparing the head of the current pull request
