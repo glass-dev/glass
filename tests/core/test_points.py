@@ -208,6 +208,7 @@ def test_sample_number_galaxies(
     compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
     compare.assert_allclose(n[6:], n_in[6:], atol=250)
 
+
 def test_sample_number_galaxies_rng(
     compare: type[Compare],
     urng: UnifiedGenerator,
