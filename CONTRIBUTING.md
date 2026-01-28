@@ -321,10 +321,10 @@ merging the pull request.
 <!-- prettier-ignore -->
 > [!WARNING]
 > A pull request that introduces a change such as the creation of a new module
-> or a change to the name of an existing module may cause the regression workflow to
-> fail because the new module wouldn't exist in `main`. Extra caution should be
-> taken in this case. It is recommended to run the benchmark tests manually and
-> look at the table of values.
+> or a change to the name of an existing module may cause the regression
+> workflow to fail because the new module wouldn't exist in `main`. Extra
+> caution should be taken in this case. It is recommended to run the benchmark
+> tests manually and look at the table of values.
 
 ## Contributing workflow
 
