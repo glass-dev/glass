@@ -172,9 +172,10 @@ def iternorm(
             raise ValueError(msg)
         s = np.sqrt(s)
 
-        # yield the next index, vector a, and standard deviation s
-        # converting back to the input array namespace.
+        # Extract input array backend or conversion of outputs
         xp = x.__array_namespace__()
+
+        # yield the next index, vector a, and standard deviation s
         yield j, xp.asarray(a), xp.asarray(s)
 
 
