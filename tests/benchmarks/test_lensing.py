@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    cosmob: Cosmology,
+    cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
@@ -35,7 +35,7 @@ def test_multi_plane_matrix(
         )
         for i in range(1_000)
     ]
-    mat = glass.multi_plane_matrix(shells, cosmob)
+    mat = glass.multi_plane_matrix(shells, cosmo)
     deltas = urngb.random((len(shells), 10))
 
     compare.assert_array_equal(mat, xpb.tril(mat))
@@ -50,7 +50,7 @@ def test_multi_plane_matrix(
         dict[Never, Never],
     ]:
         """Run setup a generator with zip before each benchmark run."""
-        convergence = glass.MultiPlaneConvergence(cosmob)
+        convergence = glass.MultiPlaneConvergence(cosmo)
         return (convergence, shells, deltas), {}
 
     def multi_plane_matrix_add_window(
@@ -80,7 +80,7 @@ def test_multi_plane_matrix(
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
     compare: type[Compare],
-    cosmob: Cosmology,
+    cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
@@ -101,7 +101,7 @@ def test_multi_plane_weights(
     deltas = urngb.random((len(shells), 10))
     weights = urngb.random((len(shells), 3))
 
-    w_out = glass.multi_plane_weights(w_in, shells, cosmob)
+    w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
     compare.assert_array_equal(w_out, xpb.triu(w_out, 1))
     compare.assert_array_equal(xpb.tril(w_out), 0)
@@ -114,7 +114,7 @@ def test_multi_plane_weights(
         dict[Never, Never],
     ]:
         """Run setup a generator with zip before each benchmark run."""
-        convergence = glass.MultiPlaneConvergence(cosmob)
+        convergence = glass.MultiPlaneConvergence(cosmo)
         return (convergence, zip(shells, deltas, weights, strict=False)), {}
 
     def multi_plane_weights_add_window(
