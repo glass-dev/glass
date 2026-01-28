@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import itertools
 import math
 import warnings
 from collections.abc import Sequence
@@ -124,10 +123,6 @@ def iternorm(
         If the covariance matrix is not positive definite.
 
     """
-    # Convert to list here to allow determining the namespace
-    first = next(cov)  # type: ignore[call-overload]
-    xp = first.__array_namespace__()
-
     n = (size,) if isinstance(size, int) else size
 
     m = np.zeros((*n, k, k))
@@ -137,13 +132,15 @@ def iternorm(
     j = 0 if k > 0 else None
 
     # We must use cov_expanded here as cov has been consumed to determine the namespace
-    for i, x in enumerate(itertools.chain([first], cov)):
-        x = np.asarray(x)  # noqa: PLW2901
-        if x.shape != q:
+    for i, x in enumerate(cov):
+        x_np = np.asarray(x)
+        if x_np.shape != q:
             try:
-                x = np.broadcast_to(x, q)  # noqa: PLW2901
+                x_np = np.broadcast_to(x_np, q)
             except ValueError:
-                msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
+                msg = (
+                    f"covariance row {i}: shape {x_np.shape} cannot be broadcast to {q}"
+                )
                 raise TypeError(msg) from None
 
         # only need to update matrix A if there are correlations
@@ -160,7 +157,7 @@ def iternorm(
             )
 
             # compute new vector a
-            c = x[..., 1:, np.newaxis]
+            c = x_np[..., 1:, np.newaxis]
             a = np.matmul(m[..., :j], c[..., k - j :, :])
             a += np.matmul(m[..., j:], c[..., : k - j, :])
             a = np.reshape(a, (*n, k))
@@ -169,13 +166,15 @@ def iternorm(
             j = (j - 1) % k
 
         # compute new standard deviation
-        s = x[..., 0] - np.einsum("...i,...i", a, a)
+        s = x_np[..., 0] - np.einsum("...i,...i", a, a)
         if np.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
         s = np.sqrt(s)
 
         # yield the next index, vector a, and standard deviation s
+        # converting back to the input array namespace.
+        xp = x.__array_namespace__()
         yield j, xp.asarray(a), xp.asarray(s)
 
 
