@@ -562,7 +562,7 @@ class MultiPlaneConvergence:
         t = xp.asarray(t)
         self.kappa3 *= 1 - t
         self.kappa3 += t * self.kappa2
-        self.kappa3 += xp.asarray(f * delta2)
+        self.kappa3 += xp.asarray(f) * delta2
 
     @property
     def zsrc(self) -> float | FloatArray:
