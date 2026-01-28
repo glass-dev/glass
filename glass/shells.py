@@ -62,7 +62,6 @@ from glass._array_api_utils import xp_additions as uxpx
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from types import ModuleType
-    from typing import Any
 
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
@@ -216,7 +215,7 @@ class RadialWindow:
     wa: FloatArray
     zeff: float = math.nan
 
-    def __array_namespace__(self, **kwargs: Any) -> ModuleType:  # noqa: ANN401
+    def __array_namespace__(self, **kwargs: str | None) -> ModuleType:
         """
         Return the array backend of this RadialWindow's type bound values.
 

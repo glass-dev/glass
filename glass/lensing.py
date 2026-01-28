@@ -44,7 +44,6 @@ from glass._array_api_utils import xp_additions as uxpx
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
-    from typing import Any
 
     from glass._types import AnyArray, ComplexArray, FloatArray
     from glass.cosmology import Cosmology
@@ -433,7 +432,7 @@ class MultiPlaneConvergence:
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
 
-    def __array_namespace__(self, **kwargs: Any) -> ModuleType:  # noqa: ANN401
+    def __array_namespace__(self, **kwargs: str | None) -> ModuleType:
         """
         Return the array backend of this MultiPlaneConvergence's type bound values.
 
