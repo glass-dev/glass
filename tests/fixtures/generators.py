@@ -21,6 +21,7 @@ def rng() -> np.random.Generator:
     RNG fixture for non array API tests.
 
     Use `urng` for array API tests.
+
     """
     return np.random.default_rng(seed=_rng.SEED)
 
@@ -33,6 +34,7 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
     Access the relevant RNG using `urng.` in tests.
 
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
+
     """
     return _rng.rng_dispatcher(xp=xp)
 
@@ -45,5 +47,6 @@ def urngb(xpb: ModuleType) -> UnifiedGenerator:
     Access the relevant RNG using `urngb.` in tests.
 
     Must be used with the `xpb` fixture.
+
     """
     return _rng.rng_dispatcher(xp=xpb)

@@ -22,6 +22,7 @@ class Compare:
     This class wraps numpy testing functions to provide a consistent interface
     for comparing arrays in tests. Ultimately, it would be great if we can
     make the array testing backend-agnostic.
+
     """
 
     @staticmethod
@@ -123,6 +124,7 @@ class GeneratorConsumer:
 
         The resulting generator will be consumed an any ValueError
         exceptions swallowed.
+
         """
         output: list[Any] = []
         try:

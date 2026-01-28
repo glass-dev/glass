@@ -38,6 +38,7 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     ------
     NotImplementedError
         If the array backend is not supported.
+
     """
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
@@ -60,6 +61,7 @@ class Generator:
 
     This class wraps NumPy's random number generator and returns arrays compatible
     with array_api_strict.
+
     """
 
     __slots__ = ("ap", "np", "rng")

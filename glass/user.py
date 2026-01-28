@@ -87,6 +87,7 @@ class _FitsWriter:
     Writer that creates a FITS file.
 
     Initialised with the fits object and extension name.
+
     """
 
     def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
