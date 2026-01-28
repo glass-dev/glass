@@ -286,7 +286,7 @@ to the `main` branch. The benchmark tests are first run over the `main` branch,
 followed by the head of the pull request. If there is any statistically
 significant regression in performance, the workflow fails with the error
 `pytest_benchmark.session.PerformanceRegression: Performance has regressed`. One
-must scroll through the logs to find a line similar to the following to find out
+must scroll through the logs to find lines similar to the following to find out
 which benchmark(s) caused the regression:
 
 ```rst
@@ -301,7 +301,7 @@ This indicates that the benchmark `test_displacement` using the NumPy array
 backend has regressed by approximately 36.73% compared to the previous version.
 Effort has been made to reduce the number of false positives in these regression
 tests, however some still occur. It is worth checking if the given function
-(i.e. `glass.displacement`) has actually been hit by changed in the given pull
+(i.e. `glass.displacement`) has actually been hit by changes in the given pull
 request (whether directly or indirectly). If not, the regression can be ignored
 and merged. Sometimes this can be fixed by manually re-running the workflow. If
 the regression is genuine, the workflow should repeatedly fail. Regressions can
@@ -311,7 +311,7 @@ merging the pull request.
 <!-- prettier-ignore -->
 > [!WARNING]
 > A pull request that introduces a change such as the creation of a new module
-> or changes the name of an existing module may cause the regression workflow to
+> or a change to the name of an existing module may cause the regression workflow to
 > fail because the new module wouldn't exist in `main`. Extra caution should be
 > taken in this case. It is recommended to run the benchmark tests manually and
 > look at the table of values.
