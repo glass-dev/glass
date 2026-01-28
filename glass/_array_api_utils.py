@@ -6,7 +6,7 @@ This module provides utility functions and classes for working with multiple arr
 backends in the glass project, including NumPy, JAX, and array-api-strict. It includes
 functions for importing backends, determining array namespaces, dispatching random
 number generators, and providing missing functionality for array-api-strict through the
-XPAdditions class.
+xp_additions class.
 
 Classes and functions in this module help ensure consistent behavior and compatibility
 across different array libraries, and provide wrappers for common operations such as

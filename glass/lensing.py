@@ -36,6 +36,7 @@ from typing import TYPE_CHECKING, Literal, overload
 import numpy as np
 
 import array_api_compat
+import array_api_extra as xpx
 
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
@@ -44,7 +45,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    from glass._types import ComplexArray, FloatArray
+    from glass._types import AnyArray, ComplexArray, FloatArray
     from glass.cosmology import Cosmology
     from glass.shells import RadialWindow
 
@@ -269,6 +270,8 @@ def from_convergence(  # noqa: PLR0913
         = \sqrt{(l+2) \, (l+1) \, l \, (l-1)} \, \psi_{lm} \;.
 
     """
+    xp = kappa.__array_namespace__()
+
     # no output means no computation, return empty tuple
     if not (potential or deflection or shear):
         return ()
@@ -281,15 +284,21 @@ def from_convergence(  # noqa: PLR0913
     # compute alm
     alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
-    # mode number; all conversions are factors of this
-    ell = np.arange(lmax + 1)
+    # mode number; all conversions are factors of this.
+    # Must be float to allow division later
+    ell = xp.arange(lmax + 1, dtype=xp.float64)
 
     # this tuple will be returned
     results: tuple[FloatArray | ComplexArray, ...] = ()
 
     # convert convergence to potential
-    fl = np.divide(-2, ell * (ell + 1), where=(ell > 0), out=np.zeros(lmax + 1))
-    hp.almxfl(alm, fl, inplace=True)
+    fl = xpx.apply_where(
+        ell > 0,
+        ell,
+        lambda a: xp.divide(-2.0, a * (a + 1)),
+        fill_value=0,
+    )
+    alm = hp.almxfl(alm, fl)
 
     # if potential is requested, compute map and add to output
     if potential:
@@ -301,12 +310,12 @@ def from_convergence(  # noqa: PLR0913
         return results
 
     # zero B-modes for spin-weighted maps
-    blm = np.zeros_like(alm)
+    blm = xp.zeros_like(alm)
 
     # compute deflection alms in place
-    fl = np.sqrt(ell * (ell + 1))
+    fl = xp.sqrt(ell * (ell + 1))
     # missing spin-1 pixel window function here
-    hp.almxfl(alm, fl, inplace=True)
+    alm = hp.almxfl(alm, fl)
 
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
@@ -320,12 +329,17 @@ def from_convergence(  # noqa: PLR0913
 
     # compute shear alms in place
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
-    fl = np.sqrt((ell - 1) * (ell + 2), where=(ell > 0), out=np.zeros(lmax + 1))
+    fl = xpx.apply_where(
+        ell > 0,
+        ell,
+        lambda a: xp.sqrt((a - 1) * (a + 2)),
+        fill_value=0,
+    )
     fl /= 2
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=xp)
         fl *= pw2 / pw0
-    hp.almxfl(alm, fl, inplace=True)
+    alm = hp.almxfl(alm, fl)
 
     # transform to shear maps
     gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
@@ -414,9 +428,42 @@ class MultiPlaneConvergence:
         self.x3: float = 0.0
         self.w3: float = 0.0
         self.r23: float = 1.0
-        self.delta3: FloatArray = np.asarray(0.0)
+        self.delta3: FloatArray | None = None
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
+
+    def __array_namespace__(self, **kwargs: str | None) -> ModuleType:
+        """
+        Return the array backend of this MultiPlaneConvergence's type bound values.
+
+        This method allows the passing of a MultiPlaneConvergence into the method
+        array_api_compat.array_namespace such that the array backend of its
+        type-bound parameters (delta3, etc) is returned.
+
+        """
+        return array_api_compat.array_namespace(  # type: ignore[no-any-return]
+            self.delta3,
+            self.kappa2,
+            self.kappa3,
+            self.z2,
+            self.z3,
+            use_compat=False,
+        )
+
+    def _initialise_inputs(self, *arrays: AnyArray) -> None:
+        """
+        Sets the default value of delta3 once the array backend is
+        known from inputs.
+
+        Parameters
+        ----------
+        arrays
+            A squence of arrays from which the array backend should be determined
+
+        """
+        if self.delta3 is None:
+            xp = array_api_compat.array_namespace(*arrays, use_compat=False)
+            self.delta3 = xp.asarray(0.0)
 
     def add_window(self, delta: FloatArray, w: RadialWindow) -> None:
         """
@@ -433,8 +480,10 @@ class MultiPlaneConvergence:
             The window function.
 
         """
+        self._initialise_inputs(delta)
+
         zsrc = w.zeff
-        lens_weight = float(np.trapezoid(w.wa, w.za) / np.interp(zsrc, w.za, w.wa))
+        lens_weight = float(uxpx.trapezoid(w.wa, w.za) / uxpx.interp(zsrc, w.za, w.wa))
 
         self.add_plane(delta, zsrc, lens_weight)
 
@@ -462,6 +511,10 @@ class MultiPlaneConvergence:
             If the source redshift is not increasing.
 
         """
+        self._initialise_inputs(delta, zsrc)
+
+        xp = array_api_compat.array_namespace(delta, self, zsrc, use_compat=False)
+
         if zsrc <= self.z3:
             msg = "source redshift must be increasing"
             raise ValueError(msg)
@@ -496,8 +549,8 @@ class MultiPlaneConvergence:
 
         # create kappa planes on first iteration
         if self.kappa2 is None:
-            self.kappa2 = np.zeros_like(delta)
-            self.kappa3 = np.zeros_like(delta)
+            self.kappa2 = xp.zeros_like(delta)
+            self.kappa3 = xp.zeros_like(delta)
 
         # cycle convergence planes
         # normally: kappa1, kappa2, kappa3 = kappa2, kappa3, <empty>
@@ -506,9 +559,10 @@ class MultiPlaneConvergence:
         self.kappa2, self.kappa3 = self.kappa3, self.kappa2
 
         # compute next convergence plane in place of last
+        t = xp.asarray(t)
         self.kappa3 *= 1 - t
         self.kappa3 += t * self.kappa2
-        self.kappa3 += f * delta2
+        self.kappa3 += xp.asarray(f) * delta2
 
     @property
     def zsrc(self) -> float | FloatArray:
@@ -550,11 +604,13 @@ def multi_plane_matrix(
         The matrix of lensing contributions.
 
     """
+    xp = array_api_compat.array_namespace(*shells, use_compat=False)
+
     mpc = MultiPlaneConvergence(cosmo)
-    wmat = np.eye(len(shells))
+    wmat = xp.eye(len(shells))
     for i, w in enumerate(shells):
-        mpc.add_window(wmat[i].copy(), w)
-        wmat[i, :] = mpc.kappa
+        mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)
+        wmat = xpx.at(wmat)[i, :].set(mpc.kappa)
     return wmat
 
 
@@ -593,16 +649,18 @@ def multi_plane_weights(
         If the shape of *weights* does not match the number of shells.
 
     """
+    xp = array_api_compat.array_namespace(weights, *shells, use_compat=False)
+
     # ensure shape of weights ends with the number of shells
     shape = weights.shape
     if not shape or shape[0] != len(shells):
         msg = "shape mismatch between weights and shells"
         raise ValueError(msg)
     # normalise weights
-    weights = weights / np.sum(weights, axis=0)
+    weights = weights / xp.sum(weights, axis=0)
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
-    return np.matmul(mat.T, weights)
+    return xp.matmul(mat.T, weights)
 
 
 def deflect(

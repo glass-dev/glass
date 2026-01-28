@@ -92,9 +92,9 @@ def vmap_galactic_ecliptic(
 
     m = xp.ones(hp.nside2npix(nside))
     m *= 1 - hp.query_strip(nside, galactic, dtype=xp.float64, xp=xp)
-    m = hp.Rotator(coord="GC", xp=xp).rotate_map_pixel(m)
+    m = hp.Rotator(coord="GC").rotate_map_pixel(m)
     m *= 1 - hp.query_strip(nside, ecliptic, dtype=xp.float64, xp=xp)
-    return hp.Rotator(coord="CE", xp=xp).rotate_map_pixel(m)
+    return hp.Rotator(coord="CE").rotate_map_pixel(m)
 
 
 def gaussian_nz(
