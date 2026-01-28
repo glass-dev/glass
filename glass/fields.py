@@ -593,7 +593,7 @@ def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
     xp = _utils.default_xp() if xp is None else xp
 
     i, j = uxpx.tril_indices(n, xp=xp)
-    return xp.asarray([i, i - j]).T
+    return xp.stack([i, i - j]).T
 
 
 def effective_cls(

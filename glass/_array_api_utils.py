@@ -599,7 +599,7 @@ class xp_additions:  # noqa: N801
         Returns
         -------
             The row and column indices, respectively. The row indices are sorted in
-            non-decreasing order, and the correspdonding column indices are strictly
+            non-decreasing order, and the corresponding column indices are strictly
             increasing for each row.
         """
         if xp.__name__ in {"numpy", "jax.numpy"}:
@@ -607,7 +607,7 @@ class xp_additions:  # noqa: N801
 
         if xp.__name__ == "array_api_strict":
             np = import_numpy(xp.__name__)
-            return np.tril_indices(n, k=k, m=m)  # type: ignore[no-any-return]
+            return tuple(xp.asarray(arr) for arr in np.tril_indices(n, k=k, m=m))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
