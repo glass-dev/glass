@@ -80,10 +80,16 @@ def solve(  # noqa: PLR0912, PLR0913
     :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
+    xp = cl.__array_namespace__()
+
+    # This function is difficult to port to the Array API so for now we work
+    # in NumPy and ultimately convert back at the end of it.
+    cl = np.asarray(cl)
+
     if t2 is None:
         t2 = t1
 
-    n = len(cl)  # type: ignore[arg-type]
+    n = len(cl)
     if pad < 0:
         msg = "pad must be a positive integer"
         raise ValueError(msg)
@@ -138,4 +144,4 @@ def solve(  # noqa: PLR0912, PLR0913
 
         gl, gt, rl, fl, clerr = gl_, gt_, rl_, fl_, clerr_
 
-    return gl, rl, info
+    return xp.asarray(gl), xp.asarray(rl), info

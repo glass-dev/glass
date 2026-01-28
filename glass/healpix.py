@@ -319,7 +319,7 @@ def pixwin(
     lmax: int | None = None,
     pol: bool = False,
     xp: ModuleType | None = None,
-) -> tuple[FloatArray, ...]:
+) -> FloatArray | tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
 
