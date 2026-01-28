@@ -461,8 +461,9 @@ class MultiPlaneConvergence:
             A squence of arrays from which the array backend should be determined
 
         """
-        xp = array_api_compat.array_namespace(*arrays, use_compat=False)
-        self.delta3 = xp.asarray(0.0) if self.delta3 is None else self.delta3
+        if self.delta3 is None:
+            xp = array_api_compat.array_namespace(*arrays, use_compat=False)
+            self.delta3 = xp.asarray(0.0)
 
     def add_window(self, delta: FloatArray, w: RadialWindow) -> None:
         """
