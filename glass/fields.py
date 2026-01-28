@@ -388,8 +388,8 @@ def _generate_grf(
     cov = cls2cov(gls, n, ngrf, ncorr)
 
     # working arrays for the iterative sampling
-    z = xp.zeros(n * (n + 1) // 2, dtype=xp.complex128)
-    y = xp.zeros((n * (n + 1) // 2, ncorr), dtype=xp.complex128)
+    z_size = n * (n + 1) // 2
+    y = xp.zeros((z_size, ncorr), dtype=xp.complex128)
 
     # generate the conditional normal distribution for iterative sampling
     conditional_dist = iternorm(ncorr, cov, size=n)
@@ -398,7 +398,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal((n * (n + 1),)) + (1j * rng.standard_normal((n * (n + 1),)))
+        z = rng.standard_normal((z_size,)) + (1j * rng.standard_normal((z_size,)))
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
