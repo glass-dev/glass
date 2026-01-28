@@ -225,7 +225,7 @@ class RadialWindow:
 
             >>> import numpy as np
             >>> rw = RadialWindow(np.zeros(10), np.zeros(10), 10)
-            >>> array_api_compat.array_namespace(rw, use_compat=False)
+            >>> rw.__array_namespace__()
             <module 'numpy' from '/path/to/numpy/__init__.py'>
 
         """

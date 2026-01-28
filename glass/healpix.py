@@ -460,7 +460,7 @@ class Rotator:
             Map in the new reference frame
 
         """
-        xp = array_api_compat.array_namespace(m, use_compat=False)
+        xp = m.__array_namespace__()
 
         return xp.asarray(
             healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m)),
