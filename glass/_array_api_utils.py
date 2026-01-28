@@ -601,6 +601,7 @@ class xp_additions:  # noqa: N801
             The row and column indices, respectively. The row indices are sorted in
             non-decreasing order, and the corresponding column indices are strictly
             increasing for each row.
+
         """
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.tril_indices(n, k=k, m=m)  # type: ignore[no-any-return]
