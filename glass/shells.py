@@ -219,8 +219,8 @@ class RadialWindow:
         """
         Return the array backend of this RadialWindow's type bound values.
 
-        This method allows the passing of a RadialWindow into the method
-        array_api_compat.array_namespace::
+        This method makes it possible to find the array backend of
+        the ``RadialWindow`` class through the following:
 
             >>> import numpy as np
             >>> rw = RadialWindow(np.zeros(10), np.zeros(10), 10)
