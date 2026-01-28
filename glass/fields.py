@@ -832,7 +832,7 @@ def generate(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Iterator[AnyArray]:
     """
     Sample random fields from Gaussian angular power spectra.
@@ -871,14 +871,12 @@ def generate(
         Sampled random fields.
 
     """
-    xp = array_api_compat.array_namespace(*gls, use_compat=False)
-
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
-    variances = (xp.asarray(cltovar(np.asarray(getcl(gls, i, i)))) for i in range(n))
+    variances = (cltovar(np.asarray(getcl(gls, i, i))) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
