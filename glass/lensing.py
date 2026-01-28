@@ -450,7 +450,7 @@ class MultiPlaneConvergence:
             use_compat=False,
         )
 
-    def __post_init__(self, *arrays: AnyArray) -> None:
+    def _initialise_inputs(self, *arrays: AnyArray) -> None:
         """
         Sets the default value of delta3 once the array backend is
         known from inputs.
@@ -479,7 +479,7 @@ class MultiPlaneConvergence:
             The window function.
 
         """
-        self.__post_init__(delta)
+        self._initialise_inputs(delta)
 
         zsrc = w.zeff
         lens_weight = float(uxpx.trapezoid(w.wa, w.za) / uxpx.interp(zsrc, w.za, w.wa))
@@ -510,7 +510,7 @@ class MultiPlaneConvergence:
             If the source redshift is not increasing.
 
         """
-        self.__post_init__(delta, zsrc)
+        self._initialise_inputs(delta, zsrc)
 
         xp = array_api_compat.array_namespace(delta, self, zsrc, use_compat=False)
 
