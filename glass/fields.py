@@ -875,6 +875,7 @@ def generate(
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
+    # cltovar requires numpy but getcl maintains xp, so conversion is required
     variances = (cltovar(np.asarray(getcl(gls, i, i))) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
