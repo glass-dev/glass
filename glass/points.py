@@ -714,7 +714,7 @@ def displace(
 
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - d / math.pi * 180, tp / math.pi * 180
+    return lon + d / math.pi * 180, tp / math.pi * 180
 
 
 def displacement(
@@ -732,9 +732,13 @@ def displacement(
 
     Parameters
     ----------
-    from_lon, from_lat
+    from_lon
         Points before displacement.
-    to_lon, to_lat
+    from_lat
+        Points before displacement.
+    to_lon
+        Points after displacement.
+    to_lat
         Points after displacement.
 
     Returns
@@ -754,16 +758,14 @@ def displacement(
         use_compat=False,
     )
 
-    a = (90.0 - to_lat) / 180 * math.pi
-    b = (90.0 - from_lat) / 180 * math.pi
-    g = (from_lon - to_lon) / 180 * math.pi
+    a = uxpx.radians(from_lat)
+    b = uxpx.radians(to_lat)
+    g = uxpx.radians(to_lon - from_lon)
 
     sa, ca = xp.sin(a), xp.cos(a)
     sb, cb = xp.sin(b), xp.cos(b)
     sg, cg = xp.sin(g), xp.cos(g)
 
-    r = xp.atan2(xp.hypot(sa * cb - ca * sb * cg, sb * sg), ca * cb + sa * sb * cg)
-    x = sb * ca - cb * sa * cg
-    y = sa * sg
-    z = xp.hypot(x, y)
-    return r * (x / z + 1j * y / z)
+    r = xp.atan2(xp.hypot(cb * sg, ca * sb - sa * cb * cg), sa * sb + ca * cb * cg)
+    x = xp.atan2(cb * sg, ca * sb - sa * cb * cg)
+    return r * xp.exp(1j * x)

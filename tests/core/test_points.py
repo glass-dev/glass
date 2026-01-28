@@ -9,7 +9,7 @@ import array_api_extra as xpx
 
 import glass
 import glass.healpix as hp
-import glass.points
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -500,11 +500,11 @@ def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray(1j * r))
-    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-1j * r))
-    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
 
 def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
@@ -526,11 +526,11 @@ def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, r]))
-    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, -r]))
-    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
 
 def test_displace_abs(
@@ -578,14 +578,14 @@ def test_displacement(
     data = [
         # equator
         (zero, zero, zero, five, deg5 * north),
-        (zero, zero, -five, zero, deg5 * east),
+        (zero, zero, five, zero, deg5 * east),
         (zero, zero, zero, -five, deg5 * south),
-        (zero, zero, five, zero, deg5 * west),
+        (zero, zero, -five, zero, deg5 * west),
         # pole
         (zero, ninety, ninety * 2, ninety - five, deg5 * north),
-        (zero, ninety, -ninety, ninety - five, deg5 * east),
+        (zero, ninety, ninety, ninety - five, deg5 * east),
         (zero, ninety, zero, ninety - five, deg5 * south),
-        (zero, ninety, ninety, ninety - five, deg5 * west),
+        (zero, ninety, -ninety, ninety - five, deg5 * west),
     ]
 
     # test each displacement individually
@@ -601,3 +601,126 @@ def test_displacement(
         urng.uniform(-90.0, 90.0, size=5),
     )
     assert alpha.shape == (20, 5)
+
+
+def test_displacement_zerodist(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Check that zero displacement is computed correctly."""
+    lon = urng.uniform(-180.0, 180.0, size=100)
+    lat = urng.uniform(-90.0, 90.0, size=100)
+
+    compare.assert_allclose(
+        glass.displacement(lon, lat, lon, lat),
+        xp.zeros(100),
+    )
+
+
+def test_displacement_consistent(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Check displacement is consistent with displace."""
+    n = 1_000
+
+    # magnitude and angle of displacement we want to achieve
+    r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
+    x = urng.uniform(-math.pi, math.pi, size=n)
+
+    # displace at random positions on the sphere
+    from_lon = urng.uniform(-180.0, 180.0, size=n)
+    from_lat = xp.asin(urng.uniform(-1.0, 1.0, size=n)) / math.pi * 180.0
+
+    # compute the intended displacement
+    alpha_in = r * xp.exp(1j * x)
+
+    # displace random points
+    to_lon, to_lat = glass.displace(from_lon, from_lat, alpha_in)
+
+    # measure displacement
+    alpha_out = glass.displacement(from_lon, from_lat, to_lon, to_lat)
+
+    compare.assert_allclose(alpha_out, alpha_in, atol=0.0, rtol=1e-10)
+
+
+def test_displacement_random(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Check displacement for random points."""
+    n = 1_000
+
+    # magnitude and angle of displacement we want to achieve
+    r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
+    x = urng.uniform(-math.pi, math.pi, size=n)
+
+    # displacement at random positions on the sphere
+    theta = xp.acos(urng.uniform(-1.0, 1.0, size=n))
+    phi = urng.uniform(-math.pi, math.pi, size=n)
+
+    # rotation matrix that moves (0, 0, 1) to theta and phi
+    zero = xp.zeros(n)
+    one = xp.ones(n)
+    rot_y = xp.stack(
+        [
+            xp.cos(theta), zero, xp.sin(theta),
+            zero, one, zero,
+            -xp.sin(theta), zero, xp.cos(theta),
+        ],
+        axis=1,
+    )  # fmt: skip
+    rot_z = xp.stack(
+        [
+            xp.cos(phi), -xp.sin(phi), zero,
+            xp.sin(phi), xp.cos(phi), zero,
+            zero, zero, one,
+        ],
+        axis=1,
+    )  # fmt: skip
+    rot = xp.reshape(rot_z, (n, 3, 3)) @ xp.reshape(rot_y, (n, 3, 3))
+
+    # meta-check that rotation works by rotating (0, 0, 1) to theta and phi
+    u = xp.stack(
+        [
+            xp.sin(theta) * xp.cos(phi),
+            xp.sin(theta) * xp.sin(phi),
+            xp.cos(theta),
+        ],
+        axis=1,
+    )
+    compare.assert_allclose(rot @ xp.asarray([0.0, 0.0, 1.0]), u)
+
+    # meta-check that recovering theta and phi from vector works
+    compare.assert_allclose(xp.atan2(xp.hypot(u[:, 0], u[:, 1]), u[:, 2]), theta)
+    compare.assert_allclose(xp.atan2(u[:, 1], u[:, 0]), phi)
+
+    # build the displaced points near (0, 0, 1) and rotate near theta and phi
+    v = xp.stack(
+        [
+            xp.sin(r) * xp.cos(math.pi - x),
+            xp.sin(r) * xp.sin(math.pi - x),
+            xp.cos(r),
+        ],
+        axis=1,
+    )
+    v = rot @ xp.reshape(v, (n, 3, 1))
+    v = xp.reshape(v, (n, 3))
+
+    # compute displaced theta and phi
+    theta_d = xp.atan2(xp.hypot(v[:, 0], v[:, 1]), v[:, 2])
+    phi_d = xp.atan2(v[:, 1], v[:, 0])
+
+    # compute longitude and latitude
+    from_lon = uxpx.degrees(phi)
+    from_lat = 90.0 - uxpx.degrees(theta)
+    to_lon = uxpx.degrees(phi_d)
+    to_lat = 90.0 - uxpx.degrees(theta_d)
+
+    # compute displacement and compare to input
+    alpha_in = r * xp.exp(1j * x)
+    alpha_out = glass.displacement(from_lon, from_lat, to_lon, to_lat)
+    compare.assert_allclose(alpha_out, alpha_in, atol=0.0, rtol=1e-10)
