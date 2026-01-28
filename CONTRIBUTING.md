@@ -280,7 +280,7 @@ uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ## Failure of the `Regression tests / Regression test` Workflow
 
 The regression tests are run in GitHub Actions for every pull request to ensure
-that new change do not degrade the performances of _GLASS_. This workflow uses
+that new changes do not degrade the performances of _GLASS_. This workflow uses
 the `nox` command detailed above comparing the head of the current pull request
 to the `main` branch. The benchmark tests are first run over the `main` branch,
 followed by the head of the pull request. If there is any statistically
