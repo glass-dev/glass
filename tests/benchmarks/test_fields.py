@@ -13,10 +13,10 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from conftest import Compare, GeneratorConsumer
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare, GeneratorConsumer
 
 
 @pytest.mark.stable
@@ -31,7 +31,7 @@ def test_iternorm_no_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )
@@ -77,7 +77,7 @@ def test_iternorm_specify_size(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in), size)
-        return generator_consumer.consume(  # type: ignore[no-any-return]
+        return generator_consumer.consume(
             generator,
             valid_exception="covariance matrix is not positive definite",
         )
@@ -112,7 +112,7 @@ def test_iternorm_k_0(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     results = benchmark(function_to_benchmark)
 
@@ -140,7 +140,7 @@ def test_cls2cov(
             nf,
             nc,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     covs = benchmark(function_to_benchmark)
     cov = covs[0]
@@ -156,18 +156,14 @@ def test_cls2cov(
 @pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
-def test_generate_grf(  # noqa: PLR0913
-    xpb: ModuleType,
+def test_generate_grf(
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
+    ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
-    ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.fields._generate_grf not yet ported for {xpb.__name__}")
-
     gls: AngularPowerSpectra = [urngb.random(1_000)]
     nside = 4
 
@@ -178,7 +174,7 @@ def test_generate_grf(  # noqa: PLR0913
             rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)  # type: ignore[no-any-return]
+        return generator_consumer.consume(generator)
 
     gaussian_fields = benchmark(function_to_benchmark)
 
@@ -195,9 +191,6 @@ def test_generate(
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.generate."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.generate not yet ported for {xpb.__name__}")
-
     n = 100
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
@@ -212,8 +205,8 @@ def test_generate(
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(  # type: ignore[no-any-return]
-            generator,
+        return generator_consumer.consume(
+            generator,  # type: ignore[arg-type]
             valid_exception="covariance matrix is not positive definite",
         )
 

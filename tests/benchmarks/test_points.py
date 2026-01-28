@@ -40,10 +40,6 @@ def test_positions_from_delta(  # noqa: PLR0913
     remove_monopole: bool,  # noqa: FBT001
 ) -> None:
     """Benchmarks for glass.positions_from_delta."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(
-            f"glass.lensing.multi_plane_matrix not yet ported for {xpb.__name__}",
-        )
     nside = 48
     npix = 12 * nside * nside
 
