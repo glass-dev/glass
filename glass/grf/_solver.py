@@ -81,6 +81,9 @@ def solve(  # noqa: PLR0912, PLR0913
 
     """
     xp = cl.__array_namespace__()
+
+    # This function is difficult to port to the Array API so for now we work
+    # in NumPy and ultimately convert back at the end of it.
     cl = np.asarray(cl)
 
     if t2 is None:
