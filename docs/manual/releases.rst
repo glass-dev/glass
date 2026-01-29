@@ -1,6 +1,6 @@
 
 Release notes
-
+=============
 
 These notes document the changes between individual *GLASS* releases.
 
