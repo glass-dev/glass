@@ -4,6 +4,8 @@ ci:
   autofix_prs: false
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
+  skip:
+    - ty
 
 exclude: ^uv.lock$
 repos:
@@ -77,8 +79,6 @@ repos:
   - repo: local
     hooks:
       - id: ty
-        additional_dependencies:
-          - uv
         entry: uv run ty check
         language: python
         name: ty-check
