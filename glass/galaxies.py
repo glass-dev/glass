@@ -152,7 +152,7 @@ def redshifts_from_nz(
         )
         total += count_out[k]
 
-    assert total == redshifts.shape[0]  # noqa: S101
+    assert total == redshifts.size  # noqa: S101
 
     return redshifts  # ty: ignore[invalid-return-type]
 
