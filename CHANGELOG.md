@@ -17,7 +17,8 @@ All functional changes to the project are documented in this file.
 - gh-990: fix `vmap_galactic_ecliptic` porting (#991)
 - gh-970: Move rng code to its own module (#971)
 - gh-960: move `healpy`/`healpix` work to own module (#968)
-- gh-902: port `cls2cov`, `spectra_indices`, `_glass_to_healpix_alm` in `fields.py` (#963)
+- gh-902: port `cls2cov`, `spectra_indices`, `_glass_to_healpix_alm` in
+  `fields.py` (#963)
 - gh-958: make `positions_from_delta` Array API compatible (#959)
 - gh-907: Port points.uniform_positions to support jax (#955)
 - gh-908: Port `shapes.py` to support jax (#954)
