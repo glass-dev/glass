@@ -380,7 +380,7 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
 
 
 def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
-    gls = [xp.asarray([1.0, 0.5, 0.1])]
+    gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
 

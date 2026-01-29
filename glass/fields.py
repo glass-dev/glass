@@ -417,7 +417,7 @@ def _generate_grf(
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        alm = xpx.at(alm)[:n].set(xp.real(alm[:n])[:] + xp.imag(alm[:n]) + 0j)
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
