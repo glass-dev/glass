@@ -9,3 +9,4 @@ Modules
    arraytools
    grf
    harmonics
+   healpix
