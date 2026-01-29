@@ -430,7 +430,7 @@ def generate_gaussian(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[FloatArray]:
     """
     Sample Gaussian random fields from Cls iteratively.
@@ -484,7 +484,7 @@ def generate_lognormal(
     shift: float = 1.0,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[FloatArray]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
