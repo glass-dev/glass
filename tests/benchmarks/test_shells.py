@@ -9,12 +9,6 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-<<<<<<< HEAD
-    from conftest import Compare  # ty: ignore[unresolved-import]
-||||||| c92f097
-    from conftest import Compare
-=======
->>>>>>> main
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from tests.fixtures.helper_classes import Compare

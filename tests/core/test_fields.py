@@ -329,7 +329,7 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
 
     nside = 4
 
-    pw: FloatArray = hp.pixwin(nside, lmax=7, xp=xp)
+    pw = hp.pixwin(nside, lmax=7, xp=xp)
 
     result = glass.discretized_cls(
         [xp.asarray([]), xp.ones(10), xp.ones(10)],
@@ -337,7 +337,7 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
     )
 
     for cl in result:
-        n = min(cl.shape[0], pw.shape[0])
+        n = min(cl.shape[0], pw.shape[0])  # ty: ignore[possibly-missing-attribute]
         expected = xp.ones(n) * pw[:n] ** 2
         compare.assert_allclose(cl[:n], expected)
 

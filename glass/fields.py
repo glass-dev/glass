@@ -279,7 +279,7 @@ def discretized_cls(
         ]
 
     if nside is not None:
-        pw: FloatArray = hp.pixwin(nside, lmax=lmax, xp=xp)
+        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
 
     gls = []
     for cl in cls:
@@ -287,7 +287,7 @@ def discretized_cls(
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(cl.shape[0], pw.shape[0])
+                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[possibly-missing-attribute]
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
@@ -683,7 +683,7 @@ def effective_cls(
         out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
             out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
-    return out
+    return out  # ty: ignore[invalid-return-type]
 
 
 def gaussian_fields(
@@ -1021,7 +1021,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return cov
+    return cov  # ty: ignore[invalid-return-type]
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
