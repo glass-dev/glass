@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from threading import Lock
+import threading
 from typing import TYPE_CHECKING
 
 import jax.dtypes
@@ -48,7 +48,7 @@ class Generator:
 
     __slots__ = ("key", "lock")
     key: PRNGKeyArray
-    lock: Lock
+    lock: threading.Lock
 
     @classmethod
     def from_key(cls, key: PRNGKeyArray) -> Self:
@@ -61,13 +61,13 @@ class Generator:
             raise ValueError(msg)
         rng = object.__new__(cls)
         rng.key = key
-        rng.lock = Lock()
+        rng.lock = threading.Lock()
         return rng
 
     def __init__(self, seed: int | AnyArray, *, impl: str | None = None) -> None:
         """Create a wrapper instance with a new key."""
         self.key = jax.random.key(seed, impl=impl)
-        self.lock = Lock()
+        self.lock = threading.Lock()
 
     @property
     def __key(self) -> AnyArray:
