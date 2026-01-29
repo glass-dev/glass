@@ -876,6 +876,7 @@ def generate(
 
     """
     xp = array_api_compat.array_namespace(*gls, use_compat=False)
+
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and gls"
