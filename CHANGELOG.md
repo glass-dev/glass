@@ -6,6 +6,7 @@ All functional changes to the project are documented in this file.
 
 ## [2026.1] (29 Jan 2026)
 
+- gh-1034: Expose glass.healpix module (#1035)
 - gh-923: migrate from mypy to ty (#926)
 - gh-977: Actually test deprecated fields.py functions (#1033)
 - gh-977: Port remaining functions in `fields.py` (#979)
