@@ -93,8 +93,8 @@ class xp_additions:  # noqa: N801
     interpolation, and linear algebra, ensuring compatibility across NumPy, JAX,
     and array-api-strict backends.
 
-    This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
-    for details.
+    This is intended as a temporary solution. See
+    https://github.com/glass-dev/glass/issues/645 for details.
 
     """
 

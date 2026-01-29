@@ -434,7 +434,8 @@ class Rotator:
         *,
         coord: Sequence[str] | None = None,
     ) -> None:
-        """Create a rotator with given parameters.
+        """
+        Create a rotator with given parameters.
 
         Parameters
         ----------
