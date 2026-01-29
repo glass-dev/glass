@@ -373,8 +373,7 @@ def _generate_grf(
         rng = _rng.rng_dispatcher(xp=xp)
 
     # number of gls and number of fields
-    ngls = len(gls)
-    ngrf = nfields_from_nspectra(ngls)
+    ngrf = nfields_from_nspectra(len(gls))
 
     # number of correlated fields if not specified
     if ncorr is None:

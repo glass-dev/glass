@@ -129,6 +129,6 @@ def test_multi_plane_weights(
         rounds=100,
     )
 
-    assert len(actual_convergence.kappa) == 10
+    assert actual_convergence.kappa.shape[0] == 10
     for x in actual_convergence.kappa:
         assert x is not None
