@@ -121,13 +121,13 @@ def test_broadcast_inputs(
     )
 
     assert dims == (3, 2)
-    assert bias.shape == dims  # type: ignore[union-attr]
+    assert bias.shape == dims  # ty: ignore[possibly-missing-attribute]
     assert xp.all(bias == bias_in)
     compare.assert_array_equal(delta, xp.zeros_like(delta))
-    assert ngal.shape == dims  # type: ignore[union-attr]
-    compare.assert_array_equal(ngal[0, :], ngal_in)  # type: ignore[index]
-    assert vis.shape == delta.shape  # type: ignore[union-attr]
-    compare.assert_array_equal(vis[0, 0, :], vis_in)  # type: ignore[index]
+    assert ngal.shape == dims  # ty: ignore[possibly-missing-attribute]
+    compare.assert_array_equal(ngal[0, :], ngal_in)  # ty: ignore[not-subscriptable]
+    assert vis.shape == delta.shape  # ty: ignore[possibly-missing-attribute]
+    compare.assert_array_equal(vis[0, 0, :], vis_in)  # ty: ignore[not-subscriptable]
 
 
 @pytest.mark.parametrize(
