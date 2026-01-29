@@ -217,6 +217,21 @@ class RadialWindow:
     wa: FloatArray
     zeff: float = math.nan
 
+    def __array_namespace__(self, **kwargs: str | None) -> ModuleType:
+        """
+        Return the array backend of this RadialWindow's type bound values.
+
+        This method makes it possible to find the array backend of
+        the ``RadialWindow`` class through the following:
+
+            >>> import numpy as np
+            >>> rw = RadialWindow(np.zeros(10), np.zeros(10), 10)
+            >>> rw.__array_namespace__()
+            <module 'numpy' from '/path/to/numpy/__init__.py'>
+
+        """
+        return array_api_compat.array_namespace(self.za, self.wa, use_compat=False)  # type: ignore[no-any-return]
+
     def __post_init__(self) -> None:
         """
         Magic method to setup optional inputs
