@@ -29,14 +29,8 @@ These notes document the changes between individual *GLASS* releases.
 * The :func:`glass.positions_from_delta` function now only accepts callable
   functions rather than also strings.
 
-* The :class:`glass._array_api_utils.xp_additions` class now determines the
-  array backend from the input arrays and be imported as `uxpx` at the top
-  of files.
-
 * All ``healpix`` and ``healpy`` calls have been moved to a new module
   :mod:`glass.healpix` to isolate Array API support.
-
-* All RNG operations have moved to a new module :mod:`glass._rng`.
 
 * Exposed the :mod:`glass.arraytools` module to users.
 
