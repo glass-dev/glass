@@ -18,7 +18,7 @@ To simplify running benchmarks on myriad there are several scripts provided.
 
 2. Then, to reduce the required run time of the benchmark jobs on myriad, we
    install the required python dependencies from the group `test`. Therefore, we
-   must create our virtual environment, ensureing we upgrade pip to a version
+   must create our virtual environment, ensuring we upgrade pip to a version
    which supports dependency groups...
 
    ```sh
