@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
     from pytest_mock import MockerFixture
 
-    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
+    from glass._types import AngularPowerSpectra, UnifiedGenerator
     from tests.fixtures.helper_classes import Compare
 
 HAVE_JAX = importlib.util.find_spec("jax") is not None
