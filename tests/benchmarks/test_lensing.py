@@ -62,7 +62,7 @@ def test_multi_plane_matrix(
         for i in range(min(len(shells), deltas.shape[0])):
             shell = shells[i]
             delta = deltas[i, ...]
-            convergence.add_window(delta, shell)
+            convergence.add_window(delta, shell)  # ty: ignore[missing-argument]
         return convergence
 
     actual_convergence = benchmark.pedantic(

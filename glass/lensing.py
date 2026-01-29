@@ -455,7 +455,7 @@ class MultiPlaneConvergence:
         type-bound parameters (delta3, etc) is returned.
 
         """
-        return array_api_compat.array_namespace(  # type: ignore[no-any-return]
+        return array_api_compat.array_namespace(
             self.delta3,
             self.kappa2,
             self.kappa3,
@@ -589,7 +589,7 @@ class MultiPlaneConvergence:
         return self.kappa3
 
     @property
-    def delta(self) -> FloatArray:
+    def delta(self) -> FloatArray | None:
         """The current matter plane."""
         return self.delta3
 
@@ -625,7 +625,7 @@ def multi_plane_matrix(
     for i, w in enumerate(shells):
         mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)
         wmat = xpx.at(wmat)[i, :].set(mpc.kappa)
-    return wmat
+    return wmat  # ty: ignore[invalid-return-type]
 
 
 def multi_plane_weights(

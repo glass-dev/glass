@@ -45,16 +45,16 @@ def test_from_convergence(
     results = glass.from_convergence(kappa, shear=True)
     compare.assert_array_equal(len(results), 1)
 
-    results = glass.from_convergence(kappa, potential=True, deflection=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, potential=True, deflection=True)
     compare.assert_array_equal(len(results), 2)
 
-    results = glass.from_convergence(kappa, potential=True, shear=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, potential=True, shear=True)
     compare.assert_array_equal(len(results), 2)
 
-    results = glass.from_convergence(kappa, deflection=True, shear=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, deflection=True, shear=True)
     compare.assert_array_equal(len(results), 2)
 
-    results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
     compare.assert_array_equal(len(results), 3)
 
 

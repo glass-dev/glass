@@ -228,7 +228,7 @@ class RadialWindow:
             <module 'numpy' from '/path/to/numpy/__init__.py'>
 
         """
-        return array_api_compat.array_namespace(self.za, self.wa, use_compat=False)  # type: ignore[no-any-return]
+        return array_api_compat.array_namespace(self.za, self.wa, use_compat=False)
 
     def __post_init__(self) -> None:
         """
