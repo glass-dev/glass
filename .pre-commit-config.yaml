@@ -74,6 +74,17 @@ repos:
     rev: v1.7.10
     hooks:
       - id: actionlint
+  - repo: local
+    hooks:
+      - id: ty-check
+        name: ty-check
+        language: python
+        entry: ty check
+        pass_filenames: false
+        args:
+          - --python=.venv/
+        additional_dependencies:
+          - ty
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.2
     hooks:
