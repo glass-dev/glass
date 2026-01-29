@@ -8,18 +8,19 @@ These notes document the changes between individual *GLASS* releases.
 --------------------
 
 * Added full Array API support for the following -
-  * :func:`glass.algorithm.nnls`
-  * :func:`glass.cls2cov`
-  * :func:`glass.ellipticity_gaussian`
-  * :func:`glass.ellipticity_intnorm`
-  * :func:`glass.ellipticity_ryden04`
-  * :func:`glass.fields._glass_to_healpix_alm`
-  * :func:`glass.multi_plane_matrix`
-  * :func:`glass.multi_plane_weights`
-  * :func:`glass.positions_from_delta`
-  * :func:`glass.spectra_indices`
-  * :func:`glass.uniform_positions`
-  * :func:`glass.vmap_galactic_ecliptic`
+
+    * :func:`glass.algorithm.nnls`
+    * :func:`glass.cls2cov`
+    * :func:`glass.ellipticity_gaussian`
+    * :func:`glass.ellipticity_intnorm`
+    * :func:`glass.ellipticity_ryden04`
+    * :func:`glass.fields._glass_to_healpix_alm`
+    * :func:`glass.multi_plane_matrix`
+    * :func:`glass.multi_plane_weights`
+    * :func:`glass.positions_from_delta`
+    * :func:`glass.spectra_indices`
+    * :func:`glass.uniform_positions`
+    * :func:`glass.vmap_galactic_ecliptic`
 
 * The :func:`glass.displace` and :func:`glass.displacement` functions have
   been fixed to be fully consistent with each other. Displacement is now
@@ -40,10 +41,10 @@ These notes document the changes between individual *GLASS* releases.
 
 * Exposed the :mod:`glass.arraytools` module to users.
 
-* Added instructions to :doc:`CONTRIBUTING.md` on how the regression tests work.
+* Added instructions to ``CONTRIBUTING.md`` on how the regression tests work.
 
 * Added documentation to GLASS on the extension packages in
-  :doc:`docs/manual/releases.rst`.
+  ``docs/manual/extensions.rst``.
 
 * Fixed support for Python 3.10 in the CI and in ``pre-commit``.
 
