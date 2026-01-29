@@ -16,8 +16,6 @@ body:
     attributes:
       label: What Can be Improved About This Section
       description: Is it incomplete, incorrect or difficult to understand?
-    validations:
-      required: true
   - id: suggestions
     type: textarea
     attributes:

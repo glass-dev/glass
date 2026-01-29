@@ -62,9 +62,9 @@ def test_iternorm_specify_size(
     elif num_dimensions == 2:
         list_input = [
             [
-                [1.0, 0.5, 0.5],  # type: ignore[list-item]
-                [0.5, 0.2, 0.1],  # type: ignore[list-item]
-                [0.5, 0.1, 0.2],  # type: ignore[list-item]
+                [1.0, 0.5, 0.5],
+                [0.5, 0.2, 0.1],
+                [0.5, 0.1, 0.2],
             ]
             for _ in range(10_000)
         ]
@@ -200,13 +200,13 @@ def test_generate(
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.generate(
-            fields,  # type: ignore[arg-type]
+            fields,
             gls,
             nside=nside,
             ncorr=ncorr,
         )
         return generator_consumer.consume(
-            generator,  # type: ignore[arg-type]
+            generator,
             valid_exception="covariance matrix is not positive definite",
         )
 

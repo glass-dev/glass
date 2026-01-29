@@ -230,7 +230,7 @@ class RadialWindow:
             <module 'numpy' from '/path/to/numpy/__init__.py'>
 
         """
-        return array_api_compat.array_namespace(self.za, self.wa, use_compat=False)  # type: ignore[no-any-return]
+        return array_api_compat.array_namespace(self.za, self.wa, use_compat=False)
 
     def __post_init__(self) -> None:
         """
@@ -261,7 +261,7 @@ class RadialWindow:
 
         """
         if self.za.shape[0] > 0:
-            return uxpx.trapezoid(  # type: ignore[return-value]
+            return uxpx.trapezoid(
                 self.za * self.wa,
                 self.za,
             ) / uxpx.trapezoid(self.wa, self.za)
@@ -526,7 +526,7 @@ def restrict(
         left=0.0,
         right=0.0,
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
-    return zr, fr
+    return zr, fr  # ty: ignore[invalid-return-type]
 
 
 def partition(
@@ -787,7 +787,7 @@ def partition_nnls(
 
     x = xp.stack(
         [
-            glass.algorithm.nnls(r, y[(*i, ...)])  # type: ignore[arg-type]
+            glass.algorithm.nnls(r, y[(*i, ...)])
             for i in itertools.product(*(range(d) for d in dims))
         ],
         axis=0,

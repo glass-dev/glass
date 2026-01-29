@@ -31,7 +31,7 @@ def test_from_convergence(
 
     # check with all False
 
-    results = glass.from_convergence(kappa)
+    results = glass.from_convergence(kappa)  # ty: ignore[no-matching-overload]
     compare.assert_array_equal(results, ())
 
     # check all combinations of potential, deflection, shear being True

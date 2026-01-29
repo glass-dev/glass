@@ -84,10 +84,10 @@ def vmap_galactic_ecliptic(
     xp = _utils.default_xp() if xp is None else xp
 
     if len(galactic) != 2:
-        msg = "galactic stripe must be a pair of numbers"  # type: ignore[unreachable]
+        msg = "galactic stripe must be a pair of numbers"
         raise TypeError(msg)
     if len(ecliptic) != 2:
-        msg = "ecliptic stripe must be a pair of numbers"  # type: ignore[unreachable]
+        msg = "ecliptic stripe must be a pair of numbers"
         raise TypeError(msg)
 
     m = xp.ones(hp.nside2npix(nside))
@@ -134,8 +134,8 @@ def gaussian_nz(
     mean = xp.asarray(mean, dtype=xp.float64)
     sigma = xp.asarray(sigma, dtype=xp.float64)
 
-    mean = xp.reshape(mean, mean.shape + (1,) * z.ndim)  # type: ignore[union-attr]
-    sigma = xp.reshape(sigma, sigma.shape + (1,) * z.ndim)  # type: ignore[union-attr]
+    mean = xp.reshape(mean, mean.shape + (1,) * z.ndim)
+    sigma = xp.reshape(sigma, sigma.shape + (1,) * z.ndim)
 
     nz = xp.exp(-(((z - mean) / sigma) ** 2) / 2)
     nz /= uxpx.trapezoid(nz, z, axis=-1)[..., xp.newaxis]
