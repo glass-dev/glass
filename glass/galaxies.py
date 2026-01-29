@@ -152,7 +152,7 @@ def redshifts_from_nz(
         )
         total += count_out[k]
 
-    assert total == redshifts.size  # noqa: S101
+    assert total == redshifts.shape[0]  # noqa: S101
 
     return redshifts  # ty: ignore[invalid-return-type]
 
@@ -209,7 +209,7 @@ def galaxy_shear(  # noqa: PLR0913
 
     nside = hp.npix2nside(xp.broadcast_arrays(kappa, gamma1, gamma2)[0].shape[-1])
 
-    size = xp.broadcast_arrays(lon, lat, eps)[0].size
+    size = xp.broadcast_arrays(lon, lat, eps)[0].shape[0]
 
     # output arrays
     k = xp.empty(size)

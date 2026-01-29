@@ -38,9 +38,9 @@ def test_pad(cl: FloatArray, rng: np.random.Generator) -> None:
     t = glass.grf.Lognormal(lam)
 
     # check that output size matches pad
-    _, cl_out, _ = glass.grf.solve(cl, t, pad=2 * cl.size)
+    _, cl_out, _ = glass.grf.solve(cl, t, pad=2 * cl.shape[0])
 
-    assert cl_out.size == 3 * cl.size
+    assert cl_out.shape[0] == 3 * cl.shape[0]
 
     with pytest.raises(ValueError, match="pad must be a positive integer"):
         glass.grf.solve(cl, t, pad=-1)
@@ -87,12 +87,12 @@ def test_lognormal(
 
     assert info > 0
 
-    compare.assert_allclose(cl_[1 : cl.size], cl[1:], atol=0.0, rtol=cltol)
+    compare.assert_allclose(cl_[1 : cl.shape[0]], cl[1:], atol=0.0, rtol=cltol)
 
     gl_ = glass.grf.compute(cl_, t1, t2)
 
     assert gl[0] == gl0
-    compare.assert_allclose(gl_[1 : gl.size], gl[1:])
+    compare.assert_allclose(gl_[1 : gl.shape[0]], gl[1:])
 
 
 def test_monopole(

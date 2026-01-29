@@ -475,13 +475,13 @@ def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
-            assert result.size == 1
+            assert result.shape[0] == 1
             compare.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
-            assert result.size == 51
+            assert result.shape[0] == 51
             compare.assert_allclose(result[2:], expected)
 
 
@@ -596,7 +596,7 @@ def test_compute_gaussian_spectra_gh639(mocker: MockerFixture, xp: ModuleType) -
     assert mock.call_args_list[0] == mocker.call(spectra[0], fields[0], fields[0])
     assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
     assert gls[:2] == [mock.return_value, mock.return_value]
-    assert gls[2].size == 0
+    assert gls[2].shape[0] == 0
 
 
 def test_solve_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:

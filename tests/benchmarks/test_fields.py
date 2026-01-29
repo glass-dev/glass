@@ -244,7 +244,7 @@ def test_getcl_lmax_0(
         lmax=0,
     )
     expected = xpb.asarray([max(random_i, random_j)], dtype=xpb.float64)
-    assert result.size == 1
+    assert result.shape[0] == 1
     compare.assert_allclose(result, expected)
 
 
@@ -276,5 +276,5 @@ def test_getcl_lmax_larger_than_cls(
         lmax=lmax,
     )
     expected = xpb.zeros((lmax - 1,), dtype=xpb.float64)
-    assert result.size == lmax + 1
+    assert result.shape[0] == lmax + 1
     compare.assert_allclose(result[2:], expected)

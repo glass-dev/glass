@@ -86,7 +86,7 @@ def test_tophat_windows(xp: ModuleType) -> None:
 
     ws = glass.tophat_windows(zb, dz)
 
-    assert len(ws) == zb.size - 1
+    assert len(ws) == zb.shape[0] - 1
 
     assert all(
         z0 == w.za[0] and zn == w.za[-1]
@@ -94,7 +94,7 @@ def test_tophat_windows(xp: ModuleType) -> None:
     )
 
     assert all(
-        zn <= z0 + w.za.size * dz <= zn + dz
+        zn <= z0 + w.za.shape[0] * dz <= zn + dz
         for w, z0, zn in zip(ws, zb, zb[1:], strict=False)
     )
 
@@ -121,7 +121,7 @@ def test_linear_windows(compare: type[Compare], xp: ModuleType) -> None:
 
     # check number of windows
 
-    assert len(ws) == zgrid.size - 2
+    assert len(ws) == zgrid.shape[0] - 2
 
     # check values of zeff
 
@@ -170,7 +170,7 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
 
     # check number of windows
 
-    assert len(ws) == zgrid.size - 2
+    assert len(ws) == zgrid.shape[0] - 2
 
     # check values of zeff
 
@@ -289,13 +289,13 @@ def test_redshift_grid_default_xp() -> None:
 
     num = 5
     z = glass.redshift_grid(zmin, zmax, num=5)
-    assert z.size == num + 1
+    assert z.shape[0] == num + 1
 
     # check dz input
 
     dz = 0.2
     z = glass.redshift_grid(zmin, zmax, dz=dz)
-    assert z.size == math.ceil((zmax - zmin) / dz) + 1
+    assert z.shape[0] == math.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 
@@ -312,13 +312,13 @@ def test_redshift_grid(xp: ModuleType) -> None:
 
     num = 5
     z = glass.redshift_grid(zmin, zmax, num=5, xp=xp)
-    assert z.size == num + 1
+    assert z.shape[0] == num + 1
 
     # check dz input
 
     dz = 0.2
     z = glass.redshift_grid(zmin, zmax, dz=dz, xp=xp)
-    assert z.size == math.ceil((zmax - zmin) / dz) + 1
+    assert z.shape[0] == math.ceil((zmax - zmin) / dz) + 1
 
     # check dz for spacing which results in a max value above zmax
 

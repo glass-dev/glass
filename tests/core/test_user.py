@@ -38,7 +38,9 @@ def test_read_write_cls(
         split = npz["split"]
 
     compare.assert_array_equal(values, np.concat(cls))
-    compare.assert_array_equal(split, np.cumulative_sum([len(cl) for cl in cls[:-1]]))
+    compare.assert_array_equal(
+        split, np.cumulative_sum([cl.shape[0] for cl in cls[:-1]])
+    )
     compare.assert_array_equal(cls, np.split(values, split))
 
     npz = glass.load_cls(tmp_path / cls_file)

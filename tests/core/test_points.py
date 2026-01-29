@@ -382,7 +382,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
     # case: only the southern hemisphere is visible
 
-    vis = xpx.at(vis)[: vis.size // 2].set(0.0)
+    vis = xpx.at(vis)[: vis.shape[0] // 2].set(0.0)
 
     lon, lat, count = data_transformer.catpos(
         glass.positions_from_delta(ngal, delta, bias, vis),
