@@ -93,7 +93,8 @@ def test_write_exception(tmp_path: pathlib.Path) -> None:
         """Custom exception for controlled testing."""
 
     def raise_error(msg: str) -> None:
-        """Raise a custom exception for controlled testing.
+        """
+        Raise a custom exception for controlled testing.
 
         Parameters
         ----------
