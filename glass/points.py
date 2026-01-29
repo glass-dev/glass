@@ -278,7 +278,7 @@ def _compute_expected_count(
 
     # turn into number count, modifying the array in place
     n = n + 1
-    n *= ARCMIN2_SPHERE / n.shape[0] * ngal[k]  # ty: ignore[not-subscriptable]
+    n *= ARCMIN2_SPHERE / n.size * ngal[k]  # ty: ignore[not-subscriptable]
     return n
 
 
@@ -428,9 +428,9 @@ def _sample_galaxies_per_pixel(
             # next batch
             start, size = stop, 0
             # keep track of remaining number of points
-            count -= ipix.shape[0]
+            count -= ipix.size
             # yield the batch
-            yield lon, lat, ipix.shape[0] * cmask
+            yield lon, lat, ipix.size * cmask
 
     # make sure that the correct number of pixels was sampled
     assert xp.sum(n[stop:]) == 0  # noqa: S101
