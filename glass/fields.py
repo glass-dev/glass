@@ -66,6 +66,7 @@ def _inv_triangle_number(triangle_number: int) -> int:
     The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`. If
     the argument is :math:`T_n`, then :math:`n` is returned. Otherwise,
     a :class:`ValueError` is raised.
+
     """
     n = math.floor(math.sqrt(2 * triangle_number))
     if n * (n + 1) // 2 != triangle_number:
@@ -81,6 +82,7 @@ def nfields_from_nspectra(nspectra: int) -> int:
     Given the number of spectra *nspectra*, returns the number of
     fields *n* such that ``n * (n + 1) // 2 == nspectra`` or raises
     a :class:`ValueError` if the number of spectra is invalid.
+
     """
     try:
         n = _inv_triangle_number(nspectra)
