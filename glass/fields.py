@@ -875,6 +875,8 @@ def generate(
         Sampled random fields.
 
     """
+    xp = array_api_compat.array_namespace(*gls, use_compat=False)
+
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and gls"
@@ -885,7 +887,7 @@ def generate(
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
-        yield t(x, var)
+        yield t(x, xp.asarray(var))
 
 
 def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:
