@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 import warnings
 from collections.abc import Sequence
