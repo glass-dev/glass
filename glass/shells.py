@@ -260,7 +260,7 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        if self.za.size > 0:
+        if self.za.shape[0] > 0:
             return uxpx.trapezoid(  # type: ignore[return-value]
                 self.za * self.wa,
                 self.za,
@@ -313,7 +313,7 @@ def tophat_windows(
     if zbins.ndim != 1:
         msg = "zbins must be a 1D array"
         raise ValueError(msg)
-    if zbins.size < 2:
+    if zbins.shape[0] < 2:
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
     if zbins[0] != 0:
@@ -381,7 +381,7 @@ def linear_windows(
     if zgrid.ndim != 1:
         msg = "zgrid must be a 1D array"
         raise ValueError(msg)
-    if zgrid.size < 3:
+    if zgrid.shape[0] < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
@@ -451,7 +451,7 @@ def cubic_windows(
     if zgrid.ndim != 1:
         msg = "zgrid must be a 1D array"
         raise ValueError(msg)
-    if zgrid.size < 3:
+    if zgrid.shape[0] < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
@@ -711,7 +711,7 @@ def partition_lstsq(
     # do the least-squares fit over partially flattened b, then reshape
     x = uxpx.linalg_lstsq(
         xp.matrix_transpose(a),
-        xp.matrix_transpose(xp.reshape(b, (-1, zp.size + 1))),
+        xp.matrix_transpose(xp.reshape(b, (-1, zp.shape[0] + 1))),
         rcond=None,
     )[0]
     x = xp.reshape(xp.matrix_transpose(x), (*dims, len(shells)))

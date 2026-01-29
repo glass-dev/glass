@@ -80,7 +80,7 @@ def test_gaussian_nz(
         xp.tile(xp.asarray(sigma), z.shape),
         norm=urng.normal(size=z.shape),
     )
-    assert nz.shape == (z.size, z.size)
+    assert nz.shape == (z.shape[0], z.shape[0])
 
 
 def test_smail_nz(compare: type[Compare], xp: ModuleType) -> None:
@@ -204,4 +204,4 @@ def test_tomo_nz_gausserr(compare: type[Compare], xp: ModuleType) -> None:
 
     # check the shape of the output
 
-    assert binned_nz.shape == (len(zbins), z.size)
+    assert binned_nz.shape == (len(zbins), z.shape[0])

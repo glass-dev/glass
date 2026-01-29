@@ -473,13 +473,13 @@ def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
-            assert result.size == 1
+            assert result.shape[0] == 1
             compare.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
-            assert result.size == 51
+            assert result.shape[0] == 51
             compare.assert_allclose(result[2:], expected)
 
 

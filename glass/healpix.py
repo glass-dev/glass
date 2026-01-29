@@ -122,7 +122,7 @@ def almxfl(
     alm
         The alm to multiply.
     fl
-        The function (at l=0..fl.size-1) by which alm must be multiplied.
+        The function (at l=0..fl.shape[0]-1) by which alm must be multiplied.
     inplace
         If True, modify the given alm, otherwise make a copy before multiplying.
 

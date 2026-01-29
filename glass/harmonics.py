@@ -40,4 +40,4 @@ def multalm(
 
     """
     xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
-    return alm * xp.repeat(bl, xp.arange(bl.size) + 1)
+    return alm * xp.repeat(bl, xp.arange(bl.shape[0]) + 1)
