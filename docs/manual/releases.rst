@@ -49,6 +49,8 @@ These notes document the changes between individual *GLASS* releases.
 
 * Extended support to ``array-api-compat==1.13.0``.
 
+* Perform type checking with ``astral-sh/ty`` instead of ``mypy``.
+
 
 2025.3 (2 Dec 2025)
 --------------------

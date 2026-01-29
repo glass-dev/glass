@@ -6,6 +6,8 @@ All functional changes to the project are documented in this file.
 
 ## [2026.1] (29 Jan 2026)
 
+- gh-923: migrate from mypy to ty (#926)
+- gh-977: Actually test deprecated fields.py functions (#1033)
 - gh-977: Port remaining functions in `fields.py` (#979)
 - gh-903: Port galaxies.py to support jax (#919)
 - gh-1002: Add a section to the contributing guidelines on regression (1019)
