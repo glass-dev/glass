@@ -6,6 +6,28 @@ All functional changes to the project are documented in this file.
 
 ## [2026.1] (29 Jan 2026)
 
+- gh-1002: Add a section to the contributing guidelines on regression (1019)
+- gh-996: Fix bug in `apply_along_axis` (#997)
+- gh-969: determine `xp` when function called in XPAdditions (#994)
+- gh-990: fix `vmap_galactic_ecliptic` porting (#991)
+- gh-970: Move rng code to its own module (#971)
+- gh-960: move `healpy`/`healpix` work to own module (#968)
+- gh-902: port `cls2cov`, `spectra_indices`, `_glass_to_healpix_alm` in `fields.py` (#963)
+- gh-958: make `positions_from_delta` Array API compatible (#959)
+- gh-907: Port points.uniform_positions to support jax (#955)
+- gh-908: Port `shapes.py` to support jax (#954)
+- gh-906: Port `observations.vmap_galactic_ecliptic` to array-api (#953)
+- gh-943: bump `array-api-compat` and fix tests (#944)
+- gh-186: add GLASS extensions to documentation (#927)
+- gh-905: Port lensing.py functions to array-api with jax (#925)
+- gh-921: pin `pre-commit` to oldest support Python version (#924)
+- gh-901: Port `algorithm.nnls` to support jax (#918)
+- gh-914: fix versions for array backends for 3.10 (#916)
+- gh-910: consistent definition of displacement (#911)
+- gh-880: Fix inconsistencies in the documentation rendering (#889)
+- gh-637: Use xpx.at in fields.cls2cov (#874)
+- gh-824: expose `glass.arraytools` module (#857)
+
 ## [2025.3] (2 Dec 2025)
 
 - gh-323: add `uv` support in `nox` and CI (#801)
