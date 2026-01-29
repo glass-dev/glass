@@ -705,8 +705,8 @@ def partition_lstsq(
     a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
     b = xp.concat([b, mult * xp.reshape(uxpx.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
-    # now a is a matrix of shape (len(shells), len(zp) + 1)
-    # and b is a matrix of shape (*dims, len(zp) + 1)
+    # now a is a matrix of shape (len(shells), zp.shape[0] + 1)
+    # and b is a matrix of shape (*dims, zp.shape[0] + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
     x = uxpx.linalg_lstsq(
@@ -777,8 +777,8 @@ def partition_nnls(
     a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
     b = xp.concat([b, mult * xp.reshape(uxpx.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
-    # now a is a matrix of shape (len(shells), len(zp) + 1)
-    # and b is a matrix of shape (*dims, len(zp) + 1)
+    # now a is a matrix of shape (len(shells), zp.shape[0] + 1)
+    # and b is a matrix of shape (*dims, zp.shape[0] + 1)
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition

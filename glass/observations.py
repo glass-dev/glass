@@ -332,7 +332,7 @@ def tomo_nz_gausserr(
     Returns
     -------
         The tomographic redshift bins convolved with a gaussian error.
-        Array has a shape (nbins, len(z))
+        Array has a shape (nbins, z.shape[0])
 
     See Also
     --------
