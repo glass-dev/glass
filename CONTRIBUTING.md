@@ -185,7 +185,7 @@ to the code's functionality.
 
 ## Nox
 
-`GLASS` supports running various critical commands using
+_GLASS_ supports running various critical commands using
 [nox](https://github.com/wntrblm/nox) to make them less intimidating for new
 developers. All of these commands (or sessions in the language of `nox`) -
 `lint`, `tests`, `coverage`, `coverage_benchmarks`, `doctests`, `examples`,
@@ -259,13 +259,72 @@ A single benchmark can be run by specifying the revision to benchmark.
 uv run nox -s benchmark -- <revision-to-benchmark>
 ```
 
-The benchmarks can be used to run a regression test of `glass`. These regression
+The benchmarks can be used to run a regression test of _GLASS_. These regression
 tests can be used to compare the performance of two different revisions of
-`glass`.
+_GLASS_.
 
 ```sh
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
+
+<!-- prettier-ignore -->
+> [!TIP]
+> Benchmark tests should do minimal assertions on what is returned to
+> make sure that the function is working as expected. The main goal of benchmark
+> tests is to measure the performance of the function, and not to test its
+> correctness. In the event that benchmarks are testing for specific values the
+> regression workflow may fail due to mismatches in values. See
+> [01e6e4c](https://github.com/glass-dev/glass/pull/911/changes/01e6e4c248e96e4683ca651edffa2fd4d845502f)
+> for an example.
+
+## Failure of the `Regression tests / Regression test` Workflow
+
+<!-- prettier-ignore -->
+> [!NOTE]
+> There are two types of benchmark tests in _GLASS_: `stable` and `unstable`.
+> These are marked using the `@pytest.mark.stable` and `@pytest.mark.unstable`
+> decorators respectively. The stable benchmarks are expected to have minimal
+> variance in their results across different runs, and are therefore measured in
+> percentage change during regression tests. The unstable benchmarks may have
+> higher variance, and are therefore measured in absolute time change during
+> regression tests.
+
+The regression tests are run in GitHub Actions for every pull request to ensure
+that new changes do not degrade the performances of _GLASS_. This workflow uses
+the `nox` command detailed above comparing the head of the current pull request
+to the `main` branch. The benchmark tests are first run over the `main` branch,
+followed by the head of the pull request. If there is any statistically
+significant regression in performance, the workflow fails with the error
+`pytest_benchmark.session.PerformanceRegression: Performance has regressed`. One
+must scroll through the logs to find lines similar to the following to find out
+which benchmark(s) caused the regression:
+
+```rst
+--------------------------------------------------------------------------------
+Performance has regressed:
+    test_displacement[numpy] (0001_8b154d8) - Field 'mean' has failed
+        PercentageRegressionCheck: 36.729528797 > 5.000000000
+--------------------------------------------------------------------------------
+```
+
+This indicates that the benchmark `test_displacement` using the NumPy array
+backend has regressed by approximately 36.73% compared to the previous version.
+Effort has been made to reduce the number of false positives in these regression
+tests, however some still occur. It is worth checking if the given function
+(i.e. `glass.displacement`) has actually been hit by changes in the given pull
+request (whether directly or indirectly). If not, the regression can be ignored
+and merged. Sometimes this can be fixed by manually re-running the workflow. If
+the regression is genuine, the workflow should repeatedly fail. Regressions can
+be unavoidable sometimes, but every effort should be made to fix them before
+merging the pull request.
+
+<!-- prettier-ignore -->
+> [!WARNING]
+> A pull request that introduces a change such as the creation of a new module
+> or a change to the name of an existing module may cause the regression
+> workflow to fail because the new module wouldn't exist in `main`. Extra
+> caution should be taken in this case. It is recommended to run the benchmark
+> tests manually and look at the table of values.
 
 ## Contributing workflow
 

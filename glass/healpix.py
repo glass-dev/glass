@@ -433,7 +433,6 @@ class Rotator:
         self,
         *,
         coord: Sequence[str] | None = None,
-        xp: ModuleType | None = None,
     ) -> None:
         """Create a rotator with given parameters.
 
@@ -445,10 +444,7 @@ class Rotator:
             The array library backend to use for array operations.
 
         """
-        xp = _utils.default_xp() if xp is None else xp
-
         self.coord = coord
-        self.xp = xp
 
     def rotate_map_pixel(self, m: FloatArray) -> FloatArray:
         """
@@ -464,6 +460,8 @@ class Rotator:
             Map in the new reference frame
 
         """
-        return self.xp.asarray(
+        xp = m.__array_namespace__()
+
+        return xp.asarray(
             healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m)),
         )
