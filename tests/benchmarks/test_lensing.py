@@ -9,12 +9,12 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
     from typing_extensions import Never
 
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.stable
@@ -85,9 +85,6 @@ def test_multi_plane_weights(
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_weights."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.multi_plane_weights not yet ported for {xpb.__name__}")
-
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
