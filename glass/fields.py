@@ -551,7 +551,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.shape[0]))
-    return cl
+    return cl  # ty: ignore[invalid-return-type]
 
 
 def enumerate_spectra(

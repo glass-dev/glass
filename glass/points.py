@@ -278,7 +278,7 @@ def _compute_expected_count(
 
     # turn into number count, modifying the array in place
     n = n + 1
-    n *= ARCMIN2_SPHERE / n.shape[0] * ngal[k]
+    n *= ARCMIN2_SPHERE / n.shape[0] * ngal[k]  # ty: ignore[not-subscriptable]
     return n
 
 
