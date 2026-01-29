@@ -209,7 +209,7 @@ def galaxy_shear(  # noqa: PLR0913
 
     nside = hp.npix2nside(xp.broadcast_arrays(kappa, gamma1, gamma2)[0].shape[-1])
 
-    size = xp.broadcast_arrays(lon, lat, eps)[0].shape[0]
+    size = xp.broadcast_arrays(lon, lat, eps)[0].size
 
     # output arrays
     k = xp.empty(size)
