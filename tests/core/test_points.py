@@ -9,9 +9,12 @@ import array_api_extra as xpx
 
 import glass
 import glass.healpix as hp
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
+    from typing import Any
 
     from pytest_mock import MockerFixture
 
@@ -99,6 +102,148 @@ def test_loglinear_bias(
         glass.loglinear_bias(delta, b),
         xp.expm1(b * xp.log1p(delta)),
     )
+
+
+def test_broadcast_inputs(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    bias_in = 0.8
+    delta_in = xp.zeros((3, 1, 12))
+    ngal_in = xp.asarray([1e-3, 2e-3])
+    vis_in = xp.repeat(xp.asarray([0.0, 1.0]), 6)
+
+    bias, delta, dims, ngal, vis = glass.points._broadcast_inputs(
+        bias_in,
+        delta_in,
+        ngal_in,
+        vis_in,
+    )
+
+    assert dims == (3, 2)
+    assert bias.shape == dims  # type: ignore[union-attr]
+    assert xp.all(bias == bias_in)
+    compare.assert_array_equal(delta, xp.zeros_like(delta))
+    assert ngal.shape == dims  # type: ignore[union-attr]
+    compare.assert_array_equal(ngal[0, :], ngal_in)  # type: ignore[index]
+    assert vis.shape == delta.shape  # type: ignore[union-attr]
+    compare.assert_array_equal(vis[0, 0, :], vis_in)  # type: ignore[index]
+
+
+@pytest.mark.parametrize(
+    "bias_model",
+    [
+        glass.linear_bias,
+        glass.loglinear_bias,
+    ],
+)
+def test_compute_density_contrast(
+    bias_model: Callable[..., Any],
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    bias = 0.8 * xp.ones((3, 2))
+    bias_model = glass.linear_bias
+    delta = xp.zeros((3, 2, 12))
+    k = (1, 1)
+
+    n = glass.points._compute_density_contrast(
+        bias,
+        bias_model,
+        delta,
+        k,
+    )
+
+    assert n.shape[0] == delta.shape[-1]
+    compare.assert_array_equal(n, xp.zeros_like(n))
+
+
+@pytest.mark.parametrize("remove_monopole", [False, True])
+def test_compute_expected_count(
+    xp: ModuleType,
+    *,
+    remove_monopole: bool,
+) -> None:
+    k = (1, 1)
+    n_in = xp.zeros(12)
+    ngal = xp.tile(xp.asarray([1e-3, 2e-3]), (3, 1))
+
+    n = glass.points._compute_expected_count(
+        k,
+        n_in,
+        ngal,
+        remove_monopole=remove_monopole,
+    )
+
+    assert n.shape == n_in.shape
+    assert xp.all(n == n[0])
+
+
+def test_apply_visibility(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    k = (1, 1)
+    n_in = 24751.77674965 * xp.ones(12)
+    vis = xp.tile(xp.repeat(xp.asarray([0.0, 1.0]), 6), (3, 2, 1))
+
+    n = glass.points._apply_visibility(
+        k,
+        xp.asarray(n_in, copy=True),
+        vis,
+    )
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_array_equal(n[6:], n_in[6:])
+
+
+def test_sample_number_galaxies(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
+    n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
+
+    n = glass.points._sample_number_galaxies(n_in)
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_allclose(n[6:], n_in[6:], atol=250)
+
+
+def test_sample_number_galaxies_rng(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
+
+    n = glass.points._sample_number_galaxies(n_in, rng=urng)
+
+    compare.assert_array_equal(n[:6], xp.zeros_like(n[:6]))
+    compare.assert_allclose(n[6:], n_in[6:], atol=250)
+
+
+def test_sample_galaxies_per_pixel(
+    data_transformer: DataTransformer,
+    xp: ModuleType,
+) -> None:
+    batch = 1000000
+    dims = (3, 2)
+    k = (1, 1)
+    n = xp.asarray([0, 0, 0, 0, 0, 0, 24885, 24945, 24505, 24877, 24546, 24693])
+
+    lon, lat, count = data_transformer.catpos(
+        glass.points._sample_galaxies_per_pixel(batch, dims, k, n),
+        xp=xp,
+    )
+
+    assert count.shape == dims
+    assert count[k] == lon.shape[0]
+    assert count[k] == lat.shape[0]
+    assert tuple(int(i[0]) for i in xp.nonzero(count)) == k
+    assert xp.min(lon) >= 0
+    assert xp.max(lon) < 360
+    assert xp.min(lat) >= -90
+    assert xp.max(lat) <= 90
 
 
 def test_positions_from_delta(  # noqa: PLR0915
@@ -356,11 +501,11 @@ def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray(1j * r))
-    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-1j * r))
-    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
 
 def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
@@ -382,11 +527,11 @@ def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, r]))
-    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, -r]))
-    compare.assert_allclose([lon, lat], [d, 0.0], atol=1e-15)
+    compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
 
 def test_displace_abs(
@@ -434,14 +579,14 @@ def test_displacement(
     data = [
         # equator
         (zero, zero, zero, five, deg5 * north),
-        (zero, zero, -five, zero, deg5 * east),
+        (zero, zero, five, zero, deg5 * east),
         (zero, zero, zero, -five, deg5 * south),
-        (zero, zero, five, zero, deg5 * west),
+        (zero, zero, -five, zero, deg5 * west),
         # pole
         (zero, ninety, ninety * 2, ninety - five, deg5 * north),
-        (zero, ninety, -ninety, ninety - five, deg5 * east),
+        (zero, ninety, ninety, ninety - five, deg5 * east),
         (zero, ninety, zero, ninety - five, deg5 * south),
-        (zero, ninety, ninety, ninety - five, deg5 * west),
+        (zero, ninety, -ninety, ninety - five, deg5 * west),
     ]
 
     # test each displacement individually
@@ -457,3 +602,126 @@ def test_displacement(
         urng.uniform(-90.0, 90.0, size=5),
     )
     assert alpha.shape == (20, 5)
+
+
+def test_displacement_zerodist(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Check that zero displacement is computed correctly."""
+    lon = urng.uniform(-180.0, 180.0, size=100)
+    lat = urng.uniform(-90.0, 90.0, size=100)
+
+    compare.assert_allclose(
+        glass.displacement(lon, lat, lon, lat),
+        xp.zeros(100),
+    )
+
+
+def test_displacement_consistent(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Check displacement is consistent with displace."""
+    n = 1_000
+
+    # magnitude and angle of displacement we want to achieve
+    r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
+    x = urng.uniform(-math.pi, math.pi, size=n)
+
+    # displace at random positions on the sphere
+    from_lon = urng.uniform(-180.0, 180.0, size=n)
+    from_lat = xp.asin(urng.uniform(-1.0, 1.0, size=n)) / math.pi * 180.0
+
+    # compute the intended displacement
+    alpha_in = r * xp.exp(1j * x)
+
+    # displace random points
+    to_lon, to_lat = glass.displace(from_lon, from_lat, alpha_in)
+
+    # measure displacement
+    alpha_out = glass.displacement(from_lon, from_lat, to_lon, to_lat)
+
+    compare.assert_allclose(alpha_out, alpha_in, atol=0.0, rtol=1e-10)
+
+
+def test_displacement_random(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Check displacement for random points."""
+    n = 1_000
+
+    # magnitude and angle of displacement we want to achieve
+    r = xp.acos(urng.uniform(-1.0, 1.0, size=n))
+    x = urng.uniform(-math.pi, math.pi, size=n)
+
+    # displacement at random positions on the sphere
+    theta = xp.acos(urng.uniform(-1.0, 1.0, size=n))
+    phi = urng.uniform(-math.pi, math.pi, size=n)
+
+    # rotation matrix that moves (0, 0, 1) to theta and phi
+    zero = xp.zeros(n)
+    one = xp.ones(n)
+    rot_y = xp.stack(
+        [
+            xp.cos(theta), zero, xp.sin(theta),
+            zero, one, zero,
+            -xp.sin(theta), zero, xp.cos(theta),
+        ],
+        axis=1,
+    )  # fmt: skip
+    rot_z = xp.stack(
+        [
+            xp.cos(phi), -xp.sin(phi), zero,
+            xp.sin(phi), xp.cos(phi), zero,
+            zero, zero, one,
+        ],
+        axis=1,
+    )  # fmt: skip
+    rot = xp.reshape(rot_z, (n, 3, 3)) @ xp.reshape(rot_y, (n, 3, 3))
+
+    # meta-check that rotation works by rotating (0, 0, 1) to theta and phi
+    u = xp.stack(
+        [
+            xp.sin(theta) * xp.cos(phi),
+            xp.sin(theta) * xp.sin(phi),
+            xp.cos(theta),
+        ],
+        axis=1,
+    )
+    compare.assert_allclose(rot @ xp.asarray([0.0, 0.0, 1.0]), u)
+
+    # meta-check that recovering theta and phi from vector works
+    compare.assert_allclose(xp.atan2(xp.hypot(u[:, 0], u[:, 1]), u[:, 2]), theta)
+    compare.assert_allclose(xp.atan2(u[:, 1], u[:, 0]), phi)
+
+    # build the displaced points near (0, 0, 1) and rotate near theta and phi
+    v = xp.stack(
+        [
+            xp.sin(r) * xp.cos(math.pi - x),
+            xp.sin(r) * xp.sin(math.pi - x),
+            xp.cos(r),
+        ],
+        axis=1,
+    )
+    v = rot @ xp.reshape(v, (n, 3, 1))
+    v = xp.reshape(v, (n, 3))
+
+    # compute displaced theta and phi
+    theta_d = xp.atan2(xp.hypot(v[:, 0], v[:, 1]), v[:, 2])
+    phi_d = xp.atan2(v[:, 1], v[:, 0])
+
+    # compute longitude and latitude
+    from_lon = uxpx.degrees(phi)
+    from_lat = 90.0 - uxpx.degrees(theta)
+    to_lon = uxpx.degrees(phi_d)
+    to_lat = 90.0 - uxpx.degrees(theta_d)
+
+    # compute displacement and compare to input
+    alpha_in = r * xp.exp(1j * x)
+    alpha_out = glass.displacement(from_lon, from_lat, to_lon, to_lat)
+    compare.assert_allclose(alpha_out, alpha_in, atol=0.0, rtol=1e-10)

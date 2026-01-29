@@ -41,6 +41,7 @@ if TYPE_CHECKING:
 
 def _populate_random_complex_array(
     length: int,
+    *,
     rng: UnifiedGenerator,
 ) -> ComplexArray:
     return rng.standard_normal((length,)) + (1j * rng.standard_normal((length,)))
@@ -269,12 +270,12 @@ def ellipticity_gaussian(
     # reject those where abs(e) > 0
     i = 0
     for k in uxpx.ndindex(count_broadcasted.shape, xp=xp):
-        e = _populate_random_complex_array(count_broadcasted[k], rng)
+        e = _populate_random_complex_array(count_broadcasted[k], rng=rng)
         e *= sigma_broadcasted[k]
         r = xp.abs(e) > 1
         while xp.count_nonzero(r) > 0:
             e = xpx.at(e)[r].set(
-                _populate_random_complex_array(xp.count_nonzero(r), rng),
+                _populate_random_complex_array(xp.count_nonzero(r), rng=rng),
             )
             e = xpx.at(e)[r].multiply(sigma_broadcasted[k])
             r = xp.abs(e) > 1
@@ -348,7 +349,7 @@ def ellipticity_intnorm(
     # sample complex ellipticities
     i = 0
     for k in uxpx.ndindex(count_broadcasted.shape, xp=xp):
-        e = _populate_random_complex_array(count_broadcasted[k], rng)
+        e = _populate_random_complex_array(count_broadcasted[k], rng=rng)
         e *= sigma_eta[k]
         r = xp.hypot(xp.real(e), xp.imag(e))
         e *= xp.where(
