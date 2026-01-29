@@ -4,6 +4,8 @@ ci:
   autofix_prs: false
   autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
   autoupdate_schedule: monthly
+  skip:
+    - ty
 
 exclude: ^uv.lock$
 repos:
@@ -74,14 +76,15 @@ repos:
     rev: v1.7.10
     hooks:
       - id: actionlint
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+  - repo: local
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - array-api-strict~=2.4.1
-          - jaxtyping~=0.3.4
-          - numpy~=2.2.6
+      - id: ty
+        entry: uv run ty check
+        language: python
+        name: ty-check
+        pass_filenames: true
+        types:
+          - python
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.2
     hooks:

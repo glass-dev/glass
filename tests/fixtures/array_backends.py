@@ -104,7 +104,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
     Access array library functions using `xp.` in tests.
 
     """
-    return request.param  # type: ignore[no-any-return]
+    return request.param
 
 
 @pytest.fixture(
@@ -132,7 +132,7 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
        the older versions of glass.
 
     """
-    return request.param  # type: ignore[no-any-return]
+    return request.param
 
 
 @pytest.fixture(scope="session")

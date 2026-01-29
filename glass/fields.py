@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import sys
 import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
@@ -37,14 +38,13 @@ if TYPE_CHECKING:
         UnifiedGenerator,
     )
 
-
-try:
+if sys.version_info >= (3, 13):
     from warnings import deprecated
-except ImportError:
+else:
     if TYPE_CHECKING:
         from glass._types import P, R
 
-    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore[no-redef]
+    def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:
         """Backport of Python's warnings.deprecated()."""
         import functools  # noqa: PLC0415
         import warnings  # noqa: PLC0415
@@ -279,7 +279,7 @@ def discretized_cls(
         ]
 
     if nside is not None:
-        pw: FloatArray = hp.pixwin(nside, lmax=lmax, xp=xp)
+        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
 
     gls = []
     for cl in cls:
@@ -287,7 +287,7 @@ def discretized_cls(
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(cl.shape[0], pw.shape[0])
+                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[possibly-missing-attribute]
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
@@ -552,7 +552,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.size))
-    return cl
+    return cl  # ty: ignore[invalid-return-type]
 
 
 def enumerate_spectra(
@@ -685,7 +685,7 @@ def effective_cls(
         out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
             out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
-    return out
+    return out  # ty: ignore[invalid-return-type]
 
 
 def gaussian_fields(
@@ -933,7 +933,7 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
     n = nfields_from_nspectra(len(spectra))
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
-    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]  # type: ignore[arg-type]
+    return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
 
 
 def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
@@ -1025,7 +1025,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return cov
+    return cov  # ty: ignore[invalid-return-type]
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
@@ -1093,7 +1093,7 @@ def regularized_spectra(
     elif method == "nearest":
         from glass.algorithm import cov_nearest as cov_method  # noqa: PLC0415
     else:
-        msg = f"unknown method '{method}'"  # type: ignore[unreachable]
+        msg = f"unknown method '{method}'"
         raise ValueError(msg)
 
     # get the cov matrix from spectra
