@@ -135,8 +135,8 @@ def redshifts_from_nz(
 
     # go through extra dimensions; also works if dims is empty
     for k in uxpx.ndindex(dims, xp=xp):
-        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out  # type: ignore[arg-type]
-        z_out_slice = z_out[(*k, ...)] if k != () else z_out  # type: ignore[arg-type]
+        nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
+        z_out_slice = z_out[(*k, ...)] if k != () else z_out
 
         # compute the CDF of each galaxy population
         cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
@@ -150,11 +150,11 @@ def redshifts_from_nz(
                 z_out_slice,
             )
         )
-        total += count_out[k]  # type: ignore[assignment]
+        total += count_out[k]
 
     assert total == redshifts.size  # noqa: S101
 
-    return redshifts
+    return redshifts  # ty: ignore[invalid-return-type]
 
 
 def galaxy_shear(  # noqa: PLR0913
@@ -220,8 +220,8 @@ def galaxy_shear(  # noqa: PLR0913
         upper_bound = min(size, i + 10_000)
         s = slice(i, upper_bound)
         ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=xp)
-        k = xpx.at(k)[s].set(kappa[ipix])  # type: ignore[index]
-        g = xpx.at(g)[s].set(gamma1[ipix] + 1j * gamma2[ipix])  # type: ignore[index]
+        k = xpx.at(k)[s].set(kappa[ipix])
+        g = xpx.at(g)[s].set(gamma1[ipix] + 1j * gamma2[ipix])
 
     if reduced_shear:
         # compute reduced shear in place

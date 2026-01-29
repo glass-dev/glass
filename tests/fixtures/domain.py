@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 @pytest.fixture(scope="session")
 def cosmo() -> Cosmology:
     """Mock cosmology to use for core tests."""
-    return MockCosmology()
+    return MockCosmology()  # ty: ignore[invalid-return-type]
 
 
 class MockCosmology:
@@ -79,7 +79,7 @@ class MockCosmology:
 
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
-        return 1_000 * (1 / (dc + np.finfo(float).eps))
+        return 1_000 * (1 / (dc + np.finfo(float).eps))  # ty: ignore[unsupported-operator]
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""

@@ -237,9 +237,9 @@ def _compute_density_contrast(
     xp = array_api_compat.array_namespace(delta, bias, use_compat=False)
 
     return (
-        xp.asarray(delta[(*k, ...)], copy=True)  # type: ignore[arg-type]
+        xp.asarray(delta[(*k, ...)], copy=True)
         if bias is None
-        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # type: ignore[arg-type,index]
+        else bias_model(delta[(*k, ...)], bias[(*k, ...)])  # ty: ignore[not-subscriptable]
     )
 
 
@@ -278,7 +278,7 @@ def _compute_expected_count(
 
     # turn into number count, modifying the array in place
     n = n + 1
-    n *= ARCMIN2_SPHERE / n.size * ngal[k]  # type: ignore[index]
+    n *= ARCMIN2_SPHERE / n.size * ngal[k]  # ty: ignore[not-subscriptable]
     return n
 
 
@@ -306,7 +306,7 @@ def _apply_visibility(
 
     """
     if vis is not None:
-        n *= vis[(*k, ...)]  # type: ignore[arg-type]
+        n *= vis[(*k, ...)]
     return n
 
 
@@ -341,7 +341,7 @@ def _sample_number_galaxies(
     n = xp.clip(n, min=0.0)
 
     # sample actual number in each pixel
-    return rng.poisson(n)
+    return rng.poisson(n)  # ty: ignore[invalid-return-type]
 
 
 def _sample_galaxies_per_pixel(
@@ -601,7 +601,7 @@ def uniform_positions(
         count: int | IntArray
         if dims:
             count = xp.zeros(dims, dtype=xp.int64)
-            count = xpx.at(count)[k].set(ngal_sphere[k])
+            count = xpx.at(count)[k].set(ngal_sphere[k])  # ty: ignore[invalid-assignment]
         else:
             count = int(ngal_sphere[k])
 

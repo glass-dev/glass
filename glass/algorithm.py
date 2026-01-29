@@ -99,7 +99,7 @@ def nnls(
             q = xpx.at(q)[x <= 0].set(False)
         x = xpx.at(x)[q].set(sq)
         x = xpx.at(x)[~q].set(0)
-    return x
+    return x  # ty: ignore[invalid-return-type]
 
 
 def cov_clip(
