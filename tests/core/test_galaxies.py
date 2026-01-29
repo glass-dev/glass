@@ -158,7 +158,7 @@ def test_galaxy_shear(
         gamma1,
         gamma2,
     )
-    assert shear.size == 0
+    assert shear.shape[0] == 0
 
     gal_lon, gal_lat, gal_eps = (
         urng.normal(size=(512,)),
@@ -179,7 +179,7 @@ def test_galaxy_shear(
         gamma2,
         reduced_shear=False,
     )
-    assert shear.size == 0
+    assert shear.shape[0] == 0
 
     gal_lon, gal_lat, gal_eps = (
         urng.normal(size=(512,)),

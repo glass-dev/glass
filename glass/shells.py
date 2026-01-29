@@ -260,7 +260,7 @@ class RadialWindow:
             The effective redshift depending on the size of ``za``.
 
         """
-        if self.za.size > 0:
+        if self.za.shape[0] > 0:
             return uxpx.trapezoid(
                 self.za * self.wa,
                 self.za,
@@ -313,7 +313,7 @@ def tophat_windows(
     if zbins.ndim != 1:
         msg = "zbins must be a 1D array"
         raise ValueError(msg)
-    if zbins.size < 2:
+    if zbins.shape[0] < 2:
         msg = "zbins must have at least two entries"
         raise ValueError(msg)
     if zbins[0] != 0:
@@ -381,7 +381,7 @@ def linear_windows(
     if zgrid.ndim != 1:
         msg = "zgrid must be a 1D array"
         raise ValueError(msg)
-    if zgrid.size < 3:
+    if zgrid.shape[0] < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
@@ -451,7 +451,7 @@ def cubic_windows(
     if zgrid.ndim != 1:
         msg = "zgrid must be a 1D array"
         raise ValueError(msg)
-    if zgrid.size < 3:
+    if zgrid.shape[0] < 3:
         msg = "nodes must have at least 3 entries"
         raise ValueError(msg)
     if zgrid[0] != 0:
@@ -705,13 +705,13 @@ def partition_lstsq(
     a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
     b = xp.concat([b, mult * xp.reshape(uxpx.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
-    # now a is a matrix of shape (len(shells), len(zp) + 1)
-    # and b is a matrix of shape (*dims, len(zp) + 1)
+    # now a is a matrix of shape (len(shells), zp.shape[0] + 1)
+    # and b is a matrix of shape (*dims, zp.shape[0] + 1)
     # need to find weights x such that b == x @ a over all axes of b
     # do the least-squares fit over partially flattened b, then reshape
     x = uxpx.linalg_lstsq(
         xp.matrix_transpose(a),
-        xp.matrix_transpose(xp.reshape(b, (-1, zp.size + 1))),
+        xp.matrix_transpose(xp.reshape(b, (-1, zp.shape[0] + 1))),
         rcond=None,
     )[0]
     x = xp.reshape(xp.matrix_transpose(x), (*dims, len(shells)))
@@ -777,8 +777,8 @@ def partition_nnls(
     a = xp.concat([a, mult * xp.ones((len(shells), 1))], axis=-1)
     b = xp.concat([b, mult * xp.reshape(uxpx.trapezoid(fz, z), (*dims, 1))], axis=-1)
 
-    # now a is a matrix of shape (len(shells), len(zp) + 1)
-    # and b is a matrix of shape (*dims, len(zp) + 1)
+    # now a is a matrix of shape (len(shells), zp.shape[0] + 1)
+    # and b is a matrix of shape (*dims, zp.shape[0] + 1)
     # for each dim, find non-negative weights x such that b == a.T @ x
 
     # reduce the dimensionality of the problem using a thin QR decomposition
