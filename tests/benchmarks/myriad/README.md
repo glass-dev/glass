@@ -17,15 +17,20 @@ To simplify running benchmarks on myriad there are several scripts provided.
    ```
 
 2. Then, to reduce the required run time of the benchmark jobs on myriad, we
-   install the required python dependencies which have been extracted from the
-   [pyproject.toml](../../../pyproject.toml) into
-   [test-requirements.txt](./test-requirements.txt). Therefore, we must create
-   our virtual environment...
+   install the required python dependencies from the group `test`. Therefore, we
+   must create our virtual environment, ensureing we upgrade pip to a version
+   which supports dependency groups...
 
    ```sh
    python3 -m venv $GLASS_DIR/.venv
    source $GLASS_DIR/.venv/bin/activate
-   python -m pip install -r $GLASS_DIR/tests/benchmarks/myriad/test-requirements.txt
+   python -m pip install --upgrade pip
+   ```
+
+   Now we can install our dependencies...
+
+   ```sh
+   python -m pip install --group test
    ```
 
 3. Now that our environment is setup, before we can submit our regression test

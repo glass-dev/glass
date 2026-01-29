@@ -1,9 +1,0 @@
-cosmology.api
-fitsio
-pytest
-pytest-benchmark
-pytest-cov
-pytest-doctestplus
-pytest-mock
-pytest-rerunfailures
-scipy
