@@ -594,7 +594,7 @@ def test_compute_gaussian_spectra_gh639(mocker: MockerFixture, xp: ModuleType) -
     assert mock.call_args_list[0] == mocker.call(spectra[0], fields[0], fields[0])
     assert mock.call_args_list[1] == mocker.call(spectra[1], fields[1], fields[1])
     assert gls[:2] == [mock.return_value, mock.return_value]
-    assert gls[2].size == 0
+    assert gls[2].shape[0] == 0
 
 
 def test_solve_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
