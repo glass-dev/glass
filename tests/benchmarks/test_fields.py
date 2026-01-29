@@ -13,10 +13,10 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from conftest import Compare, GeneratorConsumer  # ty: ignore[unresolved-import]
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare, GeneratorConsumer
 
 
 @pytest.mark.stable
@@ -156,18 +156,14 @@ def test_cls2cov(
 @pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
-def test_generate_grf(  # noqa: PLR0913
-    xpb: ModuleType,
+def test_generate_grf(
     benchmark: BenchmarkFixture,
     generator_consumer: GeneratorConsumer,
+    ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
-    ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.fields._generate_grf not yet ported for {xpb.__name__}")
-
     gls: AngularPowerSpectra = [urngb.random(1_000)]
     nside = 4
 
@@ -195,9 +191,6 @@ def test_generate(
     ncorr: int | None,
 ) -> None:
     """Benchmarks for glass.generate."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.generate not yet ported for {xpb.__name__}")
-
     n = 100
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005

@@ -124,6 +124,7 @@ class GeneratorConsumer:
 
         The resulting generator will be consumed an any ValueError
         exceptions swallowed.
+
         """
         output: list[Any] = []
         try:

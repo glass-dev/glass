@@ -69,7 +69,8 @@ if TYPE_CHECKING:
 
 @dataclasses.dataclass
 class DistanceWeight:
-    """Uniform weight in comoving distance.
+    """
+    Uniform weight in comoving distance.
 
     Attributes
     ----------
@@ -99,7 +100,8 @@ class DistanceWeight:
 
 @dataclasses.dataclass
 class VolumeWeight:
-    """Uniform weight in comoving volume.
+    """
+    Uniform weight in comoving volume.
 
     Attributes
     ----------
@@ -235,6 +237,7 @@ class RadialWindow:
         Magic method to setup optional inputs
         - Calculates the effective redshift if not given.
         - Determines xp from za and wa.
+
         """
         if math.isnan(self.zeff):
             object.__setattr__(self, "zeff", self._calculate_zeff())
@@ -244,11 +247,13 @@ class RadialWindow:
         Iterate over the window function and effective redshift.
 
         To be removed upon deprecation of ``glass.ext.camb``.
+
         """
         yield from (self.za, self.wa, self.zeff)
 
     def _calculate_zeff(self) -> float:
-        """Calculate ``zeff`` if not given.
+        """
+        Calculate ``zeff`` if not given.
 
         Returns
         -------

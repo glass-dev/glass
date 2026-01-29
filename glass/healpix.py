@@ -319,7 +319,7 @@ def pixwin(
     lmax: int | None = None,
     pol: bool = False,
     xp: ModuleType | None = None,
-) -> tuple[FloatArray, ...]:
+) -> FloatArray | tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
 
@@ -434,7 +434,8 @@ class Rotator:
         *,
         coord: Sequence[str] | None = None,
     ) -> None:
-        """Create a rotator with given parameters.
+        """
+        Create a rotator with given parameters.
 
         Parameters
         ----------
