@@ -4,6 +4,48 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2026.1 (29 Jan 2026)
+--------------------
+
+* Added full Array API support for the following -
+
+    * :func:`glass.algorithm.nnls`
+    * :func:`glass.ellipticity_gaussian`
+    * :func:`glass.ellipticity_intnorm`
+    * :func:`glass.ellipticity_ryden04`
+    * :func:`glass.multi_plane_matrix`
+    * :func:`glass.multi_plane_weights`
+    * :func:`glass.positions_from_delta`
+    * :func:`glass.uniform_positions`
+    * :func:`glass.vmap_galactic_ecliptic`
+    * :mod:`glass.fields`
+    * :mod:`glass.galaxies`
+
+* The :func:`glass.displace` and :func:`glass.displacement` functions have
+  been fixed to be fully consistent with each other. Displacement is now
+  everywhere defined as on a compass. Going "east" means increasing longitude,
+  and going "west" means decreasing longitude.
+
+* The :func:`glass.positions_from_delta` function now only accepts callable
+  functions rather than also strings.
+
+* All ``healpix`` and ``healpy`` calls have been moved to a new module
+  :mod:`glass.healpix` to isolate Array API support.
+
+* Exposed the :mod:`glass.arraytools` module to users.
+
+* Added instructions to ``CONTRIBUTING.md`` on how the regression tests work.
+
+* Added documentation to GLASS on the extension packages in
+  ``docs/manual/extensions.rst``.
+
+* Fixed support for Python 3.10 in the CI and in ``pre-commit``.
+
+* Extended support to ``array-api-compat==1.13.0``.
+
+* Perform type checking with ``astral-sh/ty`` instead of ``mypy``.
+
+
 2025.3 (2 Dec 2025)
 --------------------
 
