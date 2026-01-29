@@ -66,13 +66,9 @@ def test_redshifts_from_nz(
 def test_galaxy_shear(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
-    xpb: ModuleType,
     reduced_shear: bool,  # noqa: FBT001
 ) -> None:
     """Benchmark for galaxies.galaxy_shear."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.galaxy_shear not yet ported for {xpb.__name__}")
-
     scale_factor = 100
     size = (12 * scale_factor,)
     kappa = urngb.normal(size=size)
