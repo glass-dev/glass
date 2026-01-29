@@ -26,9 +26,6 @@ def test_multi_plane_matrix(
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for add_window and add_plane with a multi_plane_matrix."""
-    if xpb.__name__ == "array_api_strict":
-        pytest.skip(f"glass.multi_plane_matrix not yet ported for {xpb.__name__}")
-
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
@@ -42,26 +39,30 @@ def test_multi_plane_matrix(
     deltas = urngb.random((len(shells), 10))
 
     compare.assert_array_equal(mat, xpb.tril(mat))
-    compare.assert_array_equal(xpb.triu(mat, 1), 0)
+    compare.assert_array_equal(xpb.triu(mat, k=1), 0)
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
             glass.MultiPlaneConvergence,
-            zip[tuple[glass.RadialWindow, FloatArray]],
+            list[glass.RadialWindow],
+            FloatArray,
         ],
         dict[Never, Never],
     ]:
         """Run setup a generator with zip before each benchmark run."""
         convergence = glass.MultiPlaneConvergence(cosmo)
-        return (convergence, zip(shells, deltas, strict=False)), {}
+        return (convergence, shells, deltas), {}
 
     def multi_plane_matrix_add_window(
         convergence: type[glass.MultiPlaneConvergence],
-        zipped: tuple[list[type[glass.RadialWindow]], FloatArray],
+        shells: list[type[glass.RadialWindow]],
+        deltas: FloatArray,
     ) -> type[glass.MultiPlaneConvergence]:
         """Call add_window repeatedly, to be benchmarked."""
-        for shell, delta in zipped:
-            convergence.add_window(delta, shell)  # ty: ignore[missing-argument]
+        for i in range(min(len(shells), deltas.shape[0])):
+            shell = shells[i]
+            delta = deltas[i, ...]
+            convergence.add_window(delta, shell)
         return convergence
 
     actual_convergence = benchmark.pedantic(
@@ -70,7 +71,7 @@ def test_multi_plane_matrix(
         rounds=500,
     )
 
-    assert len(actual_convergence.kappa) == 10
+    assert actual_convergence.kappa.shape[0] == 10
     for x in actual_convergence.kappa:
         assert x is not None
 

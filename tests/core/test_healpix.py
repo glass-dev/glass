@@ -373,7 +373,6 @@ def test_rotate_map_pixel(
     coord: str,
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
-    xp: ModuleType,
 ) -> None:
     """
     Compare ``glass.healpix.Rotator.rotate_map_pixel`` against
@@ -383,5 +382,5 @@ def test_rotate_map_pixel(
     kappa = healpix_inputs.kappa(rng=urng)
     compare.assert_array_equal(
         healpy.Rotator(coord=coord).rotate_map_pixel(np.asarray(kappa)),
-        hp.Rotator(coord=coord, xp=xp).rotate_map_pixel(kappa),
+        hp.Rotator(coord=coord).rotate_map_pixel(kappa),
     )
