@@ -951,7 +951,7 @@ def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
     """
     xp = alm.__array_namespace__()
 
-    n = _inv_triangle_number(alm.shape[0])
+    n = _inv_triangle_number(alm.size)
     ell = xp.arange(n)
     out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
     return xp.concat(out)
