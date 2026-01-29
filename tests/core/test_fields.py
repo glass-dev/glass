@@ -410,12 +410,14 @@ def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
 
 def test_generate_gaussian(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
+        result = glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
+    next(result)
 
 
 def test_generate_lognormal(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
+        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
+    next(result)
 
 
 def test_generate(compare: type[Compare], xp: ModuleType) -> None:
