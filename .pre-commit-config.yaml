@@ -74,15 +74,10 @@ repos:
     rev: v1.7.10
     hooks:
       - id: actionlint
-  - repo: local
+  - repo: https://github.com/narumiruna/ty-pre-commit
+    rev: v0.0.14
     hooks:
-      - id: ty
-        entry: uv run ty check
-        language: python
-        name: ty-check
-        pass_filenames: true
-        types:
-          - python
+      - id: ty-check
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.2
     hooks:
