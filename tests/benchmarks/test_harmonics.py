@@ -13,8 +13,9 @@ glass_harmonics = pytest.importorskip(
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from conftest import Compare
     from pytest_benchmark.fixture import BenchmarkFixture
+
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.unstable

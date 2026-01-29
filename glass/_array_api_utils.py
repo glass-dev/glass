@@ -6,7 +6,7 @@ This module provides utility functions and classes for working with multiple arr
 backends in the glass project, including NumPy, JAX, and array-api-strict. It includes
 functions for importing backends, determining array namespaces, dispatching random
 number generators, and providing missing functionality for array-api-strict through the
-XPAdditions class.
+xp_additions class.
 
 Classes and functions in this module help ensure consistent behavior and compatibility
 across different array libraries, and provide wrappers for common operations such as
@@ -27,13 +27,14 @@ if TYPE_CHECKING:
 
     import numpy as np
 
-    from glass._types import AnyArray, DTypeLike
+    from glass._types import AnyArray, DTypeLike, IntArray
 
 
 class CompatibleBackendNotFoundError(Exception):
     """
     Exception raised when an array library backend that
     implements a requested function, is not found.
+
     """
 
     def __init__(self, missing_backend: str, users_backend: str | None) -> None:
@@ -68,6 +69,7 @@ def import_numpy(backend: str | None = None) -> ModuleType:
     -----
     This is useful for explaining to the user why NumPy is required when their chosen
     backend does not implement a needed function.
+
     """
     try:
         import numpy  # noqa: ICN001, PLC0415
@@ -93,6 +95,7 @@ class xp_additions:  # noqa: N801
 
     This is intended as a temporary solution. See https://github.com/glass-dev/glass/issues/645
     for details.
+
     """
 
     @staticmethod
@@ -570,6 +573,45 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"array_api_strict", "jax.numpy"}:
             np = import_numpy(xp.__name__)
             return np.ndindex(shape)  # type: ignore[no-any-return]
+
+        msg = "the array backend in not supported"
+        raise NotImplementedError(msg)
+
+    @staticmethod
+    def tril_indices(
+        n: int,
+        *,
+        k: int = 0,
+        m: int | None = None,
+        xp: ModuleType,
+    ) -> tuple[IntArray, ...]:
+        """
+        Return the indices for the lower-triangle of an (n, m) array.
+
+        Parameters
+        ----------
+        n
+            The row dimension of the arrays for which the returned indices will be
+            valid.
+        k
+            Diagonal offset.
+        m
+            The column dimension of the arrays for which the returned arrays will be
+            valid. By default m is taken equal to n.
+
+        Returns
+        -------
+            The row and column indices, respectively. The row indices are sorted in
+            non-decreasing order, and the corresponding column indices are strictly
+            increasing for each row.
+
+        """
+        if xp.__name__ in {"numpy", "jax.numpy"}:
+            return xp.tril_indices(n, k=k, m=m)  # type: ignore[no-any-return]
+
+        if xp.__name__ == "array_api_strict":
+            np = import_numpy(xp.__name__)
+            return tuple(xp.asarray(arr) for arr in np.tril_indices(n, k=k, m=m))
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)

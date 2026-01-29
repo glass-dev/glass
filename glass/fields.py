@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import itertools
 import math
 import warnings
 from collections.abc import Sequence
@@ -65,6 +64,7 @@ def _inv_triangle_number(triangle_number: int) -> int:
     The :math:`n`-th triangle number is :math:`T_n = n \, (n+1)/2`. If
     the argument is :math:`T_n`, then :math:`n` is returned. Otherwise,
     a :class:`ValueError` is raised.
+
     """
     n = math.floor(math.sqrt(2 * triangle_number))
     if n * (n + 1) // 2 != triangle_number:
@@ -80,6 +80,7 @@ def nfields_from_nspectra(nspectra: int) -> int:
     Given the number of spectra *nspectra*, returns the number of
     fields *n* such that ``n * (n + 1) // 2 == nspectra`` or raises
     a :class:`ValueError` if the number of spectra is invalid.
+
     """
     try:
         n = _inv_triangle_number(nspectra)
@@ -123,66 +124,60 @@ def iternorm(
         If the covariance matrix is not positive definite.
 
     """
-    # Convert to list here to allow determining the namespace
-    first = next(cov)  # type: ignore[call-overload]
-    xp = first.__array_namespace__()
-
     n = (size,) if isinstance(size, int) else size
 
-    m = xp.zeros((*n, k, k))
-    a = xp.zeros((*n, k))
-    s = xp.zeros((*n,))
+    m = np.zeros((*n, k, k))
+    a = np.zeros((*n, k))
+    s = np.zeros((*n,))
     q = (*n, k + 1)
     j = 0 if k > 0 else None
 
     # We must use cov_expanded here as cov has been consumed to determine the namespace
-    for i, x in enumerate(itertools.chain([first], cov)):
-        # Ideally would be xp.asanyarray but this does not yet exist. The key difference
-        # between the two in numpy is that asanyarray maintains subclasses of NDArray
-        # whereas asarray will return the base class NDArray. Currently, we don't seem
-        # to pass a subclass of NDArray so this, so it might be okay
-        x = xp.asarray(x)  # noqa: PLW2901
-        if x.shape != q:
+    for i, x in enumerate(cov):
+        x_np = np.asarray(x)
+        if x_np.shape != q:
             try:
-                x = xp.broadcast_to(x, q)  # noqa: PLW2901
+                x_np = np.broadcast_to(x_np, q)
             except ValueError:
-                msg = f"covariance row {i}: shape {x.shape} cannot be broadcast to {q}"
+                msg = (
+                    f"covariance row {i}: shape {x_np.shape} cannot be broadcast to {q}"
+                )
                 raise TypeError(msg) from None
 
         # only need to update matrix A if there are correlations
         if j is not None:
             # compute new entries of matrix A
             m[..., :, j] = 0
-            m[..., j : j + 1, :] = xp.matmul(a[..., xp.newaxis, :], m)
-            m[..., j, j] = xp.where(s != 0, -1, s)
-            # To ensure we don't divide by zero or nan we use a mask to only divide the
-            # appropriate values of m and s
-            m_j = m[..., j, :]
-            s_broadcast = xp.broadcast_to(s[..., xp.newaxis], m_j.shape)
-            mask = (m_j != 0) & (s_broadcast != 0) & ~xp.isnan(s_broadcast)
-            m_j[mask] = xp.divide(m_j[mask], -s_broadcast[mask])
-            m[..., j, :] = m_j
+            m[..., j : j + 1, :] = np.matmul(a[..., np.newaxis, :], m)
+            m[..., j, j] = np.where(s != 0, -1, 0)
+            np.divide(
+                m[..., j, :],
+                -s[..., np.newaxis],
+                where=(m[..., j, :] != 0),
+                out=m[..., j, :],
+            )
 
             # compute new vector a
-            c = x[..., 1:, xp.newaxis]
-            a = xp.matmul(m[..., :j], c[..., k - j :, :])
-            a += xp.matmul(m[..., j:], c[..., : k - j, :])
-            a = xp.reshape(a, (*n, k))
+            c = x_np[..., 1:, np.newaxis]
+            a = np.matmul(m[..., :j], c[..., k - j :, :])
+            a += np.matmul(m[..., j:], c[..., : k - j, :])
+            a = np.reshape(a, (*n, k))
 
             # next rolling index
             j = (j - 1) % k
 
         # compute new standard deviation
-        a_np = np.asarray(a, copy=True)
-        einsum_result_np = np.einsum("...i,...i", a_np, a_np)
-        s = x[..., 0] - xp.asarray(einsum_result_np, copy=True)
-        if xp.any(s < 0):
+        s = x_np[..., 0] - np.einsum("...i,...i", a, a)
+        if np.any(s < 0):
             msg = "covariance matrix is not positive definite"
             raise ValueError(msg)
-        s = xp.sqrt(s)
+        s = np.sqrt(s)
+
+        # Extract input array backend or conversion of outputs
+        xp = x.__array_namespace__()
 
         # yield the next index, vector a, and standard deviation s
-        yield j, a, s
+        yield j, xp.asarray(a), xp.asarray(s)
 
 
 def cls2cov(
@@ -269,25 +264,30 @@ def discretized_cls(
         If the length of the Cls array is not a triangle number.
 
     """
+    if len(cls) == 0:
+        return []
+
+    xp = array_api_compat.array_namespace(*cls, use_compat=False)
+
     if ncorr is not None:
         n = nfields_from_nspectra(len(cls))
         cls = [
-            cls[i * (i + 1) // 2 + j] if j <= ncorr else np.asarray([])
+            cls[i * (i + 1) // 2 + j] if j <= ncorr else xp.asarray([])
             for i in range(n)
             for j in range(i + 1)
         ]
 
     if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax, xp=np)
+        pw: FloatArray = hp.pixwin(nside, lmax=lmax, xp=xp)
 
     gls = []
     for cl in cls:
-        if len(cl) > 0:  # type: ignore[arg-type]
+        if cl.shape[0] > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(len(cl), len(pw))  # type: ignore[arg-type]
-                cl = cl[:n] * pw[:n] ** 2  # type: ignore[operator] # noqa: PLW2901
+                n = min(cl.shape[0], pw.shape[0])
+                cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
 
@@ -366,8 +366,10 @@ def _generate_grf(
         If all gls are empty.
 
     """
+    xp = array_api_compat.array_namespace(*gls, use_compat=False)
+
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=np)
+        rng = _rng.rng_dispatcher(xp=xp)
 
     # number of gls and number of fields
     ngls = len(gls)
@@ -378,7 +380,7 @@ def _generate_grf(
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((len(gl) for gl in gls), default=0)  # type: ignore[arg-type]
+    n = max((gl.shape[0] for gl in gls), default=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -387,8 +389,8 @@ def _generate_grf(
     cov = cls2cov(gls, n, ngrf, ncorr)
 
     # working arrays for the iterative sampling
-    z = np.zeros(n * (n + 1) // 2, dtype=np.complex128)
-    y = np.zeros((n * (n + 1) // 2, ncorr), dtype=np.complex128)
+    z_size = n * (n + 1) // 2
+    y = xp.zeros((z_size, ncorr), dtype=xp.complex128)
 
     # generate the conditional normal distribution for iterative sampling
     conditional_dist = iternorm(ncorr, cov, size=n)
@@ -397,7 +399,7 @@ def _generate_grf(
     for j, a, s in conditional_dist:
         # standard normal random variates for alm
         # sample real and imaginary parts, then view as complex number
-        rng.standard_normal(n * (n + 1), np.float64, z.view(np.float64))  # type: ignore[call-arg]
+        z = rng.standard_normal((z_size,)) + (1j * rng.standard_normal((z_size,)))
 
         # scale by standard deviation of the conditional distribution
         # variance is distributed over real and imaginary part
@@ -409,13 +411,12 @@ def _generate_grf(
 
         # store the standard normal in y array at the indicated index
         if j is not None:
-            y[:, j] = z
+            y = xpx.at(y)[:, j].set(z)
 
         alm = _glass_to_healpix_alm(alm)
 
         # modes with m = 0 are real-valued and come first in array
-        np.real(alm[:n])[:] += np.imag(alm[:n])
-        np.imag(alm[:n])[:] = 0
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -593,8 +594,8 @@ def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
     """
     xp = _utils.default_xp() if xp is None else xp
 
-    i, j = xp.tril_indices(n)
-    return xp.asarray([i, i - j]).T
+    i, j = uxpx.tril_indices(n, xp=xp)
+    return xp.stack([i, i - j]).T
 
 
 def effective_cls(
@@ -680,9 +681,9 @@ def effective_cls(
             for i1 in range(n)
             for i2 in range(n)
         )
-        out[j1 + j2 + (...,)] = cl
+        out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
-            out[j2 + j1 + (...,)] = cl
+            out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
     return out
 
 
@@ -795,6 +796,9 @@ def solve_gaussian_spectra(
         msg = "mismatch between number of fields and spectra"
         raise ValueError(msg)
 
+    if len(spectra) == 0:
+        return []
+
     gls = []
     for i, j, cl in enumerate_spectra(spectra):
         if cl.size > 0:
@@ -831,7 +835,7 @@ def generate(
     nside: int,
     *,
     ncorr: int | None = None,
-    rng: np.random.Generator | None = None,
+    rng: UnifiedGenerator | None = None,
 ) -> Iterator[AnyArray]:
     """
     Sample random fields from Gaussian angular power spectra.
@@ -875,7 +879,8 @@ def generate(
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
-    variances = (transformcl.cltovar(getcl(gls, i, i)) for i in range(n))
+    # cltovar requires numpy but getcl maintains xp, so conversion is required
+    variances = (transformcl.cltovar(np.asarray(getcl(gls, i, i))) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
@@ -994,6 +999,8 @@ def cov_from_spectra(
         Covariance matrix from the given spectra.
 
     """
+    xp = array_api_compat.array_namespace(*spectra, use_compat=False)
+
     # recover the number of fields from the number of spectra
     n = nfields_from_nspectra(len(spectra))
 
@@ -1003,14 +1010,17 @@ def cov_from_spectra(
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
     # missing entries are zero, which is the default value
-    cov = np.zeros((k, n, n))
+    cov = xp.zeros((k, n, n), dtype=spectra[0].dtype)
 
     # fill the matrix up by going through the spectra in order
     # skip over entries that are None
     # if the spectra are ragged, some entries at high ell may remain zero
     # only fill the lower triangular part, everything is symmetric
     for i, j, cl in enumerate_spectra(spectra):
-        cov[: cl.size, i, j] = cov[: cl.size, j, i] = cl.reshape(-1)[:k]  # type: ignore[union-attr]
+        size = min(k, cl.size)
+        cl_flat = xp.reshape(cl, (-1,))
+        cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
+        cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
     return cov
 

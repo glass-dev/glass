@@ -287,7 +287,7 @@ def test_pixwin(
 
     # Normalize to tuple
     old = old if isinstance(old, tuple) else (old,)
-    new = new if isinstance(new, tuple) else (new,)  # type: ignore[redundant-expr]
+    new = new if isinstance(new, tuple) else (new,)
 
     assert len(old) == len(new)
     for i in range(len(old)):
@@ -307,6 +307,7 @@ def test_query_strip_float64(
     The behaviour of ``query_strip`` has been changed subtly. Previously it
     returned the indices of the pixels within the strip. Now it returns a mask
     array indicating which pixels are within the strip.
+
     """
     old = np.ones(healpix_inputs.npix)
     old[healpy.query_strip(healpix_inputs.nside, *thetas)] = 0
@@ -346,6 +347,7 @@ def test_randang(
 
     ``healpix.randang`` consumes the random numbers from RNG, changing its
     internal state. So the ``rng`` must be re-initialized before each call.
+
     """
     ipix = healpix_inputs.ipix(rng=urng, xp=xp)
     old = healpix.randang(
@@ -371,14 +373,14 @@ def test_rotate_map_pixel(
     coord: str,
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
-    xp: ModuleType,
 ) -> None:
     """
     Compare ``glass.healpix.Rotator.rotate_map_pixel`` against
     ``healpy.Rotator.rotate_map_pixel``.
+
     """  # noqa: D205
     kappa = healpix_inputs.kappa(rng=urng)
     compare.assert_array_equal(
         healpy.Rotator(coord=coord).rotate_map_pixel(np.asarray(kappa)),
-        hp.Rotator(coord=coord, xp=xp).rotate_map_pixel(kappa),
+        hp.Rotator(coord=coord).rotate_map_pixel(kappa),
     )
