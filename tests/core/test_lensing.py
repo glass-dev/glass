@@ -3,27 +3,31 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
 import glass.healpix as hp
+from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import FloatArray
+    from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
     from tests.fixtures.helper_classes import Compare
 
 
-def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> None:
+def test_from_convergence(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+) -> None:
     """Add unit tests for :func:`glass.from_convergence`."""
     # l_max = 100  # noqa: ERA001
     n_side = 32
 
     # create a convergence map
-    kappa = rng.integers(10, size=hp.nside2npix(n_side))
+    kappa = urng.random(hp.nside2npix(n_side))
+    kappa *= 10.0
 
     # check with all False
 
@@ -56,27 +60,31 @@ def test_from_convergence(compare: type[Compare], rng: np.random.Generator) -> N
 
 def test_shear_from_convergence() -> None:
     """Add unit tests for :func:`glass.shear_from_convergence`."""
+    pytest.skip("No test yet implemented")
 
 
 def test_multi_plane_matrix(
     compare: type[Compare],
     cosmo: Cosmology,
-    rng: np.random.Generator,
     shells: list[glass.RadialWindow],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
 ) -> None:
     mat = glass.multi_plane_matrix(shells, cosmo)
 
-    compare.assert_array_equal(mat, np.tril(mat))
-    compare.assert_array_equal(np.triu(mat, 1), 0)
+    compare.assert_array_equal(mat, xp.tril(mat))
+    compare.assert_array_equal(xp.triu(mat, k=1), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
-    deltas = rng.random((len(shells), 10))
+    deltas = urng.random((len(shells), 10))
     kappas = []
-    for shell, delta in zip(shells, deltas, strict=False):
+    for i in range(len(shells)):
+        shell = shells[i]
+        delta = deltas[i, ...]
         convergence.add_window(delta, shell)
         if convergence.kappa is not None:
-            kappas.append(convergence.kappa.copy())  # type: ignore[union-attr]
+            kappas.append(xp.asarray(convergence.kappa, copy=True))
 
     compare.assert_allclose(mat @ deltas, kappas)
 
@@ -84,28 +92,33 @@ def test_multi_plane_matrix(
 def test_multi_plane_weights(
     compare: type[Compare],
     cosmo: Cosmology,
-    rng: np.random.Generator,
+    urng: UnifiedGenerator,
     shells: list[glass.RadialWindow],
+    xp: ModuleType,
 ) -> None:
-    w_in = np.eye(len(shells))
+    w_in = xp.eye(len(shells))
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    compare.assert_array_equal(w_out, np.triu(w_out, 1))
-    compare.assert_array_equal(np.tril(w_out), 0)
+    compare.assert_array_equal(w_out, xp.triu(w_out, k=1))
+    compare.assert_array_equal(xp.tril(w_out), 0)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
-    deltas = rng.random((len(shells), 10))
-    weights = rng.random((len(shells), 3))
+    deltas = urng.random((len(shells), 10))
+    weights = urng.random((len(shells), 3))
     kappa = 0
-    for shell, delta, weight in zip(shells, deltas, weights, strict=False):
+    for i in range(min(len(shells), deltas.shape[0], weights.shape[0])):
+        shell = shells[i]
+        delta = deltas[i, :]
+        weight = weights[i, :]
         convergence.add_window(delta, shell)
-        kappa = kappa + weight[..., None] * convergence.kappa
-    kappa /= weights.sum(axis=0)[..., None]
+        assert convergence.kappa is not None
+        kappa = kappa + weight[..., xp.newaxis] * convergence.kappa
+    kappa /= xp.sum(weights, axis=0)[..., xp.newaxis]
 
     wmat = glass.multi_plane_weights(weights, shells, cosmo)
 
-    compare.assert_allclose(np.einsum("ij,ik", wmat, deltas), kappa)
+    compare.assert_allclose(uxpx.einsum("ij,ik", wmat, deltas), kappa)
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
@@ -165,19 +178,23 @@ def test_deflect_nsew(
         glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
 
 
-def test_deflect_many(compare: type[Compare], rng: np.random.Generator) -> None:
+def test_deflect_many(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     n = 1_000
-    abs_alpha = rng.uniform(0, 2 * math.pi, size=n)
-    arg_alpha = rng.uniform(-math.pi, math.pi, size=n)
+    abs_alpha = urng.uniform(0, 2 * math.pi, size=n)
+    arg_alpha = urng.uniform(-math.pi, math.pi, size=n)
 
-    lon_ = np.degrees(rng.uniform(-math.pi, math.pi, size=n))
-    lat_ = np.degrees(np.asin(rng.uniform(-1, 1, size=n)))
+    lon_ = uxpx.degrees(urng.uniform(-math.pi, math.pi, size=n))
+    lat_ = uxpx.degrees(xp.asin(urng.uniform(-1, 1, size=n)))
 
-    lon, lat = glass.deflect(lon_, lat_, abs_alpha * np.exp(1j * arg_alpha))
+    lon, lat = glass.deflect(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
 
-    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=np)
-    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=np)
+    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=xp)
+    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=xp)
 
     dotp = x * x_ + y * y_ + z * z_
 
-    compare.assert_allclose(dotp, np.cos(abs_alpha))
+    compare.assert_allclose(dotp, xp.cos(abs_alpha))
