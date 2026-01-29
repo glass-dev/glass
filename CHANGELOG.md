@@ -4,6 +4,8 @@
 
 All functional changes to the project are documented in this file.
 
+## [2026.1] (29 Jan 2026)
+
 ## [2025.3] (2 Dec 2025)
 
 - gh-323: add `uv` support in `nox` and CI (#801)
@@ -221,6 +223,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2026.1]: https://github.com/glass-dev/glass/compare/v2025.3...v2026.1
 [2025.3]: https://github.com/glass-dev/glass/compare/v2025.2...v2025.3
 [2025.2]: https://github.com/glass-dev/glass/compare/v2025.1...v2025.2
 [2025.1]: https://github.com/glass-dev/glass/compare/v2024.2...v2025.1

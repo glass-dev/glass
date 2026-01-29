@@ -4,6 +4,9 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2026.1 (29 Jan 2026)
+--------------------
+
 2025.3 (2 Dec 2025)
 --------------------
 
