@@ -46,7 +46,7 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Upload artefact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Examples
           path: examples/**/*.html
