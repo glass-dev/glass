@@ -239,7 +239,7 @@ def test_partition(
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.partition`."""
-    if (xp.__name__ == "jax.numpy") and (method in {"nnls"}):
+    if (xp.__name__ == "jax.numpy") and (method == "nnls"):
         pytest.skip(f"Arrays in {method} are not immutable, so do not support jax")
 
     shells = [
