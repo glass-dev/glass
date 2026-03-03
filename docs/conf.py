@@ -8,7 +8,7 @@
 # -- Project information -----------------------------------------------------
 
 import datetime
-import importlib
+import importlib.metadata
 
 project = "GLASS"
 author = "GLASS developers"

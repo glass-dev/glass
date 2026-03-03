@@ -28,7 +28,7 @@ def _extend_path(path: list[str], name: str) -> list[str]:
     """
     _pkg, _, _mod = name.partition(".")
 
-    return list(
+    return list(  # ty: ignore[invalid-return-type]
         filter(
             os.path.isdir,
             (os.path.join(p, _mod) for p in pkgutil.extend_path(path, _pkg)),  # noqa: PTH118
