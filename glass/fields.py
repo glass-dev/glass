@@ -287,7 +287,7 @@ def discretized_cls(
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if nside is not None:
-                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[possibly-missing-attribute]
+                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls

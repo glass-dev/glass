@@ -121,12 +121,12 @@ def test_broadcast_inputs(
     )
 
     assert dims == (3, 2)
-    assert bias.shape == dims  # ty: ignore[possibly-missing-attribute]
+    assert bias.shape == dims  # ty: ignore[unresolved-attribute]
     assert xp.all(bias == bias_in)
     compare.assert_array_equal(delta, xp.zeros_like(delta))
-    assert ngal.shape == dims  # ty: ignore[possibly-missing-attribute]
+    assert ngal.shape == dims  # ty: ignore[unresolved-attribute]
     compare.assert_array_equal(ngal[0, :], ngal_in)  # ty: ignore[not-subscriptable]
-    assert vis.shape == delta.shape  # ty: ignore[possibly-missing-attribute]
+    assert vis.shape == delta.shape  # ty: ignore[unresolved-attribute]
     compare.assert_array_equal(vis[0, 0, :], vis_in)  # ty: ignore[not-subscriptable]
 
 
