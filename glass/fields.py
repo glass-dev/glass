@@ -882,7 +882,7 @@ def generate(
         raise ValueError(msg)
 
     # cltovar requires numpy but getcl maintains xp, so conversion is required
-    variances = (transformcl.cltovar(np.asarray(getcl(gls, i, i))) for i in range(n))
+    variances = (transformcl.cltovar(getcl(gls, i, i)) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
