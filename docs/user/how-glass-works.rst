@@ -20,8 +20,8 @@ Radial discretisation
 The discretisation in the radial (line of sight) direction is done in *GLASS*
 using the concept of a :term:`radial window`, which consists of a window
 function :math:`W` that assigns a weight :math:`W(z)` to each redshift
-:math:`z`.  In the *GLASS* code, the :class:`~glass.RadialWindow` named
-tuple is used to define radial windows.
+:math:`z`.  In the *GLASS* code, the :class:`~glass.RadialWindow` ``dataclass``
+is used to define radial windows.
 
 A sequence :math:`W_1, W_2, \ldots` of such window functions defines the shells
 of the simulation.  For example, the :func:`~glass.tophat_windows`
