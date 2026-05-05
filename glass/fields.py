@@ -874,19 +874,17 @@ def generate(
         Sampled random fields.
 
     """
-    xp = array_api_compat.array_namespace(*gls, use_compat=False)
-
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
     # cltovar requires numpy but getcl maintains xp, so conversion is required
-    variances = (transformcl.cltovar(np.asarray(getcl(gls, i, i))) for i in range(n))
+    variances = (transformcl.cltovar(getcl(gls, i, i)) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
-        yield t(x, xp.asarray(var))
+        yield t(x, var)
 
 
 def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:

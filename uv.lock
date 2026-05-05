@@ -1351,7 +1351,7 @@ requires-dist = [
     { name = "healpy", specifier = ">=1.15.0" },
     { name = "jupyter", marker = "extra == 'examples'" },
     { name = "matplotlib", marker = "extra == 'examples'" },
-    { name = "transformcl", specifier = ">=2022.8.9" },
+    { name = "transformcl", specifier = ">=2026.1" },
 ]
 provides-extras = ["examples"]
 
@@ -4429,15 +4429,15 @@ wheels = [
 
 [[package]]
 name = "transformcl"
-version = "2025.1"
+version = "2026.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "array-api-compat" },
     { name = "flt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1e/31/1b051f17ef6ec32aa67de0df7b4680d0dc35c9534721c068e92689d7caaa/transformcl-2025.1.tar.gz", hash = "sha256:7d9dafee8fe380a66da5131daa9ebf0aa37e002679ad8a0282f25c77313ad6c5", size = 4776, upload-time = "2025-05-07T23:39:12.686Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/ce/ae8373b67259c3ea6033425161f7d195387b1e68b17d4d00eee1b68e5edd/transformcl-2026.1.tar.gz", hash = "sha256:14551c33d164f3db24b9141f1f77553182a4b9c789f883476eb33d87ea4d8f13", size = 4850, upload-time = "2026-03-02T19:18:21.221Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d8/b3/7222356f8d1cfa20d6e37dd252a9e11028e71b43210e72d3ac771dc727fb/transformcl-2025.1-py3-none-any.whl", hash = "sha256:c0c07e4c32c0d1a3e3f7b3e25fdcc4270197ed6e936597e348cb91c223ff5cf0", size = 3525, upload-time = "2025-05-07T23:39:11.11Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/98/de7a05005238e03bdc57cd2885c27ad9140539bbaddf2b6ad2b2a0aa9863/transformcl-2026.1-py3-none-any.whl", hash = "sha256:fe9c380074ef783a4f854e0d326eadac677d6a35bc683e3b429d5b49a8e57223", size = 3597, upload-time = "2026-03-02T19:18:19.832Z" },
 ]
 
 [[package]]
