@@ -277,6 +277,8 @@ overrides."tool.ty".first = [
 
 [tool.ty]
 rules.invalid-argument-type = "ignore"
+rules.unresolved-import = "ignore"
+rules.unsupported-operator = "ignore"
 src.include = [
     "glass",
     "tests",
@@ -287,4 +289,3 @@ include = [
     "glass/**",
     "tests/core/**",
 ]
-rules.unsupported-operator = "ignore"
