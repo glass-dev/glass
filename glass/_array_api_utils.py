@@ -49,8 +49,8 @@ class CompatibleBackendNotFoundError(Exception):
 
 def default_xp(backend: str | None = None) -> ModuleType:
     """
-    Returns the library backend we default to (NumPy) if none is specified by the user.
-    Raises a helpful error if NumPy is not installed.
+    Returns the library backend we default to if none is specified by the user.
+    Raises a helpful error if the default is not installed.
 
     Parameters
     ----------
@@ -59,17 +59,17 @@ def default_xp(backend: str | None = None) -> ModuleType:
 
     Returns
     -------
-        The NumPy module.
+        The default module.
 
     Raises
     ------
     ModuleNotFoundError
-        If NumPy is not found in the user's environment.
+        If the default module is not found in the user's environment.
 
     Notes
     -----
-    This is useful for explaining to the user why NumPy is required when their chosen
-    backend does not implement a needed function.
+    This is useful for explaining to the user why the default module is required
+    when their chosen backend does not implement a needed function.
 
     """
     try:
