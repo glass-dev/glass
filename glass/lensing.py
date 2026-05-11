@@ -625,7 +625,7 @@ def multi_plane_matrix(
     for i, w in enumerate(shells):
         mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)
         wmat = xpx.at(wmat)[i, :].set(mpc.kappa)
-    return wmat  # ty: ignore[invalid-return-type]
+    return wmat
 
 
 def multi_plane_weights(
