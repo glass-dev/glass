@@ -26,6 +26,9 @@ BENCHMARKS_SHARED_FLAGS=(
   "--benchmark-timer=time.process_time"
 )
 
+# Activate the correct environment
+source "$GLASS_DIR/.venv/bin/activate"
+
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries
 export OMP_NUM_THREADS=1
