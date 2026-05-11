@@ -249,7 +249,7 @@ class RadialWindow:
         To be removed upon deprecation of ``glass.ext.camb``.
 
         """
-        yield from (self.za, self.wa, self.zeff) # ty: ignore[invalid-yield]
+        yield from (self.za, self.wa, self.zeff)  # ty: ignore[invalid-yield]
 
     def _calculate_zeff(self) -> float:
         """
