@@ -7,7 +7,6 @@ ci:
   skip:
     - ty
 
-exclude: ^uv.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -98,7 +97,3 @@ repos:
         args:
           - --external-sources
           - --shell=bash
-  - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.8
-    hooks:
-      - id: uv-lock
