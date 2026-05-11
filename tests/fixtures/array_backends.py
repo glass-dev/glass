@@ -63,7 +63,7 @@ def _import_and_add_array_api_strict(
 
     _check_version("array_api_strict", "2.3.1")
     xp_available_backends["array_api_strict"] = array_api_strict
-    array_api_strict.set_array_api_strict_flags(api_version="2024.12")
+    array_api_strict.set_array_api_strict_flags(api_version="2025.12")
 
 
 def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
