@@ -48,26 +48,23 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     if xp.__name__ == "numpy":
         return xp.random.default_rng(seed=SEED)
 
-    if xp.__name__ == "array_api_strict":
-        return Generator(seed=SEED)
-
-    msg = "the array backend in not supported"
-    raise NotImplementedError(msg)
+    return Generator(xp=xp, seed=SEED)
 
 
 class Generator:
     """
-    NumPy random number generator returning array_api_strict Array.
+    NumPy random number generator returning Arrays of the given backend.
 
     This class wraps NumPy's random number generator and returns arrays compatible
-    with array_api_strict.
+    with the provided backend.
 
     """
 
-    __slots__ = ("ap", "np", "rng")
+    __slots__ = ("np", "rng", "xp")
 
     def __init__(
         self,
+        xp: ModuleType,
         seed: int | bool | IntArray = SEED,  # noqa: FBT001
     ) -> None:
         """
@@ -75,15 +72,15 @@ class Generator:
 
         Parameters
         ----------
+        xp
+            The array library backend to return arrays from.
         seed
             Seed for the random number generator.
 
         """
         import numpy  # noqa: ICN001, PLC0415
 
-        import array_api_strict  # noqa: PLC0415
-
-        self.ap = array_api_strict
+        self.xp = xp
         self.np = numpy
         self.rng = self.np.random.default_rng(seed=seed)
 
@@ -111,7 +108,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.ap.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
+        return self.xp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def normal(
         self,
@@ -136,7 +133,7 @@ class Generator:
             Array of samples from the normal distribution.
 
         """
-        return self.ap.asarray(self.rng.normal(loc, scale, size))
+        return self.xp.asarray(self.rng.normal(loc, scale, size))
 
     def poisson(
         self,
@@ -158,7 +155,7 @@ class Generator:
             Array of samples from the Poisson distribution.
 
         """
-        return self.ap.asarray(self.rng.poisson(lam, size))
+        return self.xp.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
         self,
@@ -184,7 +181,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.ap.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
+        return self.xp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def uniform(
         self,
@@ -209,4 +206,4 @@ class Generator:
             Array of samples from the uniform distribution.
 
         """
-        return self.ap.asarray(self.rng.uniform(low, high, size))
+        return self.xp.asarray(self.rng.uniform(low, high, size))
