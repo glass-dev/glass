@@ -4,10 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=0:10:0
-
-# Three steps to this job which should not run in parallel (1 step at a time)
-#SBATCH --array=0-2%1
+#SBATCH --time=0:30:0
 
 # Replace [budget code] below with your project code (e.g. t01)
 #SBATCH --account=[budget code]
