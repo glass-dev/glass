@@ -103,7 +103,7 @@ def broadcast_leading_axes(
         xp.broadcast_to(xp.asarray(a), dims + t)
         for (a, _), t in zip(args, trails, strict=False)
     )
-    return (dims, *arrs)
+    return (dims, *arrs) # ty: ignore[invalid-return-type]
 
 
 def ndinterp(  # noqa: PLR0913
