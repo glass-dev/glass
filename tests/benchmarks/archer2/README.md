@@ -14,12 +14,19 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 2. Clone the glass repo into the work section of Archer2 -
    `/work/<budget-code>/<budget-code>/<user-id>`
 
+   ```sh
+    cd /work/<budget-code>/<budget-code>/<user-id>
+   git clone https://github.com/glass-dev/glass.git
+   export GLASS_DIR="/work/<budget-code>/<budget-code>/<user-id>/glass"
+   ```
+
 3. Then, to reduce the required run time of the benchmark jobs on Archer2, we
-   install the required python dependencies from the group `test`:
+   install the required dependencies from the groups `test` and `archer2`:
 
    ```sh
+   cd $GLASS_DIR
    uv venv
-   uv sync --group test
+   uv sync --group test --group archer2
    ```
 
 4. Now that our environment is setup, before we can submit our regression test

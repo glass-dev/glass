@@ -56,6 +56,9 @@ test = [
     "pytest-rerunfailures",
     "scipy",
 ]
+archer2 = [
+    "jax[rocm7-local]",
+]
 
 [project]
 classifiers = [
