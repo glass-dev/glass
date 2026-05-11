@@ -25,7 +25,6 @@ ALL_PYTHON = [
 ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
-    "cupy": "cupy>=14.0.1",
 }
 BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
@@ -89,8 +88,6 @@ def _setup_array_backend(session: nox.Session) -> None:
         session.install(ARRAY_BACKENDS["array_api_strict"])
     elif array_backend == "jax":
         session.install(ARRAY_BACKENDS["jax"])
-    elif array_backend == "cupy":
-        session.install(ARRAY_BACKENDS["cupy"])
     elif array_backend == "all":
         session.install(*ARRAY_BACKENDS.values())
 

@@ -76,14 +76,6 @@ def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     jax.config.update("jax_enable_x64", val=True)
 
 
-def _import_and_add_cupy(xp_available_backends: dict[str, ModuleType]) -> None:
-    """Add cupy to the backends dictionary."""
-    import cupy  # noqa: PLC0415
-
-    _check_version("cupy", "14.0.1")
-    xp_available_backends["cupy"] = cupy
-
-
 # a dictionary with all array backends to test
 xp_available_backends: dict[str, ModuleType] = {}
 
@@ -94,14 +86,11 @@ elif ARRAY_BACKEND == "array_api_strict":
     _import_and_add_array_api_strict(xp_available_backends)
 elif ARRAY_BACKEND == "jax":
     _import_and_add_jax(xp_available_backends)
-elif ARRAY_BACKEND == "cupy":
-    _import_and_add_cupy(xp_available_backends)
 # if all, try importing every backend
 elif ARRAY_BACKEND == "all":
     _import_and_add_numpy(xp_available_backends)
     _import_and_add_array_api_strict(xp_available_backends)
     _import_and_add_jax(xp_available_backends)
-    _import_and_add_cupy(xp_available_backends)
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
