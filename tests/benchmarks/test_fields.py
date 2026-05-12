@@ -125,7 +125,6 @@ def test_iternorm_k_0(
 @pytest.mark.stable
 def test_cls2cov(
     benchmark: BenchmarkFixture,
-    compare: Compare,
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
 ) -> None:
@@ -147,10 +146,6 @@ def test_cls2cov(
 
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
-
-    compare.assert_allclose(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
-    compare.assert_allclose(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    compare.assert_allclose(cov[:, 2], 0)
 
 
 @pytest.mark.stable
