@@ -211,8 +211,8 @@ supported Python versions using -
 uv run nox -s tests
 ```
 
-Only `tests`, `coverage`, `coverage_benchmarks`, `doctests`, `benchmarks`, and
-the `regression_tests` session run on all supported Python versions by default.
+Only `tests`, `coverage` and the `doctests` session run on all supported Python
+versions by default.
 
 To specify a particular Python version (for example `3.14`), use the following
 syntax -
@@ -253,10 +253,11 @@ To ensure that _GLASS_ remains performant over time, a set of benchmarks are
 provided in the [benchmarks](./tests/benchmarks/) folder. These benchmarks can
 be run through nox.
 
-A single benchmark can be run by specifying the revision to benchmark.
+All of the benchmarks for a given revision can be run by specifying the revision
+to benchmark.
 
 ```sh
-uv run nox -s benchmark -- <revision-to-benchmark>
+uv run nox -s benchmarks -- <revision-to-benchmark>
 ```
 
 The benchmarks can be used to run a regression test of _GLASS_. These regression
@@ -265,6 +266,19 @@ _GLASS_.
 
 ```sh
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
+```
+
+To filter the benchmark tests to be ran, one can pass pytest arguments via the
+cli after the required revision arguments. For example, if you wished to run
+only benchmarks from the `test_fields.py` file you could run one of the
+following commands:
+
+```sh
+# Benchmarks
+uv run nox -s benchmarks -- <revision-to-benchmark> -k test_fields
+# Regression tests
+uv run nox -s regression-tests -- <initial-state-revision> \
+<revision-to-compare> -k test_fields
 ```
 
 <!-- prettier-ignore -->
