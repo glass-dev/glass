@@ -164,7 +164,7 @@ def test_generate_grf(
     use_rng: bool,  # noqa: FBT001
 ) -> None:
     """Benchmarks for glass.fields._generate_grf with positional arguments only."""
-    gls: AngularPowerSpectra = [urngb.random(1_000)]
+    gls: AngularPowerSpectra = [urngb.random(1_00)]
     nside = 4
 
     def function_to_benchmark() -> list[Any]:
