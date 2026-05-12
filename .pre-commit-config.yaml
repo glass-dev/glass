@@ -78,8 +78,8 @@ repos:
   - repo: local
     hooks:
       - id: ty
-        entry: uv run --with ty==0.0.35 ty check
-        language: python
+        entry: uv run --active --with ty==0.0.35 ty check
+        language: system
         name: ty-check
         pass_filenames: true
         types:
