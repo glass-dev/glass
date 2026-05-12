@@ -237,6 +237,8 @@ def benchmarks(session: nox.Session) -> None:
     _check_revision_count(session.posargs, expected_count=1)
     revision = session.posargs[0]
 
+    _setup_array_backend(session)
+
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
     session.run(
