@@ -64,10 +64,10 @@ def _check_revision_count(
         msg = f"{expected_count} revision(s) not provided"
         raise ValueError(msg)
 
-    if len(session_posargs) != expected_count:
+    if len(session_posargs) < expected_count:
         msg = (
             f"Incorrect number of revisions provided ({len(session_posargs)}), "
-            f"expected {expected_count}"
+            f"expected at least {expected_count}"
         )
         raise ValueError(msg)
 
@@ -239,7 +239,12 @@ def benchmarks(session: nox.Session) -> None:
 
     # overwrite current package with specified revision
     session.install(f"git+{GLASS_REPO_URL}@{revision}")
-    session.run("pytest", BENCH_TESTS_LOC)
+    session.run(
+        "pytest",
+        BENCH_TESTS_LOC,
+        *SHARED_BENCHMARK_FLAGS,
+        *session.posargs[1:],
+    )
 
 
 @nox_uv.session(
@@ -271,6 +276,7 @@ def regression_tests(session: nox.Session) -> None:
         BENCH_TESTS_LOC,
         "--benchmark-autosave",
         *SHARED_BENCHMARK_FLAGS,
+        *session.posargs[2:],
     )
 
     session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
@@ -284,6 +290,7 @@ def regression_tests(session: nox.Session) -> None:
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=mean:5%",
         *SHARED_BENCHMARK_FLAGS,
+        *session.posargs[2:],
     )
 
     session.log("Running unstable regression tests")
@@ -296,4 +303,5 @@ def regression_tests(session: nox.Session) -> None:
         # Absolute time comparison in seconds
         "--benchmark-compare-fail=mean:0.0005",
         *SHARED_BENCHMARK_FLAGS,
+        *session.posargs[2:],
     )
