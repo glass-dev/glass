@@ -39,7 +39,7 @@ doctest = [
     {include-group = "test"},
 ]
 lint = [
-    "pre-commit",
+    "prek",
 ]
 release = [
     "hatch-vcs",
