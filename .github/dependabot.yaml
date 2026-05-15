@@ -11,6 +11,8 @@ updates:
       ci-dependencies:
         patterns:
           - "*"
+    labels:
+      - dependabot
     schedule:
       interval: monthly
   - package-ecosystem: pre-commit
@@ -23,5 +25,7 @@ updates:
       ci-dependencies:
         patterns:
           - "*"
+    labels:
+      - dependabot
     schedule:
       interval: monthly
