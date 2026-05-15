@@ -2,22 +2,26 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: monthly
     commit-message:
       prefix: dependabot
+    cooldown:
+      default-days: 7
+    directory: /
     groups:
       ci-dependencies:
         patterns:
           - "*"
+    schedule:
+      interval: monthly
   - package-ecosystem: pre-commit
-    directory: /
-    schedule:
-      interval: monthly
     commit-message:
       prefix: dependabot
+    cooldown:
+      default-days: 7
+    directory: /
     groups:
       ci-dependencies:
         patterns:
           - "*"
+    schedule:
+      interval: monthly
