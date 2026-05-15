@@ -30,7 +30,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -89,7 +89,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -160,7 +160,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
