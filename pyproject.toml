@@ -288,6 +288,3 @@ include = [
     "tests/core/**",
 ]
 rules.unsupported-operator = "ignore"
-
-[tool.uv]
-sources.glass = {editable = true, path = "."}
