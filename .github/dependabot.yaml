@@ -2,10 +2,24 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
     commit-message:
       prefix: dependabot
+    groups:
+      ci-dependencies:
+        patterns:
+          - "*"
+  - package-ecosystem: pre-commit
     directory: /
-    labels:
-      - dependabot
     schedule:
-      interval: weekly
+      interval: monthly
+    commit-message:
+      prefix: dependabot
+    groups:
+      ci-dependencies:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: ty
