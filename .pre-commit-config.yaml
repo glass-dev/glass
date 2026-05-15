@@ -1,12 +1,4 @@
 ---
-ci:
-  autofix_commit_msg: "pre-commit.ci: style fixes"
-  autofix_prs: false
-  autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
-  autoupdate_schedule: monthly
-  skip:
-    - ty
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
