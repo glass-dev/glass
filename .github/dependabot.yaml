@@ -21,5 +21,3 @@ updates:
       ci-dependencies:
         patterns:
           - "*"
-    ignore:
-      - dependency-name: ty
