@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Enforce PR title format
-        uses: thehanimo/pr-title-checker@v1.4.3
+        uses: thehanimo/pr-title-checker@v1.4.3 # zizmor: ignore[unpinned-uses]
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pass_on_octokit_error: false

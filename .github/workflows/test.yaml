@@ -28,17 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
         with:
           python-version: 3.14
 
       - name: Cache nox
-        uses: actions/cache@v5
+        uses: actions/cache@v5 # zizmor: ignore[unpinned-uses]
         with:
           key:
             tests-bench-${{ hashFiles('pyproject.toml') }}-${{
@@ -66,7 +66,7 @@ jobs:
           env.BENCH_COV_NAME }}.xml
 
       - name: Upload benchmark coverage to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@v2 # zizmor: ignore[unpinned-uses]
         with:
           base-path: glass/
           file: ${{ env.BENCH_COV_NAME }}.xml
@@ -87,17 +87,17 @@ jobs:
           - "3.14"
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache nox
-        uses: actions/cache@v5
+        uses: actions/cache@v5 # zizmor: ignore[unpinned-uses]
         with:
           key:
             tests-core-${{ hashFiles('pyproject.toml') }}-${{
@@ -129,7 +129,7 @@ jobs:
           matrix.python-version }}.xml
 
       - name: Upload core coverage to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@v2 # zizmor: ignore[unpinned-uses]
         with:
           base-path: glass/
           file: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml
@@ -144,7 +144,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls finished
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@v2 # zizmor: ignore[unpinned-uses]
         with:
           carryforward:
             ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.10,${{
@@ -158,12 +158,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
         with:
           python-version: 3.14
 

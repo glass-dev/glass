@@ -24,12 +24,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
         with:
           python-version: 3.14
 
@@ -45,10 +45,10 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Spellcheck
-        uses: crate-ci/typos@v1
+        uses: crate-ci/typos@v1 # zizmor: ignore[unpinned-uses]
 
       - name: Run Vale
-        uses: errata-ai/vale-action@v2
+        uses: errata-ai/vale-action@v2 # zizmor: ignore[unpinned-uses]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

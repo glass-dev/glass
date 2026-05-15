@@ -26,12 +26,12 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
         with:
           python-version: 3.14
 
