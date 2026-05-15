@@ -73,8 +73,10 @@ def _check_revision_count(
 
 
 @nox_uv.session(
-    uv_no_install_project=True,
-    uv_only_groups=["lint"],
+    # ty requires all dependencies to be installed to be the most effective
+    uv_all_extras=True,
+    uv_all_groups=True,
+    uv_sync_locked=False,
 )
 def lint(session: nox.Session) -> None:
     """Run the linter."""
@@ -95,6 +97,7 @@ def _setup_array_backend(session: nox.Session) -> None:
 @nox_uv.session(
     python=ALL_PYTHON,
     uv_groups=["test"],
+    uv_sync_locked=False,
 )
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
@@ -105,6 +108,7 @@ def tests(session: nox.Session) -> None:
 @nox_uv.session(
     python=ALL_PYTHON,
     uv_groups=["test"],
+    uv_sync_locked=False,
 )
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
@@ -119,6 +123,7 @@ def coverage(session: nox.Session) -> None:
 
 @nox_uv.session(
     uv_groups=["test"],
+    uv_sync_locked=False,
 )
 def coverage_benchmarks(session: nox.Session) -> None:
     """Run tests and compute coverage for the benchmark tests."""
@@ -137,6 +142,7 @@ def coverage_benchmarks(session: nox.Session) -> None:
     python=ALL_PYTHON,
     uv_groups=["doctest"],
     uv_no_install_project=True,
+    uv_sync_locked=False,
 )
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
@@ -150,7 +156,10 @@ def doctests(session: nox.Session) -> None:
     session.run("pytest", *session.posargs)
 
 
-@nox_uv.session(uv_extras=["examples"])
+@nox_uv.session(
+    uv_extras=["examples"],
+    uv_sync_locked=False,
+)
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
     if session.posargs:
@@ -176,7 +185,10 @@ def examples(session: nox.Session) -> None:
         )
 
 
-@nox_uv.session(uv_groups=["docs"])
+@nox_uv.session(
+    uv_groups=["docs"],
+    uv_sync_locked=False,
+)
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
     session.chdir("docs")
@@ -204,13 +216,14 @@ def docs(session: nox.Session) -> None:
 @nox_uv.session(
     uv_no_install_project=True,
     uv_only_groups=["build"],
+    uv_sync_locked=False,
 )
 def build(session: nox.Session) -> None:
     """Build an SDist and wheel."""
     session.run("python", "-m", "build")
 
 
-@nox_uv.session
+@nox_uv.session(uv_sync_locked=False)
 def version(session: nox.Session) -> None:
     """
     Check the current version of the package.
@@ -226,6 +239,7 @@ def version(session: nox.Session) -> None:
 @nox_uv.session(
     uv_no_install_project=True,
     uv_only_groups=["test"],
+    uv_sync_locked=False,
 )
 def benchmarks(session: nox.Session) -> None:
     """
@@ -250,6 +264,7 @@ def benchmarks(session: nox.Session) -> None:
 @nox_uv.session(
     uv_no_install_project=True,
     uv_only_groups=["test"],
+    uv_sync_locked=False,
 )
 def regression_tests(session: nox.Session) -> None:
     """
