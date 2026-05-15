@@ -24,13 +24,13 @@ uv sync --all-extras --all-groups
 
 ## Tooling
 
-### Pre-commit
+### Prek
 
-_GLASS_ uses a set of `pre-commit` hooks and the `pre-commit.ci` bot to format,
-lint, and prettify the codebase. The hooks can be installed locally using -
+_GLASS_ uses a set of `prek` hooks to format, lint, and prettify the codebase.
+The hooks can be installed locally using -
 
 ```bash
-pre-commit install
+prek install
 ```
 
 This would run the checks every time a commit is created locally. The checks
@@ -38,11 +38,16 @@ will only run on the files modified by that commit, but the checks can be
 triggered for all the files using -
 
 ```bash
-pre-commit run --all-files
+prek run --all-files
 ```
 
 If you would like to skip the failing checks and push the code for further
-discussion, use the `--no-verify` option with `git commit`.
+discussion, use the `--no-verify` option with `git commit`. Alternatively, one
+can run the linting workflow via `nox`:
+
+```bash
+nox -s lint
+```
 
 ## Testing
 
