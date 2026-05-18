@@ -40,6 +40,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up uv
