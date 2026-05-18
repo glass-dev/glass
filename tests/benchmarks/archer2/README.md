@@ -25,7 +25,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    and then save the following into `${HOME/home/work}/.profile`.
 
    ```sh
-   source "${HOME/home/work}/.profile"
+   source "${HOME/home/work}/.local/env"
    ```
 
 2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2 -
