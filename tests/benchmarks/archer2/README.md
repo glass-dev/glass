@@ -8,7 +8,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 1. **Install uv:** Firstly, install uv via curl onto the `/work` partition
 
    ```sh
-   cd "${PWD/home/work}"
+   cd "${HOME/home/work}"
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 

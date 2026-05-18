@@ -14,7 +14,7 @@ module load craype-accel-amd-gfx90a
 module load craype-x86-milan
 
 # Ensure uv is available
-source "${PWD/home/work}/.profile" # HOME starts as /home/... but uv need to be on /work/...
+source "${HOME/home/work}/.profile" # HOME starts as /home/... but uv need to be on /work/...
 
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries
