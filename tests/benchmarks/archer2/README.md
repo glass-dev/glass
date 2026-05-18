@@ -21,5 +21,5 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    ```
 
 3. **Run the benchmarks script:** Now we have cloned glass we can run the script
-   `run_benchmarks.sh` which will setup the required environments and submit
-   regression test job to slurm.
+   `run_regression_test.sh` which will setup the required environments and
+   submit regression test job to slurm.
