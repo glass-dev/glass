@@ -162,8 +162,6 @@ def doctests(session: nox.Session) -> None:
 )
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
-    session.install("glass-ext-camb")
-
     if session.posargs:
         if "html" in session.posargs:
             session.log("Generating HTML for the example notebooks")
