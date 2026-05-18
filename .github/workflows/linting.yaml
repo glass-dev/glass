@@ -36,7 +36,7 @@ jobs:
           python-version: 3.14
 
       - name: Install only dev dependencies
-        run: uv sync --only-dev
+        run: uv sync --only-group dev
 
       - name: Run prek
         run: uv run nox -s lint
