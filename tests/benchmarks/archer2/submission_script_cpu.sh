@@ -10,6 +10,9 @@
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 
+# Load python modules
+module load PrgEnv-gnu cray-python
+
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries
 export OMP_NUM_THREADS=1
@@ -29,11 +32,11 @@ BENCHMARKS_SHARED_FLAGS=(
 )
 
 # Generate the base report for comparison later
-source "$GLASS_DIR/.venv-base/bin/activate"
-srun python -m pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
+source "$GLASS_DIR/.venv-start/bin/activate"
+srun uv run pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
 deactivate
 
 # Run the stable and unstable benchmarks and compare to the base ref
-source "$GLASS_DIR/.venv-head/bin/activate"
-srun python -m pytest "$BENCHMARKS_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
-srun python -m pytest "$BENCHMARKS_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
+source "$GLASS_DIR/.venv-end/bin/activate"
+srun uv run pytest "$BENCHMARKS_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
+srun uv run pytest "$BENCHMARKS_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
