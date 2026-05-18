@@ -95,7 +95,6 @@ optional-dependencies = {examples = [
     "camb",
     "cosmology.api",
     "cosmology.compat.camb",
-    "glass.ext.camb",
     "jupyter",
     "matplotlib",
 ]}
