@@ -7,17 +7,19 @@ START_REF=""
 END_REF=""
 START_VENV=".venv-start"
 END_VENV=".venv-end"
+ACCOUNT=""
 
 help() {
   echo "Usage:"
   echo "    $0 "
   echo ""
   echo "ARGS:"
-  echo "    -h | --help                  Display this help message."
-  echo "    -d | --glass-dir <glass/dir> Path to the cloned glass directory."
-  echo "    -s | --start-ref <start_ref> The git ref to be used as the initial state."
-  echo "    -e | --end-ref <end_ref>     The git ref to be used as the final state."
-  echo "    -g | --gpu                   Flag to state the gpu benchmark should be ran."
+  echo "    -h | --help                      Display this help message."
+  echo "    -d | --glass-dir <glass/dir>     Path to the cloned glass directory."
+  echo "    -s | --start-ref <start_ref>     The git ref to be used as the initial state."
+  echo "    -e | --end-ref <end_ref>         The git ref to be used as the final state."
+  echo "    -a | --account <archer2_account> The archer2 account code to run jobs against."
+  echo "    -g | --gpu                       Flag to state the gpu benchmark should be ran."
 }
 
 # check for no input arguments and show help
@@ -49,6 +51,11 @@ while [ $# -gt 0 ] ; do
             shift 2
             continue
             ;;
+        -a | --account)
+            ACCOUNT=$2
+            shift 2
+            continue
+            ;;
         -g | --gpu)
             CPU_OR_GPU="gpu"
             shift 1
@@ -71,6 +78,13 @@ then
 fi
 
 if [[ "$GLASS_DIR" == "" ]]
+then
+  echo "GLASS_DIR must be provided"
+  help
+  exit 1
+fi
+
+if [[ "$ACCOUNT" == "" ]]
 then
   echo "GLASS_DIR must be provided"
   help
@@ -107,4 +121,4 @@ uv pip install "git+$GLASS_REPO_URL@$END_REF"
 rm -rf "$BENCHMARKS_DIR/outputs"
 
 # Submit job
-sbatch "$BENCHMARKS_DIR/archer2/submission_script_$CPU_OR_GPU.sh" "$GLASS_DIR"
+sbatch --account="$ACCOUNT" "$BENCHMARKS_DIR/archer2/submission_script_$CPU_OR_GPU.sh" "$GLASS_DIR"

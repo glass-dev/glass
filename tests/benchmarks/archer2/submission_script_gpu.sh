@@ -6,7 +6,6 @@
 #SBATCH --time=0:30:0
 
 # Replace [budget code] below with your project code (e.g. t01)
-#SBATCH --account=[budget code]
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 
