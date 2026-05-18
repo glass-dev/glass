@@ -71,6 +71,13 @@ then
   exit 1
 fi
 
+if [[ "$GLASS_DIR" == "" ]]
+then
+  echo "GLASS_DIR must be provided"
+  help
+  exit 1
+fi
+
 # Setup base environment
 rm -rf "${GLASS_DIR:?}/$START_VENV" # Cleanup old venv
 uv venv "$GLASS_DIR/$START_VENV"
