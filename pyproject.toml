@@ -7,7 +7,7 @@ requires = [
 ]
 
 [dependency-groups]
-archer2 = [
+archer2-gpu = [
     "jax[rocm7-local]",
 ]
 build = [
