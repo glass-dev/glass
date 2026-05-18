@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from jaxtyping import PRNGKeyArray
     from typing_extensions import Self
 
-    from glass._types import AnyArray, DTypeLike, FloatArray
+    from glass._types import AnyArray, DTypeLike, FloatArray, IntArray
 
 
 def _size(
@@ -113,7 +113,7 @@ class Generator:
         lam: float | FloatArray,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = int,
-    ) -> FloatArray:
+    ) -> IntArray:
         """Draw samples from a Poisson distribution."""
         return jax.random.poisson(self.__key, lam, size, dtype)
 

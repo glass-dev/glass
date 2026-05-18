@@ -13,13 +13,12 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray
-    from glass.cosmology import Cosmology
 
 
 @pytest.fixture(scope="session")
-def cosmo() -> Cosmology:
+def cosmo() -> MockCosmology:
     """Mock cosmology to use for core tests."""
-    return MockCosmology()  # ty: ignore[invalid-return-type]
+    return MockCosmology()
 
 
 class MockCosmology:
