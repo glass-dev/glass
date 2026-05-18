@@ -71,8 +71,9 @@ repos:
     hooks:
       - id: ty
         entry: uv run --no-active --with ty==0.0.35 ty check
-        language: python
+        language: system
         name: ty-check
+        pass_filenames: false
         types:
           - python
   - repo: https://github.com/kynan/nbstripout
