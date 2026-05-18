@@ -2,7 +2,6 @@
 
 GLASS_DIR=""
 GLASS_REPO_URL="https://github.com/glass-dev/glass"
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
 CPU_OR_GPU="cpu"
 START_REF=""
 END_REF=""
@@ -77,6 +76,8 @@ then
   help
   exit 1
 fi
+
+BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
 
 # Setup base environment
 rm -rf "${GLASS_DIR:?}/$START_VENV" # Cleanup old venv
