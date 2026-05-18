@@ -5,13 +5,11 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=0:30:0
-
-# Replace [budget code] below with your project code (e.g. t01)
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 
-# Load python modules
-module load PrgEnv-gnu cray-python
+# Ensure uv is available
+source "${HOME/home/work}/.profile" # HOME starts as /home/... but uv needs to be on /work/...
 
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries

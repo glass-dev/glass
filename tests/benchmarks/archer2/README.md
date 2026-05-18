@@ -5,21 +5,38 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 
 ## Setting up
 
-1. **Install uv:** Firstly, install uv via curl
+1. **Install uv:** Firstly, install uv via curl onto the `/work` partition
 
    ```sh
+   cd "${PWD/home/work}"
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-2. **Clone GLASS:** Clone the glass repo into the work section of Archer2 -
+   Then we must make sure uv is availale on the login node and the worker node.
+   To do this we can update our start up scripts (`.profile`) on both
+   partitions. Therefore, save the following into `$HOME/.profile`
+
+   ```sh
+   WORK_DIR="${HOME/home/work}"
+   cd "$WORK_DIR"
+   source "$WORK_DIR/.profile"
+   ```
+
+   and then save the following into `${HOME/home/work}/.profile`.
+
+   ```sh
+   source "${HOME/home/work}/.profile"
+   ```
+
+2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2 -
    `/work/<budget-code>/<budget-code>/<user-id>`
 
    ```sh
-   cd /work/<budget-code>/<budget-code>/<user-id>
+   cd "${HOME/home/work}"
    git clone https://github.com/glass-dev/glass.git
-   export GLASS_DIR="/work/<budget-code>/<budget-code>/<user-id>/glass"
    ```
 
 3. **Run the benchmarks script:** Now we have cloned glass we can run the script
-   `run_regression_test.sh` which will setup the required environments and
-   submit regression test job to slurm.
+   [run_regression_test.sh](./run_regression_test.sh) which will setup the
+   required environments and submit regression test job to slurm. A help message
+   is provided. Just run `run_regression_test.sh -h`.
