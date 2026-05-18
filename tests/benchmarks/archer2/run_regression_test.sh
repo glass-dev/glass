@@ -86,7 +86,7 @@ fi
 
 if [[ "$ACCOUNT" == "" ]]
 then
-  echo "GLASS_DIR must be provided"
+  echo "ACCOUNT must be provided"
   help
   exit 1
 fi
