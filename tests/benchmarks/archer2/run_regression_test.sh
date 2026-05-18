@@ -93,29 +93,32 @@ fi
 
 BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
 
+# Load python modules
+module load PrgEnv-gnu cray-python
+
 # Setup base environment
 rm -rf "${GLASS_DIR:?}/$START_VENV" # Cleanup old venv
-uv venv "$GLASS_DIR/$START_VENV"
+python -m venv --system-site-packages "$GLASS_DIR/$START_VENV"
 source "$GLASS_DIR/$START_VENV/bin/activate"
 if [ $CPU_OR_GPU = "gpu" ]; then
-  uv sync --active --group test --group archer2-gpu
+  python -m pip install --group test --group archer2-gpu
 else
-  uv sync --active --group test
+  python -m pip install --active --group test
 fi
-uv pip uninstall glass -y # Make sure no installation of glass already exists
-uv pip install "git+$GLASS_REPO_URL@$START_REF"
+python -m pip uninstall glass -y # Make sure no installation of glass already exists
+python -m pip install "git+$GLASS_REPO_URL@$START_REF"
 
 # Setup head environment
 rm -rf "${GLASS_DIR:?}/$END_VENV" # Cleanup old venv
-uv venv "$GLASS_DIR/$END_VENV"
+python -m venv --system-site-packages "$GLASS_DIR/$END_VENV"
 source "$GLASS_DIR/$END_VENV/bin/activate"
 if [ $CPU_OR_GPU = "gpu" ]; then
-  uv sync --active --group test --group archer2-gpu
+  python -m pip install --active --group test --group archer2-gpu
 else
-  uv sync --active --group test
+  python -m pip install --active --group test
 fi
-uv pip uninstall glass -y # Make sure no installation of glass already exists
-uv pip install "git+$GLASS_REPO_URL@$END_REF"
+python -m pip uninstall glass -y # Make sure no installation of glass already exists
+python -m pip install "git+$GLASS_REPO_URL@$END_REF"
 
 # Remove old benchmark results
 rm -rf "$BENCHMARKS_DIR/outputs"
