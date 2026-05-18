@@ -21,7 +21,7 @@ dev = [
 ]
 docs = [
     "array-api-strict",
-    "cosmology.api",
+    "cosmology-api",
     "furo",
     "ipython",
     "jax",
@@ -46,7 +46,7 @@ release = [
     "hatchling",
 ]
 test = [
-    "cosmology.api",
+    "cosmology-api",
     "fitsio",
     "pytest",
     "pytest-benchmark",
@@ -93,8 +93,8 @@ maintainers = [
 name = "glass"
 optional-dependencies = {examples = [
     "camb",
-    "cosmology.api",
-    "cosmology.compat.camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
     "glass-ext-camb",
     "jupyter",
     "matplotlib",
