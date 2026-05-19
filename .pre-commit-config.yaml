@@ -47,6 +47,11 @@ repos:
     hooks:
       - id: ruff-check
       - id: ruff-format
+        types_or:
+          - jupyter
+          - markdown
+          - pyi
+          - python
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.20.0
     hooks:
