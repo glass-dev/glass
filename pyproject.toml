@@ -41,10 +41,6 @@ doctest = [
 lint = [
     "prek",
 ]
-release = [
-    "hatch-vcs",
-    "hatchling",
-]
 test = [
     "cosmology-api",
     "fitsio",
