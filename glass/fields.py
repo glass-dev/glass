@@ -662,7 +662,8 @@ def effective_cls(
         itertools.combinations_with_replacement(uxpx.ndindex(shape1[1:], xp=xp), 2)
         if weights2 is weights1
         else itertools.product(
-            uxpx.ndindex(shape1[1:], xp=xp), uxpx.ndindex(shape2[1:], xp=xp)
+            uxpx.ndindex(shape1[1:], xp=xp),
+            uxpx.ndindex(shape2[1:], xp=xp),
         )
     )
 
