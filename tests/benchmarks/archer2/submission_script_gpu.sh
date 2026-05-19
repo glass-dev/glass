@@ -1,6 +1,7 @@
 #!/bin/bash --login
 
 #SBATCH --job-name=glass_reg_test_gpu
+#SBATCH --output=%x-%j.out
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus=1
 #SBATCH --time=0:30:0

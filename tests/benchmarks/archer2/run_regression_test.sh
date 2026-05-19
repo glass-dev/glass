@@ -134,5 +134,4 @@ then
 fi
 
 # Submit job
-sbatch --account="$ACCOUNT" --output="%x-$START_REF-$END_REF-%j.out" \
-  "$BENCHMARKS_DIR/archer2/submission_script_$CPU_OR_GPU.sh" "$GLASS_DIR"
+sbatch --account="$ACCOUNT" "$BENCHMARKS_DIR/archer2/submission_script_$CPU_OR_GPU.sh" "$GLASS_DIR"
