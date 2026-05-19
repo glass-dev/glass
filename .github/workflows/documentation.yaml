@@ -45,7 +45,7 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Spellcheck
-        uses: crate-ci/typos@v1
+        uses: crate-ci/typos@v1.46.1
 
       - name: Run Vale
         uses: errata-ai/vale-action@v2
