@@ -1,4 +1,5 @@
 #!/bin/bash -l
+# shellcheck disable=SC1090
 
 GLASS_DIR=""
 GLASS_REPO_URL="https://github.com/glass-dev/glass"

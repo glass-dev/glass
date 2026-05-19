@@ -1,4 +1,5 @@
 #!/bin/bash --login
+# shellcheck disable=SC1091
 
 #SBATCH --job-name=glass_reg_test_cpu
 #SBATCH --output=%x-%j.out
