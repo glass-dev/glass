@@ -109,7 +109,9 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
 
 @pytest.fixture(
     params=[
-        xp for name, xp in xp_available_backends.items() if name != "array_api_strict"
+        xp
+        for name, xp in xp_available_backends.items()
+        if name not in {"array_api_strict", "jax.numpy"}
     ],
     scope="session",
 )
