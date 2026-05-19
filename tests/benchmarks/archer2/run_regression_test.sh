@@ -103,16 +103,14 @@ then
   rm -rf "${GLASS_DIR:?}/$START_VENV" # Cleanup old venv
   uv venv  "$GLASS_DIR/$START_VENV"
   source "$GLASS_DIR/$START_VENV/bin/activate"
-  uv sync --active --group test
-  uv pip uninstall glass -y # Make sure no installation of glass already exists
+  uv sync --active --group test --no-install-project
   uv pip install "git+$GLASS_REPO_URL@$START_REF"
 
   # Setup head environment
   rm -rf "${GLASS_DIR:?}/$END_VENV" # Cleanup old venv
   uv venv "$GLASS_DIR/$END_VENV"
   source "$GLASS_DIR/$END_VENV/bin/activate"
-  uv sync --active --group test
-  uv pip uninstall glass -y # Make sure no installation of glass already exists
+  uv sync --active --group test --no-install-project
   uv pip install "git+$GLASS_REPO_URL@$END_REF"
 
   # Remove old benchmark results
