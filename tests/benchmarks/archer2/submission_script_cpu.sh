@@ -1,6 +1,6 @@
 #!/bin/bash --login
 
-#SBATCH --job-name=glass_cpu_benchmarks
+#SBATCH --job-name=glass_reg_test_cpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
