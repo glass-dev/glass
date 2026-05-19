@@ -32,17 +32,6 @@ class Compare:
     """
 
     @staticmethod
-    def assert_allclose(
-        actual: AnyArray,
-        desired: AnyArray,
-        *,
-        rtol: float = 1e-7,
-        atol: float = 0,
-    ) -> None:
-        """Check if two objects are not equal up to desired tolerance."""
-        np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol)
-
-    @staticmethod
     def assert_array_almost_equal_nulp(
         actual: AnyArray,
         desired: AnyArray,
@@ -51,16 +40,6 @@ class Compare:
     ) -> None:
         """Compare two arrays relatively to their spacing."""
         np.testing.assert_array_almost_equal_nulp(actual, desired, nulp=nulp)
-
-    @staticmethod
-    def assert_array_equal(actual: AnyArray, desired: AnyArray) -> None:
-        """Check if two array objects are not equal."""
-        np.testing.assert_array_equal(actual, desired)
-
-    @staticmethod
-    def assert_array_less(actual: AnyArray, desired: AnyArray) -> None:
-        """Check if two array objects are not ordered by less than."""
-        np.testing.assert_array_less(actual, desired)
 
 
 @pytest.fixture(scope="session")
@@ -160,7 +139,7 @@ class HealpixInputs:
     def alm(*, rng: UnifiedGenerator) -> ComplexArray:
         """Generate random alm coefficients."""
         return rng.standard_normal(  # ty: ignore[unsupported-operator]
-            HealpixInputs.alm_size
+            HealpixInputs.alm_size,
         ) + 1j * rng.standard_normal(
             HealpixInputs.alm_size,
         )
