@@ -25,6 +25,8 @@ jobs:
   tests-bench:
     if: github.event.pull_request.draft == false
     name: Benchmark Tests
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -77,6 +79,8 @@ jobs:
   tests-core:
     if: github.event.pull_request.draft == false
     name: Core Tests (Python ${{ matrix.python-version }})
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -143,6 +147,7 @@ jobs:
       - tests-bench
       - tests-core
     if: always()
+    permissions: {}
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls finished
@@ -157,6 +162,8 @@ jobs:
   build:
     if: github.event.pull_request.draft == false
     name: Build
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source

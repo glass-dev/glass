@@ -35,6 +35,8 @@ jobs:
   regression-tests:
     if: github.event.pull_request.draft == false
     name: Regression test
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source

@@ -16,4 +16,6 @@ jobs:
       github.event.pull_request.draft == false &&
       contains(github.event.pull_request.labels.*.name, 'run-examples')
     name: On label
+    permissions:
+      contents: read
     uses: ./.github/workflows/run-examples.yaml

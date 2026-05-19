@@ -21,6 +21,8 @@ jobs:
   docs:
     if: github.event.pull_request.draft == false
     name: Docs
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
