@@ -21,7 +21,7 @@ dev = [
 ]
 docs = [
     "array-api-strict",
-    "cosmology.api",
+    "cosmology-api",
     "furo",
     "ipython",
     "jax",
@@ -47,7 +47,7 @@ release = [
     "hatchling",
 ]
 test = [
-    "cosmology.api",
+    "cosmology-api",
     "fitsio",
     "pytest",
     "pytest-benchmark",
