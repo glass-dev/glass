@@ -139,7 +139,7 @@ class Generator:
         self,
         lam: float | FloatArray,
         size: int | tuple[int, ...] | None = None,
-    ) -> FloatArray:
+    ) -> IntArray:
         """
         Draw samples from a Poisson distribution.
 

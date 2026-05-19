@@ -12,7 +12,13 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from glass._types import AnyArray, FloatArray, IntArray, UnifiedGenerator
+    from glass._types import (
+        AnyArray,
+        ComplexArray,
+        FloatArray,
+        IntArray,
+        UnifiedGenerator,
+    )
 
 
 class Compare:
@@ -151,9 +157,11 @@ class HealpixInputs:
     nside: int = 4
 
     @staticmethod
-    def alm(*, rng: UnifiedGenerator) -> FloatArray:
+    def alm(*, rng: UnifiedGenerator) -> ComplexArray:
         """Generate random alm coefficients."""
-        return rng.standard_normal(HealpixInputs.alm_size) + 1j * rng.standard_normal(  # ty: ignore[unsupported-operator]
+        return rng.standard_normal(  # ty: ignore[unsupported-operator]
+            HealpixInputs.alm_size
+        ) + 1j * rng.standard_normal(
             HealpixInputs.alm_size,
         )
 
