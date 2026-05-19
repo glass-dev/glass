@@ -7,11 +7,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
+from array_api_extra._lib._testing import xp_assert_equal
+
 import glass
 
 if TYPE_CHECKING:
     from glass._types import AngularPowerSpectra, FloatArray
-    from tests.fixtures.helper_classes import Compare
 
 # check if available for testing
 HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
@@ -24,7 +25,6 @@ cls_file = "Cls.npz"
 
 
 def test_read_write_cls(
-    compare: type[Compare],
     rng: np.random.Generator,
     tmp_path: pathlib.Path,
 ) -> None:
@@ -37,14 +37,12 @@ def test_read_write_cls(
         values = npz["values"]
         split = npz["split"]
 
-    compare.assert_array_equal(values, np.concat(cls))
-    compare.assert_array_equal(
-        split, np.cumulative_sum([cl.shape[0] for cl in cls[:-1]])
-    )
-    compare.assert_array_equal(cls, np.split(values, split))
+    xp_assert_equal(values, np.concat(cls))
+    xp_assert_equal(split, np.cumulative_sum([cl.shape[0] for cl in cls[:-1]]))
+    xp_assert_equal(cls, np.split(values, split))
 
     npz = glass.load_cls(tmp_path / cls_file)
-    compare.assert_array_equal(npz, cls)
+    xp_assert_equal(npz, cls)
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")

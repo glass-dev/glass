@@ -7,6 +7,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
+from array_api_extra._lib._testing import (
+    xp_assert_close,
+    xp_assert_equal,
+    xp_assert_less,
+)
+
 import glass
 from glass._array_api_utils import xp_additions as uxpx
 
@@ -14,11 +20,9 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass.cosmology import Cosmology
-    from tests.fixtures.helper_classes import Compare
 
 
 def test_distance_weight(
-    compare: type[Compare],
     cosmo: Cosmology,
     xp: ModuleType,
 ) -> None:
@@ -28,7 +32,7 @@ def test_distance_weight(
     # check shape
 
     w = glass.DistanceWeight(cosmo)(z)
-    compare.assert_array_equal(w.shape, z.shape)
+    xp_assert_equal(w.shape, z.shape)
 
     # check first value is 1
 
@@ -36,11 +40,10 @@ def test_distance_weight(
 
     # check values are decreasing
 
-    compare.assert_array_less(w[1:], w[:-1])
+    xp_assert_less(w[1:], w[:-1])
 
 
 def test_volume_weight(
-    compare: type[Compare],
     cosmo: Cosmology,
     xp: ModuleType,
 ) -> None:
@@ -50,7 +53,7 @@ def test_volume_weight(
     # check shape
 
     w = glass.VolumeWeight(cosmo)(z)
-    compare.assert_array_equal(w.shape, z.shape)
+    xp_assert_equal(w.shape, z.shape)
 
     # check first value is 0
 
@@ -58,17 +61,17 @@ def test_volume_weight(
 
     # check values are increasing
 
-    compare.assert_array_less(w[:-1], w[1:])
+    xp_assert_less(w[:-1], w[1:])
 
 
-def test_density_weight(compare: type[Compare], cosmo: Cosmology) -> None:
+def test_density_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
     w = glass.DensityWeight(cosmo)(z)
-    compare.assert_array_equal(w.shape, z.shape)
+    xp_assert_equal(w.shape, z.shape)
 
     # check first value is 0
 
@@ -76,7 +79,7 @@ def test_density_weight(compare: type[Compare], cosmo: Cosmology) -> None:
 
     # check values are increasing
 
-    compare.assert_array_less(w[:-1], w[1:])
+    xp_assert_less(w[:-1], w[1:])
 
 
 def test_tophat_windows(xp: ModuleType) -> None:
@@ -101,7 +104,7 @@ def test_tophat_windows(xp: ModuleType) -> None:
     assert all(xp.all(w.wa == 1) for w in ws)
 
 
-def test_linear_windows(compare: type[Compare], xp: ModuleType) -> None:
+def test_linear_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
     dz = 1e-2
     zgrid = xp.asarray(
@@ -117,7 +120,7 @@ def test_linear_windows(compare: type[Compare], xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    compare.assert_allclose(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xp_assert_close(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -125,7 +128,7 @@ def test_linear_windows(compare: type[Compare], xp: ModuleType) -> None:
 
     # check values of zeff
 
-    compare.assert_allclose([w.zeff for w in ws], zgrid[1:-1])
+    xp_assert_close([w.zeff for w in ws], zgrid[1:-1])
 
     # check weight function input
 
@@ -134,7 +137,7 @@ def test_linear_windows(compare: type[Compare], xp: ModuleType) -> None:
         weight=lambda _: 0,
     )
     for w in ws:
-        compare.assert_allclose(w.wa, xp.zeros_like(w.wa))
+        xp_assert_close(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -150,7 +153,7 @@ def test_linear_windows(compare: type[Compare], xp: ModuleType) -> None:
         glass.linear_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
+def test_cubic_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.cubic_windows`."""
     dz = 1e-2
     zgrid = xp.asarray(
@@ -166,7 +169,7 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.cubic_windows(zgrid)
-    compare.assert_allclose(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xp_assert_close(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -174,7 +177,7 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
 
     # check values of zeff
 
-    compare.assert_allclose([w.zeff for w in ws], zgrid[1:-1])
+    xp_assert_close([w.zeff for w in ws], zgrid[1:-1])
 
     # check weight function input
 
@@ -183,7 +186,7 @@ def test_cubic_windows(compare: type[Compare], xp: ModuleType) -> None:
         weight=lambda _: 0,
     )
     for w in ws:
-        compare.assert_allclose(w.wa, xp.zeros_like(w.wa))
+        xp_assert_close(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -234,7 +237,6 @@ def test_restrict(xp: ModuleType) -> None:
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(
-    compare: type[Compare],
     method: str,
     xp: ModuleType,
 ) -> None:
@@ -277,7 +279,7 @@ def test_partition(
 
     assert part.shape == (len(shells), 3, 2)
 
-    compare.assert_allclose(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
+    xp_assert_close(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
 
 
 def test_redshift_grid_default_xp() -> None:
@@ -340,7 +342,7 @@ def test_redshift_grid(xp: ModuleType) -> None:
         glass.redshift_grid(zmin, zmax, dz=dz, num=num, xp=xp)
 
 
-def test_distance_grid(compare: type[Compare], cosmo: Cosmology) -> None:
+def test_distance_grid(cosmo: Cosmology) -> None:
     """Add unit tests for :func:`glass.distance_grid`."""
     zmin = 0.0
     zmax = 1.0
@@ -360,7 +362,7 @@ def test_distance_grid(compare: type[Compare], cosmo: Cosmology) -> None:
     # check decrease in distance
 
     x = glass.distance_grid(cosmo, zmin, zmax, dx=0.3)
-    compare.assert_array_less(x[1:], x[:-1])
+    xp_assert_less(x[1:], x[:-1])
 
     # check error raised
 
@@ -377,10 +379,7 @@ def test_distance_grid(compare: type[Compare], cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine(
-    compare: type[Compare],
-    xp: ModuleType,
-) -> None:
+def test_combine(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1_000)
     weights = xp.asarray(
@@ -416,10 +415,10 @@ def test_combine(
     assert result.shape == z.shape
 
     # Check sum of result
-    compare.assert_allclose(sum(result), 929.267284)
+    xp_assert_close(sum(result), 929.267284)
 
     # Check integral w.r.t z has not changed
-    compare.assert_allclose(uxpx.trapezoid(result, z), 4.643139, rtol=1e-6)
+    xp_assert_close(uxpx.trapezoid(result, z), 4.643139, rtol=1e-6)
 
 
 def test_radial_window_immutable(xp: ModuleType) -> None:
@@ -449,7 +448,7 @@ def test_radial_window_immutable(xp: ModuleType) -> None:
         w.zeff = zeff  # ty: ignore[invalid-assignment]
 
 
-def test_radial_window_zeff_none(compare: type[Compare], xp: ModuleType) -> None:
+def test_radial_window_zeff_none(xp: ModuleType) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
 
@@ -458,7 +457,7 @@ def test_radial_window_zeff_none(compare: type[Compare], xp: ModuleType) -> None
 
     w = glass.RadialWindow(za, wa)
 
-    compare.assert_allclose(w.zeff, 1.0)
+    xp_assert_close(w.zeff, 1.0)
 
     # check zeff is NaN when redshift array is empty
 

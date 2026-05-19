@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from array_api_extra._lib._testing import xp_assert_close
+
 import glass
 
 if TYPE_CHECKING:
@@ -11,14 +13,11 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from tests.fixtures.helper_classes import Compare
-
 
 @pytest.mark.unstable
 def test_radialwindow(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
-    compare: Compare,
 ) -> None:
     """Benchmark for shells.RadialWindow."""
     # check zeff is computed when not provided
@@ -30,4 +29,4 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    compare.assert_allclose(w.zeff, expected_zeff)
+    xp_assert_close(w.zeff, expected_zeff)

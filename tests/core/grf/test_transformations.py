@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from array_api_extra._lib._testing import xp_assert_equal
+
 import glass.grf
 
 if TYPE_CHECKING:
@@ -11,14 +13,13 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_normal(compare: type[Compare], urng: UnifiedGenerator) -> None:
+def test_normal(urng: UnifiedGenerator) -> None:
     t = glass.grf.Normal()
     x = urng.standard_normal(10)
-    compare.assert_array_equal(t(x, 1.0), x)
+    xp_assert_equal(t(x, 1.0), x)
 
 
 def test_lognormal(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -27,11 +28,10 @@ def test_lognormal(
         t = glass.grf.Lognormal(lam)
         x = urng.standard_normal(10)
         y = lam * xp.expm1(x - var / 2)
-        compare.assert_array_equal(t(x, var), y)
+        xp_assert_equal(t(x, var), y)
 
 
 def test_sqnormal(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -41,20 +41,19 @@ def test_sqnormal(
         t = glass.grf.SquaredNormal(a, lam)
         x = urng.standard_normal(10)
         y = lam * ((x - a) ** 2 - 1)
-        compare.assert_array_equal(t(x, var), y)
+        xp_assert_equal(t(x, var), y)
 
 
 def test_normal_normal(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
     x = urng.random(10)
-    compare.assert_array_equal(glass.grf.corr(t1, t2, x), x)
-    compare.assert_array_equal(glass.grf.icorr(t1, t2, x), x)
-    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
+    xp_assert_equal(glass.grf.corr(t1, t2, x), x)
+    xp_assert_equal(glass.grf.icorr(t1, t2, x), x)
+    xp_assert_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
 
 
 def test_lognormal_lognormal(
@@ -72,9 +71,9 @@ def test_lognormal_lognormal(
     y = lam1 * lam2 * xp.expm1(x)
     dy = lam1 * lam2 * xp.exp(x)
 
-    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
+    xp_assert_equal(glass.grf.corr(t1, t2, x), y)
     compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
-    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
+    xp_assert_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
 def test_lognormal_normal(
@@ -91,9 +90,9 @@ def test_lognormal_normal(
     y = lam1 * x
     dy = lam1 * xp.ones_like(x)
 
-    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
+    xp_assert_equal(glass.grf.corr(t1, t2, x), y)
     compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
-    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
+    xp_assert_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
 def test_sqnormal_sqnormal(
@@ -114,6 +113,6 @@ def test_sqnormal_sqnormal(
     y = 2 * lam1 * lam2 * x * (x + 2 * a1 * a2)
     dy = 4 * lam1 * lam2 * (x + a1 * a2)
 
-    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
+    xp_assert_equal(glass.grf.corr(t1, t2, x), y)
     compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
-    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
+    xp_assert_equal(glass.grf.dcorr(t1, t2, x), dy)

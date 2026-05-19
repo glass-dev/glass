@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from array_api_extra._lib._testing import xp_assert_equal
+
 import glass
 
 if TYPE_CHECKING:
@@ -14,13 +16,11 @@ if TYPE_CHECKING:
 
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
-    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.stable
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,
@@ -38,8 +38,8 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
     deltas = urngb.random((len(shells), 10))
 
-    compare.assert_array_equal(mat, xpb.tril(mat))
-    compare.assert_array_equal(xpb.triu(mat, k=1), 0)
+    xp_assert_equal(mat, xpb.tril(mat))
+    xp_assert_equal(xpb.triu(mat, k=1), 0)
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
@@ -79,7 +79,6 @@ def test_multi_plane_matrix(
 @pytest.mark.stable
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,
@@ -100,8 +99,8 @@ def test_multi_plane_weights(
 
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    compare.assert_array_equal(w_out, xpb.triu(w_out, 1))
-    compare.assert_array_equal(xpb.tril(w_out), 0)
+    xp_assert_equal(w_out, xpb.triu(w_out, 1))
+    xp_assert_equal(xpb.tril(w_out), 0)
 
     def setup_shells_deltas_and_weights() -> tuple[
         tuple[
