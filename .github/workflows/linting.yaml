@@ -1,0 +1,45 @@
+---
+name: Linting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+concurrency:
+  cancel-in-progress: true
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  prek:
+    if: github.event.pull_request.draft == false
+    name: Run prek
+    permissions:
+      contents: read
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.14
+
+      - name: Install only dev dependencies
+        run: uv sync --only-dev
+
+      - name: Run prek
+        run: uv run nox -s lint
+        env:
+          FORCE_COLOR: 1
