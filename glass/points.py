@@ -341,7 +341,7 @@ def _sample_number_galaxies(
     n = xp.clip(n, min=0.0)
 
     # sample actual number in each pixel
-    return rng.poisson(n)  # ty: ignore[invalid-return-type]
+    return rng.poisson(n)
 
 
 def _sample_galaxies_per_pixel(

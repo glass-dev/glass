@@ -22,7 +22,7 @@ def test_rng_dispatcher_numpy() -> None:
 
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_rng_dispatcher_jax() -> None:
-    import jax.numpy as jnp  # ty: ignore[unresolved-import]
+    import jax.numpy as jnp
 
     rng = _rng.rng_dispatcher(xp=jnp)
     assert isinstance(rng, glass.jax.Generator)
@@ -30,7 +30,7 @@ def test_rng_dispatcher_jax() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_rng_dispatcher_array_api_strict() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.rng_dispatcher(xp=array_api_strict)
     assert isinstance(rng, _rng.Generator)
@@ -38,7 +38,7 @@ def test_rng_dispatcher_array_api_strict() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_init() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.Generator(xp=array_api_strict)
     assert isinstance(rng, _rng.Generator)
@@ -46,7 +46,7 @@ def test_init() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_random() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.random(size=10_000)
@@ -58,7 +58,7 @@ def test_random() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_normal() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.normal(1, 2, size=10_000)
@@ -68,7 +68,7 @@ def test_normal() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_standard_normal() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.standard_normal(size=10_000)
@@ -78,7 +78,7 @@ def test_standard_normal() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_poisson() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.poisson(lam=1, size=10_000)
@@ -88,7 +88,7 @@ def test_poisson() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_uniform() -> None:
-    import array_api_strict  # ty: ignore[unresolved-import]
+    import array_api_strict
 
     rng = _rng.rng_dispatcher(xp=array_api_strict)
     rvs = rng.uniform(size=10_000)
