@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus=1
 #SBATCH --time=0:30:0
-#SBATCH --partition=standard
-#SBATCH --qos=standard
+#SBATCH --partition=gpu
+#SBATCH --qos=gpu-shd
 
 # Load GPU modules
 module load PrgEnv-amd/8.4.0
