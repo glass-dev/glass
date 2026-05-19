@@ -2,7 +2,6 @@
 
 GLASS_DIR=""
 GLASS_REPO_URL="https://github.com/glass-dev/glass"
-CPU_OR_GPU="cpu"
 START_REF=""
 END_REF=""
 START_VENV=".venv-start"
@@ -20,7 +19,6 @@ help() {
   echo "    -s | --start-ref <start_ref>     The git ref to be used as the initial state."
   echo "    -e | --end-ref <end_ref>         The git ref to be used as the final state."
   echo "    -a | --account <archer2_account> The archer2 account code to run jobs against."
-  echo "    -g | --gpu                       Flag to state the gpu benchmark should be ran."
   echo "    --skip-setup                     Flag to state if the setup (installation of "
   echo "                                     dependencies) can be skipped. Good for simply"
   echo "                                     re-submitting"
@@ -58,11 +56,6 @@ while [ $# -gt 0 ] ; do
         -a | --account)
             ACCOUNT=$2
             shift 2
-            continue
-            ;;
-        -g | --gpu)
-            CPU_OR_GPU="gpu"
-            shift 1
             continue
             ;;
         --skip-setup)
@@ -109,11 +102,7 @@ then
   rm -rf "${GLASS_DIR:?}/$START_VENV" # Cleanup old venv
   uv venv  "$GLASS_DIR/$START_VENV"
   source "$GLASS_DIR/$START_VENV/bin/activate"
-  if [ $CPU_OR_GPU = "gpu" ]; then
-    uv sync --active --group test --group archer2-gpu
-  else
-    uv sync --active --group test
-  fi
+  uv sync --active --group test
   uv pip uninstall glass -y # Make sure no installation of glass already exists
   uv pip install "git+$GLASS_REPO_URL@$START_REF"
 
@@ -121,11 +110,7 @@ then
   rm -rf "${GLASS_DIR:?}/$END_VENV" # Cleanup old venv
   uv venv "$GLASS_DIR/$END_VENV"
   source "$GLASS_DIR/$END_VENV/bin/activate"
-  if [ $CPU_OR_GPU = "gpu" ]; then
-    uv sync --active --group test --group archer2-gpu
-  else
-    uv sync --active --group test
-  fi
+  uv sync --active --group test
   uv pip uninstall glass -y # Make sure no installation of glass already exists
   uv pip install "git+$GLASS_REPO_URL@$END_REF"
 
@@ -134,4 +119,4 @@ then
 fi
 
 # Submit job
-sbatch --account="$ACCOUNT" "$BENCHMARKS_DIR/archer2/submission_script_$CPU_OR_GPU.sh" "$GLASS_DIR"
+sbatch --account="$ACCOUNT" "$BENCHMARKS_DIR/archer2/submission_script_cpu.sh" "$GLASS_DIR"
