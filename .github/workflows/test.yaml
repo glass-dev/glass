@@ -30,18 +30,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
+        # yamllint disable-line rule:line-length
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: 3.14
 
       - name: Cache nox
-        uses: actions/cache@v5 # zizmor: ignore[unpinned-uses]
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           key:
             tests-bench-${{ hashFiles('pyproject.toml') }}-${{
@@ -69,7 +70,8 @@ jobs:
           env.BENCH_COV_NAME }}.xml
 
       - name: Upload benchmark coverage to Coveralls
-        uses: coverallsapp/github-action@v2 # zizmor: ignore[unpinned-uses]
+        # yamllint disable-line rule:line-length
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           base-path: glass/
           file: ${{ env.BENCH_COV_NAME }}.xml
@@ -92,18 +94,19 @@ jobs:
           - "3.14"
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
+        # yamllint disable-line rule:line-length
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache nox
-        uses: actions/cache@v5 # zizmor: ignore[unpinned-uses]
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           key:
             tests-core-${{ hashFiles('pyproject.toml') }}-${{
@@ -135,7 +138,8 @@ jobs:
           matrix.python-version }}.xml
 
       - name: Upload core coverage to Coveralls
-        uses: coverallsapp/github-action@v2 # zizmor: ignore[unpinned-uses]
+        # yamllint disable-line rule:line-length
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           base-path: glass/
           file: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml
@@ -151,7 +155,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls finished
-        uses: coverallsapp/github-action@v2 # zizmor: ignore[unpinned-uses]
+        # yamllint disable-line rule:line-length
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           carryforward:
             ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.10,${{
@@ -167,13 +172,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7 # zizmor: ignore[unpinned-uses]
+        # yamllint disable-line rule:line-length
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: 3.14
 
