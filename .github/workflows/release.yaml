@@ -56,7 +56,8 @@ jobs:
         run: ls -l dist/
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        # yamllint disable-line rule:line-length
+        uses: pypa/gh-action-pypi-publish@release/v1 # zizmor: ignore[unpinned-uses]
         with:
           verbose: true
 
@@ -80,7 +81,8 @@ jobs:
         run: ls -l dist/
 
       - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        # yamllint disable-line rule:line-length
+        uses: pypa/gh-action-pypi-publish@release/v1 # zizmor: ignore[unpinned-uses]
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true
