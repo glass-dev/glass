@@ -12,7 +12,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-   Then we must make sure uv is availale on the login node and the worker node.
+   Then we must make sure uv is available on the login node and the worker node.
    To do this we can update our start up scripts (`.profile`) on both
    partitions. Therefore, save the following into `$HOME/.profile`
 
