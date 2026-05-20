@@ -274,8 +274,9 @@ def regression_tests(session: nox.Session) -> None:
     Note it is not possible to pass extra options to pytest.
 
     """
-    _check_revision_count(session.posargs, expected_count=2)
-    before_revision, after_revision = session.posargs
+    minimum_posargs = 2
+    _check_revision_count(session.posargs, expected_count=minimum_posargs)
+    before_revision, after_revision = session.posargs[:minimum_posargs]
 
     _setup_array_backend(session)
 
