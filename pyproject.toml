@@ -175,6 +175,8 @@ show-fixes = true
 src = [
     "glass",
 ]
+format.docstring-code-format = true
+format.preview = true
 lint.allowed-confusables = [
     "α",
     "γ",

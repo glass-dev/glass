@@ -768,38 +768,32 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
 
 def test_check_posdef_spectra(xp: ModuleType) -> None:
     # posdef spectra
-    assert glass.check_posdef_spectra(
-        [
-            xp.asarray(x)
-            for x in [
-                [1.0, 1.0, 1.0],
-                [1.0, 1.0, 1.0],
-                [0.9, 0.9, 0.9],
-            ]
-        ],
-    )
+    assert glass.check_posdef_spectra([
+        xp.asarray(x)
+        for x in [
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0],
+            [0.9, 0.9, 0.9],
+        ]
+    ])
     # semidef spectra
-    assert glass.check_posdef_spectra(
-        [
-            xp.asarray(x)
-            for x in [
-                [1.0, 1.0, 1.0],
-                [1.0, 1.0, 0.0],
-                [0.9, 1.0, 0.0],
-            ]
-        ],
-    )
+    assert glass.check_posdef_spectra([
+        xp.asarray(x)
+        for x in [
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 0.0],
+            [0.9, 1.0, 0.0],
+        ]
+    ])
     # indef spectra
-    assert not glass.check_posdef_spectra(
-        [
-            xp.asarray(x)
-            for x in [
-                [1.0, 1.0, 1.0],
-                [1.0, 1.0, 1.0],
-                [1.1, 1.1, 1.1],
-            ]
-        ],
-    )
+    assert not glass.check_posdef_spectra([
+        xp.asarray(x)
+        for x in [
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0],
+            [1.1, 1.1, 1.1],
+        ]
+    ])
 
 
 def test_regularized_spectra(
