@@ -27,6 +27,8 @@ def test_broadcast_leading_axes(
     b_in = xpb.zeros(b_shape)
     c_in = xpb.zeros(c_shape)
 
+    assert False, f"GLASS version: {glass.__version__}"
+
     dims, *rest = benchmark(
         glass.arraytools.broadcast_leading_axes,
         (a_in, 0),
