@@ -30,30 +30,30 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
     # check with all False
 
     results = glass.from_convergence(kappa)  # ty: ignore[no-matching-overload]
-    xp_assert_equal(results, ())
+    assert results == ()
 
     # check all combinations of potential, deflection, shear being True
 
     results = glass.from_convergence(kappa, potential=True)
-    xp_assert_equal(len(results), 1)
+    assert len(results) == 1
 
     results = glass.from_convergence(kappa, deflection=True)
-    xp_assert_equal(len(results), 1)
+    assert len(results) == 1
 
     results = glass.from_convergence(kappa, shear=True)
-    xp_assert_equal(len(results), 1)
+    assert len(results) == 1
 
     results = glass.from_convergence(kappa, potential=True, deflection=True)
-    xp_assert_equal(len(results), 2)
+    assert len(results) == 2
 
     results = glass.from_convergence(kappa, potential=True, shear=True)
-    xp_assert_equal(len(results), 2)
+    assert len(results) == 2
 
     results = glass.from_convergence(kappa, deflection=True, shear=True)
-    xp_assert_equal(len(results), 2)
+    assert len(results) == 2
 
     results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
-    xp_assert_equal(len(results), 3)
+    assert len(results) == 3
 
 
 def test_shear_from_convergence() -> None:
@@ -70,7 +70,7 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
 
     xp_assert_equal(mat, xp.tril(mat))
-    xp_assert_equal(xp.triu(mat, k=1), 0)
+    xp_assert_equal(xp.triu(mat, k=1), xp.zeros_like(mat))
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -96,7 +96,7 @@ def test_multi_plane_weights(
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
     xp_assert_equal(w_out, xp.triu(w_out, k=1))
-    xp_assert_equal(xp.tril(w_out), 0)
+    xp_assert_equal(xp.tril(w_out), xp.zeros_like(w_out))
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
