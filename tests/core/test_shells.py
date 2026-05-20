@@ -53,7 +53,7 @@ def test_volume_weight(
     # check shape
 
     w = glass.VolumeWeight(cosmo)(z)
-    xp_assert_equal(w.shape, z.shape)
+    assert w.shape == z.shape
 
     # check first value is 0
 
@@ -71,7 +71,7 @@ def test_density_weight(cosmo: Cosmology) -> None:
     # check shape
 
     w = glass.DensityWeight(cosmo)(z)
-    xp_assert_equal(w.shape, z.shape)
+    assert w.shape == z.shape
 
     # check first value is 0
 
@@ -457,7 +457,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xp_assert_close(w.zeff, 1.0)
+    xp_assert_close(w.zeff, xp.ones_like(w.zeff))
 
     # check zeff is NaN when redshift array is empty
 

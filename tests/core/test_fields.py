@@ -201,8 +201,8 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     assert cov.dtype == xpb.float64
 
     xp_assert_close(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
-    xp_assert_close(cov[:, 1], 0)
-    xp_assert_close(cov[:, 2], 0)
+    xp_assert_close(cov[:, 1], xpb.zeros_like(cov[:, 1]))
+    xp_assert_close(cov[:, 2], xpb.zeros_like(cov[:, 2]))
 
     # test negative value error
 
@@ -372,7 +372,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    xp_assert_close(result[..., 6:], 0)
+    xp_assert_close(result[..., 6:], xp.zeros_like(result[..., 6:]))
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -529,11 +529,13 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 def test_spectra_indices(xp: ModuleType) -> None:
     xp_assert_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
     xp_assert_equal(glass.spectra_indices(0, xp=xp), xp.zeros((0, 2)))
-    xp_assert_equal(glass.spectra_indices(1, xp=xp), [[0, 0]])
-    xp_assert_equal(glass.spectra_indices(2, xp=xp), [[0, 0], [1, 1], [1, 0]])
+    xp_assert_equal(glass.spectra_indices(1, xp=xp), xp.asarray([[0, 0]]))
+    xp_assert_equal(
+        glass.spectra_indices(2, xp=xp), xp.asarray([[0, 0], [1, 1], [1, 0]])
+    )
     xp_assert_equal(
         glass.spectra_indices(3, xp=xp),
-        [[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]],
+        xp.asarray([[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]]),
     )
 
 

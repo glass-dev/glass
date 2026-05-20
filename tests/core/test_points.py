@@ -306,8 +306,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     )
 
     assert int(count) == count
-    xp_assert_close(lon, [])
-    xp_assert_close(lat, [])
+    xp_assert_close(lon, xp.asarray([]))
+    xp_assert_close(lat, xp.asarray([]))
 
     # case: large delta
 
@@ -479,19 +479,19 @@ def test_displace_arg_complex(xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray(r + 0j))
-    xp_assert_close([lon, lat], [0.0, d])
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([0.0, d]))
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-r + 0j))
-    xp_assert_close([lon, lat], [0.0, -d], atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray(1j * r))
-    xp_assert_close([lon, lat], [d, 0.0], atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-1j * r))
-    xp_assert_close([lon, lat], [-d, 0.0], atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
 
 
 def test_displace_arg_real(xp: ModuleType) -> None:
@@ -505,19 +505,19 @@ def test_displace_arg_real(xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray([r, 0]))
-    xp_assert_close([lon, lat], [0.0, d])
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([0.0, d]))
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray([-r, 0]))
-    xp_assert_close([lon, lat], [0.0, -d], atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
 
     # east
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, r]))
-    xp_assert_close([lon, lat], [d, 0.0], atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     # west
     lon, lat = glass.displace(lon0, lat0, xp.asarray([0, -r]))
-    xp_assert_close([lon, lat], [-d, 0.0], atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
 
 
 def test_displace_abs(
