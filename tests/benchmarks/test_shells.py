@@ -29,4 +29,4 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    xp_assert_close(w.zeff, expected_zeff)
+    xp_assert_close(w.zeff, xpb.asarray(expected_zeff))

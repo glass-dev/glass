@@ -78,7 +78,7 @@ def test_cumulative_trapezoid_2d(
     )
     x = xpb.arange(scaled_length)  # [0, 1, 2, 3,...]
 
-    expected_first_4_out = [0, 1, 4, 7]
+    expected_first_4_out = xpb.asarray([0, 1, 4, 7])
 
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
 

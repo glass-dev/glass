@@ -73,12 +73,12 @@ def test_ndinterp(xp: ModuleType) -> None:
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (3,)
-    xp_assert_close(y, [1.15, 1.25, 1.35], atol=1e-15)
+    xp_assert_close(y, xp.asarray([1.15, 1.25, 1.35]), atol=1e-15)
 
     x = xp.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2, 2)
-    xp_assert_close(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
+    xp_assert_close(y, xp.asarray([[1.15, 1.25], [1.35, 1.45]]), atol=1e-15)
 
     # test n-dimensional interpolation in final axis
 
@@ -87,19 +87,19 @@ def test_ndinterp(xp: ModuleType) -> None:
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2,)
-    xp_assert_close(y, [1.15, 2.15], atol=1e-15)
+    xp_assert_close(y, xp.asarray([1.15, 2.15]), atol=1e-15)
 
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2, 3)
-    xp_assert_close(y, [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]], atol=1e-15)
+    xp_assert_close(y, xp.asarray([[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]]), atol=1e-15)
 
     x = xp.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2, 2, 2)
     xp_assert_close(
         y,
-        [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]],
+        xp.asarray([[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]]),
         atol=1e-15,
     )
 
@@ -112,14 +112,14 @@ def test_ndinterp(xp: ModuleType) -> None:
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
     assert y.shape == (2, 1)
-    xp_assert_close(y, [[1.15], [2.15]], atol=1e-15)
+    xp_assert_close(y, xp.asarray([[1.15], [2.15]]), atol=1e-15)
 
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
     assert y.shape == (2, 3, 1)
     xp_assert_close(
         y,
-        [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]],
+        xp.asarray([[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]]),
         atol=1e-15,
     )
 
@@ -128,18 +128,20 @@ def test_ndinterp(xp: ModuleType) -> None:
     assert y.shape == (2, 3, 4, 1)
     xp_assert_close(
         y,
-        [
+        xp.asarray(
             [
-                [[1.15], [1.25], [1.35], [1.45]],
-                [[1.45], [1.35], [1.25], [1.15]],
-                [[1.15], [1.45], [1.25], [1.35]],
-            ],
-            [
-                [[2.15], [2.25], [2.35], [2.45]],
-                [[2.45], [2.35], [2.25], [2.15]],
-                [[2.15], [2.45], [2.25], [2.35]],
-            ],
-        ],
+                [
+                    [[1.15], [1.25], [1.35], [1.45]],
+                    [[1.45], [1.35], [1.25], [1.15]],
+                    [[1.15], [1.45], [1.25], [1.35]],
+                ],
+                [
+                    [[2.15], [2.25], [2.35], [2.45]],
+                    [[2.45], [2.35], [2.25], [2.15]],
+                    [[2.15], [2.45], [2.25], [2.35]],
+                ],
+            ]
+        ),
         atol=1e-15,
     )
 
@@ -153,7 +155,7 @@ def test_trapezoid_product(xp: ModuleType) -> None:
 
     s = glass.arraytools.trapezoid_product((x1, f1), (x2, f2))
 
-    xp_assert_close(s, 1.0)
+    xp_assert_close(s, xp.ones_like(s))
 
 
 def test_cumulative_trapezoid(xp: ModuleType) -> None:

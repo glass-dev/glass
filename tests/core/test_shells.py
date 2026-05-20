@@ -32,7 +32,7 @@ def test_distance_weight(
     # check shape
 
     w = glass.DistanceWeight(cosmo)(z)
-    xp_assert_equal(w.shape, z.shape)
+    assert w.shape == z.shape
 
     # check first value is 1
 
