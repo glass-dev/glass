@@ -519,7 +519,7 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 
     # go through expected indices and values and compare
     for k, (i, j) in enumerate(indices):
-        xp_assert_close(next(it), (i, j, k))
+        assert next(it) == (i, j, k)
 
     # make sure iterator is exhausted
     with pytest.raises(StopIteration):
@@ -527,8 +527,8 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 
 
 def test_spectra_indices(xp: ModuleType) -> None:
-    xp_assert_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
-    xp_assert_equal(glass.spectra_indices(0, xp=xp), xp.zeros((0, 2)))
+    xp_assert_equal(glass.spectra_indices(0), xp.zeros((0, 2), dtype=xp.int64))
+    xp_assert_equal(glass.spectra_indices(0, xp=xp), xp.zeros((0, 2), dtype=xp.int64))
     xp_assert_equal(glass.spectra_indices(1, xp=xp), xp.asarray([[0, 0]]))
     xp_assert_equal(
         glass.spectra_indices(2, xp=xp), xp.asarray([[0, 0], [1, 1], [1, 0]])
@@ -653,13 +653,13 @@ def test_solve_gaussian_spectra(
 def test_glass_to_healpix_spectra() -> None:
     inp = [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
     out = glass.glass_to_healpix_spectra(inp)
-    xp_assert_equal(out, [11, 22, 33, 44, 21, 32, 43, 31, 42, 41])
+    assert out == [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
 
 
 def test_healpix_to_glass_spectra() -> None:
     inp = [11, 22, 33, 44, 21, 32, 43, 31, 42, 41]
     out = glass.healpix_to_glass_spectra(inp)
-    xp_assert_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
+    assert out == [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
 
 
 def test_glass_to_healpix_alm(xp: ModuleType) -> None:
@@ -671,12 +671,21 @@ def test_glass_to_healpix_alm(xp: ModuleType) -> None:
     )
 
 
-def test_lognormal_shift_hilbert2011() -> None:
+def test_lognormal_shift_hilbert2011(xp: ModuleType) -> None:
     zs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
-    shifts = [glass.lognormal_shift_hilbert2011(z) for z in zs]
+    shifts = xp.asarray([glass.lognormal_shift_hilbert2011(z) for z in zs])
 
     # computed by hand
-    check = [0.0103031, 0.02975, 0.0538781, 0.0792, 0.103203, 0.12435, 0.142078, 0.1568]
+    check = xp.asarray([
+        0.0103031,
+        0.02975,
+        0.0538781,
+        0.0792,
+        0.103203,
+        0.12435,
+        0.142078,
+        0.1568,
+    ])
 
     xp_assert_close(shifts, check, atol=1e-4, rtol=1e-4)
 
@@ -696,7 +705,7 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
 
     xp_assert_equal(
         glass.cov_from_spectra(spectra),
-        [
+        xp.asarray([
             [
                 [110, 210, 310],
                 [210, 220, 320],
@@ -717,12 +726,12 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
                 [213, 223, 323],
                 [313, 323, 333],
             ],
-        ],
+        ]),
     )
 
     xp_assert_equal(
         glass.cov_from_spectra(spectra, lmax=1),
-        [
+        xp.asarray([
             [
                 [110, 210, 310],
                 [210, 220, 320],
@@ -733,12 +742,12 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
                 [211, 221, 321],
                 [311, 321, 331],
             ],
-        ],
+        ]),
     )
 
     xp_assert_equal(
         glass.cov_from_spectra(spectra, lmax=4),
-        [
+        xp.asarray([
             [
                 [110, 210, 310],
                 [210, 220, 320],
@@ -764,7 +773,7 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
                 [0, 0, 0],
                 [0, 0, 0],
             ],
-        ],
+        ]),
     )
 
 
