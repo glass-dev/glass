@@ -88,3 +88,9 @@ repos:
         args:
           - --external-sources
           - --shell=bash
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.23.1
+    hooks:
+      - id: zizmor
+        args:
+          - --fix=safe
