@@ -24,13 +24,13 @@ def test_vmap_galactic_ecliptic(xp: ModuleType) -> None:
     # check shape
 
     vmap = glass.vmap_galactic_ecliptic(n_side, xp=xp)
-    xp_assert_equal(vmap.shape[0], hp.nside2npix(n_side))
+    assert vmap.shape[0] == hp.nside2npix(n_side)
 
     # Test without xp
 
     vmap = glass.vmap_galactic_ecliptic(n_side)
     assert vmap.__array_namespace__().__name__ == "numpy"
-    xp_assert_equal(vmap.shape[0], hp.nside2npix(n_side))
+    assert vmap.shape[0] == hp.nside2npix(n_side)
 
     # no rotation
 
@@ -70,7 +70,11 @@ def test_gaussian_nz(
 
     norm = 1
     nz = glass.gaussian_nz(z, mean, sigma, norm=norm)
-    xp_assert_close(xp.sum(nz) / nz.shape[0], norm, rtol=1e-2)
+    xp_assert_close(
+        xp.sum(nz) / nz.shape[0],
+        xp.asarray(norm, dtype=xp.float64),
+        rtol=1e-2,
+    )
 
     # check multidimensionality size
 
