@@ -35,17 +35,17 @@ def test_effective_bias(
 
     z = xp.linspace(0, 1, 10)
     bz = xp.zeros((10,))
-    xp_assert_close(glass.effective_bias(z, bz, w), 0.0)
+    xp_assert_close(glass.effective_bias(z, bz, w), xp.asarray(0.0))
 
     z = xp.zeros((10,))
     bz = xp.full_like(z, 0.5)
 
-    xp_assert_close(glass.effective_bias(z, bz, w), 0.0)
+    xp_assert_close(glass.effective_bias(z, bz, w), xp.asarray(0.0))
 
     z = xp.linspace(0, 1, 10)
     bz = xp.full_like(z, 0.5)
 
-    xp_assert_close(glass.effective_bias(z, bz, w), 0.25)
+    xp_assert_close(glass.effective_bias(z, bz, w), xp.asarray(0.25))
 
 
 def test_linear_bias(
@@ -194,8 +194,8 @@ def test_sample_number_galaxies(xp: ModuleType) -> None:
 
     n = glass.points._sample_number_galaxies(n_in)
 
-    xp_assert_equal(n[:6], xp.zeros_like(n[:6]))
-    xp_assert_close(n[6:], n_in[6:], atol=250)
+    xp_assert_equal(n[:6], xp.zeros_like(n[:6], dtype=xp.int64))
+    xp_assert_close(xp.asarray(n[6:], dtype=xp.float64), n_in[6:], atol=250)
 
 
 def test_sample_number_galaxies_rng(
@@ -207,7 +207,7 @@ def test_sample_number_galaxies_rng(
     n = glass.points._sample_number_galaxies(n_in, rng=urng)
 
     xp_assert_equal(n[:6], xp.zeros_like(n[:6]))
-    xp_assert_close(n[6:], n_in[6:], atol=250)
+    xp_assert_close(xp.asarray(n[6:], dtype=xp.float64), n_in[6:], atol=250)
 
 
 def test_sample_galaxies_per_pixel(
@@ -598,7 +598,7 @@ def test_displacement_zerodist(
 
     xp_assert_close(
         glass.displacement(lon, lat, lon, lat),
-        xp.zeros(100),
+        xp.zeros(100, dtype=xp.complex128),
     )
 
 
