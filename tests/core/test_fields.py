@@ -26,117 +26,89 @@ def not_triangle_numbers() -> list[int]:
     return [2, 4, 5, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
 
-def test_iternorm(xp: ModuleType) -> None:
-    # check output shapes and types
-
-    k = 2
-
-    generator = glass.iternorm(
-        k,
-        (xp.asarray(x) for x in [1.0, 0.5, 0.5, 0.5, 0.2, 0.1, 0.5, 0.1, 0.2]),
-    )
-    result = next(generator)
-
-    j, a, s = result
-
-    assert isinstance(j, int)
-    assert a.shape == (k,)
-    assert s.shape == ()
-    assert s.dtype == xp.float64
-    assert s.shape == ()
-
-    # specify size
-
-    size = 3
-
-    generator = glass.iternorm(
-        k,
-        (
-            xp.asarray(arr)
-            for arr in [
-                [1.0, 0.5, 0.5],
-                [0.5, 0.2, 0.1],
-                [0.5, 0.1, 0.2],
-            ]
-        ),
-        size,
-    )
-    result = next(generator)
-
-    j, a, s = result
-
-    assert isinstance(j, int)
-    assert a.shape == (size, k)
-    assert s.shape == (size,)
-
-    # test shape mismatch error
-
-    with pytest.raises(TypeError, match="covariance row 0: shape"):
-        list(
-            glass.iternorm(
-                k,
-                (
-                    xp.asarray(arr)
-                    for arr in [
-                        [1.0, 0.5],
-                        [0.5, 0.2],
-                    ]
-                ),
-            ),
+@pytest.mark.parametrize("k", [0, 1, 2], ids=["k=0", "k=1", "k=2"])
+@pytest.mark.parametrize("test_nd", [False, True], ids=["0d", "nd"])
+def test_iternorm(k, test_nd, xp: ModuleType, compare: type[Compare]) -> None:
+    """Test iternorm against explicit computation."""
+    # covariance matrix to sample
+    if test_nd:
+        cov = xp.asarray(
+            [
+                # first cov
+                [
+                    [1.0, 0.2, 0.1],
+                    [0.2, 0.5, 0.2],
+                    [0.1, 0.2, 0.3],
+                ],
+                # second cov
+                [
+                    [1.4, 0.4, 0.5],
+                    [0.4, 1.5, 0.8],
+                    [0.5, 0.8, 1.3],
+                ],
+            ],
+        )
+    else:
+        cov = xp.asarray(
+            [
+                [1.0, 0.2, 0.1],
+                [0.2, 0.5, 0.2],
+                [0.1, 0.2, 0.3],
+            ],
         )
 
-    # test positive definite error
-
-    with pytest.raises(ValueError, match="covariance matrix is not positive definite"):
-        list(
-            glass.iternorm(
-                k,
-                (xp.asarray(x) for x in [1.0, 0.5, 0.9, 0.5, 0.2, 0.4, 0.9, 0.4, -1.0]),
-            ),
-        )
-
-    # test multiple iterations
-
-    size = (3,)
-
     generator = glass.iternorm(
-        k,
-        (
-            xp.asarray(arr)
-            for arr in [
-                [
-                    [1.0, 0.5, 0.5],
-                    [0.5, 0.2, 0.1],
-                    [0.5, 0.1, 0.2],
-                ],
-                [
-                    [2.0, 1.0, 0.8],
-                    [1.0, 0.5, 0.3],
-                    [0.8, 0.3, 0.6],
-                ],
-            ]
-        ),
-        size,
+        # for each covariance row, start at the diagonal diagonal and go left
+        # trim to at most k elements (= max. number of correlations)
+        cov[..., i, i::-1][..., : min(i, k) + 1]
+        for i in range(cov.shape[-1])
     )
 
-    result1 = next(generator)
-    result2 = next(generator)
+    # check rows against explicit calculation
+    # see https://arxiv.org/pdf/2302.01942, Appendix A
+    # ruff: disable[N806]
+    for n, (a, s) in enumerate(generator):
+        Sn = cov[..., :n, :n]
+        cn = cov[..., :n, n]
+        vn = cov[..., n, n]
+        if n > k:
+            # zero out correlations that should be forgotten
+            # i.e. more than k away from the diagonal of the cov. matrix
+            mask = xp.where(
+                xp.abs(xp.arange(n)[:, None] - xp.arange(n)) <= k,
+                xp.ones(n),
+                xp.zeros(n),
+            )
+            Sn *= mask
+            mask = xp.where(xp.arange(n) >= n - k, xp.ones(n), xp.zeros(n))
+            cn *= mask
+        Sninv = xp.linalg.pinv(Sn)
+        # stabilise Cholesky decomposition
+        An = xp.linalg.cholesky(Sninv + 1e-100 * xp.eye(n), upper=True)
+        compare.assert_allclose(An.mT @ An, Sninv)
+        an = (An @ cn[..., None])[..., 0]
+        sn = xp.sqrt(vn - xp.vecdot(an, an))
+        # make sure a only has k correlations
+        assert a.shape[-1] <= k
+        # cannot compare a directly, only a^T @ a
+        compare.assert_allclose(xp.vecdot(a, a), xp.vecdot(an, an))
+        compare.assert_allclose(s, sn)
+    # ruff: enable[N806]
 
-    assert result1 != result2
-    assert isinstance(result1, tuple)
-    assert len(result1) == 3
-    assert isinstance(result2, tuple)
-    assert len(result2) == 3
 
-    # test k = 0
+def test_iternorm_errors(xp: ModuleType) -> None:
+    """Test iternorm raises when it should."""
+    # covariance matrix is empty
+    with pytest.raises(ValueError, match="empty covariance"):
+        list(glass.iternorm([xp.ones(0)]))
 
-    generator = glass.iternorm(0, xp.asarray([1.0]))
+    # covariance matrix changes shape
+    with pytest.raises(ValueError, match="shape mismatch"):
+        list(glass.iternorm([xp.ones(1), xp.ones((5, 2))]))
 
-    j, a, s = result
-
-    assert j == 1
-    assert a.shape == (3, 2)
-    assert s.shape == (3,)
+    # covariance matrix not pos. def.
+    with pytest.raises(ValueError, match="not positive definite"):
+        list(glass.iternorm([xp.asarray([1.0]), xp.asarray([0.1, 1.0])]))
 
 
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")

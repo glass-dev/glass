@@ -9,7 +9,6 @@ import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-import numpy as np
 import transformcl
 
 import array_api_compat
@@ -91,94 +90,78 @@ def nfields_from_nspectra(nspectra: int) -> int:
     return n
 
 
-def iternorm(
-    k: int,
-    cov: Iterable[FloatArray],
-    size: int | tuple[int, ...] = (),
-) -> Generator[tuple[int | None, FloatArray, FloatArray]]:
+def iternorm(cov: Iterable[FloatArray]) -> Generator[tuple[FloatArray, FloatArray]]:
     """
-    Return the vector a and variance sigma^2 for iterative normal sampling.
+    Return shift vector and and standard deviation for iterative normal sampling.
 
     Parameters
     ----------
-    k
-        The number of fields.
     cov
         The covariance matrix for the fields.
-    size
-        The size of the covariance matrix.
 
     Yields
     ------
-    index
-        The index for iterative sampling.
     vector
-        The vector for iterative sampling.
+        The shift vector for iterative sampling.
     standard_deviation
         The standard deviation for iterative sampling.
 
-    Raises
-    ------
-    TypeError
-        If the covariance matrix is not broadcastable to the given size.
-    ValueError
-        If the covariance matrix is not positive definite.
-
     """
-    n = (size,) if isinstance(size, int) else size
-
-    m = np.zeros((*n, k, k))
-    a = np.zeros((*n, k))
-    s = np.zeros((*n,))
-    q = (*n, k + 1)
-    j = 0 if k > 0 else None
-
-    # We must use cov_expanded here as cov has been consumed to determine the namespace
     for i, x in enumerate(cov):
-        x_np = np.asarray(x)
-        if x_np.shape != q:
-            try:
-                x_np = np.broadcast_to(x_np, q)
-            except ValueError:
-                msg = (
-                    f"covariance row {i}: shape {x_np.shape} cannot be broadcast to {q}"
-                )
-                raise TypeError(msg) from None
+        # number of correlations, this will determine matrix size
+        k = x.shape[-1] - 1
+        if k < 0:
+            raise ValueError("empty covariance matrix")
 
-        # only need to update matrix A if there are correlations
-        if j is not None:
+        # check for first iteration
+        if i == 0:
+            # extract input array backend
+            xp = x.__array_namespace__()
+            # get shape of covariance
+            n = x.shape[:-1]
+            # initialise empty matrix to start iteration
+            m = xp.zeros((*n, k, k))
+            a = xp.zeros((*n, k))
+            s = xp.ones(n)
+        else:
+            # make sure input shape is compatible with previous iteration
+            if x.shape[:-1] != n:
+                raise ValueError("shape mismatch in covariance")
+
             # compute new entries of matrix A
-            m[..., :, j] = 0
-            m[..., j : j + 1, :] = np.matmul(a[..., np.newaxis, :], m)
-            m[..., j, j] = np.where(s != 0, -1, 0)
-            np.divide(
-                m[..., j, :],
-                -s[..., np.newaxis],
-                where=(m[..., j, :] != 0),
-                out=m[..., j, :],
-            )
+            # see https://arxiv.org/pdf/2302.01942
 
-            # compute new vector a
-            c = x_np[..., 1:, np.newaxis]
-            a = np.matmul(m[..., :j], c[..., k - j :, :])
-            a += np.matmul(m[..., j:], c[..., : k - j, :])
-            a = np.reshape(a, (*n, k))
+            # compute a^T @ m via matmul by adding a new axis
+            atm = a[..., None, :] @ m
 
-            # next rolling index
-            j = (j - 1) % k
+            # build the updated matrix m
+            # append zero column to matrix block
+            m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
+            # new row with 1 in bottom right corner
+            r = xp.concat([-atm, xp.ones((*n, 1, 1), dtype=atm.dtype)], axis=-1)
+            # scale new row with standard deviation
+            r /= s[..., None, None]
+            # concatenate first row and rest of matrix
+            m = xp.concat([m, r], axis=-2)
+
+        # cut matrix down to size
+        m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
+
+        # get correlation vector
+        # reverse vector to order it from oldest to newest
+        c = x[..., :0:-1]
+
+        # compute new vector a via matmul
+        a = (m @ c[..., None])[..., 0]
 
         # compute new standard deviation
-        s = x_np[..., 0] - np.einsum("...i,...i", a, a)
-        if np.any(s < 0):
-            msg = "covariance matrix is not positive definite"
-            raise ValueError(msg)
-        s = np.sqrt(s)
+        s = x[..., 0] - xp.vecdot(a, a)
+        if xp.any(s < 0):
+            raise ValueError("covariance matrix is not positive definite")
+        s = xp.sqrt(s)
 
-        # Extract input array backend or conversion of outputs
-        xp = x.__array_namespace__()
-
-        # yield the next index, vector a, and standard deviation s
-        yield j, xp.asarray(a), xp.asarray(s)
+        # yield the shift vector a and standard deviation s
+        yield a, s
 
 
 def cls2cov(
