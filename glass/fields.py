@@ -101,7 +101,7 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
 
     Yields
     ------
-    x
+    w
         The scaling vector (or a stack of scaling vectors) for iterative sampling.
 
     """
@@ -159,10 +159,10 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         s = xp.sqrt(s)
 
         # concatenate a and s into a single scaling vector
-        x = xp.concat([a, s[..., None]], axis=-1)
+        w = xp.concat([a, s[..., None]], axis=-1)
 
         # yield the scaling vector
-        yield x
+        yield w
 
 
 def cls2cov(
