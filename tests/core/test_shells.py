@@ -411,7 +411,7 @@ def test_combine(xp: ModuleType) -> None:
     assert result.shape == z.shape
 
     # Check sum of result
-    assert sum(result) == 929.2672844944944
+    xp_assert_close(xp.sum(result), xp.asarray(929.267284))
 
     # Check integral w.r.t z has not changed
     xp_assert_close(uxpx.trapezoid(result, z), xp.asarray(4.643139), rtol=1e-6)
