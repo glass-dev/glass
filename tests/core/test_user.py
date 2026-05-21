@@ -7,13 +7,9 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-from array_api_extra._lib._testing import xp_assert_equal
-
 import glass
 
 if TYPE_CHECKING:
-    from types import ModuleType
-
     from glass._types import AngularPowerSpectra, FloatArray
 
 # check if available for testing
@@ -29,7 +25,6 @@ cls_file = "Cls.npz"
 def test_read_write_cls(
     rng: np.random.Generator,
     tmp_path: pathlib.Path,
-    xp: ModuleType,
 ) -> None:
     cls: AngularPowerSpectra = [rng.normal(size=(10,)) for _ in range(10)]
     glass.save_cls(tmp_path / cls_file, cls)
@@ -40,12 +35,14 @@ def test_read_write_cls(
         values = npz["values"]
         split = npz["split"]
 
-    xp_assert_equal(values, xp.concat(cls))
-    xp_assert_equal(split, xp.cumulative_sum([cl.shape[0] for cl in cls[:-1]]))
-    xp_assert_equal(xp.asarray(cls), xp.asarray(xp.split(values, split)))
+    np.testing.assert_array_equal(values, np.concat(cls))
+    np.testing.assert_array_equal(
+        split, np.cumulative_sum([cl.shape[0] for cl in cls[:-1]])
+    )
+    np.testing.assert_array_equal(cls, np.split(values, split))
 
     npz = glass.load_cls(tmp_path / cls_file)
-    xp_assert_equal(xp.asarray(npz), xp.asarray(cls))
+    np.testing.assert_array_equal(npz, cls)
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
