@@ -9,7 +9,6 @@ import pytest
 
 from array_api_extra._lib._testing import (
     xp_assert_close,
-    xp_assert_equal,
     xp_assert_less,
 )
 
@@ -120,7 +119,7 @@ def test_linear_windows(xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    xp_assert_close(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xp_assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -128,7 +127,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xp_assert_close([w.zeff for w in ws], zgrid[1:-1])
+    xp_assert_close(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -169,7 +168,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.cubic_windows(zgrid)
-    xp_assert_close(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xp_assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -177,7 +176,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xp_assert_close([w.zeff for w in ws], zgrid[1:-1])
+    xp_assert_close(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -415,10 +414,10 @@ def test_combine(xp: ModuleType) -> None:
     assert result.shape == z.shape
 
     # Check sum of result
-    xp_assert_close(sum(result), 929.267284)
+    assert sum(result) == 929.2672844944944
 
     # Check integral w.r.t z has not changed
-    xp_assert_close(uxpx.trapezoid(result, z), 4.643139, rtol=1e-6)
+    xp_assert_close(uxpx.trapezoid(result, z), xp.asarray(4.643139), rtol=1e-6)
 
 
 def test_radial_window_immutable(xp: ModuleType) -> None:

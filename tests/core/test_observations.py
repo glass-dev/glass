@@ -116,14 +116,14 @@ def test_fixed_zbins_default_xp() -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
     assert len(zbins) == nbins
-    xp_assert_close(zbins, expected_zbins, rtol=1e-15)
+    xp_assert_close(np.asarray(zbins), expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    xp_assert_close(zbins, expected_zbins, rtol=1e-15)
+    xp_assert_close(np.asarray(zbins), expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -154,14 +154,14 @@ def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins, xp=xp)
     assert len(zbins) == nbins
-    xp_assert_close(zbins, expected_zbins, rtol=1e-15)
+    xp_assert_close(xp.asarray(zbins), expected_zbins, rtol=1e-15)
 
     # check dz input
 
     dz = 0.2
     zbins = glass.fixed_zbins(zmin, zmax, dz=dz, xp=xp)
     assert len(zbins) == math.ceil((zmax - zmin) / dz)
-    xp_assert_close(zbins, expected_zbins, rtol=1e-15)
+    xp_assert_close(xp.asarray(zbins), expected_zbins, rtol=1e-15)
 
     # check dz for spacing which results in a max value above zmax
 
@@ -188,7 +188,7 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
         ],
     )
     zbins = glass.equal_dens_zbins(z, xp.ones_like(z), nbins)
-    xp_assert_close(zbins, expected_zbins, rtol=1e-15)
+    xp_assert_close(xp.asarray(zbins), expected_zbins, rtol=1e-15)
 
     # check output shape
 

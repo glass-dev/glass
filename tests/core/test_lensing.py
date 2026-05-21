@@ -143,11 +143,11 @@ def test_deflect_nsew(
 
     # east
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
 
     # west
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
+    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     # At least one input is an array
     lon, lat = glass.deflect(
