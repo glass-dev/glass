@@ -281,7 +281,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    xp_assert_equal(z, phz)
+    xp_assert_equal(z * xp.ones_like(phz), phz)
 
     # case: array redshift, array sigma_0
 

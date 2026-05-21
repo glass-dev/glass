@@ -68,7 +68,7 @@ def test_ndinterp(xp: ModuleType) -> None:
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == ()
-    xp_assert_close(y, 1.15, atol=1e-15)
+    xp_assert_close(y, xp.asarray(1.15), atol=1e-15)
 
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
@@ -128,20 +128,18 @@ def test_ndinterp(xp: ModuleType) -> None:
     assert y.shape == (2, 3, 4, 1)
     xp_assert_close(
         y,
-        xp.asarray(
+        xp.asarray([
             [
-                [
-                    [[1.15], [1.25], [1.35], [1.45]],
-                    [[1.45], [1.35], [1.25], [1.15]],
-                    [[1.15], [1.45], [1.25], [1.35]],
-                ],
-                [
-                    [[2.15], [2.25], [2.35], [2.45]],
-                    [[2.45], [2.35], [2.25], [2.15]],
-                    [[2.15], [2.45], [2.25], [2.35]],
-                ],
-            ]
-        ),
+                [[1.15], [1.25], [1.35], [1.45]],
+                [[1.45], [1.35], [1.25], [1.15]],
+                [[1.15], [1.45], [1.25], [1.35]],
+            ],
+            [
+                [[2.15], [2.25], [2.35], [2.45]],
+                [[2.45], [2.35], [2.25], [2.15]],
+                [[2.15], [2.45], [2.25], [2.35]],
+            ],
+        ]),
         atol=1e-15,
     )
 

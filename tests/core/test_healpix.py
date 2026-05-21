@@ -283,7 +283,7 @@ def test_pixwin(
 
     assert len(old) == len(new)
     for i in range(len(old)):
-        xp_assert_equal(old[i], new[i])
+        xp_assert_equal(xp.asarray(old[i], dtype=xp.float64), new[i])
 
 
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
