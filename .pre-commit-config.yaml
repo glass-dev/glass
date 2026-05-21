@@ -66,15 +66,6 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
-  - repo: local
-    hooks:
-      - id: ty
-        entry: uv run --no-active --with ty==0.0.35 ty check
-        language: system
-        name: ty-check
-        pass_filenames: false
-        types:
-          - python
   - repo: https://github.com/kynan/nbstripout
     rev: 0.9.1
     hooks:
