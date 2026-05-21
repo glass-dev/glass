@@ -30,13 +30,15 @@ BENCHMARKS_SHARED_FLAGS=(
   "--benchmark-sort=name"
   "--benchmark-timer=time.process_time"
 )
+START_VENV_BIN="$GLASS_DIR/.venv-start/bin"
+END_VENV_BIN="$GLASS_DIR/.venv-end/bin"
 
 # Generate the base report for comparison later
-source "$GLASS_DIR/.venv-start/bin/activate"
-srun uv run --active pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
+source "$START_VENV_BIN/activate"
+srun "$START_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
 deactivate
 
 # Run the stable and unstable benchmarks and compare to the base ref
-source "$GLASS_DIR/.venv-end/bin/activate"
-srun uv run --active pytest "$BENCHMARKS_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
-srun uv run --active pytest "$BENCHMARKS_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
+source "$END_VENV_BIN/activate"
+srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
+srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
