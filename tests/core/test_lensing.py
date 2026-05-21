@@ -83,7 +83,7 @@ def test_multi_plane_matrix(
         if convergence.kappa is not None:
             kappas.append(xp.asarray(convergence.kappa, copy=True))
 
-    xp_assert_close(mat @ deltas, xp.asarray(kappas))
+    xp_assert_close(mat @ deltas, xp.stack(kappas))
 
 
 def test_multi_plane_weights(
@@ -135,19 +135,19 @@ def test_deflect_nsew(
 
     # north
     lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([0.0, d]), atol=1e-15)
+    xp_assert_close(xp.stack([lon, lat]), xp.asarray([0.0, d]), atol=1e-15)
 
     # south
     lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
+    xp_assert_close(xp.stack([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
 
     # east
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
+    xp_assert_close(xp.stack([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
 
     # west
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
+    xp_assert_close(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     # At least one input is an array
     lon, lat = glass.deflect(
@@ -155,7 +155,7 @@ def test_deflect_nsew(
         xp.asarray(0.0),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    xp_assert_close(xp.asarray([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
+    xp_assert_close(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     lon, lat = glass.deflect(
         xp.asarray([0.0, 0.0]),

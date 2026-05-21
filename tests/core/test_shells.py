@@ -127,7 +127,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xp_assert_close(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
+    xp_assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -176,7 +176,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xp_assert_close(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
+    xp_assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
