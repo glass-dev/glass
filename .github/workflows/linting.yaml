@@ -20,7 +20,7 @@ concurrency:
 jobs:
   prek:
     if: github.event.pull_request.draft == false
-    name: Run prek
+    name: Run linting
     permissions:
       contents: read
     runs-on: ubuntu-slim
