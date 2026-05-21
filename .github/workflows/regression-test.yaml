@@ -63,9 +63,7 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run regression test
-        run:
-          uv run nox -s regression_tests -- "$BASE_REF" "$HEAD_REF" -k
-          test_broadcast_leading_axes
+        run: uv run nox -s regression_tests -- "$BASE_REF" "$HEAD_REF"
         env:
           ARRAY_BACKEND: all
           BASE_REF: ${{ inputs.base_ref || github.event.pull_request.base.ref }}
