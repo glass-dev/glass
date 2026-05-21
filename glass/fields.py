@@ -136,8 +136,17 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
             # build the updated matrix m
             # append zero column to matrix block
             m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
-            # new row with 1 in bottom right corner
-            r = xp.concat([-atm, xp.ones((*n, 1, 1), dtype=atm.dtype)], axis=-1)
+            # generate the bottom right corner: 1 where s > 0, 0 otherwise
+            u = xp.where(
+                s > 0,
+                xp.ones(n, dtype=atm.dtype),
+                xp.zeros(n, dtype=atm.dtype),
+            )
+            # assemble the new row
+            r = xp.concat([-atm, u[..., None, None]], axis=-1)
+            # set zero standard deviation to unity to prevent division by zero
+            # this should be fine as corresponding entries in r are zero
+            s = xp.where(s > 0, s, xp.ones(n, dtype=s.dtype))
             # scale new row with standard deviation
             r /= s[..., None, None]
             # concatenate first row and rest of matrix
