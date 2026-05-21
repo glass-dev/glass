@@ -116,7 +116,7 @@ then
   deactivate
 
   # Remove old benchmark results
-  rm -rf "$BENCHMARKS_DIR/outputs"
+  rm -rf "$BENCHMARKS_DIR/archer2/outputs"
 fi
 
 # Submit job
