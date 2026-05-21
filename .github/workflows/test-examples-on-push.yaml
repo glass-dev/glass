@@ -23,4 +23,6 @@ jobs:
   test-examples-on-push:
     if: github.event.pull_request.draft == false
     name: On push
+    permissions:
+      contents: read
     uses: ./.github/workflows/run-examples.yaml

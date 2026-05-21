@@ -1,12 +1,4 @@
 ---
-ci:
-  autofix_commit_msg: "pre-commit.ci: style fixes"
-  autofix_prs: false
-  autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
-  autoupdate_schedule: monthly
-  skip:
-    - ty
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -47,12 +39,11 @@ repos:
     hooks:
       - id: ruff-check
       - id: ruff-format
-  - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.20.0
-    hooks:
-      - id: blacken-docs
-        additional_dependencies:
-          - black
+        types_or:
+          - jupyter
+          - markdown
+          - pyi
+          - python
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.24.4
     hooks:
@@ -78,10 +69,10 @@ repos:
   - repo: local
     hooks:
       - id: ty
-        entry: uv run --with ty==0.0.35 ty check
-        language: python
+        entry: uv run --no-active --with ty==0.0.35 ty check
+        language: system
         name: ty-check
-        pass_filenames: true
+        pass_filenames: false
         types:
           - python
   - repo: https://github.com/kynan/nbstripout
@@ -97,3 +88,9 @@ repos:
         args:
           - --external-sources
           - --shell=bash
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.23.1
+    hooks:
+      - id: zizmor
+        args:
+          - --fix=safe

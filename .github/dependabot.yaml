@@ -4,8 +4,28 @@ updates:
   - package-ecosystem: github-actions
     commit-message:
       prefix: dependabot
+    cooldown:
+      default-days: 7
     directory: /
+    groups:
+      ci-dependencies:
+        patterns:
+          - "*"
     labels:
       - dependabot
     schedule:
-      interval: weekly
+      interval: monthly
+  - package-ecosystem: pre-commit
+    commit-message:
+      prefix: dependabot
+    cooldown:
+      default-days: 7
+    directory: /
+    groups:
+      ci-dependencies:
+        patterns:
+          - "*"
+    labels:
+      - dependabot
+    schedule:
+      interval: monthly

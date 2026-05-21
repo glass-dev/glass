@@ -39,7 +39,6 @@ doctest = [
     {include-group = "test"},
 ]
 lint = [
-    "pre-commit",
     "prek",
 ]
 test = [
@@ -90,9 +89,9 @@ maintainers = [
 name = "glass"
 optional-dependencies = {examples = [
     "camb",
-    "cosmology.api",
-    "cosmology.compat.camb",
-    "glass.ext.camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
+    "glass-ext-camb",
     "jupyter",
     "matplotlib",
 ]}
@@ -175,6 +174,8 @@ show-fixes = true
 src = [
     "glass",
 ]
+format.docstring-code-format = true
+format.preview = true
 lint.allowed-confusables = [
     "α",
     "γ",
