@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
@@ -527,7 +528,7 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 
 
 def test_spectra_indices(xp: ModuleType) -> None:
-    xp_assert_equal(glass.spectra_indices(0, xp=xp), xp.zeros((0, 2), dtype=xp.int64))
+    xp_assert_equal(glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64))
     xp_assert_equal(glass.spectra_indices(0, xp=xp), xp.zeros((0, 2), dtype=xp.int64))
     xp_assert_equal(glass.spectra_indices(1, xp=xp), xp.asarray([[0, 0]]))
     xp_assert_equal(
