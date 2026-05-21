@@ -33,6 +33,9 @@ BENCHMARKS_SHARED_FLAGS=(
 START_VENV_BIN="$GLASS_DIR/.venv-start/bin"
 END_VENV_BIN="$GLASS_DIR/.venv-end/bin"
 
+# Change into archer2 dir to ensure we don't pickup the glass directory as an import
+cd "$BENCHMARKS_DIR/archer2" || exit
+
 # Generate the base report for comparison later
 source "$START_VENV_BIN/activate"
 srun "$START_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
