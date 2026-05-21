@@ -6,6 +6,7 @@ import itertools
 import math
 import sys
 import warnings
+from collections import deque
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -372,30 +373,30 @@ def _generate_grf(
     # generates the covariance matrix for the iterative sampler
     cov = cls2cov(gls, n, ngrf, ncorr)
 
-    # working arrays for the iterative sampling
+    # alm size
     z_size = n * (n + 1) // 2
-    y = xp.zeros((z_size, ncorr), dtype=xp.complex128)
 
-    # generate the conditional normal distribution for iterative sampling
-    conditional_dist = iternorm(ncorr, cov, size=n)
+    # store standard normal random variates
+    y = deque()
 
-    # sample the fields from the conditional distribution
-    for j, a, s in conditional_dist:
+    # sample the Gaussian fields iteratively
+    for w in iternorm(cov):
         # standard normal random variates for alm
-        # sample real and imaginary parts, then view as complex number
-        z = rng.standard_normal((z_size,)) + (1j * rng.standard_normal((z_size,)))
+        # sample real and imaginary parts, then combine into complex number
+        z = rng.standard_normal((z_size, 2)) @ xp.asarray([1, 1j])
 
-        # scale by standard deviation of the conditional distribution
-        # variance is distributed over real and imaginary part
-        alm = glass.harmonics.multalm(z, s)
+        # append to stack of standard normals
+        y.append(z)
 
-        # add the mean of the conditional distribution
-        for i in range(ncorr):
-            alm += glass.harmonics.multalm(y[:, i], a[:, i])
+        # forget oldest variates that are no longer correlated
+        while len(y) > w.shape[-1]:
+            y.popleft()
 
-        # store the standard normal in y array at the indicated index
-        if j is not None:
-            y = xpx.at(y)[:, j].set(z)
+        # how many correlations have missing variates
+        mis = w.shape[-1] - len(y)
+
+        # compute the correlated variate
+        alm = sum(glass.harmonics.multalm(z, w[..., i + mis]) for i, z in enumerate(y))
 
         alm = _glass_to_healpix_alm(alm)
 
