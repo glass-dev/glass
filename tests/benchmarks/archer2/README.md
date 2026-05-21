@@ -40,8 +40,9 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    git clone https://github.com/glass-dev/glass.git
    ```
 
-3. **Run the benchmarks script:** Now we have cloned glass, we can run the
-   script [run_regression_test.sh](./run_regression_test.sh) which will setup
-   the required environments and submit regression test job to slurm. A help
-   message is provided. Just run `run_regression_test.sh -h` from the root of
-   the GLASS repo.
+## Run the regression tests
+
+Now we have cloned glass, we can run the script
+[run_regression_test.sh](./run_regression_test.sh) which will setup the required
+environments and submit regression test job to slurm. A help message is
+provided. Just run `run_regression_test.sh -h` from the root of the GLASS repo.
