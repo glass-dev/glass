@@ -67,7 +67,7 @@ def test_iternorm(k, test_nd, xp: ModuleType, compare: type[Compare]) -> None:
     # check rows against explicit calculation
     # see https://arxiv.org/pdf/2302.01942, Appendix A
     # ruff: disable[N806]
-    for n, (a, s) in enumerate(generator):
+    for n, x in enumerate(generator):
         Sn = cov[..., :n, :n]
         cn = cov[..., :n, n]
         vn = cov[..., n, n]
@@ -89,7 +89,9 @@ def test_iternorm(k, test_nd, xp: ModuleType, compare: type[Compare]) -> None:
         an = (An @ cn[..., None])[..., 0]
         sn = xp.sqrt(vn - xp.vecdot(an, an))
         # make sure a only has k correlations
-        assert a.shape[-1] <= k
+        assert x.shape[-1] <= min(n, k) + 1
+        # split scaling vector up into a and s
+        a, s = x[..., :-1], x[..., -1]
         # cannot compare a directly, only a^T @ a
         compare.assert_allclose(xp.vecdot(a, a), xp.vecdot(an, an))
         compare.assert_allclose(s, sn)

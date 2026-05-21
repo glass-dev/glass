@@ -90,42 +90,40 @@ def nfields_from_nspectra(nspectra: int) -> int:
     return n
 
 
-def iternorm(cov: Iterable[FloatArray]) -> Generator[tuple[FloatArray, FloatArray]]:
+def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
     """
-    Return shift vector and and standard deviation for iterative normal sampling.
+    Compute scaling vectors for iterative normal sampling.
 
     Parameters
     ----------
     cov
-        The covariance matrix for the fields.
+        The covariance matrix (or a stack of covariance matrices) for the fields.
 
     Yields
     ------
-    vector
-        The shift vector for iterative sampling.
-    standard_deviation
-        The standard deviation for iterative sampling.
+    x
+        The scaling vector (or a stack of scaling vectors) for iterative sampling.
 
     """
-    for i, x in enumerate(cov):
+    for i, row in enumerate(cov):
         # number of correlations, this will determine matrix size
-        k = x.shape[-1] - 1
+        k = row.shape[-1] - 1
         if k < 0:
             raise ValueError("empty covariance matrix")
 
         # check for first iteration
         if i == 0:
             # extract input array backend
-            xp = x.__array_namespace__()
+            xp = row.__array_namespace__()
             # get shape of covariance
-            n = x.shape[:-1]
+            n = row.shape[:-1]
             # initialise empty matrix to start iteration
             m = xp.zeros((*n, k, k))
             a = xp.zeros((*n, k))
             s = xp.ones(n)
         else:
             # make sure input shape is compatible with previous iteration
-            if x.shape[:-1] != n:
+            if row.shape[:-1] != n:
                 raise ValueError("shape mismatch in covariance")
 
             # compute new entries of matrix A
@@ -149,19 +147,22 @@ def iternorm(cov: Iterable[FloatArray]) -> Generator[tuple[FloatArray, FloatArra
 
         # get correlation vector
         # reverse vector to order it from oldest to newest
-        c = x[..., :0:-1]
+        c = row[..., :0:-1]
 
         # compute new vector a via matmul
         a = (m @ c[..., None])[..., 0]
 
         # compute new standard deviation
-        s = x[..., 0] - xp.vecdot(a, a)
+        s = row[..., 0] - xp.vecdot(a, a)
         if xp.any(s < 0):
             raise ValueError("covariance matrix is not positive definite")
         s = xp.sqrt(s)
 
-        # yield the shift vector a and standard deviation s
-        yield a, s
+        # concatenate a and s into a single scaling vector
+        x = xp.concat([a, s[..., None]], axis=-1)
+
+        # yield the scaling vector
+        yield x
 
 
 def cls2cov(
