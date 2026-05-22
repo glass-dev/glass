@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import collections
 import itertools
 import math
 import sys
 import warnings
-import collections
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -104,6 +104,12 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
     ------
     w
         The scaling vector (or a stack of scaling vectors) for iterative sampling.
+
+    Raises
+    ------
+    ValueError
+        Raised when the provided covariance matrix is empty, has inconsistent
+        shape, or is not positive semi-definite.
 
     """
     for i, row in enumerate(cov):
