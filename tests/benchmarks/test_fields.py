@@ -26,16 +26,15 @@ def test_iternorm_no_size(
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with k=2."""
-    array_in = [xpb.asarray([x, x, x]) for x in xpb.arange(10_000, dtype=xpb.float64)]
+    array_in = [xpb.asarray([1.0, 0.5, 0.1])] * 10_000
 
-    def function_to_benchmark() -> None:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(array_in)
-        generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        return generator_consumer.consume(generator)
 
-    benchmark(function_to_benchmark)
+    result = benchmark(function_to_benchmark)
+
+    assert len(result) == len(array_in)
 
 
 @pytest.mark.stable
@@ -48,26 +47,17 @@ def test_iternorm_specify_size(
 ) -> None:
     """Benchmarks for glass.iternorm with k=2 and size=(3,)."""
     if num_dimensions == 1:
-        list_input = [[1.0, 0.5, 0.5] for _ in range(10_000)]
+        array_in = [xpb.asarray([1.0, 0.5, 0.1])] * 10_000
     elif num_dimensions == 2:
-        list_input = [
-            [
-                [1.0, 0.5, 0.5],
-                [0.5, 0.2, 0.1],
-                [0.5, 0.1, 0.2],
-            ]
-            for _ in range(10_000)
-        ]
-    array_in = [xpb.asarray(arr, dtype=xpb.float64) for arr in list_input]
+        array_in = [xpb.asarray([[1.0, 0.5, 0.1]] * 3)] * 10_000
 
-    def function_to_benchmark() -> None:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(array_in)
-        generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        return generator_consumer.consume(generator)
 
-    benchmark(function_to_benchmark)
+    result = benchmark(function_to_benchmark)
+
+    assert len(result) == len(array_in)
 
 
 @pytest.mark.stable
@@ -79,11 +69,13 @@ def test_iternorm_k_0(
     """Benchmarks for glass.iternorm with k set to 0."""
     array_in = [xpb.asarray([x]) for x in xpb.ones(1_000, dtype=xpb.float64)]
 
-    def function_to_benchmark() -> None:
+    def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(array_in)
-        generator_consumer.consume(generator)
+        return generator_consumer.consume(generator)
 
-    benchmark(function_to_benchmark)
+    result = benchmark(function_to_benchmark)
+
+    assert len(result) == len(array_in)
 
 
 @pytest.mark.stable
