@@ -28,7 +28,12 @@ def not_triangle_numbers() -> list[int]:
 
 @pytest.mark.parametrize("k", [0, 1, 2], ids=["k=0", "k=1", "k=2"])
 @pytest.mark.parametrize("test_nd", [False, True], ids=["0d", "nd"])
-def test_iternorm(k, test_nd, xp: ModuleType, compare: type[Compare]) -> None:
+def test_iternorm(
+    compare: type[Compare],
+	k: int,
+	test_nd: bool,
+	xp: ModuleType,
+) -> None:
     """Test iternorm against explicit computation."""
     # covariance matrix to sample
     if test_nd:

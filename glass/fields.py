@@ -6,7 +6,7 @@ import itertools
 import math
 import sys
 import warnings
-from collections import deque
+import collections
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -386,7 +386,7 @@ def _generate_grf(
     z_size = n * (n + 1) // 2
 
     # store standard normal random variates
-    y = deque()
+    y = collections.deque()
 
     # sample the Gaussian fields iteratively
     for w in iternorm(cov):
