@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from array_api_extra._lib._testing import xp_assert_close
+import array_api_extra as xpx
 
 import glass
 
@@ -29,4 +29,4 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    xp_assert_close(w.zeff, xpb.asarray(expected_zeff))
+    xpx.testing.assert_close(w.zeff, xpb.asarray(expected_zeff))

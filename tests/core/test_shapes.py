@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from array_api_extra._lib._testing import xp_assert_close, xp_assert_less
+import array_api_extra as xpx
 
 import glass
 
@@ -151,21 +151,41 @@ def test_ellipticity_gaussian(
 
     assert eps.shape == (n,)
 
-    xp_assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
 
-    xp_assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
 
     eps = glass.ellipticity_gaussian(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    xp_assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
 
-    xp_assert_close(xp.std(xp.real(eps)[:n]), xp.asarray(0.128), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.imag(eps)[:n]), xp.asarray(0.128), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.real(eps)[n:]), xp.asarray(0.256), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.imag(eps)[n:]), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
 
 
 def test_ellipticity_intnorm(
@@ -192,21 +212,41 @@ def test_ellipticity_intnorm(
 
     assert eps.shape == (n,)
 
-    xp_assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
 
-    xp_assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
 
     eps = glass.ellipticity_intnorm(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    xp_assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
 
-    xp_assert_close(xp.std(xp.real(eps)[:n]), xp.asarray(0.128), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.imag(eps)[:n]), xp.asarray(0.128), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.real(eps)[n:]), xp.asarray(0.256), atol=1e-3, rtol=0)
-    xp_assert_close(xp.std(xp.imag(eps)[n:]), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
 
     with pytest.raises(ValueError, match="sigma must be between"):
         glass.ellipticity_intnorm(1, 0.71, xp=xp)

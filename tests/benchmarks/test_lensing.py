@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from array_api_extra._lib._testing import xp_assert_equal
+import array_api_extra as xpx
 
 import glass
 
@@ -38,8 +38,8 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
     deltas = urngb.random((len(shells), 10))
 
-    xp_assert_equal(mat, xpb.tril(mat))
-    xp_assert_equal(xpb.triu(mat, k=1), xpb.zeros_like(mat))
+    xpx.testing.assert_equal(mat, xpb.tril(mat))
+    xpx.testing.assert_equal(xpb.triu(mat, k=1), xpb.zeros_like(mat))
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
@@ -99,8 +99,8 @@ def test_multi_plane_weights(
 
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    xp_assert_equal(w_out, xpb.triu(w_out, 1))
-    xp_assert_equal(xpb.tril(w_out), xpb.zeros_like(w_out))
+    xpx.testing.assert_equal(w_out, xpb.triu(w_out, 1))
+    xpx.testing.assert_equal(xpb.tril(w_out), xpb.zeros_like(w_out))
 
     def setup_shells_deltas_and_weights() -> tuple[
         tuple[

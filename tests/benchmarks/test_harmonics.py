@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from array_api_extra._lib._testing import xp_assert_close
+import array_api_extra as xpx
 
 glass_harmonics = pytest.importorskip(
     "glass.harmonics",
@@ -31,7 +31,7 @@ def test_multalm(
 
     result = benchmark(glass_harmonics.multalm, alm, bl)
 
-    xp_assert_close(
+    xpx.testing.assert_close(
         result[:5],
         xpb.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
     )

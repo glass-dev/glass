@@ -9,7 +9,7 @@ import healpy
 import numpy as np
 import pytest
 
-from array_api_extra._lib._testing import xp_assert_equal
+import array_api_extra as xpx
 
 import glass.healpix as hp
 from glass import _rng
@@ -55,7 +55,7 @@ def test_alm2map_individual(
         pixwin=pixwin,
         pol=pol,
     )
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.parametrize(
@@ -92,7 +92,7 @@ def test_alm2map_sequence(
         pixwin=pixwin,
         pol=pol,
     )
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.parametrize("spin", [1, 2])
@@ -115,7 +115,7 @@ def test_alm2map_spin(
     assert type(old) is type(new)
     assert len(old) == len(new)
     for i in range(len(old)):
-        xp_assert_equal(xp.asarray(old[i]), new[i])
+        xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
 
 
 def test_almxfl(
@@ -128,7 +128,7 @@ def test_almxfl(
     fl = healpix_inputs.fl(rng=urng)
     old = healpy.almxfl(alm, fl)
     new = hp.almxfl(alm, fl)
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.parametrize(
@@ -151,7 +151,7 @@ def test_ang2pix(  # noqa: PLR0913
     phis = healpix_inputs.latitudes(max_phi, rng=urng)
     old = healpix.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat)
     new = hp.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat, xp=xp)
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.parametrize(
@@ -177,7 +177,7 @@ def test_ang2vec(  # noqa: PLR0913
     assert type(old) is type(new)
     assert len(old) == len(new)
     for i in range(len(old)):
-        xp_assert_equal(xp.asarray(old[i]), new[i])
+        xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
 
 
 def test_get_nside(
@@ -219,7 +219,7 @@ def test_map2alm_individual(
         pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.parametrize(
@@ -254,7 +254,7 @@ def test_map2alm_sequence(
         pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 def test_npix2nside(healpix_inputs: type[HealpixInputs]) -> None:
@@ -285,7 +285,7 @@ def test_pixwin(
 
     assert len(old) == len(new)
     for i in range(len(old)):
-        xp_assert_equal(xp.asarray(old[i], dtype=xp.float64), new[i])
+        xpx.testing.assert_equal(xp.asarray(old[i], dtype=xp.float64), new[i])
 
 
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
@@ -306,7 +306,7 @@ def test_query_strip_float64(
     old[healpy.query_strip(healpix_inputs.nside, *thetas)] = 0
     new = xp.ones(healpix_inputs.npix)
     new *= 1 - hp.query_strip(healpix_inputs.nside, thetas, dtype=xp.float64, xp=xp)
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
@@ -357,7 +357,7 @@ def test_randang(
     assert type(old) is type(new)
     assert len(old) == len(new)
     for i in range(len(old)):
-        xp_assert_equal(xp.asarray(old[i]), new[i])
+        xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
 
 
 @pytest.mark.parametrize("coord", ["CE", "GC"])
@@ -375,4 +375,4 @@ def test_rotate_map_pixel(
     kappa = healpix_inputs.kappa(rng=urng)
     old = healpy.Rotator(coord=coord).rotate_map_pixel(np.asarray(kappa))
     new = hp.Rotator(coord=coord).rotate_map_pixel(kappa)
-    xp_assert_equal(xp.asarray(old), new)
+    xpx.testing.assert_equal(xp.asarray(old), new)
