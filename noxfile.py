@@ -79,7 +79,8 @@ def _check_revision_count(
 )
 def lint(session: nox.Session) -> None:
     """Run the linter."""
-    session.run("prek", "run", "--all-files", "--color", "always", *session.posargs)
+    session.run("prek", "run", "--all-files", "--color", "always")
+    session.run("ty", "check")
 
 
 def _setup_array_backend(session: nox.Session) -> None:
