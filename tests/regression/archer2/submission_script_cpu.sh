@@ -20,10 +20,10 @@ export OMP_NUM_THREADS=1
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 # Set path to class and select base or head
-GLASS_DIR="$1"
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
-BENCHMARK_OUTPUT_PATH="$BENCHMARKS_DIR/archer2/.benchmarks"
-BENCHMARKS_SHARED_FLAGS=(
+export GLASS_DIR="$(pwd)"
+export BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
+export BENCHMARK_OUTPUT_PATH="$BENCHMARKS_DIR/archer2/.benchmarks"
+export BENCHMARKS_SHARED_FLAGS=(
   "--benchmark-storage=file://$BENCHMARK_OUTPUT_PATH"
   "--benchmark-calibration-precision=1000"
   "--benchmark-columns=mean,stddev,rounds"
