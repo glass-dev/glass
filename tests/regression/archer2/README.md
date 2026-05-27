@@ -1,7 +1,7 @@
-# GLASS benchmarks on Archer2
+# GLASS regression testing on Archer2
 
-For a more consistent benchmarking and regression testing environment we have
-been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
+For a more consistent regression testsing environment we have
+been trialing using [Archer2](https://www.archer2.ac.uk/).
 
 ## Setting up
 

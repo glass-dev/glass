@@ -39,7 +39,7 @@ def test_positions_from_delta(  # noqa: PLR0913
     bias_model: Callable[[int], int],
     remove_monopole: bool,  # noqa: FBT001
 ) -> None:
-    """Benchmarks for glass.positions_from_delta."""
+    """Regression tests for glass.positions_from_delta."""
     nside = 48
     npix = 12 * nside * nside
 
@@ -75,7 +75,7 @@ def test_uniform_positions(
     generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.uniform_positionsuniform_positions."""
+    """Regression tests for glass.uniform_positionsuniform_positions."""
     scaling_factor = 12
     shape_ngal = (int(scaling_factor / 2), 2)
 
@@ -115,7 +115,7 @@ def test_displace(
     xpb: ModuleType,
     r_to_alpha: Callable[[float], complex | list[float]],
 ) -> None:
-    """Benchmark for glass.displace with complex values."""
+    """Regression test for glass.displace with complex values."""
     scale_length = 100_000
 
     d = 5.0  # deg
@@ -145,7 +145,7 @@ def test_displacement(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
 ) -> None:
-    """Benchmark for glass.displacement."""
+    """Regression test for glass.displacement."""
     scale_factor = 100
 
     # test on an array

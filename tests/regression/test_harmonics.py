@@ -24,7 +24,7 @@ def test_multalm(
     compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.harmonics.multalm."""
+    """Regression tests for glass.harmonics.multalm."""
     scale_factor = 100_000
 
     alm = xpb.arange(scale_factor * 5, dtype=xpb.float64)

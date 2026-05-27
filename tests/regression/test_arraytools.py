@@ -19,7 +19,7 @@ def test_broadcast_leading_axes(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark test for glass.arraytools.broadcast_leading_axes."""
+    """Regression test for glass.arraytools.broadcast_leading_axes."""
     # Ensure we don't use too much memory
     a_in = 0
     b_shape = (4, 10)
@@ -47,7 +47,7 @@ def test_cumulative_trapezoid_1d(
     compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmark test for glass.arraytools.cumulative_trapezoid."""
+    """Regression test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 10_000
 
     f = xpb.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
@@ -69,7 +69,7 @@ def test_cumulative_trapezoid_2d(
     compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmark test for glass.arraytools.cumulative_trapezoid."""
+    """Regression test for glass.arraytools.cumulative_trapezoid."""
     scaled_length = 5_000
 
     f = xpb.stack(

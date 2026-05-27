@@ -20,7 +20,7 @@ def test_radialwindow(
     compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for shells.RadialWindow."""
+    """Regression test for shells.RadialWindow."""
     # check zeff is computed when not provided
     arr_length = 100_000
     expected_zeff = 66_666.0

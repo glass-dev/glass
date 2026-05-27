@@ -19,7 +19,7 @@ def test_ellipticity_ryden04(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
 ) -> None:
-    """Benchmark for glass.ellipticity_ryden04."""
+    """Regression test for glass.ellipticity_ryden04."""
     size = (1_000, 1_000)
 
     # single ellipticity
@@ -38,7 +38,7 @@ def test_ellipticity_gaussian(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for glass.ellipticity_gaussian."""
+    """Regression test for glass.ellipticity_gaussian."""
     array_length = 10
     n = 1_000_000
     count = xpb.full(array_length, fill_value=n)
@@ -58,7 +58,7 @@ def test_ellipticity_intnorm(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for glass.ellipticity_intnorm."""
+    """Regression test for glass.ellipticity_intnorm."""
     array_length = 10
     n = 1_000_000
     count = xpb.full(array_length, fill_value=n)
