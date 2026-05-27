@@ -20,10 +20,10 @@ export OMP_NUM_THREADS=1
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 # Set path to class and select base or head
-export GLASS_DIR="$(pwd)"
-export REGRESSION_DIR="$GLASS_DIR/tests/regression"
-export REGRESSION_OUTPUT_PATH="$REGRESSION_DIR/archer2/.benchmarks"
-export REGRESSION_SHARED_FLAGS=(
+GLASS_DIR="$1"
+REGRESSION_DIR="$GLASS_DIR/tests/regression"
+REGRESSION_OUTPUT_PATH="$REGRESSION_DIR/archer2/.benchmarks"
+REGRESSION_SHARED_FLAGS=(
   "--benchmark-storage=file://$REGRESSION_OUTPUT_PATH"
   "--benchmark-calibration-precision=1000"
   "--benchmark-columns=mean,stddev,rounds"

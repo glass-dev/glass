@@ -49,7 +49,7 @@ def test_multi_plane_matrix(
         ],
         dict[Never, Never],
     ]:
-        """Setup a generator with zip before each run."""
+        """Run setup a generator with zip before each benchmark run."""
         convergence = glass.MultiPlaneConvergence(cosmo)
         return (convergence, shells, deltas), {}
 
