@@ -114,9 +114,6 @@ then
   uv sync --active --group test --no-install-project
   uv pip install --no-deps "git+$GLASS_REPO_URL@$END_REF"
   deactivate
-
-  # Remove old benchmark results
-  rm -rf "$BENCHMARKS_DIR/archer2/outputs"
 fi
 
 # Submit job

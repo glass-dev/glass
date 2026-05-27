@@ -22,8 +22,9 @@ export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 # Set path to class and select base or head
 GLASS_DIR="$1"
 BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
+BENCHMARK_OUTPUT_PATH="$BENCHMARKS_DIR/archer2/.benchmarks"
 BENCHMARKS_SHARED_FLAGS=(
-  "--benchmark-storage=file://$BENCHMARKS_DIR/archer2/outputs"
+  "--benchmark-storage=file://$BENCHMARK_OUTPUT_PATH"
   "--benchmark-calibration-precision=1000"
   "--benchmark-columns=mean,stddev,rounds"
   "--benchmark-max-time=5.0"
@@ -32,6 +33,9 @@ BENCHMARKS_SHARED_FLAGS=(
 )
 START_VENV_BIN="$GLASS_DIR/.venv-start/bin"
 END_VENV_BIN="$GLASS_DIR/.venv-end/bin"
+
+# Remove old benchmark results
+rm -rf "$BENCHMARK_OUTPUT_PATH"
 
 # Change into archer2 dir to ensure we don't pickup the glass directory as an import
 cd "$BENCHMARKS_DIR/archer2" || exit
