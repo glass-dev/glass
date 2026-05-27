@@ -25,7 +25,7 @@ def test_multi_plane_matrix(
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for add_window and add_plane with a multi_plane_matrix."""
+    """Regression tests for add_window and add_plane with a multi_plane_matrix."""
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
@@ -49,7 +49,7 @@ def test_multi_plane_matrix(
         ],
         dict[Never, Never],
     ]:
-        """Run setup a generator with zip before each benchmark run."""
+        """Setup a generator with zip before each run."""
         convergence = glass.MultiPlaneConvergence(cosmo)
         return (convergence, shells, deltas), {}
 
@@ -83,7 +83,7 @@ def test_multi_plane_weights(
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for add_window and add_plane with a multi_plane_weights."""
+    """Regression tests for add_window and add_plane with a multi_plane_weights."""
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(

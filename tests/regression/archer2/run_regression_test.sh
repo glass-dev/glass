@@ -95,7 +95,7 @@ then
   exit 1
 fi
 
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
+REGRESSION_DIR="$GLASS_DIR/tests/regression"
 
 
 if [[ "$SETUP_ENVS" == "true" ]]
@@ -124,4 +124,4 @@ then
 fi
 
 # Submit job
-sbatch --account="$ACCOUNT" "$BENCHMARKS_DIR/archer2/submission_script_cpu.sh" "$GLASS_DIR"
+sbatch --account="$ACCOUNT" "$REGRESSION_DIR/archer2/submission_script_cpu.sh" "$GLASS_DIR"

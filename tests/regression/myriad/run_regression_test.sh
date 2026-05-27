@@ -19,9 +19,9 @@
 
 GLASS_DIR="$HOME/Scratch/glass"
 GLASS_REPO_URL="https://github.com/glass-dev/glass"
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
-BENCHMARKS_SHARED_FLAGS=(
-  "--benchmark-storage=file://$BENCHMARKS_DIR/outputs"
+REGRESSION_DIR="$GLASS_DIR/tests/regression"
+REGRESSION_SHARED_FLAGS=(
+  "--benchmark-storage=file://$REGRESSION_DIR/outputs"
   "--benchmark-calibration-precision=1000"
   "--benchmark-columns=mean,stddev,rounds"
   "--benchmark-max-time=5.0"
@@ -35,12 +35,12 @@ HEAD_REF="<some-git-commit-hash>"
 
 # Load modules and pre-installed python dependencies through venv
 # shellcheck source=/dev/null
-source "$BENCHMARKS_DIR/myriad/load_modules.sh"
+source "$REGRESSION_DIR/myriad/load_modules.sh"
 # shellcheck source=/dev/null
 source "$GLASS_DIR/.venv/bin/activate"
 
-# Remove old benchmark results
-rm -rf "$BENCHMARKS_DIR/outputs"
+# Remove old regression test results
+rm -rf "$REGRESSION_DIR/outputs"
 
 # Make sure to installation of glass already exists
 python -m pip uninstall glass -y
@@ -49,7 +49,7 @@ python -m pip uninstall glass -y
 python -m pip install "git+$GLASS_REPO_URL@$BASE_REF"
 
 # Generate the base report for comparison later
-python -m pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
+python -m pytest "$REGRESSION_DIR" --benchmark-autosave "${REGRESSION_SHARED_FLAGS[@]}"
 
 # Uninstall the base ref of glass
 python -m pip uninstall glass -y
@@ -57,6 +57,6 @@ python -m pip uninstall glass -y
 # Install the head ref of glass
 python -m pip install "git+$GLASS_REPO_URL@$HEAD_REF"
 
-# Run the stable and unstable benchmarks and compare to the base ref
-python -m pytest "$BENCHMARKS_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
-python -m pytest "$BENCHMARKS_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
+# Run the stable and unstable regression tests and compare to the base ref
+python -m pytest "$REGRESSION_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${REGRESSION_SHARED_FLAGS[@]}"
+python -m pytest "$REGRESSION_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${REGRESSION_SHARED_FLAGS[@]}"
