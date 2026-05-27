@@ -53,6 +53,13 @@ test = [
     "pytest-rerunfailures",
     "scipy",
 ]
+benchmarks = [
+    "camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
+    "glass-ext-camb",
+    {include-group = "test"},
+]
 
 [project]
 classifiers = [
