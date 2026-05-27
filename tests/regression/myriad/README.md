@@ -1,10 +1,10 @@
 # GLASS regression tests on Myriad
 
-For a more consistent regression testing environment we have
-been trialing using the UCL machine
-[Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
+For a more consistent regression testing environment we have been trialing using
+the UCL machine [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
 
-To simplify running regression tests on myriad there are several scripts provided.
+To simplify running regression tests on myriad there are several scripts
+provided.
 
 ## Setting up
 
@@ -16,9 +16,9 @@ To simplify running regression tests on myriad there are several scripts provide
    source $GLASS_DIR/tests/regression/myriad/load_modules.sh
    ```
 
-2. Then, to reduce the required run time of the regression test jobs on myriad, we
-   install the required python dependencies from the group `test`. Therefore, we
-   must create our virtual environment, ensuring we upgrade pip to a version
+2. Then, to reduce the required run time of the regression test jobs on myriad,
+   we install the required python dependencies from the group `test`. Therefore,
+   we must create our virtual environment, ensuring we upgrade pip to a version
    which supports dependency groups...
 
    ```sh

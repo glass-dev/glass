@@ -1,7 +1,7 @@
 # GLASS regression testing on Archer2
 
-For a more consistent regression testing environment we have
-been trialing using [Archer2](https://www.archer2.ac.uk/).
+For a more consistent regression testing environment we have been trialing using
+[Archer2](https://www.archer2.ac.uk/).
 
 ## Setting up
 
