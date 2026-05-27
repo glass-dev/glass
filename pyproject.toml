@@ -7,6 +7,13 @@ requires = [
 ]
 
 [dependency-groups]
+benchmarks = [
+    "camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
+    "glass-ext-camb",
+    {include-group = "test"},
+]
 build = [
     "build",
 ]
