@@ -57,7 +57,8 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run regression tests with all backends and generate coverage report
+      - name:
+          Run regression tests with all backends and generate coverage report
         run: uv run nox -s coverage_regression --verbose
         env:
           ARRAY_BACKEND: all

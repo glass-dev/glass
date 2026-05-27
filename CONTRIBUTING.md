@@ -194,8 +194,8 @@ _GLASS_ supports running various critical commands using
 [nox](https://github.com/wntrblm/nox) to make them less intimidating for new
 developers. All of these commands (or sessions in the language of `nox`) -
 `lint`, `tests`, `coverage`, `coverage_regression`, `doctests`, `examples`,
-`docs`, `build`, `version`, and `regression_tests` - are defined
-in [noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
+`docs`, `build`, `version`, and `regression_tests` - are defined in
+[noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
 
 `nox` can be installed via `uv` using -
 
@@ -254,17 +254,18 @@ saved under `.nox/` and reused by default.
 
 ### Regression testing
 
-To ensure that _GLASS_ remains performant over time, a set of regression tests are
-provided in the [regression](./tests/regression/) folder. These regression tests can
-be run through nox. To compare the performance of two different revisions of _GLASS_.
+To ensure that _GLASS_ remains performant over time, a set of regression tests
+are provided in the [regression](./tests/regression/) folder. These regression
+tests can be run through nox. To compare the performance of two different
+revisions of _GLASS_.
 
 ```sh
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
-To filter the tests to be ran, one can pass pytest arguments via the
-cli after the required revision arguments. For example, if you wished to run
-only regression tests from the `test_fields.py` file you could run one of the
+To filter the tests to be ran, one can pass pytest arguments via the cli after
+the required revision arguments. For example, if you wished to run only
+regression tests from the `test_fields.py` file you could run one of the
 following commands:
 
 ```sh
@@ -313,16 +314,16 @@ Performance has regressed:
 --------------------------------------------------------------------------------
 ```
 
-This indicates that the regression test `test_displacement` using the NumPy array
-backend has regressed by approximately 36.73% compared to the previous version.
-Effort has been made to reduce the number of false positives in these regression
-tests, however some still occur. It is worth checking if the given function
-(i.e. `glass.displacement`) has actually been hit by changes in the given pull
-request (whether directly or indirectly). If not, the regression can be ignored
-and merged. Sometimes this can be fixed by manually re-running the workflow. If
-the regression is genuine, the workflow should repeatedly fail. Regressions can
-be unavoidable sometimes, but every effort should be made to fix them before
-merging the pull request.
+This indicates that the regression test `test_displacement` using the NumPy
+array backend has regressed by approximately 36.73% compared to the previous
+version. Effort has been made to reduce the number of false positives in these
+regression tests, however some still occur. It is worth checking if the given
+function (i.e. `glass.displacement`) has actually been hit by changes in the
+given pull request (whether directly or indirectly). If not, the regression can
+be ignored and merged. Sometimes this can be fixed by manually re-running the
+workflow. If the regression is genuine, the workflow should repeatedly fail.
+Regressions can be unavoidable sometimes, but every effort should be made to fix
+them before merging the pull request.
 
 <!-- prettier-ignore -->
 > [!WARNING]
