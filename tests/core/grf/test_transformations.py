@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from tests.fixtures.helper_classes import Compare
 
 
 def test_normal(urng: UnifiedGenerator) -> None:
@@ -57,7 +56,6 @@ def test_normal_normal(
 
 
 def test_lognormal_lognormal(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -72,12 +70,11 @@ def test_lognormal_lognormal(
     dy = lam1 * lam2 * xp.exp(x)
 
     xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), y)
-    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
+    xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x)
     xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
 def test_lognormal_normal(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -91,12 +88,11 @@ def test_lognormal_normal(
     dy = lam1 * xp.ones_like(x)
 
     xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), y)
-    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
+    xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x)
     xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
 def test_sqnormal_sqnormal(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -114,5 +110,5 @@ def test_sqnormal_sqnormal(
     dy = 4 * lam1 * lam2 * (x + a1 * a2)
 
     xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), y)
-    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
+    xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
     xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), dy)

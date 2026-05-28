@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import UnifiedGenerator
-    from tests.fixtures.helper_classes import Compare
 
 
 def test_nnls(
@@ -123,7 +122,6 @@ def test_nearcorr(xp: ModuleType) -> None:
 
 
 def test_cov_nearest(
-    compare: type[Compare],
     mocker: MockerFixture,
     urng: UnifiedGenerator,
     xp: ModuleType,
@@ -149,7 +147,7 @@ def test_cov_nearest(
 
     # make sure nearcorr was called with correct input
     nearcorr.assert_called_once()
-    compare.assert_array_almost_equal_nulp(
+    xpx.testing.assert_close_nulp(
         nearcorr.call_args_list[0].args[0],
         xp.divide(a, norm),
     )
