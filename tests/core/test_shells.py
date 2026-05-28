@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-import array_api_extra as xpx
+import array_api_extra.testing as xpx_testing
 
 import glass
 from glass._array_api_utils import xp_additions as uxpx
@@ -36,7 +36,7 @@ def test_distance_weight(
 
     # check values are decreasing
 
-    xpx.testing.assert_less(w[1:], w[:-1])
+    xpx_testing.assert_less(w[1:], w[:-1])
 
 
 def test_volume_weight(
@@ -57,7 +57,7 @@ def test_volume_weight(
 
     # check values are increasing
 
-    xpx.testing.assert_less(w[:-1], w[1:])
+    xpx_testing.assert_less(w[:-1], w[1:])
 
 
 def test_density_weight(cosmo: Cosmology) -> None:
@@ -75,7 +75,7 @@ def test_density_weight(cosmo: Cosmology) -> None:
 
     # check values are increasing
 
-    xpx.testing.assert_less(w[:-1], w[1:])
+    xpx_testing.assert_less(w[:-1], w[1:])
 
 
 def test_tophat_windows(xp: ModuleType) -> None:
@@ -116,7 +116,7 @@ def test_linear_windows(xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    xpx.testing.assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xpx_testing.assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -124,7 +124,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
+    xpx_testing.assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -133,7 +133,7 @@ def test_linear_windows(xp: ModuleType) -> None:
         weight=lambda _: 0,
     )
     for w in ws:
-        xpx.testing.assert_close(w.wa, xp.zeros_like(w.wa))
+        xpx_testing.assert_close(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -165,7 +165,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.cubic_windows(zgrid)
-    xpx.testing.assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xpx_testing.assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -173,7 +173,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
+    xpx_testing.assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -182,7 +182,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
         weight=lambda _: 0,
     )
     for w in ws:
-        xpx.testing.assert_close(w.wa, xp.zeros_like(w.wa))
+        xpx_testing.assert_close(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -275,7 +275,7 @@ def test_partition(
 
     assert part.shape == (len(shells), 3, 2)
 
-    xpx.testing.assert_close(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
+    xpx_testing.assert_close(xp.sum(part, axis=0), uxpx.trapezoid(fz, z))
 
 
 def test_redshift_grid_default_xp() -> None:
@@ -358,7 +358,7 @@ def test_distance_grid(cosmo: Cosmology) -> None:
     # check decrease in distance
 
     x = glass.distance_grid(cosmo, zmin, zmax, dx=0.3)
-    xpx.testing.assert_less(x[1:], x[:-1])
+    xpx_testing.assert_less(x[1:], x[:-1])
 
     # check error raised
 
@@ -411,10 +411,10 @@ def test_combine(xp: ModuleType) -> None:
     assert result.shape == z.shape
 
     # Check sum of result
-    xpx.testing.assert_close(xp.sum(result), xp.asarray(929.267284))
+    xpx_testing.assert_close(xp.sum(result), xp.asarray(929.267284))
 
     # Check integral w.r.t z has not changed
-    xpx.testing.assert_close(uxpx.trapezoid(result, z), xp.asarray(4.643139), rtol=1e-6)
+    xpx_testing.assert_close(uxpx.trapezoid(result, z), xp.asarray(4.643139), rtol=1e-6)
 
 
 def test_radial_window_immutable(xp: ModuleType) -> None:
@@ -453,7 +453,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xpx.testing.assert_close(w.zeff, xp.ones_like(w.zeff))
+    xpx_testing.assert_close(w.zeff, xp.ones_like(w.zeff))
 
     # check zeff is NaN when redshift array is empty
 

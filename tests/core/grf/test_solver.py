@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-import array_api_extra as xpx
+import array_api_extra.testing as xpx_testing
 
 import glass.grf
 
@@ -30,7 +30,7 @@ def test_one_transformation(
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, t)
 
-    xpx.testing.assert_equal(gl1, gl2)
+    xpx_testing.assert_equal(gl1, gl2)
 
 
 def test_pad(
@@ -61,7 +61,7 @@ def test_initial(
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, initial=gl)
 
-    xpx.testing.assert_equal(gl1, gl2)
+    xpx_testing.assert_equal(gl1, gl2)
 
 
 def test_no_iterations(cl: FloatArray) -> None:
@@ -70,7 +70,7 @@ def test_no_iterations(cl: FloatArray) -> None:
     gl1 = glass.grf.compute(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, maxiter=0)
 
-    xpx.testing.assert_equal(gl1, gl2)
+    xpx_testing.assert_equal(gl1, gl2)
 
 
 def test_lognormal(
@@ -88,12 +88,12 @@ def test_lognormal(
 
     assert info > 0
 
-    xpx.testing.assert_close(cl_[1 : cl.shape[0]], cl[1:], atol=0.0, rtol=cltol)
+    xpx_testing.assert_close(cl_[1 : cl.shape[0]], cl[1:], atol=0.0, rtol=cltol)
 
     gl_ = glass.grf.compute(cl_, t1, t2)
 
     assert gl[0] == gl0
-    xpx.testing.assert_close(gl_[1 : gl.shape[0]], gl[1:])
+    xpx_testing.assert_close(gl_[1 : gl.shape[0]], gl[1:])
 
 
 def test_monopole(
@@ -108,10 +108,10 @@ def test_monopole(
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=None, gltol=1e-8)
 
     assert gl[0] != 0.0
-    xpx.testing.assert_close(cl_out[0], cl[0])
+    xpx_testing.assert_close(cl_out[0], cl[0])
 
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=gl0, gltol=1e-8)
 
     assert gl[0] == gl0
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        xpx.testing.assert_close(cl_out[0], cl[0])
+        xpx_testing.assert_close(cl_out[0], cl[0])
