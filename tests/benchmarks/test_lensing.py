@@ -24,7 +24,7 @@ def test_lensing(benchmark: BenchmarkFixture, xp: ModuleType, urng):
     Ob = 0.05
 
     # basic parameters of the simulation
-    nside = lmax = 256
+    nside = lmax = 1024
 
     # set up CAMB parameters for matter angular power spectrum
     pars = camb.set_params(
@@ -99,5 +99,7 @@ def test_lensing(benchmark: BenchmarkFixture, xp: ModuleType, urng):
         kappa_bar /= ngal.sum()
         gamm1_bar /= ngal.sum()
         gamm2_bar /= ngal.sum()
+
+        return kappa_bar, gamm1_bar, gamm2_bar
 
     benchmark(function_to_benchmark)

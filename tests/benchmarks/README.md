@@ -25,10 +25,9 @@ Now you should be able to run the benchmarks
 
 ```sh
 .venv-benchmark/bin/python -m pytest tests/benchmarks \
-    --benchmark-autosave                        \
-    --benchmark-calibration-precision=1000      \
-    --benchmark-columns=mean,stddev,rounds      \
-    --benchmark-max-time=5.0                    \
-    --benchmark-sort=name                       \
+    --benchmark-autosave                              \
+    --benchmark-columns=mean,stddev,rounds,iterations \
+    --benchmark-max-time=5.0                          \
+    --benchmark-sort=name                             \
     --benchmark-timer=time.process_time 
 ```
