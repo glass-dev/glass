@@ -8,7 +8,6 @@ import sys
 import typing
 import warnings
 from collections.abc import Sequence
-from typing import Any
 
 import numpy as np
 import transformcl

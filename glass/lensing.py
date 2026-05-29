@@ -56,9 +56,9 @@ def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[False],
-    deflection: Literal[False],
-    shear: Literal[False],
+    potential: Literal[False] = False,
+    deflection: Literal[False] = False,
+    shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[()]:
     # returns empty tuple
