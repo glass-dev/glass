@@ -150,7 +150,7 @@ def test_cls2cov(
 
     xpx.testing.assert_close(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
     xpx.testing.assert_close(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    xpx.testing.assert_close(cov[:, 2], xpb.asarray(0.0),check_shape=False)
+    xpx.testing.assert_close(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
 
 @pytest.mark.stable
