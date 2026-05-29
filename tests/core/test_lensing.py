@@ -29,7 +29,12 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
     # check with all False
 
-    results = glass.from_convergence(kappa)  # ty: ignore[no-matching-overload]
+    results = glass.from_convergence(
+        kappa,
+        potential=False,
+        deflection=False,
+        shear=False,
+    )
     assert results == ()
 
     # check all combinations of potential, deflection, shear being True
