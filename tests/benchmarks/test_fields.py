@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import array_api_extra.testing as xpx_testing
+import array_api_extra as xpx
 
 import glass
 import glass.fields
@@ -120,7 +120,7 @@ def test_iternorm_k_0(
     j, a, s = results[0]
     assert j is None
     assert a.shape == (0,)
-    xpx_testing.assert_close(s, xpb.ones_like(s))
+    xpx.testing.assert_close(s, xpb.ones_like(s))
 
 
 @pytest.mark.stable
@@ -148,9 +148,9 @@ def test_cls2cov(
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    xpx_testing.assert_close(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
-    xpx_testing.assert_close(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    xpx_testing.assert_close(cov[:, 2], xpb.zeros_like(cov[:, 2]))
+    xpx.testing.assert_close(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
+    xpx.testing.assert_close(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
+    xpx.testing.assert_close(cov[:, 2], xpb.zeros_like(cov[:, 2]))
 
 
 @pytest.mark.stable
@@ -213,7 +213,7 @@ def test_generate(
 
     for field in result:
         assert field.shape == (hp.nside2npix(nside),)
-    xpx_testing.assert_close(result[1], result[0] ** 2, atol=1e-05)
+    xpx.testing.assert_close(result[1], result[0] ** 2, atol=1e-05)
 
 
 @pytest.mark.unstable
@@ -243,7 +243,7 @@ def test_getcl_lmax_0(
     )
     expected = xpb.asarray([max(random_i, random_j)], dtype=xpb.float64)
     assert result.shape[0] == 1
-    xpx_testing.assert_close(result, expected)
+    xpx.testing.assert_close(result, expected)
 
 
 @pytest.mark.unstable
@@ -274,4 +274,4 @@ def test_getcl_lmax_larger_than_cls(
     )
     expected = xpb.zeros((lmax - 1,), dtype=xpb.float64)
     assert result.shape[0] == lmax + 1
-    xpx_testing.assert_close(result[2:], expected)
+    xpx.testing.assert_close(result[2:], expected)
