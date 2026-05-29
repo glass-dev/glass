@@ -305,8 +305,8 @@ def test_positions_from_delta(  # noqa: PLR0915
     )
 
     assert int(count) == count
-    xpx.testing.assert_close(lon, xp.asarray([]))
-    xpx.testing.assert_close(lat, xp.asarray([]))
+    xpx.testing.assert_equal(lon, xp.asarray([]))
+    xpx.testing.assert_equal(lat, xp.asarray([]))
 
     # case: large delta
 

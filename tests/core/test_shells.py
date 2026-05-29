@@ -102,7 +102,7 @@ def test_tophat_windows(xp: ModuleType) -> None:
 
 def test_linear_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
-    dz = 1e-2
+    dz = xp.asarray(1e-2)
     zgrid = xp.asarray(
         [
             0.0,
@@ -116,7 +116,7 @@ def test_linear_windows(xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.linear_windows(zgrid)
-    xpx.testing.assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xpx.testing.assert_close(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -151,7 +151,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
 def test_cubic_windows(xp: ModuleType) -> None:
     """Add unit tests for :func:`glass.cubic_windows`."""
-    dz = 1e-2
+    dz = xp.asarray(1e-2)
     zgrid = xp.asarray(
         [
             0.0,
@@ -165,7 +165,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
     # check spacing of redshift grid
 
     ws = glass.cubic_windows(zgrid)
-    xpx.testing.assert_close(xp.asarray(dz), xp.mean(xp.diff(ws[0].za)), atol=1e-2)
+    xpx.testing.assert_close(dz, xp.mean(xp.diff(ws[0].za)), atol=1e-2)
 
     # check number of windows
 
@@ -453,7 +453,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xpx.testing.assert_close(w.zeff, xp.ones_like(w.zeff))
+    xpx.testing.assert_close(w.zeff, xp.asarray(1.0))
 
     # check zeff is NaN when redshift array is empty
 
