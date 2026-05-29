@@ -151,7 +151,7 @@ def test_ellipticity_gaussian(
 
     assert eps.shape == (n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
     xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
     xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
@@ -160,7 +160,7 @@ def test_ellipticity_gaussian(
 
     assert eps.shape == (2 * n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
     xpx.testing.assert_close(
         xp.std(xp.real(eps)[:n]),
@@ -212,7 +212,7 @@ def test_ellipticity_intnorm(
 
     assert eps.shape == (n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
     xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
     xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
@@ -221,7 +221,7 @@ def test_ellipticity_intnorm(
 
     assert eps.shape == (2 * n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.ones_like(eps, dtype=xp.float64))
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
     xpx.testing.assert_close(
         xp.std(xp.real(eps)[:n]),

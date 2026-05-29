@@ -120,7 +120,7 @@ def test_iternorm_k_0(
     j, a, s = results[0]
     assert j is None
     assert a.shape == (0,)
-    xpx.testing.assert_close(s, xpb.ones_like(s))
+    xpx.testing.assert_close(s, xpb.asarray(1.0))
 
 
 @pytest.mark.stable
@@ -150,7 +150,7 @@ def test_cls2cov(
 
     xpx.testing.assert_close(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
     xpx.testing.assert_close(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    xpx.testing.assert_close(cov[:, 2], xpb.zeros_like(cov[:, 2]))
+    xpx.testing.assert_close(cov[:, 2], xpb.asarray(0.0),check_shape=False)
 
 
 @pytest.mark.stable

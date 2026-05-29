@@ -70,7 +70,7 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
 
     xpx.testing.assert_equal(mat, xp.tril(mat))
-    xpx.testing.assert_equal(xp.triu(mat, k=1), xp.zeros_like(mat))
+    xpx.testing.assert_equal(xp.triu(mat, k=1), xp.asarray(0.0), check_shape=False)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -96,7 +96,7 @@ def test_multi_plane_weights(
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
     xpx.testing.assert_equal(w_out, xp.triu(w_out, k=1))
-    xpx.testing.assert_equal(xp.tril(w_out), xp.zeros_like(w_out))
+    xpx.testing.assert_equal(xp.tril(w_out), xp.asarray(0.0), check_shape=False)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
