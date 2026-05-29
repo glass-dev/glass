@@ -22,11 +22,11 @@ def test_radialwindow(
     """Benchmark for shells.RadialWindow."""
     # check zeff is computed when not provided
     arr_length = 100_000
-    expected_zeff = 66_666.0
+    expected_zeff = xpb.asarray(66_666.0)
 
     wa = xpb.arange(arr_length)
     za = xpb.arange(arr_length)
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    xpx_testing.assert_close(w.zeff, xpb.asarray(expected_zeff))
+    xpx_testing.assert_close(w.zeff, expected_zeff)

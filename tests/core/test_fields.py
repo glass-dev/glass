@@ -202,8 +202,8 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     assert cov.dtype == xpb.float64
 
     xpx_testing.assert_close(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
-    xpx_testing.assert_close(cov[:, 1], xpb.zeros_like(cov[:, 1]))
-    xpx_testing.assert_close(cov[:, 2], xpb.zeros_like(cov[:, 2]))
+    xpx_testing.assert_close(cov[:, 1], xpb.asarray(0.0), check_shape=False)
+    xpx_testing.assert_close(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
     # test negative value error
 
@@ -373,7 +373,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    xpx_testing.assert_close(result[..., 6:], xp.zeros_like(result[..., 6:]))
+    xpx_testing.assert_close(result[..., 6:], xp.asarray(0.0), check_shape=False)
 
     # check with weights1 and weights2 and weights1 is weights2
 
