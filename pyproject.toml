@@ -44,6 +44,7 @@ lint = [
     "ty==0.0.35",
 ]
 test = [
+    "array-api-extra @ git+https://github.com/data-apis/array-api-extra.git",
     "cosmology-api",
     "fitsio",
     "pytest",
@@ -70,7 +71,7 @@ classifiers = [
 ]
 dependencies = [
     "array-api-compat>=1.12.0",
-    "array-api-extra @ git+https://github.com/data-apis/array-api-extra.git",
+    "array-api-extra>=0.9.0",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "transformcl>=2026.1",
