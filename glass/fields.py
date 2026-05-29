@@ -8,6 +8,7 @@ import sys
 import typing
 import warnings
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 import transformcl
@@ -551,7 +552,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.shape[0]))
-    return cl  # ty: ignore[invalid-return-type]
+    return typing.cast("FloatArray", cl)
 
 
 def enumerate_spectra(
@@ -1023,7 +1024,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return cov  # ty: ignore[invalid-return-type]
+    return typing.cast("Any", cov)
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
