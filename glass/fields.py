@@ -1024,7 +1024,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return typing.cast("Any", cov)
+    return typing.cast("AnyArray", cov)
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
