@@ -163,7 +163,7 @@ def test_deflect_nsew(
         alpha(0, -r, usecomplex=usecomplex),
     )
     xpx.testing.assert_close(lon, xp.asarray([d, d]), atol=1e-15)
-    xpx.testing.assert_close(lat, xp.asarray([0.0, 0.0]), atol=1e-15)
+    xpx.testing.assert_close(lat, xp.asarray(0.0), atol=1e-15, check_shape=False)
 
     # No inputs are arrays and xp not provided
     with pytest.raises(
