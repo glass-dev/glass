@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import itertools
 import math
-from typing import TYPE_CHECKING
+import typing
 
 import array_api_compat
 
@@ -38,7 +38,7 @@ import glass.arraytools
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray

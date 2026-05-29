@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import pytest
 
@@ -12,7 +12,7 @@ glass_harmonics = pytest.importorskip(
 )
 
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture

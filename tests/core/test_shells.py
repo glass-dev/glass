@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import math
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 import pytest
@@ -12,7 +12,7 @@ import array_api_extra as xpx
 import glass
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass.cosmology import Cosmology

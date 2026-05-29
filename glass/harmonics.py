@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import array_api_compat
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from glass._types import ComplexArray, FloatArray
 
 

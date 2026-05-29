@@ -31,7 +31,7 @@ Applying lensing
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, overload
+import typing
 
 import numpy as np
 
@@ -41,16 +41,17 @@ import array_api_extra as xpx
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
+    from typing import Literal
 
     from glass._types import AnyArray, ComplexArray, FloatArray
     from glass.cosmology import Cosmology
     from glass.shells import RadialWindow
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -64,7 +65,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -78,7 +79,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -92,7 +93,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -106,7 +107,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -123,7 +124,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -140,7 +141,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -157,7 +158,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,

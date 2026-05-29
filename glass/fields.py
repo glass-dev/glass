@@ -5,9 +5,9 @@ from __future__ import annotations
 import itertools
 import math
 import sys
+import typing
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 import numpy as np
 import transformcl
@@ -23,7 +23,7 @@ import glass.shells
 from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
     from types import ModuleType
     from typing import Literal
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 if sys.version_info >= (3, 13):
     from warnings import deprecated
 else:
-    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
         from glass._types import P, R
 
     def deprecated(msg: str, /) -> Callable[[Callable[P, R]], Callable[P, R]]:

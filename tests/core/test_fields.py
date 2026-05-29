@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 import pytest
@@ -13,7 +13,7 @@ import glass.fields
 import glass.healpix as hp
 from glass import _rng
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_mock import MockerFixture

@@ -48,8 +48,8 @@ from __future__ import annotations
 import dataclasses
 import itertools
 import math
+import typing
 import warnings
-from typing import TYPE_CHECKING
 
 import array_api_compat
 import array_api_extra as xpx
@@ -59,7 +59,7 @@ import glass.algorithm
 import glass.arraytools
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from types import ModuleType
 

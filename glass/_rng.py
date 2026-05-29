@@ -10,9 +10,9 @@ the user.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import DTypeLike, FloatArray, IntArray, UnifiedGenerator

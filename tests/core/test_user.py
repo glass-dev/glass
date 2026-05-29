@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import importlib.util
 import pathlib
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 import pytest
 
 import glass
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from glass._types import AngularPowerSpectra, FloatArray
 
 # check if available for testing

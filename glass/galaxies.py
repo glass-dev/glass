@@ -20,8 +20,8 @@ Functions
 from __future__ import annotations
 
 import math
+import typing
 import warnings
-from typing import TYPE_CHECKING
 
 import array_api_compat
 import array_api_extra as xpx
@@ -32,7 +32,7 @@ import glass.shells
 from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray, UnifiedGenerator

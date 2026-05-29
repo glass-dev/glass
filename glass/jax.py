@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import threading
-from typing import TYPE_CHECKING
+import typing
 
 import jax.dtypes
 import jax.numpy as jnp
@@ -12,7 +12,7 @@ import jax.random
 import jax.scipy
 import jax.typing
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from typing import Self
 
     from jaxtyping import PRNGKeyArray

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+import typing
 
 import pytest
 
@@ -11,7 +11,7 @@ import glass
 import glass.fields
 import glass.healpix as hp
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 

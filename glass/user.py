@@ -19,12 +19,12 @@ Input and Output
 
 from __future__ import annotations
 
+import typing
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
 
 import numpy as np
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     import importlib.util
     from collections.abc import Generator
     from os import PathLike

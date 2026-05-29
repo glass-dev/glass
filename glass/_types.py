@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING, Any
+import typing
+from typing import Any
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import ParamSpec, TypeAlias, TypeVar
 
     import jaxtyping
     import numpy as np
@@ -13,20 +13,24 @@ if TYPE_CHECKING:
     import glass.jax
     from glass import _rng
 
-    P = ParamSpec("P")
-    R = TypeVar("R")
-    T = TypeVar("T")
+    P = typing.ParamSpec("P")
+    R = typing.TypeVar("R")
+    T = typing.TypeVar("T")
 
-    AnyArray: TypeAlias = np.typing.NDArray[Any] | jaxtyping.Array | Array
-    ComplexArray: TypeAlias = np.typing.NDArray[np.complex128] | jaxtyping.Array | Array
-    DTypeLike: TypeAlias = np.typing.DTypeLike | jaxtyping.DTypeLike | DType
-    FloatArray: TypeAlias = np.typing.NDArray[np.float64] | jaxtyping.Array | Array
-    IntArray: TypeAlias = np.typing.NDArray[np.int64] | jaxtyping.Array | Array
-    UnifiedGenerator: TypeAlias = (
+    AnyArray: typing.TypeAlias = np.typing.NDArray[Any] | jaxtyping.Array | Array
+    ComplexArray: typing.TypeAlias = (
+        np.typing.NDArray[np.complex128] | jaxtyping.Array | Array
+    )
+    DTypeLike: typing.TypeAlias = np.typing.DTypeLike | jaxtyping.DTypeLike | DType
+    FloatArray: typing.TypeAlias = (
+        np.typing.NDArray[np.float64] | jaxtyping.Array | Array
+    )
+    IntArray: typing.TypeAlias = np.typing.NDArray[np.int64] | jaxtyping.Array | Array
+    UnifiedGenerator: typing.TypeAlias = (
         np.random.Generator | glass.jax.Generator | _rng.Generator
     )
 
-    AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
+    AngularPowerSpectra: typing.TypeAlias = Sequence[AnyArray]
 else:
     # Runtime fallbacks (for Sphinx / autodoc)
     # https://github.com/sphinx-doc/sphinx/issues/11991

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import typing
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 import healpix
 import healpy
@@ -14,7 +14,7 @@ import array_api_compat
 import glass._array_api_utils as _utils
 from glass import _rng
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray

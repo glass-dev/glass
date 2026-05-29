@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import typing
 import warnings
-from typing import TYPE_CHECKING
 
 import array_api_compat
 import array_api_extra as xpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from glass._types import FloatArray
 
 

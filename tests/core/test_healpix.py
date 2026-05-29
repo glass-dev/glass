@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import math
-from typing import TYPE_CHECKING
+import typing
 
 import healpix
 import healpy
@@ -14,7 +14,7 @@ import array_api_extra as xpx
 import glass.healpix as hp
 from glass import _rng
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator

@@ -40,7 +40,8 @@ from __future__ import annotations
 
 import itertools
 import math
-from typing import TYPE_CHECKING, Any
+import typing
+from typing import Any
 
 import array_api_compat
 import array_api_extra as xpx
@@ -51,7 +52,7 @@ import glass.shells
 from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Callable, Generator
     from types import ModuleType
 

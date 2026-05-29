@@ -10,13 +10,13 @@ from __future__ import annotations
 
 import importlib.metadata
 import os
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 import packaging.version
 import pytest
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
 # environment variable to specify array backends for testing

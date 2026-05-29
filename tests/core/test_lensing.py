@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+import typing
 
 import pytest
 
@@ -11,7 +11,7 @@ import glass
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray, UnifiedGenerator

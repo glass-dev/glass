@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+import typing
 
 import pytest
 
 import glass
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
     from typing import Any

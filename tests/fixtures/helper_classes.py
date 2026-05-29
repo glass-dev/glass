@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import pytest
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from collections.abc import Generator
     from types import ModuleType
     from typing import Any

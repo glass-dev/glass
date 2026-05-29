@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing
 
 import numpy as np
 import pytest
@@ -9,7 +9,7 @@ import array_api_extra as xpx
 
 import glass.grf
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from glass._types import FloatArray
 
 

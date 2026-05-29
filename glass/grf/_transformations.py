@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import typing
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from types import NotImplementedType
 
     from glass._types import AnyArray
