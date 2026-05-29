@@ -227,7 +227,7 @@ def cls2cov(
             cov = xpx.at(cov)[:n, i].set(cl)
             cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
-        yield cov  # ty: ignore[invalid-yield]
+        yield typing.cast("FloatArray", cov)
 
 
 def discretized_cls(
