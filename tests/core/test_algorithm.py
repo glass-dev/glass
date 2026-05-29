@@ -75,7 +75,7 @@ def test_cov_clip(
 
     # make sure all eigenvalues are positive
     h = xp.max(xp.linalg.eigvalsh(a))
-    xpx_testing.assert_close(xp.linalg.eigvalsh(cov), h * xp.ones(cov.shape[0]))
+    xpx_testing.assert_close(xp.linalg.eigvalsh(cov), h, check_shape=False)
 
 
 def test_nearcorr(xp: ModuleType) -> None:
