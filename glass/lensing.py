@@ -32,7 +32,7 @@ Applying lensing
 from __future__ import annotations
 
 import typing
-from typing import TYPE_CHECKING, Literal, overload
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
@@ -51,7 +51,7 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -65,7 +65,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -79,7 +79,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -93,7 +93,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -107,7 +107,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -124,7 +124,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -141,7 +141,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -158,7 +158,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,

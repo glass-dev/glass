@@ -107,9 +107,9 @@ Issues = "https://github.com/glass-dev/glass/issues"
 [tool.coverage]
 report = {exclude_also = [
     "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
-    "@overload\\n",
+    "@(?:typing\\.)?overload\\n",
     "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
-    "if TYPE_CHECKING:",
+    "if (?:typing\\.)?TYPE_CHECKING:",
 ], omit = [
     "_types.py", # typing-only module
     "_version.py", # not being tracked anyway
