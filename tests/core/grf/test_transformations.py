@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import array_api_extra as xpx
-
 import glass.grf
 
 if typing.TYPE_CHECKING:
@@ -78,7 +76,7 @@ def test_lognormal_lognormal(
     dy = lam1 * lam2 * xp.exp(x)
 
     compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
-    xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x)
+    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
     compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
@@ -97,7 +95,7 @@ def test_lognormal_normal(
     dy = lam1 * xp.ones_like(x)
 
     compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
-    xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x)
+    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x)
     compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
@@ -120,5 +118,5 @@ def test_sqnormal_sqnormal(
     dy = 4 * lam1 * lam2 * (x + a1 * a2)
 
     compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
-    xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
+    compare.assert_array_almost_equal_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
     compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
