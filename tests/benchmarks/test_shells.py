@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 @pytest.mark.unstable
 def test_radialwindow(
     benchmark: BenchmarkFixture,
-    xpb: ModuleType,
     compare: type[Compare],
+    xpb: ModuleType,
 ) -> None:
     """Benchmark for shells.RadialWindow."""
     # check zeff is computed when not provided
