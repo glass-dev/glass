@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:
 @pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.harmonics.multalm."""

@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
 
 
 def test_nnls(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -56,7 +56,7 @@ def test_nnls(
 
 
 def test_cov_clip(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -81,7 +81,7 @@ def test_cov_clip(
 
 
 def test_nearcorr(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     # from Higham (2002)
@@ -128,7 +128,7 @@ def test_nearcorr(
 
 
 def test_cov_nearest(
-    compare: Compare,
+    compare: type[Compare],
     mocker: MockerFixture,
     urng: UnifiedGenerator,
     xp: ModuleType,

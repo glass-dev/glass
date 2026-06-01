@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 def test_normal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
 ) -> None:
     t = glass.grf.Normal()
@@ -21,7 +21,7 @@ def test_normal(
 
 
 def test_lognormal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -34,7 +34,7 @@ def test_lognormal(
 
 
 def test_sqnormal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -48,7 +48,7 @@ def test_sqnormal(
 
 
 def test_normal_normal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -61,7 +61,7 @@ def test_normal_normal(
 
 
 def test_lognormal_lognormal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -81,7 +81,7 @@ def test_lognormal_lognormal(
 
 
 def test_lognormal_normal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -100,7 +100,7 @@ def test_lognormal_normal(
 
 
 def test_sqnormal_sqnormal(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

@@ -44,7 +44,7 @@ def test_broadcast_leading_axes(
 @pytest.mark.unstable
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
@@ -66,7 +66,7 @@ def test_cumulative_trapezoid_1d(
 @pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""

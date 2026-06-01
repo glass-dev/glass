@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 
 
 def test_multalm(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     # check output values and shapes

@@ -60,7 +60,7 @@ def test_broadcast_leading_axes(xp: ModuleType) -> None:
 
 
 def test_ndinterp(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     # test 1d interpolation
@@ -152,7 +152,7 @@ def test_ndinterp(
 
 
 def test_trapezoid_product(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     x1 = xp.linspace(0, 2, 100)
@@ -167,7 +167,7 @@ def test_trapezoid_product(
 
 
 def test_cumulative_trapezoid(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     # 1D f and x

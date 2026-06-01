@@ -205,7 +205,7 @@ def test_galaxy_shear(
 
 
 def test_gaussian_phz(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

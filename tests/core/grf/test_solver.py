@@ -21,7 +21,7 @@ def cl() -> FloatArray:
 
 def test_one_transformation(
     cl: FloatArray,
-    compare: Compare,
+    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     lam = rng.random()
@@ -51,7 +51,7 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
-    compare: Compare,
+    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     lam = rng.random()
@@ -67,7 +67,7 @@ def test_initial(
 
 def test_no_iterations(
     cl: FloatArray,
-    compare: Compare,
+    compare: type[Compare],
 ) -> None:
     t = glass.grf.Lognormal()
 
@@ -79,7 +79,7 @@ def test_no_iterations(
 
 def test_lognormal(
     cl: FloatArray,
-    compare: Compare,
+    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     t1 = glass.grf.Lognormal()
@@ -103,7 +103,7 @@ def test_lognormal(
 
 def test_monopole(
     cl: FloatArray,
-    compare: Compare,
+    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     t = glass.grf.Lognormal()

@@ -22,7 +22,7 @@ if typing.TYPE_CHECKING:
 @pytest.mark.stable
 def test_iternorm_no_size(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with default value for size."""
@@ -50,7 +50,7 @@ def test_iternorm_no_size(
 @pytest.mark.parametrize("num_dimensions", [1, 2])
 def test_iternorm_specify_size(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     num_dimensions: int,
 ) -> None:
@@ -102,8 +102,8 @@ def test_iternorm_specify_size(
 @pytest.mark.stable
 def test_iternorm_k_0(
     benchmark: BenchmarkFixture,
-    compare: Compare,
-    generator_consumer: GeneratorConsumer,
+    compare: type[Compare],
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with k set to 0."""
@@ -125,8 +125,8 @@ def test_iternorm_k_0(
 @pytest.mark.stable
 def test_cls2cov(
     benchmark: BenchmarkFixture,
-    compare: Compare,
-    generator_consumer: GeneratorConsumer,
+    compare: type[Compare],
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.cls2cov."""
@@ -158,7 +158,7 @@ def test_cls2cov(
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
@@ -185,8 +185,8 @@ def test_generate_grf(
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
     benchmark: BenchmarkFixture,
-    compare: Compare,
-    generator_consumer: GeneratorConsumer,
+    compare: type[Compare],
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     ncorr: int | None,
 ) -> None:
@@ -220,7 +220,7 @@ def test_generate(
 @pytest.mark.unstable
 def test_getcl_lmax_0(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.getcl with lmax of 0."""
@@ -251,7 +251,7 @@ def test_getcl_lmax_0(
 @pytest.mark.unstable
 def test_getcl_lmax_larger_than_cls(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.getcl with lmax larger than the length of cl."""

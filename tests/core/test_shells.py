@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
 
 
 def test_distance_weight(
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
     xp: ModuleType,
 ) -> None:
@@ -40,7 +40,7 @@ def test_distance_weight(
 
 
 def test_volume_weight(
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
     xp: ModuleType,
 ) -> None:
@@ -62,7 +62,7 @@ def test_volume_weight(
 
 
 def test_density_weight(
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
 ) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
@@ -105,7 +105,7 @@ def test_tophat_windows(xp: ModuleType) -> None:
 
 
 def test_linear_windows(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
@@ -157,7 +157,7 @@ def test_linear_windows(
 
 
 def test_cubic_windows(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.cubic_windows`."""
@@ -245,7 +245,7 @@ def test_restrict(
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(
-    compare: Compare,
+    compare: type[Compare],
     method: str,
     xp: ModuleType,
 ) -> None:
@@ -352,7 +352,7 @@ def test_redshift_grid(xp: ModuleType) -> None:
 
 
 def test_distance_grid(
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
 ) -> None:
     """Add unit tests for :func:`glass.distance_grid`."""
@@ -392,7 +392,7 @@ def test_distance_grid(
 
 
 def test_combine(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.combine`."""
@@ -464,7 +464,7 @@ def test_radial_window_immutable(xp: ModuleType) -> None:
 
 
 def test_radial_window_zeff_none(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""

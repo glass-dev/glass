@@ -32,8 +32,8 @@ if typing.TYPE_CHECKING:
 @pytest.mark.parametrize("remove_monopole", [True, False])
 def test_positions_from_delta(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
-    data_transformer: DataTransformer,
-    generator_consumer: GeneratorConsumer,
+    data_transformer: type[DataTransformer],
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     bias: float,
     bias_model: Callable[[int], int],
@@ -71,8 +71,8 @@ def test_positions_from_delta(  # noqa: PLR0913
 @pytest.mark.stable
 def test_uniform_positions(
     benchmark: BenchmarkFixture,
-    data_transformer: DataTransformer,
-    generator_consumer: GeneratorConsumer,
+    data_transformer: type[DataTransformer],
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.uniform_positionsuniform_positions."""

@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 
 def test_vmap_galactic_ecliptic(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.vmap_galactic_ecliptic`."""
@@ -55,7 +55,7 @@ def test_vmap_galactic_ecliptic(
 
 
 def test_gaussian_nz(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -91,7 +91,7 @@ def test_gaussian_nz(
 
 
 def test_smail_nz(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.smail_nz`."""
@@ -106,7 +106,7 @@ def test_smail_nz(
     compare.assert_array_equal(pz, xp.zeros_like(pz))
 
 
-def test_fixed_zbins_default_xp(compare: Compare) -> None:
+def test_fixed_zbins_default_xp(compare: type[Compare]) -> None:
     """Add unit tests for :func:`glass.fixed_zbins` with default xp."""
     zmin = 0.0
     zmax = 1.0
@@ -145,7 +145,7 @@ def test_fixed_zbins_default_xp(compare: Compare) -> None:
 
 
 def test_fixed_zbins_xp_provided(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.fixed_zbins`."""
@@ -184,7 +184,7 @@ def test_fixed_zbins_xp_provided(
 
 
 def test_equal_dens_zbins(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.equal_dens_zbins`."""
@@ -208,7 +208,7 @@ def test_equal_dens_zbins(
 
 
 def test_tomo_nz_gausserr(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.tomo_nz_gausserr`."""

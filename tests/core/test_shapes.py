@@ -127,7 +127,7 @@ def test_ellipticity_ryden04(
 
 @pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])
 def test_ellipticity_gaussian(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -189,7 +189,7 @@ def test_ellipticity_gaussian(
 
 
 def test_ellipticity_intnorm(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

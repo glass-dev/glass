@@ -20,7 +20,7 @@ if typing.TYPE_CHECKING:
 @pytest.mark.stable
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,
@@ -79,7 +79,7 @@ def test_multi_plane_matrix(
 @pytest.mark.stable
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,

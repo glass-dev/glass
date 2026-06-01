@@ -61,7 +61,7 @@ def test_shear_from_convergence() -> None:
 
 
 def test_multi_plane_matrix(
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
     shells: list[glass.RadialWindow],
     urng: UnifiedGenerator,
@@ -87,7 +87,7 @@ def test_multi_plane_matrix(
 
 
 def test_multi_plane_weights(
-    compare: Compare,
+    compare: type[Compare],
     cosmo: Cosmology,
     urng: UnifiedGenerator,
     shells: list[glass.RadialWindow],
@@ -120,7 +120,7 @@ def test_multi_plane_weights(
 
 @pytest.mark.parametrize("usecomplex", [True, False])
 def test_deflect_nsew(
-    compare: Compare,
+    compare: type[Compare],
     usecomplex: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
@@ -176,7 +176,7 @@ def test_deflect_nsew(
 
 
 def test_deflect_many(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

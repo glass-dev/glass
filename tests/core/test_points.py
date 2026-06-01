@@ -22,7 +22,7 @@ if typing.TYPE_CHECKING:
 
 
 def test_effective_bias(
-    compare: Compare,
+    compare: type[Compare],
     mocker: MockerFixture,
     xp: ModuleType,
 ) -> None:
@@ -47,7 +47,7 @@ def test_effective_bias(
 
 
 def test_linear_bias(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -74,7 +74,7 @@ def test_linear_bias(
 
 
 def test_loglinear_bias(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -104,7 +104,7 @@ def test_loglinear_bias(
 
 
 def test_broadcast_inputs(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     bias_in = 0.8
@@ -137,7 +137,7 @@ def test_broadcast_inputs(
     ],
 )
 def test_compute_density_contrast(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     bias = 0.8 * xp.ones((3, 2))
@@ -178,7 +178,7 @@ def test_compute_expected_count(
 
 
 def test_apply_visibility(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     k = (1, 1)
@@ -195,7 +195,10 @@ def test_apply_visibility(
     compare.assert_array_equal(n[6:], n_in[6:])
 
 
-def test_sample_number_galaxies(compare: Compare, xp: ModuleType) -> None:
+def test_sample_number_galaxies(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
     n = glass.points._sample_number_galaxies(n_in)
@@ -205,7 +208,7 @@ def test_sample_number_galaxies(compare: Compare, xp: ModuleType) -> None:
 
 
 def test_sample_number_galaxies_rng(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -218,7 +221,7 @@ def test_sample_number_galaxies_rng(
 
 
 def test_sample_galaxies_per_pixel(
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     xp: ModuleType,
 ) -> None:
     batch = 1000000
@@ -242,8 +245,8 @@ def test_sample_galaxies_per_pixel(
 
 
 def test_positions_from_delta(  # noqa: PLR0915
-    compare: Compare,
-    data_transformer: DataTransformer,
+    compare: type[Compare],
+    data_transformer: type[DataTransformer],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -395,7 +398,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
 
 def test_uniform_positions(
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -448,7 +451,7 @@ def test_uniform_positions(
 
 
 def test_position_weights(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -478,7 +481,7 @@ def test_position_weights(
 
 
 def test_displace_arg_complex(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Test displace function with complex-valued displacement."""
@@ -507,7 +510,7 @@ def test_displace_arg_complex(
 
 
 def test_displace_arg_real(
-    compare: Compare,
+    compare: type[Compare],
     xp: ModuleType,
 ) -> None:
     """Test displace function with real-valued argument."""
@@ -536,7 +539,7 @@ def test_displace_arg_real(
 
 
 def test_displace_abs(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -560,7 +563,7 @@ def test_displace_abs(
 
 
 def test_displacement(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -606,7 +609,7 @@ def test_displacement(
 
 
 def test_displacement_zerodist(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -621,7 +624,7 @@ def test_displacement_zerodist(
 
 
 def test_displacement_consistent(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -649,7 +652,7 @@ def test_displacement_consistent(
 
 
 def test_displacement_random(
-    compare: Compare,
+    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
