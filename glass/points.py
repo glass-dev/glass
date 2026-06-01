@@ -40,7 +40,7 @@ from __future__ import annotations
 
 import itertools
 import math
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import array_api_compat
 import array_api_extra as xpx
@@ -54,6 +54,7 @@ from glass._array_api_utils import xp_additions as uxpx
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
     from types import ModuleType
+    from typing import Any
 
     from glass._types import (
         ComplexArray,
