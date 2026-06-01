@@ -599,7 +599,6 @@ def uniform_positions(
         lat = uxpx.degrees(xp.asin(rng.uniform(-1, 1, size=size)))
 
         # report count
-        count: int | IntArray
         if dims:
             count = xp.zeros(dims, dtype=xp.int64)
             count = xpx.at(count)[k].set(ngal_sphere[k])
