@@ -59,7 +59,10 @@ def test_broadcast_leading_axes(xp: ModuleType) -> None:
     assert c_out.shape == (3, 4, 5, 6)
 
 
-def test_ndinterp(compare: type[Compare], xp: ModuleType) -> None:
+def test_ndinterp(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # test 1d interpolation
 
     xq = xp.asarray([0, 1, 2, 3, 4])
@@ -144,7 +147,10 @@ def test_ndinterp(compare: type[Compare], xp: ModuleType) -> None:
     )
 
 
-def test_trapezoid_product(compare: type[Compare], xp: ModuleType) -> None:
+def test_trapezoid_product(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     x1 = xp.linspace(0, 2, 100)
     f1 = xp.full_like(x1, 2.0)
 
@@ -156,7 +162,10 @@ def test_trapezoid_product(compare: type[Compare], xp: ModuleType) -> None:
     compare.assert_allclose(s, 1.0)
 
 
-def test_cumulative_trapezoid(compare: type[Compare], xp: ModuleType) -> None:
+def test_cumulative_trapezoid(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # 1D f and x
 
     f = xp.asarray([1, 2, 3, 4])

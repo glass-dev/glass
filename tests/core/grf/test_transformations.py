@@ -11,7 +11,10 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_normal(compare: type[Compare], urng: UnifiedGenerator) -> None:
+def test_normal(
+    compare: type[Compare],
+    urng: UnifiedGenerator,
+) -> None:
     t = glass.grf.Normal()
     x = urng.standard_normal(10)
     compare.assert_array_equal(t(x, 1.0), x)

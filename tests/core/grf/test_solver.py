@@ -33,7 +33,10 @@ def test_one_transformation(
     compare.assert_array_equal(gl1, gl2)
 
 
-def test_pad(cl: FloatArray, rng: np.random.Generator) -> None:
+def test_pad(
+    cl: FloatArray,
+    rng: np.random.Generator,
+) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
@@ -62,7 +65,10 @@ def test_initial(
     compare.assert_array_equal(gl1, gl2)
 
 
-def test_no_iterations(cl: FloatArray, compare: type[Compare]) -> None:
+def test_no_iterations(
+    cl: FloatArray,
+    compare: type[Compare],
+) -> None:
     t = glass.grf.Lognormal()
 
     gl1 = glass.grf.compute(cl, t)
