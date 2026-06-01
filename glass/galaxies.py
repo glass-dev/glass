@@ -148,7 +148,7 @@ def redshifts_from_nz(
                 rng.uniform(0, 1, size=int(count_out[k])),
                 cdf,
                 z_out_slice,
-            )
+            ),
         )
         total += count_out[k]
 
