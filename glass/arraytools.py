@@ -48,7 +48,7 @@ def broadcast_leading_axes(
     xp: ModuleType | None = None,
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[FloatArray, ...], ...],
+    Unpack[tuple[FloatArray, ...]],
 ]:
     """
     Broadcast all but the last N axes.
