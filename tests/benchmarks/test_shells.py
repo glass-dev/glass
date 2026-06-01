@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 def test_radialwindow(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
-    compare: Compare,
+    compare: type[Compare],
 ) -> None:
     """Benchmark for shells.RadialWindow."""
     # check zeff is computed when not provided
