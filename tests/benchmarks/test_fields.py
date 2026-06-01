@@ -150,7 +150,7 @@ def test_cls2cov(
 
     compare.assert_allclose(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
     compare.assert_allclose(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    compare.assert_allclose(cov[:, 2], xpb.asarray(0.0), check_shape=False)
+    compare.assert_allclose(cov[:, 2], xpb.asarray(0.0))
 
 
 @pytest.mark.stable

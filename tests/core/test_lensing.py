@@ -70,7 +70,7 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
 
     compare.assert_array_equal(mat, xp.tril(mat))
-    compare.assert_array_equal(xp.triu(mat, k=1), xp.asarray(0.0), check_shape=False)
+    compare.assert_array_equal(xp.triu(mat, k=1), xp.asarray(0.0))
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -97,7 +97,7 @@ def test_multi_plane_weights(
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
     compare.assert_array_equal(w_out, xp.triu(w_out, k=1))
-    compare.assert_array_equal(xp.tril(w_out), xp.asarray(0.0), check_shape=False)
+    compare.assert_array_equal(xp.tril(w_out), xp.asarray(0.0))
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -165,7 +165,7 @@ def test_deflect_nsew(
         alpha(0, -r, usecomplex=usecomplex),
     )
     compare.assert_allclose(lon, xp.asarray([d, d]), atol=1e-15)
-    compare.assert_allclose(lat, xp.asarray(0.0), atol=1e-15, check_shape=False)
+    compare.assert_allclose(lat, xp.asarray(0.0), atol=1e-15)
 
     # No inputs are arrays and xp not provided
     with pytest.raises(
