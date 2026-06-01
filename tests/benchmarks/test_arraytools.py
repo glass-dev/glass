@@ -80,9 +80,9 @@ def test_cumulative_trapezoid_2d(
     )
     x = xpb.arange(scaled_length)  # [0, 1, 2, 3,...]
 
-    ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
+    expected_first_4_out = [0, 1, 4, 7]
 
-    expected_first_4_out = xpb.asarray([0, 1, 4, 7])
+    ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
 
     # Compare to int64 as old versions of glass round to int64 if `dtype` is not passed.
     compare.assert_allclose(
