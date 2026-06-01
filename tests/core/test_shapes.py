@@ -4,14 +4,13 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 
 if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_triaxial_axis_ratio(
@@ -128,6 +127,7 @@ def test_ellipticity_ryden04(
 
 @pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])
 def test_ellipticity_gaussian(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -189,6 +189,7 @@ def test_ellipticity_gaussian(
 
 
 def test_ellipticity_intnorm(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

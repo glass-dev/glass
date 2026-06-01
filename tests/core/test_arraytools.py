@@ -4,12 +4,12 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass.arraytools
 
 if typing.TYPE_CHECKING:
     from types import ModuleType
+
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_broadcast_first(xp: ModuleType) -> None:
@@ -59,7 +59,10 @@ def test_broadcast_leading_axes(xp: ModuleType) -> None:
     assert c_out.shape == (3, 4, 5, 6)
 
 
-def test_ndinterp(xp: ModuleType) -> None:
+def test_ndinterp(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     # test 1d interpolation
 
     xq = xp.asarray([0, 1, 2, 3, 4])
@@ -148,7 +151,10 @@ def test_ndinterp(xp: ModuleType) -> None:
     )
 
 
-def test_trapezoid_product(xp: ModuleType) -> None:
+def test_trapezoid_product(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     x1 = xp.linspace(0, 2, 100)
     f1 = xp.full_like(x1, 2.0)
 
@@ -160,7 +166,10 @@ def test_trapezoid_product(xp: ModuleType) -> None:
     compare.assert_allclose(s, xp.asarray(1.0))
 
 
-def test_cumulative_trapezoid(xp: ModuleType) -> None:
+def test_cumulative_trapezoid(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     # 1D f and x
 
     f = xp.asarray([1, 2, 3, 4])

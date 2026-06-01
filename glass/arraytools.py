@@ -12,6 +12,8 @@ from glass._array_api_utils import xp_additions as uxpx
 if typing.TYPE_CHECKING:
     from types import ModuleType
 
+    from typing_extensions import Unpack
+
     from glass._types import AnyArray, FloatArray, IntArray
 
 
@@ -46,7 +48,7 @@ def broadcast_leading_axes(
     xp: ModuleType | None = None,
 ) -> tuple[
     tuple[int, ...],
-    *tuple[FloatArray, ...],
+    Unpack[tuple[FloatArray, ...], ...],
 ]:
     """
     Broadcast all but the last N axes.

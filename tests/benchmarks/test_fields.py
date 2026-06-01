@@ -5,8 +5,6 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 import glass.fields
 import glass.healpix as hp
@@ -18,7 +16,7 @@ if typing.TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
-    from tests.fixtures.helper_classes import GeneratorConsumer
+    from tests.fixtures.helper_classes import Compare, GeneratorConsumer
 
 
 @pytest.mark.stable
@@ -104,6 +102,7 @@ def test_iternorm_specify_size(
 @pytest.mark.stable
 def test_iternorm_k_0(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
 ) -> None:
@@ -126,6 +125,7 @@ def test_iternorm_k_0(
 @pytest.mark.stable
 def test_cls2cov(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
 ) -> None:
@@ -185,6 +185,7 @@ def test_generate_grf(
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     generator_consumer: GeneratorConsumer,
     xpb: ModuleType,
     ncorr: int | None,
@@ -219,6 +220,7 @@ def test_generate(
 @pytest.mark.unstable
 def test_getcl_lmax_0(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.getcl with lmax of 0."""
@@ -249,6 +251,7 @@ def test_getcl_lmax_0(
 @pytest.mark.unstable
 def test_getcl_lmax_larger_than_cls(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.getcl with lmax larger than the length of cl."""

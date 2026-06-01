@@ -14,9 +14,11 @@ if typing.TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_nnls(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -54,6 +56,7 @@ def test_nnls(
 
 
 def test_cov_clip(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -77,7 +80,10 @@ def test_cov_clip(
     compare.assert_allclose(xp.linalg.eigvalsh(cov), h, check_shape=False)
 
 
-def test_nearcorr(xp: ModuleType) -> None:
+def test_nearcorr(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     # from Higham (2002)
     a = xp.asarray(
         [

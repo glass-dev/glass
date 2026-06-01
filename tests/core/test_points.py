@@ -13,17 +13,16 @@ import glass.points
 from glass._array_api_utils import xp_additions as uxpx
 
 if typing.TYPE_CHECKING:
-    from collections.abc import Callable
     from types import ModuleType
-    from typing import Any
 
     from pytest_mock import MockerFixture
 
     from glass._types import UnifiedGenerator
-    from tests.fixtures.helper_classes import DataTransformer
+    from tests.fixtures.helper_classes import Compare, DataTransformer
 
 
 def test_effective_bias(
+    compare: Compare,
     mocker: MockerFixture,
     xp: ModuleType,
 ) -> None:
@@ -48,6 +47,7 @@ def test_effective_bias(
 
 
 def test_linear_bias(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -74,6 +74,7 @@ def test_linear_bias(
 
 
 def test_loglinear_bias(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -102,7 +103,10 @@ def test_loglinear_bias(
     )
 
 
-def test_broadcast_inputs(xp: ModuleType) -> None:
+def test_broadcast_inputs(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     bias_in = 0.8
     delta_in = xp.zeros((3, 1, 12))
     ngal_in = xp.asarray([1e-3, 2e-3])
@@ -133,7 +137,7 @@ def test_broadcast_inputs(xp: ModuleType) -> None:
     ],
 )
 def test_compute_density_contrast(
-    bias_model: Callable[..., Any],
+    compare: Compare,
     xp: ModuleType,
 ) -> None:
     bias = 0.8 * xp.ones((3, 2))
@@ -173,7 +177,10 @@ def test_compute_expected_count(
     assert xp.all(n == n[0])
 
 
-def test_apply_visibility(xp: ModuleType) -> None:
+def test_apply_visibility(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     k = (1, 1)
     n_in = 24751.77674965 * xp.ones(12)
     vis = xp.tile(xp.repeat(xp.asarray([0.0, 1.0]), 6), (3, 2, 1))
@@ -188,7 +195,7 @@ def test_apply_visibility(xp: ModuleType) -> None:
     compare.assert_array_equal(n[6:], n_in[6:])
 
 
-def test_sample_number_galaxies(xp: ModuleType) -> None:
+def test_sample_number_galaxies(compare: Compare, xp: ModuleType) -> None:
     n_in = xp.repeat(xp.asarray([0.0, 24751.77674965]), 6)
 
     n = glass.points._sample_number_galaxies(n_in)
@@ -198,6 +205,7 @@ def test_sample_number_galaxies(xp: ModuleType) -> None:
 
 
 def test_sample_number_galaxies_rng(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -234,6 +242,7 @@ def test_sample_galaxies_per_pixel(
 
 
 def test_positions_from_delta(  # noqa: PLR0915
+    compare: Compare,
     data_transformer: DataTransformer,
     urng: UnifiedGenerator,
     xp: ModuleType,
@@ -439,6 +448,7 @@ def test_uniform_positions(
 
 
 def test_position_weights(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -467,7 +477,10 @@ def test_position_weights(
             compare.assert_allclose(weights, expected)
 
 
-def test_displace_arg_complex(xp: ModuleType) -> None:
+def test_displace_arg_complex(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Test displace function with complex-valued displacement."""
     d = 5.0  # deg
     r = d / 180 * math.pi
@@ -493,7 +506,10 @@ def test_displace_arg_complex(xp: ModuleType) -> None:
     compare.assert_allclose(xp.stack([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
 
 
-def test_displace_arg_real(xp: ModuleType) -> None:
+def test_displace_arg_real(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Test displace function with real-valued argument."""
     d = 5.0  # deg
     r = d / 180 * math.pi
@@ -520,6 +536,7 @@ def test_displace_arg_real(xp: ModuleType) -> None:
 
 
 def test_displace_abs(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -543,6 +560,7 @@ def test_displace_abs(
 
 
 def test_displacement(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -588,6 +606,7 @@ def test_displacement(
 
 
 def test_displacement_zerodist(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -602,6 +621,7 @@ def test_displacement_zerodist(
 
 
 def test_displacement_consistent(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -629,6 +649,7 @@ def test_displacement_consistent(
 
 
 def test_displacement_random(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

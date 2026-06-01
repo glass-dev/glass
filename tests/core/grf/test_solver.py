@@ -5,12 +5,11 @@ import typing
 import numpy as np
 import pytest
 
-import array_api_extra as xpx
-
 import glass.grf
 
 if typing.TYPE_CHECKING:
     from glass._types import FloatArray
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.fixture(scope="session")
@@ -22,6 +21,7 @@ def cl() -> FloatArray:
 
 def test_one_transformation(
     cl: FloatArray,
+    compare: Compare,
     rng: np.random.Generator,
 ) -> None:
     lam = rng.random()
@@ -51,6 +51,7 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
+    compare: Compare,
     rng: np.random.Generator,
 ) -> None:
     lam = rng.random()
@@ -64,7 +65,10 @@ def test_initial(
     compare.assert_array_equal(gl1, gl2)
 
 
-def test_no_iterations(cl: FloatArray) -> None:
+def test_no_iterations(
+    cl: FloatArray,
+    compare: Compare,
+) -> None:
     t = glass.grf.Lognormal()
 
     gl1 = glass.grf.compute(cl, t)
@@ -75,6 +79,7 @@ def test_no_iterations(cl: FloatArray) -> None:
 
 def test_lognormal(
     cl: FloatArray,
+    compare: Compare,
     rng: np.random.Generator,
 ) -> None:
     t1 = glass.grf.Lognormal()
@@ -98,6 +103,7 @@ def test_lognormal(
 
 def test_monopole(
     cl: FloatArray,
+    compare: Compare,
     rng: np.random.Generator,
 ) -> None:
     t = glass.grf.Lognormal()

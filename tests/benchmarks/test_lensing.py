@@ -4,8 +4,6 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 
 if typing.TYPE_CHECKING:
@@ -16,11 +14,13 @@ if typing.TYPE_CHECKING:
 
     from glass._types import FloatArray, UnifiedGenerator
     from glass.cosmology import Cosmology
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.stable
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,
@@ -79,6 +79,7 @@ def test_multi_plane_matrix(
 @pytest.mark.stable
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
     xpb: ModuleType,

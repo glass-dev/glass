@@ -4,8 +4,6 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 glass_harmonics = pytest.importorskip(
     "glass.harmonics",
     reason="tests require glass.harmonics",
@@ -17,10 +15,13 @@ if typing.TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
+    from tests.fixtures.helper_classes import Compare
+
 
 @pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.harmonics.multalm."""

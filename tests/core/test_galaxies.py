@@ -4,8 +4,6 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 
 if typing.TYPE_CHECKING:
@@ -14,6 +12,7 @@ if typing.TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_redshifts(
@@ -206,6 +205,7 @@ def test_galaxy_shear(
 
 
 def test_gaussian_phz(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

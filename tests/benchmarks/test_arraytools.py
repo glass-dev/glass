@@ -4,14 +4,14 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass.arraytools
 
 if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
+
+    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.unstable
@@ -44,6 +44,7 @@ def test_broadcast_leading_axes(
 @pytest.mark.unstable
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     xpb: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
@@ -65,6 +66,7 @@ def test_cumulative_trapezoid_1d(
 @pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     xpb: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""

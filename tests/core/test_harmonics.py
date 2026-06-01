@@ -4,15 +4,18 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass.harmonics
 
 if typing.TYPE_CHECKING:
     from types import ModuleType
 
+    from tests.fixtures.helper_classes import Compare
 
-def test_multalm(xp: ModuleType) -> None:
+
+def test_multalm(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     # check output values and shapes
 
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])

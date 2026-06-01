@@ -6,8 +6,6 @@ import typing
 import numpy as np
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 import glass.healpix as hp
 
@@ -15,9 +13,13 @@ if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare
 
 
-def test_vmap_galactic_ecliptic(xp: ModuleType) -> None:
+def test_vmap_galactic_ecliptic(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.vmap_galactic_ecliptic`."""
     n_side = 4
 
@@ -53,6 +55,7 @@ def test_vmap_galactic_ecliptic(xp: ModuleType) -> None:
 
 
 def test_gaussian_nz(
+    compare: Compare,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -87,7 +90,10 @@ def test_gaussian_nz(
     assert nz.shape == (z.shape[0], z.shape[0])
 
 
-def test_smail_nz(xp: ModuleType) -> None:
+def test_smail_nz(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.smail_nz`."""
     alpha = 1
     beta = 1
@@ -100,7 +106,7 @@ def test_smail_nz(xp: ModuleType) -> None:
     compare.assert_array_equal(pz, xp.zeros_like(pz))
 
 
-def test_fixed_zbins_default_xp() -> None:
+def test_fixed_zbins_default_xp(compare: Compare) -> None:
     """Add unit tests for :func:`glass.fixed_zbins` with default xp."""
     zmin = 0.0
     zmax = 1.0
@@ -138,7 +144,10 @@ def test_fixed_zbins_default_xp() -> None:
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
 
 
-def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
+def test_fixed_zbins_xp_provided(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.fixed_zbins`."""
     zmin = 0.0
     zmax = 1.0
@@ -174,7 +183,10 @@ def test_fixed_zbins_xp_provided(xp: ModuleType) -> None:
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz, xp=xp)
 
 
-def test_equal_dens_zbins(xp: ModuleType) -> None:
+def test_equal_dens_zbins(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.equal_dens_zbins`."""
     z = xp.linspace(0, 1, 11)
     nbins = 5
@@ -195,7 +207,10 @@ def test_equal_dens_zbins(xp: ModuleType) -> None:
     assert len(zbins) == nbins
 
 
-def test_tomo_nz_gausserr(xp: ModuleType) -> None:
+def test_tomo_nz_gausserr(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.tomo_nz_gausserr`."""
     sigma_0 = 0.1
     z = xp.linspace(0, 1, 11)

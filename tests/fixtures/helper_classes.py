@@ -20,6 +20,7 @@ if typing.TYPE_CHECKING:
         UnifiedGenerator,
     )
 
+
 class Compare:
     """
     Helper class for array comparisons in tests.
@@ -66,6 +67,7 @@ class Compare:
 def compare() -> type[Compare]:
     """Fixture for array comparison utility."""
     return Compare
+
 
 class DataTransformer:
     """Helper class for transforming various data structures into others."""

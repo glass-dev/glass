@@ -6,8 +6,6 @@ import typing
 import numpy as np
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 import glass.fields
 import glass.healpix as hp
@@ -19,6 +17,7 @@ if typing.TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
+    from tests.fixtures.helper_classes import Compare
 
 HAVE_JAX = importlib.util.find_spec("jax") is not None
 
@@ -142,7 +141,7 @@ def test_iternorm(xp: ModuleType) -> None:
 
 
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
-def test_cls2cov_jax(jnp: ModuleType) -> None:
+def test_cls2cov_jax(compare: Compare, jnp: ModuleType) -> None:
     nl, nf, nc = 3, 3, 2
 
     generator = glass.cls2cov(
@@ -185,7 +184,10 @@ def test_cls2cov_jax(jnp: ModuleType) -> None:
         compare.assert_allclose(cov2, cov3)
 
 
-def test_cls2cov_no_jax(xpb: ModuleType) -> None:
+def test_cls2cov_no_jax(
+    compare: Compare,
+    xpb: ModuleType,
+) -> None:
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
@@ -296,7 +298,7 @@ def test_lognormal_gls(xp: ModuleType) -> None:
     assert out[2].shape[0] == 3
 
 
-def test_discretized_cls(xp: ModuleType) -> None:
+def test_discretized_cls(compare: Compare, xp: ModuleType) -> None:
     # empty cls
 
     result = glass.discretized_cls([])
@@ -344,7 +346,7 @@ def test_discretized_cls(xp: ModuleType) -> None:
         compare.assert_allclose(cl[:n], expected)
 
 
-def test_effective_cls(xp: ModuleType) -> None:
+def test_effective_cls(compare: Compare, xp: ModuleType) -> None:
     # empty cls
 
     result = glass.effective_cls([], xp.asarray([]))
@@ -381,7 +383,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     assert result.shape == (1, 1, 15)
 
 
-def test_generate_grf(xp: ModuleType) -> None:
+def test_generate_grf(compare: Compare, xp: ModuleType) -> None:
     gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
@@ -422,7 +424,10 @@ def test_generate_lognormal(xp: ModuleType) -> None:
     next(result)
 
 
-def test_generate(xp: ModuleType) -> None:
+def test_generate(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
@@ -460,7 +465,10 @@ def test_generate(xp: ModuleType) -> None:
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl(xp: ModuleType) -> None:
+def test_getcl(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     # make a mock Cls array with the index pairs as entries
     cls: AngularPowerSpectra = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -527,8 +535,13 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
         next(it)
 
 
-def test_spectra_indices(xp: ModuleType) -> None:
-    compare.assert_array_equal(glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64))
+def test_spectra_indices(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
+    compare.assert_array_equal(
+        glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64)
+    )
     compare.assert_array_equal(
         glass.spectra_indices(0, xp=xp),
         xp.zeros((0, 2), dtype=xp.int64),
@@ -667,7 +680,10 @@ def test_healpix_to_glass_spectra() -> None:
     assert out == [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
 
 
-def test_glass_to_healpix_alm(xp: ModuleType) -> None:
+def test_glass_to_healpix_alm(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33], dtype=xp.complex128)
     out = glass.fields._glass_to_healpix_alm(inp)
     compare.assert_array_equal(
@@ -676,7 +692,10 @@ def test_glass_to_healpix_alm(xp: ModuleType) -> None:
     )
 
 
-def test_lognormal_shift_hilbert2011(xp: ModuleType) -> None:
+def test_lognormal_shift_hilbert2011(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     zs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
     shifts = xp.asarray([glass.lognormal_shift_hilbert2011(z) for z in zs])
 
@@ -695,7 +714,10 @@ def test_lognormal_shift_hilbert2011(xp: ModuleType) -> None:
     compare.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
-def test_cov_from_spectra(xp: ModuleType) -> None:
+def test_cov_from_spectra(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     spectra: AngularPowerSpectra = [
         xp.asarray(x)
         for x in [

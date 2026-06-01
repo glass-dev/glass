@@ -4,8 +4,6 @@ import typing
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 
 if typing.TYPE_CHECKING:
@@ -13,10 +11,13 @@ if typing.TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
+    from tests.fixtures.helper_classes import Compare
+
 
 @pytest.mark.unstable
 def test_radialwindow(
     benchmark: BenchmarkFixture,
+    compare: Compare,
     xpb: ModuleType,
 ) -> None:
     """Benchmark for shells.RadialWindow."""

@@ -7,8 +7,6 @@ import typing
 import numpy as np
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 from glass._array_api_utils import xp_additions as uxpx
 
@@ -16,9 +14,11 @@ if typing.TYPE_CHECKING:
     from types import ModuleType
 
     from glass.cosmology import Cosmology
+    from tests.fixtures.helper_classes import Compare
 
 
 def test_distance_weight(
+    compare: Compare,
     cosmo: Cosmology,
     xp: ModuleType,
 ) -> None:
@@ -40,6 +40,7 @@ def test_distance_weight(
 
 
 def test_volume_weight(
+    compare: Compare,
     cosmo: Cosmology,
     xp: ModuleType,
 ) -> None:
@@ -60,7 +61,10 @@ def test_volume_weight(
     compare.assert_array_less(w[:-1], w[1:])
 
 
-def test_density_weight(cosmo: Cosmology) -> None:
+def test_density_weight(
+    compare: Compare,
+    cosmo: Cosmology,
+) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
@@ -100,7 +104,10 @@ def test_tophat_windows(xp: ModuleType) -> None:
     assert all(xp.all(w.wa == 1) for w in ws)
 
 
-def test_linear_windows(xp: ModuleType) -> None:
+def test_linear_windows(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.linear_windows`."""
     dz = xp.asarray(1e-2)
     zgrid = xp.asarray(
@@ -149,7 +156,10 @@ def test_linear_windows(xp: ModuleType) -> None:
         glass.linear_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_cubic_windows(xp: ModuleType) -> None:
+def test_cubic_windows(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.cubic_windows`."""
     dz = xp.asarray(1e-2)
     zgrid = xp.asarray(
@@ -198,7 +208,9 @@ def test_cubic_windows(xp: ModuleType) -> None:
         glass.cubic_windows(xp.asarray([0.1, 0.2, 0.3]))
 
 
-def test_restrict(xp: ModuleType) -> None:
+def test_restrict(
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.restrict`."""
     # Gaussian test function
     z = xp.linspace(0.0, 5.0, 1_000)
@@ -233,6 +245,7 @@ def test_restrict(xp: ModuleType) -> None:
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(
+    compare: Compare,
     method: str,
     xp: ModuleType,
 ) -> None:
@@ -338,7 +351,10 @@ def test_redshift_grid(xp: ModuleType) -> None:
         glass.redshift_grid(zmin, zmax, dz=dz, num=num, xp=xp)
 
 
-def test_distance_grid(cosmo: Cosmology) -> None:
+def test_distance_grid(
+    compare: Compare,
+    cosmo: Cosmology,
+) -> None:
     """Add unit tests for :func:`glass.distance_grid`."""
     zmin = 0.0
     zmax = 1.0
@@ -375,7 +391,10 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine(xp: ModuleType) -> None:
+def test_combine(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1_000)
     weights = xp.asarray(
@@ -444,7 +463,10 @@ def test_radial_window_immutable(xp: ModuleType) -> None:
         w.zeff = zeff  # ty: ignore[invalid-assignment]
 
 
-def test_radial_window_zeff_none(xp: ModuleType) -> None:
+def test_radial_window_zeff_none(
+    compare: Compare,
+    xp: ModuleType,
+) -> None:
     """Checks ``zeff`` is computed when not provided to :class:`RadialWindow`."""
     # check zeff is computed when not provided
 
