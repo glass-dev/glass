@@ -71,17 +71,17 @@ def test_ndinterp(
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == ()
-    compare.assert_allclose(y, xp.asarray(1.15), atol=1e-15)
+    compare.assert_allclose(y, 1.15, atol=1e-15)
 
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (3,)
-    compare.assert_allclose(y, xp.asarray([1.15, 1.25, 1.35]), atol=1e-15)
+    compare.assert_allclose(y, [1.15, 1.25, 1.35], atol=1e-15)
 
     x = xp.asarray([[0.5, 1.5], [2.5, 3.5]])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2, 2)
-    compare.assert_allclose(y, xp.asarray([[1.15, 1.25], [1.35, 1.45]]), atol=1e-15)
+    compare.assert_allclose(y, [[1.15, 1.25], [1.35, 1.45]], atol=1e-15)
 
     # test n-dimensional interpolation in final axis
 
@@ -90,14 +90,14 @@ def test_ndinterp(
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2,)
-    compare.assert_allclose(y, xp.asarray([1.15, 2.15]), atol=1e-15)
+    compare.assert_allclose(y, [1.15, 2.15], atol=1e-15)
 
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq)
     assert y.shape == (2, 3)
     compare.assert_allclose(
         y,
-        xp.asarray([[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]]),
+        [[1.15, 1.25, 1.35], [2.15, 2.25, 2.35]],
         atol=1e-15,
     )
 
@@ -106,7 +106,7 @@ def test_ndinterp(
     assert y.shape == (2, 2, 2)
     compare.assert_allclose(
         y,
-        xp.asarray([[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]]),
+        [[[1.15, 1.25], [1.35, 1.45]], [[2.15, 2.25], [2.35, 2.45]]],
         atol=1e-15,
     )
 
@@ -119,14 +119,14 @@ def test_ndinterp(
     x = 0.5
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
     assert y.shape == (2, 1)
-    compare.assert_allclose(y, xp.asarray([[1.15], [2.15]]), atol=1e-15)
+    compare.assert_allclose(y, [[1.15], [2.15]], atol=1e-15)
 
     x = xp.asarray([0.5, 1.5, 2.5])
     y = glass.arraytools.ndinterp(x, xq, yq, axis=1)
     assert y.shape == (2, 3, 1)
     compare.assert_allclose(
         y,
-        xp.asarray([[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]]),
+        [[[1.15], [1.25], [1.35]], [[2.15], [2.25], [2.35]]],
         atol=1e-15,
     )
 
@@ -176,7 +176,7 @@ def test_cumulative_trapezoid(
     x = xp.asarray([0, 1, 2, 3])
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    compare.assert_allclose(ct, xp.asarray([0.0, 1.5, 4.0, 7.5]))
+    compare.assert_allclose(ct, [0.0, 1.5, 4.0, 7.5])
 
     # 2D f and 1D x
     f = xp.asarray([[1, 4, 9, 16], [2, 3, 5, 7]])
@@ -185,5 +185,5 @@ def test_cumulative_trapezoid(
     ct = glass.arraytools.cumulative_trapezoid(f, x)
     compare.assert_allclose(
         ct,
-        xp.asarray([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]),
+        [[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]],
     )
