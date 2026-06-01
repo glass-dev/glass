@@ -38,7 +38,7 @@ def test_nnls(
         x,
         tol=500 * xp.linalg.matrix_norm(a, ord=1) * xp.finfo(xp.float64).eps,
     )
-    xpx.testing.assert_close(res, b, rtol=0.0, atol=1e-10)
+    compare.assert_allclose(res, b, rtol=0.0, atol=1e-10)
 
     # check matrix and vector's shape
 
@@ -74,7 +74,7 @@ def test_cov_clip(
 
     # make sure all eigenvalues are positive
     h = xp.max(xp.linalg.eigvalsh(a))
-    xpx.testing.assert_close(xp.linalg.eigvalsh(cov), h, check_shape=False)
+    compare.assert_allclose(xp.linalg.eigvalsh(cov), h, check_shape=False)
 
 
 def test_nearcorr(xp: ModuleType) -> None:
@@ -95,11 +95,11 @@ def test_nearcorr(xp: ModuleType) -> None:
     )
 
     x = glass.algorithm.nearcorr(a)
-    xpx.testing.assert_close(x, b, atol=1e-4)
+    compare.assert_allclose(x, b, atol=1e-4)
 
     # explicit tolerance
     x = glass.algorithm.nearcorr(a, tol=1e-10)
-    xpx.testing.assert_close(x, b, atol=1e-4)
+    compare.assert_allclose(x, b, atol=1e-4)
 
     # no iterations
     with pytest.warns(
@@ -107,7 +107,7 @@ def test_nearcorr(xp: ModuleType) -> None:
         match="Nearest correlation matrix not found in 0 iterations",
     ):
         x = glass.algorithm.nearcorr(a, niter=0)
-    xpx.testing.assert_close(x, a)
+    compare.assert_allclose(x, a)
 
     # non-square matrix should raise
     with pytest.raises(ValueError, match="non-square matrix"):

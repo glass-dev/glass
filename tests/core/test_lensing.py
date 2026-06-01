@@ -69,8 +69,8 @@ def test_multi_plane_matrix(
 ) -> None:
     mat = glass.multi_plane_matrix(shells, cosmo)
 
-    xpx.testing.assert_equal(mat, xp.tril(mat))
-    xpx.testing.assert_equal(xp.triu(mat, k=1), xp.asarray(0.0), check_shape=False)
+    compare.assert_array_equal(mat, xp.tril(mat))
+    compare.assert_array_equal(xp.triu(mat, k=1), xp.asarray(0.0), check_shape=False)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -83,7 +83,7 @@ def test_multi_plane_matrix(
         if convergence.kappa is not None:
             kappas.append(xp.asarray(convergence.kappa, copy=True))
 
-    xpx.testing.assert_close(mat @ deltas, xp.stack(kappas))
+    compare.assert_allclose(mat @ deltas, xp.stack(kappas))
 
 
 def test_multi_plane_weights(
@@ -95,8 +95,8 @@ def test_multi_plane_weights(
     w_in = xp.eye(len(shells))
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    xpx.testing.assert_equal(w_out, xp.triu(w_out, k=1))
-    xpx.testing.assert_equal(xp.tril(w_out), xp.asarray(0.0), check_shape=False)
+    compare.assert_array_equal(w_out, xp.triu(w_out, k=1))
+    compare.assert_array_equal(xp.tril(w_out), xp.asarray(0.0), check_shape=False)
 
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -114,7 +114,7 @@ def test_multi_plane_weights(
 
     wmat = glass.multi_plane_weights(weights, shells, cosmo)
 
-    xpx.testing.assert_close(uxpx.einsum("ij,ik", wmat, deltas), kappa)
+    compare.assert_allclose(uxpx.einsum("ij,ik", wmat, deltas), kappa)
 
 
 @pytest.mark.parametrize("usecomplex", [True, False])
@@ -135,19 +135,19 @@ def test_deflect_nsew(
 
     # north
     lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([0.0, d]), atol=1e-15)
+    compare.assert_allclose(xp.stack([lon, lat]), xp.asarray([0.0, d]), atol=1e-15)
 
     # south
     lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
+    compare.assert_allclose(xp.stack([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
 
     # east
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
+    compare.assert_allclose(xp.stack([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
 
     # west
     lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
+    compare.assert_allclose(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     # At least one input is an array
     lon, lat = glass.deflect(
@@ -155,15 +155,15 @@ def test_deflect_nsew(
         xp.asarray(0.0),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
+    compare.assert_allclose(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
 
     lon, lat = glass.deflect(
         xp.asarray([0.0, 0.0]),
         xp.asarray([0.0, 0.0]),
         alpha(0, -r, usecomplex=usecomplex),
     )
-    xpx.testing.assert_close(lon, xp.asarray([d, d]), atol=1e-15)
-    xpx.testing.assert_close(lat, xp.asarray(0.0), atol=1e-15, check_shape=False)
+    compare.assert_allclose(lon, xp.asarray([d, d]), atol=1e-15)
+    compare.assert_allclose(lat, xp.asarray(0.0), atol=1e-15, check_shape=False)
 
     # No inputs are arrays and xp not provided
     with pytest.raises(
@@ -191,4 +191,4 @@ def test_deflect_many(
 
     dotp = x * x_ + y * y_ + z * z_
 
-    xpx.testing.assert_close(dotp, xp.cos(abs_alpha))
+    compare.assert_allclose(dotp, xp.cos(abs_alpha))

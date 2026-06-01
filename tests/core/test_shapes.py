@@ -151,36 +151,36 @@ def test_ellipticity_gaussian(
 
     assert eps.shape == (n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
+    compare.assert_array_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
-    xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    compare.assert_allclose(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    compare.assert_allclose(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
 
     eps = glass.ellipticity_gaussian(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
+    compare.assert_array_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.real(eps)[:n]),
         xp.asarray(0.128),
         atol=1e-3,
         rtol=0,
     )
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.imag(eps)[:n]),
         xp.asarray(0.128),
         atol=1e-3,
         rtol=0,
     )
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.real(eps)[n:]),
         xp.asarray(0.256),
         atol=1e-3,
         rtol=0,
     )
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.imag(eps)[n:]),
         xp.asarray(0.256),
         atol=1e-3,
@@ -212,36 +212,36 @@ def test_ellipticity_intnorm(
 
     assert eps.shape == (n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
+    compare.assert_array_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
-    xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    compare.assert_allclose(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    compare.assert_allclose(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
 
     eps = glass.ellipticity_intnorm(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
+    compare.assert_array_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.real(eps)[:n]),
         xp.asarray(0.128),
         atol=1e-3,
         rtol=0,
     )
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.imag(eps)[:n]),
         xp.asarray(0.128),
         atol=1e-3,
         rtol=0,
     )
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.real(eps)[n:]),
         xp.asarray(0.256),
         atol=1e-3,
         rtol=0,
     )
-    xpx.testing.assert_close(
+    compare.assert_allclose(
         xp.std(xp.imag(eps)[n:]),
         xp.asarray(0.256),
         atol=1e-3,

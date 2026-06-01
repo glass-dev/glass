@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
 def test_normal(urng: UnifiedGenerator) -> None:
     t = glass.grf.Normal()
     x = urng.standard_normal(10)
-    xpx.testing.assert_equal(t(x, 1.0), x)
+    compare.assert_array_equal(t(x, 1.0), x)
 
 
 def test_lognormal(
@@ -27,7 +27,7 @@ def test_lognormal(
         t = glass.grf.Lognormal(lam)
         x = urng.standard_normal(10)
         y = lam * xp.expm1(x - var / 2)
-        xpx.testing.assert_equal(t(x, var), y)
+        compare.assert_array_equal(t(x, var), y)
 
 
 def test_sqnormal(
@@ -40,7 +40,7 @@ def test_sqnormal(
         t = glass.grf.SquaredNormal(a, lam)
         x = urng.standard_normal(10)
         y = lam * ((x - a) ** 2 - 1)
-        xpx.testing.assert_equal(t(x, var), y)
+        compare.assert_array_equal(t(x, var), y)
 
 
 def test_normal_normal(
@@ -50,9 +50,9 @@ def test_normal_normal(
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()
     x = urng.random(10)
-    xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), x)
-    xpx.testing.assert_equal(glass.grf.icorr(t1, t2, x), x)
-    xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), x)
+    compare.assert_array_equal(glass.grf.icorr(t1, t2, x), x)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), xp.ones_like(x))
 
 
 def test_lognormal_lognormal(
@@ -69,9 +69,9 @@ def test_lognormal_lognormal(
     y = lam1 * lam2 * xp.expm1(x)
     dy = lam1 * lam2 * xp.exp(x)
 
-    xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), y)
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
     xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x)
-    xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), dy)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
 def test_lognormal_normal(
@@ -87,9 +87,9 @@ def test_lognormal_normal(
     y = lam1 * x
     dy = lam1 * xp.ones_like(x)
 
-    xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), y)
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
     xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x)
-    xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), dy)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)
 
 
 def test_sqnormal_sqnormal(
@@ -109,6 +109,6 @@ def test_sqnormal_sqnormal(
     y = 2 * lam1 * lam2 * x * (x + 2 * a1 * a2)
     dy = 4 * lam1 * lam2 * (x + a1 * a2)
 
-    xpx.testing.assert_equal(glass.grf.corr(t1, t2, x), y)
+    compare.assert_array_equal(glass.grf.corr(t1, t2, x), y)
     xpx.testing.assert_close_nulp(glass.grf.icorr(t1, t2, y), x, nulp=8)
-    xpx.testing.assert_equal(glass.grf.dcorr(t1, t2, x), dy)
+    compare.assert_array_equal(glass.grf.dcorr(t1, t2, x), dy)

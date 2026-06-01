@@ -22,9 +22,9 @@ def test_multalm(xp: ModuleType) -> None:
     result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([2.0, 1.0, 1.5, 4.0, 5.0, 6.0])
-    xpx.testing.assert_close(result, expected_result)
+    compare.assert_allclose(result, expected_result)
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        xpx.testing.assert_close(alm_copy, result)
+        compare.assert_allclose(alm_copy, result)
 
     # multiple with 1s
 
@@ -32,7 +32,7 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.ones(3)
 
     result = glass.harmonics.multalm(alm, bl)
-    xpx.testing.assert_close(result, alm)
+    compare.assert_allclose(result, alm)
 
     # multiple with 0s
 
@@ -41,7 +41,7 @@ def test_multalm(xp: ModuleType) -> None:
     result = glass.harmonics.multalm(alm, bl)
 
     expected_result = xp.asarray([0.0, 2.0, 3.0, 0.0, 0.0, 0.0])
-    xpx.testing.assert_close(result, expected_result)
+    compare.assert_allclose(result, expected_result)
 
     # empty arrays
 
@@ -49,4 +49,4 @@ def test_multalm(xp: ModuleType) -> None:
     bl = xp.asarray([])
 
     result = glass.harmonics.multalm(alm, bl)
-    xpx.testing.assert_close(result, alm)
+    compare.assert_allclose(result, alm)

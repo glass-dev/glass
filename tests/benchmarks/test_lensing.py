@@ -38,8 +38,8 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
     deltas = urngb.random((len(shells), 10))
 
-    xpx.testing.assert_equal(mat, xpb.tril(mat))
-    xpx.testing.assert_equal(xpb.triu(mat, k=1), xpb.asarray(0.0), check_shape=False)
+    compare.assert_array_equal(mat, xpb.tril(mat))
+    compare.assert_array_equal(xpb.triu(mat, k=1), xpb.asarray(0.0), check_shape=False)
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
@@ -99,8 +99,8 @@ def test_multi_plane_weights(
 
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    xpx.testing.assert_equal(w_out, xpb.triu(w_out, 1))
-    xpx.testing.assert_equal(xpb.tril(w_out), xpb.asarray(0.0), check_shape=False)
+    compare.assert_array_equal(w_out, xpb.triu(w_out, 1))
+    compare.assert_array_equal(xpb.tril(w_out), xpb.asarray(0.0), check_shape=False)
 
     def setup_shells_deltas_and_weights() -> tuple[
         tuple[

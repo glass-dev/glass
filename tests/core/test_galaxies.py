@@ -218,13 +218,13 @@ def test_gaussian_phz(
 
     phz = glass.gaussian_phz(z, sigma_0)
 
-    xpx.testing.assert_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # test with rng
 
     phz = glass.gaussian_phz(z, sigma_0, rng=urng)
 
-    xpx.testing.assert_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # case: truncated normal
 
@@ -270,7 +270,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    xpx.testing.assert_equal(z, phz)
+    compare.assert_array_equal(z, phz)
 
     # case: scalar redshift, array sigma_0
 
@@ -281,7 +281,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    xpx.testing.assert_equal(xp.broadcast_to(xp.asarray(1.0), phz.shape), phz)
+    compare.assert_array_equal(xp.broadcast_to(xp.asarray(1.0), phz.shape), phz)
 
     # case: array redshift, array sigma_0
 
@@ -292,7 +292,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (11, 10)
-    xpx.testing.assert_equal(xp.broadcast_to(z, (11, 10)), phz)
+    compare.assert_array_equal(xp.broadcast_to(z, (11, 10)), phz)
 
     # shape mismatch
 

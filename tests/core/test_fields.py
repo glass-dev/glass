@@ -175,14 +175,14 @@ def test_cls2cov_jax(jnp: ModuleType) -> None:
     assert cov3.dtype == jnp.float64
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    xpx.testing.assert_close(cov1[:, 0], jnp.asarray([0.5, 0.25, 0.15]))
+    compare.assert_allclose(cov1[:, 0], jnp.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        xpx.testing.assert_close(cov1, cov2)
+        compare.assert_allclose(cov1, cov2)
 
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        xpx.testing.assert_close(cov2, cov3)
+        compare.assert_allclose(cov2, cov3)
 
 
 def test_cls2cov_no_jax(xpb: ModuleType) -> None:
@@ -201,9 +201,9 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    xpx.testing.assert_close(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
-    xpx.testing.assert_close(cov[:, 1], xpb.asarray(0.0), check_shape=False)
-    xpx.testing.assert_close(cov[:, 2], xpb.asarray(0.0), check_shape=False)
+    compare.assert_allclose(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
+    compare.assert_allclose(cov[:, 1], xpb.asarray(0.0), check_shape=False)
+    compare.assert_allclose(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
     # test negative value error
 
@@ -259,19 +259,19 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     assert cov3.dtype == xpb.float64
 
     # cov1|2|3 reuse the same data, so should all equal the third result
-    xpx.testing.assert_close(cov1[:, 0], xpb.asarray([0.45, 0.25, 0.15]))
-    xpx.testing.assert_close(cov1, cov2)
-    xpx.testing.assert_close(cov2, cov3)
+    compare.assert_allclose(cov1[:, 0], xpb.asarray([0.45, 0.25, 0.15]))
+    compare.assert_allclose(cov1, cov2)
+    compare.assert_allclose(cov2, cov3)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    xpx.testing.assert_close(cov1_copy[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
+    compare.assert_allclose(cov1_copy[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        xpx.testing.assert_close(cov1_copy, cov2_copy)
+        compare.assert_allclose(cov1_copy, cov2_copy)
 
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        xpx.testing.assert_close(cov2_copy, cov3)
+        compare.assert_allclose(cov2_copy, cov3)
 
 
 def test_lognormal_gls(xp: ModuleType) -> None:
@@ -341,7 +341,7 @@ def test_discretized_cls(xp: ModuleType) -> None:
     for cl in result:
         n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
         expected = xp.ones(n) * pw[:n] ** 2
-        xpx.testing.assert_close(cl[:n], expected)
+        compare.assert_allclose(cl[:n], expected)
 
 
 def test_effective_cls(xp: ModuleType) -> None:
@@ -373,7 +373,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    xpx.testing.assert_close(result[..., 6:], xp.asarray(0.0), check_shape=False)
+    compare.assert_allclose(result[..., 6:], xp.asarray(0.0), check_shape=False)
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -404,7 +404,7 @@ def test_generate_grf(xp: ModuleType) -> None:
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
-    xpx.testing.assert_close(new_gaussian_fields[0], gaussian_fields[0])
+    compare.assert_allclose(new_gaussian_fields[0], gaussian_fields[0])
 
     with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([xp.asarray([])], nside))
@@ -457,7 +457,7 @@ def test_generate(xp: ModuleType) -> None:
 
     result = list(glass.generate(fields, gls, nside=nside))
 
-    xpx.testing.assert_close(result[1], result[0] ** 2, atol=1e-05)
+    compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
 def test_getcl(xp: ModuleType) -> None:
@@ -472,19 +472,19 @@ def test_getcl(xp: ModuleType) -> None:
         for j in range(10):
             result = glass.getcl(cls, i, j)
             expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
-            xpx.testing.assert_close(xp.sort(result), expected)
+            compare.assert_allclose(xp.sort(result), expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
             assert result.shape[0] == 1
-            xpx.testing.assert_close(result, expected)
+            compare.assert_allclose(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
             assert result.shape[0] == 51
-            xpx.testing.assert_close(result[2:], expected)
+            compare.assert_allclose(result[2:], expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]) -> None:
@@ -528,17 +528,17 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 
 
 def test_spectra_indices(xp: ModuleType) -> None:
-    xpx.testing.assert_equal(glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64))
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64))
+    compare.assert_array_equal(
         glass.spectra_indices(0, xp=xp),
         xp.zeros((0, 2), dtype=xp.int64),
     )
-    xpx.testing.assert_equal(glass.spectra_indices(1, xp=xp), xp.asarray([[0, 0]]))
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(glass.spectra_indices(1, xp=xp), xp.asarray([[0, 0]]))
+    compare.assert_array_equal(
         glass.spectra_indices(2, xp=xp),
         xp.asarray([[0, 0], [1, 1], [1, 0]]),
     )
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(
         glass.spectra_indices(3, xp=xp),
         xp.asarray([[0, 0], [1, 1], [1, 0], [2, 2], [2, 1], [2, 0]]),
     )
@@ -670,7 +670,7 @@ def test_healpix_to_glass_spectra() -> None:
 def test_glass_to_healpix_alm(xp: ModuleType) -> None:
     inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33], dtype=xp.complex128)
     out = glass.fields._glass_to_healpix_alm(inp)
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(
         out,
         xp.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33], dtype=xp.complex128),
     )
@@ -692,7 +692,7 @@ def test_lognormal_shift_hilbert2011(xp: ModuleType) -> None:
         0.1568,
     ])
 
-    xpx.testing.assert_close(shifts, check, atol=1e-4, rtol=1e-4)
+    compare.assert_allclose(shifts, check, atol=1e-4, rtol=1e-4)
 
 
 def test_cov_from_spectra(xp: ModuleType) -> None:
@@ -708,7 +708,7 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
         ]
     ]
 
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(
         glass.cov_from_spectra(spectra),
         xp.asarray([
             [
@@ -734,7 +734,7 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
         ]),
     )
 
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(
         glass.cov_from_spectra(spectra, lmax=1),
         xp.asarray([
             [
@@ -750,7 +750,7 @@ def test_cov_from_spectra(xp: ModuleType) -> None:
         ]),
     )
 
-    xpx.testing.assert_equal(
+    compare.assert_array_equal(
         glass.cov_from_spectra(spectra, lmax=4),
         xp.asarray([
             [
