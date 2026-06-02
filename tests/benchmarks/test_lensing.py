@@ -15,8 +15,14 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
+    from glass._types import UnifiedGenerator
 
-def test_lensing(benchmark: BenchmarkFixture, xp: ModuleType, urng):
+
+def test_lensing(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Benchmark for a realistic example lensing simulation."""
     # cosmology for the simulation
     h = 0.7
@@ -73,7 +79,7 @@ def test_lensing(benchmark: BenchmarkFixture, xp: ModuleType, urng):
     # distribute dN/dz over the radial window functions
     ngal = glass.partition(z, dndz, shells)
 
-    def function_to_benchmark():
+    def function_to_benchmark() -> None:
         # the integrated convergence and shear field over the redshift distribution
         kappa_bar = xp.zeros(12 * nside**2)
         gamm1_bar = xp.zeros(12 * nside**2)
@@ -99,7 +105,5 @@ def test_lensing(benchmark: BenchmarkFixture, xp: ModuleType, urng):
         kappa_bar /= ngal.sum()
         gamm1_bar /= ngal.sum()
         gamm2_bar /= ngal.sum()
-
-        return kappa_bar, gamm1_bar, gamm2_bar
 
     benchmark(function_to_benchmark)
