@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 @pytest.mark.stable
 def test_iternorm_no_size(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with default value for size."""
@@ -52,7 +52,7 @@ def test_iternorm_no_size(
 @pytest.mark.parametrize("num_dimensions", [1, 2])
 def test_iternorm_specify_size(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     num_dimensions: int,
 ) -> None:
@@ -104,7 +104,7 @@ def test_iternorm_specify_size(
 @pytest.mark.stable
 def test_iternorm_k_0(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.iternorm with k set to 0."""
@@ -126,7 +126,7 @@ def test_iternorm_k_0(
 @pytest.mark.stable
 def test_cls2cov(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
     """Benchmarks for glass.cls2cov."""
@@ -158,7 +158,7 @@ def test_cls2cov(
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
@@ -185,7 +185,7 @@ def test_generate_grf(
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     ncorr: int | None,
 ) -> None:

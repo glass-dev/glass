@@ -210,7 +210,7 @@ def test_sample_number_galaxies_rng(
 
 
 def test_sample_galaxies_per_pixel(
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     xp: ModuleType,
 ) -> None:
     batch = 1000000
@@ -234,7 +234,7 @@ def test_sample_galaxies_per_pixel(
 
 
 def test_positions_from_delta(  # noqa: PLR0915
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -386,7 +386,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
 
 def test_uniform_positions(
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

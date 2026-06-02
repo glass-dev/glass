@@ -20,6 +20,7 @@ Functions
 from __future__ import annotations
 
 import math
+import typing
 import warnings
 from typing import TYPE_CHECKING
 
@@ -154,7 +155,7 @@ def redshifts_from_nz(
 
     assert total == redshifts.size  # noqa: S101
 
-    return redshifts  # ty: ignore[invalid-return-type]
+    return typing.cast("FloatArray", redshifts)
 
 
 def galaxy_shear(  # noqa: PLR0913

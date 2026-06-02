@@ -48,6 +48,7 @@ from __future__ import annotations
 import dataclasses
 import itertools
 import math
+import typing
 import warnings
 from typing import TYPE_CHECKING
 
@@ -526,7 +527,7 @@ def restrict(
         left=0.0,
         right=0.0,
     ) * glass.arraytools.ndinterp(zr, w.za, w.wa)
-    return zr, fr  # ty: ignore[invalid-return-type]
+    return typing.cast("FloatArray", zr), typing.cast("FloatArray", fr)
 
 
 def partition(

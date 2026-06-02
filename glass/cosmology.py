@@ -1,6 +1,6 @@
 """Module for cosmology.api utilities."""
 
-from typing import Protocol
+import typing
 
 import cosmology.api
 
@@ -18,6 +18,6 @@ class Cosmology(
     cosmology.api.HasOmegaM0[AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasOmegaM[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasTransverseComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
-    Protocol,
+    typing.Protocol,
 ):
     """Cosmology protocol for GLASS."""
