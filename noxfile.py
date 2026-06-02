@@ -25,7 +25,7 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
-REGRESSION_TESTS_LOC = pathlib.Path("tests/regression")
+REG_TESTS_LOC = pathlib.Path("tests/regression")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 SHARED_PYTEST_BENCHMARK_FLAGS = [
     "--benchmark-calibration-precision=1000",
@@ -129,7 +129,7 @@ def coverage_regression(session: nox.Session) -> None:
     _setup_array_backend(session)
     session.run(
         "pytest",
-        REGRESSION_TESTS_LOC,
+        REG_TESTS_LOC,
         "--cov",
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs,
@@ -263,7 +263,7 @@ def regression_tests(session: nox.Session) -> None:
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
-        REGRESSION_TESTS_LOC,
+        REG_TESTS_LOC,
         "--benchmark-autosave",
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs[2:],
@@ -274,7 +274,7 @@ def regression_tests(session: nox.Session) -> None:
     session.log("Running stable regression tests")
     session.run(
         "pytest",
-        REGRESSION_TESTS_LOC,
+        REG_TESTS_LOC,
         "-m",
         "stable",
         "--benchmark-compare=0001",
@@ -286,7 +286,7 @@ def regression_tests(session: nox.Session) -> None:
     session.log("Running unstable regression tests")
     session.run(
         "pytest",
-        REGRESSION_TESTS_LOC,
+        REG_TESTS_LOC,
         "-m",
         "unstable",
         "--benchmark-compare=0001",
