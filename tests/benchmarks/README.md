@@ -21,7 +21,7 @@ source .venv-benchmark/bin/activate
 uv sync --active --group benchmarks
 ```
 
-Now you should be able to run the benchmarks
+Now you should be able to run the benchmarks with the following command.
 
 ```sh
 .venv-benchmark/bin/python -m pytest tests/benchmarks \
@@ -31,6 +31,12 @@ Now you should be able to run the benchmarks
     --benchmark-sort=name                             \
     --benchmark-timer=time.process_time 
 ```
+
+### Benchmarking a cluster
+
+To get a reliable benchmark, you should run your job on an exlusive node of
+the machine you are benchmarking. You can do this either via an interactive
+session or through submitting a job to the queue system.
 
 ## Setting up UV on Archer2
 
