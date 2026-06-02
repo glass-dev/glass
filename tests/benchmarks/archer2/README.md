@@ -54,7 +54,7 @@ of the GLASS repo.
 ### Example execution
 
 If I wished to to run a test to check for regressions from `main` to my feature
-branch `feature` usign the budget from account code `myaccount`, I could run the
+branch `feature` using the budget from account code `myaccount`, I could run the
 following command from the root of the glass repo.
 
 ```sh
