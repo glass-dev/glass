@@ -5,7 +5,8 @@ For a more consistent regression testing environment we have been trialing using
 
 ## Setting up
 
-1. **Install uv:** Follow the instructions for [Setting up UV on Archer2](../../benchmarks/README.md#setting-up-uv-on-archer2).
+1. **Install uv:** Follow the instructions for
+   [Setting up UV on Archer2](../../benchmarks/README.md#setting-up-uv-on-archer2).
 
 2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2:
 
