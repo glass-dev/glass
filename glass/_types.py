@@ -1,8 +1,9 @@
+import typing
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import ParamSpec, TypeAlias, TypeVar
+    from typing import TypeAlias
 
     import jaxtyping
     import numpy as np
@@ -13,9 +14,9 @@ if TYPE_CHECKING:
     import glass.jax
     from glass import _rng
 
-    P = ParamSpec("P")
-    R = TypeVar("R")
-    T = TypeVar("T")
+    P = typing.ParamSpec("P")
+    R = typing.TypeVar("R")
+    T = typing.TypeVar("T")
 
     AnyArray: TypeAlias = np.typing.NDArray[Any] | jaxtyping.Array | Array
     ComplexArray: TypeAlias = np.typing.NDArray[np.complex128] | jaxtyping.Array | Array

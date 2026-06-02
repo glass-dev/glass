@@ -140,7 +140,10 @@ def test_iternorm(xp: ModuleType) -> None:
 
 
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
-def test_cls2cov_jax(compare: type[Compare], jnp: ModuleType) -> None:
+def test_cls2cov_jax(
+    compare: type[Compare],
+    jnp: ModuleType,
+) -> None:
     nl, nf, nc = 3, 3, 2
 
     generator = glass.cls2cov(
@@ -183,7 +186,10 @@ def test_cls2cov_jax(compare: type[Compare], jnp: ModuleType) -> None:
         compare.assert_allclose(cov2, cov3)
 
 
-def test_cls2cov_no_jax(compare: type[Compare], xpb: ModuleType) -> None:
+def test_cls2cov_no_jax(
+    compare: type[Compare],
+    xpb: ModuleType,
+) -> None:
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
@@ -294,7 +300,10 @@ def test_lognormal_gls(xp: ModuleType) -> None:
     assert out[2].shape[0] == 3
 
 
-def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
+def test_discretized_cls(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # empty cls
 
     result = glass.discretized_cls([])
@@ -342,7 +351,10 @@ def test_discretized_cls(compare: type[Compare], xp: ModuleType) -> None:
         compare.assert_allclose(cl[:n], expected)
 
 
-def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
+def test_effective_cls(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # empty cls
 
     result = glass.effective_cls([], xp.asarray([]))
@@ -379,7 +391,10 @@ def test_effective_cls(compare: type[Compare], xp: ModuleType) -> None:
     assert result.shape == (1, 1, 15)
 
 
-def test_generate_grf(compare: type[Compare], xp: ModuleType) -> None:
+def test_generate_grf(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
@@ -420,7 +435,10 @@ def test_generate_lognormal(xp: ModuleType) -> None:
     next(result)
 
 
-def test_generate(compare: type[Compare], xp: ModuleType) -> None:
+def test_generate(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
@@ -458,7 +476,10 @@ def test_generate(compare: type[Compare], xp: ModuleType) -> None:
     compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
-def test_getcl(compare: type[Compare], xp: ModuleType) -> None:
+def test_getcl(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # make a mock Cls array with the index pairs as entries
     cls: AngularPowerSpectra = [
         xp.asarray([i, j], dtype=xp.float64)
@@ -503,7 +524,10 @@ def test_nfields_from_nspectra(not_triangle_numbers: list[int]) -> None:
             glass.nfields_from_nspectra(t)
 
 
-def test_enumerate_spectra(compare: type[Compare], xp: ModuleType) -> None:
+def test_enumerate_spectra(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     n = 100
     tn = n * (n + 1) // 2
 
@@ -525,12 +549,16 @@ def test_enumerate_spectra(compare: type[Compare], xp: ModuleType) -> None:
         next(it)
 
 
-def test_spectra_indices(compare: type[Compare], xp: ModuleType) -> None:
+def test_spectra_indices(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     compare.assert_array_equal(glass.spectra_indices(0), xp.zeros((0, 2)))
     compare.assert_array_equal(glass.spectra_indices(0, xp=xp), xp.zeros((0, 2)))
     compare.assert_array_equal(glass.spectra_indices(1, xp=xp), [[0, 0]])
     compare.assert_array_equal(
-        glass.spectra_indices(2, xp=xp), [[0, 0], [1, 1], [1, 0]]
+        glass.spectra_indices(2, xp=xp),
+        [[0, 0], [1, 1], [1, 0]],
     )
     compare.assert_array_equal(
         glass.spectra_indices(3, xp=xp),
@@ -564,7 +592,10 @@ def test_lognormal_fields(xp: ModuleType) -> None:
     assert [f.lamda for f in fields] == [1, 4, 9]
 
 
-def test_compute_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
+def test_compute_gaussian_spectra(
+    mocker: MockerFixture,
+    xp: ModuleType,
+) -> None:
     mock = mocker.patch("glass.grf.compute")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
@@ -583,7 +614,10 @@ def test_compute_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None
         glass.compute_gaussian_spectra(fields, spectra[:2])
 
 
-def test_compute_gaussian_spectra_gh639(mocker: MockerFixture, xp: ModuleType) -> None:
+def test_compute_gaussian_spectra_gh639(
+    mocker: MockerFixture,
+    xp: ModuleType,
+) -> None:
     """Test compute_gaussian_spectra() with an empty input."""
     mock = mocker.patch("glass.grf.compute")
 
@@ -599,7 +633,10 @@ def test_compute_gaussian_spectra_gh639(mocker: MockerFixture, xp: ModuleType) -
     assert gls[2].shape[0] == 0
 
 
-def test_solve_gaussian_spectra(mocker: MockerFixture, xp: ModuleType) -> None:
+def test_solve_gaussian_spectra(
+    mocker: MockerFixture,
+    xp: ModuleType,
+) -> None:
     mock = mocker.patch("glass.grf.solve")
 
     result = mock.return_value
@@ -652,7 +689,10 @@ def test_healpix_to_glass_spectra(compare: type[Compare]) -> None:
     compare.assert_array_equal(out, [11, 22, 21, 33, 32, 31, 44, 43, 42, 41])
 
 
-def test_glass_to_healpix_alm(compare: type[Compare], xp: ModuleType) -> None:
+def test_glass_to_healpix_alm(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33], dtype=xp.complex128)
     out = glass.fields._glass_to_healpix_alm(inp)
     compare.assert_array_equal(

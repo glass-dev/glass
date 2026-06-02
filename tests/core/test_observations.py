@@ -16,7 +16,10 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_vmap_galactic_ecliptic(compare: type[Compare], xp: ModuleType) -> None:
+def test_vmap_galactic_ecliptic(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.vmap_galactic_ecliptic`."""
     n_side = 4
 
@@ -83,7 +86,10 @@ def test_gaussian_nz(
     assert nz.shape == (z.shape[0], z.shape[0])
 
 
-def test_smail_nz(compare: type[Compare], xp: ModuleType) -> None:
+def test_smail_nz(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.smail_nz`."""
     alpha = 1
     beta = 1
@@ -134,7 +140,10 @@ def test_fixed_zbins_default_xp(compare: type[Compare]) -> None:
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz)
 
 
-def test_fixed_zbins_xp_provided(compare: type[Compare], xp: ModuleType) -> None:
+def test_fixed_zbins_xp_provided(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.fixed_zbins`."""
     zmin = 0.0
     zmax = 1.0
@@ -170,7 +179,10 @@ def test_fixed_zbins_xp_provided(compare: type[Compare], xp: ModuleType) -> None
         glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=dz, xp=xp)
 
 
-def test_equal_dens_zbins(compare: type[Compare], xp: ModuleType) -> None:
+def test_equal_dens_zbins(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.equal_dens_zbins`."""
     z = xp.linspace(0, 1, 11)
     nbins = 5
@@ -191,7 +203,10 @@ def test_equal_dens_zbins(compare: type[Compare], xp: ModuleType) -> None:
     assert len(zbins) == nbins
 
 
-def test_tomo_nz_gausserr(compare: type[Compare], xp: ModuleType) -> None:
+def test_tomo_nz_gausserr(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.tomo_nz_gausserr`."""
     sigma_0 = 0.1
     z = xp.linspace(0, 1, 11)

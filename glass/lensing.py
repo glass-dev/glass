@@ -31,7 +31,8 @@ Applying lensing
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, overload
+import typing
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
@@ -50,21 +51,21 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
     *,
-    potential: Literal[False],
-    deflection: Literal[False],
-    shear: Literal[False],
+    potential: Literal[False] = False,
+    deflection: Literal[False] = False,
+    shear: Literal[False] = False,
     discretized: bool = True,
 ) -> tuple[()]:
     # returns empty tuple
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -78,7 +79,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -92,7 +93,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -106,7 +107,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -123,7 +124,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -140,7 +141,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -157,7 +158,7 @@ def from_convergence(
     ...
 
 
-@overload
+@typing.overload
 def from_convergence(
     kappa: FloatArray,
     lmax: int | None = None,
@@ -625,7 +626,7 @@ def multi_plane_matrix(
     for i, w in enumerate(shells):
         mpc.add_window(xp.asarray(wmat[i, :], copy=True), w)
         wmat = xpx.at(wmat)[i, :].set(mpc.kappa)
-    return wmat  # ty:ignore[invalid-return-type]
+    return typing.cast("FloatArray", wmat)
 
 
 def multi_plane_weights(

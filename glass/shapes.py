@@ -25,6 +25,7 @@ Utilities
 from __future__ import annotations
 
 import math
+import typing
 from typing import TYPE_CHECKING
 
 import array_api_compat
@@ -282,7 +283,7 @@ def ellipticity_gaussian(
         eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
-    return eps  # ty:ignore[invalid-return-type]
+    return typing.cast("ComplexArray", eps)
 
 
 def ellipticity_intnorm(
@@ -361,4 +362,4 @@ def ellipticity_intnorm(
         eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
-    return eps  # ty:ignore[invalid-return-type]
+    return typing.cast("ComplexArray", eps)

@@ -15,7 +15,10 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
+def test_redshifts(
+    mocker: MockerFixture,
+    xp: ModuleType,
+) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = xp.linspace(0.0, 1.0, 20)
@@ -32,7 +35,10 @@ def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
+def test_redshifts_from_nz(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # test sampling
 
     redshifts = glass.redshifts_from_nz(

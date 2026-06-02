@@ -5,6 +5,7 @@ from __future__ import annotations
 import itertools
 import math
 import sys
+import typing
 import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
@@ -226,7 +227,7 @@ def cls2cov(
             cov = xpx.at(cov)[:n, i].set(cl)
             cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
-        yield cov  # ty:ignore[invalid-yield]
+        yield typing.cast("FloatArray", cov)
 
 
 def discretized_cls(
@@ -551,7 +552,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.shape[0]))
-    return cl  # ty: ignore[invalid-return-type]
+    return typing.cast("FloatArray", cl)
 
 
 def enumerate_spectra(
@@ -662,7 +663,8 @@ def effective_cls(
         itertools.combinations_with_replacement(uxpx.ndindex(shape1[1:], xp=xp), 2)
         if weights2 is weights1
         else itertools.product(
-            uxpx.ndindex(shape1[1:], xp=xp), uxpx.ndindex(shape2[1:], xp=xp)
+            uxpx.ndindex(shape1[1:], xp=xp),
+            uxpx.ndindex(shape2[1:], xp=xp),
         )
     )
 
@@ -684,7 +686,7 @@ def effective_cls(
         out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
             out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
-    return out  # ty:ignore[invalid-return-type]
+    return typing.cast("FloatArray", out)
 
 
 def gaussian_fields(
@@ -1022,7 +1024,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return cov  # ty:ignore[invalid-return-type]
+    return typing.cast("AnyArray", cov)
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
