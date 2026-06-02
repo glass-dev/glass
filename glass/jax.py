@@ -13,8 +13,9 @@ import jax.scipy
 import jax.typing
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from jaxtyping import PRNGKeyArray
-    from typing_extensions import Self
 
     from glass._types import AnyArray, DTypeLike, FloatArray, IntArray
 
