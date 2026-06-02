@@ -35,7 +35,7 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.12
+    rev: v0.15.14
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -80,7 +80,7 @@ repos:
           - --external-sources
           - --shell=bash
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.23.1
+    rev: v1.25.2
     hooks:
       - id: zizmor
         args:
