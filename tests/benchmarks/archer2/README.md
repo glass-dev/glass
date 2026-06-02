@@ -24,7 +24,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    EOF
    ```
 
-   and simlarly
+   and similarly
 
    ```sh
    cat <<'EOF' >> "${HOME/home/work}/.profile"
@@ -36,8 +36,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    Now when you next login to archer2, uv will be in your path and you will be
    on the `/work` partition as your `HOME` dir.
 
-2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2 -
-   `/work/<budget-code>/<budget-code>/<user-id>`
+2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2:
 
    ```sh
    cd "${HOME/home/work}"
