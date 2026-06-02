@@ -26,7 +26,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 
    ```sh
    export HOME="${HOME/home/work}"
-   source "$HOME/.local/env"
+   source "$HOME/.local/bin/env"
    ```
 
    Now when you next login to archer2, uv will be in your path and you will be
