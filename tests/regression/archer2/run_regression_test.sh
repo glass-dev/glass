@@ -1,22 +1,22 @@
 #!/bin/bash -l
 # shellcheck disable=SC1090
 
-GLASS_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../../../" &> /dev/null && pwd )"
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
+GLASS_DIR=""
 GLASS_REPO_URL="https://github.com/glass-dev/glass"
-START_VENV=".venv-start"
-END_VENV=".venv-end"
-SETUP_ENVS="true"
 START_REF=""
 END_REF=""
+START_VENV=".venv-start"
+END_VENV=".venv-end"
 ACCOUNT=""
+SETUP_ENVS="true"
 
 help() {
   echo "Usage:"
-  echo "    $0 "
+  echo "    $0 -d <glass/dir> -s <start_ref> -e <end_ref> -a <archer2_account> [--skip-setup] [-h|--help]"
   echo ""
   echo "ARGS:"
   echo "    -h | --help                      Display this help message."
+  echo "    -d | --glass-dir <glass/dir>     Path to the cloned glass directory."
   echo "    -s | --start-ref <start_ref>     The git ref to be used as the initial state."
   echo "    -e | --end-ref <end_ref>         The git ref to be used as the final state."
   echo "    -a | --account <archer2_account> The archer2 account code to run jobs against."
@@ -38,6 +38,11 @@ while [ $# -gt 0 ] ; do
         -h | --help)
             help
             exit 0
+            ;;
+        -d | --glass-dir)
+            GLASS_DIR=$2
+            shift 2
+            continue
             ;;
         -s | --start-ref)
             START_REF=$2
@@ -75,12 +80,22 @@ then
   exit 1
 fi
 
+if [[ "$GLASS_DIR" == "" ]]
+then
+  echo "GLASS_DIR must be provided"
+  help
+  exit 1
+fi
+
 if [[ "$ACCOUNT" == "" ]]
 then
   echo "ACCOUNT must be provided"
   help
   exit 1
 fi
+
+REGRESSION_DIR="$GLASS_DIR/tests/regression"
+
 
 if [[ "$SETUP_ENVS" == "true" ]]
 then
@@ -102,4 +117,4 @@ then
 fi
 
 # Submit job
-sbatch --account="$ACCOUNT" "$BENCHMARKS_DIR/archer2/submission_script_cpu.sh" "$GLASS_DIR"
+sbatch --account="$ACCOUNT" "$REGRESSION_DIR/archer2/submission_script_cpu.sh" "$GLASS_DIR"
