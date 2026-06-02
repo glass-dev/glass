@@ -15,7 +15,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    Then we must make sure uv is available on the login node and the worker node.
    To do this we can update our start up scripts (`.profile`) on both
    partitions. Therefore, execute the following
-   
+
    ```sh
    cat <<'EOF' >> "$HOME/.profile"
    WORK_DIR="${HOME/home/work}"
@@ -25,7 +25,7 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    ```
 
    and simlarly
-   
+
    ```sh
    cat <<'EOF' >> "${HOME/home/work}/.profile"
    export HOME="${HOME/home/work}"
