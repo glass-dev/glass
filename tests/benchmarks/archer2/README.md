@@ -49,4 +49,21 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 Now we have cloned glass, we can run the script
 [run_regression_test.sh](./run_regression_test.sh) which will setup the required
 environments and submit regression test job to slurm. A help message is
-provided. Just run `run_regression_test.sh -h` from the root of the GLASS repo.
+provided. Just run `./tests/benchmarks/run_regression_test.sh -h` from the root
+of the GLASS repo.
+
+### Example execution
+
+If I wished to to run a test to check for regressions from `main` to my feature
+branch `feature` using the budget from account code `myaccount`, I could run the
+following command from the root of the glass repo.
+
+```sh
+./tests/benchmarks/archer2/run_regression_test.sh \
+   -d "$(pwd)"                                    \
+   -s main                                        \
+   -e feature                                     \
+   -a myaccount
+```
+
+> Note that this script does not have to be ran from the root of the glass repo.
