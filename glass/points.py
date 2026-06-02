@@ -605,7 +605,7 @@ def uniform_positions(
         else:
             count = int(ngal_sphere[k])
 
-        yield lon, lat, count  # ty:ignore[invalid-yield]
+        yield lon, lat, count  # ty: ignore[invalid-yield]
 
 
 def position_weights(

@@ -154,7 +154,7 @@ def redshifts_from_nz(
 
     assert total == redshifts.size  # noqa: S101
 
-    return redshifts  # ty:ignore[invalid-return-type]
+    return redshifts  # ty: ignore[invalid-return-type]
 
 
 def galaxy_shear(  # noqa: PLR0913
