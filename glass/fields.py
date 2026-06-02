@@ -226,7 +226,7 @@ def cls2cov(
             cov = xpx.at(cov)[:n, i].set(cl)
             cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
-        yield cov
+        yield cov  # ty:ignore[invalid-yield]
 
 
 def discretized_cls(
@@ -684,7 +684,7 @@ def effective_cls(
         out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
             out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
-    return out
+    return out  # ty:ignore[invalid-return-type]
 
 
 def gaussian_fields(
@@ -1022,7 +1022,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return cov
+    return cov  # ty:ignore[invalid-return-type]
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
