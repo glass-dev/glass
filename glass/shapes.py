@@ -282,7 +282,7 @@ def ellipticity_gaussian(
         eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
-    return eps
+    return eps  # ty:ignore[invalid-return-type]
 
 
 def ellipticity_intnorm(
@@ -361,4 +361,4 @@ def ellipticity_intnorm(
         eps = xpx.at(eps)[i : i + count_broadcasted[k]].set(e)
         i += count_broadcasted[k]
 
-    return eps
+    return eps  # ty:ignore[invalid-return-type]
