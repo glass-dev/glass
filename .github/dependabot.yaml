@@ -5,6 +5,7 @@ multi-ecosystem-groups:
   ci-dependencies:
     schedule:
       interval: monthly
+      timezone: Europe/London
     commit-message:
       prefix: dependabot
     labels:
@@ -12,16 +13,16 @@ multi-ecosystem-groups:
 
 updates:
   - package-ecosystem: github-actions
-    directory: /
-    patterns:
-      - "*"
     cooldown:
       default-days: 7
+    directory: /
     multi-ecosystem-group: ci-dependencies
+    patterns:
+      - "*"
   - package-ecosystem: pre-commit
-    directory: /
-    patterns:
-      - "*"
     cooldown:
       default-days: 7
+    directory: /
     multi-ecosystem-group: ci-dependencies
+    patterns:
+      - "*"
