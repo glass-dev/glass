@@ -36,7 +36,8 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
    Now when you next login to archer2, uv will be in your path and you will be
    on the `/work` partition as your `HOME` dir.
 
-2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2:
+2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2 -
+   `/work/<budget-code>/<budget-code>/<user-id>`
 
    ```sh
    cd "${HOME/home/work}"
@@ -48,15 +49,4 @@ been trialing using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 Now we have cloned glass, we can run the script
 [run_regression_test.sh](./run_regression_test.sh) which will setup the required
 environments and submit regression test job to slurm. A help message is
-provided. Just run `./tests/benchmarks/run_regression_test.sh -h` from the root
-of the GLASS repo.
-
-### Example execution
-
-If I wished to to run a test to check for regressions from `main` to my feature
-branch `feature` using the budget from account code `myaccount`, I could run the
-following command from the root of the glass repo.
-
-```sh
-./tests/benchmarks/archer2/run_regression_test.sh -s main -e feature -a myaccount
-```
+provided. Just run `run_regression_test.sh -h` from the root of the GLASS repo.

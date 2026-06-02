@@ -19,8 +19,8 @@ export OMP_NUM_THREADS=1
 # Ensure the cpus-per-task option is propagated to srun commands
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
-# Set path to glass and select base or head
-GLASS_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../../../" &> /dev/null && pwd )"
+# Set path to class and select base or head
+GLASS_DIR="$1"
 BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
 BENCHMARK_OUTPUT_PATH="$BENCHMARKS_DIR/archer2/.benchmarks"
 BENCHMARKS_SHARED_FLAGS=(
