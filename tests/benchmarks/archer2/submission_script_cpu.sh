@@ -42,10 +42,15 @@ cd "$BENCHMARKS_DIR/archer2" || exit
 
 # Generate the base report for comparison later
 source "$START_VENV_BIN/activate"
-srun "$START_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
+srun "$START_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" \
+    --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
 deactivate
 
 # Run the stable and unstable benchmarks and compare to the base ref
 source "$END_VENV_BIN/activate"
-srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m stable --benchmark-compare=0001 --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
-srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m unstable --benchmark-compare=0001 --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
+srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m stable \
+    --benchmark-compare=0001 \
+    --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
+srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m unstable \
+    --benchmark-compare=0001 \
+    --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
