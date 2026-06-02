@@ -99,6 +99,9 @@ BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
 
 if [[ "$SETUP_ENVS" == "true" ]]
 then
+  # Move to the glass directory
+  pushd "$GLASS_DIR" || exit
+
   # Setup base environment
   rm -rf "${GLASS_DIR:?}/$START_VENV" # Cleanup old venv
   uv venv  "$GLASS_DIR/$START_VENV"
@@ -114,6 +117,9 @@ then
   uv sync --active --group test --no-install-project
   uv pip install --no-deps "git+$GLASS_REPO_URL@$END_REF"
   deactivate
+
+  # Return to the starting directory
+  popd || exit
 fi
 
 # Submit job
