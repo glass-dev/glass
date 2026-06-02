@@ -58,5 +58,5 @@ branch `feature` usign the budget from account code `myaccount`, I could run the
 following command from the root of the glass repo.
 
 ```sh
-./tests/benchmarks/run_regression_test.sh -s main -e feature -a myaccount
+./tests/benchmarks/archer2/run_regression_test.sh -s main -e feature -a myaccount
 ```
