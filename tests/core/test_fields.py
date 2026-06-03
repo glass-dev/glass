@@ -528,7 +528,7 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
 
 
 def test_spectra_indices(xp: ModuleType) -> None:
-    # explicitly testing the default array backend
+    # explicitly testing the default array backend NumPy
     xpx.testing.assert_equal(glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64))
     xpx.testing.assert_equal(
         glass.spectra_indices(0, xp=xp),
