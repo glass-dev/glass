@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 @pytest.mark.unstable
 def test_radialwindow(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmark for shells.RadialWindow."""
@@ -30,4 +29,4 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    xpx.testing.assert_close(w.zeff, expected_zeff)
+    xpx.testing.assert_equal(w.zeff, expected_zeff)

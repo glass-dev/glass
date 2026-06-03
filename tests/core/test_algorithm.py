@@ -107,7 +107,7 @@ def test_nearcorr(xp: ModuleType) -> None:
         match="Nearest correlation matrix not found in 0 iterations",
     ):
         x = glass.algorithm.nearcorr(a, niter=0)
-    xpx.testing.assert_close(x, a)
+    xpx.testing.assert_equal(x, a)
 
     # non-square matrix should raise
     with pytest.raises(ValueError, match="non-square matrix"):

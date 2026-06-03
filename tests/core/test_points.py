@@ -34,17 +34,17 @@ def test_effective_bias(
 
     z = xp.linspace(0, 1, 10)
     bz = xp.zeros((10,))
-    xpx.testing.assert_close(glass.effective_bias(z, bz, w), xp.asarray(0.0))
+    xpx.testing.assert_equal(glass.effective_bias(z, bz, w), xp.asarray(0.0))
 
     z = xp.zeros((10,))
     bz = xp.full_like(z, 0.5)
 
-    xpx.testing.assert_close(glass.effective_bias(z, bz, w), xp.asarray(0.0))
+    xpx.testing.assert_equal(glass.effective_bias(z, bz, w), xp.asarray(0.0))
 
     z = xp.linspace(0, 1, 10)
     bz = xp.full_like(z, 0.5)
 
-    xpx.testing.assert_close(glass.effective_bias(z, bz, w), xp.asarray(0.25))
+    xpx.testing.assert_equal(glass.effective_bias(z, bz, w), xp.asarray(0.25))
 
 
 def test_linear_bias(
@@ -56,21 +56,21 @@ def test_linear_bias(
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    xpx.testing.assert_close(glass.linear_bias(delta, b), xp.zeros((2, 2)))
+    xpx.testing.assert_equal(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    xpx.testing.assert_close(glass.linear_bias(delta, b), xp.zeros((2, 2)))
+    xpx.testing.assert_equal(glass.linear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with original implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    xpx.testing.assert_close(glass.linear_bias(delta, b), b * delta)
+    xpx.testing.assert_equal(glass.linear_bias(delta, b), b * delta)
 
 
 def test_loglinear_bias(
@@ -82,21 +82,21 @@ def test_loglinear_bias(
     delta = xp.zeros((2, 2))
     b = 2.0
 
-    xpx.testing.assert_close(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
+    xpx.testing.assert_equal(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # test with 0 b
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 0.0
 
-    xpx.testing.assert_close(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
+    xpx.testing.assert_equal(glass.loglinear_bias(delta, b), xp.zeros((2, 2)))
 
     # compare with numpy implementation
 
     delta = urng.normal(5, 1, size=(2, 2))
     b = 2.0
 
-    xpx.testing.assert_close(
+    xpx.testing.assert_equal(
         glass.loglinear_bias(delta, b),
         xp.expm1(b * xp.log1p(delta)),
     )
@@ -464,7 +464,7 @@ def test_position_weights(
                     )
                 expected = bias * expected
 
-            xpx.testing.assert_close(weights, expected)
+            xpx.testing.assert_equal(weights, expected)
 
 
 def test_displace_arg_complex(xp: ModuleType) -> None:
@@ -478,7 +478,7 @@ def test_displace_arg_complex(xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray(r + 0j))
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([0.0, d]))
+    xpx.testing.assert_equal(xp.stack([lon, lat]), xp.asarray([0.0, d]))
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray(-r + 0j))
@@ -504,7 +504,7 @@ def test_displace_arg_real(xp: ModuleType) -> None:
 
     # north
     lon, lat = glass.displace(lon0, lat0, xp.asarray([r, 0]))
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([0.0, d]))
+    xpx.testing.assert_equal(xp.stack([lon, lat]), xp.asarray([0.0, d]))
 
     # south
     lon, lat = glass.displace(lon0, lat0, xp.asarray([-r, 0]))
@@ -595,7 +595,7 @@ def test_displacement_zerodist(
     lon = urng.uniform(-180.0, 180.0, size=100)
     lat = urng.uniform(-90.0, 90.0, size=100)
 
-    xpx.testing.assert_close(
+    xpx.testing.assert_equal(
         glass.displacement(lon, lat, lon, lat),
         xp.zeros(100, dtype=xp.complex128),
     )
@@ -673,7 +673,7 @@ def test_displacement_random(
         ],
         axis=1,
     )
-    xpx.testing.assert_close(rot @ xp.asarray([0.0, 0.0, 1.0]), u)
+    xpx.testing.assert_equal(rot @ xp.asarray([0.0, 0.0, 1.0]), u)
 
     # meta-check that recovering theta and phi from vector works
     xpx.testing.assert_close(xp.atan2(xp.hypot(u[:, 0], u[:, 1]), u[:, 2]), theta)

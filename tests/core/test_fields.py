@@ -175,7 +175,7 @@ def test_cls2cov_jax(jnp: ModuleType) -> None:
     assert cov3.dtype == jnp.float64
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    xpx.testing.assert_close(cov1[:, 0], jnp.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1[:, 0], jnp.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
@@ -201,9 +201,9 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    xpx.testing.assert_close(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
-    xpx.testing.assert_close(cov[:, 1], xpb.asarray(0.0), check_shape=False)
-    xpx.testing.assert_close(cov[:, 2], xpb.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov[:, 1], xpb.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
     # test negative value error
 
@@ -259,12 +259,12 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     assert cov3.dtype == xpb.float64
 
     # cov1|2|3 reuse the same data, so should all equal the third result
-    xpx.testing.assert_close(cov1[:, 0], xpb.asarray([0.45, 0.25, 0.15]))
-    xpx.testing.assert_close(cov1, cov2)
-    xpx.testing.assert_close(cov2, cov3)
+    xpx.testing.assert_equal(cov1[:, 0], xpb.asarray([0.45, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1, cov2)
+    xpx.testing.assert_equal(cov2, cov3)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    xpx.testing.assert_close(cov1_copy[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1_copy[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
@@ -341,7 +341,7 @@ def test_discretized_cls(xp: ModuleType) -> None:
     for cl in result:
         n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
         expected = xp.ones(n) * pw[:n] ** 2
-        xpx.testing.assert_close(cl[:n], expected)
+        xpx.testing.assert_equal(cl[:n], expected)
 
 
 def test_effective_cls(xp: ModuleType) -> None:
@@ -373,7 +373,7 @@ def test_effective_cls(xp: ModuleType) -> None:
     result = glass.effective_cls(cls, weights1, lmax=5)
 
     assert result.shape == (1, 1, 6)
-    xpx.testing.assert_close(result[..., 6:], xp.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(result[..., 6:], xp.asarray(0.0), check_shape=False)
 
     # check with weights1 and weights2 and weights1 is weights2
 
@@ -404,7 +404,7 @@ def test_generate_grf(xp: ModuleType) -> None:
 
     assert new_gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
-    xpx.testing.assert_close(new_gaussian_fields[0], gaussian_fields[0])
+    xpx.testing.assert_equal(new_gaussian_fields[0], gaussian_fields[0])
 
     with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([xp.asarray([])], nside))
@@ -472,19 +472,19 @@ def test_getcl(xp: ModuleType) -> None:
         for j in range(10):
             result = glass.getcl(cls, i, j)
             expected = xp.asarray([min(i, j), max(i, j)], dtype=xp.float64)
-            xpx.testing.assert_close(xp.sort(result), expected)
+            xpx.testing.assert_equal(xp.sort(result), expected)
 
             # check slicing
             result = glass.getcl(cls, i, j, lmax=0)
             expected = xp.asarray([max(i, j)], dtype=xp.float64)
             assert result.shape[0] == 1
-            xpx.testing.assert_close(result, expected)
+            xpx.testing.assert_equal(result, expected)
 
             # check padding
             result = glass.getcl(cls, i, j, lmax=50)
             expected = xp.zeros((49,), dtype=xp.float64)
             assert result.shape[0] == 51
-            xpx.testing.assert_close(result[2:], expected)
+            xpx.testing.assert_equal(result[2:], expected)
 
 
 def test_is_inv_triangle_number(not_triangle_numbers: list[int]) -> None:

@@ -31,7 +31,7 @@ def test_multalm(
 
     result = benchmark(glass_harmonics.multalm, alm, bl)
 
-    xpx.testing.assert_close(
+    xpx.testing.assert_equal(
         result[:5],
         xpb.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
     )

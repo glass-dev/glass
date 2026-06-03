@@ -124,7 +124,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
+    xpx.testing.assert_equal(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -133,7 +133,7 @@ def test_linear_windows(xp: ModuleType) -> None:
         weight=lambda _: 0,
     )
     for w in ws:
-        xpx.testing.assert_close(w.wa, xp.zeros_like(w.wa))
+        xpx.testing.assert_equal(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -173,7 +173,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_close(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
+    xpx.testing.assert_equal(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -182,7 +182,7 @@ def test_cubic_windows(xp: ModuleType) -> None:
         weight=lambda _: 0,
     )
     for w in ws:
-        xpx.testing.assert_close(w.wa, xp.zeros_like(w.wa))
+        xpx.testing.assert_equal(w.wa, xp.zeros_like(w.wa))
 
     # check error raised
 
@@ -453,7 +453,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xpx.testing.assert_close(w.zeff, xp.asarray(1.0))
+    xpx.testing.assert_equal(w.zeff, xp.asarray(1.0))
 
     # check zeff is NaN when redshift array is empty
 

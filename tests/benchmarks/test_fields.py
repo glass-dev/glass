@@ -120,7 +120,7 @@ def test_iternorm_k_0(
     j, a, s = results[0]
     assert j is None
     assert a.shape == (0,)
-    xpx.testing.assert_close(s, xpb.asarray(1.0))
+    xpx.testing.assert_equal(s, xpb.asarray(1.0))
 
 
 @pytest.mark.stable
@@ -148,9 +148,9 @@ def test_cls2cov(
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    xpx.testing.assert_close(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
-    xpx.testing.assert_close(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    xpx.testing.assert_close(cov[:, 2], xpb.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
+    xpx.testing.assert_equal(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
+    xpx.testing.assert_equal(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
 
 @pytest.mark.stable
@@ -243,7 +243,7 @@ def test_getcl_lmax_0(
     )
     expected = xpb.asarray([max(random_i, random_j)], dtype=xpb.float64)
     assert result.shape[0] == 1
-    xpx.testing.assert_close(result, expected)
+    xpx.testing.assert_equal(result, expected)
 
 
 @pytest.mark.unstable
@@ -274,4 +274,4 @@ def test_getcl_lmax_larger_than_cls(
     )
     expected = xpb.zeros((lmax - 1,), dtype=xpb.float64)
     assert result.shape[0] == lmax + 1
-    xpx.testing.assert_close(result[2:], expected)
+    xpx.testing.assert_equal(result[2:], expected)

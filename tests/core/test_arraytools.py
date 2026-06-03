@@ -157,7 +157,7 @@ def test_trapezoid_product(xp: ModuleType) -> None:
 
     s = glass.arraytools.trapezoid_product((x1, f1), (x2, f2))
 
-    xpx.testing.assert_close(s, xp.asarray(1.0))
+    xpx.testing.assert_equal(s, xp.asarray(1.0))
 
 
 def test_cumulative_trapezoid(xp: ModuleType) -> None:
@@ -167,14 +167,14 @@ def test_cumulative_trapezoid(xp: ModuleType) -> None:
     x = xp.asarray([0, 1, 2, 3])
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    xpx.testing.assert_close(ct, xp.asarray([0.0, 1.5, 4.0, 7.5]))
+    xpx.testing.assert_equal(ct, xp.asarray([0.0, 1.5, 4.0, 7.5]))
 
     # 2D f and 1D x
     f = xp.asarray([[1, 4, 9, 16], [2, 3, 5, 7]])
     x = xp.asarray([0, 1, 2.5, 4])
 
     ct = glass.arraytools.cumulative_trapezoid(f, x)
-    xpx.testing.assert_close(
+    xpx.testing.assert_equal(
         ct,
         xp.asarray([[0.0, 2.5, 12.25, 31.0], [0.0, 2.5, 8.5, 17.5]]),
     )
