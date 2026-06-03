@@ -90,10 +90,14 @@ file which, in the above case, would be called `glass_reg_test_cpu-13925816.out`
 
 - If your job does not finish in time your output will contain lines such as,
 
+  <!-- markdownlint-disable MD013 -->
+
   ```txt
   slurmstepd: error: *** STEP 13925937.0 ON nid001228 CANCELLED AT 2026-06-03T11:12:41 DUE TO TIME LIMIT ***
   slurmstepd: error: *** JOB 13925937 ON nid001228 CANCELLED AT 2026-06-03T11:12:41 DUE TO TIME LIMIT ***
   ```
+
+  <!-- markdownlint-enable MD013 -->
 
   To rectify this issue, you can increase the time limit of your job by altering
   the following line in [submission_script_cpu.sh](./submission_script_cpu.sh)
