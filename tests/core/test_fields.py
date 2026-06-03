@@ -63,7 +63,7 @@ def test_iternorm(
         )
 
     generator = glass.iternorm(
-        # for each covariance row, start at the diagonal diagonal and go left
+        # for each covariance row, start at the diagonal and go left
         # trim to at most k elements (= max. number of correlations)
         cov[..., i, i::-1][..., : min(i, k) + 1]
         for i in range(cov.shape[-1])
