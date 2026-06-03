@@ -31,7 +31,6 @@ def not_triangle_numbers() -> list[int]:
 @pytest.mark.parametrize("k", [0, 1, 2], ids=["k=0", "k=1", "k=2"])
 @pytest.mark.parametrize("test_nd", [False, True], ids=["0d", "nd"])
 def test_iternorm(
-    compare: type[Compare],
     k: int,
     test_nd: bool,  # noqa: FBT001
     xp: ModuleType,
@@ -92,7 +91,7 @@ def test_iternorm(
         Sninv = xp.linalg.pinv(Sn)
         # stabilise Cholesky decomposition
         An = xp.linalg.cholesky(Sninv + 1e-100 * xp.eye(n), upper=True)
-        compare.assert_allclose(An.mT @ An, Sninv)
+        xpx.testing.assert_close(An.mT @ An, Sninv)
         an = (An @ cn[..., None])[..., 0]
         sn = xp.sqrt(vn - xp.vecdot(an, an))
         # make sure a only has k correlations
@@ -100,8 +99,8 @@ def test_iternorm(
         # split scaling vector up into a and s
         a, s = w[..., :-1], w[..., -1]
         # cannot compare a directly, only a^T @ a
-        compare.assert_allclose(xp.vecdot(a, a), xp.vecdot(an, an))
-        compare.assert_allclose(s, sn)
+        xpx.testing.assert_close(xp.vecdot(a, a), xp.vecdot(an, an))
+        xpx.testing.assert_close(s, sn)
     # ruff: enable[N806]
 
 
