@@ -4,6 +4,17 @@
 
 All functional changes to the project are documented in this file.
 
+## [2026.2] (4 Jun 2026)
+
+- gh-1076: Use array comparison functions from `array-api-extra` (#1083)
+- gh-690: Drop `3.10` support (#1093)
+- gh-1090: move `ty` from `pre-commit` to `nox` (#1091)
+- gh-1085: refactor iternorm (#1089)
+- gh-1070: Replace `pre-commit.ci` with manual workflow (#1073)
+- gh-995: Allow filtering a single benchmark test (#1068)
+- gh-1045: bump Array API to `2025.12` (#1061)
+- gh-1059: remove `uv.lock` (#1060)
+
 ## [2026.1] (29 Jan 2026)
 
 - gh-1034: Expose glass.healpix module (#1035)
@@ -251,6 +262,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2026.2]: https://github.com/glass-dev/glass/compare/v2026.1...v2026.2
 [2026.1]: https://github.com/glass-dev/glass/compare/v2025.3...v2026.1
 [2025.3]: https://github.com/glass-dev/glass/compare/v2025.2...v2025.3
 [2025.2]: https://github.com/glass-dev/glass/compare/v2025.1...v2025.2

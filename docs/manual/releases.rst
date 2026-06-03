@@ -4,6 +4,35 @@ Release notes
 
 These notes document the changes between individual *GLASS* releases.
 
+2026.2 (4 Jun 2026)
+--------------------
+
+* Added the ability to run regression tests for a single test. This is useful
+  for development of a specific function without having to run the entire suite
+  of regression tests.
+
+* Changed the implementation of :func:`glass.iternorm` to be fully Array API
+  compliant.
+
+* Changed the Array API Version to ``2025.12``.
+
+* Changed the way that array comparison is performed within the tests. This is
+  now done using ``array_api_extra.testing`` rather than our own wrapper around
+  ``numpy.testing``.
+
+* Changed the way type checking is performed as part of the ``lint`` step in the
+  ``nox`` file rather than as a ``pre-commit`` hook.
+
+* Removed Python 3.10 support. This was necessary to benefit from updates to
+  ``array-api-extra``.
+
+* Removed the ``uv.lock`` file. This was causing us dependency alerts with
+  little benefit. Further work has been carried out to ensure that CI works as
+  intended without this file.
+
+* Removed ``pre-commit.ci`` in favour of a manual workflow using ``prek``. This
+  was due to inconsistencies between local development and CI.
+
 2026.1 (29 Jan 2026)
 --------------------
 
