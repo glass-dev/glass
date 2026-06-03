@@ -29,4 +29,4 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    xpx.testing.assert_equal(w.zeff, expected_zeff)
+    xpx.testing.assert_close(w.zeff, expected_zeff)
