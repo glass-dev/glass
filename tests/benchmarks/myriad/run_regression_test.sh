@@ -1,9 +1,9 @@
 #!/bin/bash -l
 
-# Request ten minutes of wallclock time (format hours:minutes:seconds).
+# Request three hours of wallclock time (format hours:minutes:seconds).
 #$ -l h_rt=3:0:0
 
-# Request 1 gigabyte of RAM (must be an integer followed by M, G, or T)
+# Request 4 gigabyte of RAM (must be an integer followed by M, G, or T)
 #$ -l mem=4G
 
 # Request exclusive access to a node
