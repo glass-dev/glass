@@ -70,7 +70,7 @@ classifiers = [
 ]
 dependencies = [
     "array-api-compat>=1.12.0",
-    "array-api-extra>=0.10.2",
+    "array-api-extra>=0.10.3",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "transformcl>=2026.1",
