@@ -223,7 +223,7 @@ def test_sample_number_galaxies_rng(
 
 
 def test_sample_galaxies_per_pixel(
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     xp: ModuleType,
 ) -> None:
     batch = 1000000
@@ -248,7 +248,7 @@ def test_sample_galaxies_per_pixel(
 
 def test_positions_from_delta(  # noqa: PLR0915
     compare: type[Compare],
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -400,7 +400,7 @@ def test_positions_from_delta(  # noqa: PLR0915
 
 
 def test_uniform_positions(
-    data_transformer: DataTransformer,
+    data_transformer: type[DataTransformer],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -482,7 +482,10 @@ def test_position_weights(
             compare.assert_allclose(weights, expected)
 
 
-def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
+def test_displace_arg_complex(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Test displace function with complex-valued displacement."""
     d = 5.0  # deg
     r = d / 180 * math.pi
@@ -508,7 +511,10 @@ def test_displace_arg_complex(compare: type[Compare], xp: ModuleType) -> None:
     compare.assert_allclose([lon, lat], [-d, 0.0], atol=1e-15)
 
 
-def test_displace_arg_real(compare: type[Compare], xp: ModuleType) -> None:
+def test_displace_arg_real(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     """Test displace function with real-valued argument."""
     d = 5.0  # deg
     r = d / 180 * math.pi

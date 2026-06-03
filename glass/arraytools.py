@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing
 from typing import TYPE_CHECKING
 
 import array_api_compat
@@ -11,8 +12,6 @@ from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from types import ModuleType
-
-    from typing_extensions import Unpack
 
     from glass._types import AnyArray, FloatArray, IntArray
 
@@ -48,7 +47,7 @@ def broadcast_leading_axes(
     xp: ModuleType | None = None,
 ) -> tuple[
     tuple[int, ...],
-    Unpack[tuple[FloatArray, ...]],
+    *tuple[FloatArray, ...],
 ]:
     """
     Broadcast all but the last N axes.
@@ -177,9 +176,12 @@ def trapezoid_product(
     x: FloatArray
     x, _ = f
     for x_, _ in ff:
-        x = xpx.union1d(  # ty: ignore[invalid-assignment]
-            x[(x >= x_[0]) & (x <= x_[-1])],
-            x_[(x_ >= x[0]) & (x_ <= x[-1])],
+        x = typing.cast(
+            "FloatArray",
+            xpx.union1d(
+                x[(x >= x_[0]) & (x <= x_[-1])],
+                x_[(x_ >= x[0]) & (x_ <= x[-1])],
+            ),
         )
     y = uxpx.interp(x, *f)
     for f_ in ff:

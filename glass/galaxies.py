@@ -20,6 +20,7 @@ Functions
 from __future__ import annotations
 
 import math
+import typing
 import warnings
 from typing import TYPE_CHECKING
 
@@ -148,13 +149,13 @@ def redshifts_from_nz(
                 rng.uniform(0, 1, size=int(count_out[k])),
                 cdf,
                 z_out_slice,
-            )
+            ),
         )
         total += count_out[k]
 
     assert total == redshifts.size  # noqa: S101
 
-    return redshifts
+    return typing.cast("FloatArray", redshifts)
 
 
 def galaxy_shear(  # noqa: PLR0913

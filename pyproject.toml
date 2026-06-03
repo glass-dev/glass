@@ -59,7 +59,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -96,7 +95,7 @@ optional-dependencies = {examples = [
     "jupyter",
     "matplotlib",
 ]}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
@@ -107,9 +106,9 @@ Issues = "https://github.com/glass-dev/glass/issues"
 [tool.coverage]
 report = {exclude_also = [
     "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
-    "@overload\\n",
-    "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
-    "if TYPE_CHECKING:",
+    "@(?:typing\\.)?overload\\n",
+    "class\\s+\\w+\\([^)]*\\b(?:typing\\.)?Protocol\\b[^)]*\\):", # protocol classes
+    "if (?:typing\\.)?TYPE_CHECKING:",
 ], omit = [
     "_types.py", # typing-only module
     "_version.py", # not being tracked anyway

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing
 import warnings
 from typing import TYPE_CHECKING
 
@@ -99,7 +100,7 @@ def nnls(
             q = xpx.at(q)[x <= 0].set(False)
         x = xpx.at(x)[q].set(sq)
         x = xpx.at(x)[~q].set(0)
-    return x
+    return typing.cast("FloatArray", x)
 
 
 def cov_clip(
