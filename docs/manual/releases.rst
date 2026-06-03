@@ -7,9 +7,9 @@ These notes document the changes between individual *GLASS* releases.
 2026.2 (4 Jun 2026)
 --------------------
 
-* Added the ability to run regression tests for a single test. This is useful
-  for development of a specific function without having to run the entire suite
-  of regression tests.
+* Added the ability to filter benchmark and regression test runs to a single test
+  (e.g., via ``-k``). This is useful for development of a specific function
+  without having to run the entire suite of tests.
 
 * Changed the implementation of :func:`glass.iternorm` to be fully Array API
   compliant.
