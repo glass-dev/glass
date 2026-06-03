@@ -13,7 +13,10 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
+def test_triaxial_axis_ratio(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # Pass floats without xp
 
     with pytest.raises(
@@ -63,7 +66,10 @@ def test_triaxial_axis_ratio(urng: UnifiedGenerator, xp: ModuleType) -> None:
     assert xp.all((qmax >= q) & (q >= qmin))
 
 
-def test_ellipticity_ryden04(urng: UnifiedGenerator, xp: ModuleType) -> None:
+def test_ellipticity_ryden04(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # Pass floats without xp
 
     with pytest.raises(

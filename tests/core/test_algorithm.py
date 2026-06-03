@@ -80,7 +80,10 @@ def test_cov_clip(
     compare.assert_allclose(xp.linalg.eigvalsh(cov), h)
 
 
-def test_nearcorr(compare: type[Compare], xp: ModuleType) -> None:
+def test_nearcorr(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # from Higham (2002)
     a = xp.asarray(
         [

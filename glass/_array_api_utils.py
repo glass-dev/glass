@@ -17,13 +17,14 @@ integration, interpolation, and linear algebra.
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import array_api_compat
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from types import ModuleType
+    from typing import Any
 
     import numpy as np
 

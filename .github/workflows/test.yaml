@@ -87,7 +87,6 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.10"
           - "3.11"
           - "3.12"
           - "3.13"
@@ -159,9 +158,9 @@ jobs:
         uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           carryforward:
-            ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.10,${{
-            env.CORE_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.12,${{
-            env.CORE_COV_NAME }}-3.13,${{ env.CORE_COV_NAME }}-3.14
+            ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.11,${{
+            env.CORE_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.13,${{
+            env.CORE_COV_NAME }}-3.14
           parallel-finished: true
 
   build:

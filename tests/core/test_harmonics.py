@@ -12,7 +12,10 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import Compare
 
 
-def test_multalm(compare: type[Compare], xp: ModuleType) -> None:
+def test_multalm(
+    compare: type[Compare],
+    xp: ModuleType,
+) -> None:
     # check output values and shapes
 
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
