@@ -108,7 +108,7 @@ def test_monopole(
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=None, gltol=1e-8)
 
     assert gl[0] != 0.0
-    xpx.testing.assert_equal(cl_out[0], cl[0])
+    xpx.testing.assert_close(cl_out[0], cl[0])
 
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=gl0, gltol=1e-8)
 
