@@ -53,9 +53,9 @@ of the GLASS repo.
 
 ### Example execution
 
-If I wished to to run a test to check for regressions from `main` to my feature
-branch `feature` using the budget from account code `ecsega23`, I could run the
-following command from the root of the glass repo.
+If you wished to run a test to check for regressions from `main` to a feature
+branch called `feature` using the budget from account code `ecsega23`, you could
+run the following command from the root of the glass repo.
 
 ```sh
 ./tests/benchmarks/archer2/run_regression_test.sh \
