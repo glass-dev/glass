@@ -137,7 +137,6 @@ def test_compute_density_contrast(
     xp: ModuleType,
 ) -> None:
     bias = 0.8 * xp.ones((3, 2))
-    bias_model = glass.linear_bias
     delta = xp.zeros((3, 2, 12))
     k = (1, 1)
 
