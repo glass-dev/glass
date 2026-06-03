@@ -20,6 +20,7 @@ help() {
   echo "    -s | --start-ref <start_ref>     The git ref to be used as the initial state."
   echo "    -e | --end-ref <end_ref>         The git ref to be used as the final state."
   echo "    -a | --account <archer2_account> The archer2 account code to run jobs against."
+  echo "                                     This is not your username but your budget code."
   echo "    --skip-setup                     Flag to state if the setup (installation of "
   echo "                                     dependencies) can be skipped. Good for simply"
   echo "                                     re-submitting"

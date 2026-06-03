@@ -54,7 +54,7 @@ of the GLASS repo.
 ### Example execution
 
 If I wished to to run a test to check for regressions from `main` to my feature
-branch `feature` using the budget from account code `myaccount`, I could run the
+branch `feature` using the budget from account code `ecsega23`, I could run the
 following command from the root of the glass repo.
 
 ```sh
@@ -62,7 +62,26 @@ following command from the root of the glass repo.
    -d "$(pwd)"                                    \
    -s main                                        \
    -e feature                                     \
-   -a myaccount
+   -a ecsega23
 ```
 
 > Note that this script does not have to be ran from the root of the glass repo.
+
+#### The results
+
+Once you have run the script `run_regression_test.sh`, you will be given a job
+ID such as `13925816`, which you can find in the terminal output within a line
+which looks like the following output.
+
+```txt
+Submitted batch job 13925816
+```
+
+You can monitor your submitted jobs and their status in the slurm queue via:
+
+```sh
+squeue -u $USER
+```
+
+Once your job has finished, you can inspect the results by reading the outputted
+file which, in the above case, would be called `glass_reg_test_cpu-13925816.out`
