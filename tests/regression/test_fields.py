@@ -119,7 +119,7 @@ def test_generate_grf(
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
 ) -> None:
-    """Regression tests of glass.fields._generate_grf with pos args only."""
+    """Regression tests of glass.fields._generate_grf with positional arguments only."""
     gls: AngularPowerSpectra = [urngb.random(1_000)]
     nside = 4
 
