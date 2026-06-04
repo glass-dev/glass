@@ -8,7 +8,15 @@ extend-ignore-re = [
 
 [files]
 extend-exclude = [
-    "**/*.ipynb",
-    "**/*.py",
     "bibliography.rst",
 ]
+
+[type.jupyter.extend-words]
+arange = "arange"
+
+[type.py.extend-words]
+gam = "gam"
+lamda = "lamda"
+mis = "mis"
+nd = "nd"
+wht = "wht"
