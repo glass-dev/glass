@@ -7,6 +7,13 @@ requires = [
 ]
 
 [dependency-groups]
+benchmarks = [
+    "camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
+    "glass-ext-camb",
+    {include-group = "test"},
+]
 build = [
     "build",
 ]
@@ -234,6 +241,12 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "tests/*" = [
     "INP001", # implicit-namespace-package
     "S101", # assert
+], "tests/benchmarks/*" = [
+    "D100", # undocumented-public-module
+    "N806", # non-lowercase-variable-in-function
+    "PLR2004", # magic-value-comparison
+    "S311", # suspicious-non-cryptographic-random-usage
+    "SLF001", # private-member-access
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
