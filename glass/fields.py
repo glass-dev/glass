@@ -213,14 +213,14 @@ def cls2cov(
         If negative values are found in the Cls.
 
     """
-    xp = array_api_compat.array_namespace(*cls, use_compat=False)
+    xp = array_api_compat.array_namespace(cls, use_compat=False)
 
     cov = xp.zeros((nl, nc + 1))
     end = 0
     for j in range(nf):
         begin, end = end, end + j + 1
         for i, cl in enumerate(cls[begin:end][: nc + 1]):
-            if i == 0 and xp.any(xp.less(cl, 0)):
+            if i == 0 and xp.any(xp.less(cl, xp.asarray(0))):
                 msg = "negative values in cl"
                 raise ValueError(msg)
             n = cl.shape[0]
@@ -368,20 +368,20 @@ def _generate_grf(
         If all gls are empty.
 
     """
-    xp = array_api_compat.array_namespace(*gls, use_compat=False)
+    xp = array_api_compat.array_namespace(gls, use_compat=False)
 
     if rng is None:
         rng = _rng.rng_dispatcher(xp=xp)
 
     # number of gls and number of fields
-    ngrf = nfields_from_nspectra(len(gls))
+    ngrf = nfields_from_nspectra(gls.shape[0])
 
     # number of correlated fields if not specified
     if ncorr is None:
         ncorr = ngrf - 1
 
     # number of modes
-    n = max((gl.shape[0] for gl in gls), default=0)
+    n = xp.max(gls, axis=0)
     if n == 0:
         msg = "all gls are empty"
         raise ValueError(msg)
@@ -472,7 +472,7 @@ def generate_gaussian(
         If all gls are empty.
 
     """
-    n = nfields_from_nspectra(len(gls))
+    n = nfields_from_nspectra(gls.shape[0])
     fields = [glass.grf.Normal() for _ in range(n)]
     yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 

@@ -74,6 +74,7 @@ intersphinx_mapping = {
     "jaxtyping": ("https://docs.kidger.site/jaxtyping", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "python": ("https://docs.python.org/3", None),
+    "ragged": ("https://scikit-hep.org/ragged", None),
 }
 
 

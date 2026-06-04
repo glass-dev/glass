@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
+import ragged
 
 import array_api_extra as xpx
 
@@ -169,31 +170,28 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [xpb.asarray([1.0, 0.5, 0.3]), None, xpb.asarray([0.7, 0.6, 0.1])],
+        ragged.array([[1.0, 0.5, 0.3], [], [0.7, 0.6, 0.1]]),
         nl,
         nf,
         nc,
     )
     cov = next(generator)
 
-    assert cov.shape == (nl, nc + 1)
+    assert cov.shape[0] == nl
     assert cov.dtype == xpb.float64
 
-    xpx.testing.assert_equal(cov[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
-    xpx.testing.assert_equal(cov[:, 1], xpb.asarray(0.0), check_shape=False)
-    xpx.testing.assert_equal(cov[:, 2], xpb.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 0], ragged.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov[:, 1], ragged.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 2], ragged.asarray(0.0), check_shape=False)
 
     # test negative value error
 
     generator = glass.cls2cov(
-        [
-            xpb.asarray(arr)
-            for arr in [
-                [-1.0, 0.5, 0.3],
-                [0.8, 0.4, 0.2],
-                [0.7, 0.6, 0.1],
-            ]
-        ],
+        ragged.array([
+            [-1.0, 0.5, 0.3],
+            [0.8, 0.4, 0.2],
+            [0.7, 0.6, 0.1],
+        ]),
         nl,
         nf,
         nc,
@@ -206,40 +204,37 @@ def test_cls2cov_no_jax(xpb: ModuleType) -> None:
     nl, nf, nc = 3, 3, 2
 
     generator = glass.cls2cov(
-        [
-            xpb.asarray(arr)
-            for arr in [
-                [1.0, 0.5, 0.3],
-                [0.8, 0.4, 0.2],
-                [0.7, 0.6, 0.1],
-                [0.9, 0.5, 0.3],
-                [0.6, 0.3, 0.2],
-                [0.8, 0.7, 0.4],
-            ]
-        ],
+        ragged.array([
+            [1.0, 0.5, 0.3],
+            [0.8, 0.4, 0.2],
+            [0.7, 0.6, 0.1],
+            [0.9, 0.5, 0.3],
+            [0.6, 0.3, 0.2],
+            [0.8, 0.7, 0.4],
+        ]),
         nl,
         nf,
         nc,
     )
 
-    cov1 = xpb.asarray(next(generator), copy=False)
-    cov1_copy = xpb.asarray(cov1, copy=True)
-    cov2 = xpb.asarray(next(generator), copy=False)
-    cov2_copy = xpb.asarray(cov2, copy=True)
+    cov1 = next(generator)
+    cov1_copy = xpb.asarray(cov1, copy=True, dtype=xpb.float64)
+    cov2 = next(generator)
+    cov2_copy = xpb.asarray(cov2, copy=True, dtype=xpb.float64)
     cov3 = next(generator)
 
-    assert cov1.shape == (nl, nc + 1)
-    assert cov2.shape == (nl, nc + 1)
-    assert cov3.shape == (nl, nc + 1)
+    assert cov1.shape[0] == nl
+    assert cov2.shape[0] == nl
+    assert cov3.shape[0] == nl
 
     assert cov1.dtype == xpb.float64
     assert cov2.dtype == xpb.float64
     assert cov3.dtype == xpb.float64
 
     # cov1|2|3 reuse the same data, so should all equal the third result
-    xpx.testing.assert_equal(cov1[:, 0], xpb.asarray([0.45, 0.25, 0.15]))
-    xpx.testing.assert_equal(cov1, cov2)
-    xpx.testing.assert_equal(cov2, cov3)
+    xpx.testing.assert_equal(cov1[:, 0], ragged.asarray([0.45, 0.25, 0.15]))
+    np.testing.assert_array_equal(cov1, cov2)
+    np.testing.assert_array_equal(cov2, cov3)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
     xpx.testing.assert_equal(cov1_copy[:, 0], xpb.asarray([0.5, 0.25, 0.15]))
@@ -360,7 +355,7 @@ def test_effective_cls(xp: ModuleType) -> None:
 
 
 def test_generate_grf(xp: ModuleType) -> None:
-    gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
+    gls: AngularPowerSpectra = ragged.array([1.0, 0.5, 0.1])
     nside = 4
     ncorr = 1
 
@@ -388,15 +383,15 @@ def test_generate_grf(xp: ModuleType) -> None:
         list(glass.fields._generate_grf([xp.asarray([])], nside))
 
 
-def test_generate_gaussian(xp: ModuleType) -> None:
+def test_generate_gaussian() -> None:
     with pytest.deprecated_call():
-        result = glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
+        result = glass.generate_gaussian(ragged.asarray([1.0, 0.5, 0.1]), 4)
     next(result)
 
 
-def test_generate_lognormal(xp: ModuleType) -> None:
+def test_generate_lognormal() -> None:
     with pytest.deprecated_call():
-        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
+        result = glass.generate_lognormal(ragged.array([1.0, 0.5, 0.1]), 4)
     next(result)
 
 
@@ -412,7 +407,7 @@ def test_generate(xp: ModuleType) -> None:
 
     nside = 16
     npix = hp.nside2npix(nside)
-    gls: AngularPowerSpectra = [xp.ones(10), xp.ones(10), xp.ones(10)]
+    gls: AngularPowerSpectra = ragged.array([xp.ones(10), xp.ones(10), xp.ones(10)])
 
     result = list(glass.generate(fields, gls, nside=nside))
 

@@ -2,11 +2,11 @@ import typing
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from typing import TypeAlias
 
     import jaxtyping
     import numpy as np
+    import ragged
 
     from array_api_strict._array_object import Array
     from array_api_strict._dtypes import DType
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         np.random.Generator | glass.jax.Generator | _rng.Generator
     )
 
-    AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
+    AngularPowerSpectra: TypeAlias = ragged.array
 else:
     # Runtime fallbacks (for Sphinx / autodoc)
     # https://github.com/sphinx-doc/sphinx/issues/11991
