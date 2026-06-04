@@ -473,7 +473,7 @@ class MultiPlaneConvergence:
         Parameters
         ----------
         arrays
-            A squence of arrays from which the array backend should be determined
+            A sequence of arrays from which the array backend should be determined
 
         """
         if self.delta3 is None:
