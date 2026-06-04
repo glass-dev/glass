@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import array_api_extra as xpx
+
 import glass.arraytools
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
-
-    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.mark.unstable
@@ -44,7 +44,6 @@ def test_broadcast_leading_axes(
 @pytest.mark.unstable
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
@@ -56,7 +55,7 @@ def test_cumulative_trapezoid_1d(
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
 
     # Compare to int64 as old versions of glass round to int64 if `dtype` is not passed.
-    compare.assert_allclose(
+    xpx.testing.assert_equal(
         xpb.asarray(ct[:4], dtype=xpb.int64),
         xpb.asarray([0, 1, 4, 7]),
     )
@@ -66,7 +65,6 @@ def test_cumulative_trapezoid_1d(
 @pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
     """Benchmark test for glass.arraytools.cumulative_trapezoid."""
@@ -80,16 +78,16 @@ def test_cumulative_trapezoid_2d(
     )
     x = xpb.arange(scaled_length)  # [0, 1, 2, 3,...]
 
-    expected_first_4_out = [0, 1, 4, 7]
-
     ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
 
+    expected_first_4_out = xpb.asarray([0, 1, 4, 7])
+
     # Compare to int64 as old versions of glass round to int64 if `dtype` is not passed.
-    compare.assert_allclose(
+    xpx.testing.assert_equal(
         xpb.asarray(ct[0, :4], dtype=xpb.int64),
         expected_first_4_out,
     )
-    compare.assert_allclose(
+    xpx.testing.assert_equal(
         xpb.asarray(ct[1, :4], dtype=xpb.int64),
         expected_first_4_out,
     )

@@ -4,13 +4,14 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import array_api_extra as xpx
+
 import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from tests.fixtures.helper_classes import Compare
 
 
 def test_triaxial_axis_ratio(
@@ -127,7 +128,6 @@ def test_ellipticity_ryden04(
 
 @pytest.mark.flaky(rerun=5, only_rerun=["AssertionError"])
 def test_ellipticity_gaussian(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -151,25 +151,44 @@ def test_ellipticity_gaussian(
 
     assert eps.shape == (n,)
 
-    compare.assert_array_less(xp.abs(eps), 1)
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    compare.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
 
     eps = glass.ellipticity_gaussian(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    compare.assert_array_less(xp.abs(eps), 1)
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    compare.assert_allclose(xp.std(xp.real(eps)[:n]), 0.128, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.imag(eps)[:n]), 0.128, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.real(eps)[n:]), 0.256, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.imag(eps)[n:]), 0.256, atol=1e-3, rtol=0)
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
 
 
 def test_ellipticity_intnorm(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -193,21 +212,41 @@ def test_ellipticity_intnorm(
 
     assert eps.shape == (n,)
 
-    compare.assert_array_less(xp.abs(eps), 1)
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    compare.assert_allclose(xp.std(xp.real(eps)), 0.256, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.imag(eps)), 0.256, atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.real(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
+    xpx.testing.assert_close(xp.std(xp.imag(eps)), xp.asarray(0.256), atol=1e-3, rtol=0)
 
     eps = glass.ellipticity_intnorm(xp.asarray([n, n]), xp.asarray([0.128, 0.256]))
 
     assert eps.shape == (2 * n,)
 
-    compare.assert_array_less(xp.abs(eps), 1)
+    xpx.testing.assert_less(xp.abs(eps), xp.asarray(1.0), check_shape=False)
 
-    compare.assert_allclose(xp.std(xp.real(eps)[:n]), 0.128, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.imag(eps)[:n]), 0.128, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.real(eps)[n:]), 0.256, atol=1e-3, rtol=0)
-    compare.assert_allclose(xp.std(xp.imag(eps)[n:]), 0.256, atol=1e-3, rtol=0)
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[:n]),
+        xp.asarray(0.128),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.real(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
+    xpx.testing.assert_close(
+        xp.std(xp.imag(eps)[n:]),
+        xp.asarray(0.256),
+        atol=1e-3,
+        rtol=0,
+    )
 
     with pytest.raises(ValueError, match="sigma must be between"):
         glass.ellipticity_intnorm(1, 0.71, xp=xp)

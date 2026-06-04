@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
+import array_api_extra as xpx
+
 import glass.grf
 
 if TYPE_CHECKING:
     from glass._types import FloatArray
-    from tests.fixtures.helper_classes import Compare
 
 
 @pytest.fixture(scope="session")
@@ -21,7 +22,6 @@ def cl() -> FloatArray:
 
 def test_one_transformation(
     cl: FloatArray,
-    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     lam = rng.random()
@@ -30,7 +30,7 @@ def test_one_transformation(
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, t)
 
-    compare.assert_array_equal(gl1, gl2)
+    xpx.testing.assert_equal(gl1, gl2)
 
 
 def test_pad(
@@ -51,7 +51,6 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
-    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     lam = rng.random()
@@ -62,24 +61,20 @@ def test_initial(
     gl1, _, _ = glass.grf.solve(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, initial=gl)
 
-    compare.assert_array_equal(gl1, gl2)
+    xpx.testing.assert_equal(gl1, gl2)
 
 
-def test_no_iterations(
-    cl: FloatArray,
-    compare: type[Compare],
-) -> None:
+def test_no_iterations(cl: FloatArray) -> None:
     t = glass.grf.Lognormal()
 
     gl1 = glass.grf.compute(cl, t)
     gl2, _, _ = glass.grf.solve(cl, t, maxiter=0)
 
-    compare.assert_array_equal(gl1, gl2)
+    xpx.testing.assert_equal(gl1, gl2)
 
 
 def test_lognormal(
     cl: FloatArray,
-    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     t1 = glass.grf.Lognormal()
@@ -93,17 +88,16 @@ def test_lognormal(
 
     assert info > 0
 
-    compare.assert_allclose(cl_[1 : cl.shape[0]], cl[1:], atol=0.0, rtol=cltol)
+    xpx.testing.assert_close(cl_[1 : cl.shape[0]], cl[1:], atol=0.0, rtol=cltol)
 
     gl_ = glass.grf.compute(cl_, t1, t2)
 
     assert gl[0] == gl0
-    compare.assert_allclose(gl_[1 : gl.shape[0]], gl[1:])
+    xpx.testing.assert_close(gl_[1 : gl.shape[0]], gl[1:])
 
 
 def test_monopole(
     cl: FloatArray,
-    compare: type[Compare],
     rng: np.random.Generator,
 ) -> None:
     t = glass.grf.Lognormal()
@@ -114,10 +108,10 @@ def test_monopole(
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=None, gltol=1e-8)
 
     assert gl[0] != 0.0
-    compare.assert_allclose(cl_out[0], cl[0])
+    xpx.testing.assert_close(cl_out[0], cl[0])
 
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=gl0, gltol=1e-8)
 
     assert gl[0] == gl0
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
-        compare.assert_allclose(cl_out[0], cl[0])
+        xpx.testing.assert_close(cl_out[0], cl[0])
