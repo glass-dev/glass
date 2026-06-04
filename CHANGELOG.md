@@ -12,6 +12,7 @@ All functional changes to the project are documented in this file.
 - gh-1085: refactor iternorm (#1089)
 - gh-1070: Replace `pre-commit.ci` with manual workflow (#1073)
 - gh-995: Allow filtering a single benchmark test (#1068)
+- gh-1063: Default to numpy for all unrecognised array backends (#1065)
 - gh-1045: bump Array API to `2025.12` (#1061)
 - gh-1059: remove `uv.lock` (#1060)
 

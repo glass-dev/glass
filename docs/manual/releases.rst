@@ -16,6 +16,9 @@ These notes document the changes between individual *GLASS* releases.
 
 * Changed the Array API Version to ``2025.12``.
 
+* Changed the default behaviour to use NumPy if an array backend is not
+  supported rather than raising an exception.
+
 * Changed the way that array comparison is performed within the tests. This is
   now done using ``array_api_extra.testing`` rather than our own wrapper around
   ``numpy.testing``.
