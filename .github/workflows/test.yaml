@@ -18,11 +18,11 @@ concurrency:
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 env:
-  REG_COV_NAME: cov-regression
+  REG_COV_NAME: cov-reg
   CORE_COV_NAME: cov-core
 
 jobs:
-  tests-regressions:
+  tests-reg:
     if: github.event.pull_request.draft == false
     name: Regression Tests
     permissions:
@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           key:
-            tests-regressions-${{ hashFiles('pyproject.toml') }}-${{
+            tests-reg-${{ hashFiles('pyproject.toml') }}-${{
             hashFiles('noxfile.py') }}
           path: .nox
 
@@ -148,7 +148,7 @@ jobs:
 
   aggregate-tests:
     needs:
-      - tests-regressions
+      - tests-reg
       - tests-core
     if: always()
     permissions: {}
