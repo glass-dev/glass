@@ -113,16 +113,19 @@ def test_cls2cov(
 @pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
-def test_generate_grf(
+def test_generate_grf(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     generator_consumer: type[GeneratorConsumer],
     ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
+    xpb: ModuleType,
 ) -> None:
     """Regression tests of glass.fields._generate_grf with positional arguments only."""
-    gls: AngularPowerSpectra = [urngb.random(1_000)]
-    nside = 4
+    n = 100
+    nth_triangular_number = int((n * (n + 1)) / 2)
+    gls: AngularPowerSpectra = [xpb.ones(10) for _ in range(nth_triangular_number)]
+    nside = 16
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.fields._generate_grf(
@@ -131,7 +134,10 @@ def test_generate_grf(
             rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(
+            generator,
+            valid_exception="covariance matrix is not positive definite",
+        )
 
     gaussian_fields = benchmark(function_to_benchmark)
 
