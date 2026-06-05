@@ -18,13 +18,13 @@ concurrency:
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 env:
-  BENCH_COV_NAME: cov-bench
+  REG_COV_NAME: cov-reg
   CORE_COV_NAME: cov-core
 
 jobs:
-  tests-bench:
+  tests-reg:
     if: github.event.pull_request.draft == false
-    name: Benchmark Tests
+    name: Regression Tests
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           key:
-            tests-bench-${{ hashFiles('pyproject.toml') }}-${{
+            tests-reg-${{ hashFiles('pyproject.toml') }}-${{
             hashFiles('noxfile.py') }}
           path: .nox
 
@@ -57,25 +57,26 @@ jobs:
         env:
           FORCE_COLOR: 1
 
-      - name: Run benchmark tests with all backends and generate coverage report
-        run: uv run nox -s coverage_benchmarks --verbose
+      - name:
+          Run regression tests with all backends and generate coverage report
+        run: uv run nox -s coverage_regression --verbose
         env:
           ARRAY_BACKEND: all
-          COVERAGE_FILE: ${{ env.BENCH_COV_NAME }}
+          COVERAGE_FILE: ${{ env.REG_COV_NAME }}
           FORCE_COLOR: 1
 
-      - name: Generate XML report for benchmark tests
+      - name: Generate XML report for regression tests
         run: >-
-          uv run coverage xml --data-file ${{ env.BENCH_COV_NAME }} -o ${{
-          env.BENCH_COV_NAME }}.xml
+          uv run coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
+          env.REG_COV_NAME }}.xml
 
-      - name: Upload benchmark coverage to Coveralls
+      - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
         uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           base-path: glass/
-          file: ${{ env.BENCH_COV_NAME }}.xml
-          flag-name: ${{ env.BENCH_COV_NAME }}
+          file: ${{ env.REG_COV_NAME }}.xml
+          flag-name: ${{ env.REG_COV_NAME }}
           parallel: true
 
   tests-core:
@@ -147,7 +148,7 @@ jobs:
 
   aggregate-tests:
     needs:
-      - tests-bench
+      - tests-reg
       - tests-core
     if: always()
     permissions: {}
@@ -158,7 +159,7 @@ jobs:
         uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           carryforward:
-            ${{ env.BENCH_COV_NAME }},${{ env.CORE_COV_NAME }}-3.11,${{
+            ${{ env.REG_COV_NAME }},${{ env.CORE_COV_NAME }}-3.11,${{
             env.CORE_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.13,${{
             env.CORE_COV_NAME }}-3.14
           parallel-finished: true

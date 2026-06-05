@@ -193,9 +193,9 @@ to the code's functionality.
 _GLASS_ supports running various critical commands using
 [nox](https://github.com/wntrblm/nox) to make them less intimidating for new
 developers. All of these commands (or sessions in the language of `nox`) -
-`lint`, `tests`, `coverage`, `coverage_benchmarks`, `doctests`, `examples`,
-`docs`, `build`, `version`, `benchmarks`, and `regression_tests` - are defined
-in [noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
+`lint`, `tests`, `coverage`, `coverage_regression`, `doctests`, `examples`,
+`docs`, `build`, `version`, and `regression_tests` - are defined in
+[noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
 
 `nox` can be installed via `uv` using -
 
@@ -252,35 +252,23 @@ uv run nox -s docs -- serve
 The `nox` environments created for each type of session on the first run is
 saved under `.nox/` and reused by default.
 
-### Benchmarking
+### Regression testing
 
-To ensure that _GLASS_ remains performant over time, a set of benchmarks are
-provided in the [benchmarks](./tests/benchmarks/) folder. These benchmarks can
-be run through nox.
-
-All of the benchmarks for a given revision can be run by specifying the revision
-to benchmark.
-
-```sh
-uv run nox -s benchmarks -- <revision-to-benchmark>
-```
-
-The benchmarks can be used to run a regression test of _GLASS_. These regression
-tests can be used to compare the performance of two different revisions of
-_GLASS_.
+To ensure that _GLASS_ remains performant over time, a set of regression tests
+are provided in the [regression](./tests/regression/) folder. These regression
+tests can be run through nox. To compare the performance of two different
+revisions of _GLASS_.
 
 ```sh
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
-To filter the benchmark tests to be ran, one can pass pytest arguments via the
-cli after the required revision arguments. For example, if you wished to run
-only benchmarks from the `test_fields.py` file you could run one of the
+To filter the tests to be ran, one can pass pytest arguments via the cli after
+the required revision arguments. For example, if you wished to run only
+regression tests from the `test_fields.py` file you could run one of the
 following commands:
 
 ```sh
-# Benchmarks
-uv run nox -s benchmarks -- <revision-to-benchmark> -k test_fields
 # Regression tests
 uv run nox -s regression-tests -- <initial-state-revision> \
 <revision-to-compare> -k test_fields
@@ -288,10 +276,10 @@ uv run nox -s regression-tests -- <initial-state-revision> \
 
 <!-- prettier-ignore -->
 > [!TIP]
-> Benchmark tests should do minimal assertions on what is returned to
-> make sure that the function is working as expected. The main goal of benchmark
+> Regression tests should do minimal assertions on what is returned to
+> make sure that the function is working as expected. The main goal of regression
 > tests is to measure the performance of the function, and not to test its
-> correctness. In the event that benchmarks are testing for specific values the
+> correctness. In the event that we testing for specific values the
 > regression workflow may fail due to mismatches in values. See
 > [01e6e4c](https://github.com/glass-dev/glass/pull/911/changes/01e6e4c248e96e4683ca651edffa2fd4d845502f)
 > for an example.
@@ -300,23 +288,23 @@ uv run nox -s regression-tests -- <initial-state-revision> \
 
 <!-- prettier-ignore -->
 > [!NOTE]
-> There are two types of benchmark tests in _GLASS_: `stable` and `unstable`.
+> There are two types of regression tests in _GLASS_: `stable` and `unstable`.
 > These are marked using the `@pytest.mark.stable` and `@pytest.mark.unstable`
-> decorators respectively. The stable benchmarks are expected to have minimal
+> decorators respectively. The stable tests are expected to have minimal
 > variance in their results across different runs, and are therefore measured in
-> percentage change during regression tests. The unstable benchmarks may have
+> percentage change during regression tests. The unstable tests may have
 > higher variance, and are therefore measured in absolute time change during
 > regression tests.
 
 The regression tests are run in GitHub Actions for every pull request to ensure
 that new changes do not degrade the performances of _GLASS_. This workflow uses
 the `nox` command detailed above comparing the head of the current pull request
-to the `main` branch. The benchmark tests are first run over the `main` branch,
+to the `main` branch. The regression tests are first run over the `main` branch,
 followed by the head of the pull request. If there is any statistically
 significant regression in performance, the workflow fails with the error
 `pytest_benchmark.session.PerformanceRegression: Performance has regressed`. One
 must scroll through the logs to find lines similar to the following to find out
-which benchmark(s) caused the regression:
+which test(s) caused the regression:
 
 ```rst
 --------------------------------------------------------------------------------
@@ -326,23 +314,23 @@ Performance has regressed:
 --------------------------------------------------------------------------------
 ```
 
-This indicates that the benchmark `test_displacement` using the NumPy array
-backend has regressed by approximately 36.73% compared to the previous version.
-Effort has been made to reduce the number of false positives in these regression
-tests, however some still occur. It is worth checking if the given function
-(i.e. `glass.displacement`) has actually been hit by changes in the given pull
-request (whether directly or indirectly). If not, the regression can be ignored
-and merged. Sometimes this can be fixed by manually re-running the workflow. If
-the regression is genuine, the workflow should repeatedly fail. Regressions can
-be unavoidable sometimes, but every effort should be made to fix them before
-merging the pull request.
+This indicates that the regression test `test_displacement` using the NumPy
+array backend has regressed by approximately 36.73% compared to the previous
+version. Effort has been made to reduce the number of false positives in these
+regression tests, however some still occur. It is worth checking if the given
+function (i.e. `glass.displacement`) has actually been hit by changes in the
+given pull request (whether directly or indirectly). If not, the regression can
+be ignored and merged. Sometimes this can be fixed by manually re-running the
+workflow. If the regression is genuine, the workflow should repeatedly fail.
+Regressions can be unavoidable sometimes, but every effort should be made to fix
+them before merging the pull request.
 
 <!-- prettier-ignore -->
 > [!WARNING]
 > A pull request that introduces a change such as the creation of a new module
 > or a change to the name of an existing module may cause the regression
 > workflow to fail because the new module wouldn't exist in `main`. Extra
-> caution should be taken in this case. It is recommended to run the benchmark
+> caution should be taken in this case. It is recommended to run the regression
 > tests manually and look at the table of values.
 
 ## Contributing workflow

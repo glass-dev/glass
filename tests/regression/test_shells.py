@@ -19,7 +19,7 @@ def test_radialwindow(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for shells.RadialWindow."""
+    """Regression test for shells.RadialWindow."""
     # check zeff is computed when not provided
     arr_length = 100_000
     expected_zeff = xpb.asarray(66_666.0)

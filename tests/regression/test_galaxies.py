@@ -20,7 +20,7 @@ def test_redshifts(
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for galaxies.redshifts."""
+    """Regression test for galaxies.redshifts."""
     scale_factor = 1_000
     # create a mock radial window function
     za = xpb.linspace(0.0, 1.0, 20 * scale_factor)
@@ -40,7 +40,7 @@ def test_redshifts_from_nz(
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
-    """Benchmark for galaxies.redshifts_from_nz."""
+    """Regression test for galaxies.redshifts_from_nz."""
     scale_factor = 1_000
     # create a mock radial window function
     za = xpb.linspace(0.0, 1.0, 20 * scale_factor)
@@ -68,7 +68,7 @@ def test_galaxy_shear(
     urngb: UnifiedGenerator,
     reduced_shear: bool,  # noqa: FBT001
 ) -> None:
-    """Benchmark for galaxies.galaxy_shear."""
+    """Regression test for galaxies.galaxy_shear."""
     scale_factor = 100
     size = (12 * scale_factor,)
     kappa = urngb.normal(size=size)
@@ -99,7 +99,7 @@ def test_gaussian_phz(
     urngb: UnifiedGenerator,
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for galaxies.gaussian_phz."""
+    """Regression tests for galaxies.gaussian_phz."""
     scaled_length = 10_000
 
     z = xpb.linspace(0, 1, scaled_length)

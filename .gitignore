@@ -14,5 +14,5 @@ build
 coverage*
 dist
 styles
-tests/benchmarks/**/results
+tests/regression/**/results
 uv.lock
