@@ -476,3 +476,11 @@ def test_distribute(
     index = glass.distribute(redshifts, shells, rng=urng)
 
     xpx.testing.assert_equal(index, xp.arange(len(shells)))
+
+    # give redshifts that fall out of bounds
+    redshifts = xp.asarray([-1.0, xp.max(shells[-1].za) + 1.0])
+
+    # each redshift should land in shell -1
+    index = glass.distribute(redshifts, shells, rng=urng)
+
+    xpx.testing.assert_equal(index, -xp.ones_like(index))
