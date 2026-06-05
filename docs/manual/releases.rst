@@ -2,7 +2,7 @@
 Release notes
 =============
 
-These notes document the changes between individual *GLASS* releases.
+These notes document the changes between individual GLASS releases.
 
 2026.2 (4 Jun 2026)
 --------------------
@@ -279,7 +279,7 @@ These notes document the changes between individual *GLASS* releases.
   the effect of the discretisation on, e.g., a redshift distribution.
 
 * There is now a way to compute the effective angular power spectra that can
-  be expected from a *GLASS* simulation, including all discretisations and
+  be expected from a GLASS simulation, including all discretisations and
   approximations.
 
   * A new function :func:`~glass.fields.effective_cls()` which combines power
@@ -342,7 +342,7 @@ These notes document the changes between individual *GLASS* releases.
 
 - The ``glass`` module is no longer a namespace package.  The new ``glass.ext``
   namespace is reserved for extensions instead.  This is done to follow best
-  practices, so that a bad extension can no longer break all of *GLASS* by
+  practices, so that a bad extension can no longer break all of GLASS by
   mistake.  The ``glass.all`` meta-module is no longer necessary.
 
 - The point sampling functions :func:`~glass.points.positions_from_delta` and
@@ -377,7 +377,7 @@ These notes document the changes between individual *GLASS* releases.
 
 - New user functions :func:`glass.user.save_cls` and
   :func:`glass.user.load_cls` to save and load angular power spectra in the
-  *GLASS* format.
+  GLASS format.
 
 - Some type hints were added to library functions.  These are mostly
   perfunctory at this time, but there is interest in adding proper typing
@@ -430,7 +430,7 @@ These notes document the changes between individual *GLASS* releases.
 
 - **Initial wide release for GLASS paper**
 
-  This was the initial full release of *GLASS*, coinciding with the release of
+  This was the initial full release of GLASS, coinciding with the release of
   preprint `arXiv:2302.01942`__.
 
   __ https://arxiv.org/abs/2302.01942
