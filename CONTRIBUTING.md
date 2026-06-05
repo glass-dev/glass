@@ -116,7 +116,7 @@ def test_something(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
 _GLASS_'s documentation is mainly written in the form of
 [docstrings](https://peps.python.org/pep-0257) and
-[reStructurredText](https://docutils.sourceforge.io/docs/user/rst/quickref.html).
+[reStructuredText](https://docutils.sourceforge.io/docs/user/rst/quickref.html).
 The docstrings include the description, arguments, examples, return values, and
 attributes of a class or a function, and the `.rst` files enable us to render
 this documentation on _GLASS_'s documentation website.

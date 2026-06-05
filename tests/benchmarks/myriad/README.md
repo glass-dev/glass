@@ -1,7 +1,7 @@
 # GLASS benchmarks on Myriad
 
 For a more consistent benchmarking and regression testing environment we have
-been trialing using the UCL machine
+been trialling using the UCL machine
 [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
 
 To simplify running benchmarks on myriad there are several scripts provided.
@@ -41,5 +41,5 @@ To simplify running benchmarks on myriad there are several scripts provided.
    have done this, we can submit the job...
 
    ```sh
-   qsub $GLASS_DIR/tests/benchmarks/myriad/run_regresion_test.sh
+   qsub $GLASS_DIR/tests/benchmarks/myriad/run_regression_test.sh
    ```

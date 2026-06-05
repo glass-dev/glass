@@ -116,7 +116,7 @@ All functional changes to the project are documented in this file.
 - gh-358: add static types support (#368)
 - gh-131: rename `gaussian_gls` to `discretized_cls` (#345)
 - gh-328: efficient resampling in `ellipticity_ryden04` (#341)
-- gh-137: deprecate `redshifts_from_nz` in favor of `redshifts` (#333)
+- gh-137: deprecate `redshifts_from_nz` in favour of `redshifts` (#333)
 - gh-328: fix shape mismatch bug in ellipticity_ryden04 (#332)
 - gh-315: add broadcasting rule in ellipticity_ryden04 + tests (#317)
 - gh-198: enforce `python>3.8` & `numpy>1.21` (#326)
