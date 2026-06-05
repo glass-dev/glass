@@ -25,6 +25,7 @@ Window function tools
 .. autofunction:: restrict
 .. autofunction:: partition
 .. autofunction:: combine
+.. autofunction:: distribute
 
 
 Redshift grids
