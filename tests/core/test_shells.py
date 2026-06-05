@@ -15,7 +15,50 @@ from glass._array_api_utils import xp_additions as uxpx
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from glass._types import UnifiedGenerator
     from glass.cosmology import Cosmology
+
+
+@pytest.fixture
+def shells(xp: ModuleType) -> list[glass.RadialWindow]:
+    """
+    Mock shells for testing.
+
+    Set up in such a way that the sum at each redshift is always 1.0, otherwise
+    there are problems with testing ``glass.partition(... method="restrict")``.
+    """
+    return [
+        glass.RadialWindow(
+            xp.asarray([0.0, 1.0]),
+            xp.asarray([1.0, 0.0]),
+            0.0,
+        ),
+        glass.RadialWindow(
+            xp.asarray([0.0, 1.0, 2.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            1.0,
+        ),
+        glass.RadialWindow(
+            xp.asarray([1.0, 2.0, 3.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            2.0,
+        ),
+        glass.RadialWindow(
+            xp.asarray([2.0, 3.0, 4.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            3.0,
+        ),
+        glass.RadialWindow(
+            xp.asarray([3.0, 4.0, 5.0]),
+            xp.asarray([0.0, 1.0, 0.0]),
+            4.0,
+        ),
+        glass.RadialWindow(
+            xp.asarray([4.0, 5.0]),
+            xp.asarray([0.0, 1.0]),
+            5.0,
+        ),
+    ]
 
 
 def test_distance_weight(
@@ -235,35 +278,11 @@ def test_restrict(xp: ModuleType) -> None:
 def test_partition(
     method: str,
     xp: ModuleType,
+    shells: list[glass.RadialWindow],
 ) -> None:
     """Add unit tests for :func:`glass.partition`."""
     if (xp.__name__ == "jax.numpy") and (method == "nnls"):
         pytest.skip(f"Arrays in {method} are not immutable, so do not support jax")
-
-    shells = [
-        glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
-        glass.RadialWindow(
-            xp.asarray([0.0, 1.0, 2.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            0.5,
-        ),
-        glass.RadialWindow(
-            xp.asarray([1.0, 2.0, 3.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            1.5,
-        ),
-        glass.RadialWindow(
-            xp.asarray([2.0, 3.0, 4.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            2.5,
-        ),
-        glass.RadialWindow(
-            xp.asarray([3.0, 4.0, 5.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            3.5,
-        ),
-        glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
-    ]
 
     z = xp.linspace(0.0, 5.0, 1_000)
     k = 1.0 + xp.reshape(xp.arange(6.0), (3, 2, 1))
@@ -375,36 +394,15 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
 
 
-def test_combine(xp: ModuleType) -> None:
+def test_combine(
+    xp: ModuleType,
+    shells: list[glass.RadialWindow],
+) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1_000)
     weights = xp.asarray(
         [1.0, 0.90595172, 0.81025465, 0.72003963, 0.63892872, 0.56796183],
     )
-    shells = [
-        glass.RadialWindow(xp.asarray([0.0, 1.0]), xp.asarray([1.0, 0.0]), 0.0),
-        glass.RadialWindow(
-            xp.asarray([0.0, 1.0, 2.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            0.5,
-        ),
-        glass.RadialWindow(
-            xp.asarray([1.0, 2.0, 3.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            1.5,
-        ),
-        glass.RadialWindow(
-            xp.asarray([2.0, 3.0, 4.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            2.5,
-        ),
-        glass.RadialWindow(
-            xp.asarray([3.0, 4.0, 5.0]),
-            xp.asarray([0.0, 1.0, 0.0]),
-            3.5,
-        ),
-        glass.RadialWindow(xp.asarray([4.0, 5.0]), xp.asarray([0.0, 1.0]), 5.0),
-    ]
 
     result = glass.combine(z, weights, shells)
 
@@ -462,3 +460,19 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
     w = glass.RadialWindow(za, wa)
 
     assert math.isnan(w.zeff)
+
+
+def test_distribute(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+    shells: list[glass.RadialWindow],
+) -> None:
+    """Test distribution of redshifts over shells."""
+    # well-defined shells have non-overlapping effective redshifts
+    # so pick those as redshifts to sample to get a sure draw
+    redshifts = xp.asarray([shell.zeff for shell in shells])
+
+    # each redshift should land in its own shell
+    index = glass.distribute(redshifts, shells, rng=urng)
+
+    xpx.testing.assert_equal(index, xp.arange(len(shells)))

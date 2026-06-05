@@ -207,3 +207,12 @@ class Generator:
 
         """
         return self.xp.asarray(self.rng.uniform(low, high, size))
+
+    def multinomial(
+        self,
+        n: int | IntArray,
+        pvals: FloatArray,
+        size: int | tuple[int, ...] | None = None,
+    ) -> IntArray:
+        """Draw samples from a multinomial distribution."""
+        return self.xp.asarray(self.rng.multinomial(n, pvals, size))

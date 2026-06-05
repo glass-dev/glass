@@ -96,3 +96,13 @@ def test_uniform() -> None:
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
     assert isinstance(rvs, ArrayLike)
+
+
+def test_multinomial() -> None:
+    rng = _rng.rng_dispatcher(xp=jnp)
+    key = rng.key  # ty: ignore[unresolved-attribute]
+    p = jnp.array([0.0, 0.1, 0.2, 0.3, 0.4])
+    rvs = rng.multinomial(10_000, p)
+    assert rng.key != key  # ty: ignore[unresolved-attribute]
+    assert jnp.sum(rvs) == 10_000
+    assert rvs.shape == p.shape
