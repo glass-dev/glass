@@ -37,7 +37,7 @@ END_VENV_BIN="$GLASS_DIR/.venv-end/bin"
 # Remove old benchmark results
 rm -rf "$BENCHMARK_OUTPUT_PATH"
 
-# Change into archer2 dir to ensure we don't pickup the glass directory as an import
+# Change into archer2 dir to ensure we don't pickup the GLASS directory as an import
 cd "$BENCHMARKS_DIR/archer2" || exit
 
 # Generate the base report for comparison later

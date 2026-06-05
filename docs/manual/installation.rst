@@ -29,7 +29,7 @@ or conda::
 Install a specific release
 --------------------------
 
-To install the a specific *GLASS* release, pass the version number to pip::
+To install a specific *GLASS* release, pass the version number to pip::
 
     $ pip install glass==2023.1
 

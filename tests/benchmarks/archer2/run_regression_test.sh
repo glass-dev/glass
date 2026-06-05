@@ -16,7 +16,7 @@ help() {
   echo ""
   echo "ARGS:"
   echo "    -h | --help                      Display this help message."
-  echo "    -d | --glass-dir <glass/dir>     Path to the cloned glass directory."
+  echo "    -d | --glass-dir <glass/dir>     Path to the cloned GLASS directory."
   echo "    -s | --start-ref <start_ref>     The git ref to be used as the initial state."
   echo "    -e | --end-ref <end_ref>         The git ref to be used as the final state."
   echo "    -a | --account <archer2_account> The archer2 account code to run jobs against."
@@ -100,7 +100,7 @@ BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
 
 if [[ "$SETUP_ENVS" == "true" ]]
 then
-  # Move to the glass directory
+  # Move to the GLASS directory
   pushd "$GLASS_DIR" || exit
 
   # Setup base environment
