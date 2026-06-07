@@ -134,4 +134,5 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
-        return jax.random.uniform(self.__key, _size(size), dtype, low, high)
+        shape = _size(size, low, high)
+        return jax.random.uniform(self.__key, shape, dtype, low, high)
