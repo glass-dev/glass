@@ -36,7 +36,7 @@ provided.
 3. Now that our environment is set up, before we can submit our regression test
    script to the scheduler, we must make some changes to the submission script -
    ([run_regression_test.sh](./run_regression_test.sh)). These changes will
-   include setting the path to the root of the GLASS repo in myriad and choosing
+   include setting the path to the root of the glass repo in myriad and choosing
    the BASE and the HEAD refs to be compared in the regression test. Once we
    have done this, we can submit the job...
 
