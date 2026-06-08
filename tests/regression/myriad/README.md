@@ -1,7 +1,7 @@
 # GLASS regression tests on Myriad
 
-For a more consistent regression testing environment we have been trialling using
-the UCL machine [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
+For a more consistent regression testing environment we have been trialling
+using the UCL machine [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
 
 To simplify running regression tests on myriad there are several scripts
 provided.

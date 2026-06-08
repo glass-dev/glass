@@ -1,7 +1,7 @@
 # GLASS regression testing on Archer2
 
-For a more consistent regression testing environment we have been trialling using
-[Archer2](https://www.archer2.ac.uk/).
+For a more consistent regression testing environment we have been trialling
+using [Archer2](https://www.archer2.ac.uk/).
 
 ## Setting up
 
@@ -46,8 +46,8 @@ For a more consistent regression testing environment we have been trialling usin
 ## Run the regression tests
 
 Now we have cloned glass, we can run the script
-[run_regression_test.sh](./run_regression_test.sh) which will set up the required
-environments and submit regression test job to slurm. A help message is
+[run_regression_test.sh](./run_regression_test.sh) which will set up the
+required environments and submit regression test job to slurm. A help message is
 provided. Just run `./tests/regression/archer2/run_regression_test.sh -h` from
 the root of the glass repo.
 

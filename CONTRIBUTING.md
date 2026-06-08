@@ -252,10 +252,10 @@ saved under `.nox/` and reused by default.
 
 ### Regression testing
 
-To ensure that GLASS remains performant over time, a set of regression tests
-are provided in the [regression](./tests/regression/) folder. These regression
-tests can be run through nox. To compare the performance of two different
-revisions of GLASS.
+To ensure that GLASS remains performant over time, a set of regression tests are
+provided in the [regression](./tests/regression/) folder. These regression tests
+can be run through nox. To compare the performance of two different revisions of
+GLASS.
 
 ```sh
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
