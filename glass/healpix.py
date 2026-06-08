@@ -255,6 +255,15 @@ def map2alm(
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
 
+    If you are running in an offline environment, you must provide a datapath to local
+    healpy datafiles. To download these files:
+
+        git clone --depth 1 https://github.com/healpy/healpy-data
+        cd healpy-data
+        bash download_weights_8192.sh
+
+    and set datapath to the root of the repository.
+
     Parameters
     ----------
     maps
@@ -338,6 +347,15 @@ def pixwin(
 ) -> FloatArray | tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
+
+    If you are running in an offline environment, you must provide a datapath to local
+    healpy datafiles. To download these files:
+
+        git clone --depth 1 https://github.com/healpy/healpy-data
+        cd healpy-data
+        bash download_weights_8192.sh
+
+    and set datapath to the root of the repository.
 
     Parameters
     ----------
