@@ -45,7 +45,7 @@ using [Archer2](https://www.archer2.ac.uk/).
 
 ## Run the regression tests
 
-Now we have cloned glass, we can run the script
+Now we have cloned GLASS, we can run the script
 [run_regression_test.sh](./run_regression_test.sh) which will set up the
 required environments and submit regression test job to slurm. A help message is
 provided. Just run `./tests/regression/archer2/run_regression_test.sh -h` from
