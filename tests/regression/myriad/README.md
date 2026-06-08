@@ -1,7 +1,7 @@
 # GLASS regression tests on Myriad
 
-For a more consistent regression testing environment we have been trialing using
-the UCL machine [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
+For a more consistent regression testing environment we have been trialling
+using the UCL machine [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
 
 To simplify running regression tests on myriad there are several scripts
 provided.
@@ -33,7 +33,7 @@ provided.
    python -m pip install --group test
    ```
 
-3. Now that our environment is setup, before we can submit our regression test
+3. Now that our environment is set up, before we can submit our regression test
    script to the scheduler, we must make some changes to the submission script -
    ([run_regression_test.sh](./run_regression_test.sh)). These changes will
    include setting the path to the root of the glass repo in myriad and choosing
@@ -41,5 +41,5 @@ provided.
    have done this, we can submit the job...
 
    ```sh
-   qsub $GLASS_DIR/tests/regression/myriad/run_regresion_test.sh
+   qsub $GLASS_DIR/tests/regression/myriad/run_regression_test.sh
    ```

@@ -1,14 +1,14 @@
 
-How *GLASS* works
+How GLASS works
 =================
 
 .. note::
-   This page gives a fairly high-level overview of how *GLASS* works.  See the
+   This page gives a fairly high-level overview of how GLASS works.  See the
    :doc:`list of GLASS publications <publications>` for additional in-depth
    references.
 
 
-The main purpose of *GLASS* is to produce cosmological simulations on the
+The main purpose of GLASS is to produce cosmological simulations on the
 sphere.  The full, three-dimensional past light cone of the observer is
 discretised into a sequence of nested shells, which are further discretised in
 the angular dimensions into maps of the sphere.
@@ -17,10 +17,10 @@ the angular dimensions into maps of the sphere.
 Radial discretisation
 ---------------------
 
-The discretisation in the radial (line of sight) direction is done in *GLASS*
+The discretisation in the radial (line of sight) direction is done in GLASS
 using the concept of a :term:`radial window`, which consists of a window
 function :math:`W` that assigns a weight :math:`W(z)` to each redshift
-:math:`z`.  In the *GLASS* code, the :class:`~glass.RadialWindow` ``dataclass``
+:math:`z`.  In the GLASS code, the :class:`~glass.RadialWindow` ``dataclass``
 is used to define radial windows.
 
 A sequence :math:`W_1, W_2, \ldots` of such window functions defines the shells
@@ -48,7 +48,7 @@ which are flat and non-overlapping.
     plt.ylabel("window function $W(z)$")
     plt.tight_layout()
 
-Given such a sequence of window functions :math:`W_i`, *GLASS* discretises a
+Given such a sequence of window functions :math:`W_i`, GLASS discretises a
 continuous field :math:`F` (e.g. the matter density in the universe) by using
 each :math:`W_i` in turn to project :math:`F` onto the sphere,
 
@@ -57,7 +57,7 @@ each :math:`W_i` in turn to project :math:`F` onto the sphere,
     F_i = \frac{\int W_i(z) \, F(z) \, dz}{\int W_i(z) \, dz} \;.
 
 This results in the sequence :math:`F_1, F_2, \ldots` of integrated (projected)
-fields, which are :term:`spherical functions<spherical function>`.  *GLASS*
+fields, which are :term:`spherical functions<spherical function>`.  GLASS
 then simulates the (radially) continuous field :math:`F(z)` as the (radially)
 discretised fields :math:`F_i`.
 
@@ -67,7 +67,7 @@ discretised fields :math:`F_i`.
 Window functions
 ^^^^^^^^^^^^^^^^
 
-*GLASS* supports arbitrary window functions (although the computation of
+GLASS supports arbitrary window functions (although the computation of
 :ref:`line-of-sight integrals <user-los-integrals>` makes some assumptions).
 The following :ref:`window functions <reference-window-functions>` are
 included:
@@ -118,7 +118,7 @@ Angular discretisation
 
 The projected fields :math:`F_i` are still continuous functions on the sphere.
 They therefore require further discretisation, which turns :math:`F_i` into a
-spherical map of finite resolution.  In *GLASS*, this is done using the
+spherical map of finite resolution.  In GLASS, this is done using the
 *HEALPix* [HEALPix05]_ discretisation of the sphere.
 
 Any spherical map is a discrete collection of spherical pixels :math:`F_{i,k}`,
@@ -134,8 +134,8 @@ usually called the :term:`pixel window function`.  This convolution is then
 sampled at the pixel centres.  In the second case, the continuous projected
 field :math:`F_i` itself is sampled at the pixel centres.
 
-*GLASS* can simulate either kind of angular discretisation.  The only
-difference between the two is whether or not the pixel window function is
+GLASS can simulate either kind of angular discretisation.  The only
+difference between the two is whether the pixel window function is
 applied to the spherical harmonic expansion of the fields.
 
 
@@ -152,7 +152,7 @@ line-of-sight integrals of the form
     I(z) = \int_{0}^{z} \! a(z') \, F(z') \, dz' \;,
 
 with :math:`a` some redshift-dependent factor, and :math:`F` a continuous field
-simulated by *GLASS*.  Integrals of this kind appear e.g. when simulating
+simulated by GLASS.  Integrals of this kind appear e.g. when simulating
 gravitational lensing or the distribution of galaxies.
 
 To approximate such integrals using the discretised fields :math:`F_i`, three
@@ -177,7 +177,7 @@ shells:
       W_j(z) = 0 \quad \text{if $j > i$ and $z \le z_{{\rm eff}, i}$.}
 
 In short, the requirements say that each shell has an effective redshift which
-partitions the window functions of all other shells. In *GLASS*, it is stored
+partitions the window functions of all other shells. In GLASS, it is stored
 as the ``zeff`` attribute of :class:`~glass.RadialWindow`.  Functions
 that construct a list of windows for shells should ensure these requirements
 are met.
