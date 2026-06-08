@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def shells(xp: ModuleType) -> list[glass.RadialWindow]:
     """
     Mock shells for testing.
@@ -277,8 +277,8 @@ def test_restrict(xp: ModuleType) -> None:
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(
     method: str,
-    xp: ModuleType,
     shells: list[glass.RadialWindow],
+    xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.partition`."""
     if (xp.__name__ == "jax.numpy") and (method == "nnls"):
@@ -395,8 +395,8 @@ def test_distance_grid(cosmo: Cosmology) -> None:
 
 
 def test_combine(
-    xp: ModuleType,
     shells: list[glass.RadialWindow],
+    xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.combine`."""
     z = xp.linspace(0.0, 5.0, 1_000)
@@ -463,9 +463,9 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
 
 def test_distribute(
+    shells: list[glass.RadialWindow],
     urng: UnifiedGenerator,
     xp: ModuleType,
-    shells: list[glass.RadialWindow],
 ) -> None:
     """Test distribution of redshifts over shells."""
     # well-defined shells have non-overlapping effective redshifts

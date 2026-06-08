@@ -37,12 +37,12 @@ def test_distribute(
     xpb: ModuleType,
 ) -> None:
     """Regression test for distribute() over a moderately-sized catalogue."""
-    # use 50 shells
+    # use N shells; tens is a good number
     shells = glass.linear_windows(xpb.linspace(0.0, 3.0, 52))
     assert len(shells) == 50
-    # use 1 million redshifts
+    # use M redshifts; millions is a good number
     redshifts = xpb.linspace(0.1, 2.9, 1_000_000)
-    # distribute redshifts over shells; problem size is 50_000_000
+    # distribute redshifts over shells; problem size is N * M
     result = benchmark(glass.distribute, redshifts, shells)
     # make sure result was computed for each redshift
     assert result.shape == redshifts.shape

@@ -1026,7 +1026,7 @@ def distribute(
         Array of redshifts to distribute over shells.
     shells
         List of window functions.
-    rng : optional
+    rng
         Random number generator. If not provided, a default is used.
 
     Returns
