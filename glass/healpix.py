@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import pathlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -18,6 +20,13 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
+
+
+def _get_healpy_datapath() -> str:
+    healpy_datapath = os.environ.get("HEALPY_DATAPATH")
+    if healpy_datapath is None or pathlib.Path(healpy_datapath).is_dir():
+        raise ValueError(f"Healpy datapath not found at '{healpy_datapath}'")
+    return healpy_datapath
 
 
 def alm2map(  # noqa: PLR0913
@@ -274,8 +283,15 @@ def map2alm(
         if isinstance(maps, Sequence)
         else np.asarray(maps)
     )
+
     return xp.asarray(
-        healpy.map2alm(inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights),
+        healpy.map2alm(
+            inputs,
+            datapath=_get_healpy_datapath(),
+            lmax=lmax,
+            pol=pol,
+            use_pixel_weights=use_pixel_weights,
+        ),
     )
 
 
@@ -341,7 +357,7 @@ def pixwin(
     """
     xp = _utils.default_xp() if xp is None else xp
 
-    output = healpy.pixwin(nside, lmax=lmax, pol=pol)
+    output = healpy.pixwin(nside, datapath=_get_healpy_datapath(), lmax=lmax, pol=pol)
     return (
         tuple(xp.asarray(out, dtype=xp.float64) for out in output)
         if pol
