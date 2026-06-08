@@ -22,11 +22,9 @@ if TYPE_CHECKING:
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
 
 
-def _get_healpy_datapath() -> str | None:
-    healpy_datapath = os.environ.get("HEALPY_DATAPATH")
-    if healpy_datapath is not None and not pathlib.Path(healpy_datapath).is_dir():
-        raise ValueError(f"Healpy datapath not found at '{healpy_datapath}'")
-    return healpy_datapath
+HEALPY_DATAPATH = os.environ.get("HEALPY_DATAPATH")
+if HEALPY_DATAPATH is not None and not pathlib.Path(HEALPY_DATAPATH).is_dir():
+    raise ValueError(f"Healpy datapath not found at '{HEALPY_DATAPATH}'")
 
 
 def alm2map(  # noqa: PLR0913
@@ -297,7 +295,7 @@ def map2alm(
     return xp.asarray(
         healpy.map2alm(
             inputs,
-            datapath=_get_healpy_datapath(),
+            datapath=HEALPY_DATAPATH,
             lmax=lmax,
             pol=pol,
             use_pixel_weights=use_pixel_weights,
@@ -377,7 +375,7 @@ def pixwin(
     """
     xp = _utils.default_xp() if xp is None else xp
 
-    output = healpy.pixwin(nside, datapath=_get_healpy_datapath(), lmax=lmax, pol=pol)
+    output = healpy.pixwin(nside, datapath=HEALPY_DATAPATH, lmax=lmax, pol=pol)
     return (
         tuple(xp.asarray(out, dtype=xp.float64) for out in output)
         if pol
