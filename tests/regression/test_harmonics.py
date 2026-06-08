@@ -23,7 +23,7 @@ def test_multalm(
     benchmark: BenchmarkFixture,
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.harmonics.multalm."""
+    """Regression tests for glass.harmonics.multalm."""
     scale_factor = 100_000
 
     alm = xpb.arange(scale_factor * 5, dtype=xpb.float64)

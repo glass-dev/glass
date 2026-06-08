@@ -1,10 +1,10 @@
-# GLASS benchmarks on Myriad
+# GLASS regression tests on Myriad
 
-For a more consistent benchmarking and regression testing environment we have
-been trialling using the UCL machine
-[Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
+For a more consistent regression testing environment we have been trialling using
+the UCL machine [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/).
 
-To simplify running benchmarks on myriad there are several scripts provided.
+To simplify running regression tests on myriad there are several scripts
+provided.
 
 ## Setting up
 
@@ -13,12 +13,12 @@ To simplify running benchmarks on myriad there are several scripts provided.
 
    ```sh
    export GLASS_DIR=/path/to/glass
-   source $GLASS_DIR/tests/benchmarks/myriad/load_modules.sh
+   source $GLASS_DIR/tests/regression/myriad/load_modules.sh
    ```
 
-2. Then, to reduce the required run time of the benchmark jobs on myriad, we
-   install the required python dependencies from the group `test`. Therefore, we
-   must create our virtual environment, ensuring we upgrade pip to a version
+2. Then, to reduce the required run time of the regression test jobs on myriad,
+   we install the required python dependencies from the group `test`. Therefore,
+   we must create our virtual environment, ensuring we upgrade pip to a version
    which supports dependency groups...
 
    ```sh
@@ -41,5 +41,5 @@ To simplify running benchmarks on myriad there are several scripts provided.
    have done this, we can submit the job...
 
    ```sh
-   qsub $GLASS_DIR/tests/benchmarks/myriad/run_regression_test.sh
+   qsub $GLASS_DIR/tests/regression/myriad/run_regression_test.sh
    ```

@@ -21,10 +21,10 @@ export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 # Set path to class and select base or head
 GLASS_DIR="$1"
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
-BENCHMARK_OUTPUT_PATH="$BENCHMARKS_DIR/archer2/.benchmarks"
-BENCHMARKS_SHARED_FLAGS=(
-  "--benchmark-storage=file://$BENCHMARK_OUTPUT_PATH"
+REGRESSION_DIR="$GLASS_DIR/tests/regression"
+REGRESSION_OUTPUT_PATH="$REGRESSION_DIR/archer2/.benchmarks"
+REGRESSION_SHARED_FLAGS=(
+  "--benchmark-storage=file://$REGRESSION_OUTPUT_PATH"
   "--benchmark-calibration-precision=1000"
   "--benchmark-columns=mean,stddev,rounds"
   "--benchmark-max-time=5.0"
@@ -34,23 +34,23 @@ BENCHMARKS_SHARED_FLAGS=(
 START_VENV_BIN="$GLASS_DIR/.venv-start/bin"
 END_VENV_BIN="$GLASS_DIR/.venv-end/bin"
 
-# Remove old benchmark results
-rm -rf "$BENCHMARK_OUTPUT_PATH"
+# Remove old regression results
+rm -rf "$REGRESSION_OUTPUT_PATH"
 
-# Change into archer2 dir to ensure we don't pickup the GLASS directory as an import
-cd "$BENCHMARKS_DIR/archer2" || exit
+# Change into archer2 dir to ensure we don't pickup the glass directory as an import
+cd "$REGRESSION_DIR/archer2" || exit
 
 # Generate the base report for comparison later
 source "$START_VENV_BIN/activate"
-srun "$START_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" \
-    --benchmark-autosave "${BENCHMARKS_SHARED_FLAGS[@]}"
+srun "$START_VENV_BIN/python" -m pytest "$REGRESSION_DIR" \
+    --benchmark-autosave "${REGRESSION_SHARED_FLAGS[@]}"
 deactivate
 
-# Run the stable and unstable benchmarks and compare to the base ref
+# Run the stable and unstable regression tests and compare to the base ref
 source "$END_VENV_BIN/activate"
-srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m stable \
+srun "$END_VENV_BIN/python" -m pytest "$REGRESSION_DIR" -m stable \
     --benchmark-compare=0001 \
-    --benchmark-compare-fail=mean:5% "${BENCHMARKS_SHARED_FLAGS[@]}"
-srun "$END_VENV_BIN/python" -m pytest "$BENCHMARKS_DIR" -m unstable \
+    --benchmark-compare-fail=mean:5% "${REGRESSION_SHARED_FLAGS[@]}"
+srun "$END_VENV_BIN/python" -m pytest "$REGRESSION_DIR" -m unstable \
     --benchmark-compare=0001 \
-    --benchmark-compare-fail=mean:0.0005 "${BENCHMARKS_SHARED_FLAGS[@]}"
+    --benchmark-compare-fail=mean:0.0005 "${REGRESSION_SHARED_FLAGS[@]}"

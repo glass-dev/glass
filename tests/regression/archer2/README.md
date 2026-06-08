@@ -1,7 +1,7 @@
-# GLASS benchmarks on Archer2
+# GLASS regression testing on Archer2
 
-For a more consistent benchmarking and regression testing environment we have
-been trialling using the UCL machine [Archer2](https://www.archer2.ac.uk/).
+For a more consistent regression testing environment we have been trialling using
+[Archer2](https://www.archer2.ac.uk/).
 
 ## Setting up
 
@@ -45,11 +45,11 @@ been trialling using the UCL machine [Archer2](https://www.archer2.ac.uk/).
 
 ## Run the regression tests
 
-Now we have cloned GLASS, we can run the script
-[run_regression_test.sh](./run_regression_test.sh) which will set up the
-required environments and submit regression test job to slurm. A help message is
-provided. Just run `./tests/benchmarks/run_regression_test.sh -h` from the root
-of the GLASS repo.
+Now we have cloned glass, we can run the script
+[run_regression_test.sh](./run_regression_test.sh) which will set up the required
+environments and submit regression test job to slurm. A help message is
+provided. Just run `./tests/regression/archer2/run_regression_test.sh -h` from
+the root of the GLASS repo.
 
 ### Example execution
 
@@ -58,7 +58,7 @@ branch called `feature` using the budget from account code `ecsega23`, you could
 run the following command from the root of the GLASS repo.
 
 ```sh
-./tests/benchmarks/archer2/run_regression_test.sh \
+./tests/regression/archer2/run_regression_test.sh \
    -d "$(pwd)"                                    \
    -s main                                        \
    -e feature                                     \
