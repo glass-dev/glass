@@ -22,9 +22,9 @@ if TYPE_CHECKING:
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
 
 
-def _get_healpy_datapath() -> str:
+def _get_healpy_datapath() -> str | None:
     healpy_datapath = os.environ.get("HEALPY_DATAPATH")
-    if healpy_datapath is None or pathlib.Path(healpy_datapath).is_dir():
+    if healpy_datapath is not None and not pathlib.Path(healpy_datapath).is_dir():
         raise ValueError(f"Healpy datapath not found at '{healpy_datapath}'")
     return healpy_datapath
 
@@ -262,7 +262,8 @@ def map2alm(
         cd healpy-data
         bash download_weights_8192.sh
 
-    and set datapath to the root of the repository.
+    and set datapath to the root of the repository. If this method is used, the only
+    supported values of nside are 2^n for n in the range 5-13.
 
     Parameters
     ----------
@@ -355,7 +356,8 @@ def pixwin(
         cd healpy-data
         bash download_weights_8192.sh
 
-    and set datapath to the root of the repository.
+    and set datapath to the root of the repository. If this method is used, the only
+    supported values of nside are 2^n for n in the range 5-13.
 
     Parameters
     ----------
