@@ -42,19 +42,19 @@ source "$GLASS_DIR/.venv/bin/activate"
 # Remove old regression test results
 rm -rf "$REGRESSION_DIR/outputs"
 
-# Make sure to installation of glass already exists
+# Make sure to installation of GLASS already exists
 python -m pip uninstall glass -y
 
-# Install the base ref of glass
+# Install the base ref of GLASS
 python -m pip install "git+$GLASS_REPO_URL@$BASE_REF"
 
 # Generate the base report for comparison later
 python -m pytest "$REGRESSION_DIR" --benchmark-autosave "${REGRESSION_SHARED_FLAGS[@]}"
 
-# Uninstall the base ref of glass
+# Uninstall the base ref of GLASS
 python -m pip uninstall glass -y
 
-# Install the head ref of glass
+# Install the head ref of GLASS
 python -m pip install "git+$GLASS_REPO_URL@$HEAD_REF"
 
 # Run the stable and unstable regression tests and compare to the base ref
