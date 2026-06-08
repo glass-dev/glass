@@ -1,7 +1,7 @@
 # GLASS regression testing on Archer2
 
-For a more consistent regression testing environment we have been trialing using
-[Archer2](https://www.archer2.ac.uk/).
+For a more consistent regression testing environment we have been trialling
+using [Archer2](https://www.archer2.ac.uk/).
 
 ## Setting up
 
@@ -13,8 +13,8 @@ For a more consistent regression testing environment we have been trialing using
    ```
 
    Then we must make sure uv is available on the login node and the worker node.
-   To do this we can update our start up scripts (`.profile`) on both
-   partitions. Therefore, execute the following
+   To do this we can update our startup scripts (`.profile`) on both partitions.
+   Therefore, execute the following
 
    ```sh
    cat <<'EOF' >> "$HOME/.profile"
@@ -33,7 +33,7 @@ For a more consistent regression testing environment we have been trialing using
    EOF
    ```
 
-   Now when you next login to archer2, uv will be in your path and you will be
+   Now when you next log in to archer2, uv will be in your path, and you will be
    on the `/work` partition as your `HOME` dir.
 
 2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2:
@@ -45,11 +45,11 @@ For a more consistent regression testing environment we have been trialing using
 
 ## Run the regression tests
 
-Now we have cloned glass, we can run the script
-[run_regression_test.sh](./run_regression_test.sh) which will setup the required
-environments and submit regression test job to slurm. A help message is
+Now we have cloned GLASS, we can run the script
+[run_regression_test.sh](./run_regression_test.sh) which will set up the
+required environments and submit regression test job to slurm. A help message is
 provided. Just run `./tests/regression/archer2/run_regression_test.sh -h` from
-the root of the GLASS repo.
+the root of the glass repo.
 
 ### Example execution
 
@@ -65,7 +65,7 @@ run the following command from the root of the glass repo.
    -a ecsega23
 ```
 
-> Note that this script does not have to be ran from the root of the glass repo.
+> Note that this script does not have to be run from the root of the glass repo.
 
 #### The results
 

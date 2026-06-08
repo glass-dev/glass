@@ -1,14 +1,13 @@
 # Contributing to GLASS
 
-If you are planning to develop _GLASS_, or want to use the latest commit of
-_GLASS_ on your local machine, you might want to install it from the source.
-This installation is not recommended for users who want to use the stable
-version of _GLASS_. The page below describes how to build, test, and develop
-_GLASS_.
+If you are planning to develop GLASS, or want to use the latest commit of GLASS
+on your local machine, you might want to install it from the source. This
+installation is not recommended for users who want to use the stable version of
+GLASS. The page below describes how to build, test, and develop GLASS.
 
 ## Installation
 
-The developer installation of _GLASS_ comes with several optional dependencies -
+The developer installation of GLASS comes with several optional dependencies -
 
 - `test`: installs extra packages used in tests and the relevant testing
   framework/plugins
@@ -26,8 +25,8 @@ uv sync --all-extras --all-groups
 
 ### Prek
 
-_GLASS_ uses a set of `prek` hooks to format, lint, and prettify the codebase.
-The hooks can be installed locally using -
+GLASS uses a set of `prek` hooks to format, lint, and prettify the codebase. The
+hooks can be installed locally using -
 
 ```bash
 prek install
@@ -51,17 +50,17 @@ nox -s lint
 
 ## Testing
 
-_GLASS_ is tested using `pytest` and `pytest-doctestplus`. `pytest` is
-responsible for testing the code, whose configuration is available in
+GLASS is tested using `pytest` and `pytest-doctestplus`. `pytest` is responsible
+for testing the code, whose configuration is available in
 [pyproject.toml](https://github.com/glass-dev/glass/blob/main/pyproject.toml).
 `pytest-doctestplus` is responsible for testing the examples available in every
-docstring, which prevents them from going stale. Additionally, _GLASS_ also uses
+docstring, which prevents them from going stale. Additionally, GLASS also uses
 `pytest-cov` (and [Coveralls](https://coveralls.io)) to calculate/display the
 coverage of these unit tests.
 
 ### Running tests locally
 
-The tests can be executed using the `test` dependencies of _GLASS_ in the
+The tests can be executed using the `test` dependencies of GLASS in the
 following way -
 
 ```bash
@@ -71,11 +70,11 @@ python -m pytest --cov --doctest-plus
 ### Array API tests
 
 One can specify a particular array backend for testing by setting the
-`ARRAY_BACKEND` environment variable. The default array backend is NumPy.
-_GLASS_ can be tested with every supported array library available in the
-environment by setting `ARRAY_BACKEND` to `all`. The testing framework only
-installs NumPy automatically; hence, remaining array libraries should either be
-installed manually or developers should use `Nox`.
+`ARRAY_BACKEND` environment variable. The default array backend is NumPy. GLASS
+can be tested with every supported array library available in the environment by
+setting `ARRAY_BACKEND` to `all`. The testing framework only installs NumPy
+automatically; hence, remaining array libraries should either be installed
+manually or developers should use `Nox`.
 
 ```bash
 # run tests using numpy
@@ -114,27 +113,27 @@ def test_something(xp: ModuleType, urng: UnifiedGenerator) -> None:
 
 ## Documenting
 
-_GLASS_'s documentation is mainly written in the form of
+GLASS's documentation is mainly written in the form of
 [docstrings](https://peps.python.org/pep-0257) and
-[reStructurredText](https://docutils.sourceforge.io/docs/user/rst/quickref.html).
+[reStructuredText](https://docutils.sourceforge.io/docs/user/rst/quickref.html).
 The docstrings include the description, arguments, examples, return values, and
 attributes of a class or a function, and the `.rst` files enable us to render
-this documentation on _GLASS_'s documentation website.
+this documentation on GLASS's documentation website.
 
-_GLASS_ primarily uses [Sphinx](https://www.sphinx-doc.org/en/master/) for
+GLASS primarily uses [Sphinx](https://www.sphinx-doc.org/en/master/) for
 rendering documentation on its website. The configuration file (`conf.py`) for
 `sphinx` can be found
 [under the `docs` folder](https://github.com/glass-dev/glass/blob/main/docs/conf.py).
 The [documentation is deployed](https://glass.readthedocs.io/latest/) on
 <https://readthedocs.io>.
 
-Ideally, with the addition of every new feature to _GLASS_, documentation should
+Ideally, with the addition of every new feature to GLASS, documentation should
 be added using comments, docstrings, and `.rst` files.
 
 ### Building documentation locally
 
 The documentation is located in the `docs` folder of the main repository. This
-documentation can be generated using the `docs` dependencies of _GLASS_ in the
+documentation can be generated using the `docs` dependencies of GLASS in the
 following way -
 
 ```bash
@@ -149,7 +148,7 @@ any browser by opening the `index.html` file.
 
 ## Releases
 
-To release a new version of _GLASS_, there should be a commit that includes the
+To release a new version of GLASS, there should be a commit that includes the
 following changes:
 
 - The changes since the last release are added to the [changelog](CHANGELOG.md)
@@ -172,25 +171,24 @@ the release should be a copy of its release note.
 Creating the release will automatically start the build process that uploads
 Python packages for the new version to PyPI.
 
-If any _GLASS_ extension packages depend on the new release, new versions of
-these packages should be produced as soon as the new release is published to
-PyPI.
+If any GLASS extension packages depend on the new release, new versions of these
+packages should be produced as soon as the new release is published to PyPI.
 
 ### Versioning
 
-_GLASS_ follows [CalVer](https://calver.org). There is no difference between
+GLASS follows [CalVer](https://calver.org). There is no difference between
 releases that increment the year and releases that increment the month; in
 particular, releases that increment the month may introduce breaking changes.
 
 The current version number is automatically inferred from the last release
 (i.e., git tag), subsequent unreleased commits, and local changes, if any.
 
-The target is to have a new _GLASS_ release once there are significant changes
-to the code's functionality.
+The target is to have a new GLASS release once there are significant changes to
+the code's functionality.
 
 ## Nox
 
-_GLASS_ supports running various critical commands using
+GLASS supports running various critical commands using
 [nox](https://github.com/wntrblm/nox) to make them less intimidating for new
 developers. All of these commands (or sessions in the language of `nox`) -
 `lint`, `tests`, `coverage`, `coverage_regression`, `doctests`, `examples`,
@@ -227,9 +225,9 @@ uv run nox -s tests-3.14
 ```
 
 One can specify a particular array backend for testing by setting the
-`ARRAY_BACKEND` environment variable. The default array backend is NumPy.
-_GLASS_ can be tested with every supported array library by setting
-`ARRAY_BACKEND` to `all`.
+`ARRAY_BACKEND` environment variable. The default array backend is NumPy. GLASS
+can be tested with every supported array library by setting `ARRAY_BACKEND` to
+`all`.
 
 ```bash
 # run tests using numpy
@@ -254,10 +252,10 @@ saved under `.nox/` and reused by default.
 
 ### Regression testing
 
-To ensure that _GLASS_ remains performant over time, a set of regression tests
-are provided in the [regression](./tests/regression/) folder. These regression
-tests can be run through nox. To compare the performance of two different
-revisions of _GLASS_.
+To ensure that GLASS remains performant over time, a set of regression tests are
+provided in the [regression](./tests/regression/) folder. These regression tests
+can be run through nox. To compare the performance of two different revisions of
+GLASS.
 
 ```sh
 uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
@@ -288,7 +286,7 @@ uv run nox -s regression-tests -- <initial-state-revision> \
 
 <!-- prettier-ignore -->
 > [!NOTE]
-> There are two types of regression tests in _GLASS_: `stable` and `unstable`.
+> There are two types of regression tests in GLASS: `stable` and `unstable`.
 > These are marked using the `@pytest.mark.stable` and `@pytest.mark.unstable`
 > decorators respectively. The stable tests are expected to have minimal
 > variance in their results across different runs, and are therefore measured in
@@ -297,7 +295,7 @@ uv run nox -s regression-tests -- <initial-state-revision> \
 > regression tests.
 
 The regression tests are run in GitHub Actions for every pull request to ensure
-that new changes do not degrade the performances of _GLASS_. This workflow uses
+that new changes do not degrade the performances of GLASS. This workflow uses
 the `nox` command detailed above comparing the head of the current pull request
 to the `main` branch. The regression tests are first run over the `main` branch,
 followed by the head of the pull request. If there is any statistically
@@ -399,11 +397,11 @@ Cc: @octocat
 
 ### Acknowledging contributors
 
-_GLASS_ uses [All Contributors](https://allcontributors.org) to acknowledge
+GLASS uses [All Contributors](https://allcontributors.org) to acknowledge
 different types of contributions to the project. The contributor data is stored
 in `.all-contributorsrc` as JSON and is rendered as Markdown in
 `docs/CONTRIBUTORS.md`. The markdown file is further rendered in
-[_GLASS_' documentation](https://glass.readthedocs.io/latest/#contributors).
+[GLASS' documentation](https://glass.readthedocs.io/latest/#contributors).
 
 We encourage people to minimize contribution types, keeping them restricted to
 `code` (usually includes `docs`, `infra`, and other related activities),
