@@ -1035,7 +1035,7 @@ def distribute(
         Array of shell indices of the same shape as ``redshifts``.
 
     """
-    xp = array_api_compat.array_namespace(redshifts, use_compat=False)
+    xp = redshifts.__array_namespace__()
 
     # get default RNG if not given
     if rng is None:
@@ -1067,14 +1067,14 @@ def distribute(
         outside = wnorm == 0
 
         # normalise the weights for redshifts in shells
-        weights /= xp.where(outside, xp.ones_like(wnorm), wnorm)[:, None]
+        weights /= xp.where(outside, xp.ones_like(wnorm), wnorm)[:, xp.newaxis]
 
         # create an extra "shell" with unit probability for redshifts outside
         pout = xp.where(outside, xp.ones_like(wnorm), xp.zeros_like(wnorm))
 
         # prepend this extra shell in front of the actual shells
         # we later subtract 1 from the shell index so this is "shell -1"
-        weights = xp.concat([pout[:, None], weights], axis=1)
+        weights = xp.concat([pout[:, xp.newaxis], weights], axis=1)
 
         # clean up before sampling
         del wnorm, outside, pout
