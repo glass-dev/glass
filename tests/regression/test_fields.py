@@ -122,7 +122,7 @@ def test_generate_grf(  # noqa: PLR0913
     xpb: ModuleType,
 ) -> None:
     """Regression tests of glass.fields._generate_grf with positional arguments only."""
-    n = 4
+    n = 100
     nth_triangular_number = int((n * (n + 1)) / 2)
     gls: AngularPowerSpectra = [xpb.ones(10) for _ in range(nth_triangular_number)]
     nside = 16
@@ -134,7 +134,10 @@ def test_generate_grf(  # noqa: PLR0913
             rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(
+            generator,
+            valid_exception="covariance matrix is not positive definite",
+        )
 
     gaussian_fields = benchmark(function_to_benchmark)
 
