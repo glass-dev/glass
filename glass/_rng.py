@@ -214,5 +214,21 @@ class Generator:
         pvals: FloatArray,
         size: int | tuple[int, ...] | None = None,
     ) -> IntArray:
-        """Draw samples from a multinomial distribution."""
+        """
+        Draw samples from a multinomial distribution.
+
+        Parameters
+        ----------
+        n
+            Number of experiments.
+        pvals
+            Probabilities of each of the p different outcomes.
+        size
+            Output shape.
+
+        Returns
+        -------
+            The drawn sample.
+
+        """
         return self.xp.asarray(self.rng.multinomial(n, pvals, size))
