@@ -190,22 +190,19 @@ def test_get_nside(
 
 
 @pytest.mark.parametrize(
-    "pol,expected_shape",
+    ("pol", "expected_shape"),
     [
-        (
-            False,
-            (78,)
-        ),
-    ]
+        (False, (78,)),
+    ],
 )
 def test_map2alm_with_pulled_data(
-    add_healpy_datapath_to_env: pytest.FixtureDef,
+    add_healpy_datapath_to_env: pytest.FixtureDef,  # noqa: ARG001
     expected_shape: tuple[int],
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
-):  
-    kappa = urng.normal(size=12_288) # nside=32
+) -> None:
+    kappa = urng.normal(size=12_288)  # nside=32
     result = hp.map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
@@ -307,26 +304,14 @@ def test_pixwin(
         xpx.testing.assert_equal(xp.asarray(old[i], dtype=xp.float64), new[i])
 
 
-@pytest.mark.parametrize(
-    "pol,expected_shape",
-    [
-        (
-            False,
-            (12,)
-        ),
-        (
-            True,
-            (2, 12,)
-        )
-    ]
-)
+@pytest.mark.parametrize(("pol", "expected_shape"), [(False, (12,)), (True, (2, 12))])
 def test_pixwin_with_pulled_data(
-    add_healpy_datapath_to_env: pytest.FixtureDef,
+    add_healpy_datapath_to_env: pytest.FixtureDef,  # noqa: ARG001
     expected_shape: tuple[int],
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
     xp: ModuleType,
-):  
+) -> None:
     result = hp.pixwin(healpix_inputs.nside, lmax=healpix_inputs.lmax, pol=pol, xp=xp)
     assert xp.asarray(result).shape == expected_shape
 

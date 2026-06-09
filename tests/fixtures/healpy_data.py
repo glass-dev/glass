@@ -1,55 +1,57 @@
-"""Fixtures for handling healpy data within tests"""
+"""Fixtures for handling healpy data within tests."""
+
+from __future__ import annotations
+
+import os
+import pathlib
+import subprocess
+from typing import TYPE_CHECKING
 
 import pytest
-import subprocess
-import pathlib
-import os
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 @pytest.fixture(scope="session")
-def healpy_datapath(request: pytest.FixtureRequest) -> str:
+def healpy_datapath() -> Generator[str]:
     """
-    Pulls the healpy data and returns the path to the new folder.
+    Pull the healpy data and returns the path to the new folder.
 
     Also performs cleanup by removing the cloned dir.
     """
-    subprocess.run(
+    subprocess.run(  # noqa: S602
         """
         git clone --depth 1 https://github.com/healpy/healpy-data;
         cd healpy-data;
         bash download_weights_8192.sh;
-        """
-        ,
+        """,  # noqa: S607
         shell=True,
         check=True,
         capture_output=True,
     )
     healpy_datapath = str(pathlib.Path("healpy-data").absolute())
 
-    # Define a finalizer function for teardown
-    def finalizer():
-      """Deletes the pulled healpy_datapath directory"""
-      subprocess.run(["rm","-rf",healpy_datapath])
+    yield healpy_datapath
 
-    # Register the finalizer to ensure cleanup
-    request.addfinalizer(finalizer)
+    # Teardown
+    subprocess.run(  # noqa: S603
+        ["rm", "-rf", healpy_datapath],  # noqa: S607
+        check=True,
+    )
 
-    return healpy_datapath
-   
 
-@pytest.fixture(scope="function")
-def add_healpy_datapath_to_env(request: pytest.FixtureRequest, healpy_datapath: str) -> None:
+@pytest.fixture
+def add_healpy_datapath_to_env(healpy_datapath: str) -> Generator:
     """
-    Adds the path to the healpy into the environment.
+    Add the path to the healpy into the environment.
 
     Also removes the new env var when finalising.
     """
     # Set path to healpy data in environment
     os.environ["HEALPY_DATAPATH"] = healpy_datapath
 
-    # Define a finalizer function for teardown
-    def finalizer():
-      """Removes healpy_datapath from the env"""
-      os.environ.pop("HEALPY_DATAPATH")
+    yield
 
-    # Register the finalizer to ensure cleanup
-    request.addfinalizer(finalizer)
+    # Teardown
+    os.environ.pop("HEALPY_DATAPATH")
