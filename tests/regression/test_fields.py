@@ -137,7 +137,10 @@ def test_generate_grf(  # noqa: PLR0913
             rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(generator)
+        return generator_consumer.consume(
+            generator,
+            valid_exception="covariance matrix is not positive definite",
+        )
 
     gaussian_fields = benchmark(function_to_benchmark)
 
