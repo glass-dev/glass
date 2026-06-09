@@ -34,6 +34,8 @@ def _shape(
     ----------
     shape
         Non-negative integers representing the result shape.
+    bcast
+        Arrays whose shapes will be broadcast together to determine the broadcast.
 
     Returns
     -------
