@@ -20,18 +20,45 @@ if TYPE_CHECKING:
     from glass._types import AnyArray, DTypeLike, FloatArray, IntArray
 
 
-def _size(
-    size: int | tuple[int, ...] | None,
+def _shape(
+    shape: int | tuple[int, ...] | None,
     *bcast: AnyArray,
 ) -> tuple[int, ...]:
     """
-    Return a size, which can be a single int or None, as a shape, which
-    is a tuple of int.
+    Computes the shape of an array given an explicit shape and a broadcast shape.
+
+    A check will be performed to ensure that the explicit shape is compatible
+    with the broadcast shape.
+
+    Parameters
+    ----------
+    shape
+        Non-negative integers representing the result shape.
+
+    Returns
+    -------
+        The resulting shape as a tuple of non-negative integers.
+
+    Raises
+    ------
+    ValueError
+        If the explicit shape is incompatible with the broadcast shape.
 
     """
-    if size is None:
-        return jnp.broadcast_shapes(*map(jnp.shape, bcast)) if bcast else ()
-    return (size,) if isinstance(size, int) else size
+    bcast_shape = jnp.broadcast_shapes(*map(jnp.shape, bcast)) if bcast else ()
+
+    if shape is None:
+        return bcast_shape
+
+    explicit_shape = (shape,) if isinstance(shape, int) else shape
+
+    if bcast_shape and explicit_shape != bcast_shape:
+        raise ValueError(
+            f"shape {explicit_shape} is incompatible with input shapes "
+            f"that broadcast to {bcast_shape}",
+        )
+
+    return explicit_shape
 
 
 def trapezoid(
@@ -79,7 +106,7 @@ class Generator:
 
     def split(self, size: int | tuple[int, ...] | None = None) -> AnyArray:
         """Split random key."""
-        shape = _size(size)
+        shape = _shape(size)
         with self.lock:
             keys = jax.random.split(self.key, 1 + math.prod(shape))
             self.key = keys[0]
@@ -97,7 +124,7 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
-        return jax.random.uniform(self.__key, _size(size), dtype)
+        return jax.random.uniform(self.__key, _shape(size), dtype)
 
     def normal(
         self,
@@ -107,7 +134,11 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
-        return loc + scale * jax.random.normal(self.__key, _size(size), dtype)
+        return loc + scale * jax.random.normal(
+            self.__key,
+            _shape(size, loc, scale),
+            dtype,
+        )
 
     def poisson(
         self,
@@ -116,7 +147,7 @@ class Generator:
         dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a Poisson distribution."""
-        return jax.random.poisson(self.__key, lam, size, dtype)
+        return jax.random.poisson(self.__key, lam, _shape(size, lam), dtype)
 
     def standard_normal(
         self,
@@ -124,7 +155,7 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-        return jax.random.normal(self.__key, _size(size), dtype)
+        return jax.random.normal(self.__key, _shape(size), dtype)
 
     def uniform(
         self,
@@ -134,4 +165,4 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
-        return jax.random.uniform(self.__key, _size(size), dtype, low, high)
+        return jax.random.uniform(self.__key, _shape(size, low, high), dtype, low, high)
