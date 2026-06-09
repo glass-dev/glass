@@ -477,6 +477,17 @@ def test_distribute(
 
     xpx.testing.assert_equal(index, xp.arange(len(shells)))
 
+    # sample random redshifts that could fall into overlapping shells
+    lower, upper = redshifts[:-1], redshifts[1:]
+    redshifts = urng.uniform(lower, upper, size=lower.shape)
+
+    # redshift i land in shell i or i+1
+    index = glass.distribute(redshifts, shells, rng=urng)
+
+    # redshift 0 can fall into shells 0 or 1, redshift 1 into 1 or 2, etc.
+    xpx.testing.assert_less(xp.arange(-1, len(shells) - 2), index)
+    xpx.testing.assert_less(index, xp.arange(2, len(shells) + 1))
+
     # give redshifts that fall out of bounds
     redshifts = xp.asarray([-1.0, 10.0])
 
