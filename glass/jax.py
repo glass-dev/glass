@@ -126,7 +126,11 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
-        return jax.random.uniform(self.__key, _shape(size), dtype)
+        return jax.random.uniform(
+            self.__key,
+            _shape(size),
+            dtype,
+        )
 
     def normal(
         self,
@@ -149,7 +153,12 @@ class Generator:
         dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a Poisson distribution."""
-        return jax.random.poisson(self.__key, lam, _shape(size, lam), dtype)
+        return jax.random.poisson(
+            self.__key,
+            lam,
+            _shape(size, lam),
+            dtype,
+        )
 
     def standard_normal(
         self,
@@ -157,7 +166,11 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-        return jax.random.normal(self.__key, _shape(size), dtype)
+        return jax.random.normal(
+            self.__key,
+            _shape(size),
+            dtype,
+        )
 
     def uniform(
         self,
@@ -167,4 +180,10 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
-        return jax.random.uniform(self.__key, _shape(size, low, high), dtype, low, high)
+        return jax.random.uniform(
+            self.__key,
+            _shape(size, low, high),
+            dtype,
+            low,
+            high,
+        )
