@@ -49,50 +49,105 @@ def test_spawn() -> None:
         assert subrng.key == subkey
 
 
-def test_random() -> None:
+@pytest.mark.parametrize(
+    ("size_input", "shape_output"),
+    [
+        (10_000, (10_000,)),
+    ],
+)
+def test_random(
+    shape_output: tuple[int, ...],
+    size_input: int,
+) -> None:
+    """Test passing glass.jax.Generator.random."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.random(size=10_000)
+    rvs = rng.random(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == (10_000,)
+    assert rvs.shape == shape_output
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
     assert isinstance(rvs, ArrayLike)
 
 
-def test_normal() -> None:
+@pytest.mark.parametrize(
+    ("loc", "scale", "size_input", "shape_output"),
+    [
+        (1, 2, 10_000, (10_000,)),
+    ],
+)
+def test_normal(
+    loc: float,
+    scale: float,
+    shape_output: tuple[int, ...],
+    size_input: int,
+) -> None:
+    """Test passing glass.jax.Generator.normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.normal(1, 2, size=10_000)
+    rvs = rng.normal(loc, scale, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == (10_000,)
+    assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
-def test_standard_normal() -> None:
+@pytest.mark.parametrize(
+    ("size_input", "shape_output"),
+    [
+        (10_000, (10_000,)),
+    ],
+)
+def test_standard_normal(
+    shape_output: tuple[int, ...],
+    size_input: int,
+) -> None:
+    """Test passing glass.jax.Generator.standard_normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.standard_normal(size=10_000)
+    rvs = rng.standard_normal(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == (10_000,)
+    assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
-def test_poisson() -> None:
+@pytest.mark.parametrize(
+    ("lam", "size_input", "shape_output"),
+    [
+        (1, 10_000, (10_000,)),
+    ],
+)
+def test_poisson(
+    lam: int,
+    shape_output: tuple[int, ...],
+    size_input: int,
+) -> None:
+    """Test passing glass.jax.Generator.poisson."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.poisson(lam=1, size=10_000)
+    rvs = rng.poisson(lam=lam, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == (10_000,)
+    assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
-def test_uniform() -> None:
+@pytest.mark.parametrize(
+    ("low", "high", "size_input", "shape_output"),
+    [
+        (0.0, 1.0, 10_000, (10_000,)),
+    ],
+)
+def test_uniform(
+    low: float,
+    high: float,
+    shape_output: tuple[int, ...],
+    size_input: int,
+) -> None:
+    """Test passing glass.jax.Generator.uniform."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.uniform(size=10_000)
+    rvs = rng.uniform(size=size_input, low=low, high=high)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == (10_000,)
-    assert jnp.min(rvs) >= 0.0
-    assert jnp.max(rvs) < 1.0
+    assert rvs.shape == shape_output
+    assert jnp.min(rvs) >= low
+    assert jnp.max(rvs) < high
     assert isinstance(rvs, ArrayLike)
