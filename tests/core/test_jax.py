@@ -68,7 +68,6 @@ def test_random(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing for glass.jax.Generator.random."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.random(size=size_input)
@@ -97,27 +96,32 @@ def test_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing for glass.jax.Generator.normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.normal(loc, scale, size=size_input)
+    rvs = rng.normal(loc=loc, scale=scale, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
     assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
-@pytest.mark.parametrize(
-    ("loc", "scale", "size_input"),
-    [
-        (1, 2, 10_000),
-    ],
-)
-def test_normal_shape_mismatch(
-    loc: float | FloatArray,
-    scale: float | FloatArray,
-    size_input: int | tuple[int, ...] | None,
-) -> None:
-    """Test failure for glass.jax.Generator.normal."""
+def test_normal_shape_mismatch_explicit() -> None:
+    """Explicit size incompatible with input broadcast shape."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="is incompatible with input shapes that broadcast to",
+    ):
+        rng.normal(loc=jnp.ones(5), scale=2, size=3)
+
+
+def test_normal_shape_mismatch_broadcast() -> None:
+    """Input shapes that cannot be broadcast together."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="Incompatible shapes for broadcasting: shapes=",
+    ):
+        rng.normal(loc=jnp.ones(5), scale=jnp.ones(3), size=None)
 
 
 @pytest.mark.parametrize(
@@ -132,7 +136,6 @@ def test_standard_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing for glass.jax.Generator.standard_normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.standard_normal(size=size_input)
@@ -156,7 +159,6 @@ def test_poisson(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing for glass.jax.Generator.poisson."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.poisson(lam=lam, size=size_input)
@@ -165,17 +167,14 @@ def test_poisson(
     assert isinstance(rvs, ArrayLike)
 
 
-@pytest.mark.parametrize(
-    ("lam", "size_input"),
-    [
-        (1, 10_000),
-    ],
-)
-def test_poisson_shape_mismatch(
-    lam: float | FloatArray,
-    size_input: int | tuple[int, ...] | None,
-) -> None:
-    """Test failure for glass.jax.Generator.poisson."""
+def test_poisson_shape_mismatch_explicit() -> None:
+    """Explicit size incompatible with input broadcast shape."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="is incompatible with input shapes that broadcast to",
+    ):
+        rng.poisson(lam=jnp.ones(5), size=3)
 
 
 @pytest.mark.parametrize(
@@ -197,10 +196,9 @@ def test_uniform(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing for glass.jax.Generator.uniform."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    rvs = rng.uniform(size=size_input, low=low, high=high)
+    rvs = rng.uniform(low=low, high=high, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
     assert rvs.shape == shape_output
     assert jnp.all(rvs >= low)
@@ -208,15 +206,21 @@ def test_uniform(
     assert isinstance(rvs, ArrayLike)
 
 
-@pytest.mark.parametrize(
-    ("low", "high", "size_input"),
-    [
-        (0.0, 1.0, 10_000),
-    ],
-)
-def test_uniform_shape_mismatch(
-    low: float | FloatArray,
-    high: float | FloatArray,
-    size_input: int | tuple[int, ...] | None,
-) -> None:
-    """Test failure for glass.jax.Generator.uniform."""
+def test_uniform_shape_mismatch_explicit() -> None:
+    """Explicit size incompatible with input broadcast shape."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="is incompatible with input shapes that broadcast to",
+    ):
+        rng.uniform(low=jnp.zeros(5), high=1.0, size=3)
+
+
+def test_uniform_shape_mismatch_broadcast() -> None:
+    """Input shapes that cannot be broadcast together."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="Incompatible shapes for broadcasting: shapes=",
+    ):
+        rng.uniform(low=jnp.zeros(5), high=jnp.ones(3), size=None)
