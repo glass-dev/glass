@@ -33,7 +33,6 @@ SHARED_PYTEST_BENCHMARK_FLAGS = [
     "--benchmark-max-time=5.0",
     "--benchmark-sort=name",
     "--benchmark-timer=time.process_time",
-    "--benchmark-warmup=on",
 ]
 
 
