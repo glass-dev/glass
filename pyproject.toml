@@ -40,8 +40,14 @@ doctest = [
     {include-group = "test"},
 ]
 lint = [
+    "array-api-strict",
+    "cosmology-api",
+    "fitsio",
+    "jax",
+    "jaxtyping",
     "prek",
-    "ty==0.0.46",
+    "pytest-benchmark",
+    "pytest-mock",
 ]
 test = [
     "cosmology-api",
