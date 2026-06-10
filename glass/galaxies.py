@@ -226,7 +226,7 @@ def galaxy_shear(  # noqa: PLR0913
 
     if reduced_shear:
         # compute reduced shear in place
-        g = g / 1 - k
+        g /= 1 - k
 
         # compute lensed ellipticities
         g = (eps + g) / (1 + xp.conj(g) * eps)
