@@ -106,7 +106,17 @@ def test_normal(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_normal_shape_mismatch() -> None:
+@pytest.mark.parametrize(
+    ("loc", "scale", "size_input"),
+    [
+        (1, 2, 10_000),
+    ],
+)
+def test_normal_shape_mismatch(
+    loc: float | FloatArray,
+    scale: float | FloatArray,
+    size_input: int | tuple[int, ...] | None,
+) -> None:
     """Test failure for glass.jax.Generator.normal."""
 
 
@@ -155,7 +165,16 @@ def test_poisson(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_poisson_shape_mismatch() -> None:
+@pytest.mark.parametrize(
+    ("lam", "size_input"),
+    [
+        (1, 10_000),
+    ],
+)
+def test_poisson_shape_mismatch(
+    lam: float | FloatArray,
+    size_input: int | tuple[int, ...] | None,
+) -> None:
     """Test failure for glass.jax.Generator.poisson."""
 
 
@@ -189,5 +208,15 @@ def test_uniform(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_uniform_shape_mismatch() -> None:
+@pytest.mark.parametrize(
+    ("low", "high", "size_input"),
+    [
+        (0.0, 1.0, 10_000),
+    ],
+)
+def test_uniform_shape_mismatch(
+    low: float | FloatArray,
+    high: float | FloatArray,
+    size_input: int | tuple[int, ...] | None,
+) -> None:
     """Test failure for glass.jax.Generator.uniform."""
