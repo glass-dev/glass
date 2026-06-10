@@ -41,7 +41,7 @@ doctest = [
 ]
 lint = [
     "prek",
-    "ty==0.0.35",
+    "ty==0.0.46",
 ]
 test = [
     "cosmology-api",
