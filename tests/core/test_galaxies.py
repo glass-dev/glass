@@ -134,7 +134,7 @@ def test_redshifts_from_nz(
     z = xp.linspace(0, 1, 100)
     nz = xp.stack([z * (1 - z), (z - 0.5) ** 2])
 
-    with pytest.raises(ValueError, match="Incompatible shapes for broadcasting"):
+    with pytest.raises(ValueError, match=r"shape mismatch|Incompatible shapes"):
         glass.redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
