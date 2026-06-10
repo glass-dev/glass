@@ -72,8 +72,7 @@ def _check_revision_count(
 
 
 @nox_uv.session(
-    # ty requires all dependencies to be installed to be the most effective
-    uv_all_groups=True,
+    uv_only_groups=["lint"],
     uv_sync_locked=False,
 )
 def lint(session: nox.Session) -> None:
