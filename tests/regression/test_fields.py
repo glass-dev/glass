@@ -144,7 +144,7 @@ def test_generate_grf(  # noqa: PLR0913
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
 
-@pytest.mark.stable
+@pytest.mark.unstable
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
     benchmark: BenchmarkFixture,
