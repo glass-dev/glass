@@ -68,7 +68,7 @@ def test_random(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing glass.jax.Generator.random."""
+    """Test passing for glass.jax.Generator.random."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.random(size=size_input)
@@ -97,13 +97,17 @@ def test_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing glass.jax.Generator.normal."""
+    """Test passing for glass.jax.Generator.normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.normal(loc, scale, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
     assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
+
+
+def test_normal_shape_mismatch() -> None:
+    """Test failure for glass.jax.Generator.normal."""
 
 
 @pytest.mark.parametrize(
@@ -118,7 +122,7 @@ def test_standard_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing glass.jax.Generator.standard_normal."""
+    """Test passing for glass.jax.Generator.standard_normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.standard_normal(size=size_input)
@@ -142,13 +146,17 @@ def test_poisson(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing glass.jax.Generator.poisson."""
+    """Test passing for glass.jax.Generator.poisson."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.poisson(lam=lam, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
     assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
+
+
+def test_poisson_shape_mismatch() -> None:
+    """Test failure for glass.jax.Generator.poisson."""
 
 
 @pytest.mark.parametrize(
@@ -170,7 +178,7 @@ def test_uniform(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    """Test passing glass.jax.Generator.uniform."""
+    """Test passing for glass.jax.Generator.uniform."""
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.uniform(size=size_input, low=low, high=high)
@@ -179,3 +187,7 @@ def test_uniform(
     assert jnp.all(rvs >= low)
     assert jnp.all(rvs < high)
     assert isinstance(rvs, ArrayLike)
+
+
+def test_uniform_shape_mismatch() -> None:
+    """Test failure for glass.jax.Generator.uniform."""
