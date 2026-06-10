@@ -173,6 +173,6 @@ def test_uniform(
     rvs = rng.uniform(size=size_input, low=low, high=high)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
     assert rvs.shape == shape_output
-    assert (jnp.min(rvs) >= low).all()
-    assert (jnp.max(rvs) < high).all()
+    assert jnp.all(rvs >= low)
+    assert jnp.all(rvs < high)
     assert isinstance(rvs, ArrayLike)
