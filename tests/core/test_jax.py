@@ -65,8 +65,8 @@ def test_spawn() -> None:
     ],
 )
 def test_random(
-    shape_output: tuple[int, ...],
     size_input: int | tuple[int, ...] | None,
+    shape_output: tuple[int, ...],
 ) -> None:
     """Test passing glass.jax.Generator.random."""
     rng = _rng.rng_dispatcher(xp=jnp)
@@ -86,6 +86,7 @@ def test_random(
         (1, 2 * jnp.ones(10_000), 10_000, (10_000,)),
         (jnp.ones(10_000), 2, 10_000, (10_000,)),
         (jnp.ones(10_000), 2 * jnp.ones(10_000), 10_000, (10_000,)),
+        (jnp.ones(10_000), 2 * jnp.ones(10_000), None, (10_000,)),
         (1, 2, (10_000, 2), (10_000, 2)),
         (1, 2, None, ()),
     ],
@@ -93,8 +94,8 @@ def test_random(
 def test_normal(
     loc: float | FloatArray,
     scale: float | FloatArray,
-    shape_output: tuple[int, ...],
     size_input: int | tuple[int, ...] | None,
+    shape_output: tuple[int, ...],
 ) -> None:
     """Test passing glass.jax.Generator.normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
@@ -114,8 +115,8 @@ def test_normal(
     ],
 )
 def test_standard_normal(
-    shape_output: tuple[int, ...],
     size_input: int | tuple[int, ...] | None,
+    shape_output: tuple[int, ...],
 ) -> None:
     """Test passing glass.jax.Generator.standard_normal."""
     rng = _rng.rng_dispatcher(xp=jnp)
@@ -131,14 +132,15 @@ def test_standard_normal(
     [
         (1, 10_000, (10_000,)),
         (jnp.ones(10_000), 10_000, (10_000,)),
+        (jnp.ones(10_000), None, (10_000,)),
         (1, (10_000, 2), (10_000, 2)),
         (1, None, ()),
     ],
 )
 def test_poisson(
     lam: float | FloatArray,
-    shape_output: tuple[int, ...],
     size_input: int | tuple[int, ...] | None,
+    shape_output: tuple[int, ...],
 ) -> None:
     """Test passing glass.jax.Generator.poisson."""
     rng = _rng.rng_dispatcher(xp=jnp)
@@ -156,6 +158,7 @@ def test_poisson(
         (jnp.zeros(10_000), 1.0, 10_000, (10_000,)),
         (0, jnp.ones(10_000), 10_000, (10_000,)),
         (jnp.zeros(10_000), jnp.ones(10_000), 10_000, (10_000,)),
+        (jnp.zeros(10_000), jnp.ones(10_000), None, (10_000,)),
         (0.0, 1.0, (10_000, 2), (10_000, 2)),
         (0.0, 1.0, None, ()),
         (-5.0, 5.0, 10_000, (10_000,)),
@@ -164,8 +167,8 @@ def test_poisson(
 def test_uniform(
     low: float | FloatArray,
     high: float | FloatArray,
-    shape_output: tuple[int, ...],
     size_input: int | tuple[int, ...] | None,
+    shape_output: tuple[int, ...],
 ) -> None:
     """Test passing glass.jax.Generator.uniform."""
     rng = _rng.rng_dispatcher(xp=jnp)
