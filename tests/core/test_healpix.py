@@ -202,6 +202,7 @@ def test_map2alm_with_pulled_data(
     pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
 ) -> None:
+    """Tests running map2alm offline works as expected."""
     kappa = urng.normal(size=12_288)  # nside=32
     result = hp.map2alm(
         kappa,
@@ -210,6 +211,26 @@ def test_map2alm_with_pulled_data(
         use_pixel_weights=True,
     )
     assert result.shape == expected_shape
+
+
+@pytest.mark.parametrize("pol", [False, True])
+def test_map2alm_with_pulled_data_wrong_path(
+    invalid_healpy_datapath: str,
+    healpix_inputs: type[HealpixInputs],
+    pol: bool,  # noqa: FBT001
+    urng: UnifiedGenerator,
+) -> None:
+    """Tests running map2alm offline incorrectly doesn't fallback to a HTTP request."""
+    kappa = urng.normal(size=12_288)  # nside=32
+    with pytest.raises(
+        ValueError, match=f"Healpy datapath not found at '{invalid_healpy_datapath}"
+    ):
+        hp.map2alm(
+            kappa,
+            lmax=healpix_inputs.lmax,
+            pol=pol,
+            use_pixel_weights=True,
+        )
 
 
 @pytest.mark.parametrize("pol", [True, False])
@@ -304,16 +325,33 @@ def test_pixwin(
         xpx.testing.assert_equal(xp.asarray(old[i], dtype=xp.float64), new[i])
 
 
-@pytest.mark.parametrize(("pol", "expected_shape"), [(False, (12,)), (True, (2, 12))])
+@pytest.mark.parametrize("pol", [False, True])
 def test_pixwin_with_pulled_data(
     add_healpy_datapath_to_env: pytest.FixtureDef,  # noqa: ARG001
-    expected_shape: tuple[int],
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
+    """Tests running pixwin offline works as expected."""
     result = hp.pixwin(healpix_inputs.nside, lmax=healpix_inputs.lmax, pol=pol, xp=xp)
-    assert xp.asarray(result).shape == expected_shape
+    if pol:
+        assert xp.stack(result).shape == (2, 12)
+    else:
+        assert xp.asarray(result).shape == (12,)
+
+
+@pytest.mark.parametrize("pol", [False, True])
+def test_pixwin_with_pulled_data_wrong_path(
+    invalid_healpy_datapath: str,
+    healpix_inputs: type[HealpixInputs],
+    pol: bool,  # noqa: FBT001
+    xp: ModuleType,
+) -> None:
+    """Tests running pixwin offline incorrectly doesn't fallback to a HTTP request."""
+    with pytest.raises(
+        ValueError, match=f"Healpy datapath not found at '{invalid_healpy_datapath}"
+    ):
+        hp.pixwin(healpix_inputs.nside, lmax=healpix_inputs.lmax, pol=pol, xp=xp)
 
 
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])

@@ -44,7 +44,7 @@ def healpy_datapath() -> Generator[str]:
 @pytest.fixture
 def add_healpy_datapath_to_env(healpy_datapath: str) -> Generator:
     """
-    Add the path to the healpy into the environment.
+    Add the path to the healpy data into the environment.
 
     Also removes the new env var when finalising.
     """
@@ -52,6 +52,23 @@ def add_healpy_datapath_to_env(healpy_datapath: str) -> Generator:
     os.environ["HEALPY_DATAPATH"] = healpy_datapath
 
     yield
+
+    # Teardown
+    os.environ.pop("HEALPY_DATAPATH")
+
+
+@pytest.fixture
+def invalid_healpy_datapath() -> Generator[str]:
+    """
+    Add an invalid path to the healpy data into the environment.
+
+    Also removes the new env var when finalising.
+    """
+    # Set path to healpy data in environment
+    fake_datapath = "/does/not/exist"
+    os.environ["HEALPY_DATAPATH"] = fake_datapath
+
+    yield fake_datapath
 
     # Teardown
     os.environ.pop("HEALPY_DATAPATH")
