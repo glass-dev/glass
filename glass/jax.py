@@ -135,3 +135,13 @@ class Generator:
     ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
         return jax.random.uniform(self.__key, _size(size), dtype, low, high)
+
+    def multinomial(
+        self,
+        n: int | IntArray,
+        pvals: FloatArray,
+        size: int | tuple[int, ...] | None = None,
+    ) -> IntArray:
+        """Draw samples from a multinomial distribution."""
+        shape = _size(size) if size is not None else None
+        return jax.random.multinomial(self.__key, n, pvals, shape=shape)
