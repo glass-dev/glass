@@ -247,6 +247,7 @@ def test_multinomial(
     rvs = rng.multinomial(n, pvals, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
     assert jnp.all(jnp.sum(rvs, axis=-1) == n)
+    assert jax.dtypes.issubdtype(rvs.dtype, jnp.integer)
     assert rvs.shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
