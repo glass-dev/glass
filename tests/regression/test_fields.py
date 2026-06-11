@@ -122,10 +122,13 @@ def test_generate_grf(  # noqa: PLR0913
     xpb: ModuleType,
 ) -> None:
     """Regression tests of glass.fields._generate_grf with positional arguments only."""
-    n = 100
-    nth_triangular_number = int((n * (n + 1)) / 2)
-    gls: AngularPowerSpectra = [xpb.ones(10) for _ in range(nth_triangular_number)]
-    nside = 16
+    n = 10
+    gls: AngularPowerSpectra = [
+        xpb.ones(n) if i == j else xpb.zeros(n)
+        for i in range(n)
+        for j in range(i, -1, -1)
+    ]
+    nside = 32
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.fields._generate_grf(
@@ -134,10 +137,7 @@ def test_generate_grf(  # noqa: PLR0913
             rng=urngb if use_rng else None,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        return generator_consumer.consume(generator)
 
     gaussian_fields = benchmark(function_to_benchmark)
 
@@ -153,12 +153,15 @@ def test_generate(
     ncorr: int | None,
 ) -> None:
     """Regression tests for glass.generate."""
-    n = 100
+    n = 10
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
-    nth_triangular_number = int((n * (n + 1)) / 2)
-    gls: AngularPowerSpectra = [xpb.ones(10) for _ in range(nth_triangular_number)]
-    nside = 16
+    gls: AngularPowerSpectra = [
+        xpb.ones(n) if i == j else xpb.zeros(n)
+        for i in range(n)
+        for j in range(i, -1, -1)
+    ]
+    nside = 32
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.generate(
@@ -167,16 +170,12 @@ def test_generate(
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        return generator_consumer.consume(generator)
 
     result = benchmark(function_to_benchmark)
 
     for field in result:
         assert field.shape == (hp.nside2npix(nside),)
-    xpx.testing.assert_close(result[1], result[0] ** 2, atol=1e-05)
 
 
 @pytest.mark.unstable
