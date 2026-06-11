@@ -90,6 +90,6 @@ repos:
     hooks:
       - id: ty
         args:
-          - --group=lint
+          - --group=typechecking
           - --isolated
           - --no-default-groups

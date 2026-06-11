@@ -40,14 +40,7 @@ doctest = [
     {include-group = "test"},
 ]
 lint = [
-    "array-api-strict",
-    "cosmology-api",
-    "fitsio",
-    "jax",
-    "jaxtyping",
     "prek",
-    "pytest-benchmark",
-    "pytest-mock",
 ]
 test = [
     "cosmology-api",
@@ -59,6 +52,16 @@ test = [
     "pytest-mock",
     "pytest-rerunfailures",
     "scipy",
+]
+typechecking = [
+    "array-api-strict",
+    "cosmology-api",
+    "fitsio",
+    "jax",
+    "jaxtyping",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-mock",
 ]
 
 [project]
