@@ -196,7 +196,11 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> IntArray:
         """Draw samples from a multinomial distribution."""
+        # JAX's shape parameter is the full shape of pvals including the
+        # categories axis, so infer only the batch dimensions here.
         batch_shape = _shape(size, n, pvals[..., 0])
+        # Append the categories axis, or pass None to let JAX default to
+        # pvals.shape when there are no batch dimensions.
         shape = (*batch_shape, pvals.shape[-1]) if batch_shape else None
         return jax.random.multinomial(
             self.__key,
