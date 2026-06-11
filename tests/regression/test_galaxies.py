@@ -61,7 +61,7 @@ def test_redshifts_from_nz(
     assert xpb.all((redshifts >= 0) & (redshifts <= 1))
 
 
-@pytest.mark.stable
+@pytest.mark.unstable
 @pytest.mark.parametrize("reduced_shear", [True, False])
 def test_galaxy_shear(
     benchmark: BenchmarkFixture,
