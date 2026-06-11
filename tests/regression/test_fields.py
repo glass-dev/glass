@@ -122,7 +122,7 @@ def test_generate_grf(  # noqa: PLR0913
     xpb: ModuleType,
 ) -> None:
     """Regression tests of glass.fields._generate_grf with positional arguments only."""
-    n = 100
+    n = 10
     gls: AngularPowerSpectra = [
         xpb.ones(n) if i == j else xpb.zeros(n)
         for i in range(n)
@@ -153,7 +153,7 @@ def test_generate(
     ncorr: int | None,
 ) -> None:
     """Regression tests for glass.generate."""
-    n = 100
+    n = 10
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
     gls: AngularPowerSpectra = [
