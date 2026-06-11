@@ -25,6 +25,7 @@ Window function tools
 .. autofunction:: restrict
 .. autofunction:: partition
 .. autofunction:: combine
+.. autofunction:: distribute
 
 
 Redshift grids
@@ -58,13 +59,14 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
+from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from types import ModuleType
 
-    from glass._types import FloatArray
+    from glass._types import FloatArray, IntArray, UnifiedGenerator
     from glass.cosmology import Cosmology
 
 
@@ -999,3 +1001,99 @@ def combine(
         ),
         axis=0,
     )
+
+
+def distribute(
+    redshifts: FloatArray,
+    shells: Sequence[RadialWindow],
+    *,
+    rng: UnifiedGenerator | None = None,
+) -> IntArray:
+    """
+    Distribute redshifts over shells.
+
+    Given an array of redshifts and a list of window functions, returns the
+    index of the shell that each redshift belongs to.
+
+    For overlapping shells, redshifts are randomly associated with shells with
+    the correct relative frequencies.
+
+    Redshifts that do not fall into any shell are given index -1.
+
+    Parameters
+    ----------
+    redshifts
+        Array of redshifts to distribute over shells.
+    shells
+        List of window functions.
+    rng
+        Random number generator. If not provided, a default is used.
+
+    Returns
+    -------
+    index
+        Array of shell indices of the same shape as ``redshifts``.
+
+    """
+    xp = redshifts.__array_namespace__()
+
+    # get default RNG if not given
+    if rng is None:
+        rng = _rng.rng_dispatcher(xp=xp)
+
+    # flatten redshifts but store shape
+    shape = redshifts.shape
+    redshifts = xp.reshape(redshifts, (-1,))
+
+    # this is the output catalogue to be built
+    out = []
+
+    # go through redshifts in batches of 1000
+    batch = 1000
+    for start in range(0, redshifts.size, batch):
+        # redshift batch
+        z = redshifts[start : min(start + batch, redshifts.size)]
+
+        # compute the weight for each shell in the given redshifts
+        weights = xp.stack(
+            [uxpx.interp(z, za, wa, left=0.0, right=0.0) for za, wa, _ in shells],
+            axis=1,
+        )
+
+        # normalisation of weights
+        wnorm = xp.sum(weights, axis=1)
+
+        # some redshifts may fall outside of the shells
+        outside = wnorm == 0
+
+        # normalise the weights for redshifts in shells
+        weights /= xp.where(outside, xp.ones_like(wnorm), wnorm)[:, xp.newaxis]
+
+        # create an extra "shell" with unit probability for redshifts outside
+        pout = xp.where(outside, xp.ones_like(wnorm), xp.zeros_like(wnorm))
+
+        # prepend this extra shell in front of the actual shells
+        # we later subtract 1 from the shell index so this is "shell -1"
+        weights = xp.concat([pout[:, xp.newaxis], weights], axis=1)
+
+        # clean up before sampling
+        del wnorm, outside, pout
+
+        # sample shells from weights
+        # simulate a draw from a categorial distribution by
+        # drawing a single event from a multinomial distribution
+        # and finding the bin in which the event landed
+        index = xp.argmax(rng.multinomial(1, weights), axis=1)
+
+        # subtract 1 so that the "outside" shell is -1
+        index -= 1
+
+        # append to output
+        out.append(index)
+
+    # return empty array if nothing was sampled
+    if not out:
+        return xp.empty(shape, dtype=int)
+
+    # return output in input shape
+    return xp.reshape(xp.concat(out), shape)

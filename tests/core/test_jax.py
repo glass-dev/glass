@@ -224,3 +224,13 @@ def test_uniform_shape_mismatch_broadcast() -> None:
         match="Incompatible shapes for broadcasting: shapes=",
     ):
         rng.uniform(low=jnp.zeros(5), high=jnp.ones(3), size=None)
+
+
+def test_multinomial() -> None:
+    rng = _rng.rng_dispatcher(xp=jnp)
+    key = rng.key  # ty: ignore[unresolved-attribute]
+    p = jnp.array([0.0, 0.1, 0.2, 0.3, 0.4])
+    rvs = rng.multinomial(10_000, p)
+    assert rng.key != key  # ty: ignore[unresolved-attribute]
+    assert jnp.sum(rvs) == 10_000
+    assert rvs.shape == p.shape

@@ -30,3 +30,19 @@ def test_radialwindow(
     w = benchmark(glass.RadialWindow, za, wa)
 
     xpx.testing.assert_close(w.zeff, expected_zeff)
+
+
+def test_distribute(
+    benchmark: BenchmarkFixture,
+    xpb: ModuleType,
+) -> None:
+    """Regression test for distribute() over a moderately-sized catalogue."""
+    # use N shells; tens is a good number
+    shells = glass.linear_windows(xpb.linspace(0.0, 3.0, 52))
+    assert len(shells) == 50
+    # use M redshifts; millions is a good number
+    redshifts = xpb.linspace(0.1, 2.9, 1_000_000)
+    # distribute redshifts over shells; problem size is N * M
+    result = benchmark(glass.distribute, redshifts, shells)
+    # make sure result was computed for each redshift
+    assert result.shape == redshifts.shape
