@@ -25,10 +25,11 @@ def _shape(
     *bcast: AnyArray,
 ) -> tuple[int, ...]:
     """
-    Computes the shape of an array given an explicit shape and a broadcast shape.
+    Computes the output shape given an optional explicit shape and the shape
+    obtained by broadcasting the inputs.
 
-    A check will be performed to ensure that the explicit shape is compatible
-    with the broadcast shape.
+    If an explicit shape is provided, it must match the broadcasted shape
+    whenever the broadcasted shape is non-scalar.
 
     Parameters
     ----------
