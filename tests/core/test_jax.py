@@ -13,7 +13,7 @@ from glass import _rng  # noqa: E402
 from glass.jax import Generator  # noqa: E402
 
 if TYPE_CHECKING:
-    from glass._types import FloatArray
+    from glass._types import FloatArray, IntArray
 
 
 def test_init() -> None:
@@ -119,7 +119,7 @@ def test_normal_shape_mismatch_broadcast() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
-        match="Incompatible shapes for broadcasting: shapes=",
+        match="Incompatible shapes for broadcasting",
     ):
         rng.normal(loc=jnp.ones(5), scale=jnp.ones(3), size=None)
 
@@ -221,16 +221,51 @@ def test_uniform_shape_mismatch_broadcast() -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
-        match="Incompatible shapes for broadcasting: shapes=",
+        match="Incompatible shapes for broadcasting",
     ):
         rng.uniform(low=jnp.zeros(5), high=jnp.ones(3), size=None)
 
 
-def test_multinomial() -> None:
+@pytest.mark.parametrize(
+    ("n", "pvals", "size_input", "shape_output"),
+    [
+        (10_000, jnp.array([0.1, 0.2, 0.3, 0.4]), None, (4,)),
+        (10_000, jnp.ones((3, 4)) / 4, None, (3, 4)),
+        (jnp.array([10, 20, 30]), jnp.ones((3, 4)) / 4, None, (3, 4)),
+        (10_000, jnp.ones((3, 4)) / 4, (3,), (3, 4)),
+        (jnp.array([10, 20, 30]), jnp.ones((3, 4)) / 4, (3,), (3, 4)),
+    ],
+)
+def test_multinomial(
+    n: int | IntArray,
+    pvals: FloatArray,
+    size_input: int | tuple[int, ...] | None,
+    shape_output: tuple[int, ...],
+) -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
-    p = jnp.array([0.0, 0.1, 0.2, 0.3, 0.4])
-    rvs = rng.multinomial(10_000, p)
+    rvs = rng.multinomial(n, pvals, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert jnp.sum(rvs) == 10_000
-    assert rvs.shape == p.shape
+    assert jnp.all(jnp.sum(rvs, axis=-1) == n)
+    assert rvs.shape == shape_output
+    assert isinstance(rvs, ArrayLike)
+
+
+def test_multinomial_shape_mismatch_explicit() -> None:
+    """Explicit size incompatible with input broadcast shape."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="is incompatible with input shapes that broadcast to",
+    ):
+        rng.multinomial(jnp.array([10, 20, 30]), jnp.ones((3, 4)) / 4, size=5)
+
+
+def test_multinomial_shape_mismatch_broadcast() -> None:
+    """Input shapes that cannot be broadcast together."""
+    rng = _rng.rng_dispatcher(xp=jnp)
+    with pytest.raises(
+        ValueError,
+        match="Incompatible shapes for broadcasting",
+    ):
+        rng.multinomial(jnp.array([10, 20, 30]), jnp.ones((5, 4)) / 4)
