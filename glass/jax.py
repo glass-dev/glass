@@ -193,7 +193,7 @@ class Generator:
         n: int | IntArray,
         pvals: FloatArray,
         size: int | tuple[int, ...] | None = None,
-        dtype: DTypeLike = float,
+        dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a multinomial distribution."""
         # JAX's shape parameter is the full shape of pvals including the
