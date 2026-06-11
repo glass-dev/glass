@@ -9,13 +9,13 @@ on:
 
 jobs:
   dist:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -23,7 +23,7 @@ jobs:
       - name: Set up uv
         if: github.event_name == 'workflow_dispatch'
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           enable-cache: false
           python-version: 3.14
@@ -41,7 +41,7 @@ jobs:
   publish-pypi:
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: dist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: publish
       url: https://pypi.org/project/glass
@@ -67,7 +67,7 @@ jobs:
   publish-test-pypi:
     if: github.event_name == 'workflow_dispatch'
     needs: dist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: test-publish
       url: https://test.pypi.org/project/glass

@@ -97,12 +97,12 @@ def broadcast_leading_axes(
         i = len(s) - n
         shapes.append(s[:i])
         trails.append(s[i:])
-    dims = xpx.broadcast_shapes(*shapes)
+    dims = xp.broadcast_shapes(*shapes)
     arrs = (
         xp.broadcast_to(xp.asarray(a), dims + t)
         for (a, _), t in zip(args, trails, strict=False)
     )
-    return (dims, *arrs)  # ty: ignore[invalid-return-type]
+    return (dims, *arrs)
 
 
 def ndinterp(  # noqa: PLR0913
