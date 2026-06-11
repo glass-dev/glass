@@ -72,6 +72,7 @@ def _check_revision_count(
 
 
 @nox_uv.session(
+    uv_no_install_project=True,
     uv_only_groups=["lint"],
     uv_sync_locked=False,
 )
