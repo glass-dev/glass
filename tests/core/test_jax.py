@@ -63,6 +63,11 @@ def test_spawn() -> None:
         ((10_000, 2), (10_000, 2)),
         (None, ()),
     ],
+    ids=[
+        "explicit_int_size",
+        "explicit_tuple_size",
+        "no_size_scalar_output",
+    ],
 )
 def test_random(
     size_input: int | tuple[int, ...] | None,
@@ -88,6 +93,15 @@ def test_random(
         (jnp.ones(10_000), 2 * jnp.ones(10_000), None, (10_000,)),
         (1, 2, (10_000, 2), (10_000, 2)),
         (1, 2, None, ()),
+    ],
+    ids=[
+        "scalar_inputs_explicit_size",
+        "array_scale_explicit_size",
+        "array_loc_explicit_size",
+        "array_inputs_explicit_size",
+        "array_inputs_shape_inferred",
+        "scalar_inputs_2D_explicit_size",
+        "scalar_inputs_scalar_output",
     ],
 )
 def test_normal(
@@ -131,6 +145,11 @@ def test_normal_shape_mismatch_broadcast() -> None:
         ((10_000, 2), (10_000, 2)),
         (None, ()),
     ],
+    ids=[
+        "explicit_int_size",
+        "explicit_tuple_size",
+        "no_size_scalar_output",
+    ],
 )
 def test_standard_normal(
     size_input: int | tuple[int, ...] | None,
@@ -152,6 +171,13 @@ def test_standard_normal(
         (jnp.ones(10_000), None, (10_000,)),
         (1, (10_000, 2), (10_000, 2)),
         (1, None, ()),
+    ],
+    ids=[
+        "scalar_lam_explicit_size",
+        "array_lam_explicit_size",
+        "array_lam_shape_inferred",
+        "scalar_lam_2D_explicit_size",
+        "scalar_lam_scalar_output",
     ],
 )
 def test_poisson(
@@ -188,6 +214,16 @@ def test_poisson_shape_mismatch_explicit() -> None:
         (0.0, 1.0, (10_000, 2), (10_000, 2)),
         (0.0, 1.0, None, ()),
         (-5.0, 5.0, 10_000, (10_000,)),
+    ],
+    ids=[
+        "scalar_inputs_explicit_size",
+        "array_low_explicit_size",
+        "array_high_explicit_size",
+        "array_inputs_explicit_size",
+        "array_inputs_shape_inferred",
+        "scalar_inputs_2D_explicit_size",
+        "scalar_inputs_scalar_output",
+        "negative_low_explicit_size",
     ],
 )
 def test_uniform(
@@ -234,6 +270,13 @@ def test_uniform_shape_mismatch_broadcast() -> None:
         (jnp.array([10, 20, 30]), jnp.ones((3, 4)) / 4, None, (3, 4)),
         (10_000, jnp.ones((3, 4)) / 4, (3,), (3, 4)),
         (jnp.array([10, 20, 30]), jnp.ones((3, 4)) / 4, (3,), (3, 4)),
+    ],
+    ids=[
+        "scalar_n_1D_pvals_no_size",
+        "scalar_n_2D_pvals_no_size",
+        "batched_n_2D_pvals_no_size",
+        "scalar_n_2D_pvals_explicit_size",
+        "batched_n_2D_pvals_explicit_size",
     ],
 )
 def test_multinomial(
