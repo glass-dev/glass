@@ -195,7 +195,8 @@ def test_map2alm_with_pulled_data(
     urng: UnifiedGenerator,
 ) -> None:
     """Tests running map2alm offline works as expected."""
-    kappa = urng.normal(size=12_288)  # nside=32
+    npix = healpy.nside2npix(32)
+    kappa = urng.normal(size=npix)
     result = hp.map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
@@ -213,7 +214,8 @@ def test_map2alm_with_pulled_data_wrong_path(
     urng: UnifiedGenerator,
 ) -> None:
     """Tests running map2alm offline incorrectly doesn't fallback to a HTTP request."""
-    kappa = urng.normal(size=12_288)  # nside=32
+    npix = healpy.nside2npix(32)
+    kappa = urng.normal(size=npix)
     with pytest.raises(
         ValueError,
         match=f"Healpy datapath not found at '{invalid_healpy_datapath}",
