@@ -85,3 +85,11 @@ repos:
       - id: zizmor
         args:
           - --fix=safe
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.48
+    hooks:
+      - id: ty
+        args:
+          - --group=typechecking
+          - --isolated
+          - --no-default-groups

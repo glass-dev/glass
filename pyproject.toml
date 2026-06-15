@@ -41,7 +41,6 @@ doctest = [
 ]
 lint = [
     "prek",
-    "ty==0.0.46",
 ]
 test = [
     "cosmology-api",
@@ -53,6 +52,16 @@ test = [
     "pytest-mock",
     "pytest-rerunfailures",
     "scipy",
+]
+typechecking = [
+    "array-api-strict",
+    "cosmology-api",
+    "fitsio",
+    "jax",
+    "jaxtyping",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-mock",
 ]
 
 [project]
