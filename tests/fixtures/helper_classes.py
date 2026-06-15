@@ -72,23 +72,9 @@ class GeneratorConsumer:
     @staticmethod
     def consume(
         generator: Generator[Any],
-        *,
-        valid_exception: str = "",
     ) -> list[Any]:
-        """
-        Generate and consume a generator returned by a given functions.
-
-        The resulting generator will be consumed an any ValueError
-        exceptions swallowed.
-
-        """
-        output: list[Any] = []
-        try:
-            # Consume in a loop, as we expect users to
-            output.extend(iter(generator))
-        except ValueError as e:
-            assert str(e) == valid_exception  # noqa: PT017
-        return output
+        """Generate and consume a generator returned by a given functions."""
+        return list(generator)
 
 
 @pytest.fixture(scope="session")
