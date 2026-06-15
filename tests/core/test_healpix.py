@@ -189,17 +189,9 @@ def test_get_nside(
     assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
-@pytest.mark.parametrize(
-    ("pol", "expected_shape"),
-    [
-        (False, (78,)),
-    ],
-)
 def test_map2alm_with_pulled_data(
     add_healpy_datapath_to_env: pytest.FixtureDef,  # noqa: ARG001
-    expected_shape: tuple[int],
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
 ) -> None:
     """Tests running map2alm offline works as expected."""
@@ -207,10 +199,10 @@ def test_map2alm_with_pulled_data(
     result = hp.map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
-        pol=pol,
+        pol=False,
         use_pixel_weights=True,
     )
-    assert result.shape == expected_shape
+    assert result.shape == (78,)
 
 
 @pytest.mark.parametrize("pol", [False, True])
