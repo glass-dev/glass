@@ -189,8 +189,8 @@ def test_get_nside(
     assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
 
 
+@pytest.mark.usefixtures("_add_healpy_datapath_to_env")
 def test_map2alm_with_pulled_data(
-    add_healpy_datapath_to_env: pytest.FixtureDef,  # noqa: ARG001
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
 ) -> None:
@@ -320,9 +320,9 @@ def test_pixwin(
         xpx.testing.assert_equal(xp.asarray(old[i], dtype=xp.float64), new[i])
 
 
+@pytest.mark.usefixtures("_add_healpy_datapath_to_env")
 @pytest.mark.parametrize("pol", [False, True])
 def test_pixwin_with_pulled_data(
-    add_healpy_datapath_to_env: pytest.FixtureDef,  # noqa: ARG001
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
     xp: ModuleType,

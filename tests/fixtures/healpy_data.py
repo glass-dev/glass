@@ -41,7 +41,7 @@ def healpy_datapath() -> Generator[str]:
 
 
 @pytest.fixture
-def add_healpy_datapath_to_env(healpy_datapath: str) -> Generator:
+def _add_healpy_datapath_to_env(healpy_datapath: str) -> Generator:
     """
     Add the path to the healpy data into the environment.
 
