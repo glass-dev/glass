@@ -110,7 +110,7 @@ def test_cls2cov(
     xpx.testing.assert_equal(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
 
-@pytest.mark.unstable
+@pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(  # noqa: PLR0913
@@ -147,7 +147,7 @@ def test_generate_grf(  # noqa: PLR0913
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
 
-@pytest.mark.unstable
+@pytest.mark.stable
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
     benchmark: BenchmarkFixture,
