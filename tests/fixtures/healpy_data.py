@@ -24,7 +24,6 @@ def healpy_datapath() -> Generator[str]:
         """
         git clone --depth 1 https://github.com/healpy/healpy-data;
         cd healpy-data;
-        bash download_weights_8192.sh;
         """,  # noqa: S607
         shell=True,
         check=True,
