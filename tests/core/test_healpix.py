@@ -223,7 +223,8 @@ def test_map2alm_with_pulled_data_wrong_path(
     """Tests running map2alm offline incorrectly doesn't fallback to a HTTP request."""
     kappa = urng.normal(size=12_288)  # nside=32
     with pytest.raises(
-        ValueError, match=f"Healpy datapath not found at '{invalid_healpy_datapath}"
+        ValueError,
+        match=f"Healpy datapath not found at '{invalid_healpy_datapath}",
     ):
         hp.map2alm(
             kappa,
@@ -349,7 +350,8 @@ def test_pixwin_with_pulled_data_wrong_path(
 ) -> None:
     """Tests running pixwin offline incorrectly doesn't fallback to a HTTP request."""
     with pytest.raises(
-        ValueError, match=f"Healpy datapath not found at '{invalid_healpy_datapath}"
+        ValueError,
+        match=f"Healpy datapath not found at '{invalid_healpy_datapath}",
     ):
         hp.pixwin(healpix_inputs.nside, lmax=healpix_inputs.lmax, pol=pol, xp=xp)
 
