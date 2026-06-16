@@ -12,7 +12,7 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/glass)](https://pypi.org/project/glass)
 [![Test](https://github.com/glass-dev/glass/actions/workflows/test.yaml/badge.svg)](https://github.com/glass-dev/glass/actions/workflows/test.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/glass-dev/glass/badge.svg?branch=main)](https://coveralls.io/github/glass-dev/glass?branch=main)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/glass-dev/glass/main.svg)](https://results.pre-commit.ci/latest/github/glass-dev/glass/main)
+[![Linting status](https://github.com/glass-dev/glass/actions/workflows/linting.yaml/badge.svg)](https://github.com/glass-dev/glass/actions/workflows/linting.yaml)
 
 <!-- Science -->
 

@@ -4,6 +4,18 @@
 
 All functional changes to the project are documented in this file.
 
+## [2026.2] (4 Jun 2026)
+
+- gh-1076: Use array comparison functions from `array-api-extra` (#1083)
+- gh-690: Drop `3.10` support (#1093)
+- gh-1090: move `ty` from `pre-commit` to `nox` (#1091)
+- gh-1085: refactor iternorm (#1089)
+- gh-1070: Replace `pre-commit.ci` with manual workflow (#1073)
+- gh-995: Allow filtering a single benchmark test (#1068)
+- gh-1063: Default to numpy for all unrecognised array backends (#1065)
+- gh-1045: bump Array API to `2025.12` (#1061)
+- gh-1059: remove `uv.lock` (#1060)
+
 ## [2026.1] (29 Jan 2026)
 
 - gh-1034: Expose glass.healpix module (#1035)
@@ -20,14 +32,14 @@ All functional changes to the project are documented in this file.
 - gh-902: port `cls2cov`, `spectra_indices`, `_glass_to_healpix_alm` in
   `fields.py` (#963)
 - gh-958: make `positions_from_delta` Array API compatible (#959)
-- gh-907: Port points.uniform_positions to support jax (#955)
-- gh-908: Port `shapes.py` to support jax (#954)
+- gh-907: Port points.uniform_positions to support JAX (#955)
+- gh-908: Port `shapes.py` to support JAX (#954)
 - gh-906: Port `observations.vmap_galactic_ecliptic` to array-api (#953)
 - gh-943: bump `array-api-compat` and fix tests (#944)
 - gh-186: add GLASS extensions to documentation (#927)
-- gh-905: Port lensing.py functions to array-api with jax (#925)
+- gh-905: Port lensing.py functions to array-api with JAX (#925)
 - gh-921: pin `pre-commit` to oldest support Python version (#924)
-- gh-901: Port `algorithm.nnls` to support jax (#918)
+- gh-901: Port `algorithm.nnls` to support JAX (#918)
 - gh-914: fix versions for array backends for 3.10 (#916)
 - gh-910: consistent definition of displacement (#911)
 - gh-880: Fix inconsistencies in the documentation rendering (#889)
@@ -60,7 +72,7 @@ All functional changes to the project are documented in this file.
 - gh-583: fix flakiness of `test_generate` (#584)
 - gh-575: bring back inv_triangle_number (#577)
 - gh-572: make `multalm` private (#576)
-- gh-487: reorder alms in \_generate_grf to glass ordering (#533)
+- gh-487: reorder alms in \_generate_grf to GLASS ordering (#533)
 - gh-568: convert `_weight` funcs to classes for `_windows` funcs (#589)
 - gh-495: allow `zeff` to be computed automatically (#590)
 - gh-566: add example on galaxy redshift distributions (#567)
@@ -85,15 +97,15 @@ All functional changes to the project are documented in this file.
 - gh-440: remove scipy as a test dependency (#462)
 - gh-443: `if` should be `elif` in `fixed_zbins` (#444)
 - gh-445: place all public function in `__all__` (#446)
-- gh-465: enable installing glass through git archives (#483)
+- gh-465: enable installing GLASS through git archives (#483)
 - gh-470: instructions to install using conda (#481)
-- gh-478: `glass.core.array` -> `glass.arraytools` (#524)
+- gh-478: `glass.core.array` → `glass.arraytools` (#524)
 - gh-493: add module for Gaussian random fields (#494)
 - gh-496: functions for legacy mode (#497)
 - gh-501: change imports to be directly from `glass` (#512)
 - gh-504: deprecate old generator functions (#523)
 - gh-508: create standalone bibliography page (#518)
-- gh-509: `inv_triangle_number` -> `nfields_from_nspectra` (plus make it public)
+- gh-509: `inv_triangle_number` → `nfields_from_nspectra` (plus make it public)
   (#527)
 - gh-513: make algorithm a public module (#514)
 
@@ -104,7 +116,7 @@ All functional changes to the project are documented in this file.
 - gh-358: add static types support (#368)
 - gh-131: rename `gaussian_gls` to `discretized_cls` (#345)
 - gh-328: efficient resampling in `ellipticity_ryden04` (#341)
-- gh-137: deprecate `redshifts_from_nz` in favor of `redshifts` (#333)
+- gh-137: deprecate `redshifts_from_nz` in favour of `redshifts` (#333)
 - gh-328: fix shape mismatch bug in ellipticity_ryden04 (#332)
 - gh-315: add broadcasting rule in ellipticity_ryden04 + tests (#317)
 - gh-198: enforce `python>3.8` & `numpy>1.21` (#326)
@@ -251,6 +263,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2026.2]: https://github.com/glass-dev/glass/compare/v2026.1...v2026.2
 [2026.1]: https://github.com/glass-dev/glass/compare/v2025.3...v2026.1
 [2025.3]: https://github.com/glass-dev/glass/compare/v2025.2...v2025.3
 [2025.2]: https://github.com/glass-dev/glass/compare/v2025.1...v2025.2

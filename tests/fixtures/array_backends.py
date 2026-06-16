@@ -63,7 +63,7 @@ def _import_and_add_array_api_strict(
 
     _check_version("array_api_strict", "2.3.1")
     xp_available_backends["array_api_strict"] = array_api_strict
-    array_api_strict.set_array_api_strict_flags(api_version="2024.12")
+    array_api_strict.set_array_api_strict_flags(api_version="2025.12")
 
 
 def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
@@ -117,7 +117,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
 )
 def xpb(request: pytest.FixtureRequest) -> ModuleType:
     """
-    Fixture for array backend to be used in benchmarks.
+    Fixture for array backend to be used in regression tests.
 
     Access array library functions using `xpb.` in tests.
 
@@ -125,7 +125,7 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
     1. Our use of array-api-strict is not for its performance but
        for checking our interface with array libraries. Additionally,
        users are unlikely to use array-api-strict with glass.
-       Therefore, it is not worth benchmarking with array-api-strict.
+       Therefore, it is not worth regression testing with array-api-strict.
     2. We did not previously support jax, therefore it does
        not _yet_ make sense to regression test jax as there is
        nothing to compare against, since jax is not supported by

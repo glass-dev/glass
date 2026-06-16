@@ -2,7 +2,7 @@
 Definitions
 ===========
 
-The *GLASS* code uses the following mathematical definitions.
+The GLASS code uses the following mathematical definitions.
 
 .. glossary::
 

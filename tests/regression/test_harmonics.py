@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import array_api_extra as xpx
+
 glass_harmonics = pytest.importorskip(
     "glass.harmonics",
     reason="tests require glass.harmonics",
@@ -15,16 +17,13 @@ if TYPE_CHECKING:
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from tests.fixtures.helper_classes import Compare
-
 
 @pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.harmonics.multalm."""
+    """Regression tests for glass.harmonics.multalm."""
     scale_factor = 100_000
 
     alm = xpb.arange(scale_factor * 5, dtype=xpb.float64)
@@ -32,7 +31,7 @@ def test_multalm(
 
     result = benchmark(glass_harmonics.multalm, alm, bl)
 
-    compare.assert_allclose(
+    xpx.testing.assert_equal(
         result[:5],
         xpb.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
     )

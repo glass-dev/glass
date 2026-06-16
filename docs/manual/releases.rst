@@ -2,7 +2,39 @@
 Release notes
 =============
 
-These notes document the changes between individual *GLASS* releases.
+These notes document the changes between individual GLASS releases.
+
+2026.2 (4 Jun 2026)
+--------------------
+
+* Added the ability to filter regression test runs to a single test (e.g. via
+  ``-k``). This is useful for development of a specific function without having
+  to run the entire suite of tests.
+
+* Changed the implementation of :func:`glass.iternorm` to be fully Array API
+  compliant.
+
+* Changed the Array API Version to ``2025.12``.
+
+* Changed the default behaviour to use NumPy if an array backend is not
+  supported rather than raising an exception.
+
+* Changed the way that array comparison is performed within the tests. This is
+  now done using ``array_api_extra.testing`` rather than our own wrapper around
+  ``numpy.testing``.
+
+* Changed the way type checking is performed as part of the ``lint`` step in the
+  ``nox`` file rather than as a ``pre-commit`` hook.
+
+* Removed Python 3.10 support. This was necessary to benefit from updates to
+  ``array-api-extra``.
+
+* Removed the ``uv.lock`` file. This was causing us dependency alerts with
+  little benefit. Further work has been carried out to ensure that CI works as
+  intended without this file.
+
+* Removed ``pre-commit.ci`` in favour of a manual workflow using ``prek``. This
+  was due to inconsistencies between local development and CI.
 
 2026.1 (29 Jan 2026)
 --------------------
@@ -147,7 +179,7 @@ These notes document the changes between individual *GLASS* releases.
 * ``SciPy`` has been removed as a dependency for testing.
 
 * Fixed a bug in :func:`glass.fixed_zbins` that prevented the user supplying
-  ``nbins`` as an argument. The functions intended use is to accept eiher ``dz``
+  ``nbins`` as an argument. The functions intended use is to accept either ``dz``
   or ``nbins`` as an argument, but not both.
 
 * It is now possible to install ``glass`` both through git archives and from
@@ -247,7 +279,7 @@ These notes document the changes between individual *GLASS* releases.
   the effect of the discretisation on, e.g., a redshift distribution.
 
 * There is now a way to compute the effective angular power spectra that can
-  be expected from a *GLASS* simulation, including all discretisations and
+  be expected from a GLASS simulation, including all discretisations and
   approximations.
 
   * A new function :func:`~glass.fields.effective_cls()` which combines power
@@ -310,7 +342,7 @@ These notes document the changes between individual *GLASS* releases.
 
 - The ``glass`` module is no longer a namespace package.  The new ``glass.ext``
   namespace is reserved for extensions instead.  This is done to follow best
-  practices, so that a bad extension can no longer break all of *GLASS* by
+  practices, so that a bad extension can no longer break all of GLASS by
   mistake.  The ``glass.all`` meta-module is no longer necessary.
 
 - The point sampling functions :func:`~glass.points.positions_from_delta` and
@@ -345,7 +377,7 @@ These notes document the changes between individual *GLASS* releases.
 
 - New user functions :func:`glass.user.save_cls` and
   :func:`glass.user.load_cls` to save and load angular power spectra in the
-  *GLASS* format.
+  GLASS format.
 
 - Some type hints were added to library functions.  These are mostly
   perfunctory at this time, but there is interest in adding proper typing
@@ -398,7 +430,7 @@ These notes document the changes between individual *GLASS* releases.
 
 - **Initial wide release for GLASS paper**
 
-  This was the initial full release of *GLASS*, coinciding with the release of
+  This was the initial full release of GLASS, coinciding with the release of
   preprint `arXiv:2302.01942`__.
 
   __ https://arxiv.org/abs/2302.01942

@@ -13,13 +13,12 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray
-    from glass.cosmology import Cosmology
 
 
 @pytest.fixture(scope="session")
-def cosmo() -> Cosmology:
+def cosmo() -> MockCosmology:
     """Mock cosmology to use for core tests."""
-    return MockCosmology()  # ty: ignore[invalid-return-type]
+    return MockCosmology()
 
 
 class MockCosmology:
@@ -79,7 +78,7 @@ class MockCosmology:
 
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
-        return 1_000 * (1 / (dc + np.finfo(float).eps))  # ty: ignore[unsupported-operator]
+        return 1_000 * (1 / (dc + np.finfo(float).eps))
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""

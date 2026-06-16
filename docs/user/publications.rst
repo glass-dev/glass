@@ -1,7 +1,7 @@
 Publications
 ============
 
-The following publications about *GLASS* exist.
+The following publications about GLASS exist.
 
 .. [Tessore23] *GLASS: Generator for Large Scale Structure*.  Tessore N.,
    Loureiro A., Joachimi B., von Wietersheim-Kramsta M., Jeffrey N.  The Open

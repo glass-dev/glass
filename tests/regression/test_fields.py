@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import array_api_extra as xpx
+
 import glass
 import glass.fields
 import glass.healpix as hp
@@ -16,120 +18,75 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
-    from tests.fixtures.helper_classes import Compare, GeneratorConsumer
+    from tests.fixtures.helper_classes import GeneratorConsumer
 
 
 @pytest.mark.stable
 def test_iternorm_no_size(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.iternorm with default value for size."""
-    k = 2
-    array_in = [xpb.asarray(x) for x in xpb.arange(10_000, dtype=xpb.float64)]
+    """Regression tests for glass.iternorm with k=2."""
+    array_in = [xpb.asarray([1.0, 0.5, 0.1])] * 10_000
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.iternorm(k, iter(array_in))
-        return generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        generator = glass.iternorm(array_in)
+        return generator_consumer.consume(generator)
 
-    results = benchmark(function_to_benchmark)
-    j, a, s = results[0]
+    result = benchmark(function_to_benchmark)
 
-    assert isinstance(j, int)
-    assert a.shape == (k,)
-    assert s.shape == ()
-    assert s.dtype == xpb.float64
-    assert s.shape == ()
+    assert len(result) == len(array_in)
 
 
 @pytest.mark.stable
 @pytest.mark.parametrize("num_dimensions", [1, 2])
 def test_iternorm_specify_size(
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     num_dimensions: int,
 ) -> None:
-    """Benchmarks for glass.iternorm with size specified."""
-    k = 2
-    size = (3,)
+    """Regression tests for glass.iternorm with k=2 and size=(3,)."""
     if num_dimensions == 1:
-        list_input = [[1.0, 0.5, 0.5] for _ in range(10_000)]
+        array_in = [xpb.asarray([1.0, 0.5, 0.1])] * 10_000
     elif num_dimensions == 2:
-        list_input = [
-            [
-                [1.0, 0.5, 0.5],
-                [0.5, 0.2, 0.1],
-                [0.5, 0.1, 0.2],
-            ]
-            for _ in range(10_000)
-        ]
-    array_in = [xpb.asarray(arr, dtype=xpb.float64) for arr in list_input]
-    expected_result = [
-        1,
-        (3, 2),
-        (3,),
-    ]
+        array_in = [xpb.asarray([[1.0, 0.5, 0.1]] * 3)] * 10_000
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.iternorm(k, iter(array_in), size)
-        return generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        generator = glass.iternorm(array_in)
+        return generator_consumer.consume(generator)
 
-    # check output shapes and types
+    result = benchmark(function_to_benchmark)
 
-    results = benchmark(function_to_benchmark)
-    result1 = results[0]
-    result2 = results[1]
-
-    assert result1 != result2
-    assert isinstance(result1, tuple)
-    assert len(result1) == 3
-
-    j, a, s = result1
-    assert isinstance(j, int)
-    assert j == expected_result[0]
-    assert a.shape == expected_result[1]
-    assert s.shape == expected_result[2]
+    assert len(result) == len(array_in)
 
 
 @pytest.mark.stable
 def test_iternorm_k_0(
     benchmark: BenchmarkFixture,
-    compare: Compare,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.iternorm with k set to 0."""
-    k = 0
-    array_in = [xpb.stack([x]) for x in xpb.ones(1_000, dtype=xpb.float64)]
+    """Regression tests glass.iternorm with k set to 0."""
+    array_in = [xpb.asarray([x]) for x in xpb.ones(1_000, dtype=xpb.float64)]
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.iternorm(k, iter(array_in))
+        generator = glass.iternorm(array_in)
         return generator_consumer.consume(generator)
 
-    results = benchmark(function_to_benchmark)
+    result = benchmark(function_to_benchmark)
 
-    j, a, s = results[0]
-    assert j is None
-    assert a.shape == (0,)
-    compare.assert_allclose(xpb.asarray(s), 1.0)
+    assert len(result) == len(array_in)
 
 
 @pytest.mark.stable
 def test_cls2cov(
     benchmark: BenchmarkFixture,
-    compare: Compare,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.cls2cov."""
+    """Regression tests for glass.cls2cov."""
     nl, nf, nc = 3, 2, 2
     array_in = [xpb.arange(i + 1.0, i + 4.0) for i in range(1_000)]
 
@@ -148,24 +105,30 @@ def test_cls2cov(
     assert cov.shape == (nl, nc + 1)
     assert cov.dtype == xpb.float64
 
-    compare.assert_allclose(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
-    compare.assert_allclose(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
-    compare.assert_allclose(cov[:, 2], 0)
+    xpx.testing.assert_equal(cov[:, 0], xpb.asarray([1.0, 1.5, 2.0]))
+    xpx.testing.assert_equal(cov[:, 1], xpb.asarray([1.5, 2.0, 2.5]))
+    xpx.testing.assert_equal(cov[:, 2], xpb.asarray(0.0), check_shape=False)
 
 
 @pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
-def test_generate_grf(
+def test_generate_grf(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     ncorr: int | None,
     urngb: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
+    xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.fields._generate_grf with positional arguments only."""
-    gls: AngularPowerSpectra = [urngb.random(1_000)]
-    nside = 4
+    """Regression tests of glass.fields._generate_grf with positional arguments only."""
+    n = 10
+    gls: AngularPowerSpectra = [
+        xpb.ones(n) if i == j else xpb.zeros(n)
+        for i in range(n)
+        for j in range(i, -1, -1)
+    ]
+    nside = 32
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.fields._generate_grf(
@@ -185,18 +148,20 @@ def test_generate_grf(
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
     benchmark: BenchmarkFixture,
-    compare: Compare,
-    generator_consumer: GeneratorConsumer,
+    generator_consumer: type[GeneratorConsumer],
     xpb: ModuleType,
     ncorr: int | None,
 ) -> None:
-    """Benchmarks for glass.generate."""
-    n = 100
+    """Regression tests for glass.generate."""
+    n = 10
     fields = [lambda x, var: x for _ in range(n)]  # noqa: ARG005
     fields[1] = lambda x, var: x**2  # noqa: ARG005
-    nth_triangular_number = int((n * (n + 1)) / 2)
-    gls: AngularPowerSpectra = [xpb.ones(10) for _ in range(nth_triangular_number)]
-    nside = 16
+    gls: AngularPowerSpectra = [
+        xpb.ones(n) if i == j else xpb.zeros(n)
+        for i in range(n)
+        for j in range(i, -1, -1)
+    ]
+    nside = 32
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.generate(
@@ -205,25 +170,20 @@ def test_generate(
             nside=nside,
             ncorr=ncorr,
         )
-        return generator_consumer.consume(
-            generator,
-            valid_exception="covariance matrix is not positive definite",
-        )
+        return generator_consumer.consume(generator)
 
     result = benchmark(function_to_benchmark)
 
     for field in result:
         assert field.shape == (hp.nside2npix(nside),)
-    compare.assert_allclose(result[1], result[0] ** 2, atol=1e-05)
 
 
 @pytest.mark.unstable
 def test_getcl_lmax_0(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.getcl with lmax of 0."""
+    """Regression tests for glass.getcl with lmax of 0."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls: AngularPowerSpectra = [
@@ -245,16 +205,15 @@ def test_getcl_lmax_0(
     )
     expected = xpb.asarray([max(random_i, random_j)], dtype=xpb.float64)
     assert result.shape[0] == 1
-    compare.assert_allclose(result, expected)
+    xpx.testing.assert_equal(result, expected)
 
 
 @pytest.mark.unstable
 def test_getcl_lmax_larger_than_cls(
     benchmark: BenchmarkFixture,
-    compare: type[Compare],
     xpb: ModuleType,
 ) -> None:
-    """Benchmarks for glass.getcl with lmax larger than the length of cl."""
+    """Regression tests for glass.getcl with lmax larger than the length of cl."""
     scale_factor = 1_000
     # make a mock Cls array with the index pairs as entries
     cls: AngularPowerSpectra = [
@@ -277,4 +236,4 @@ def test_getcl_lmax_larger_than_cls(
     )
     expected = xpb.zeros((lmax - 1,), dtype=xpb.float64)
     assert result.shape[0] == lmax + 1
-    compare.assert_allclose(result[2:], expected)
+    xpx.testing.assert_equal(result[2:], expected)

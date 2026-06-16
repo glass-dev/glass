@@ -269,7 +269,7 @@ def equal_dens_zbins(
     z: FloatArray,
     nz: FloatArray,
     nbins: int,
-) -> list[tuple[float, float]]:
+) -> list[tuple[FloatArray, FloatArray]]:
     """
     Equal density tomographic redshift bins.
 
@@ -359,9 +359,10 @@ def tomo_nz_gausserr(
     sz = 2**0.5 * sigma_0 * (1 + z)
     # we need to call xp.asarray here because erf will return a numpy
     # array for array libs which do not implement vectorize.
-    binned_nz = xp.asarray(erf((z - z_lower) / sz))
-    binned_nz -= xp.asarray(erf((z - z_upper) / sz))
-    binned_nz /= 1 + xp.asarray(erf(z / sz))
+    binned_nz = erf((z - z_lower) / sz)
+    binned_nz -= erf((z - z_upper) / sz)
+    binned_nz /= 1 + erf(z / sz)
+    binned_nz = xp.asarray(binned_nz)
     binned_nz *= nz
 
     return binned_nz

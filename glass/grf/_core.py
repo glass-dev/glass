@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+import typing
+from typing import TYPE_CHECKING
 
 import transformcl
 
@@ -10,7 +11,7 @@ if TYPE_CHECKING:
     from glass._types import AnyArray
 
 
-class Transformation(Protocol):
+class Transformation(typing.Protocol):
     """Protocol for transformations of Gaussian random fields."""
 
     def __call__(self, x: AnyArray, var: float, /) -> AnyArray:

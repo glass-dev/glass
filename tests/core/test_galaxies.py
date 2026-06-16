@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import array_api_extra as xpx
+
 import glass
 
 if TYPE_CHECKING:
@@ -12,10 +14,12 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import FloatArray, UnifiedGenerator
-    from tests.fixtures.helper_classes import Compare
 
 
-def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
+def test_redshifts(
+    mocker: MockerFixture,
+    xp: ModuleType,
+) -> None:
     # create a mock radial window function
     w = mocker.Mock()
     w.za = xp.linspace(0.0, 1.0, 20)
@@ -32,7 +36,10 @@ def test_redshifts(mocker: MockerFixture, xp: ModuleType) -> None:
     assert z.shape == (10,)
 
 
-def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
+def test_redshifts_from_nz(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     # test sampling
 
     redshifts = glass.redshifts_from_nz(
@@ -127,7 +134,7 @@ def test_redshifts_from_nz(urng: UnifiedGenerator, xp: ModuleType) -> None:
     z = xp.linspace(0, 1, 100)
     nz = xp.stack([z * (1 - z), (z - 0.5) ** 2])
 
-    with pytest.raises(ValueError, match="shape mismatch"):
+    with pytest.raises(ValueError, match=r"shape mismatch|Incompatible shapes"):
         glass.redshifts_from_nz(count, z, nz, warn=False)
 
     with pytest.warns(UserWarning, match="when sampling galaxies"):
@@ -199,7 +206,6 @@ def test_galaxy_shear(
 
 
 def test_gaussian_phz(
-    compare: type[Compare],
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -212,13 +218,13 @@ def test_gaussian_phz(
 
     phz = glass.gaussian_phz(z, sigma_0)
 
-    compare.assert_array_equal(z, phz)
+    xpx.testing.assert_equal(z, phz)
 
     # test with rng
 
     phz = glass.gaussian_phz(z, sigma_0, rng=urng)
 
-    compare.assert_array_equal(z, phz)
+    xpx.testing.assert_equal(z, phz)
 
     # case: truncated normal
 
@@ -264,7 +270,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    compare.assert_array_equal(z, phz)
+    xpx.testing.assert_equal(z, phz)
 
     # case: scalar redshift, array sigma_0
 
@@ -275,7 +281,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (10,)
-    compare.assert_array_equal(z, phz)
+    xpx.testing.assert_equal(xp.broadcast_to(xp.asarray(1.0), phz.shape), phz)
 
     # case: array redshift, array sigma_0
 
@@ -286,7 +292,7 @@ def test_gaussian_phz(
 
     assert phz.__array_namespace__() == xp
     assert phz.shape == (11, 10)
-    compare.assert_array_equal(xp.broadcast_to(z, (11, 10)), phz)
+    xpx.testing.assert_equal(xp.broadcast_to(z, (11, 10)), phz)
 
     # shape mismatch
 

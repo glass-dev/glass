@@ -14,6 +14,7 @@ dev = [
     "coverage[toml]",
     "hatch-vcs",
     "hatchling",
+    "jupyter",
     "nox",
     "nox-uv",
     {include-group = "build"},
@@ -21,7 +22,7 @@ dev = [
 ]
 docs = [
     "array-api-strict",
-    "cosmology.api",
+    "cosmology-api",
     "furo",
     "ipython",
     "jax",
@@ -39,14 +40,10 @@ doctest = [
     {include-group = "test"},
 ]
 lint = [
-    "pre-commit",
-]
-release = [
-    "hatch-vcs",
-    "hatchling",
+    "prek",
 ]
 test = [
-    "cosmology.api",
+    "cosmology-api",
     "fitsio",
     "pytest",
     "pytest-benchmark",
@@ -56,13 +53,22 @@ test = [
     "pytest-rerunfailures",
     "scipy",
 ]
+typechecking = [
+    "array-api-strict",
+    "cosmology-api",
+    "fitsio",
+    "jax",
+    "jaxtyping",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-mock",
+]
 
 [project]
 classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -73,10 +79,10 @@ classifiers = [
 ]
 dependencies = [
     "array-api-compat>=1.12.0",
-    "array-api-extra>=0.9.0",
+    "array-api-extra>=0.10.3",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
-    "transformcl>=2022.8.9",
+    "transformcl>=2026.1",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -93,13 +99,13 @@ maintainers = [
 name = "glass"
 optional-dependencies = {examples = [
     "camb",
-    "cosmology.api",
-    "cosmology.compat.camb",
-    "glass.ext.camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
+    "glass-ext-camb",
     "jupyter",
     "matplotlib",
 ]}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [project.urls]
 Changelog = "https://glass.readthedocs.io/stable/manual/releases.html"
@@ -110,9 +116,9 @@ Issues = "https://github.com/glass-dev/glass/issues"
 [tool.coverage]
 report = {exclude_also = [
     "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
-    "@overload\\n",
-    "class\\s+\\w+\\([^)]*\\bProtocol\\b[^)]*\\):", # protocol classes
-    "if TYPE_CHECKING:",
+    "@(?:typing\\.)?overload\\n",
+    "class\\s+\\w+\\([^)]*\\b(?:typing\\.)?Protocol\\b[^)]*\\):", # protocol classes
+    "if (?:typing\\.)?TYPE_CHECKING:",
 ], omit = [
     "_types.py", # typing-only module
     "_version.py", # not being tracked anyway
@@ -178,6 +184,8 @@ show-fixes = true
 src = [
     "glass",
 ]
+format.docstring-code-format = true
+format.preview = true
 lint.allowed-confusables = [
     "α",
     "γ",
@@ -236,11 +244,6 @@ lint.per-file-ignores = {"__init__.py" = [
 ], "tests/*" = [
     "INP001", # implicit-namespace-package
     "S101", # assert
-], "tests/benchmarks/*" = [
-    "D100", # undocumented-public-module
-    "PLR2004", # magic-value-comparison
-    "S311", # suspicious-non-cryptographic-random-usage
-    "SLF001", # private-member-access
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
@@ -248,6 +251,11 @@ lint.per-file-ignores = {"__init__.py" = [
     "D103", # TODO: undocumented-public-function
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
+    "SLF001", # private-member-access
+], "tests/regression/*" = [
+    "D100", # undocumented-public-module
+    "PLR2004", # magic-value-comparison
+    "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
 ]}
 lint.select = [
@@ -271,16 +279,20 @@ overrides."tool.hatch".first = [
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
 # https://github.com/pappasam/toml-sort/issues/94
 overrides."tool.ty".first = [
+    "analysis",
     "rules",
     "src",
+    "terminal",
 ]
 
 [tool.ty]
+analysis.respect-type-ignore-comments = false
 rules.invalid-argument-type = "ignore"
 src.include = [
     "glass",
     "tests",
 ]
+terminal.error-on-warning = true
 
 [[tool.ty.overrides]]
 include = [

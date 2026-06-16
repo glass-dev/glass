@@ -1,13 +1,4 @@
 ---
-ci:
-  autofix_commit_msg: "pre-commit.ci: style fixes"
-  autofix_prs: false
-  autoupdate_commit_msg: "pre-commit.ci: update pre-commit hooks"
-  autoupdate_schedule: monthly
-  skip:
-    - ty
-
-exclude: ^uv.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -44,26 +35,25 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.4
+    rev: v0.15.15
     hooks:
       - id: ruff-check
       - id: ruff-format
-  - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.20.0
-    hooks:
-      - id: blacken-docs
-        additional_dependencies:
-          - black
+        types_or:
+          - jupyter
+          - markdown
+          - pyi
+          - python
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.3
+    rev: v0.24.4
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.8.1
+    rev: v3.8.3
     hooks:
       - id: prettier
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint-fix
         args:
@@ -73,18 +63,9 @@ repos:
     hooks:
       - id: forbid-tabs
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.11
+    rev: v1.7.12
     hooks:
       - id: actionlint
-  - repo: local
-    hooks:
-      - id: ty
-        entry: uv run ty check
-        language: python
-        name: ty-check
-        pass_filenames: true
-        types:
-          - python
   - repo: https://github.com/kynan/nbstripout
     rev: 0.9.1
     hooks:
@@ -98,7 +79,17 @@ repos:
         args:
           - --external-sources
           - --shell=bash
-  - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.10.7
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.25.2
     hooks:
-      - id: uv-lock
+      - id: zizmor
+        args:
+          - --fix=safe
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.48
+    hooks:
+      - id: ty
+        args:
+          - --group=typechecking
+          - --isolated
+          - --no-default-groups

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import functools
 from functools import wraps
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -27,6 +27,7 @@ import array_api_compat
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from types import ModuleType
+    from typing import Any
 
     import numpy as np
 
@@ -50,9 +51,10 @@ class CompatibleBackendNotFoundError(Exception):
         super().__init__(self.message)
 
 
-def import_numpy(backend: str | None = None) -> ModuleType:
+def default_xp(backend: str | None = None) -> ModuleType:
     """
-    Import the NumPy module, raising a helpful error if NumPy is not installed.
+    Returns the library backend we default to if none is specified by the user.
+    Raises a helpful error if the default is not installed.
 
     Parameters
     ----------
@@ -61,17 +63,17 @@ def import_numpy(backend: str | None = None) -> ModuleType:
 
     Returns
     -------
-        The NumPy module.
+        The default module.
 
     Raises
     ------
     ModuleNotFoundError
-        If NumPy is not found in the user's environment.
+        If the default module is not found in the user's environment.
 
     Notes
     -----
-    This is useful for explaining to the user why NumPy is required when their chosen
-    backend does not implement a needed function.
+    This is useful for explaining to the user why the default module is required
+    when their chosen backend does not implement a needed function.
 
     """
     try:
@@ -81,11 +83,6 @@ def import_numpy(backend: str | None = None) -> ModuleType:
         raise CompatibleBackendNotFoundError("numpy", backend) from err
     else:
         return numpy
-
-
-def default_xp() -> ModuleType:
-    """Returns the library backend we default to if none is specified by the user."""
-    return import_numpy()
 
 
 class xp_additions:  # noqa: N801
@@ -126,11 +123,6 @@ class xp_additions:  # noqa: N801
         -------
             Integrated result.
 
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
         Notes
         -----
         See https://github.com/glass-dev/glass/issues/646
@@ -146,17 +138,12 @@ class xp_additions:  # noqa: N801
         if xp.__name__ == "numpy":
             return xp.trapezoid(y, x=x, dx=dx, axis=axis)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            y_np = np.asarray(y, copy=True)
-            x_np = np.asarray(x, copy=True)
-            result_np = np.trapezoid(y_np, x_np, dx=dx, axis=axis)
-            return xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        y_dxp = dxp.asarray(y, copy=True)
+        x_dxp = dxp.asarray(x, copy=True)
+        result_dxp = dxp.trapezoid(y_dxp, x_dxp, dx=dx, axis=axis)
+        return xp.asarray(result_dxp, copy=True)
 
     @staticmethod
     def interp(  # noqa: PLR0913
@@ -211,25 +198,20 @@ class xp_additions:  # noqa: N801
                 period=period,
             )
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            x_np = np.asarray(x, copy=True)
-            x_points_np = np.asarray(x_points, copy=True)
-            y_points_np = np.asarray(y_points, copy=True)
-            result_np = np.interp(
-                x_np,
-                x_points_np,
-                y_points_np,
-                left=left,
-                right=right,
-                period=period,
-            )
-            return xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        x_dxp = dxp.asarray(x, copy=True)
+        x_points_dxp = dxp.asarray(x_points, copy=True)
+        y_points_dxp = dxp.asarray(y_points, copy=True)
+        result_dxp = dxp.interp(
+            x_dxp,
+            x_points_dxp,
+            y_points_dxp,
+            left=left,
+            right=right,
+            period=period,
+        )
+        return xp.asarray(result_dxp, copy=True)
 
     @staticmethod
     def gradient(f: AnyArray) -> AnyArray:
@@ -260,15 +242,11 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.gradient(f)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            f_np = np.asarray(f, copy=True)
-            result_np = np.gradient(f_np)
-            return xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        f_dxp = dxp.asarray(f, copy=True)
+        result_dxp = dxp.gradient(f_dxp)
+        return xp.asarray(result_dxp, copy=True)
 
     @staticmethod
     def linalg_lstsq(
@@ -320,17 +298,12 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.linalg.lstsq(a, b, rcond=rcond)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            a_np = np.asarray(a, copy=True)
-            b_np = np.asarray(b, copy=True)
-            result_np = np.linalg.lstsq(a_np, b_np, rcond=rcond)
-            return tuple(xp.asarray(res, copy=True) for res in result_np)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        a_dxp = dxp.asarray(a, copy=True)
+        b_dxp = dxp.asarray(b, copy=True)
+        result_dxp = dxp.linalg.lstsq(a_dxp, b_dxp, rcond=rcond)
+        return tuple(xp.asarray(res, copy=True) for res in result_dxp)
 
     @staticmethod
     def einsum(subscripts: str, *operands: AnyArray) -> AnyArray:
@@ -363,16 +336,11 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.einsum(subscripts, *operands)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-
-            # Using design principle of scipy (i.e. copy, use np, copy back)
-            operands_np = (np.asarray(op, copy=True) for op in operands)
-            result_np = np.einsum(subscripts, *operands_np)
-            return xp.asarray(result_np, copy=True)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        operands_dxp = (dxp.asarray(op, copy=True) for op in operands)
+        result_dxp = dxp.einsum(subscripts, *operands_dxp)
+        return xp.asarray(result_dxp, copy=True)
 
     @staticmethod
     def apply_along_axis(
@@ -424,21 +392,14 @@ class xp_additions:  # noqa: N801
             func1d = functools.partial(func, *func_inputs)
             return xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
-        if xp.__name__ == "array_api_strict":
-            # Import here to prevent users relying on numpy unless in this instance
-            np = import_numpy(xp.__name__)
-
-            # Everything must be NumPy to avoid mismatches between array types
-            inputs_np = (np.asarray(inp) for inp in func_inputs)
-            func1d = functools.partial(func, *inputs_np)
-
-            return xp.asarray(
-                np.apply_along_axis(func1d, axis, arr, *args, **kwargs),
-                copy=True,
-            )
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        inputs_dxp = (dxp.asarray(inp) for inp in func_inputs)
+        func1d = functools.partial(func, *inputs_dxp)
+        return xp.asarray(
+            dxp.apply_along_axis(func1d, axis, arr, *args, **kwargs),
+            copy=True,
+        )
 
     @staticmethod
     def vectorize(
@@ -476,14 +437,9 @@ class xp_additions:  # noqa: N801
         if xp.__name__ == "numpy":
             return xp.vectorize(pyfunc, otypes=otypes)
 
-        if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-            # Import here to prevent users relying on numpy unless in this instance
-            np = import_numpy(xp.__name__)
-
-            return np.vectorize(pyfunc, otypes=otypes)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        return dxp.vectorize(pyfunc, otypes=otypes)
 
     @staticmethod
     def radians(deg_arr: AnyArray) -> AnyArray:
@@ -510,12 +466,9 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.radians(deg_arr)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-            return xp.asarray(np.radians(deg_arr))
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        return xp.asarray(dxp.radians(deg_arr))
 
     @staticmethod
     def degrees(rad_arr: AnyArray) -> AnyArray:
@@ -542,12 +495,9 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.degrees(rad_arr)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-            return xp.asarray(np.degrees(rad_arr))
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        return xp.asarray(dxp.degrees(rad_arr))
 
     @staticmethod
     def ndindex(shape: tuple[int, ...], *, xp: ModuleType) -> np.ndindex:
@@ -573,12 +523,9 @@ class xp_additions:  # noqa: N801
         if xp.__name__ == "numpy":
             return xp.ndindex(shape)
 
-        if xp.__name__ in {"array_api_strict", "jax.numpy"}:
-            np = import_numpy(xp.__name__)
-            return np.ndindex(shape)
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        return dxp.ndindex(shape)
 
     @staticmethod
     def tril_indices(
@@ -612,13 +559,9 @@ class xp_additions:  # noqa: N801
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.tril_indices(n, k=k, m=m)
 
-        if xp.__name__ == "array_api_strict":
-            np = import_numpy(xp.__name__)
-            return tuple(xp.asarray(arr) for arr in np.tril_indices(n, k=k, m=m))
-
-        msg = "the array backend in not supported"
-        raise NotImplementedError(msg)
-
+        # If any other backend use default
+        dxp = default_xp(xp.__name__)
+        return tuple(xp.asarray(arr) for arr in dxp.tril_indices(n, k=k, m=m))
 
 def numpy_fallback(func):
     @wraps(func)

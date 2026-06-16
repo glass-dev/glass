@@ -38,7 +38,9 @@ def test_rng_dispatcher_array_api_strict() -> None:
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_init() -> None:
-    rng = _rng.Generator()
+    import array_api_strict
+
+    rng = _rng.Generator(xp=array_api_strict)
     assert isinstance(rng, _rng.Generator)
 
 

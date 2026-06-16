@@ -50,7 +50,7 @@ def save_cls(
     filename
         The name of the file to save to.
     cls
-        Angular matter power spectra in *GLASS* ordering.
+        Angular matter power spectra in GLASS ordering.
 
     """
     split = np.cumulative_sum([cl.shape[0] for cl in cls[:-1]])

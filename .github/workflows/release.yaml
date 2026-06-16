@@ -9,20 +9,23 @@ on:
 
 jobs:
   dist:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up uv
         if: github.event_name == 'workflow_dispatch'
-        uses: astral-sh/setup-uv@v7
+        # yamllint disable-line rule:line-length
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
+          enable-cache: false
           python-version: 3.14
 
       - name: Set build version for TestPyPI
@@ -32,12 +35,13 @@ jobs:
           VERSION=$(uv run hatchling version | cut -d+ -f1)
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - uses: hynek/build-and-inspect-python-package@v2
+      # yamllint disable-line rule:line-length
+      - uses: hynek/build-and-inspect-python-package@d44ca7d91762de7a7d5436ddae667c6da6d1c3df # v2
 
   publish-pypi:
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: dist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: publish
       url: https://pypi.org/project/glass
@@ -45,7 +49,8 @@ jobs:
       id-token: write
     steps:
       - name: Download distributions
-        uses: actions/download-artifact@v8
+        # yamllint disable-line rule:line-length
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: Packages
           path: dist
@@ -54,14 +59,15 @@ jobs:
         run: ls -l dist/
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        # yamllint disable-line rule:line-length
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           verbose: true
 
   publish-test-pypi:
     if: github.event_name == 'workflow_dispatch'
     needs: dist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: test-publish
       url: https://test.pypi.org/project/glass
@@ -69,7 +75,8 @@ jobs:
       id-token: write
     steps:
       - name: Download distributions
-        uses: actions/download-artifact@v8
+        # yamllint disable-line rule:line-length
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: Packages
           path: dist
@@ -78,7 +85,8 @@ jobs:
         run: ls -l dist/
 
       - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        # yamllint disable-line rule:line-length
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true

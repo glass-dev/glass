@@ -16,7 +16,6 @@ nox.options.sessions = [
 ]
 
 ALL_PYTHON = [
-    "3.10",
     "3.11",
     "3.12",
     "3.13",
@@ -26,9 +25,9 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
-BENCH_TESTS_LOC = pathlib.Path("tests/benchmarks")
+REG_TESTS_LOC = pathlib.Path("tests/regression")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
-SHARED_BENCHMARK_FLAGS = [
+SHARED_PYTEST_BENCHMARK_FLAGS = [
     "--benchmark-calibration-precision=1000",
     "--benchmark-columns=mean,stddev,rounds",
     "--benchmark-max-time=5.0",
@@ -64,10 +63,10 @@ def _check_revision_count(
         msg = f"{expected_count} revision(s) not provided"
         raise ValueError(msg)
 
-    if len(session_posargs) != expected_count:
+    if len(session_posargs) < expected_count:
         msg = (
             f"Incorrect number of revisions provided ({len(session_posargs)}), "
-            f"expected {expected_count}"
+            f"expected at least {expected_count}"
         )
         raise ValueError(msg)
 
@@ -75,10 +74,11 @@ def _check_revision_count(
 @nox_uv.session(
     uv_no_install_project=True,
     uv_only_groups=["lint"],
+    uv_sync_locked=False,
 )
 def lint(session: nox.Session) -> None:
     """Run the linter."""
-    session.run("pre-commit", "run", "--all-files", *session.posargs)
+    session.run("prek", "run", "--all-files", "--color", "always", *session.posargs)
 
 
 def _setup_array_backend(session: nox.Session) -> None:
@@ -95,6 +95,7 @@ def _setup_array_backend(session: nox.Session) -> None:
 @nox_uv.session(
     python=ALL_PYTHON,
     uv_groups=["test"],
+    uv_sync_locked=False,
 )
 def tests(session: nox.Session) -> None:
     """Run the unit tests."""
@@ -105,6 +106,7 @@ def tests(session: nox.Session) -> None:
 @nox_uv.session(
     python=ALL_PYTHON,
     uv_groups=["test"],
+    uv_sync_locked=False,
 )
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
@@ -119,15 +121,16 @@ def coverage(session: nox.Session) -> None:
 
 @nox_uv.session(
     uv_groups=["test"],
+    uv_sync_locked=False,
 )
-def coverage_benchmarks(session: nox.Session) -> None:
-    """Run tests and compute coverage for the benchmark tests."""
+def coverage_regression(session: nox.Session) -> None:
+    """Run tests and compute coverage for the regression tests."""
     _setup_array_backend(session)
     session.run(
         "pytest",
-        BENCH_TESTS_LOC,
+        REG_TESTS_LOC,
         "--cov",
-        *SHARED_BENCHMARK_FLAGS,
+        *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs,
         env=os.environ,
     )
@@ -137,6 +140,7 @@ def coverage_benchmarks(session: nox.Session) -> None:
     python=ALL_PYTHON,
     uv_groups=["doctest"],
     uv_no_install_project=True,
+    uv_sync_locked=False,
 )
 def doctests(session: nox.Session) -> None:
     """Run the doctests."""
@@ -150,7 +154,10 @@ def doctests(session: nox.Session) -> None:
     session.run("pytest", *session.posargs)
 
 
-@nox_uv.session(uv_extras=["examples"])
+@nox_uv.session(
+    uv_extras=["examples"],
+    uv_sync_locked=False,
+)
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
     if session.posargs:
@@ -176,7 +183,10 @@ def examples(session: nox.Session) -> None:
         )
 
 
-@nox_uv.session(uv_groups=["docs"])
+@nox_uv.session(
+    uv_groups=["docs"],
+    uv_sync_locked=False,
+)
 def docs(session: nox.Session) -> None:
     """Build the docs. Pass "serve" to serve."""
     session.chdir("docs")
@@ -204,13 +214,14 @@ def docs(session: nox.Session) -> None:
 @nox_uv.session(
     uv_no_install_project=True,
     uv_only_groups=["build"],
+    uv_sync_locked=False,
 )
 def build(session: nox.Session) -> None:
     """Build an SDist and wheel."""
     session.run("python", "-m", "build")
 
 
-@nox_uv.session
+@nox_uv.session(uv_sync_locked=False)
 def version(session: nox.Session) -> None:
     """
     Check the current version of the package.
@@ -226,51 +237,35 @@ def version(session: nox.Session) -> None:
 @nox_uv.session(
     uv_no_install_project=True,
     uv_only_groups=["test"],
-)
-def benchmarks(session: nox.Session) -> None:
-    """
-    Run the benchmark test for a specific revision.
-
-    Note it is not possible to pass extra options to pytest.
-
-    """
-    _check_revision_count(session.posargs, expected_count=1)
-    revision = session.posargs[0]
-
-    # overwrite current package with specified revision
-    session.install(f"git+{GLASS_REPO_URL}@{revision}")
-    session.run("pytest", BENCH_TESTS_LOC)
-
-
-@nox_uv.session(
-    uv_no_install_project=True,
-    uv_only_groups=["test"],
+    uv_sync_locked=False,
 )
 def regression_tests(session: nox.Session) -> None:
     """
-    Run regression benchmark tests between two revisions.
+    Run regression tests between two revisions.
 
     Note it is not possible to pass extra options to pytest.
 
     """
-    _check_revision_count(session.posargs, expected_count=2)
-    before_revision, after_revision = session.posargs
+    minimum_posargs = 2
+    _check_revision_count(session.posargs, expected_count=minimum_posargs)
+    before_revision, after_revision = session.posargs[:minimum_posargs]
 
     _setup_array_backend(session)
 
-    # make sure benchmark directory is clean
+    # make sure .benchmark directory is clean
     benchmark_dir = pathlib.Path(".benchmarks")
     if benchmark_dir.exists():
-        session.log(f"Deleting previous benchmark directory: {benchmark_dir}")
+        session.log(f"Deleting previous .benchmark directory: {benchmark_dir}")
         shutil.rmtree(benchmark_dir)
 
     session.log(f"Generating prior benchmark from revision {before_revision}")
     session.install(f"git+{GLASS_REPO_URL}@{before_revision}")
     session.run(
         "pytest",
-        BENCH_TESTS_LOC,
+        REG_TESTS_LOC,
         "--benchmark-autosave",
-        *SHARED_BENCHMARK_FLAGS,
+        *SHARED_PYTEST_BENCHMARK_FLAGS,
+        *session.posargs[2:],
     )
 
     session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
@@ -278,22 +273,24 @@ def regression_tests(session: nox.Session) -> None:
     session.log("Running stable regression tests")
     session.run(
         "pytest",
-        BENCH_TESTS_LOC,
+        REG_TESTS_LOC,
         "-m",
         "stable",
         "--benchmark-compare=0001",
         "--benchmark-compare-fail=mean:5%",
-        *SHARED_BENCHMARK_FLAGS,
+        *SHARED_PYTEST_BENCHMARK_FLAGS,
+        *session.posargs[2:],
     )
 
     session.log("Running unstable regression tests")
     session.run(
         "pytest",
-        BENCH_TESTS_LOC,
+        REG_TESTS_LOC,
         "-m",
         "unstable",
         "--benchmark-compare=0001",
         # Absolute time comparison in seconds
         "--benchmark-compare-fail=mean:0.0005",
-        *SHARED_BENCHMARK_FLAGS,
+        *SHARED_PYTEST_BENCHMARK_FLAGS,
+        *session.posargs[2:],
     )

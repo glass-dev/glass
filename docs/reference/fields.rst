@@ -90,7 +90,7 @@ returns sets which are well-defined and, in some sense, "close" to the input.
    then find the nearest valid correlation matrices, using the alternating
    projections algorithm of [Higham02]_ with tolerance *tol* for *niter*
    iterations.  This keeps the diagonals (i.e.  auto-correlations) fixed, but
-   requires all of them to be nonnegative.
+   requires all of them to be non-negative.
 
    .. seealso::
 

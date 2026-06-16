@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+import collections
 import itertools
 import math
 import sys
+import typing
 import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-import numpy as np
 import transformcl
 
 import array_api_compat
@@ -91,94 +92,94 @@ def nfields_from_nspectra(nspectra: int) -> int:
     return n
 
 
-def iternorm(
-    k: int,
-    cov: Iterable[FloatArray],
-    size: int | tuple[int, ...] = (),
-) -> Generator[tuple[int | None, FloatArray, FloatArray]]:
+def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
     """
-    Return the vector a and variance sigma^2 for iterative normal sampling.
+    Compute scaling vectors for iterative normal sampling.
 
     Parameters
     ----------
-    k
-        The number of fields.
     cov
-        The covariance matrix for the fields.
-    size
-        The size of the covariance matrix.
+        The covariance matrix (or a stack of covariance matrices) for the fields.
 
     Yields
     ------
-    index
-        The index for iterative sampling.
-    vector
-        The vector for iterative sampling.
-    standard_deviation
-        The standard deviation for iterative sampling.
+    w
+        The scaling vector (or a stack of scaling vectors) for iterative sampling.
 
     Raises
     ------
-    TypeError
-        If the covariance matrix is not broadcastable to the given size.
     ValueError
-        If the covariance matrix is not positive definite.
+        Raised when the provided covariance matrix is empty, has inconsistent
+        shape, or is not positive semi-definite.
 
     """
-    n = (size,) if isinstance(size, int) else size
+    for i, row in enumerate(cov):
+        # number of correlations, this will determine matrix size
+        k = row.shape[-1] - 1
+        if k < 0:
+            raise ValueError("empty covariance matrix")
 
-    m = np.zeros((*n, k, k))
-    a = np.zeros((*n, k))
-    s = np.zeros((*n,))
-    q = (*n, k + 1)
-    j = 0 if k > 0 else None
+        # check for first iteration
+        if i == 0:
+            # extract input array backend
+            xp = row.__array_namespace__()
+            # get shape of covariance
+            n = row.shape[:-1]
+            # initialise empty matrix to start iteration
+            m = xp.zeros((*n, k, k))
+            a = xp.zeros((*n, k))
+            s = xp.ones(n)
+        else:
+            # make sure input shape is compatible with previous iteration
+            if row.shape[:-1] != n:
+                raise ValueError("shape mismatch in covariance")
 
-    # We must use cov_expanded here as cov has been consumed to determine the namespace
-    for i, x in enumerate(cov):
-        x_np = np.asarray(x)
-        if x_np.shape != q:
-            try:
-                x_np = np.broadcast_to(x_np, q)
-            except ValueError:
-                msg = (
-                    f"covariance row {i}: shape {x_np.shape} cannot be broadcast to {q}"
-                )
-                raise TypeError(msg) from None
-
-        # only need to update matrix A if there are correlations
-        if j is not None:
             # compute new entries of matrix A
-            m[..., :, j] = 0
-            m[..., j : j + 1, :] = np.matmul(a[..., np.newaxis, :], m)
-            m[..., j, j] = np.where(s != 0, -1, 0)
-            np.divide(
-                m[..., j, :],
-                -s[..., np.newaxis],
-                where=(m[..., j, :] != 0),
-                out=m[..., j, :],
+            # see https://arxiv.org/pdf/2302.01942
+
+            # compute a^T @ m via matmul by adding a new axis
+            atm = a[..., None, :] @ m
+
+            # build the updated matrix m
+            # append zero column to matrix block
+            m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
+            # generate the bottom right corner: 1 where s > 0, 0 otherwise
+            u = xp.where(
+                s > 0,
+                xp.ones(n, dtype=atm.dtype),
+                xp.zeros(n, dtype=atm.dtype),
             )
+            # assemble the new row
+            r = xp.concat([-atm, u[..., None, None]], axis=-1)
+            # set zero standard deviation to unity to prevent division by zero
+            # this should be fine as corresponding entries in r are zero
+            s = xp.where(s > 0, s, xp.ones(n, dtype=s.dtype))
+            # scale new row with standard deviation
+            r /= s[..., None, None]
+            # concatenate first row and rest of matrix
+            m = xp.concat([m, r], axis=-2)
 
-            # compute new vector a
-            c = x_np[..., 1:, np.newaxis]
-            a = np.matmul(m[..., :j], c[..., k - j :, :])
-            a += np.matmul(m[..., j:], c[..., : k - j, :])
-            a = np.reshape(a, (*n, k))
+        # cut matrix down to size
+        m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
 
-            # next rolling index
-            j = (j - 1) % k
+        # get correlation vector
+        # reverse vector to order it from oldest to newest
+        c = row[..., :0:-1]
+
+        # compute new vector a via matmul
+        a = (m @ c[..., None])[..., 0]
 
         # compute new standard deviation
-        s = x_np[..., 0] - np.einsum("...i,...i", a, a)
-        if np.any(s < 0):
-            msg = "covariance matrix is not positive definite"
-            raise ValueError(msg)
-        s = np.sqrt(s)
+        s = row[..., 0] - xp.vecdot(a, a)
+        if xp.any(s < 0):
+            raise ValueError("covariance matrix is not positive definite")
+        s = xp.sqrt(s)
 
-        # Extract input array backend or conversion of outputs
-        xp = x.__array_namespace__()
+        # concatenate a and s into a single scaling vector
+        w = xp.concat([a, s[..., None]], axis=-1)
 
-        # yield the next index, vector a, and standard deviation s
-        yield j, xp.asarray(a), xp.asarray(s)
+        # yield the scaling vector
+        yield w
 
 
 def cls2cov(
@@ -193,7 +194,7 @@ def cls2cov(
     Parameters
     ----------
     cls
-        Angular matter power spectra in *GLASS* ordering.
+        Angular matter power spectra in GLASS ordering.
     nl
         The number of modes.
     nf
@@ -226,7 +227,7 @@ def cls2cov(
             cov = xpx.at(cov)[:n, i].set(cl)
             cov = xpx.at(cov)[n:, i].set(0.0)
         cov /= 2
-        yield cov
+        yield typing.cast("FloatArray", cov)
 
 
 def discretized_cls(
@@ -247,7 +248,7 @@ def discretized_cls(
     Parameters
     ----------
     cls
-        Angular matter power spectra in *GLASS* ordering.
+        Angular matter power spectra in GLASS ordering.
     lmax
         The maximum mode number to truncate the spectra.
     ncorr
@@ -310,7 +311,7 @@ def lognormal_gls(
     Parameters
     ----------
     cls
-        Angular matter power spectra in *GLASS* ordering.
+        Angular matter power spectra in GLASS ordering.
     shift
         The shift parameter for the lognormal transformation.
 
@@ -388,30 +389,30 @@ def _generate_grf(
     # generates the covariance matrix for the iterative sampler
     cov = cls2cov(gls, n, ngrf, ncorr)
 
-    # working arrays for the iterative sampling
+    # alm size
     z_size = n * (n + 1) // 2
-    y = xp.zeros((z_size, ncorr), dtype=xp.complex128)
 
-    # generate the conditional normal distribution for iterative sampling
-    conditional_dist = iternorm(ncorr, cov, size=n)
+    # store standard normal random variates
+    y = collections.deque()
 
-    # sample the fields from the conditional distribution
-    for j, a, s in conditional_dist:
+    # sample the Gaussian fields iteratively
+    for w in iternorm(cov):
         # standard normal random variates for alm
-        # sample real and imaginary parts, then view as complex number
-        z = rng.standard_normal((z_size,)) + (1j * rng.standard_normal((z_size,)))
+        # sample real and imaginary parts, then combine into complex number
+        z = rng.standard_normal((z_size, 2)) @ xp.asarray([1, 1j])
 
-        # scale by standard deviation of the conditional distribution
-        # variance is distributed over real and imaginary part
-        alm = glass.harmonics.multalm(z, s)
+        # append to stack of standard normals
+        y.append(z)
 
-        # add the mean of the conditional distribution
-        for i in range(ncorr):
-            alm += glass.harmonics.multalm(y[:, i], a[:, i])
+        # forget oldest variates that are no longer correlated
+        while len(y) > w.shape[-1]:
+            y.popleft()
 
-        # store the standard normal in y array at the indicated index
-        if j is not None:
-            y = xpx.at(y)[:, j].set(z)
+        # how many correlations have missing variates
+        mis = w.shape[-1] - len(y)
+
+        # compute the correlated variate
+        alm = sum(glass.harmonics.multalm(z, w[..., i + mis]) for i, z in enumerate(y))
 
         alm = _glass_to_healpix_alm(alm)
 
@@ -529,7 +530,7 @@ def getcl(
     Parameters
     ----------
     cls
-        Angular matter power spectra in *GLASS* ordering.
+        Angular matter power spectra in GLASS ordering.
     i
         Indices to return.
     j
@@ -540,7 +541,7 @@ def getcl(
     Returns
     -------
         The angular power spectrum for indices *i* and *j* from an
-        array in *GLASS* ordering.
+        array in GLASS ordering.
 
     """
     if j > i:
@@ -551,7 +552,7 @@ def getcl(
             cl = cl[: lmax + 1]
         else:
             cl = xpx.pad(cl, (0, lmax + 1 - cl.shape[0]))
-    return cl  # ty: ignore[invalid-return-type]
+    return typing.cast("FloatArray", cl)
 
 
 def enumerate_spectra(
@@ -615,7 +616,7 @@ def effective_cls(
     Parameters
     ----------
     cls
-        Angular matter power spectra in *GLASS* ordering.
+        Angular matter power spectra in GLASS ordering.
     weights1
         Weight factors for spectra. The first axis must be equal to
         the number of fields.
@@ -662,7 +663,8 @@ def effective_cls(
         itertools.combinations_with_replacement(uxpx.ndindex(shape1[1:], xp=xp), 2)
         if weights2 is weights1
         else itertools.product(
-            uxpx.ndindex(shape1[1:], xp=xp), uxpx.ndindex(shape2[1:], xp=xp)
+            uxpx.ndindex(shape1[1:], xp=xp),
+            uxpx.ndindex(shape2[1:], xp=xp),
         )
     )
 
@@ -684,7 +686,7 @@ def effective_cls(
         out = xpx.at(out)[j1 + j2 + (...,)].set(cl)
         if weights2 is weights1 and j1 != j2:
             out = xpx.at(out)[j2 + j1 + (...,)].set(cl)
-    return out  # ty: ignore[invalid-return-type]
+    return typing.cast("FloatArray", out)
 
 
 def gaussian_fields(
@@ -874,19 +876,17 @@ def generate(
         Sampled random fields.
 
     """
-    xp = array_api_compat.array_namespace(*gls, use_compat=False)
-
     n = len(fields)
     if len(gls) != n * (n + 1) // 2:
         msg = "mismatch between number of fields and gls"
         raise ValueError(msg)
 
     # cltovar requires numpy but getcl maintains xp, so conversion is required
-    variances = (transformcl.cltovar(np.asarray(getcl(gls, i, i))) for i in range(n))
+    variances = (transformcl.cltovar(getcl(gls, i, i)) for i in range(n))
     grf = _generate_grf(gls, nside, ncorr=ncorr, rng=rng)
 
     for t, x, var in zip(fields, grf, variances, strict=True):
-        yield t(x, xp.asarray(var))
+        yield t(x, var)
 
 
 def glass_to_healpix_spectra(spectra: Sequence[T]) -> list[T]:
@@ -1024,7 +1024,7 @@ def cov_from_spectra(
         cov = xpx.at(cov)[:size, i, j].set(cl_flat[:size])
         cov = xpx.at(cov)[:size, j, i].set(cl_flat[:size])
 
-    return cov  # ty: ignore[invalid-return-type]
+    return typing.cast("AnyArray", cov)
 
 
 def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
