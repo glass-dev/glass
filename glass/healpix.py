@@ -9,7 +9,6 @@ import healpix
 import healpy
 import numpy as np
 
-
 import glass._array_api_utils as _utils
 from glass import _rng
 from glass._array_api_utils import numpy_fallback
@@ -53,20 +52,19 @@ def alm2map(  # noqa: PLR0913
         A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
 
     """
-
     inputs = (
         [np.asarray(alm) for alm in alms]
         if isinstance(alms, Sequence)
         else np.asarray(alms)
     )
     return healpy.alm2map(
-            inputs,
-            nside,
-            inplace=inplace,
-            lmax=lmax,
-            pixwin=pixwin,
-            pol=pol,
-   )
+        inputs,
+        nside,
+        inplace=inplace,
+        lmax=lmax,
+        pixwin=pixwin,
+        pol=pol,
+    )
 
 
 @numpy_fallback
@@ -95,7 +93,6 @@ def alm2map_spin(
         List of 2 out maps in RING scheme as arrays.
 
     """
-
     inputs = [np.asarray(alm) for alm in alms]
     outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
     return [out for out in outputs]
@@ -126,11 +123,10 @@ def almxfl(
         The modified alm, either a new array or a reference to input alm.
 
     """
-
     return healpy.almxfl(
-            np.asarray(alm),
-            np.asarray(fl),
-            inplace=inplace,
+        np.asarray(alm),
+        np.asarray(fl),
+        inplace=inplace,
     )
 
 
@@ -164,12 +160,11 @@ def ang2pix(
         The HEALPix pixel numbers.
 
     """
-
     return healpix.ang2pix(
-            nside,
-            np.asarray(theta),
-            np.asarray(phi),
-            lonlat=lonlat,
+        nside,
+        np.asarray(theta),
+        np.asarray(phi),
+        lonlat=lonlat,
     )
 
 
@@ -200,7 +195,6 @@ def ang2vec(
         A normalised 3-vector pointing in the same direction as ``ang``.
 
     """
-
     x, y, z = healpix.ang2vec(
         np.asarray(theta),
         np.asarray(phi),
@@ -254,13 +248,14 @@ def map2alm(
         alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
 
     """
-
     inputs = (
         [np.asarray(m) for m in maps]
         if isinstance(maps, Sequence)
         else np.asarray(maps)
     )
-    return healpy.map2alm(inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights)
+    return healpy.map2alm(
+        inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights
+    )
 
 
 def npix2nside(npix: int) -> int:
@@ -400,7 +395,6 @@ def randang(
         A tuple ``theta, phi`` of mathematical coordinates.
 
     """
-
     theta, phi = healpix.randang(
         nside,
         np.asarray(ipix),
@@ -446,5 +440,4 @@ class Rotator:
             Map in the new reference frame
 
         """
-
         return healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m))

@@ -17,11 +17,12 @@ integration, interpolation, and linear algebra.
 from __future__ import annotations
 
 import functools
+from functools import wraps
 from typing import TYPE_CHECKING, Any
 
-import array_api_compat
-from functools import wraps
 import numpy as np
+
+import array_api_compat
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -618,6 +619,7 @@ class xp_additions:  # noqa: N801
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
 
+
 def numpy_fallback(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -627,7 +629,7 @@ def numpy_fallback(func):
         for arg in args:
             if hasattr(arg, "__array_namespace__"):
                 list_of_xp.append(arg)
-    
+
         for arg in kwargs.values():
             if hasattr(arg, "__array_namespace__"):
                 list_of_xp.append(arg)
@@ -664,7 +666,6 @@ def numpy_fallback(func):
 
         if xp is None:
             return result
-        else:
-            return convert_back(result)
+        return convert_back(result)
 
     return wrapper

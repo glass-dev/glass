@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from transformcl import cltocorr, corrtocl
-from glass._array_api_utils import numpy_fallback
 
 import glass.grf
+from glass._array_api_utils import numpy_fallback
 
 if TYPE_CHECKING:
     from glass._types import AnyArray
@@ -82,7 +82,6 @@ def solve(  # noqa: PLR0912, PLR0913
     :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
-
     # This function is difficult to port to the Array API so for now we work
     # in NumPy and ultimately convert back at the end of it.
 
