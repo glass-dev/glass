@@ -22,6 +22,7 @@ import glass.healpix as hp
 import glass.shells
 from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
+from glass._array_api_utils import numpy_fallback
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence

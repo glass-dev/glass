@@ -20,6 +20,8 @@ import functools
 from typing import TYPE_CHECKING, Any
 
 import array_api_compat
+from functools import wraps
+import numpy as np
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -615,3 +617,54 @@ class xp_additions:  # noqa: N801
 
         msg = "the array backend in not supported"
         raise NotImplementedError(msg)
+
+def numpy_fallback(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        xp = default_xp()
+        list_of_xp = []
+
+        for arg in args:
+            if hasattr(arg, "__array_namespace__"):
+                list_of_xp.append(arg)
+    
+        for arg in kwargs.values():
+            if hasattr(arg, "__array_namespace__"):
+                list_of_xp.append(arg)
+
+        if "xp" in kwargs:
+            xp = kwargs["xp"]
+            xp = default_xp() if xp is None else xp
+        elif not list_of_xp:
+            return func(*args, **kwargs)
+        else:
+            xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
+
+        np_args = [
+            np.asarray(arg) if hasattr(arg, "__array_namespace__") else arg
+            for arg in args
+        ]
+        np_kwargs = {
+            k: np.asarray(v) if hasattr(v, "__array_namespace__") else v
+            for k, v in kwargs.items()
+        }
+
+        result = func(*np_args, **np_kwargs)
+
+        def convert_back(obj):
+            if isinstance(obj, np.ndarray):
+                return xp.asarray(obj)
+            if isinstance(obj, tuple):
+                return tuple(convert_back(o) for o in obj)
+            if isinstance(obj, list):
+                return [convert_back(o) for o in obj]
+            if isinstance(obj, dict):
+                return {k: convert_back(v) for k, v in obj.items()}
+            return obj
+
+        if xp is None:
+            return result
+        else:
+            return convert_back(result)
+
+    return wrapper
