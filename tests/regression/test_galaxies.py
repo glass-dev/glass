@@ -35,6 +35,37 @@ def test_redshifts(
 
 
 @pytest.mark.stable
+def test_redshifts_from_bins(
+    benchmark: BenchmarkFixture,
+    urngb: UnifiedGenerator,
+    xpb: ModuleType,
+) -> None:
+    """Regression test for galaxies.redshifts_from_bins."""
+    # sample N of redshifts from K bins
+    # good values are millions of redshifts, O(10) bins
+
+    # random bins
+    bins = xpb.astype(urngb.uniform(0.0, 10.0, size=1_000_000), int)
+
+    # generate a flat redshift distribution
+    # shape does not matter for performance
+    z = xpb.linspace(0.0, 3.0, 301)
+    nz_dict = {k: xpb.ones(z.shape) for k in range(10)}
+
+    # sample redshifts (scalar)
+    redshifts = benchmark(
+        glass.redshifts_from_bins,
+        bins,
+        z,
+        nz_dict,
+        rng=urngb,
+    )
+
+    # ensure that function has run on input size
+    assert redshifts.shape == bins.shape
+
+
+@pytest.mark.stable
 def test_redshifts_from_nz(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
