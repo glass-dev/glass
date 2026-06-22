@@ -13,6 +13,8 @@ from glass import _rng  # noqa: E402
 from glass.jax import Generator  # noqa: E402
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import FloatArray, IntArray
 
 
@@ -72,12 +74,13 @@ def test_spawn() -> None:
 def test_random(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    xp: ModuleType,
 ) -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.random(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert xp.asarray(rvs) == shape_output
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
     assert isinstance(rvs, ArrayLike)
@@ -109,12 +112,13 @@ def test_normal(
     scale: float | FloatArray,
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    xp: ModuleType,
 ) -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.normal(loc=loc, scale=scale, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert xp.asarray(rvs) == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
@@ -154,12 +158,13 @@ def test_normal_shape_mismatch_broadcast() -> None:
 def test_standard_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    xp: ModuleType,
 ) -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.standard_normal(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert xp.asarray(rvs) == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
@@ -184,12 +189,13 @@ def test_poisson(
     lam: float | FloatArray,
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    xp: ModuleType,
 ) -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.poisson(lam=lam, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert xp.asarray(rvs) == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
@@ -231,12 +237,13 @@ def test_uniform(
     high: float | FloatArray,
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    xp: ModuleType,
 ) -> None:
     rng = _rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.uniform(low=low, high=high, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert xp.asarray(rvs) == shape_output
     assert jnp.all(rvs >= low)
     assert jnp.all(rvs < high)
     assert isinstance(rvs, ArrayLike)
