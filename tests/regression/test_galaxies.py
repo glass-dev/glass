@@ -18,20 +18,20 @@ if TYPE_CHECKING:
 def test_redshifts(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression test for galaxies.redshifts."""
     scale_factor = 1_000
     # create a mock radial window function
-    za = xpb.linspace(0.0, 1.0, 20 * scale_factor)
-    wa = xpb.exp(-0.5 * (za - 0.5) ** 2 / 0.1**2)
+    za = xp.linspace(0.0, 1.0, 20 * scale_factor)
+    wa = xp.exp(-0.5 * (za - 0.5) ** 2 / 0.1**2)
     w = glass.RadialWindow(za, wa)
 
     # sample redshifts (scalar)
     z = benchmark(glass.redshifts, 13 * scale_factor, w, rng=urngb)
     assert z.shape == (13 * scale_factor,)
-    assert xpb.min(z) >= 0.0
-    assert xpb.max(z) <= 1.0
+    assert xp.min(z) >= 0.0
+    assert xp.max(z) <= 1.0
 
 
 @pytest.mark.stable
@@ -69,13 +69,13 @@ def test_redshifts_from_bins(
 def test_redshifts_from_nz(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression test for galaxies.redshifts_from_nz."""
     scale_factor = 1_000
     # create a mock radial window function
-    za = xpb.linspace(0.0, 1.0, 20 * scale_factor)
-    wa = xpb.exp(-0.5 * (za - 0.5) ** 2 / 0.1**2)
+    za = xp.linspace(0.0, 1.0, 20 * scale_factor)
+    wa = xp.exp(-0.5 * (za - 0.5) ** 2 / 0.1**2)
 
     # sample redshifts (scalar)
     redshifts = benchmark(
@@ -87,9 +87,9 @@ def test_redshifts_from_nz(
         warn=False,
     )
     assert redshifts.shape == (13 * scale_factor,)
-    assert xpb.min(redshifts) >= 0.0
-    assert xpb.max(redshifts) <= 1.0
-    assert xpb.all((redshifts >= 0) & (redshifts <= 1))
+    assert xp.min(redshifts) >= 0.0
+    assert xp.max(redshifts) <= 1.0
+    assert xp.all((redshifts >= 0) & (redshifts <= 1))
 
 
 @pytest.mark.unstable
@@ -128,13 +128,13 @@ def test_galaxy_shear(
 def test_gaussian_phz(
     benchmark: BenchmarkFixture,
     urngb: UnifiedGenerator,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for galaxies.gaussian_phz."""
     scaled_length = 10_000
 
-    z = xpb.linspace(0, 1, scaled_length)
-    sigma_0 = xpb.ones(scaled_length)
+    z = xp.linspace(0, 1, scaled_length)
+    sigma_0 = xp.ones(scaled_length)
 
     phz = benchmark(
         glass.gaussian_phz,
@@ -146,5 +146,5 @@ def test_gaussian_phz(
     )
 
     assert phz.shape == (scaled_length,)
-    assert xpb.all(phz >= 0.5)
-    assert xpb.all(phz <= 1.5)
+    assert xp.all(phz >= 0.5)
+    assert xp.all(phz <= 1.5)

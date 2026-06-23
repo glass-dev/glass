@@ -36,13 +36,13 @@ def test_ellipticity_ryden04(
 @pytest.mark.stable
 def test_ellipticity_gaussian(
     benchmark: BenchmarkFixture,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression test for glass.ellipticity_gaussian."""
     array_length = 10
     n = 1_000_000
-    count = xpb.full(array_length, fill_value=n)
-    sigma = xpb.full(array_length, fill_value=0.256)
+    count = xp.full(array_length, fill_value=n)
+    sigma = xp.full(array_length, fill_value=0.256)
 
     eps = benchmark(
         glass.ellipticity_gaussian,
@@ -56,13 +56,13 @@ def test_ellipticity_gaussian(
 @pytest.mark.stable
 def test_ellipticity_intnorm(
     benchmark: BenchmarkFixture,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression test for glass.ellipticity_intnorm."""
     array_length = 20
     n = 100_000
-    count = xpb.full(array_length, fill_value=n)
-    sigma = xpb.full(array_length, fill_value=0.256)
+    count = xp.full(array_length, fill_value=n)
+    sigma = xp.full(array_length, fill_value=0.256)
 
     eps = benchmark(
         glass.ellipticity_intnorm,

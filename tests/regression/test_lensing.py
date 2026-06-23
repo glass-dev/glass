@@ -23,14 +23,14 @@ def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for add_window and add_plane with a multi_plane_matrix."""
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
-            xpb.arange(i, i + 3, dtype=xpb.float64),
-            xpb.asarray([0.0, 1.0, 0.0]),
+            xp.arange(i, i + 3, dtype=xp.float64),
+            xp.asarray([0.0, 1.0, 0.0]),
             float(i + 1),
         )
         for i in range(1_000)
@@ -38,8 +38,8 @@ def test_multi_plane_matrix(
     mat = glass.multi_plane_matrix(shells, cosmo)
     deltas = urngb.random((len(shells), 10))
 
-    xpx.testing.assert_equal(mat, xpb.tril(mat))
-    xpx.testing.assert_equal(xpb.triu(mat, k=1), xpb.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(mat, xp.tril(mat))
+    xpx.testing.assert_equal(xp.triu(mat, k=1), xp.asarray(0.0), check_shape=False)
 
     def setup_shells_and_deltas() -> tuple[
         tuple[
@@ -81,26 +81,26 @@ def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
     cosmo: Cosmology,
     urngb: UnifiedGenerator,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for add_window and add_plane with a multi_plane_weights."""
     # Use this over the fixture to allow us to add many more windows
     shells = [
         glass.RadialWindow(
-            xpb.arange(i, i + 3, dtype=xpb.float64),
-            xpb.asarray([0.0, 1.0, 0.0]),
+            xp.arange(i, i + 3, dtype=xp.float64),
+            xp.asarray([0.0, 1.0, 0.0]),
             float(i + 1),
         )
         for i in range(500)
     ]
-    w_in = xpb.eye(len(shells))
+    w_in = xp.eye(len(shells))
     deltas = urngb.random((len(shells), 10))
     weights = urngb.random((len(shells), 3))
 
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 
-    xpx.testing.assert_equal(w_out, xpb.triu(w_out, 1))
-    xpx.testing.assert_equal(xpb.tril(w_out), xpb.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(w_out, xp.triu(w_out, 1))
+    xpx.testing.assert_equal(xp.tril(w_out), xp.asarray(0.0), check_shape=False)
 
     def setup_shells_deltas_and_weights() -> tuple[
         tuple[

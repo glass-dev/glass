@@ -21,17 +21,17 @@ if TYPE_CHECKING:
 @pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,
-    xpb: ModuleType,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for glass.harmonics.multalm."""
     scale_factor = 100_000
 
-    alm = xpb.arange(scale_factor * 5, dtype=xpb.float64)
-    bl = xpb.asarray(scale_factor * 3, dtype=xpb.float64)
+    alm = xp.arange(scale_factor * 5, dtype=xp.float64)
+    bl = xp.asarray(scale_factor * 3, dtype=xp.float64)
 
     result = benchmark(glass_harmonics.multalm, alm, bl)
 
     xpx.testing.assert_equal(
         result[:5],
-        xpb.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
+        xp.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
     )
