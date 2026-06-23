@@ -11,7 +11,7 @@ import glass
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import UnifiedGenerator
+    from glass._types import ComplexArray, UnifiedGenerator
 
 
 def test_triaxial_axis_ratio(
@@ -252,23 +252,30 @@ def test_ellipticity_intnorm(
         glass.ellipticity_intnorm(1, 0.71, xp=xp)
 
 
-def test_resample_shapes(
+@pytest.fixture
+def epsilon(
     urng: UnifiedGenerator,
     xp: ModuleType,
-) -> None:
-    """Test for resample_shapes() without compensation."""
-    # generate an array of random ellipticities
-    n = 1000
+) -> ComplexArray:
+    """Generate uniform random epsilon ellipticities."""
+    n = 1_000_000
     r = xp.sqrt(urng.uniform(0.0, 1.0, n))
     phi = urng.uniform(0.0, 2 * xp.pi, n)
-    epsilon = r * xp.exp(1j * phi)
+    return r * xp.exp(1j * phi)
 
+
+def test_resample_shapes(
+    epsilon: ComplexArray,
+    urng: UnifiedGenerator,
+) -> None:
+    """Test for resample_shapes() without compensation."""
     # resulting absolute values should match identically
     result = glass.resample_shapes(epsilon, rng=urng)
     xpx.testing.assert_close(abs(result), abs(epsilon), rtol=1e-10)
 
 
 def test_resample_shapes_varg(
+    epsilon: ComplexArray,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -276,19 +283,13 @@ def test_resample_shapes_varg(
     # variance to compensate
     varg = 0.1
 
-    # generate an array of random ellipticities
-    n = 1000
-    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
-    phi = urng.uniform(0.0, 2 * xp.pi, n)
-    epsilon = r * xp.exp(1j * phi)
-
     # compute compensated result
     result = glass.resample_shapes(epsilon, varg=varg, rng=urng)
 
     # sample g with given variance
     g = urng.normal(
         scale=xp.sqrt(xp.asarray(varg / 2)),
-        size=(n, 2),
+        size=(*epsilon.shape, 2),
     ) @ xp.asarray([1, 1j])
 
     # apply g to result
@@ -303,6 +304,7 @@ def test_resample_shapes_varg(
 
 
 def test_resample_shapes_vargamma(
+    epsilon: ComplexArray,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -310,19 +312,13 @@ def test_resample_shapes_vargamma(
     # variance to compensate
     vargamma = 0.1
 
-    # generate an array of random ellipticities
-    n = 1000
-    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
-    phi = urng.uniform(0.0, 2 * xp.pi, n)
-    epsilon = r * xp.exp(1j * phi)
-
     # compute compensated result
     result = glass.resample_shapes(epsilon, vargamma=vargamma, rng=urng)
 
     # sample gamma with given variance
     gamma = urng.normal(
         scale=xp.sqrt(xp.asarray(vargamma / 2)),
-        size=(n, 2),
+        size=(*epsilon.shape, 2),
     ) @ xp.asarray([1, 1j])
 
     # apply gamma to result
