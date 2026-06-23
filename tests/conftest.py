@@ -10,4 +10,5 @@ pytest_plugins = [
     "fixtures.domain",
     "fixtures.generators",
     "fixtures.helper_classes",
+    "fixtures.healpy_data",
 ]
