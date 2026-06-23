@@ -117,7 +117,7 @@ def test_generate_grf(  # noqa: PLR0913
     benchmark: BenchmarkFixture,
     generator_consumer: type[GeneratorConsumer],
     ncorr: int | None,
-    urngb: UnifiedGenerator,
+    urng: UnifiedGenerator,
     use_rng: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
@@ -134,7 +134,7 @@ def test_generate_grf(  # noqa: PLR0913
         generator = glass.fields._generate_grf(
             gls,
             nside,
-            rng=urngb if use_rng else None,
+            rng=urng if use_rng else None,
             ncorr=ncorr,
         )
         return generator_consumer.consume(generator)

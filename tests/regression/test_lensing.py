@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
     cosmo: Cosmology,
-    urngb: UnifiedGenerator,
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     """Regression tests for add_window and add_plane with a multi_plane_matrix."""
@@ -36,7 +36,7 @@ def test_multi_plane_matrix(
         for i in range(1_000)
     ]
     mat = glass.multi_plane_matrix(shells, cosmo)
-    deltas = urngb.random((len(shells), 10))
+    deltas = urng.random((len(shells), 10))
 
     xpx.testing.assert_equal(mat, xp.tril(mat))
     xpx.testing.assert_equal(xp.triu(mat, k=1), xp.asarray(0.0), check_shape=False)
@@ -80,7 +80,7 @@ def test_multi_plane_matrix(
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
     cosmo: Cosmology,
-    urngb: UnifiedGenerator,
+    urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
     """Regression tests for add_window and add_plane with a multi_plane_weights."""
@@ -94,8 +94,8 @@ def test_multi_plane_weights(
         for i in range(500)
     ]
     w_in = xp.eye(len(shells))
-    deltas = urngb.random((len(shells), 10))
-    weights = urngb.random((len(shells), 3))
+    deltas = urng.random((len(shells), 10))
+    weights = urng.random((len(shells), 3))
 
     w_out = glass.multi_plane_weights(w_in, shells, cosmo)
 

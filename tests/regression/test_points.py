@@ -143,16 +143,16 @@ def test_displace(
 )
 def test_displacement(
     benchmark: BenchmarkFixture,
-    urngb: UnifiedGenerator,
+    urng: UnifiedGenerator,
 ) -> None:
     """Regression test for glass.displacement."""
     scale_factor = 100
 
     # test on an array
-    from_lon = urngb.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
-    from_lat = urngb.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
-    to_lon = urngb.uniform(-180.0, 180.0, size=5 * scale_factor)
-    to_lat = urngb.uniform(-90.0, 90.0, size=5 * scale_factor)
+    from_lon = urng.uniform(-180.0, 180.0, size=(20 * scale_factor, 1))
+    from_lat = urng.uniform(-90.0, 90.0, size=(20 * scale_factor, 1))
+    to_lon = urng.uniform(-180.0, 180.0, size=5 * scale_factor)
+    to_lat = urng.uniform(-90.0, 90.0, size=5 * scale_factor)
     alpha = benchmark(
         glass.displacement,
         from_lon,

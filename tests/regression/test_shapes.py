@@ -17,17 +17,17 @@ if TYPE_CHECKING:
 @pytest.mark.stable
 def test_ellipticity_ryden04(
     benchmark: BenchmarkFixture,
-    urngb: UnifiedGenerator,
+    urng: UnifiedGenerator,
 ) -> None:
     """Regression test for glass.ellipticity_ryden04."""
     size = (1_000, 1_000)
 
     # single ellipticity
 
-    mu = urngb.random(size) * -1.0
-    sigma = urngb.random(size)
-    gamma = urngb.random(size)
-    sigma_gamma = urngb.random(size)
+    mu = urng.random(size) * -1.0
+    sigma = urng.random(size)
+    gamma = urng.random(size)
+    sigma_gamma = urng.random(size)
 
     e = benchmark(glass.ellipticity_ryden04, mu, sigma, gamma, sigma_gamma, size=size)
     assert e.shape == size
