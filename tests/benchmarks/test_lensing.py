@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import array_api_extra as xpx
+
 # use the CAMB cosmology that generated the matter power spectra
 import camb  # ty: ignore[unresolved-import]
 from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
@@ -12,14 +14,12 @@ from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
 import glass
 import glass.ext.camb  # ty: ignore[unresolved-import]
 
-import array_api_extra as xpx
-
 if TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
 
-    from glass._types import UnifiedGenerator
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 def test_lensing(
@@ -84,9 +84,10 @@ def test_lensing(
     ngal = glass.partition(z, dndz, shells)
 
     shape = 12 * nside**2
-    def function_to_benchmark() -> None:
+
+    def function_to_benchmark() -> tuple[FloatArray, FloatArray, FloatArray]:
         # the integrated convergence and shear field over the redshift distribution
-        
+
         kappa_bar = xp.zeros(shape)
         gamm1_bar = xp.zeros(shape)
         gamm2_bar = xp.zeros(shape)
