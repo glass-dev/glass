@@ -250,3 +250,87 @@ def test_ellipticity_intnorm(
 
     with pytest.raises(ValueError, match="sigma must be between"):
         glass.ellipticity_intnorm(1, 0.71, xp=xp)
+
+
+def test_resample_shapes(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Test for resample_shapes() without compensation."""
+    # generate an array of random ellipticities
+    n = 1000
+    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
+    phi = urng.uniform(0.0, 2 * xp.pi, n)
+    epsilon = r * xp.exp(1j * phi)
+
+    # resulting absolute values should match identically
+    result = glass.resample_shapes(epsilon, rng=urng)
+    xpx.testing.assert_close(abs(result), abs(epsilon), rtol=1e-10)
+
+
+def test_resample_shapes_varg(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Test for resample_shapes() with varg compensation."""
+    # variance to compensate
+    varg = 0.1
+
+    # generate an array of random ellipticities
+    n = 1000
+    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
+    phi = urng.uniform(0.0, 2 * xp.pi, n)
+    epsilon = r * xp.exp(1j * phi)
+
+    # compute compensated result
+    result = glass.resample_shapes(epsilon, varg=varg, rng=urng)
+
+    # sample g with given variance
+    g = urng.normal(
+        scale=xp.sqrt(xp.asarray(varg / 2)),
+        size=(n, 2),
+    ) @ xp.asarray([1, 1j])
+
+    # apply g to result
+    result = (result + g) / (1 + result * xp.conj(g))
+
+    # check variance is close to input
+    xpx.testing.assert_close(
+        xp.var(xp.real(result)) + xp.var(xp.imag(result)),
+        xp.var(xp.real(epsilon)) + xp.var(xp.imag(epsilon)),
+        atol=1e-2,
+    )
+
+
+def test_resample_shapes_vargamma(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Test for resample_shapes() with vargamma compensation."""
+    # variance to compensate
+    vargamma = 0.1
+
+    # generate an array of random ellipticities
+    n = 1000
+    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
+    phi = urng.uniform(0.0, 2 * xp.pi, n)
+    epsilon = r * xp.exp(1j * phi)
+
+    # compute compensated result
+    result = glass.resample_shapes(epsilon, vargamma=vargamma, rng=urng)
+
+    # sample gamma with given variance
+    gamma = urng.normal(
+        scale=xp.sqrt(xp.asarray(vargamma / 2)),
+        size=(n, 2),
+    ) @ xp.asarray([1, 1j])
+
+    # apply gamma to result
+    result = result + gamma
+
+    # check variance is close to input
+    xpx.testing.assert_close(
+        xp.var(xp.real(result)) + xp.var(xp.imag(result)),
+        xp.var(xp.real(epsilon)) + xp.var(xp.imag(epsilon)),
+        atol=1e-2,
+    )
