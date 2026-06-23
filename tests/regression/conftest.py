@@ -19,7 +19,7 @@ def xp(xpb: ModuleType) -> ModuleType:
 
 
 @pytest.fixture
-def urngb(xpb: ModuleType) -> UnifiedGenerator:
+def urng(xpb: ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface to be used in regression tests.
 
