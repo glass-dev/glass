@@ -1,14 +1,18 @@
 """Benchmarks for lensing example simulations."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 # use the CAMB cosmology that generated the matter power spectra
-import camb
-from cosmology.compat.camb import Cosmology
+import camb  # ty: ignore[unresolved-import]
+from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
 
 # almost all GLASS functionality is available from the `glass` namespace
 import glass
-import glass.ext.camb
+import glass.ext.camb  # ty: ignore[unresolved-import]
+
+import array_api_extra as xpx
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -51,7 +55,7 @@ def test_lensing(
     shells = glass.linear_windows(zb)
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = glass.ext.camb.matter_cls(pars, lmax, shells)
+    cls = glass.ext.camb.matter_cls(pars, lmax, shells)  # ty: ignore[unresolved-attribute]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -79,11 +83,13 @@ def test_lensing(
     # distribute dN/dz over the radial window functions
     ngal = glass.partition(z, dndz, shells)
 
+    shape = 12 * nside**2
     def function_to_benchmark() -> None:
         # the integrated convergence and shear field over the redshift distribution
-        kappa_bar = xp.zeros(12 * nside**2)
-        gamm1_bar = xp.zeros(12 * nside**2)
-        gamm2_bar = xp.zeros(12 * nside**2)
+        
+        kappa_bar = xp.zeros(shape)
+        gamm1_bar = xp.zeros(shape)
+        gamm2_bar = xp.zeros(shape)
 
         # main loop to simulate the matter fields iterative
         for i, delta_i in enumerate(matter):
@@ -97,13 +103,22 @@ def test_lensing(
             gamm1_i, gamm2_i = glass.shear_from_convergence(kappa_i)
 
             # add to mean fields using the galaxy number density as weight
-            kappa_bar += ngal[i] * kappa_i
-            gamm1_bar += ngal[i] * gamm1_i
-            gamm2_bar += ngal[i] * gamm2_i
+            kappa_bar += ngal[i] * kappa_i  # ty: ignore[unsupported-operator]
+            gamm1_bar += ngal[i] * gamm1_i  # ty: ignore[unsupported-operator]
+            gamm2_bar += ngal[i] * gamm2_i  # ty: ignore[unsupported-operator]
 
         # normalise mean fields by the total galaxy number density
-        kappa_bar /= ngal.sum()
-        gamm1_bar /= ngal.sum()
-        gamm2_bar /= ngal.sum()
+        kappa_bar /= xp.sum(ngal)
+        gamm1_bar /= xp.sum(ngal)
+        gamm2_bar /= xp.sum(ngal)
 
-    benchmark(function_to_benchmark)
+        return (kappa_bar, gamm1_bar, gamm2_bar)
+
+    results = benchmark(function_to_benchmark)
+
+    assert results[0].shape == (shape,)
+    assert results[1].shape == (shape,)
+    assert results[2].shape == (shape,)
+    xpx.testing.assert_equal(results[0], xp.zeros_like(results[0]))
+    xpx.testing.assert_equal(results[1], xp.zeros_like(results[1]))
+    xpx.testing.assert_equal(results[2], xp.zeros_like(results[2]))
