@@ -59,8 +59,8 @@ def test_ellipticity_intnorm(
     xpb: ModuleType,
 ) -> None:
     """Regression test for glass.ellipticity_intnorm."""
-    array_length = 10
-    n = 1_000_000
+    array_length = 20
+    n = 100_000
     count = xpb.full(array_length, fill_value=n)
     sigma = xpb.full(array_length, fill_value=0.256)
 

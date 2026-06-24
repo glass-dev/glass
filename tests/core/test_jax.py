@@ -77,7 +77,7 @@ def test_random(
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.random(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert jnp.asarray(rvs).shape == shape_output
     assert jnp.min(rvs) >= 0.0
     assert jnp.max(rvs) < 1.0
     assert isinstance(rvs, ArrayLike)
@@ -114,7 +114,7 @@ def test_normal(
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.normal(loc=loc, scale=scale, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert jnp.asarray(rvs).shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
@@ -159,7 +159,7 @@ def test_standard_normal(
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.standard_normal(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert jnp.asarray(rvs).shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
@@ -189,7 +189,7 @@ def test_poisson(
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.poisson(lam=lam, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert jnp.asarray(rvs).shape == shape_output
     assert isinstance(rvs, ArrayLike)
 
 
@@ -236,7 +236,7 @@ def test_uniform(
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.uniform(low=low, high=high, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
-    assert rvs.shape == shape_output
+    assert jnp.asarray(rvs).shape == shape_output
     assert jnp.all(rvs >= low)
     assert jnp.all(rvs < high)
     assert isinstance(rvs, ArrayLike)
