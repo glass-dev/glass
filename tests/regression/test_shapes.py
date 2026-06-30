@@ -71,3 +71,34 @@ def test_ellipticity_intnorm(
     )
 
     assert eps.shape == (n * array_length,)
+
+
+@pytest.mark.stable
+@pytest.mark.parametrize(
+    ("varg", "vargamma"),
+    [(None, None), (0.1, None), (None, 0.1)],
+    ids=["novar", "varg", "vargamma"],
+)
+def test_resample_shapes(
+    varg: float | None,
+    vargamma: float | None,
+    benchmark: BenchmarkFixture,
+    xpb: ModuleType,
+    urngb: UnifiedGenerator,
+) -> None:
+    """Regression test for :func:`glass.resample_shapes`."""
+    n = 1_000_000
+
+    r = xpb.sqrt(urngb.uniform(0.0, 1.0, n))
+    phi = urngb.uniform(0.0, 2 * xpb.pi, n)
+    epsilon = r * xpb.exp(1j * phi)
+
+    result = benchmark(
+        glass.resample_shapes,
+        epsilon,
+        varg=varg,
+        vargamma=vargamma,
+        rng=urngb,
+    )
+
+    assert result.shape == epsilon.shape
