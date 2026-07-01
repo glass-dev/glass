@@ -80,7 +80,7 @@ then
 fi
 
 # Get execution method
-PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python -m pytest"
+PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python"
 if [[ -n "$SLURM_JOB_ID" || -n "$SLURM_BATCH_SCRIPT" ]]; then
   echo "Running under SLURM (batch). SLURM_JOB_ID=${SLURM_JOB_ID:-unknown}"
   PYTHON_COMMAND="srun $PYTHON_COMMAND"
