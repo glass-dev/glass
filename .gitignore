@@ -16,3 +16,4 @@ dist
 styles
 tests/regression/**/results
 uv.lock
+healpy-data

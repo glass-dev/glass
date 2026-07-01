@@ -40,8 +40,6 @@ __lazy_modules__ = [
 import typing
 from typing import TYPE_CHECKING, Literal
 
-import numpy as np
-
 import array_api_compat
 import array_api_extra as xpx
 

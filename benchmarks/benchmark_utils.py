@@ -1,25 +1,24 @@
-"""Helper functions for running glass benchmarks"""
+"""Helper functions for running glass benchmarks."""
 
 from __future__ import annotations
 
+import cProfile
+import io
+import os
+from pstats import SortKey, Stats
+from timeit import timeit
 from typing import TYPE_CHECKING
 
-import os
-
-import cProfile, io
-from pstats import SortKey, Stats
-
-from timeit import timeit
-
-
-import numpy as np
-import array_api_strict
 import jax
+import numpy as np
+
+import array_api_strict
 
 if TYPE_CHECKING:
-    from typing import Any
     from types import FunctionType, ModuleType
+    from typing import Any
 
+    from glass._types import FloatArray
     from glass.cosmology import Cosmology
 
 xp_available_backends: dict[str, ModuleType] = {}
@@ -46,43 +45,50 @@ else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
 
-print("Running benchmarks for backends: ", ", ".join(xp_available_backends.keys()))
+print("Running benchmarks for backends: ", ", ".join(xp_available_backends.keys()))  # noqa: T201
 
-# Configure backends
+# Configure backends
 array_api_strict.set_array_api_strict_flags(api_version="2025.12")
 jax.config.update("jax_enable_x64", val=True)
 
 RUN_PROFILE: str = os.environ.get("RUN_PROFILE")
 
 
-def run_benchmark(function_to_benchmark: FunctionType, xp: ModuleType) -> Any:
-    """Benchmark the provided function call"""
+def run_benchmark(
+    function_to_benchmark: FunctionType,
+    *args: tuple[Any, ...],
+    xp: ModuleType,
+    **kwargs: dict[str, Any],
+) -> None:
+    """Benchmark the provided function call."""
     if RUN_PROFILE:
         pr = cProfile.Profile()
         pr.enable()
 
-        function_to_benchmark(xp)
+        function_to_benchmark(*args, xp=xp, **kwargs)
 
         pr.disable()
         sortby = SortKey.CUMULATIVE
         s = io.StringIO()
         ps = Stats(pr, stream=s).sort_stats(sortby)
-        ps.print_stats(.05)
-        print(s.getvalue())
+        ps.print_stats(0.05)
     else:
         # benchmark the task
-        result = timeit(lambda: function_to_benchmark(xp), number=100)
+        result = timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
         # report the result
-        print(f'Took {result:.3f} seconds with {xp.__name__}')
+        print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
+
 
 class CosmologyWrapper:
-    """An Python Array API compatible wrapper for a Cosmology instance"""
+    """An Python Array API compatible wrapper for a Cosmology instance."""
 
     cosmo: Cosmology
     cosmo_xp: ModuleType
     xp: ModuleType
 
-    def __init__(self, *, cosmo: Cosmology, cosmo_xp: ModuleType = np, xp: ModuleType) -> None:
+    def __init__(
+        self, *, cosmo: Cosmology, cosmo_xp: ModuleType = np, xp: ModuleType
+    ) -> None:
         self.cosmo = cosmo
         self.cosmo_xp = cosmo_xp
         self.xp = xp
@@ -104,11 +110,7 @@ class CosmologyWrapper:
 
     def H_over_H0(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Standardised Hubble function :math:`E(z) = H(z)/H_0`."""
-        return self.xp.asarray(
-            self.cosmo.H_over_H0(
-                self.cosmo_xp.asarray(z)
-            )
-        )
+        return self.xp.asarray(self.cosmo.H_over_H0(self.cosmo_xp.asarray(z)))
 
     def xm(
         self,
@@ -131,11 +133,7 @@ class CosmologyWrapper:
 
     def rho_m_z(self, z: FloatArray) -> FloatArray:
         """Redshift-dependent matter density in Msol Mpc-3."""
-        return self.xp.asarray(
-            self.cosmo.rho_m_z(
-                self.cosmo_xp.asarray(z)
-            )
-        )
+        return self.xp.asarray(self.cosmo.rho_m_z(self.cosmo_xp.asarray(z)))
 
     def comoving_distance(
         self,
@@ -143,25 +141,17 @@ class CosmologyWrapper:
         z2: float | None = None,
     ) -> FloatArray:
         """Comoving distance :math:`d_c(z)` in Mpc."""
-        return self.xp.asarray(
-            self.cosmo.comoving_distance(z, z2)
-        )
+        return self.xp.asarray(self.cosmo.comoving_distance(z, z2))
 
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
         return self.xp.asarray(
-            self.cosmo.inv_comoving_distance(
-                self.cosmo_xp.asarray(dc)
-            )
+            self.cosmo.inv_comoving_distance(self.cosmo_xp.asarray(dc))
         )
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""
-        return self.xp.asarray(
-            self.cosmo.Omega_m(
-                self.cosmo_xp(z)
-            )
-        )
+        return self.xp.asarray(self.cosmo.Omega_m(self.cosmo_xp(z)))
 
     def transverse_comoving_distance(
         self,
@@ -169,6 +159,4 @@ class CosmologyWrapper:
         z2: float | None = None,
     ) -> FloatArray:
         """Transverse comoving distance :math:`d_M(z)` in Mpc."""
-        return self.xp.asarray(
-            self.cosmo.transverse_comoving_distance(z, z2)
-        )
+        return self.xp.asarray(self.cosmo.transverse_comoving_distance(z, z2))

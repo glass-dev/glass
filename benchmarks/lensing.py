@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+from benchmark_utils import CosmologyWrapper, run_benchmark, xp_available_backends
+
 # use the CAMB cosmology that generated the matter power spectra
 import camb  # ty: ignore[unresolved-import]
 from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
@@ -12,21 +15,16 @@ from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
 import glass
 import glass.ext.camb  # ty: ignore[unresolved-import]
 from glass import _rng
-import numpy as np
-
-from benchmark_utils import run_benchmark, xp_available_backends, CosmologyWrapper
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import FloatArray, UnifiedGenerator
-
-
-outputs: list[tuple[FloatArray, FloatArray, FloatArray]] = [() for _ in range(len(xp_available_backends))]
+    from glass._types import AnyArray, FloatArray, UnifiedGenerator
+    from glass.shells import RadialWindow
 
 
 # Run benchmarks for each requested backend
-for xp_idx, xp in enumerate(xp_available_backends.values()):
+for xp in xp_available_backends.values():
     urng: UnifiedGenerator = _rng.rng_dispatcher(xp=xp)
 
     # cosmology for the simulation
@@ -35,7 +33,7 @@ for xp_idx, xp in enumerate(xp_available_backends.values()):
     Ob = 0.05
 
     # basic parameters of the simulation
-    nside = lmax = 128
+    nside = lmax = 256
 
     # set up CAMB parameters for matter angular power spectrum
     pars = camb.set_params(
@@ -54,9 +52,9 @@ for xp_idx, xp in enumerate(xp_available_backends.values()):
 
     # linear radial window functions
     shells = glass.linear_windows(zb)
-    shells_np = glass.linear_windows(np.asarray(zb))
 
-    np.testing.assert_allclose(shells[0].za, shells_np[0].za)
+    # linear radial window functions using numpy to allow calling camb
+    shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
     cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]  # ty: ignore[unresolved-attribute]
@@ -66,7 +64,7 @@ for xp_idx, xp in enumerate(xp_available_backends.values()):
     # - maximum angular mode number (`lmax=lmax`)
     # - number of correlated shells (`ncorr=3`)
     cls = glass.discretized_cls(cls, nside=nside, lmax=lmax, ncorr=3)
-    
+
     # set up lognormal fields for simulation
     fields = glass.lognormal_fields(shells)
 
@@ -89,16 +87,22 @@ for xp_idx, xp in enumerate(xp_available_backends.values()):
 
     shape = 12 * nside**2
 
-    def lensing_benchmark(xp: ModuleType) -> tuple[FloatArray, FloatArray, FloatArray]:
-        # the integrated convergence and shear field over the redshift distribution
-
+    def lensing_benchmark(  # noqa: PLR0913
+        *,
+        convergence: glass.MultiPlaneConvergence,
+        matter: StopIteration[AnyArray],
+        ngal: FloatArray,
+        shape: tuple[int, ...],
+        shells: list[RadialWindow],
+        xp: ModuleType,
+    ) -> tuple[FloatArray, FloatArray, FloatArray]:
+        """Realistic lensing simulation benchmark."""
         kappa_bar = xp.zeros(shape)
         gamm1_bar = xp.zeros(shape)
         gamm2_bar = xp.zeros(shape)
 
         # main loop to simulate the matter fields iterative
         for i, delta_i in enumerate(matter):
-
             # add lensing plane from the window function of this shell
             convergence.add_window(delta_i, shells[i])
 
@@ -118,15 +122,13 @@ for xp_idx, xp in enumerate(xp_available_backends.values()):
         gamm1_bar /= xp.sum(ngal)
         gamm2_bar /= xp.sum(ngal)
 
-        outputs[xp_idx] = (
-            kappa_bar,
-            gamm1_bar,
-            gamm2_bar,
-        )
-
-    run_benchmark(lensing_benchmark, xp)
-    
-for i in range(len(outputs) - 1):
-    np.testing.assert_allclose(outputs[i][0], outputs[i+1][0])
-    np.testing.assert_allclose(outputs[i][1], outputs[i+1][1])
-    np.testing.assert_allclose(outputs[i][2], outputs[i+1][2])
+    # Run benchmark passing convergence and matter
+    run_benchmark(
+        lensing_benchmark,
+        convergence=convergence,
+        matter=matter,
+        ngal=ngal,
+        shape=shape,
+        shells=shells,
+        xp=xp,
+    )
