@@ -22,15 +22,18 @@ source .venv/bin/activate
 uv sync --active --group benchmarks
 ```
 
-Now you should be able to run the benchmarks with the following command.
+Now you should be able to run a benchmark. For example, to run the lensing
+benchmark with the NumPy, run the following.
 
 ```sh
-.venv/bin/python -m pytest tests/benchmarks \
-    --benchmark-autosave                              \
-    --benchmark-columns=mean,stddev,rounds,iterations \
-    --benchmark-max-time=5.0                          \
-    --benchmark-sort=name                             \
-    --benchmark-timer=time.process_time
+uv run python benchmarks/lensing.py
+```
+
+The array backend can be chosen using the environment variable `ARRAY_BACKEND`.
+For example, to run the same benchmark with jax, run the following command.
+
+```sh
+ARRAY_BACKEND="jax" uv run python benchmarks/lensing.py
 ```
 
 ### Benchmarking a cluster

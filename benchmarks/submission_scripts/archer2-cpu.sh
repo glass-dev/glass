@@ -79,25 +79,13 @@ then
   exit 1
 fi
 
-BENCHMARKS_DIR="$GLASS_DIR/tests/benchmarks"
-BENCHMARKS_OUTPUT_PATH="$BENCHMARKS_DIR/.benchmarks"
-VENV_BIN="$GLASS_DIR/.venv/bin"
-
 # Get execution method
-PYTEST_COMMAND="$VENV_BIN/python -m pytest"
+PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python -m pytest"
 if [[ -n "$SLURM_JOB_ID" || -n "$SLURM_BATCH_SCRIPT" ]]; then
   echo "Running under SLURM (batch). SLURM_JOB_ID=${SLURM_JOB_ID:-unknown}"
-  PYTEST_COMMAND="srun $PYTEST_COMMAND"
+  PYTHON_COMMAND="srun $PYTHON_COMMAND"
 else
   echo "Running directly from CLI"
 fi
 
-
-source "$VENV_BIN/activate"
-HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" $PYTEST_COMMAND "$BENCHMARKS_DIR" \
-    --benchmark-autosave                                           \
-    --benchmark-storage="file://$BENCHMARKS_OUTPUT_PATH"           \
-    --benchmark-columns=mean,stddev,rounds,iterations              \
-    --benchmark-max-time=5.0                                       \
-    --benchmark-sort=name                                          \
-    --benchmark-timer=time.process_time
+HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" $PYTHON_COMMAND benchmarks/lensing.py
