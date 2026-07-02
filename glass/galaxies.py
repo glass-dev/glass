@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
 
 def _draw_nz(
-    count: int | FloatArray,
+    count: int | IntArray,
     z: FloatArray,
     nz: FloatArray,
     *,
