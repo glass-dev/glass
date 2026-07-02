@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import pathlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -19,7 +21,13 @@ if TYPE_CHECKING:
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
 
 
-@numpy_fallback
+def _get_healpy_datapath() -> str | None:
+    healpy_datapath = os.environ.get("HEALPY_DATAPATH")
+    if healpy_datapath is not None and not pathlib.Path(healpy_datapath).is_dir():
+        raise ValueError(f"Healpy datapath not found at '{healpy_datapath}'")
+    return healpy_datapath
+
+
 def alm2map(  # noqa: PLR0913
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
@@ -231,6 +239,16 @@ def map2alm(
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
 
+    If you are running in an offline environment, you must provide a datapath to local
+    healpy datafiles. To download these files:
+
+        git clone --depth 1 https://github.com/healpy/healpy-data
+        cd healpy-data
+        bash download_weights_8192.sh
+
+    and set datapath to the root of the repository. If this method is used, the only
+    supported values of nside are 2^n for n in the range 5-13.
+
     Parameters
     ----------
     maps
@@ -253,8 +271,13 @@ def map2alm(
         if isinstance(maps, Sequence)
         else np.asarray(maps)
     )
+
     return healpy.map2alm(
-        inputs, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights
+        inputs,
+        datapath=_get_healpy_datapath(),
+        lmax=lmax,
+        pol=pol,
+        use_pixel_weights=use_pixel_weights,
     )
 
 
@@ -302,6 +325,16 @@ def pixwin(
     """
     Return the pixel window function for the given nside.
 
+    If you are running in an offline environment, you must provide a datapath to local
+    healpy datafiles. To download these files:
+
+        git clone --depth 1 https://github.com/healpy/healpy-data
+        cd healpy-data
+        bash download_weights_8192.sh
+
+    and set datapath to the root of the repository. If this method is used, the only
+    supported values of nside are 2^n for n in the range 5-13.
+
     Parameters
     ----------
     nside
@@ -320,7 +353,7 @@ def pixwin(
     """
     xp = _utils.default_xp() if xp is None else xp
 
-    output = healpy.pixwin(nside, lmax=lmax, pol=pol)
+    output = healpy.pixwin(nside, datapath=_get_healpy_datapath(), lmax=lmax, pol=pol)
     return (
         tuple(xp.asarray(out, dtype=xp.float64) for out in output)
         if pol

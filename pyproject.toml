@@ -104,6 +104,7 @@ optional-dependencies = {examples = [
     "glass-ext-camb",
     "jupyter",
     "matplotlib",
+    "numpy<2.4", # TODO: remove when cmbant/CAMB#203 is fixed
 ]}
 requires-python = ">=3.11"
 

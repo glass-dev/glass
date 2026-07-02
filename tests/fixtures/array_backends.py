@@ -135,6 +135,15 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
     return request.param
 
 
+@pytest.fixture(
+    params=[xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
+    scope="session",
+)
+def xp_no_jax(request: pytest.FixtureRequest) -> ModuleType:
+    """Fixture for array backends excluding jax."""
+    return request.param
+
+
 @pytest.fixture(scope="session")
 def ap() -> ModuleType:
     """Fixture for the array_api_strict array backend."""
