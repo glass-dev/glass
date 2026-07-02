@@ -1,7 +1,7 @@
 #!/bin/bash --login
 # shellcheck disable=SC1091
 
-#SBATCH --job-name=glass_reg_test_gpu
+#SBATCH --job-name=glass_benchmark_gpu
 #SBATCH --output=%x-%j.out
 #SBATCH --cpus-per-task=1
 #SBATCH --nodes=1
@@ -10,11 +10,8 @@
 #SBATCH --partition=gpu
 #SBATCH --qos=gpu-shd
 
-# Load GPU modules
-module load PrgEnv-amd/8.6.0
-module load rocm
-module load craype-accel-amd-gfx90a
-module load craype-x86-milan
+# Setup environment
+./setup-env.sh
 
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries
