@@ -1,24 +1,30 @@
 # Archer2
 
-This document contains instructions specific to running the glass benchmarks on Archer2
+This document contains instructions specific to running the glass benchmarks on
+Archer2
 
-## Prerequisites 
+## Prerequisites
 
-Archer2 only support rocm up to v0.6.x. Therefore, we are restricted to using `jax==0.4.35`. The relevant modules can be loaded via the provided script [setup-env.sh](./setup-env.sh)
+Archer2 only support rocm up to v0.6.x. Therefore, we are restricted to using
+`jax==0.4.35`. This in turn restricts us to using python3.12. The relevant
+modules can be loaded via the provided script [setup-env.sh](./setup-env.sh)
 
-> Note that setup-env.sh is called automatically by the submission script [submit-gpu.sh](./submit-gpu.sh)
+> Note that setup-env.sh is called automatically by the submission script
+> [submit-gpu.sh](./submit-gpu.sh)
 
 ## Running the benchmarks
 
 Benchmarks should be submitted as a batch job to slurm via the provided script.
 
-For example to benchmark using jax with amd/rocm, run the following from the root of the glass repo on Archer2:
+For example to benchmark using jax with amd/rocm, run the following from the
+root of the glass repo on Archer2:
 
 ```sh
 sbatch benchmarks/archer2/submit-gpu.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
 ```
 
-> To understand what HEALPY_DATAPATH is, read an explanation in [benchmarks/README.md#healpy-data](../README.md#healpy-data)
+> To understand what HEALPY_DATAPATH is, read an explanation in
+> [benchmarks/README.md#healpy-data](../README.md#healpy-data)
 
 ## Setting up UV on Archer2
 
