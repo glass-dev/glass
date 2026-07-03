@@ -10,9 +10,6 @@
 #SBATCH --partition=gpu
 #SBATCH --qos=gpu-shd
 
-# Setup environment
-./setup-env.sh
-
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries
 export OMP_NUM_THREADS=1
@@ -87,6 +84,9 @@ then
   help
   exit 1
 fi
+
+# Setup environment
+source "$GLASS_DIR/benchmarks/archer2/setup-env.sh"
 
 # Get execution method
 PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python"
