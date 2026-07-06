@@ -82,8 +82,6 @@ def solve(  # noqa: PLR0912, PLR0913
     :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
-    # This function is difficult to port to the Array API so for now we work
-    # in NumPy and ultimately convert back at the end of it.
 
     if t2 is None:
         t2 = t1

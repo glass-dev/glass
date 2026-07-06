@@ -563,7 +563,26 @@ class xp_additions:  # noqa: N801
         dxp = default_xp(xp.__name__)
         return tuple(xp.asarray(arr) for arr in dxp.tril_indices(n, k=k, m=m))
 
-def numpy_fallback(func):
+def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
+    """
+    Decorator to convert function arguments to Numpy arrays and back. 
+
+    Array API arguments are converted to ``numpy.ndarray`` before calling
+    the wrapped function. Any NumPy arrays returned by the wrapped function are
+    converted back to the original array namespace. Nested tuples, lists, and
+    dictionaries containing NumPy arrays are converted recursively. Useful for
+    functions that are difficult to port to the Array API.
+
+    Parameters
+    ----------
+    func
+        Function to wrap.
+
+    Returns
+    -------
+        Wrapped function that accepts Array API arrays and returns results in
+        the corresponding array namespace.
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         xp = default_xp()
