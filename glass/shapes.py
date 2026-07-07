@@ -13,7 +13,7 @@ Ellipticity
 .. autofunction:: ellipticity_gaussian
 .. autofunction:: ellipticity_intnorm
 .. autofunction:: ellipticity_ryden04
-
+.. autofunction:: resample_shapes
 
 Utilities
 ---------
@@ -363,3 +363,65 @@ def ellipticity_intnorm(
         i += count_broadcasted[k]
 
     return typing.cast("ComplexArray", eps)
+
+
+def resample_shapes(
+    epsilon: ComplexArray,
+    *,
+    varg: float | None = None,
+    vargamma: float | None = None,
+    rng: UnifiedGenerator | None = None,
+) -> ComplexArray:
+    """Resample galaxy shapes with random orientations.
+
+    Return the galaxy shapes *epsilon* resampled with random orientations.
+    If *varg* or *vargamma* are provided, the ellipticities are rescaled to
+    compensate for the intrinsic variance of the reduced shear (*varg*) or
+    shear (*vargamma*). Only one of *varg* or *vargamma* can be provided.
+
+    Parameters
+    ----------
+    epsilon
+        Complex-valued array of input ellipticity.
+    varg, vargamma
+        Intrinsic variance of the reduced shear or shear field.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Returns
+    -------
+        Complex-valued array of resampled :term:`ellipticity` values.
+
+    """
+    if varg is not None and vargamma is not None:
+        raise ValueError("only one of varg or vargamma can be given")
+
+    xp = epsilon.__array_namespace__()
+
+    if rng is None:
+        rng = _rng.rng_dispatcher(xp=xp)
+
+    # get absolute value of epsilon
+    r = xp.hypot(xp.real(epsilon), xp.imag(epsilon))
+
+    # compensate for variance of intrinsic field if given
+    if vargamma is not None:
+        vare = xp.mean(r**2)
+        if vargamma > vare:
+            raise ValueError("vargamma too large for epsilon")
+        r *= xp.sqrt(1 - vargamma / vare)
+    elif varg is not None:
+        vare = xp.mean(r**2)
+        if varg > vare:
+            raise ValueError("varg too large for epsilon")
+        eve4 = xp.mean(r**4)
+        r *= xp.sqrt(
+            (
+                xp.sqrt(((1 - 2 * varg) * vare) ** 2 + 4 * varg * eve4 * (vare - varg))
+                - (1 - 2 * varg) * vare
+            )
+            / (2 * varg * eve4)
+        )
+
+    # assign random orientations to shapes
+    return r * xp.exp(1j * rng.uniform(0, 2 * xp.pi, size=r.shape))

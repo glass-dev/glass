@@ -35,7 +35,7 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.15
+    rev: v0.15.19
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -49,11 +49,11 @@ repos:
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.8.3
+    rev: v3.8.4
     hooks:
       - id: prettier
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.48.0
+    rev: v0.49.0
     hooks:
       - id: markdownlint-fix
         args:
@@ -80,13 +80,13 @@ repos:
           - --external-sources
           - --shell=bash
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.25.2
+    rev: v1.26.1
     hooks:
       - id: zizmor
         args:
           - --fix=safe
   - repo: https://github.com/astral-sh/ty-pre-commit
-    rev: v0.0.48
+    rev: v0.0.52
     hooks:
       - id: ty
         args:

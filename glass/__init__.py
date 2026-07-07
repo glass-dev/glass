@@ -63,6 +63,7 @@ __all__ = [
     "redshifts_from_bins",
     "redshifts_from_nz",
     "regularized_spectra",
+    "resample_shapes",
     "restrict",
     "save_cls",
     "shear_from_convergence",
@@ -144,6 +145,7 @@ from glass.shapes import (
     ellipticity_gaussian,
     ellipticity_intnorm,
     ellipticity_ryden04,
+    resample_shapes,
     triaxial_axis_ratio,
 )
 from glass.shells import (
