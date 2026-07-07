@@ -92,7 +92,7 @@ class Generator:
 
         self.xp = xp
         self.np = numpy
-        self.rng = default_rng(seed=seed, xp=xp)
+        self.rng = self.np.random.default_rng(seed=seed)
 
     def random(
         self,
@@ -118,7 +118,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.xp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload, too-many-positional-arguments]
+        return self.xp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def normal(
         self,
@@ -191,7 +191,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.np.float64
-        return self.xp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload, too-many-positional-arguments]
+        return self.xp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
 
     def uniform(
         self,

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import typing
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -24,10 +23,7 @@ def rng() -> np.random.Generator:
     Use `urng` for array API tests.
 
     """
-    return typing.cast(
-        "np.random.Generator",
-        glass.rng.default_rng(seed=glass.rng.SEED, xp=np),
-    )
+    return np.random.default_rng(seed=glass.rng.SEED)
 
 
 @pytest.fixture
