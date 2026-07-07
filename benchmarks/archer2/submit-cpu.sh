@@ -13,6 +13,7 @@
 GLASS_DIR=""
 ARRAY_BACKEND="numpy"
 HEALPY_DATAPATH=""
+RUN_PROFILE="false"
 
 help() {
   echo "Usage:"
@@ -58,6 +59,11 @@ while [ $# -gt 0 ] ; do
             shift 2
             continue
             ;;
+        -p | --profile)
+            RUN_PROFILE="true"
+            shift 1
+            continue
+            ;;
         --healpy-datapath)
             HEALPY_DATAPATH="$2"
             shift 2
@@ -88,4 +94,4 @@ else
   echo "Running directly from CLI"
 fi
 
-HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" $PYTHON_COMMAND benchmarks/lensing.py
+RUN_PROFILE="$RUN_PROFILE" HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" $PYTHON_COMMAND benchmarks/lensing.py
