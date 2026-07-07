@@ -65,7 +65,7 @@ class Generator:
     def __init__(
         self,
         xp: ModuleType,
-        seed: int | bool | IntArray = SEED,  # noqa: FBT001
+        seed: int | IntArray = SEED,
     ) -> None:
         """
         Initialize the Generator.
