@@ -86,7 +86,7 @@ then
 fi
 
 # Setup environment
-source "$GLASS_DIR/benchmarks/archer2/setup-env.sh"
+source "$GLASS_DIR/benchmarks/archer2/setup-gpu-env.sh"
 
 # Get execution method
 PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python"
