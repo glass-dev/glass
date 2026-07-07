@@ -153,7 +153,7 @@ def redshifts_from_bins(
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # tally the bins
     bin_label, _, bin_index, bin_count = xp.unique_all(bins)
