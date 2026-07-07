@@ -59,7 +59,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
-from glass import _rng
+import glass.rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:

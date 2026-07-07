@@ -9,7 +9,6 @@ jax = pytest.importorskip("jax", reason="tests require jax")
 import jax.numpy as jnp  # noqa: E402
 from jax.typing import ArrayLike  # noqa: E402
 
-from glass import _rng  # noqa: E402
 from glass.jax import Generator  # noqa: E402
 
 if TYPE_CHECKING:

@@ -31,7 +31,6 @@ from typing import TYPE_CHECKING
 import array_api_compat
 import array_api_extra as xpx
 
-from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:

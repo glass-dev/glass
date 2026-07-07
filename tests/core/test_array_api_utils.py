@@ -4,7 +4,7 @@ import importlib.util
 import numpy as np
 import pytest
 
-from glass import _rng
+import glass.rng
 
 with contextlib.suppress(ImportError):
     # only import if jax is available

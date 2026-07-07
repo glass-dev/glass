@@ -12,7 +12,6 @@ import pytest
 import array_api_extra as xpx
 
 import glass.healpix as hp
-from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType

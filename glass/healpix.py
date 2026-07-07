@@ -14,7 +14,6 @@ import numpy as np
 import array_api_compat
 
 import glass._array_api_utils as _utils
-from glass import _rng
 
 if TYPE_CHECKING:
     from types import ModuleType

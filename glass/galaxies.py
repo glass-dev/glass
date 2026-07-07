@@ -29,8 +29,8 @@ import array_api_extra as xpx
 
 import glass.arraytools
 import glass.healpix as hp
+import glass.rng
 import glass.shells
-from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:

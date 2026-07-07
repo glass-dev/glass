@@ -20,8 +20,8 @@ import glass._array_api_utils as _utils
 import glass.grf
 import glass.harmonics
 import glass.healpix as hp
+import glass.rng
 import glass.shells
-from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:

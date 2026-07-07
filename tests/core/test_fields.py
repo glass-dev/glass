@@ -11,7 +11,7 @@ import array_api_extra as xpx
 import glass
 import glass.fields
 import glass.healpix as hp
-from glass import _rng
+import glass.rng
 
 if TYPE_CHECKING:
     from types import ModuleType

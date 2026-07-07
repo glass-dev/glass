@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from array_api_strict._dtypes import DType
 
     import glass.jax
-    from glass import _rng
+    import glass.rng
 
     P = typing.ParamSpec("P")
     R = typing.TypeVar("R")
