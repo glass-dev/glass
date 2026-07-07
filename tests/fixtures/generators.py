@@ -37,16 +37,3 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
 
     """
     return glass.rng.rng_dispatcher(xp=xp)
-
-
-@pytest.fixture
-def urngb(xpb: ModuleType) -> UnifiedGenerator:
-    """
-    Fixture for a unified RNG interface to be used in regression tests.
-
-    Access the relevant RNG using `urngb.` in tests.
-
-    Must be used with the `xpb` fixture.
-
-    """
-    return glass.rng.rng_dispatcher(xp=xpb)
