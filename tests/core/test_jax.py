@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-
 jax = pytest.importorskip("jax", reason="tests require jax")
 
 import jax.numpy as jnp  # noqa: E402
