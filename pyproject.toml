@@ -21,7 +21,7 @@ dev = [
     {include-group = "lint"},
 ]
 docs = [
-    "array-api-strict",
+    "array-api-strict>=2.5",
     "cosmology-api",
     "furo",
     "ipython",
@@ -54,7 +54,7 @@ test = [
     "scipy",
 ]
 typechecking = [
-    "array-api-strict",
+    "array-api-strict>=2.5",
     "cosmology-api",
     "fitsio",
     "jax",
