@@ -31,6 +31,7 @@ from typing import TYPE_CHECKING
 import array_api_compat
 import array_api_extra as xpx
 
+import glass.rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
@@ -92,7 +93,7 @@ def triaxial_axis_ratio(
 
     # default RNG if not provided
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # get size from inputs if not explicitly provided
     if size is None:
@@ -181,7 +182,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # default RNG if not provided
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # default size if not given
     if size is None:
@@ -261,7 +262,7 @@ def ellipticity_gaussian(
 
     # default RNG if not provided
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # allocate flattened output array
     eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
@@ -324,7 +325,7 @@ def ellipticity_intnorm(
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
     # default RNG if not provided
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
@@ -398,7 +399,7 @@ def resample_shapes(
     xp = epsilon.__array_namespace__()
 
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # get absolute value of epsilon
     r = xp.hypot(xp.real(epsilon), xp.imag(epsilon))

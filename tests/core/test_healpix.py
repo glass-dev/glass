@@ -12,6 +12,7 @@ import pytest
 import array_api_extra as xpx
 
 import glass.healpix as hp
+import glass.rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -408,7 +409,7 @@ def test_randang(
         healpix_inputs.nside,
         ipix,
         lonlat=lonlat,
-        rng=_rng.rng_dispatcher(xp=np),
+        rng=glass.rng.rng_dispatcher(xp=np),
     )
     new = hp.randang(
         healpix_inputs.nside,
