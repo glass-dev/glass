@@ -1,12 +1,4 @@
-"""
-Random Number Generation Utilities for glass.
-=============================================
-
-This module includes functions for dispatching random number generators using consistent
-seeds. The chhoice of rng generator is determined based on the array library chosen by
-the user.
-
-"""
+"""Module for random number generation utilities."""
 
 from __future__ import annotations
 
@@ -21,9 +13,40 @@ if TYPE_CHECKING:
 SEED = 42
 
 
+def default_rng(
+    *,
+    seed: int | IntArray | None = None,
+    xp: ModuleType,
+) -> UnifiedGenerator:
+    """
+    Dispatch a random number generator for the array backend for a given seed.
+
+    Parameters
+    ----------
+    xp
+        The array library backend to use for array operations.
+    seed
+        Seed for the random number generator.
+
+    Returns
+    -------
+        The appropriate random number generator for the array's backend.
+
+    """
+    if xp.__name__ == "jax.numpy":
+        import glass.jax  # noqa: PLC0415
+
+        return glass.jax.Generator(seed=seed)
+
+    if xp.__name__ == "numpy":
+        return xp.random.default_rng(seed=seed)
+
+    return Generator(xp=xp, seed=seed)
+
+
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     """
-    Dispatch a random number generator based on the provided array's backend.
+    Dispatch a random number generator for the array backend for the GLASS default seed.
 
     Parameters
     ----------
@@ -34,21 +57,8 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
     -------
         The appropriate random number generator for the array's backend.
 
-    Raises
-    ------
-    NotImplementedError
-        If the array backend is not supported.
-
     """
-    if xp.__name__ == "jax.numpy":
-        import glass.jax  # noqa: PLC0415
-
-        return glass.jax.Generator(seed=SEED)
-
-    if xp.__name__ == "numpy":
-        return xp.random.default_rng(seed=SEED)
-
-    return Generator(xp=xp, seed=SEED)
+    return default_rng(seed=SEED, xp=xp)
 
 
 class Generator:
@@ -65,7 +75,7 @@ class Generator:
     def __init__(
         self,
         xp: ModuleType,
-        seed: int | bool | IntArray = SEED,  # noqa: FBT001
+        seed: int | IntArray = SEED,
     ) -> None:
         """
         Initialize the Generator.

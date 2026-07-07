@@ -47,8 +47,8 @@ import array_api_extra as xpx
 
 import glass.arraytools
 import glass.healpix as hp
+import glass.rng
 import glass.shells
-from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
@@ -336,7 +336,7 @@ def _sample_number_galaxies(
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # clip number density at zero
     n = xp.clip(n, min=0.0)
@@ -518,7 +518,7 @@ def positions_from_delta(  # noqa: PLR0913
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # ensure bias_model is a function
     if not callable(bias_model):
@@ -581,7 +581,7 @@ def uniform_positions(
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     ngal = xp.asarray(ngal)
 

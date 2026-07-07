@@ -30,8 +30,8 @@ import array_api_extra as xpx
 
 import glass.arraytools
 import glass.healpix as hp
+import glass.rng
 import glass.shells
-from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
@@ -153,7 +153,7 @@ def redshifts_from_bins(
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # tally the bins
     bin_label, _, bin_index, bin_count = xp.unique_all(bins)
@@ -231,7 +231,7 @@ def redshifts_from_nz(
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
@@ -416,7 +416,7 @@ def gaussian_phz(  # noqa: PLR0913
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
     lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)

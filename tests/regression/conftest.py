@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from glass import _rng
+import glass.rng
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -28,4 +28,4 @@ def urng(xpb: ModuleType) -> UnifiedGenerator:
     Must be used with the `xp` fixture.
 
     """
-    return _rng.rng_dispatcher(xp=xpb)
+    return glass.rng.rng_dispatcher(xp=xpb)

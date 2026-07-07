@@ -59,7 +59,7 @@ import array_api_extra as xpx
 import glass._array_api_utils as _utils
 import glass.algorithm
 import glass.arraytools
-from glass import _rng
+import glass.rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
@@ -1039,7 +1039,7 @@ def distribute(
 
     # get default RNG if not given
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # flatten redshifts but store shape
     shape = redshifts.shape
