@@ -11,6 +11,7 @@ Functions
 ---------
 
 .. autofunction:: redshifts
+.. autofunction:: redshifts_from_bins
 .. autofunction:: redshifts_from_nz
 .. autofunction:: galaxy_shear
 .. autofunction:: gaussian_phz
@@ -34,14 +35,54 @@ from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from types import ModuleType
+    from typing import Any
 
-    from glass._types import FloatArray, UnifiedGenerator
+    from glass._types import AnyArray, FloatArray, IntArray, UnifiedGenerator
     from glass.cosmology import Cosmology
 
 
+def _draw_nz(
+    count: int | IntArray,
+    z: FloatArray,
+    nz: FloatArray,
+    *,
+    rng: UnifiedGenerator,
+) -> FloatArray:
+    """
+    Draw redshifts from a 1D source distribution.
+
+    Parameters
+    ----------
+    count
+        Number of redshifts to sample.
+    z
+        Source distribution. Must be 1D.
+    nz
+        Source distribution. Must be 1D.
+    rng
+        Random number generator.
+
+    Returns
+    -------
+        Redshifts sampled from the given source distribution.
+
+    """
+    # compute the CDF
+    cdf = glass.arraytools.cumulative_trapezoid(nz, z)
+    cdf /= cdf[-1]
+
+    # sample redshifts and return result
+    return uxpx.interp(
+        rng.uniform(0.0, 1.0, size=count),
+        cdf,
+        z,
+    )
+
+
 def redshifts(
-    n: int | FloatArray,
+    n: int | IntArray,
     w: glass.shells.RadialWindow,
     *,
     rng: UnifiedGenerator | None = None,
@@ -68,6 +109,74 @@ def redshifts(
 
     """
     return redshifts_from_nz(n, w.za, w.wa, rng=rng, warn=False)
+
+
+def redshifts_from_bins(
+    bins: AnyArray,
+    z: FloatArray,
+    nz_dict: Mapping[Any, FloatArray],
+    *,
+    rng: UnifiedGenerator | None = None,
+) -> FloatArray:
+    """Sample redshifts for a catalogue of redshift bins.
+
+    This function samples redshifts from a catalogue of tomographic redshift
+    bin labels *bins* according to a dictionary *nz_dict* of redshift
+    distributions :math:`n(z)`.
+
+    Parameters
+    ----------
+    bins
+        Array of tomographic bin labels. Each value must correspond to a
+        key in *nz_dict*.
+    z
+        Redshift values for the distributions in *nz_dict*.
+    nz_dict
+        Dictionary of redshift distribution values for each tomographic bin
+        label.
+    rng
+        Random number generator. If not given, a default RNG is used.
+
+    Returns
+    -------
+        Random redshifts following the given redshift distribution for each
+        tomographic bin label.
+
+    """
+    # array types are not guaranteed to be hashable
+    # will have to find bin labels in nz_dict keys by equality comparison
+    # split the array into ordered lists of keys and values
+    nz_keys = list(nz_dict.keys())
+    nz_values = list(nz_dict.values())
+
+    xp = array_api_compat.array_namespace(bins, z, *nz_values, use_compat=False)
+
+    # get default RNG if not given
+    if rng is None:
+        rng = _rng.rng_dispatcher(xp=xp)
+
+    # tally the bins
+    bin_label, _, bin_index, bin_count = xp.unique_all(bins)
+
+    # sample the redshifts from each nz
+    # concatenate into runs of redshifts for each bin
+    redshifts = xp.concat([
+        _draw_nz(int(k), z, nz_values[nz_keys.index(x)], rng=rng)
+        for x, k in zip(bin_label, bin_count, strict=True)
+    ])
+
+    # argsort the runs of redshifts into their intended positions
+    # argsort 1: sort bin_index into runs of the same bin
+    bin_index = xp.argsort(bin_index)
+    # argsort 2: invert the sort
+    bin_index = xp.argsort(bin_index)
+    # apply to runs of redshifts
+    redshifts = redshifts[bin_index]
+    # runs of redshifts are now sorted according to the original bin_index
+
+    # return the sampled redshifts for each bin
+    # reshape to match input shape
+    return xp.reshape(redshifts, bins.shape)
 
 
 def redshifts_from_nz(
@@ -139,16 +248,13 @@ def redshifts_from_nz(
         nz_out_slice = nz_out[(*k, ...)] if k != () else nz_out
         z_out_slice = z_out[(*k, ...)] if k != () else z_out
 
-        # compute the CDF of each galaxy population
-        cdf = glass.arraytools.cumulative_trapezoid(nz_out_slice, z_out_slice)
-        cdf /= cdf[-1]
-
         # sample redshifts and store result
         redshifts = xpx.at(redshifts)[total : total + count_out[k]].set(
-            uxpx.interp(
-                rng.uniform(0, 1, size=int(count_out[k])),
-                cdf,
+            _draw_nz(
+                int(count_out[k]),
                 z_out_slice,
+                nz_out_slice,
+                rng=rng,
             ),
         )
         total += count_out[k]

@@ -60,6 +60,7 @@ __all__ = [
     "positions_from_delta",
     "redshift_grid",
     "redshifts",
+    "redshifts_from_bins",
     "redshifts_from_nz",
     "regularized_spectra",
     "resample_shapes",
@@ -111,6 +112,7 @@ from glass.galaxies import (
     galaxy_shear,
     gaussian_phz,
     redshifts,
+    redshifts_from_bins,
     redshifts_from_nz,
 )
 from glass.lensing import (
