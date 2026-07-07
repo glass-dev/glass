@@ -10,3 +10,4 @@ Modules
    grf
    harmonics
    healpix
+   random

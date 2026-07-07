@@ -1,12 +1,4 @@
-"""
-Random Number Generation Utilities for glass.
-=============================================
-
-This module includes functions for dispatching random number generators using consistent
-seeds. The chhoice of rng generator is determined based on the array library chosen by
-the user.
-
-"""
+"""Module for random number generation utilities."""
 
 from __future__ import annotations
 
