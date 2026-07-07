@@ -25,6 +25,5 @@ class Cosmology(
 class CosmologyWithOmegaM(
     Cosmology,
     cosmology.api.HasOmegaM[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
-    typing.Protocol,
 ):
     """Cosmology protocol for GLASS with OmegaM."""
