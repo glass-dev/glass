@@ -83,22 +83,22 @@ def test_resample_shapes(
     varg: float | None,
     vargamma: float | None,
     benchmark: BenchmarkFixture,
-    xpb: ModuleType,
-    urngb: UnifiedGenerator,
+    xp: ModuleType,
+    urng: UnifiedGenerator,
 ) -> None:
     """Regression test for :func:`glass.resample_shapes`."""
     n = 1_000_000
 
-    r = xpb.sqrt(urngb.uniform(0.0, 1.0, n))
-    phi = urngb.uniform(0.0, 2 * xpb.pi, n)
-    epsilon = r * xpb.exp(1j * phi)
+    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
+    phi = urng.uniform(0.0, 2 * xp.pi, n)
+    epsilon = r * xp.exp(1j * phi)
 
     result = benchmark(
         glass.resample_shapes,
         epsilon,
         varg=varg,
         vargamma=vargamma,
-        rng=urngb,
+        rng=urng,
     )
 
     assert result.shape == epsilon.shape

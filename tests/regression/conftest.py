@@ -23,9 +23,9 @@ def urng(xpb: ModuleType) -> UnifiedGenerator:
     """
     Fixture for a unified RNG interface to be used in regression tests.
 
-    Access the relevant RNG using `urngb.` in tests.
+    Access the relevant RNG using `urng.` in tests.
 
-    Must be used with the `xpb` fixture.
+    Must be used with the `xp` fixture.
 
     """
     return _rng.rng_dispatcher(xp=xpb)
