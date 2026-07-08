@@ -146,7 +146,7 @@ class DensityWeight:
 
     """
 
-    cosmo_inv_co_dist: Cosmology
+    cosmo_inv_co_dist: CosmologyWithInverseComovingDistance
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
