@@ -142,11 +142,11 @@ class DensityWeight:
     Attributes
     ----------
     cosmo
-        Cosmology instance with inverse comoving distance.
+        Cosmology instance.
 
     """
 
-    cosmo: CosmologyWithInverseComovingDistance
+    cosmo: Cosmology
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
