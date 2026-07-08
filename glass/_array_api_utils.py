@@ -21,7 +21,7 @@ from functools import wraps
 from typing import TYPE_CHECKING
 
 import numpy as np
-
+from collections.abc import Sequence
 import array_api_compat
 
 if TYPE_CHECKING:
@@ -585,31 +585,49 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        xp = default_xp()
         list_of_xp = []
 
+        def collect_arrays(obj):
+            if hasattr(obj, "__array_namespace__"):
+                list_of_xp.append(obj)
+            elif isinstance(obj, dict):
+                for v in obj.values():
+                    collect_arrays(v)
+            elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
+                for item in obj:
+                    collect_arrays(item)
+
         for arg in args:
-            if hasattr(arg, "__array_namespace__"):
-                list_of_xp.append(arg)
+            collect_arrays(arg)
 
         for arg in kwargs.values():
-            if hasattr(arg, "__array_namespace__"):
-                list_of_xp.append(arg)
-
+            collect_arrays(arg)
+        
+        if not list_of_xp:
+            return func(*args, **kwargs)      
         if "xp" in kwargs:
-            xp = kwargs["xp"]
-            xp = default_xp() if xp is None else xp
-        elif not list_of_xp:
-            return func(*args, **kwargs)
+            xp = kwargs.get("xp")
+            if xp is None:
+                xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
         else:
             xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
 
+        def to_numpy(obj):
+            if hasattr(obj, "__array_namespace__"):
+                return np.asarray(obj)
+            if isinstance(obj, tuple):
+                return tuple(to_numpy(x) for x in obj)
+            if isinstance(obj, list):
+                return [to_numpy(x) for x in obj]
+            if isinstance(obj, dict):
+                return {k: to_numpy(v) for k, v in obj.items()}
+            return obj
         np_args = [
-            np.asarray(arg) if hasattr(arg, "__array_namespace__") else arg
+            to_numpy(arg)
             for arg in args
         ]
         np_kwargs = {
-            k: np.asarray(v) if hasattr(v, "__array_namespace__") else v
+            k: to_numpy(v)
             for k, v in kwargs.items()
         }
 
@@ -626,8 +644,6 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
                 return {k: convert_back(v) for k, v in obj.items()}
             return obj
 
-        if xp is None:
-            return result
         return convert_back(result)
 
     return wrapper

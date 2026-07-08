@@ -28,6 +28,7 @@ def _get_healpy_datapath() -> str | None:
     return healpy_datapath
 
 
+@numpy_fallback
 def alm2map(  # noqa: PLR0913
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
@@ -60,13 +61,8 @@ def alm2map(  # noqa: PLR0913
         A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
 
     """
-    inputs = (
-        [np.asarray(alm) for alm in alms]
-        if isinstance(alms, Sequence)
-        else np.asarray(alms)
-    )
     return healpy.alm2map(
-        inputs,
+        alms,
         nside,
         inplace=inplace,
         lmax=lmax,
@@ -266,14 +262,9 @@ def map2alm(
         alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
 
     """
-    inputs = (
-        [np.asarray(m) for m in maps]
-        if isinstance(maps, Sequence)
-        else np.asarray(maps)
-    )
 
     return healpy.map2alm(
-        inputs,
+        maps,
         datapath=_get_healpy_datapath(),
         lmax=lmax,
         pol=pol,
@@ -430,7 +421,7 @@ def randang(
     """
     theta, phi = healpix.randang(
         nside,
-        np.asarray(ipix),
+        ipix,
         lonlat=lonlat,
         rng=glass.rng.rng_dispatcher(xp=np),
     )
@@ -473,4 +464,4 @@ class Rotator:
             Map in the new reference frame
 
         """
-        return healpy.Rotator(coord=self.coord).rotate_map_pixel(np.asarray(m))
+        return healpy.Rotator(coord=self.coord).rotate_map_pixel(m)
