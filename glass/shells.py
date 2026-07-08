@@ -141,7 +141,7 @@ class DensityWeight:
 
     Attributes
     ----------
-    cosmo_omega_m
+    cosmo
         Cosmology instance with OmegaM.
 
     """
