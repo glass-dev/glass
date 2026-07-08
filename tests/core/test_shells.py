@@ -103,9 +103,7 @@ def test_volume_weight(
     xpx.testing.assert_less(w[:-1], w[1:])
 
 
-def test_density_weight(
-    cosmo: Cosmology,
-) -> None:
+def test_density_weight(cosmo: Cosmology) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
