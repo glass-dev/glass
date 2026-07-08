@@ -36,6 +36,33 @@ def test_redshifts(
     assert z.shape == (10,)
 
 
+def test_redshifts_from_bins(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
+    """Test that random redshifts can be sample for pre-assigned bins."""
+    # these are the bin labels
+    # not consecutive on purpose
+    bins = xp.asarray([5, 1, 4, 2])
+
+    # redshift array for distributions
+    z = xp.asarray([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
+
+    # tomographic redshift distributions
+    # each one has support over 1 redshift grid point
+    nz_dict = {
+        1: xp.asarray([0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
+        2: xp.asarray([0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
+        4: xp.asarray([0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+        5: xp.asarray([0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+    }
+
+    # sample redshifts and check that each is in the limited range it was given
+    zout = glass.redshifts_from_bins(bins, z, nz_dict, rng=urng)
+    xpx.testing.assert_less(xp.asarray([0.3, 0.0, 0.2, 0.1]), zout)
+    xpx.testing.assert_less(zout, xp.asarray([0.5, 0.2, 0.4, 0.3]))
+
+
 def test_redshifts_from_nz(
     urng: UnifiedGenerator,
     xp: ModuleType,

@@ -12,7 +12,7 @@ import healpy
 import numpy as np
 
 import glass._array_api_utils as _utils
-from glass import _rng
+import glass.rng
 from glass._array_api_utils import numpy_fallback
 
 if TYPE_CHECKING:
@@ -432,7 +432,7 @@ def randang(
         nside,
         np.asarray(ipix),
         lonlat=lonlat,
-        rng=_rng.rng_dispatcher(xp=np),
+        rng=glass.rng.rng_dispatcher(xp=np),
     )
     return theta, phi
 

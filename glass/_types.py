@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from array_api_strict._dtypes import DType
 
     import glass.jax
-    from glass import _rng
+    import glass.rng
 
     P = typing.ParamSpec("P")
     R = typing.TypeVar("R")
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     FloatArray: TypeAlias = np.typing.NDArray[np.float64] | jaxtyping.Array | Array
     IntArray: TypeAlias = np.typing.NDArray[np.int64] | jaxtyping.Array | Array
     UnifiedGenerator: TypeAlias = (
-        np.random.Generator | glass.jax.Generator | _rng.Generator
+        np.random.Generator | glass.jax.Generator | glass.rng.Generator
     )
 
     AngularPowerSpectra: TypeAlias = Sequence[AnyArray]

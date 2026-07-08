@@ -60,10 +60,12 @@ __all__ = [
     "positions_from_delta",
     "redshift_grid",
     "redshifts",
+    "redshifts_from_bins",
     "redshifts_from_nz",
     "regularized_spectra",
     "resample_shapes",
     "restrict",
+    "rng",
     "save_cls",
     "shear_from_convergence",
     "smail_nz",
@@ -82,7 +84,7 @@ with contextlib.suppress(ModuleNotFoundError):
     from ._version import __version__
 
 # modules
-from glass import algorithm, arraytools, grf, harmonics, healpix
+from glass import algorithm, arraytools, grf, harmonics, healpix, rng
 from glass.fields import (
     check_posdef_spectra,
     cls2cov,
@@ -111,6 +113,7 @@ from glass.galaxies import (
     galaxy_shear,
     gaussian_phz,
     redshifts,
+    redshifts_from_bins,
     redshifts_from_nz,
 )
 from glass.lensing import (

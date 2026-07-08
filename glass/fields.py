@@ -20,8 +20,8 @@ import glass._array_api_utils as _utils
 import glass.grf
 import glass.harmonics
 import glass.healpix as hp
+import glass.rng
 import glass.shells
-from glass import _rng
 from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
@@ -371,7 +371,7 @@ def _generate_grf(
     xp = array_api_compat.array_namespace(*gls, use_compat=False)
 
     if rng is None:
-        rng = _rng.rng_dispatcher(xp=xp)
+        rng = glass.rng.rng_dispatcher(xp=xp)
 
     # number of gls and number of fields
     ngrf = nfields_from_nspectra(len(gls))

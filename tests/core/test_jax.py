@@ -9,7 +9,7 @@ jax = pytest.importorskip("jax", reason="tests require jax")
 import jax.numpy as jnp  # noqa: E402
 from jax.typing import ArrayLike  # noqa: E402
 
-from glass import _rng  # noqa: E402
+import glass.rng  # noqa: E402
 from glass.jax import Generator  # noqa: E402
 
 if TYPE_CHECKING:
@@ -17,15 +17,15 @@ if TYPE_CHECKING:
 
 
 def test_init() -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     assert isinstance(rng, Generator)
     assert isinstance(rng.key, jax.Array)
     assert jax.dtypes.issubdtype(rng.key.dtype, jax.dtypes.prng_key)
-    assert jnp.all(rng.key == jax.random.key(_rng.SEED))
+    assert jnp.all(rng.key == jax.random.key(glass.rng.SEED))
 
 
 def test_from_key() -> None:
-    key = jax.random.key(_rng.SEED)
+    key = jax.random.key(glass.rng.SEED)
     rng = Generator.from_key(key)
     assert rng.key is key
 
@@ -37,7 +37,7 @@ def test_from_key() -> None:
 
 
 def test_key() -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     rngkey, outkey = jax.random.split(rng.key, 2)  # ty: ignore[unresolved-attribute]
     key = rng.split()  # ty: ignore[unresolved-attribute]
     assert jnp.all(rng.key == rngkey)  # ty: ignore[unresolved-attribute]
@@ -45,7 +45,7 @@ def test_key() -> None:
 
 
 def test_spawn() -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key, *subkeys = jax.random.split(rng.key, 4)  # ty: ignore[unresolved-attribute]
     subrngs = rng.spawn(3)  # ty: ignore[unresolved-attribute]
     assert rng.key == key  # ty: ignore[unresolved-attribute]
@@ -73,7 +73,7 @@ def test_random(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.random(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
@@ -110,7 +110,7 @@ def test_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.normal(loc=loc, scale=scale, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
@@ -120,7 +120,7 @@ def test_normal(
 
 def test_normal_shape_mismatch_explicit() -> None:
     """Explicit size incompatible with input broadcast shape."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="is incompatible with input shapes that broadcast to",
@@ -130,7 +130,7 @@ def test_normal_shape_mismatch_explicit() -> None:
 
 def test_normal_shape_mismatch_broadcast() -> None:
     """Input shapes that cannot be broadcast together."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="Incompatible shapes for broadcasting",
@@ -155,7 +155,7 @@ def test_standard_normal(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.standard_normal(size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
@@ -185,7 +185,7 @@ def test_poisson(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.poisson(lam=lam, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
@@ -195,7 +195,7 @@ def test_poisson(
 
 def test_poisson_shape_mismatch_explicit() -> None:
     """Explicit size incompatible with input broadcast shape."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="is incompatible with input shapes that broadcast to",
@@ -232,7 +232,7 @@ def test_uniform(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.uniform(low=low, high=high, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
@@ -244,7 +244,7 @@ def test_uniform(
 
 def test_uniform_shape_mismatch_explicit() -> None:
     """Explicit size incompatible with input broadcast shape."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="is incompatible with input shapes that broadcast to",
@@ -254,7 +254,7 @@ def test_uniform_shape_mismatch_explicit() -> None:
 
 def test_uniform_shape_mismatch_broadcast() -> None:
     """Input shapes that cannot be broadcast together."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="Incompatible shapes for broadcasting",
@@ -285,7 +285,7 @@ def test_multinomial(
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
     rvs = rng.multinomial(n, pvals, size=size_input)
     assert rng.key != key  # ty: ignore[unresolved-attribute]
@@ -297,7 +297,7 @@ def test_multinomial(
 
 def test_multinomial_shape_mismatch_explicit() -> None:
     """Explicit size incompatible with input broadcast shape."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="is incompatible with input shapes that broadcast to",
@@ -307,7 +307,7 @@ def test_multinomial_shape_mismatch_explicit() -> None:
 
 def test_multinomial_shape_mismatch_broadcast() -> None:
     """Input shapes that cannot be broadcast together."""
-    rng = _rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.rng_dispatcher(xp=jnp)
     with pytest.raises(
         ValueError,
         match="Incompatible shapes for broadcasting",
