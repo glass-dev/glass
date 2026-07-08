@@ -141,12 +141,12 @@ class DensityWeight:
 
     Attributes
     ----------
-    cosmo
-        Cosmology instance.
+    cosmo_inv_co_dist
+        Cosmology instance with inverse comoving distance.
 
     """
 
-    cosmo: Cosmology
+    cosmo_inv_co_dist: Cosmology
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
@@ -163,11 +163,14 @@ class DensityWeight:
 
         """
         return (
-            self.cosmo.critical_density0
-            * self.cosmo.Omega_m(z)
-            * (self.cosmo.transverse_comoving_distance(z) / self.cosmo.hubble_distance)
+            self.cosmo_inv_co_dist.critical_density0
+            * self.cosmo_inv_co_dist.Omega_m(z)
+            * (
+                self.cosmo_inv_co_dist.transverse_comoving_distance(z)
+                / self.cosmo_inv_co_dist.hubble_distance
+            )
             ** 2
-            / self.cosmo.H_over_H0(z)
+            / self.cosmo_inv_co_dist.H_over_H0(z)
         )
 
 
