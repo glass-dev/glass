@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from glass._types import AnyArray, FloatArray, IntArray, UnifiedGenerator
-    from glass.cosmology import Cosmology
+    from glass.cosmology import CosmologyWithGrowthFactor
 
 
 def _draw_nz(
@@ -457,7 +457,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     delta: FloatArray,
     zeff: float,
     a_ia: float,
-    cosmo: Cosmology,
+    cosmo: CosmologyWithGrowthFactor,
     *,
     z0: float = 0.0,
     eta: float = 0.0,
@@ -477,7 +477,7 @@ def _kappa_ia_nla(  # noqa: PLR0913
     a_ia
         Intrinsic alignments amplitude.
     cosmo
-        Cosmology instance.
+        Cosmology instance with growth factor.
     z0
         Reference redshift for the redshift dependence.
     eta
