@@ -85,6 +85,9 @@ then
   exit 1
 fi
 
+# Setup environment
+source "$GLASS_DIR/benchmarks/archer2/setup-cpu-env.sh"
+
 # Get execution method
 PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python"
 if [[ -n "$SLURM_JOB_ID" || -n "$SLURM_BATCH_SCRIPT" ]]; then
