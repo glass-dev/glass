@@ -110,7 +110,7 @@ for xp in xp_available_backends.values():
             kappa_i = convergence.kappa
 
             # compute shear field
-            gamm1_i, gamm2_i = glass.shear_from_convergence(kappa_i)
+            gamm1_i, gamm2_i = glass.from_convergence(kappa_i)
 
             # add to mean fields using the galaxy number density as weight
             kappa_bar += ngal[i] * kappa_i  # ty: ignore[unsupported-operator]
