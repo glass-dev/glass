@@ -10,5 +10,4 @@ module load craype-x86-milan
 export LD_LIBRARY_PATH="/opt/rocm/lib:$LD_LIBRARY_PATH"
 export ROCM_PATH="/opt/rocm"
 
-uv venv --clear --python 3.12
 uv sync --group benchmarks --group archer2-gpu

@@ -3,6 +3,9 @@
 These benchmarks are intended to allow benchmarking GLASS on various machines,
 architectures and node configurations.
 
+Before running any benchmarks, you must first setup your venv with the required
+dependencies.
+
 ##  healpy-data
 
 glass depends on data from the healpy-data repo. If not found locally, glass
