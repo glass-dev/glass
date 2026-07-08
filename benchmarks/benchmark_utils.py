@@ -60,7 +60,22 @@ def run_benchmark(
     xp: ModuleType,
     **kwargs: dict[str, Any],
 ) -> None:
-    """Benchmark the provided function call."""
+    """
+    Run a benchmark of the provided function and its arguments.
+
+    Parameters
+    ----------
+    function_to_benchmark
+        The function which should be benchmarked. Note that the function must accept
+        all values passed via `args`, `xp` and `kwargs`
+    args
+        Positional arguments to be passed to `function_to_benchmark`
+    xp
+        The array backend to benchmark with. Will also be passed as a named argument to
+        `function_to_benchmark`
+    kwargs
+        Extra named arguments to be passed to `function_to_benchmark`
+    """
     if RUN_PROFILE:
         pr = cProfile.Profile()
         pr.enable()
@@ -74,7 +89,9 @@ def run_benchmark(
         ps.print_stats(0.05)
     else:
         # benchmark the task
-        result = timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
+        result = timeit(
+            lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=10
+        )
         # report the result
         print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 

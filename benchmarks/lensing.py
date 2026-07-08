@@ -17,16 +17,15 @@ import glass.ext.camb  # ty: ignore[unresolved-import]
 from glass import _rng
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from types import ModuleType
 
-    from glass._types import AnyArray, FloatArray, UnifiedGenerator
+    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
     from glass.shells import RadialWindow
 
 
 # Run benchmarks for each requested backend
 for xp in xp_available_backends.values():
-    urng: UnifiedGenerator = _rng.rng_dispatcher(xp=xp)
-
     # cosmology for the simulation
     h = 0.7
     Oc = 0.25
@@ -71,9 +70,6 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    # generator for lognormal matter fields
-    matter = glass.generate(fields, gls, nside, ncorr=3, rng=urng)
-
     # this will compute the convergence field iteratively
     convergence = glass.MultiPlaneConvergence(cosmo)
 
@@ -90,45 +86,33 @@ for xp in xp_available_backends.values():
     def lensing_benchmark(  # noqa: PLR0913
         *,
         convergence: glass.MultiPlaneConvergence,
-        matter: StopIteration[AnyArray],
-        ngal: FloatArray,
-        shape: tuple[int, ...],
+        fields: Sequence[glass.grf.Lognormal],
+        gls: AngularPowerSpectra,
+        nside: int,
         shells: list[RadialWindow],
         xp: ModuleType,
     ) -> tuple[FloatArray, FloatArray, FloatArray]:
         """Realistic lensing simulation benchmark."""
-        kappa_bar = xp.zeros(shape)
-        gamm1_bar = xp.zeros(shape)
-        gamm2_bar = xp.zeros(shape)
+        urng: UnifiedGenerator = _rng.rng_dispatcher(xp=xp)
+
+        # generator for lognormal matter fields
+        matter = glass.generate(fields, gls, nside, ncorr=3, rng=urng)
 
         # main loop to simulate the matter fields iterative
         for i, delta_i in enumerate(matter):
             # add lensing plane from the window function of this shell
             convergence.add_window(delta_i, shells[i])
 
-            # get convergence field
-            kappa_i = convergence.kappa
-
             # compute shear field
-            gamm1_i, gamm2_i = glass.from_convergence(kappa_i)
-
-            # add to mean fields using the galaxy number density as weight
-            kappa_bar += ngal[i] * kappa_i  # ty: ignore[unsupported-operator]
-            gamm1_bar += ngal[i] * gamm1_i  # ty: ignore[unsupported-operator]
-            gamm2_bar += ngal[i] * gamm2_i  # ty: ignore[unsupported-operator]
-
-        # normalise mean fields by the total galaxy number density
-        kappa_bar /= xp.sum(ngal)
-        gamm1_bar /= xp.sum(ngal)
-        gamm2_bar /= xp.sum(ngal)
+            glass.from_convergence(convergence.kappa, shear=True)
 
     # Run benchmark passing convergence and matter
     run_benchmark(
         lensing_benchmark,
         convergence=convergence,
-        matter=matter,
-        ngal=ngal,
-        shape=shape,
+        fields=fields,
+        gls=gls,
+        nside=nside,
         shells=shells,
         xp=xp,
     )
