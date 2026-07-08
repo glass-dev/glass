@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from glass.cosmology import Cosmology, CosmologyWithInverseComovingDistance
+    from glass.cosmology import Cosmology
 
 
 @pytest.fixture(scope="session")
@@ -104,14 +104,14 @@ def test_volume_weight(
 
 
 def test_density_weight(
-    cosmo_inv_co_dist: CosmologyWithInverseComovingDistance,
+    cosmo: Cosmology,
 ) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = glass.DensityWeight(cosmo_inv_co_dist)(z)
+    w = glass.DensityWeight(cosmo)(z)
     assert w.shape == z.shape
 
     # check first value is 0
