@@ -103,13 +103,13 @@ def test_volume_weight(
     xpx.testing.assert_less(w[:-1], w[1:])
 
 
-def test_density_weight(cosmo: CosmologyWithOmegaM) -> None:
+def test_density_weight(cosmo_omega_m: CosmologyWithOmegaM) -> None:
     """Add unit tests for :class:`glass.DensityWeight`."""
     z = np.linspace(0, 1, 6)
 
     # check shape
 
-    w = glass.DensityWeight(cosmo)(z)
+    w = glass.DensityWeight(cosmo_omega_m)(z)
     assert w.shape == z.shape
 
     # check first value is 0
