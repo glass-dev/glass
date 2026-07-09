@@ -70,9 +70,6 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    # this will compute the convergence field iteratively
-    convergence = glass.MultiPlaneConvergence(cosmo)
-
     # localised redshift distribution
     # the actual density per arcmin2 does not matter here, it is never used
     z = xp.linspace(0.0, 1.0, 101)
@@ -85,7 +82,7 @@ for xp in xp_available_backends.values():
 
     def lensing_benchmark(  # noqa: PLR0913
         *,
-        convergence: glass.MultiPlaneConvergence,
+        cosmo: CosmologyWrapper,
         fields: Sequence[glass.grf.Lognormal],
         gls: AngularPowerSpectra,
         nside: int,
@@ -94,6 +91,9 @@ for xp in xp_available_backends.values():
     ) -> tuple[FloatArray, FloatArray, FloatArray]:
         """Realistic lensing simulation benchmark."""
         urng: UnifiedGenerator = _rng.rng_dispatcher(xp=xp)
+
+        # this will compute the convergence field iteratively
+        convergence = glass.MultiPlaneConvergence(cosmo)
 
         # generator for lognormal matter fields
         matter = glass.generate(fields, gls, nside, ncorr=3, rng=urng)
@@ -109,7 +109,7 @@ for xp in xp_available_backends.values():
     # Run benchmark passing convergence and matter
     run_benchmark(
         lensing_benchmark,
-        convergence=convergence,
+        cosmo=cosmo,
         fields=fields,
         gls=gls,
         nside=nside,
