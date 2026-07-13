@@ -86,10 +86,6 @@ class MockCosmology:
         """Inverse function for the comoving distance in Mpc."""
         return 1_000 * (1 / (dc + np.finfo(float).eps))
 
-    def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
-        """Matter density parameter at redshift z."""
-        return self.rho_m_z(z) / self.critical_density0
-
     def transverse_comoving_distance(
         self,
         z: FloatArray,
