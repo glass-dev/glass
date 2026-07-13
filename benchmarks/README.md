@@ -4,7 +4,16 @@ These benchmarks are intended to allow benchmarking GLASS on various machines,
 architectures and node configurations.
 
 Before running any benchmarks, you must first setup your venv with the required
-dependencies.
+dependencies. For all backends, this will require installing the dependency
+group `benchmarks`, like so,
+
+```sh
+uv sync --group benchmarks
+```
+
+However, it may also be necessary to install other dependencies / dependency
+groups. For example, read the
+[prerequisites for Archer2](./archer2/README.md#prerequisites)
 
 ##  healpy-data
 

@@ -17,7 +17,7 @@ RUN_PROFILE="false"
 
 help() {
   echo "Usage:"
-  echo "    $0 -d <glass/dir> [-x <array_backend>] [-h|--help]"
+  echo "    $0 -d <glass/dir> [-x <array_backend>] [--healpy-datapath <healpy-datapath>] [-h|--help]"
   echo ""
   echo "ARGS:"
   echo "    -h | --help                          Display this help message."
@@ -25,7 +25,7 @@ help() {
   echo "    -x | --array-backend <array_backend> The array backend to use for the benchmarks."
   echo "                                         Defaults to NumPy."
   echo "    --healpy-datapath <healpy-datapath>  The path to the healpy-data repo to allow"
-  echo "                                         running offline."
+  echo "                                         running offline. Defaults to <glass/dir>/healpy-data"
 }
 
 # Ensure uv is available
@@ -78,6 +78,7 @@ while [ $# -gt 0 ] ; do
     shift 1
 done
 
+# Ensure GLASS_DIR is provided
 if [[ "$GLASS_DIR" == "" ]]
 then
   echo "GLASS_DIR must be provided"
@@ -85,8 +86,10 @@ then
   exit 1
 fi
 
-# Setup environment
-source "$GLASS_DIR/benchmarks/archer2/setup-cpu-env.sh"
+# Set HEALPY_DATAPATH default
+if [[ "$HEALPY_DATAPATH" == "" ]]; then
+    HEALPY_DATAPATH="$GLASS_DIR/healpy-data"
+fi
 
 # Get execution method
 PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python"

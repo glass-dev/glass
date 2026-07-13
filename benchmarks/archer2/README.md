@@ -5,11 +5,41 @@ Archer2
 
 ## Prerequisites
 
-Archer2 only support rocm up to v0.6.x. Therefore, we are restricted to using
-`jax==0.4.35`. This in turn restricts us to using python3.12. The relevant
-modules can be loaded via the provided script [setup-env.sh](./setup-env.sh)
+As Archer2 is a managed cluster, there are several steps to setting up your
+environment. First you should [setup uv](#setting-up-uv-on-archer2). Then you
+will need to install you python virtual environment. Finally, you will need to
+load specific modules for the GPU benchmark.
 
-> Note that setup-env.sh is called automatically by the submission script
+Note that for the GPU benchmarks Archer2 only support rocm up to v0.6.x.
+Therefore, we are restricted to using `jax==0.4.35`. This in turn restricts us
+to using python 3.12. Thus, to produce a useful CPU vs GPU comparison create
+your venv using the following command
+
+```sh
+uv venv --python 3.12
+```
+
+### CPU prerequisites
+
+To setup your python environment for running the cpu benchmark on Archer2, run
+the following commands.
+
+```sh
+uv sync --group benchmarks
+```
+
+### GPU prerequisites
+
+For the gpu benchmark, there is an additional dependency group `archer2-gpu`:
+
+```sh
+uv sync --group benchmarks --group archer2-gpu
+```
+
+Once your python environment is setup you must load the relevant modules via the
+provided script [setup-gpu-env.sh](./setup-gpu-env.sh).
+
+> Note that setup-gpu-env.sh is called automatically by the submission script
 > [submit-gpu.sh](./submit-gpu.sh)
 
 ## Running the benchmarks

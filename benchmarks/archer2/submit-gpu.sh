@@ -22,7 +22,7 @@ HEALPY_DATAPATH=""
 
 help() {
   echo "Usage:"
-  echo "    $0 -d <glass/dir> [-x <array_backend>] [-h|--help]"
+  echo "    $0 -d <glass/dir> [-x <array_backend>] [--healpy-datapath <healpy-datapath>] [-h|--help]"
   echo ""
   echo "ARGS:"
   echo "    -h | --help                          Display this help message."
@@ -30,7 +30,7 @@ help() {
   echo "    -x | --array-backend <array_backend> The array backend to use for the benchmarks."
   echo "                                         Defaults to NumPy."
   echo "    --healpy-datapath <healpy-datapath>  The path to the healpy-data repo to allow"
-  echo "                                         running offline."
+  echo "                                         running offline. Defaults to <glass/dir>/healpy-data"
 }
 
 # Ensure uv is available
@@ -78,6 +78,7 @@ while [ $# -gt 0 ] ; do
     shift 1
 done
 
+# Ensure GLASS_DIR is provided
 if [[ "$GLASS_DIR" == "" ]]
 then
   echo "GLASS_DIR must be provided"
@@ -85,16 +86,13 @@ then
   exit 1
 fi
 
+# Set HEALPY_DATAPATH default
+if [[ "$HEALPY_DATAPATH" == "" ]]; then
+    HEALPY_DATAPATH="$GLASS_DIR/healpy-data"
+fi
+
 # Setup environment
 source "$GLASS_DIR/benchmarks/archer2/setup-gpu-env.sh"
 
-# Get execution method
-PYTHON_COMMAND="$GLASS_DIR/.venv/bin/python"
-if [[ -n "$SLURM_JOB_ID" || -n "$SLURM_BATCH_SCRIPT" ]]; then
-  echo "Running under SLURM (batch). SLURM_JOB_ID=${SLURM_JOB_ID:-unknown}"
-  PYTHON_COMMAND="srun $PYTHON_COMMAND"
-else
-  echo "Running directly from CLI"
-fi
-
-HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" $PYTHON_COMMAND benchmarks/lensing.py
+# Run benchmark via slurm
+HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
