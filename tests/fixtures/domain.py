@@ -21,6 +21,12 @@ def cosmo() -> MockCosmology:
     return MockCosmology()
 
 
+@pytest.fixture(scope="session")
+def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
+    """Mock cosmology with OmegaM to use for core tests."""
+    return MockCosmologyWithOmegaM()
+
+
 class MockCosmology:
     """
     A mock class to represent Cosmology in tests.
@@ -91,6 +97,14 @@ class MockCosmology:
     ) -> FloatArray:
         """Transverse comoving distance :math:`d_M(z)` in Mpc."""
         return self.hubble_distance * self.xm(z, z2)
+
+
+class MockCosmologyWithOmegaM(MockCosmology):
+    """A mock class to represent Cosmology with OmegaM in tests."""
+
+    def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
+        """Matter density parameter at redshift z."""
+        return self.rho_m_z(z) / self.critical_density0
 
 
 @pytest.fixture(scope="session")
