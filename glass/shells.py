@@ -86,7 +86,7 @@ class DistanceWeight:
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
-        Uniform weight in comoving distance.
+        Uniform weight function in comoving distance.
 
         Parameters
         ----------
@@ -117,7 +117,7 @@ class VolumeWeight:
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
-        Uniform weight in comoving distance.
+        Uniform weight function in comoving volume.
 
         Parameters
         ----------
@@ -150,7 +150,7 @@ class DensityWeight:
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
-        Uniform weight in comoving distance.
+        Uniform weight function in matter density.
 
         Parameters
         ----------
