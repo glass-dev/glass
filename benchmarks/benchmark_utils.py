@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 import jax
 import numpy as np
-
+import cupy
 import array_api_strict
 
 if TYPE_CHECKING:
@@ -36,6 +36,8 @@ elif ARRAY_BACKEND == "array_api_strict":
     xp_available_backends["array_api_strict"] = array_api_strict
 elif ARRAY_BACKEND == "jax":
     xp_available_backends["jax.numpy"] = jax.numpy
+elif ARRAY_BACKEND == "cupy":
+    xp_available_backends["cupy"] = cupy
 # if all, try importing every backend
 elif ARRAY_BACKEND == "all":
     xp_available_backends["numpy"] = np
