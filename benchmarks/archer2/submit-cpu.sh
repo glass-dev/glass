@@ -13,7 +13,6 @@
 GLASS_DIR=""
 ARRAY_BACKEND="numpy"
 HEALPY_DATAPATH=""
-RUN_PROFILE="false"
 
 help() {
   echo "Usage:"
@@ -59,11 +58,6 @@ while [ $# -gt 0 ] ; do
             shift 2
             continue
             ;;
-        -p | --profile)
-            RUN_PROFILE="true"
-            shift 1
-            continue
-            ;;
         --healpy-datapath)
             HEALPY_DATAPATH="$2"
             shift 2
@@ -100,16 +94,10 @@ else
   echo "Running directly from CLI"
 fi
 
-PROFILE_ENV_VAR=""
-if [[ "$RUN_PROFILE" == "true" ]]
-then
-    PROFILE_ENV_VAR="RUN_PROFILE='$RUN_PROFILE'"
-fi
-
-for n in {128,256,512,1024,2048}
+for n in {128,256,512,1024}
 do
     echo "Running benchmark with nside/lmax = $n"
     sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" benchmarks/lensing.py
 
-    ARRAY_BACKEND="$ARRAY_BACKEND" HEALPY_DATAPATH="$HEALPY_DATAPATH"  "$PROFILE_ENV_VAR" $PYTHON_COMMAND benchmarks/lensing.py
+    ARRAY_BACKEND="$ARRAY_BACKEND" HEALPY_DATAPATH="$HEALPY_DATAPATH" $PYTHON_COMMAND benchmarks/lensing.py
 done
