@@ -94,7 +94,7 @@ fi
 # Setup environment
 source "$GLASS_DIR/benchmarks/archer2/setup-gpu-env.sh"
 
-for n in {128,256,512,1024,2048}
+for n in {128,256,512,1024}
 do
     echo "Running benchmark with nside/lmax = $n"
     sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" benchmarks/lensing.py
