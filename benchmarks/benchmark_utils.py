@@ -90,7 +90,7 @@ def run_benchmark(
     else:
         # benchmark the task
         result = timeit(
-            lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=10
+            lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1
         )
         # report the result
         print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201

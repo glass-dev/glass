@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --nodes=1
 #SBATCH --gpus=1
-#SBATCH --time=0:30:0
+#SBATCH --time=8:00:0
 #SBATCH --partition=gpu
 #SBATCH --qos=gpu-shd
 
@@ -94,5 +94,11 @@ fi
 # Setup environment
 source "$GLASS_DIR/benchmarks/archer2/setup-gpu-env.sh"
 
-# Run benchmark via slurm
-HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
+for n in {128,256,512,1024,2048}
+do
+    echo "Running benchmark with nside/lmax = $n"
+    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" benchmarks/lensing.py
+
+    # Run benchmark via slurm
+    HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
+done
