@@ -24,6 +24,11 @@ Utilities
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "array_api_extra",
+]
+
 import math
 import typing
 from typing import TYPE_CHECKING
@@ -420,7 +425,7 @@ def resample_shapes(
                 xp.sqrt(((1 - 2 * varg) * vare) ** 2 + 4 * varg * eve4 * (vare - varg))
                 - (1 - 2 * varg) * vare
             )
-            / (2 * varg * eve4)
+            / (2 * varg * eve4),
         )
 
     # assign random orientations to shapes

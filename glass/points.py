@@ -38,6 +38,11 @@ Displacing points
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "array_api_extra",
+]
+
 import itertools
 import math
 from typing import TYPE_CHECKING

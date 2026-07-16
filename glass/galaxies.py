@@ -20,6 +20,11 @@ Functions
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "array_api_extra",
+]
+
 import math
 import typing
 import warnings
