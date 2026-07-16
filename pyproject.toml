@@ -10,6 +10,7 @@ requires = [
 archer2-gpu = [
     "jax-rocm60-pjrt==0.4.35",
     "jax-rocm60-plugin==0.4.35",
+    {include-group = "benchmarks"},
 ]
 benchmarks = [
     "array_api_strict>=2.3.1",
