@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "healpix",
+    "healpy",
+    "numpy",
+]
+
 import os
 import pathlib
 from collections.abc import Sequence

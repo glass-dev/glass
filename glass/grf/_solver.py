@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "numpy",
+    "transformcl",
+]
+
 from typing import TYPE_CHECKING
 
 import numpy as np
