@@ -92,9 +92,6 @@ if [[ "$HEALPY_DATAPATH" == "" ]]; then
     HEALPY_DATAPATH="$GLASS_DIR/healpy-data"
 fi
 
-# Setup environment
-source "$GLASS_DIR/benchmarks/archer2/setup-gpu-env.sh"
-
 # Flags to maximise jax gpu performance
 export JAX_ENABLE_PGLE=true
 export XLA_FLAGS="--xla_gpu_enable_latency_hiding_scheduler=true"
