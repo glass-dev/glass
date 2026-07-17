@@ -9,6 +9,7 @@ requires = [
 [dependency-groups]
 cosma8-gpu = [
     "jax[rocm7-local]",
+    {include-group = "benchmarks"},
 ]
 archer2-gpu = [
     "jax-rocm60-pjrt==0.4.35",
