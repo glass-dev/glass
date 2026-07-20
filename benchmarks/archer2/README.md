@@ -1,7 +1,7 @@
 # Archer2
 
 This document contains instructions specific to running the glass benchmarks on
-Archer2
+[Archer2](https://www.archer2.ac.uk/)
 
 ## Prerequisites
 
@@ -30,10 +30,11 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the gpu benchmark, there is an additional dependency group `archer2-gpu`:
+For the gpu benchmark, there is an additional dependency group `archer2-gpu`
+which includes on `benchmarks`:
 
 ```sh
-uv sync --group benchmarks --group archer2-gpu
+uv sync --group archer2-gpu
 ```
 
 Once your python environment is setup you must load the relevant modules via the

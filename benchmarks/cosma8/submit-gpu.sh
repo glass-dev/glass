@@ -9,7 +9,7 @@
 #SBATCH --exclusive
 #SBATCH -t 8:00:0
 #SBATCH --mail-type=END # notifications for job done fail
-#SBATCH --mail-user=c.aird@ucl.ac.uk #PLEASE PUT YOUR EMAIL ADDRESS HERE (without the <>)
+#SBATCH --mail-user=<email> #PLEASE PUT YOUR EMAIL ADDRESS HERE (without the <>)
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 
