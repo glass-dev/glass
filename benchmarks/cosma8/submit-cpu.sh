@@ -34,13 +34,6 @@ help() {
   echo "                                         running offline. Defaults to <glass/dir>/healpy-data"
 }
 
-# Ensure uv is available
-source "${HOME/home/work}/.profile" # HOME starts as /home/... but uv needs to be on /work/...
-
-# Stop unintentional multi-threading within software libraries
-export OMP_NUM_THREADS=1
-# Ensure the cpus-per-task option is propagated to srun commands
-export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 # check for no input arguments and show help
 if [ $# -eq 0 ];
