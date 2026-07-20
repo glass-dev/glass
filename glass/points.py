@@ -340,8 +340,7 @@ def _sample_number_galaxies(
     xp = n.__array_namespace__()
 
     # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # clip number density at zero
     n = xp.clip(n, min=0.0)
@@ -522,8 +521,7 @@ def positions_from_delta(  # noqa: PLR0913
     xp = array_api_compat.array_namespace(ngal, delta, bias, vis, use_compat=False)
 
     # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # ensure bias_model is a function
     if not callable(bias_model):
@@ -585,13 +583,12 @@ def uniform_positions(
         xp = array_api_compat.array_namespace(ngal, use_compat=False)
 
     # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     ngal = xp.asarray(ngal)
 
     # sample number of galaxies
-    ngal_sphere = xp.asarray(rng.poisson(xp.multiply(ARCMIN2_SPHERE, ngal)))
+    ngal_sphere = rng.poisson(xp.multiply(ARCMIN2_SPHERE, ngal))
 
     # extra dimensions of the output
     dims = ngal_sphere.shape

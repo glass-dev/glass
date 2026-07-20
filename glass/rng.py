@@ -33,15 +33,21 @@ def default_rng(
         The appropriate random number generator for the array's backend.
 
     """
+    
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
         return glass.jax.Generator(seed=seed)
+    else:
+        import numpy as np
+        rng: UnifiedGenerator = np.random.default_rng(seed=seed)
+        
+        if xp.__name__ == "numpy":
+            return rng
+        
+        return Generator(rng=rng, xp=xp)
+            
 
-    if xp.__name__ == "numpy":
-        return xp.random.default_rng(seed=seed)
-
-    return Generator(xp=xp, seed=seed)
 
 
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
@@ -70,11 +76,13 @@ class Generator:
 
     """
 
-    __slots__ = ("np", "rng", "xp")
+    __slots__ = ("default_dtype", "rng", "xp")
 
     def __init__(
         self,
+        *,
         xp: ModuleType,
+        rng: UnifiedGenerator | None = None,
         seed: int | IntArray = SEED,
     ) -> None:
         """
@@ -91,8 +99,12 @@ class Generator:
         import numpy  # noqa: ICN001, PLC0415
 
         self.xp = xp
-        self.np = numpy
-        self.rng = self.np.random.default_rng(seed=seed)
+        self.default_dtype = xp.float64
+        if rng is None:
+            self.rng = default_rng(seed=seed, xp=xp)
+        else:
+            self.rng = rng
+            
 
     def random(
         self,
@@ -117,8 +129,8 @@ class Generator:
             Array of random floats.
 
         """
-        dtype = dtype if dtype is not None else self.np.float64
-        return self.xp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
+        dtype = dtype if dtype is not None else self.default_dtype
+        return self.xp.asarray(self.rng.random(size, out), dtype=dtype)  # ty: ignore[no-matching-overload]
 
     def normal(
         self,
@@ -190,8 +202,8 @@ class Generator:
             Array of samples from the standard normal distribution.
 
         """
-        dtype = dtype if dtype is not None else self.np.float64
-        return self.xp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
+        dtype = dtype if dtype is not None else self.default_dtype
+        return self.xp.asarray(self.rng.standard_normal(size, out), dtype=dtype)  # ty: ignore[no-matching-overload]
 
     def uniform(
         self,

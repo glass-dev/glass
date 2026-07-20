@@ -1043,8 +1043,7 @@ def distribute(
     xp = redshifts.__array_namespace__()
 
     # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # flatten redshifts but store shape
     shape = redshifts.shape

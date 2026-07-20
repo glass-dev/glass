@@ -74,6 +74,9 @@ def _draw_nz(
         Redshifts sampled from the given source distribution.
 
     """
+    xp = array_api_compat.array_namespace(count, z, nz, use_compat=False)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
+
     # compute the CDF
     cdf = glass.arraytools.cumulative_trapezoid(nz, z)
     cdf /= cdf[-1]
@@ -157,8 +160,7 @@ def redshifts_from_bins(
     xp = array_api_compat.array_namespace(bins, z, *nz_values, use_compat=False)
 
     # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # tally the bins
     bin_label, _, bin_index, bin_count = xp.unique_all(bins)
@@ -234,9 +236,7 @@ def redshifts_from_nz(
             stacklevel=2,
         )
 
-    # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
@@ -420,8 +420,7 @@ def gaussian_phz(  # noqa: PLR0913
     sigma_0_arr = xp.asarray(sigma_0)
 
     # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
     lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)

@@ -97,8 +97,7 @@ def triaxial_axis_ratio(
     xi = xp.asarray(xi)
 
     # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # get size from inputs if not explicitly provided
     if size is None:
@@ -186,6 +185,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma_gamma = xp.asarray(sigma_gamma)
 
     # default RNG if not provided
+    rng = glass.rng.Generator(rng=rng, xp=xp)
     if rng is None:
         rng = glass.rng.rng_dispatcher(xp=xp)
 
@@ -266,8 +266,7 @@ def ellipticity_gaussian(
     )
 
     # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # allocate flattened output array
     eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
@@ -329,8 +328,7 @@ def ellipticity_intnorm(
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
     # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
@@ -403,8 +401,7 @@ def resample_shapes(
 
     xp = epsilon.__array_namespace__()
 
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # get absolute value of epsilon
     r = xp.hypot(xp.real(epsilon), xp.imag(epsilon))

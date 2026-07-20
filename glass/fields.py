@@ -376,8 +376,7 @@ def _generate_grf(
     """
     xp = array_api_compat.array_namespace(*gls, use_compat=False)
 
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.Generator(rng=rng, xp=xp)
 
     # number of gls and number of fields
     ngrf = nfields_from_nspectra(len(gls))
