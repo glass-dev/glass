@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 import jax
 import numpy as np
+
 import array_api_strict
 
 if TYPE_CHECKING:
@@ -88,9 +89,7 @@ def run_benchmark(
         ps.print_stats(0.05)
     else:
         # benchmark the task
-        result = timeit(
-            lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1
-        )
+        result = timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
         # report the result
         print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 

@@ -6,7 +6,8 @@ This document contains instructions specific to running the glass benchmarks on
 ## Prerequisites
 
 As cosma8 is a managed cluster, there are several steps to setting up your
-environment. First you should [setup uv](https://docs.astral.sh/uv/getting-started/installation/). Then you
+environment. First you should
+[setup uv](https://docs.astral.sh/uv/getting-started/installation/). Then you
 will need to install you python virtual environment. Finally, you will need to
 load specific modules for the GPU benchmark. Your virtual environment can be
 created via:
@@ -57,4 +58,5 @@ ssh ga008
 ```
 
 Access to these different partitions/queues must be requested via the DiRAC
-SAFE. For further information [read the docs](https://cosma.readthedocs.io/en/latest/account.html).
+SAFE. For further information
+[read the docs](https://cosma.readthedocs.io/en/latest/account.html).

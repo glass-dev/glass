@@ -7,10 +7,6 @@ requires = [
 ]
 
 [dependency-groups]
-cosma8-gpu = [
-    "jax[rocm7-local]",
-    {include-group = "benchmarks"},
-]
 archer2-gpu = [
     "jax-rocm60-pjrt==0.4.35",
     "jax-rocm60-plugin==0.4.35",
@@ -28,6 +24,10 @@ benchmarks = [
 ]
 build = [
     "build",
+]
+cosma8-gpu = [
+    "jax[rocm7-local]",
+    {include-group = "benchmarks"},
 ]
 dev = [
     "coverage[toml]",
