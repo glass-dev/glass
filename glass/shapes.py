@@ -96,7 +96,6 @@ def triaxial_axis_ratio(
     zeta = xp.asarray(zeta)
     xi = xp.asarray(xi)
 
-    # default RNG if not provided
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # get size from inputs if not explicitly provided
@@ -184,7 +183,6 @@ def ellipticity_ryden04(  # noqa: PLR0913
     gamma = xp.asarray(gamma)
     sigma_gamma = xp.asarray(sigma_gamma)
 
-    # default RNG if not provided
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # default size if not given
@@ -263,7 +261,6 @@ def ellipticity_gaussian(
         xp.asarray(sigma),
     )
 
-    # default RNG if not provided
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # allocate flattened output array
@@ -325,7 +322,6 @@ def ellipticity_intnorm(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
-    # default RNG if not provided
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # bring inputs into common shape

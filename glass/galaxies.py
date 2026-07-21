@@ -159,7 +159,6 @@ def redshifts_from_bins(
 
     xp = array_api_compat.array_namespace(bins, z, *nz_values, use_compat=False)
 
-    # get default RNG if not given
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # tally the bins
@@ -419,7 +418,6 @@ def gaussian_phz(  # noqa: PLR0913
     z_arr = xp.asarray(z)
     sigma_0_arr = xp.asarray(sigma_0)
 
-    # get default RNG if not given
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
