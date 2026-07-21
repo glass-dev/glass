@@ -376,7 +376,7 @@ def _generate_grf(
     """
     xp = array_api_compat.array_namespace(*gls, use_compat=False)
 
-    rng = glass.rng.Generator(rng=rng, xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # number of gls and number of fields
     ngrf = nfields_from_nspectra(len(gls))
@@ -404,7 +404,7 @@ def _generate_grf(
     for w in iternorm(cov):
         # standard normal random variates for alm
         # sample real and imaginary parts, then combine into complex number
-        z = rng.standard_normal((z_size, 2)) @ xp.asarray([1, 1j])
+        z = xrng.standard_normal((z_size, 2)) @ xp.asarray([1, 1j])
 
         # append to stack of standard normals
         y.append(z)

@@ -45,6 +45,14 @@ def test_init() -> None:
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
+def test_init_mix_of_backends() -> None:
+    import array_api_strict
+
+    rng = glass.rng.Generator(rng=np.random.default_rng(), xp=array_api_strict)
+    assert isinstance(rng, glass.rng.Generator)
+
+
+@pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 def test_random() -> None:
     import array_api_strict
 
