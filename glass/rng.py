@@ -36,13 +36,13 @@ def default_rng(
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
-        return glass.jax.Generator(seed=seed)
+        return glass.jax.Generator(seed=seed)  # ty: ignore[invalid-return-type]
 
     import numpy as np  # noqa: PLC0415
 
     rng = np.random.default_rng(seed=seed)
 
-    return rng if xp.__name__ == "numpy" else Generator(rng=rng, xp=xp)
+    return rng if xp.__name__ == "numpy" else Generator(rng=rng, xp=xp)  # ty: ignore[invalid-return-type]
 
 
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
@@ -64,10 +64,10 @@ def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
 
 class Generator:
     """
-    NumPy random number generator returning Arrays of the given backend.
+    Wrapper for a random number generator returning Arrays of the given backend.
 
-    This class wraps NumPy's random number generator and returns arrays compatible
-    with the provided backend.
+    This class wraps random number generators which match the glass UnifiedGenerator
+    protocol and returns arrays compatible with the provided backend.
 
     """
 
@@ -122,7 +122,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.default_dtype
-        return self.xp.asarray(self.rng.random(size, out), dtype=dtype)  # ty: ignore[no-matching-overload]
+        return self.xp.asarray(self.rng.random(size, out), dtype=dtype)
 
     def normal(
         self,
@@ -195,7 +195,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.default_dtype
-        return self.xp.asarray(self.rng.standard_normal(size, out), dtype=dtype)  # ty: ignore[no-matching-overload]
+        return self.xp.asarray(self.rng.standard_normal(size, out), dtype=dtype)
 
     def uniform(
         self,
