@@ -33,21 +33,16 @@ def default_rng(
         The appropriate random number generator for the array's backend.
 
     """
-    
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
         return glass.jax.Generator(seed=seed)
-    else:
-        import numpy as np
-        rng: UnifiedGenerator = np.random.default_rng(seed=seed)
-        
-        if xp.__name__ == "numpy":
-            return rng
-        
-        return Generator(rng=rng, xp=xp)
-            
 
+    import numpy as np  # noqa: PLC0415
+
+    rng = np.random.default_rng(seed=seed)
+
+    return rng if xp.__name__ == "numpy" else Generator(rng=rng, xp=xp)
 
 
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
@@ -96,15 +91,12 @@ class Generator:
             Seed for the random number generator.
 
         """
-        import numpy  # noqa: ICN001, PLC0415
-
         self.xp = xp
         self.default_dtype = xp.float64
         if rng is None:
             self.rng = default_rng(seed=seed, xp=xp)
         else:
             self.rng = rng
-            
 
     def random(
         self,
