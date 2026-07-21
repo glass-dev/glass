@@ -7,7 +7,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import DTypeLike, FloatArray, IntArray, UnifiedGenerator
+    from glass._types import (
+        DTypeLike,
+        FloatArray,
+        IntArray,
+        SupportsGlassRNG,
+        UnifiedGenerator,
+    )
 
 
 SEED = 42
@@ -36,13 +42,16 @@ def default_rng(
     if xp.__name__ == "jax.numpy":
         import glass.jax  # noqa: PLC0415
 
-        return glass.jax.Generator(seed=seed)  # ty: ignore[invalid-return-type]
+        return glass.jax.Generator(seed=seed)
 
     import numpy as np  # noqa: PLC0415
 
     rng = np.random.default_rng(seed=seed)
 
-    return rng if xp.__name__ == "numpy" else Generator(rng=rng, xp=xp)  # ty: ignore[invalid-return-type]
+    if xp.__name__ == "numpy":
+        return rng
+
+    return Generator(rng=rng, xp=xp)
 
 
 def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
@@ -76,9 +85,9 @@ class Generator:
     def __init__(
         self,
         *,
-        xp: ModuleType,
-        rng: UnifiedGenerator | None = None,
+        rng: SupportsGlassRNG | None = None,
         seed: int | IntArray = SEED,
+        xp: ModuleType,
     ) -> None:
         """
         Initialize the Generator.
@@ -92,17 +101,13 @@ class Generator:
 
         """
         self.xp = xp
-        self.default_dtype = xp.float64
-        if rng is None:
-            self.rng = default_rng(seed=seed, xp=xp)
-        else:
-            self.rng = rng
+        self.default_dtype: DTypeLike = xp.float64
+        self.rng = default_rng(seed=seed, xp=xp) if rng is None else rng
 
     def random(
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: FloatArray | None = None,
     ) -> FloatArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
@@ -122,7 +127,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.default_dtype
-        return self.xp.asarray(self.rng.random(size, out), dtype=dtype)
+        return self.xp.asarray(self.rng.random(size), dtype=dtype)
 
     def normal(
         self,
@@ -175,7 +180,6 @@ class Generator:
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: FloatArray | None = None,
     ) -> FloatArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
@@ -195,7 +199,7 @@ class Generator:
 
         """
         dtype = dtype if dtype is not None else self.default_dtype
-        return self.xp.asarray(self.rng.standard_normal(size, out), dtype=dtype)
+        return self.xp.asarray(self.rng.standard_normal(size), dtype=dtype)
 
     def uniform(
         self,

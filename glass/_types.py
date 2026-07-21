@@ -11,6 +11,9 @@ if TYPE_CHECKING:
     from array_api_strict._array_object import Array
     from array_api_strict._dtypes import DType
 
+    import glass.jax
+    import glass.rng
+
     P = typing.ParamSpec("P")
     R = typing.TypeVar("R")
     T = typing.TypeVar("T")
@@ -20,6 +23,9 @@ if TYPE_CHECKING:
     DTypeLike: TypeAlias = np.typing.DTypeLike | jaxtyping.DTypeLike | DType
     FloatArray: TypeAlias = np.typing.NDArray[np.float64] | jaxtyping.Array | Array
     IntArray: TypeAlias = np.typing.NDArray[np.int64] | jaxtyping.Array | Array
+    UnifiedGenerator: TypeAlias = (
+        np.random.Generator | glass.jax.Generator | glass.rng.Generator
+    )
 
     AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
 else:
@@ -30,18 +36,17 @@ else:
     DTypeLike = Any
     FloatArray = Any
     IntArray = Any
+    UnifiedGenerator = Any
 
     AngularPowerSpectra = Any
 
 
-class UnifiedGenerator(Protocol):
+class SupportsGlassRNG(Protocol):
     """Defines the methods required for an RNG to be used within glass."""
 
     def random(
         self,
         size: int | tuple[int, ...] | None = None,
-        dtype: DTypeLike | None = None,
-        out: FloatArray | None = None,
     ) -> FloatArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
@@ -108,8 +113,6 @@ class UnifiedGenerator(Protocol):
     def standard_normal(
         self,
         size: int | tuple[int, ...] | None = None,
-        dtype: DTypeLike | None = None,
-        out: FloatArray | None = None,
     ) -> FloatArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
