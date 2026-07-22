@@ -1,17 +1,17 @@
 #!/bin/bash -l
 # shellcheck disable=SC1091
 
-#SBATCH -J glass_benchmark_cpu
+#SBATCH -J glass_benchmark_gpu
 #SBATCH -o %x-%j.out
 #SBATCH -e %x-%j.err
-#SBATCH -p cosma8
-#SBATCH -A do018
+#SBATCH -p SH5_MI300A_SPX
 #SBATCH --exclusive
-#SBATCH -t 8:00:0
-#SBATCH --mail-type=END # notifications for job done fail
-#SBATCH --mail-user=<email> #PLEASE PUT YOUR EMAIL ADDRESS HERE (without the <>)
+#SBATCH -t 3:0:0
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
+#SBATCH --gpus=1
+
+module load rocm
 
 # Recommended environment settings
 # Stop unintentional multi-threading within software libraries
@@ -33,7 +33,6 @@ help() {
   echo "    --healpy-datapath <healpy-datapath>  The path to the healpy-data repo to allow"
   echo "                                         running offline. Defaults to <glass/dir>/healpy-data"
 }
-
 
 # check for no input arguments and show help
 if [ $# -eq 0 ];
@@ -85,13 +84,25 @@ if [[ "$HEALPY_DATAPATH" == "" ]]; then
     HEALPY_DATAPATH="$GLASS_DIR/healpy-data"
 fi
 
+# Flags to maximise jax gpu performance
+#export JAX_ENABLE_PGLE=true
+#export XLA_FLAGS="--xla_gpu_enable_latency_hiding_scheduler=true"
+
 export ARRAY_BACKEND="$ARRAY_BACKEND"
 export HEALPY_DATAPATH="$HEALPY_DATAPATH"
 
-for n in {128,256,512,1024}
+# Run benchmarks with shared memory on and off
+for i in {1,0}
 do
-    echo "Running benchmark with nside/lmax = $n"
-    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
+    echo "Running benchmarks with HSA_XNACK=$i"
+    export HSA_XNACK=$i
 
-    "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
+    for n in {128,256,512,1024}
+    do
+        echo "Running benchmark with nside/lmax = $n"
+        sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
+
+        # Run benchmark via slurm
+        "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
+    done
 done

@@ -2,8 +2,8 @@
 # shellcheck disable=SC1091
 
 #SBATCH -J glass_benchmark_gpu
-#SBATCH -o =%x-%j.out
-#SBATCH -e =%x-%j.err
+#SBATCH -o %x-%j.out
+#SBATCH -e %x-%j.err
 #SBATCH -p mi300x
 #SBATCH -A do018
 #SBATCH --exclusive
