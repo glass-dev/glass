@@ -45,11 +45,28 @@ def test_init() -> None:
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
-def test_init_mix_of_backends() -> None:
-    import array_api_strict
+def test_init_mix_of_backends_np_array_api_strict() -> None:
+    import array_api_strict as xp
 
-    rng = glass.rng.Generator(rng=np.random.default_rng(), xp=array_api_strict)
-    assert isinstance(rng, glass.rng.Generator)
+    rng = glass.rng.Generator(rng=np.random.default_rng(), xp=xp)
+    assert rng.random(1).__array_namespace__().__name__ == "array_api_strict"
+    assert rng.poisson(1).__array_namespace__().__name__ == "array_api_strict"
+    assert rng.standard_normal(1).__array_namespace__().__name__ == "array_api_strict"
+    assert rng.uniform().__array_namespace__().__name__ == "array_api_strict"
+    assert (
+        rng.multinomial(1, xp.ones(2)).__array_namespace__().__name__
+        == "array_api_strict"
+    )
+
+
+@pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
+def test_init_mix_of_backends_jax_np() -> None:
+    rng = glass.rng.Generator(rng=glass.jax.Generator(42), xp=np)
+    assert rng.random(1).__array_namespace__().__name__ == "numpy"
+    assert rng.poisson(1).__array_namespace__().__name__ == "numpy"
+    assert rng.standard_normal(1).__array_namespace__().__name__ == "numpy"
+    assert rng.uniform().__array_namespace__().__name__ == "numpy"
+    assert rng.multinomial(1, np.ones(2)).__array_namespace__().__name__ == "numpy"
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
