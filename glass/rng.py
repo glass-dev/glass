@@ -19,18 +19,7 @@ class SupportsGlassRNG(Protocol):
     """Defines the methods required for an RNG to be used within glass."""
 
     def random(self, size: int | tuple[int, ...] | None = None) -> FloatArray:
-        """
-        Return random floats in the half-open interval [0.0, 1.0).
-
-        Parameters
-        ----------
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of random floats.
-        """
+        """Return random floats in the half-open interval [0.0, 1.0)."""
 
     def normal(
         self,
@@ -38,57 +27,15 @@ class SupportsGlassRNG(Protocol):
         scale: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
     ) -> FloatArray:
-        """
-        Draw samples from a Normal distribution (mean=loc, stdev=scale).
-
-        Parameters
-        ----------
-        loc
-            Mean of the distribution.
-        scale
-            Standard deviation of the distribution.
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the normal distribution.
-
-        """
+        """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
 
     def poisson(
         self, lam: float | FloatArray, size: int | tuple[int, ...] | None = None
     ) -> IntArray:
-        """
-        Draw samples from a Poisson distribution.
-
-        Parameters
-        ----------
-        lam
-            Expected number of events.
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the Poisson distribution.
-
-        """
+        """Draw samples from a Poisson distribution."""
 
     def standard_normal(self, size: int | tuple[int, ...] | None = None) -> FloatArray:
-        """
-        Draw samples from a standard Normal distribution (mean=0, stdev=1).
-
-        Parameters
-        ----------
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the standard normal distribution.
-
-        """
+        """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
 
     def uniform(
         self,
@@ -96,23 +43,7 @@ class SupportsGlassRNG(Protocol):
         high: float | FloatArray = 1.0,
         size: int | tuple[int, ...] | None = None,
     ) -> FloatArray:
-        """
-        Draw samples from a Uniform distribution.
-
-        Parameters
-        ----------
-        low
-            Lower bound of the distribution.
-        high
-            Upper bound of the distribution.
-        size
-            Output shape.
-
-        Returns
-        -------
-            Array of samples from the uniform distribution.
-
-        """
+        """Draw samples from a Uniform distribution."""
 
     def multinomial(
         self,
@@ -120,23 +51,7 @@ class SupportsGlassRNG(Protocol):
         pvals: FloatArray,
         size: int | tuple[int, ...] | None = None,
     ) -> IntArray:
-        """
-        Draw samples from a multinomial distribution.
-
-        Parameters
-        ----------
-        n
-            Number of experiments.
-        pvals
-            Probabilities of each of the p different outcomes.
-        size
-            Output shape.
-
-        Returns
-        -------
-            The drawn sample.
-
-        """
+        """Draw samples from a multinomial distribution."""
 
 
 SEED = 42
