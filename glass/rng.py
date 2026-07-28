@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -13,45 +13,6 @@ if TYPE_CHECKING:
         IntArray,
         UnifiedGenerator,
     )
-
-
-class SupportsGlassRNG(Protocol):
-    """Defines the methods required for an RNG to be used within glass."""
-
-    def random(self, size: int | tuple[int, ...] | None = None) -> FloatArray:
-        """Return random floats in the half-open interval [0.0, 1.0)."""
-
-    def normal(
-        self,
-        loc: float | FloatArray = 0.0,
-        scale: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | None = None,
-    ) -> FloatArray:
-        """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
-
-    def poisson(
-        self, lam: float | FloatArray, size: int | tuple[int, ...] | None = None
-    ) -> IntArray:
-        """Draw samples from a Poisson distribution."""
-
-    def standard_normal(self, size: int | tuple[int, ...] | None = None) -> FloatArray:
-        """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-
-    def uniform(
-        self,
-        low: float | FloatArray = 0.0,
-        high: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | None = None,
-    ) -> FloatArray:
-        """Draw samples from a Uniform distribution."""
-
-    def multinomial(
-        self,
-        n: int | IntArray,
-        pvals: FloatArray,
-        size: int | tuple[int, ...] | None = None,
-    ) -> IntArray:
-        """Draw samples from a multinomial distribution."""
 
 
 SEED = 42
@@ -127,7 +88,7 @@ class Generator:
     def __init__(
         self,
         *,
-        rng: SupportsGlassRNG | None = None,
+        rng: UnifiedGenerator | None = None,
         seed: int | IntArray = SEED,
         xp: ModuleType,
     ) -> None:

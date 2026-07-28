@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     FloatArray: TypeAlias = np.typing.NDArray[np.float64] | jaxtyping.Array | Array
     IntArray: TypeAlias = np.typing.NDArray[np.int64] | jaxtyping.Array | Array
     UnifiedGenerator: TypeAlias = (
-        np.random.Generator | glass.jax.Generator | glass.rng.SupportsGlassRNG
+        np.random.Generator | glass.jax.Generator | glass.rng.Generator
     )
 
     AngularPowerSpectra: TypeAlias = Sequence[AnyArray]
