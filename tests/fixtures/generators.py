@@ -36,4 +36,4 @@ def urng(xp: ModuleType) -> UnifiedGenerator:
     Must be used with the `xp` fixture. Use `rng` for non array API tests.
 
     """
-    return glass.rng.rng_dispatcher(xp=xp)
+    return glass.rng.default_rng(xp=xp)

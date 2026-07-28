@@ -16,7 +16,7 @@ HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 def test_rng_dispatcher_numpy() -> None:
-    rng = glass.rng.rng_dispatcher(xp=np)
+    rng = glass.rng.default_rng(xp=np)
     assert isinstance(rng, np.random.Generator)
 
 
@@ -24,7 +24,7 @@ def test_rng_dispatcher_numpy() -> None:
 def test_rng_dispatcher_jax() -> None:
     import jax.numpy as jnp
 
-    rng = glass.rng.rng_dispatcher(xp=jnp)
+    rng = glass.rng.default_rng(xp=jnp)
     assert isinstance(rng, glass.jax.Generator)
 
 
@@ -32,7 +32,7 @@ def test_rng_dispatcher_jax() -> None:
 def test_rng_dispatcher_array_api_strict() -> None:
     import array_api_strict
 
-    rng = glass.rng.rng_dispatcher(xp=array_api_strict)
+    rng = glass.rng.default_rng(xp=array_api_strict)
     assert isinstance(rng, glass.rng.Generator)
 
 
@@ -73,7 +73,7 @@ def test_init_mix_of_backends_jax_np() -> None:
 def test_random() -> None:
     import array_api_strict
 
-    rng = glass.rng.rng_dispatcher(xp=array_api_strict)
+    rng = glass.rng.default_rng(xp=array_api_strict)
     rvs = rng.random(size=10_000)
     assert rvs.shape == (10_000,)
     assert array_api_strict.min(rvs) >= 0.0
@@ -85,7 +85,7 @@ def test_random() -> None:
 def test_normal() -> None:
     import array_api_strict
 
-    rng = glass.rng.rng_dispatcher(xp=array_api_strict)
+    rng = glass.rng.default_rng(xp=array_api_strict)
     rvs = rng.normal(1, 2, size=10_000)
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, array_api_strict._array_object.Array)
@@ -95,7 +95,7 @@ def test_normal() -> None:
 def test_standard_normal() -> None:
     import array_api_strict
 
-    rng = glass.rng.rng_dispatcher(xp=array_api_strict)
+    rng = glass.rng.default_rng(xp=array_api_strict)
     rvs = rng.standard_normal(size=10_000)
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, array_api_strict._array_object.Array)
@@ -105,7 +105,7 @@ def test_standard_normal() -> None:
 def test_poisson() -> None:
     import array_api_strict
 
-    rng = glass.rng.rng_dispatcher(xp=array_api_strict)
+    rng = glass.rng.default_rng(xp=array_api_strict)
     rvs = rng.poisson(lam=1, size=10_000)
     assert rvs.shape == (10_000,)
     assert isinstance(rvs, array_api_strict._array_object.Array)
@@ -115,7 +115,7 @@ def test_poisson() -> None:
 def test_uniform() -> None:
     import array_api_strict
 
-    rng = glass.rng.rng_dispatcher(xp=array_api_strict)
+    rng = glass.rng.default_rng(xp=array_api_strict)
     rvs = rng.uniform(size=10_000)
     assert rvs.shape == (10_000,)
     assert array_api_strict.min(rvs) >= 0.0

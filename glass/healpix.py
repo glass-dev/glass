@@ -464,7 +464,7 @@ def randang(
         nside,
         np.asarray(ipix),
         lonlat=lonlat,
-        rng=glass.rng.rng_dispatcher(xp=np),
+        rng=glass.rng.default_rng(xp=np),
     )
     return xp.asarray(theta), xp.asarray(phi)
 

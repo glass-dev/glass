@@ -20,11 +20,13 @@ SEED = 42
 
 def default_rng(
     *,
-    seed: int | IntArray | None = None,
+    seed: int | IntArray = SEED,
     xp: ModuleType,
 ) -> UnifiedGenerator:
     """
     Dispatch a random number generator for the array backend for a given seed.
+
+    Defaults to the GLASS default seed.
 
     Parameters
     ----------
@@ -51,23 +53,6 @@ def default_rng(
         return rng
 
     return Generator(rng=rng, xp=xp)
-
-
-def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
-    """
-    Dispatch a random number generator for the array backend for the GLASS default seed.
-
-    Parameters
-    ----------
-    xp
-        The array library backend to use for array operations.
-
-    Returns
-    -------
-        The appropriate random number generator for the array's backend.
-
-    """
-    return default_rng(seed=SEED, xp=xp)
 
 
 class Generator:
