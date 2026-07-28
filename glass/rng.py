@@ -122,6 +122,8 @@ class Generator:
     rng: UnifiedGenerator
     xp: ModuleType
 
+    __slots__ = ("default_dtype", "rng", "xp")
+
     def __init__(
         self,
         *,
@@ -148,7 +150,6 @@ class Generator:
                 import glass.jax  # noqa: PLC0415
 
                 self.rng = glass.jax.Generator(seed=seed)
-
             else:
                 import numpy as np  # noqa: PLC0415
 
