@@ -369,13 +369,13 @@ def test_generate_grf(xp: ModuleType) -> None:
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.default_rng(xp=xp)
     gaussian_fields = list(glass.fields._generate_grf(gls, nside, rng=rng))
 
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
     # requires resetting the RNG for reproducibility
-    rng = glass.rng.rng_dispatcher(xp=xp)
+    rng = glass.rng.default_rng(xp=xp)
     new_gaussian_fields = list(
         glass.fields._generate_grf(gls, nside, ncorr=ncorr, rng=rng),
     )

@@ -38,7 +38,7 @@ jobs:
 
       - name: Run examples
         run: uv run nox -s examples
-        timeout-minutes: 20
+        timeout-minutes: 25
         env:
           FORCE_COLOR: 1
 

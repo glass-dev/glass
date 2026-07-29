@@ -24,6 +24,11 @@ Utilities
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "array_api_extra",
+]
+
 import math
 import typing
 from typing import TYPE_CHECKING
@@ -91,19 +96,17 @@ def triaxial_axis_ratio(
     zeta = xp.asarray(zeta)
     xi = xp.asarray(xi)
 
-    # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # get size from inputs if not explicitly provided
     if size is None:
         size = xp.broadcast_arrays(zeta, xi)[0].shape
 
     # draw random viewing angle (theta, phi)
-    cos2_theta = rng.uniform(low=-1.0, high=1.0, size=size)
+    cos2_theta = xrng.uniform(low=-1.0, high=1.0, size=size)
     cos2_theta *= cos2_theta
     sin2_theta = 1 - cos2_theta
-    cos2_phi = xp.cos(rng.uniform(low=0.0, high=2 * math.pi, size=size))
+    cos2_phi = xp.cos(xrng.uniform(low=0.0, high=2 * math.pi, size=size))
     cos2_phi *= cos2_phi
     sin2_phi = 1 - cos2_phi
 
@@ -180,9 +183,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     gamma = xp.asarray(gamma)
     sigma_gamma = xp.asarray(sigma_gamma)
 
-    # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # default size if not given
     if size is None:
@@ -197,22 +198,22 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
     # first sample unbounded normal, then rejection sample truncation
-    eps = rng.normal(mu, sigma, size=size)
+    eps = xrng.normal(mu, sigma, size=size)
     while xp.any(bad := eps > 0):
-        eps = xpx.at(eps)[bad].set(rng.normal(mu[bad], sigma[bad]))
-    gam = rng.normal(gamma, sigma_gamma, size=size)
+        eps = xpx.at(eps)[bad].set(xrng.normal(mu[bad], sigma[bad]))
+    gam = xrng.normal(gamma, sigma_gamma, size=size)
     while xp.any(bad := (gam < 0) | (gam > 1)):
-        gam = xpx.at(gam)[bad].set(rng.normal(gamma[bad], sigma_gamma[bad]))
+        gam = xpx.at(gam)[bad].set(xrng.normal(gamma[bad], sigma_gamma[bad]))
 
     # compute triaxial axis ratios zeta = B/A, xi = C/A
     zeta = -xp.expm1(eps)
     xi = (1 - gam) * zeta
 
     # random projection of random triaxial ellipsoid
-    q = triaxial_axis_ratio(zeta, xi, rng=rng)
+    q = triaxial_axis_ratio(zeta, xi, rng=xrng)
 
     # assemble ellipticity with random complex phase
-    e = xp.exp(1j * rng.uniform(0, 2 * math.pi, size=q.shape))
+    e = xp.exp(1j * xrng.uniform(0, 2 * math.pi, size=q.shape))
     e *= (1 - q) / (1 + q)
 
     # return the ellipticity
@@ -260,9 +261,7 @@ def ellipticity_gaussian(
         xp.asarray(sigma),
     )
 
-    # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # allocate flattened output array
     eps = xp.empty(xp.sum(count_broadcasted), dtype=xp.complex128)
@@ -271,12 +270,12 @@ def ellipticity_gaussian(
     # reject those where abs(e) > 0
     i = 0
     for k in uxpx.ndindex(count_broadcasted.shape, xp=xp):
-        e = _populate_random_complex_array(count_broadcasted[k], rng=rng)
+        e = _populate_random_complex_array(count_broadcasted[k], rng=xrng)
         e *= sigma_broadcasted[k]
         r = xp.abs(e) > 1
         while xp.count_nonzero(r) > 0:
             e = xpx.at(e)[r].set(
-                _populate_random_complex_array(xp.count_nonzero(r), rng=rng),
+                _populate_random_complex_array(xp.count_nonzero(r), rng=xrng),
             )
             e = xpx.at(e)[r].multiply(sigma_broadcasted[k])
             r = xp.abs(e) > 1
@@ -323,9 +322,7 @@ def ellipticity_intnorm(
     """
     if xp is None:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
-    # default RNG if not provided
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
@@ -350,7 +347,7 @@ def ellipticity_intnorm(
     # sample complex ellipticities
     i = 0
     for k in uxpx.ndindex(count_broadcasted.shape, xp=xp):
-        e = _populate_random_complex_array(count_broadcasted[k], rng=rng)
+        e = _populate_random_complex_array(count_broadcasted[k], rng=xrng)
         e *= sigma_eta[k]
         r = xp.hypot(xp.real(e), xp.imag(e))
         e *= xp.where(
@@ -398,8 +395,7 @@ def resample_shapes(
 
     xp = epsilon.__array_namespace__()
 
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # get absolute value of epsilon
     r = xp.hypot(xp.real(epsilon), xp.imag(epsilon))
@@ -420,8 +416,8 @@ def resample_shapes(
                 xp.sqrt(((1 - 2 * varg) * vare) ** 2 + 4 * varg * eve4 * (vare - varg))
                 - (1 - 2 * varg) * vare
             )
-            / (2 * varg * eve4)
+            / (2 * varg * eve4),
         )
 
     # assign random orientations to shapes
-    return r * xp.exp(1j * rng.uniform(0, 2 * xp.pi, size=r.shape))
+    return r * xp.exp(1j * xrng.uniform(0, 2 * xp.pi, size=r.shape))

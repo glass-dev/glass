@@ -16,6 +16,10 @@ integration, interpolation, and linear algebra.
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+]
+
 import functools
 from functools import wraps
 from typing import TYPE_CHECKING

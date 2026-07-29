@@ -20,6 +20,11 @@ Functions
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "array_api_extra",
+]
+
 import math
 import typing
 import warnings
@@ -69,13 +74,16 @@ def _draw_nz(
         Redshifts sampled from the given source distribution.
 
     """
+    xp = array_api_compat.array_namespace(count, z, nz, use_compat=False)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
+
     # compute the CDF
     cdf = glass.arraytools.cumulative_trapezoid(nz, z)
     cdf /= cdf[-1]
 
     # sample redshifts and return result
     return uxpx.interp(
-        rng.uniform(0.0, 1.0, size=count),
+        xrng.uniform(0.0, 1.0, size=count),
         cdf,
         z,
     )
@@ -151,9 +159,7 @@ def redshifts_from_bins(
 
     xp = array_api_compat.array_namespace(bins, z, *nz_values, use_compat=False)
 
-    # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # tally the bins
     bin_label, _, bin_index, bin_count = xp.unique_all(bins)
@@ -161,7 +167,7 @@ def redshifts_from_bins(
     # sample the redshifts from each nz
     # concatenate into runs of redshifts for each bin
     redshifts = xp.concat([
-        _draw_nz(int(k), z, nz_values[nz_keys.index(x)], rng=rng)
+        _draw_nz(int(k), z, nz_values[nz_keys.index(x)], rng=xrng)
         for x, k in zip(bin_label, bin_count, strict=True)
     ])
 
@@ -229,9 +235,7 @@ def redshifts_from_nz(
             stacklevel=2,
         )
 
-    # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # bring inputs' leading axes into common shape
     dims, *rest = glass.arraytools.broadcast_leading_axes((count, 0), (z, 1), (nz, 1))
@@ -254,7 +258,7 @@ def redshifts_from_nz(
                 int(count_out[k]),
                 z_out_slice,
                 nz_out_slice,
-                rng=rng,
+                rng=xrng,
             ),
         )
         total += count_out[k]
@@ -414,9 +418,7 @@ def gaussian_phz(  # noqa: PLR0913
     z_arr = xp.asarray(z)
     sigma_0_arr = xp.asarray(sigma_0)
 
-    # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
     lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)
@@ -428,7 +430,7 @@ def gaussian_phz(  # noqa: PLR0913
 
     sigma = xp.add(1, z_arr) * sigma_0_arr
     dims = sigma.shape
-    zphot = xp.asarray(rng.normal(z_arr, sigma))
+    zphot = xp.asarray(xrng.normal(z_arr, sigma))
 
     # Check for valid user input
     if (lower_arr.ndim == upper_arr.ndim != 0) and not (
@@ -442,12 +444,12 @@ def gaussian_phz(  # noqa: PLR0913
 
     if not dims:
         while zphot < lower_arr or zphot > upper_arr:
-            zphot = xp.asarray(rng.normal(z_arr, sigma))
+            zphot = xp.asarray(xrng.normal(z_arr, sigma))
     else:
         z_arr = xp.broadcast_to(z_arr, dims)
         trunc = (zphot < lower_arr) | (zphot > upper_arr)
         while xp.count_nonzero(trunc) > 0:
-            zphot = xp.where(trunc, rng.normal(z_arr, sigma), zphot)
+            zphot = xp.where(trunc, xrng.normal(z_arr, sigma), zphot)
             trunc = (zphot < lower_arr) | (zphot > upper_arr)
 
     return zphot
