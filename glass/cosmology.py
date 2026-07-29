@@ -25,5 +25,6 @@ class Cosmology(
 class CosmologyWithGrowthFactor(
     Cosmology,
     cosmology.api.HasGrowthFactor[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
+    typing.Protocol,
 ):
     """Cosmology protocol for GLASS with growth factor."""
