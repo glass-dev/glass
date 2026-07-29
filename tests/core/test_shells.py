@@ -16,7 +16,11 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from glass.cosmology import Cosmology, CosmologyWithInverseComovingDistance, CosmologyWithOmegaM
+    from glass.cosmology import (
+        Cosmology,
+        CosmologyWithInverseComovingDistance,
+        CosmologyWithOmegaM,
+    )
 
 
 @pytest.fixture(scope="session")
