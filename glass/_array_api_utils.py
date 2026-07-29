@@ -22,7 +22,7 @@ __lazy_modules__ = [
 
 import functools
 from collections.abc import Sequence
-from functools import wraps
+import functools
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -588,11 +588,13 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C90
         the corresponding array namespace.
     """
 
-    @wraps(func)
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, C901
+        """Convert Array API inputs to NumPy, call the function, and convert outputs back."""
         list_of_xp = []
 
         def collect_arrays(obj) -> None:  # noqa: ANN001
+            """Recursively collect Array API arrays from nested inputs."""
             if hasattr(obj, "__array_namespace__"):
                 list_of_xp.append(obj)
             elif isinstance(obj, dict):
@@ -618,6 +620,7 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C90
             xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
 
         def to_numpy(obj):  # noqa: ANN001, ANN202
+            """Recursively convert Array API arrays to NumPy arrays."""
             if hasattr(obj, "__array_namespace__"):
                 return np.asarray(obj)
             if isinstance(obj, tuple):
@@ -629,11 +632,12 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C90
             return obj
 
         np_args = [to_numpy(arg) for arg in args]
-        np_kwargs = {k: to_numpy(v) for k, v in kwargs.items()}
+        np_kwargs = {k: to_numpy(v) for k, v in kwargs.items() if k != "xp"}
 
         result = func(*np_args, **np_kwargs)
 
         def convert_back(obj):  # noqa: ANN001, ANN202
+            """Recursively convert NumPy arrays back to the original array namespace."""
             if isinstance(obj, np.ndarray):
                 return xp.asarray(obj)
             if isinstance(obj, tuple):

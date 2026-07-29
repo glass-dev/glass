@@ -135,8 +135,8 @@ def almxfl(
 
     """
     return healpy.almxfl(
-        np.asarray(alm),
-        np.asarray(fl),
+        alm,
+        fl,
         inplace=inplace,
     )
 
@@ -172,8 +172,8 @@ def ang2pix(
     """
     return healpix.ang2pix(
         nside,
-        np.asarray(theta),
-        np.asarray(phi),
+        theta,
+        phi,
         lonlat=lonlat,
     )
 
@@ -205,13 +205,14 @@ def ang2vec(
 
     """
     x, y, z = healpix.ang2vec(
-        np.asarray(theta),
-        np.asarray(phi),
+        theta,
+        phi,
         lonlat=lonlat,
     )
     return x, y, z
 
 
+@numpy_fallback
 def get_nside(m: FloatArray) -> int:
     """
     Return the nside of the given map.
@@ -226,7 +227,7 @@ def get_nside(m: FloatArray) -> int:
         The HEALPix nside parameter of the map.
 
     """
-    return int(healpy.get_nside(np.asarray(m)))
+    return int(healpy.get_nside(m))
 
 
 @numpy_fallback
