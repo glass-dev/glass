@@ -72,7 +72,11 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray, IntArray, UnifiedGenerator
-    from glass.cosmology import Cosmology, CosmologyWithOmegaM
+    from glass.cosmology import (
+        Cosmology,
+        CosmologyWithInverseComovingDistance,
+        CosmologyWithOmegaM,
+    )
 
 
 @dataclasses.dataclass
@@ -913,7 +917,7 @@ def redshift_grid(
 
 
 def distance_grid(
-    cosmo: Cosmology,
+    cosmo: CosmologyWithInverseComovingDistance,
     zmin: float,
     zmax: float,
     *,
@@ -926,7 +930,7 @@ def distance_grid(
     Parameters
     ----------
     cosmo
-        Cosmology instance.
+        Cosmology instance with inverse comoving distance.
     zmin
         The minimum redshift.
     zmax
