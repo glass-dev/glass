@@ -27,6 +27,7 @@ def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDi
     return MockCosmologyWithInverseComovingDistance()
 
 
+@pytest.fixture(scope="session")
 def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
     """Mock cosmology with OmegaM to use for core tests."""
     return MockCosmologyWithOmegaM()
