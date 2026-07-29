@@ -72,7 +72,7 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray, IntArray, UnifiedGenerator
-    from glass.cosmology import Cosmology
+    from glass.cosmology import Cosmology, CosmologyWithOmegaM
 
 
 @dataclasses.dataclass
@@ -147,11 +147,11 @@ class DensityWeight:
     Attributes
     ----------
     cosmo
-        Cosmology instance.
+        Cosmology instance with OmegaM.
 
     """
 
-    cosmo: Cosmology
+    cosmo: CosmologyWithOmegaM
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
