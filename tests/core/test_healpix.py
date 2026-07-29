@@ -409,7 +409,7 @@ def test_randang(
         healpix_inputs.nside,
         ipix,
         lonlat=lonlat,
-        rng=glass.rng.rng_dispatcher(xp=np),
+        rng=glass.rng.default_rng(xp=np),
     )
     new = hp.randang(
         healpix_inputs.nside,

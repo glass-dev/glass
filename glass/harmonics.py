@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+]
+
 from typing import TYPE_CHECKING
 
 import array_api_compat

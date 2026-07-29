@@ -10,7 +10,6 @@ from glass._types import AnyArray
 class Cosmology(
     cosmology.api.HasComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasCriticalDensity0[AnyArray],  # ty: ignore[invalid-type-arguments]
-    cosmology.api.HasGrowthFactor[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasHoverH0[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasHubbleDistance[AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasInverseComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
@@ -22,8 +21,17 @@ class Cosmology(
     """Cosmology protocol for GLASS."""
 
 
+class CosmologyWithGrowthFactor(
+    Cosmology,
+    cosmology.api.HasGrowthFactor[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
+    typing.Protocol,
+):
+    """Cosmology protocol for GLASS with growth factor."""
+
 class CosmologyWithOmegaM(
     Cosmology,
     cosmology.api.HasOmegaM[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
+    typing.Protocol,
 ):
     """Cosmology protocol for GLASS with OmegaM."""
+
