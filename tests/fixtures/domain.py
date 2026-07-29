@@ -27,6 +27,11 @@ def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDi
     return MockCosmologyWithInverseComovingDistance()
 
 
+def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
+    """Mock cosmology with OmegaM to use for core tests."""
+    return MockCosmologyWithOmegaM()
+
+
 class MockCosmology:
     """
     A mock class to represent Cosmology in tests.
@@ -82,10 +87,6 @@ class MockCosmology:
         """Comoving distance :math:`d_c(z)` in Mpc."""
         return np.divide(self.xm(z, z2), 1_000.0)
 
-    def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
-        """Matter density parameter at redshift z."""
-        return self.rho_m_z(z) / self.critical_density0
-
     def transverse_comoving_distance(
         self,
         z: FloatArray,
@@ -101,6 +102,14 @@ class MockCosmologyWithInverseComovingDistance(MockCosmology):
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
         return 1_000 * (1 / (dc + np.finfo(float).eps))
+
+
+class MockCosmologyWithOmegaM(MockCosmology):
+    """A mock class to represent Cosmology with OmegaM in tests."""
+
+    def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
+        """Matter density parameter at redshift z."""
+        return self.rho_m_z(z) / self.critical_density0
 
 
 @pytest.fixture(scope="session")

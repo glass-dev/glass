@@ -28,4 +28,4 @@ def urng(xpb: ModuleType) -> UnifiedGenerator:
     Must be used with the `xp` fixture.
 
     """
-    return glass.rng.rng_dispatcher(xp=xpb)
+    return glass.rng.default_rng(xp=xpb)

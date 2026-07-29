@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "healpix",
+    "healpy",
+    "numpy",
+]
+
 import os
 import pathlib
 from collections.abc import Sequence
@@ -457,7 +464,7 @@ def randang(
         nside,
         np.asarray(ipix),
         lonlat=lonlat,
-        rng=glass.rng.rng_dispatcher(xp=np),
+        rng=glass.rng.default_rng(xp=np),
     )
     return xp.asarray(theta), xp.asarray(phi)
 

@@ -46,6 +46,11 @@ Weight functions
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "array_api_compat",
+    "array_api_extra",
+]
+
 import dataclasses
 import itertools
 import math
@@ -67,7 +72,7 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import FloatArray, IntArray, UnifiedGenerator
-    from glass.cosmology import Cosmology, CosmologyWithInverseComovingDistance
+    from glass.cosmology import Cosmology, CosmologyWithInverseComovingDistance, CosmologyWithOmegaM
 
 
 @dataclasses.dataclass
@@ -86,7 +91,7 @@ class DistanceWeight:
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
-        Uniform weight in comoving distance.
+        Uniform weight function in comoving distance.
 
         Parameters
         ----------
@@ -117,7 +122,7 @@ class VolumeWeight:
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
-        Uniform weight in comoving distance.
+        Uniform weight function in comoving volume.
 
         Parameters
         ----------
@@ -142,15 +147,15 @@ class DensityWeight:
     Attributes
     ----------
     cosmo
-        Cosmology instance.
+        Cosmology instance with OmegaM.
 
     """
 
-    cosmo: Cosmology
+    cosmo: CosmologyWithOmegaM
 
     def __call__(self, z: FloatArray) -> FloatArray:
         """
-        Uniform weight in comoving distance.
+        Uniform weight function in matter density.
 
         Parameters
         ----------
@@ -1037,9 +1042,7 @@ def distribute(
     """
     xp = redshifts.__array_namespace__()
 
-    # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # flatten redshifts but store shape
     shape = redshifts.shape
@@ -1083,7 +1086,7 @@ def distribute(
         # simulate a draw from a categorial distribution by
         # drawing a single event from a multinomial distribution
         # and finding the bin in which the event landed
-        index = xp.argmax(rng.multinomial(1, weights), axis=1)
+        index = xp.argmax(xrng.multinomial(1, weights), axis=1)
 
         # subtract 1 so that the "outside" shell is -1
         index -= 1

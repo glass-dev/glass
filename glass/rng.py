@@ -7,7 +7,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import DTypeLike, FloatArray, IntArray, UnifiedGenerator
+    from glass._types import (
+        DTypeLike,
+        FloatArray,
+        IntArray,
+        UnifiedGenerator,
+    )
 
 
 SEED = 42
@@ -15,11 +20,13 @@ SEED = 42
 
 def default_rng(
     *,
-    seed: int | IntArray | None = None,
+    seed: int | IntArray = SEED,
     xp: ModuleType,
 ) -> UnifiedGenerator:
     """
     Dispatch a random number generator for the array backend for a given seed.
+
+    Defaults to the GLASS default seed.
 
     Parameters
     ----------
@@ -38,44 +45,37 @@ def default_rng(
 
         return glass.jax.Generator(seed=seed)
 
+    import numpy as np  # noqa: PLC0415
+
+    rng = np.random.default_rng(seed=seed)
+
     if xp.__name__ == "numpy":
-        return xp.random.default_rng(seed=seed)
+        return rng
 
-    return Generator(xp=xp, seed=seed)
-
-
-def rng_dispatcher(*, xp: ModuleType) -> UnifiedGenerator:
-    """
-    Dispatch a random number generator for the array backend for the GLASS default seed.
-
-    Parameters
-    ----------
-    xp
-        The array library backend to use for array operations.
-
-    Returns
-    -------
-        The appropriate random number generator for the array's backend.
-
-    """
-    return default_rng(seed=SEED, xp=xp)
+    return Generator(rng=rng, xp=xp)
 
 
 class Generator:
     """
-    NumPy random number generator returning Arrays of the given backend.
+    Wrapper for a random number generator returning Arrays of the given backend.
 
-    This class wraps NumPy's random number generator and returns arrays compatible
-    with the provided backend.
+    This class wraps random number generators which match the glass UnifiedGenerator
+    type and returns arrays compatible with the provided backend.
 
     """
 
-    __slots__ = ("np", "rng", "xp")
+    default_dtype: DTypeLike
+    rng: UnifiedGenerator
+    xp: ModuleType
+
+    __slots__ = ("default_dtype", "rng", "xp")
 
     def __init__(
         self,
-        xp: ModuleType,
+        *,
+        rng: UnifiedGenerator | None = None,
         seed: int | IntArray = SEED,
+        xp: ModuleType,
     ) -> None:
         """
         Initialize the Generator.
@@ -88,17 +88,25 @@ class Generator:
             Seed for the random number generator.
 
         """
-        import numpy  # noqa: ICN001, PLC0415
-
         self.xp = xp
-        self.np = numpy
-        self.rng = self.np.random.default_rng(seed=seed)
+        self.default_dtype = xp.float64
+
+        if rng is None:
+            if xp.__name__ == "jax.numpy":
+                import glass.jax  # noqa: PLC0415
+
+                self.rng = glass.jax.Generator(seed=seed)
+            else:
+                import numpy as np  # noqa: PLC0415
+
+                self.rng = np.random.default_rng(seed=seed)
+        else:
+            self.rng = rng
 
     def random(
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: FloatArray | None = None,
     ) -> FloatArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
@@ -109,16 +117,14 @@ class Generator:
             Output shape.
         dtype
             Desired data type.
-        out
-            Optional output array.
 
         Returns
         -------
             Array of random floats.
 
         """
-        dtype = dtype if dtype is not None else self.np.float64
-        return self.xp.asarray(self.rng.random(size, dtype, out))  # ty: ignore[no-matching-overload]
+        dtype = dtype if dtype is not None else self.default_dtype
+        return self.xp.asarray(self.rng.random(size), dtype=dtype)
 
     def normal(
         self,
@@ -171,7 +177,6 @@ class Generator:
         self,
         size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
-        out: FloatArray | None = None,
     ) -> FloatArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
@@ -182,16 +187,14 @@ class Generator:
             Output shape.
         dtype
             Desired data type.
-        out
-            Optional output array.
 
         Returns
         -------
             Array of samples from the standard normal distribution.
 
         """
-        dtype = dtype if dtype is not None else self.np.float64
-        return self.xp.asarray(self.rng.standard_normal(size, dtype, out))  # ty: ignore[no-matching-overload]
+        dtype = dtype if dtype is not None else self.default_dtype
+        return self.xp.asarray(self.rng.standard_normal(size), dtype=dtype)
 
     def uniform(
         self,
