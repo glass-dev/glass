@@ -25,5 +25,6 @@ class Cosmology(
 class CosmologyWithInverseComovingDistance(
     Cosmology,
     cosmology.api.HasInverseComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
+    typing.Protocol,
 ):
     """Cosmology protocol for GLASS with inverse comoving distance."""
