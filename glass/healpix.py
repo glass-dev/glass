@@ -11,7 +11,6 @@ __lazy_modules__ = [
 
 import os
 import pathlib
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 import healpix
@@ -23,6 +22,7 @@ import glass.rng
 from glass._array_api_utils import numpy_fallback
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from types import ModuleType
 
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
@@ -106,7 +106,7 @@ def alm2map_spin(
     """
     inputs = [np.asarray(alm) for alm in alms]
     outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
-    return [out for out in outputs]
+    return list(outputs)
 
 
 @numpy_fallback
@@ -148,7 +148,6 @@ def ang2pix(
     phi: float | FloatArray,
     *,
     lonlat: bool = False,
-    xp: ModuleType | None = None,
 ) -> IntArray:
     """
     Converts the angle to HEALPix pixel numbers.
@@ -185,7 +184,6 @@ def ang2vec(
     phi: float | FloatArray,
     *,
     lonlat: bool = False,
-    xp: ModuleType | None = None,
 ) -> tuple[FloatArray, FloatArray, FloatArray]:
     """
     Convert angles to 3D position vector.
@@ -269,7 +267,6 @@ def map2alm(
         alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
 
     """
-
     return healpy.map2alm(
         maps,
         datapath=_get_healpy_datapath(),

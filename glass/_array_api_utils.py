@@ -21,19 +21,18 @@ __lazy_modules__ = [
 ]
 
 import functools
+from collections.abc import Sequence
 from functools import wraps
 from typing import TYPE_CHECKING
 
 import numpy as np
-from collections.abc import Sequence
+
 import array_api_compat
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable
     from types import ModuleType
     from typing import Any
-
-    import numpy as np
 
     from glass._types import AnyArray, DTypeLike, IntArray
 
@@ -567,9 +566,10 @@ class xp_additions:  # noqa: N801
         dxp = default_xp(xp.__name__)
         return tuple(xp.asarray(arr) for arr in dxp.tril_indices(n, k=k, m=m))
 
-def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
+
+def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C901
     """
-    Decorator to convert function arguments to Numpy arrays and back. 
+    Decorator to convert function arguments to Numpy arrays and back.
 
     Array API arguments are converted to ``numpy.ndarray`` before calling
     the wrapped function. Any NumPy arrays returned by the wrapped function are
@@ -587,11 +587,12 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
         Wrapped function that accepts Array API arrays and returns results in
         the corresponding array namespace.
     """
+
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, C901
         list_of_xp = []
 
-        def collect_arrays(obj):
+        def collect_arrays(obj) -> None:  # noqa: ANN001
             if hasattr(obj, "__array_namespace__"):
                 list_of_xp.append(obj)
             elif isinstance(obj, dict):
@@ -606,9 +607,9 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
 
         for arg in kwargs.values():
             collect_arrays(arg)
-        
+
         if not list_of_xp:
-            return func(*args, **kwargs)      
+            return func(*args, **kwargs)
         if "xp" in kwargs:
             xp = kwargs.get("xp")
             if xp is None:
@@ -616,7 +617,7 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
         else:
             xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
 
-        def to_numpy(obj):
+        def to_numpy(obj):  # noqa: ANN001, ANN202
             if hasattr(obj, "__array_namespace__"):
                 return np.asarray(obj)
             if isinstance(obj, tuple):
@@ -626,18 +627,13 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:
             if isinstance(obj, dict):
                 return {k: to_numpy(v) for k, v in obj.items()}
             return obj
-        np_args = [
-            to_numpy(arg)
-            for arg in args
-        ]
-        np_kwargs = {
-            k: to_numpy(v)
-            for k, v in kwargs.items()
-        }
+
+        np_args = [to_numpy(arg) for arg in args]
+        np_kwargs = {k: to_numpy(v) for k, v in kwargs.items()}
 
         result = func(*np_args, **np_kwargs)
 
-        def convert_back(obj):
+        def convert_back(obj):  # noqa: ANN001, ANN202
             if isinstance(obj, np.ndarray):
                 return xp.asarray(obj)
             if isinstance(obj, tuple):
