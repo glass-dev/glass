@@ -1042,9 +1042,7 @@ def distribute(
     """
     xp = redshifts.__array_namespace__()
 
-    # get default RNG if not given
-    if rng is None:
-        rng = glass.rng.rng_dispatcher(xp=xp)
+    xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # flatten redshifts but store shape
     shape = redshifts.shape
@@ -1088,7 +1086,7 @@ def distribute(
         # simulate a draw from a categorial distribution by
         # drawing a single event from a multinomial distribution
         # and finding the bin in which the event landed
-        index = xp.argmax(rng.multinomial(1, weights), axis=1)
+        index = xp.argmax(xrng.multinomial(1, weights), axis=1)
 
         # subtract 1 so that the "outside" shell is -1
         index -= 1

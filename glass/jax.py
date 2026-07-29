@@ -185,6 +185,10 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
+        # Ensure arrays are jax arrays
+        low = jnp.asarray(low)
+        high = jnp.asarray(high)
+
         return jax.random.uniform(
             self.__key,
             _shape(size, low, high),
@@ -201,6 +205,10 @@ class Generator:
         dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a multinomial distribution."""
+        # Ensure arrays are jax arrays
+        n = jnp.asarray(n)
+        pvals = jnp.asarray(pvals)
+
         # JAX's shape parameter is the full shape of pvals including the
         # categories axis, so infer only the batch dimensions here.
         batch_shape = _shape(size, n, pvals[..., 0])
