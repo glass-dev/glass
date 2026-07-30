@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import cProfile
-import io
 import os
-from pstats import SortKey, Stats
 from timeit import timeit
 from typing import TYPE_CHECKING
 
@@ -51,8 +48,6 @@ print("Running benchmarks for backends: ", ", ".join(xp_available_backends.keys(
 array_api_strict.set_array_api_strict_flags(api_version="2025.12")
 jax.config.update("jax_enable_x64", val=True)
 
-RUN_PROFILE: str = os.environ.get("RUN_PROFILE")
-
 
 def run_benchmark(
     function_to_benchmark: FunctionType,
@@ -76,22 +71,10 @@ def run_benchmark(
     kwargs
         Extra named arguments to be passed to `function_to_benchmark`
     """
-    if RUN_PROFILE:
-        pr = cProfile.Profile()
-        pr.enable()
-
-        function_to_benchmark(*args, xp=xp, **kwargs)
-
-        pr.disable()
-        sortby = SortKey.CUMULATIVE
-        s = io.StringIO()
-        ps = Stats(pr, stream=s).sort_stats(sortby)
-        ps.print_stats(0.05)
-    else:
-        # benchmark the task
-        result = timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
-        # report the result
-        print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
+    # benchmark the task
+    result = timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
+    # report the result
+    print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 
 
 class CosmologyWrapper:
