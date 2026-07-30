@@ -282,6 +282,16 @@ uv run nox -s regression-tests -- <initial-state-revision> \
 > [01e6e4c](https://github.com/glass-dev/glass/pull/911/changes/01e6e4c248e96e4683ca651edffa2fd4d845502f)
 > for an example.
 
+#### Profiling regression tests
+
+pytest-benchmark comes with a cprofile integration making it easy to profile
+benchmark tests. To run the profiler pass the additional flag
+`--benchmark-cprofile` to pytest. To ensure the output is readable you'll likely
+want to limit the number of regression tests you profile by filtering with
+`-k <test_name>`. Read the
+[pytest-benchmark docs](https://pytest-benchmark.readthedocs.io/en/latest/usage.html)
+ffor more details.
+
 ## Failure of the `Regression tests / Regression test` Workflow
 
 <!-- prettier-ignore -->
