@@ -9,6 +9,7 @@ group `benchmarks`, like so,
 
 ```sh
 uv sync --group benchmarks
+uv pip install --no-deps glass-ext-camb
 ```
 
 However, it may also be necessary to install other dependencies / dependency

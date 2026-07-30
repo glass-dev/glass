@@ -156,11 +156,11 @@ def doctests(session: nox.Session) -> None:
 
 @nox_uv.session(
     uv_extras=["examples"],
-    uv_groups=["benchmarks"],
     uv_sync_locked=False,
 )
 def examples(session: nox.Session) -> None:
     """Run the example notebooks. Pass "html" to build html."""
+    session.install("glass-ext-camb", "--no-deps")
     if session.posargs:
         if "html" in session.posargs:
             session.log("Generating HTML for the example notebooks")

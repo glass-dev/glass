@@ -26,6 +26,7 @@ the following commands.
 
 ```sh
 uv sync --group benchmarks
+uv pip install --no-deps glass-ext-camb
 ```
 
 ### GPU prerequisites
@@ -35,6 +36,7 @@ which includes on `benchmarks`:
 
 ```sh
 uv sync --group archer2-gpu
+uv pip install --no-deps glass-ext-camb
 ```
 
 Once your python environment is setup you must load the relevant modules via the
