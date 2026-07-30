@@ -45,6 +45,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: >-
+            ${{ github.event_name == 'pull_request' &&
+            format('refs/pull/{0}/head', github.event.pull_request.number) ||
+            (inputs.head_ref || github.ref) }}
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
@@ -68,5 +72,7 @@ jobs:
         env:
           ARRAY_BACKEND: all
           BASE_REF: ${{ inputs.base_ref || github.event.pull_request.base.ref }}
-          HEAD_REF: ${{ inputs.head_ref || github.event.pull_request.head.ref }}
+          HEAD_REF: >-
+            ${{ github.event_name == 'pull_request' && 'local' ||
+            inputs.head_ref }}
           FORCE_COLOR: 1
