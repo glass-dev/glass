@@ -290,7 +290,7 @@ benchmark tests. To run the profiler pass the additional flag
 want to limit the number of regression tests you profile by filtering with
 `-k <test_name>`. Read the
 [pytest-benchmark docs](https://pytest-benchmark.readthedocs.io/en/latest/usage.html)
-ffor more details.
+for more details.
 
 ## Failure of the `Regression tests / Regression test` Workflow
 
