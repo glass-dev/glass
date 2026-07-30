@@ -55,4 +55,4 @@ example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
 [benchmarks/aac6/submit-gpu.sh](./benchmarks/aac6/submit-gpu.sh) specifically
-will submit a job to the SH5_MI300A_SPX queue to utilise shared CPU/GPU memmory.
+will submit a job to the SH5_MI300A_SPX queue to utilise shared CPU/GPU memory.

@@ -20,3 +20,6 @@ lamda = "lamda"
 mis = "mis"
 nd = "nd"
 wht = "wht"
+
+[type.sh.extend-words]
+HSA = "HSA"
