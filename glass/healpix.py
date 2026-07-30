@@ -104,8 +104,7 @@ def alm2map_spin(
         List of 2 out maps in RING scheme as arrays.
 
     """
-    inputs = [np.asarray(alm) for alm in alms]
-    outputs = healpy.alm2map_spin(inputs, nside, spin, lmax)
+    outputs = healpy.alm2map_spin(alms, nside, spin, lmax)
     return list(outputs)
 
 
