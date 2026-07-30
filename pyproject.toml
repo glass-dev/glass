@@ -8,12 +8,12 @@ requires = [
 
 [dependency-groups]
 aac6-gpu = [
-    "jax[rocm7-local]",
+    "jax[rocm7-local]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.13'",
     {include-group = "benchmarks"},
 ]
 archer2-gpu = [
-    "jax-rocm60-pjrt==0.4.35",
-    "jax-rocm60-plugin==0.4.35",
+    "jax-rocm60-pjrt==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
+    "jax-rocm60-plugin==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
     {include-group = "benchmarks"},
 ]
 benchmarks = [
@@ -30,7 +30,7 @@ build = [
     "build",
 ]
 cosma8-gpu = [
-    "jax[rocm7-local]",
+    "jax[rocm7-local]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.13'",
     {include-group = "benchmarks"},
 ]
 dev = [
