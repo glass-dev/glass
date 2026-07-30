@@ -14,7 +14,7 @@ from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
 # almost all GLASS functionality is available from the `glass` namespace
 import glass
 import glass.ext.camb  # ty: ignore[unresolved-import]
-from glass import _rng
+from glass import rng
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -90,7 +90,7 @@ for xp in xp_available_backends.values():
         xp: ModuleType,
     ) -> tuple[FloatArray, FloatArray, FloatArray]:
         """Realistic lensing simulation benchmark."""
-        urng: UnifiedGenerator = _rng.rng_dispatcher(xp=xp)
+        urng: UnifiedGenerator = rng.default_rng(xp=xp)
 
         # this will compute the convergence field iteratively
         convergence = glass.MultiPlaneConvergence(cosmo)

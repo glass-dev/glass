@@ -62,7 +62,7 @@ partition:
 ssh ga008
 ```
 
-> Note that ga008 is a shared resource so benchmarking there is unlikely to give
+> Note that `ga008` is a shared resource so benchmarking there is unlikely to give
 > reliable results:
 
 Access to these different partitions/queues must be requested via the DiRAC
