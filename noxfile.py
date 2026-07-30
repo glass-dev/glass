@@ -156,6 +156,7 @@ def doctests(session: nox.Session) -> None:
 
 @nox_uv.session(
     uv_extras=["examples"],
+    uv_groups=["benchmarks"],
     uv_sync_locked=False,
 )
 def examples(session: nox.Session) -> None:

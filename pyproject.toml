@@ -124,7 +124,6 @@ optional-dependencies = {examples = [
     "camb",
     "cosmology-api",
     "cosmology-compat-camb",
-    "glass-ext-camb",
     "jupyter",
     "matplotlib",
     "numpy<2.4", # TODO: remove when cmbant/CAMB#203 is fixed
