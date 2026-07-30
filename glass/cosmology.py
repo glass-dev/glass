@@ -12,7 +12,6 @@ class Cosmology(
     cosmology.api.HasCriticalDensity0[AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasHoverH0[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasHubbleDistance[AnyArray],  # ty: ignore[invalid-type-arguments]
-    cosmology.api.HasInverseComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasLittleH[AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasOmegaM0[AnyArray],  # ty: ignore[invalid-type-arguments]
     cosmology.api.HasTransverseComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
@@ -27,6 +26,14 @@ class CosmologyWithGrowthFactor(
     typing.Protocol,
 ):
     """Cosmology protocol for GLASS with growth factor."""
+
+
+class CosmologyWithInverseComovingDistance(
+    Cosmology,
+    cosmology.api.HasInverseComovingDistance[AnyArray, AnyArray],  # ty: ignore[invalid-type-arguments]
+    typing.Protocol,
+):
+    """Cosmology protocol for GLASS with inverse comoving distance."""
 
 
 class CosmologyWithOmegaM(

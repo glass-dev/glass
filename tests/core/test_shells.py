@@ -16,7 +16,11 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
-    from glass.cosmology import Cosmology, CosmologyWithOmegaM
+    from glass.cosmology import (
+        Cosmology,
+        CosmologyWithInverseComovingDistance,
+        CosmologyWithOmegaM,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -357,7 +361,9 @@ def test_redshift_grid(xp: ModuleType) -> None:
         glass.redshift_grid(zmin, zmax, dz=dz, num=num, xp=xp)
 
 
-def test_distance_grid(cosmo: Cosmology) -> None:
+def test_distance_grid(
+    cosmo_with_inverse_comoving_distance: CosmologyWithInverseComovingDistance,
+) -> None:
     """Add unit tests for :func:`glass.distance_grid`."""
     zmin = 0.0
     zmax = 1.0
@@ -365,18 +371,18 @@ def test_distance_grid(cosmo: Cosmology) -> None:
     # check num input
 
     num = 5
-    x = glass.distance_grid(cosmo, zmin, zmax, num=5)
+    x = glass.distance_grid(cosmo_with_inverse_comoving_distance, zmin, zmax, num=5)
     assert x.shape[0] == num + 1
 
     # check dz input
 
     dx = 0.2
-    x = glass.distance_grid(cosmo, zmin, zmax, dx=dx)
+    x = glass.distance_grid(cosmo_with_inverse_comoving_distance, zmin, zmax, dx=dx)
     assert x.shape[0] == math.ceil((zmax - zmin) / dx) + 1
 
     # check decrease in distance
 
-    x = glass.distance_grid(cosmo, zmin, zmax, dx=0.3)
+    x = glass.distance_grid(cosmo_with_inverse_comoving_distance, zmin, zmax, dx=0.3)
     xpx.testing.assert_less(x[1:], x[:-1])
 
     # check error raised
@@ -385,13 +391,15 @@ def test_distance_grid(cosmo: Cosmology) -> None:
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        glass.distance_grid(cosmo, zmin, zmax)
+        glass.distance_grid(cosmo_with_inverse_comoving_distance, zmin, zmax)
 
     with pytest.raises(
         ValueError,
         match="exactly one of grid step size or number of steps must be given",
     ):
-        glass.distance_grid(cosmo, zmin, zmax, dx=dx, num=num)
+        glass.distance_grid(
+            cosmo_with_inverse_comoving_distance, zmin, zmax, dx=dx, num=num
+        )
 
 
 def test_combine(

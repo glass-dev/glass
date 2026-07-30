@@ -22,6 +22,12 @@ def cosmo() -> MockCosmology:
 
 
 @pytest.fixture(scope="session")
+def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDistance:
+    """Mock cosmology with inverse comoving distance to use for core tests."""
+    return MockCosmologyWithInverseComovingDistance()
+
+
+@pytest.fixture(scope="session")
 def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
     """Mock cosmology with OmegaM to use for core tests."""
     return MockCosmologyWithOmegaM()
@@ -82,10 +88,6 @@ class MockCosmology:
         """Comoving distance :math:`d_c(z)` in Mpc."""
         return np.divide(self.xm(z, z2), 1_000.0)
 
-    def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
-        """Inverse function for the comoving distance in Mpc."""
-        return 1_000 * (1 / (dc + np.finfo(float).eps))
-
     def transverse_comoving_distance(
         self,
         z: FloatArray,
@@ -93,6 +95,14 @@ class MockCosmology:
     ) -> FloatArray:
         """Transverse comoving distance :math:`d_M(z)` in Mpc."""
         return self.hubble_distance * self.xm(z, z2)
+
+
+class MockCosmologyWithInverseComovingDistance(MockCosmology):
+    """Mock cosmology with inverse comoving distance."""
+
+    def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
+        """Inverse function for the comoving distance in Mpc."""
+        return 1_000 * (1 / (dc + np.finfo(float).eps))
 
 
 class MockCosmologyWithOmegaM(MockCosmology):
