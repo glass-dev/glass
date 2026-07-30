@@ -7,6 +7,10 @@ requires = [
 ]
 
 [dependency-groups]
+aac6-gpu = [
+    "jax[rocm7-local]",
+    {include-group = "benchmarks"},
+]
 archer2-gpu = [
     "jax-rocm60-pjrt==0.4.35",
     "jax-rocm60-plugin==0.4.35",

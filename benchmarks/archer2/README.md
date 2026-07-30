@@ -40,15 +40,16 @@ uv sync --group archer2-gpu
 Once your python environment is setup you must load the relevant modules via the
 provided script [setup-gpu-env.sh](./setup-gpu-env.sh).
 
-> Note that setup-gpu-env.sh is called automatically by the submission script
-> [submit-gpu.sh](./submit-gpu.sh)
+> Note that Many of the modules loaded are only available once you are running
+> on a GPU worker node. However, setup-gpu-env.sh is called automatically by the
+> submission script [submit-gpu.sh](./submit-gpu.sh).
 
 ## Running the benchmarks
 
 Benchmarks should be submitted as a batch job to slurm via the provided script.
-
 For example to benchmark using jax with amd/rocm, run the following from the
-root of the glass repo on Archer2:
+root of the glass repo on Archer2. You will need to make some changes to the
+submissions script (updating your email, budget code, etc):
 
 ```sh
 sbatch benchmarks/archer2/submit-gpu.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
@@ -56,6 +57,14 @@ sbatch benchmarks/archer2/submit-gpu.sh -d "$(pwd)" -x jax --healpy-datapath "$H
 
 > To understand what HEALPY_DATAPATH is, read an explanation in
 > [benchmarks/README.md#healpy-data](../README.md#healpy-data)
+
+This script will attempt to run a range of benchmarks with different nside
+values for the [lensing benchmark](../lensing.py). It is intended as more of an
+example of what can be done and how to submit such a script rather than defining
+the exact "ideal" benchmark.
+
+[benchmarks/archer2/submit-gpu.sh](./benchmarks/archer2/submit-gpu.sh)
+specifically will submit a job to the archer2 amd gpu testbed queue.
 
 ## Setting up UV on Archer2
 
