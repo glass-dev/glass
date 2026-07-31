@@ -284,11 +284,11 @@ uv run nox -s regression-tests -- <initial-state-revision> \
 
 #### Profiling regression tests
 
-pytest-benchmark comes with a cprofile integration making it easy to profile
-benchmark tests. To run the profiler pass the additional flag
-`--benchmark-cprofile` to pytest. To ensure the output is readable you'll likely
-want to limit the number of regression tests you profile by filtering with
-`-k <test_name>`. Read the
+pytest-benchmark comes with a cProfile integration making it easy to profile
+benchmark tests. To run the profiler, pass the additional flag
+`--benchmark-cprofile` to pytest. To ensure the output is readable, you'll
+likely want to limit the number of regression tests you profile by filtering
+with `-k <test_name>`. See the
 [pytest-benchmark docs](https://pytest-benchmark.readthedocs.io/en/latest/usage.html)
 for more details.
 
