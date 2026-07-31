@@ -4,6 +4,53 @@ Release notes
 
 These notes document the changes between individual GLASS releases.
 
+2026.3 (31 Jul 2026)
+--------------------
+
+* Added :func:`glass.distribute` to assign an array of redshifts to radial
+  shells, including when the shells overlap.
+
+* Added :func:`glass.redshifts_from_bins` to sample redshifts from existing
+  tomographic bin labels and redshift distributions.
+
+* Added :func:`glass.resample_shapes` to resample a catalogue of ellipticities
+  with random orientations.
+
+* Added the public :mod:`glass.rng` module and its
+  :func:`~glass.rng.default_rng` function for creating a random number generator
+  for a given array backend.
+
+* Added the :class:`glass.cosmology.CosmologyWithGrowthFactor`,
+  :class:`glass.cosmology.CosmologyWithInverseComovingDistance`, and
+  :class:`glass.cosmology.CosmologyWithOmegaM` protocols.
+
+* Changed ``UnifiedGenerator`` to a protocol, ensuring that random number
+  generators provide the methods required by GLASS.
+
+* Changed the random number generator handling to wrap NumPy generators for
+  unknown array backends.
+
+* Renamed the benchmarking test directory and associated tooling to
+  ``regression``.
+
+* Changed type checking in ``pre-commit`` to use the official ``ty`` hook from
+  Astral.
+
+* Added support for profiling regression tests with the ``pytest-benchmark``
+  cProfile profiler through ``nox``.
+
+* Fixed GLASS so that an internet connection is no longer required at runtime.
+
+* Fixed the explicit shapes passed to ``jax.random`` when input arrays are
+  broadcast.
+
+* Fixed a NumPy compatibility issue in examples that use CAMB.
+
+* Fixed the distance class docstrings in :mod:`glass.shells`.
+
+* Pinned ``array-api-strict`` to version ``2.5`` for compatibility with the
+  ``2025.12`` Array API standard.
+
 2026.2 (4 Jun 2026)
 --------------------
 
