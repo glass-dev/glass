@@ -17,6 +17,10 @@ glass_harmonics = pytest.importorskip(
 )
 
 
+@pytest.mark.skipif(
+    not hasattr(glass_harmonics, "multalm"),
+    reason="glass.harmonics.multalm not implemented",
+)
 @pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,
