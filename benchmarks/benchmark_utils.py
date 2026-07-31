@@ -42,7 +42,7 @@ else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
 
-print(f"Running benchmarks for backends: {", ".join(xp_available_backends.keys())}")  # noqa: T201
+print(f"Running benchmarks for backends: {', '.join(xp_available_backends.keys())}")  # noqa: T201
 
 # Configure backends
 array_api_strict.set_array_api_strict_flags(api_version="2025.12")
@@ -72,7 +72,9 @@ def run_benchmark(
         Extra named arguments to be passed to `function_to_benchmark`
     """
     # benchmark the task
-    result = timeit.timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
+    result = timeit.timeit(
+        lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1
+    )
     # report the result
     print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 
@@ -153,7 +155,7 @@ class CosmologyWrapper:
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""
-        return self.xp.asarray(self.cosmo.Omega_m(self.cosmo_xp(z)))
+        return self.xp.asarray(self.cosmo.Omega_m(self.cosmo_xp.asarray(z)))
 
     def transverse_comoving_distance(
         self,

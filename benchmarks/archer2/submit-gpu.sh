@@ -93,8 +93,8 @@ export XLA_FLAGS="--xla_gpu_enable_latency_hiding_scheduler=true"
 for n in {128,256,512,1024}
 do
     echo "Running benchmark with nside/lmax = $n"
-    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" benchmarks/lensing.py
+    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
 
     # Run benchmark via slurm
-    HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
+    HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/lensing.py"
 done

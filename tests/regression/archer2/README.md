@@ -6,8 +6,7 @@ using [ARCHER2](https://www.archer2.ac.uk/).
 ## Setting up
 
 1. **Install uv:** Follow the instructions for
-   [Setting up UV on ARCHER2](../../benchmarks/README.md#setting-up-uv-on-archer2).
-
+   [Setting up UV on ARCHER2](../../../benchmarks/archer2/README.md#setting-up-uv-on-archer2)
 2. **Clone GLASS:** Clone the glass repo into the `/work` partition of ARCHER2:
 
    ```sh

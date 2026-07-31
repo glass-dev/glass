@@ -43,8 +43,8 @@ Once your python environment is setup you must load the relevant modules via the
 provided script [setup-gpu-env.sh](./setup-gpu-env.sh).
 
 > Note that many of the modules loaded are only available once you are running
-> on a GPU worker node. However, `setup-gpu-env.sh` is called automatically by the
-> submission script [submit-gpu.sh](./submit-gpu.sh).
+> on a GPU worker node. However, `setup-gpu-env.sh` is called automatically by
+> the submission script [submit-gpu.sh](./submit-gpu.sh).
 
 ## Running the benchmarks
 
@@ -65,8 +65,8 @@ values for the [lensing benchmark](../lensing.py). It is intended as more of an
 example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
-[benchmarks/archer2/submit-gpu.sh](./benchmarks/archer2/submit-gpu.sh)
-specifically will submit a job to the archer2 amd gpu testbed queue.
+[benchmarks/archer2/submit-gpu.sh](./submit-gpu.sh) specifically will submit a
+job to the archer2 amd gpu testbed queue.
 
 ## Setting up uv on ARCHER2
 

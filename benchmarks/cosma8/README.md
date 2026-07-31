@@ -53,17 +53,16 @@ values for the [lensing benchmark](../lensing.py). It is intended as more of an
 example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
-[benchmarks/cosma8/submit-gpu.sh](./benchmarks/cosma8/submit-gpu.sh)
-specifically will submit a job the the mi300x queue. However, if you wish to run
-on a GPU with shared memory architecture, you will need to ssh onto the ga008
-partition:
+[benchmarks/cosma8/submit-gpu.sh](./submit-gpu.sh) specifically will submit a
+job the the mi300x queue. However, if you wish to run on a GPU with shared
+memory architecture, you will need to ssh onto the ga008 partition:
 
 ```sh
 ssh ga008
 ```
 
-> Note that `ga008` is a shared resource so benchmarking there is unlikely to give
-> reliable results:
+> Note that `ga008` is a shared resource so benchmarking there is unlikely to
+> give reliable results:
 
 Access to these different partitions/queues must be requested via the DiRAC
 SAFE. For further information

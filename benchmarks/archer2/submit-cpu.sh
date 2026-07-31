@@ -97,7 +97,7 @@ fi
 for n in {128,256,512,1024}
 do
     echo "Running benchmark with nside/lmax = $n"
-    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" benchmarks/lensing.py
+    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
 
-    ARRAY_BACKEND="$ARRAY_BACKEND" HEALPY_DATAPATH="$HEALPY_DATAPATH" $PYTHON_COMMAND benchmarks/lensing.py
+    ARRAY_BACKEND="$ARRAY_BACKEND" HEALPY_DATAPATH="$HEALPY_DATAPATH" $PYTHON_COMMAND "$GLASS_DIR/benchmarks/lensing.py"
 done

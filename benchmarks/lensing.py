@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
+    from glass._types import AngularPowerSpectra, UnifiedGenerator
     from glass.shells import RadialWindow
 
 
@@ -75,11 +75,6 @@ for xp in xp_available_backends.values():
     z = xp.linspace(0.0, 1.0, 101)
     dndz = xp.exp(-((z - 0.5) ** 2) / (0.1) ** 2)
 
-    # distribute dN/dz over the radial window functions
-    ngal = glass.partition(z, dndz, shells)
-
-    shape = 12 * nside**2
-
     def lensing_benchmark(  # noqa: PLR0913
         *,
         cosmo: CosmologyWrapper,
@@ -88,7 +83,7 @@ for xp in xp_available_backends.values():
         nside: int,
         shells: list[RadialWindow],
         xp: ModuleType,
-    ) -> tuple[FloatArray, FloatArray, FloatArray]:
+    ) -> None:
         """Realistic lensing simulation benchmark."""
         urng: UnifiedGenerator = rng.default_rng(xp=xp)
 
