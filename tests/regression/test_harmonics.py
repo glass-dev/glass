@@ -6,18 +6,21 @@ import pytest
 
 import array_api_extra as xpx
 
+if TYPE_CHECKING:
+    from types import ModuleType
+
+    from pytest_benchmark.fixture import BenchmarkFixture
+
 glass_harmonics = pytest.importorskip(
     "glass.harmonics",
     reason="tests require glass.harmonics",
 )
 
 
-if TYPE_CHECKING:
-    from types import ModuleType
-
-    from pytest_benchmark.fixture import BenchmarkFixture
-
-
+@pytest.mark.skipif(
+    not hasattr(glass_harmonics, "multalm"),
+    reason="glass.harmonics.multalm not implemented",
+)
 @pytest.mark.unstable
 def test_multalm(
     benchmark: BenchmarkFixture,

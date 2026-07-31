@@ -8,7 +8,6 @@ import pytest
 import array_api_extra as xpx
 
 import glass
-import glass.fields
 import glass.healpix as hp
 
 if TYPE_CHECKING:
@@ -20,7 +19,16 @@ if TYPE_CHECKING:
     from glass._types import AngularPowerSpectra, UnifiedGenerator
     from tests.fixtures.helper_classes import GeneratorConsumer
 
+glass_fields = pytest.importorskip(
+    "glass.fields",
+    reason="tests require glass.fields",
+)
 
+
+@pytest.mark.skipif(
+    not hasattr(glass, "iternorm"),
+    reason="glass.iternorm not implemented",
+)
 @pytest.mark.stable
 def test_iternorm_no_size(
     benchmark: BenchmarkFixture,
@@ -39,6 +47,10 @@ def test_iternorm_no_size(
     assert len(result) == len(array_in)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "iternorm"),
+    reason="glass.iternorm not implemented",
+)
 @pytest.mark.stable
 @pytest.mark.parametrize("num_dimensions", [1, 2])
 def test_iternorm_specify_size(
@@ -62,6 +74,10 @@ def test_iternorm_specify_size(
     assert len(result) == len(array_in)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "iternorm"),
+    reason="glass.iternorm not implemented",
+)
 @pytest.mark.stable
 def test_iternorm_k_0(
     benchmark: BenchmarkFixture,
@@ -80,6 +96,10 @@ def test_iternorm_k_0(
     assert len(result) == len(array_in)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "cls2cov"),
+    reason="glass.cls2cov not implemented",
+)
 @pytest.mark.stable
 def test_cls2cov(
     benchmark: BenchmarkFixture,
@@ -110,6 +130,10 @@ def test_cls2cov(
     xpx.testing.assert_equal(cov[:, 2], xp.asarray(0.0), check_shape=False)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass_fields, "_generate_grf"),
+    reason="glass.fields._generate_grf not implemented",
+)
 @pytest.mark.stable
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
@@ -131,7 +155,7 @@ def test_generate_grf(  # noqa: PLR0913
     nside = 32
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields._generate_grf(
+        generator = glass_fields._generate_grf(
             gls,
             nside,
             rng=urng if use_rng else None,
@@ -144,6 +168,10 @@ def test_generate_grf(  # noqa: PLR0913
     assert gaussian_fields[0].shape == (hp.nside2npix(nside),)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "generate"),
+    reason="glass.generate not implemented",
+)
 @pytest.mark.stable
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
@@ -178,6 +206,10 @@ def test_generate(
         assert field.shape == (hp.nside2npix(nside),)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "getcl"),
+    reason="glass.getcl not implemented",
+)
 @pytest.mark.unstable
 def test_getcl_lmax_0(
     benchmark: BenchmarkFixture,
@@ -208,6 +240,10 @@ def test_getcl_lmax_0(
     xpx.testing.assert_equal(result, expected)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "getcl"),
+    reason="glass.getcl not implemented",
+)
 @pytest.mark.unstable
 def test_getcl_lmax_larger_than_cls(
     benchmark: BenchmarkFixture,
