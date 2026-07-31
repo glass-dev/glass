@@ -84,10 +84,6 @@ if [[ "$HEALPY_DATAPATH" == "" ]]; then
     HEALPY_DATAPATH="$GLASS_DIR/healpy-data"
 fi
 
-# Flags to maximise jax gpu performance
-#export JAX_ENABLE_PGLE=true
-#export XLA_FLAGS="--xla_gpu_enable_latency_hiding_scheduler=true"
-
 export ARRAY_BACKEND="$ARRAY_BACKEND"
 export HEALPY_DATAPATH="$HEALPY_DATAPATH"
 
