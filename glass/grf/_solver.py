@@ -11,6 +11,7 @@ import numpy as np
 from transformcl import cltocorr, corrtocl
 
 import glass.grf
+from glass._array_api_utils import numpy_fallback
 
 if TYPE_CHECKING:
     from glass._types import AnyArray
@@ -22,6 +23,7 @@ def _relerr(dx: AnyArray, x: AnyArray) -> float:
     return np.fabs(q).max()
 
 
+@numpy_fallback
 def solve(  # noqa: PLR0912, PLR0913
     cl: AnyArray,
     t1: glass.grf.Transformation,
@@ -85,12 +87,6 @@ def solve(  # noqa: PLR0912, PLR0913
     :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
-    xp = cl.__array_namespace__()
-
-    # This function is difficult to port to the Array API so for now we work
-    # in NumPy and ultimately convert back at the end of it.
-    cl = np.asarray(cl)
-
     if t2 is None:
         t2 = t1
 
@@ -149,4 +145,4 @@ def solve(  # noqa: PLR0912, PLR0913
 
         gl, gt, rl, fl, clerr = gl_, gt_, rl_, fl_, clerr_
 
-    return xp.asarray(gl), xp.asarray(rl), info
+    return gl, rl, info
