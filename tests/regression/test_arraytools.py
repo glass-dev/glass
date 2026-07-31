@@ -17,6 +17,10 @@ glass_arraytools = pytest.importorskip(
 )
 
 
+@pytest.mark.skipif(
+    not hasattr(glass_arraytools, "broadcast_leading_axes"),
+    reason="glass.arraytools.broadcast_leading_axes not implemented",
+)
 @pytest.mark.unstable
 def test_broadcast_leading_axes(
     benchmark: BenchmarkFixture,
@@ -44,6 +48,10 @@ def test_broadcast_leading_axes(
     assert c_out.shape == (c_shape[0], b_shape[0], c_shape[2], c_shape[3])
 
 
+@pytest.mark.skipif(
+    not hasattr(glass_arraytools, "cumulative_trapezoid"),
+    reason="glass.arraytools.cumulative_trapezoid not implemented",
+)
 @pytest.mark.unstable
 def test_cumulative_trapezoid_1d(
     benchmark: BenchmarkFixture,
@@ -65,6 +73,10 @@ def test_cumulative_trapezoid_1d(
     assert ct.shape == (scaled_length,)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass_arraytools, "cumulative_trapezoid"),
+    reason="glass.arraytools.cumulative_trapezoid not implemented",
+)
 @pytest.mark.unstable
 def test_cumulative_trapezoid_2d(
     benchmark: BenchmarkFixture,

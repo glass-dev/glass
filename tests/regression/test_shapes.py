@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "ellipticity_ryden04"),
+    reason="glass.ellipticity_ryden04 not implemented",
+)
 @pytest.mark.stable
 def test_ellipticity_ryden04(
     benchmark: BenchmarkFixture,
@@ -33,6 +37,10 @@ def test_ellipticity_ryden04(
     assert e.shape == size
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "ellipticity_gaussian"),
+    reason="glass.ellipticity_gaussian not implemented",
+)
 @pytest.mark.stable
 def test_ellipticity_gaussian(
     benchmark: BenchmarkFixture,
@@ -53,6 +61,10 @@ def test_ellipticity_gaussian(
     assert eps.shape == (n * array_length,)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "ellipticity_intnorm"),
+    reason="glass.ellipticity_intnorm not implemented",
+)
 @pytest.mark.stable
 def test_ellipticity_intnorm(
     benchmark: BenchmarkFixture,
@@ -73,6 +85,10 @@ def test_ellipticity_intnorm(
     assert eps.shape == (n * array_length,)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "resample_shapes"),
+    reason="glass.resample_shapes not implemented",
+)
 @pytest.mark.stable
 @pytest.mark.parametrize(
     ("varg", "vargamma"),

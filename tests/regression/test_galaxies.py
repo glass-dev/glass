@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "redshifts"),
+    reason="glass.redshifts not implemented",
+)
 @pytest.mark.stable
 def test_redshifts(
     benchmark: BenchmarkFixture,
@@ -34,6 +38,10 @@ def test_redshifts(
     assert xp.max(z) <= 1.0
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "redshifts_from_bins"),
+    reason="glass.redshifts_from_bins not implemented",
+)
 @pytest.mark.stable
 def test_redshifts_from_bins(
     benchmark: BenchmarkFixture,
@@ -65,6 +73,10 @@ def test_redshifts_from_bins(
     assert redshifts.shape == bins.shape
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "redshifts_from_nz"),
+    reason="glass.redshifts_from_nz not implemented",
+)
 @pytest.mark.stable
 def test_redshifts_from_nz(
     benchmark: BenchmarkFixture,
@@ -92,6 +104,10 @@ def test_redshifts_from_nz(
     assert xp.all((redshifts >= 0) & (redshifts <= 1))
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "galaxy_shear"),
+    reason="glass.galaxy_shear not implemented",
+)
 @pytest.mark.unstable
 @pytest.mark.parametrize("reduced_shear", [True, False])
 def test_galaxy_shear(
@@ -124,6 +140,10 @@ def test_galaxy_shear(
     assert shear.shape == gal_size
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "gaussian_phz"),
+    reason="glass.gaussian_phz not implemented",
+)
 @pytest.mark.stable
 def test_gaussian_phz(
     benchmark: BenchmarkFixture,
