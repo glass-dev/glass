@@ -18,6 +18,10 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "multi_plane_matrix"),
+    reason="glass.multi_plane_matrix not implemented",
+)
 @pytest.mark.stable
 def test_multi_plane_matrix(
     benchmark: BenchmarkFixture,
@@ -76,6 +80,10 @@ def test_multi_plane_matrix(
         assert x is not None
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "multi_plane_weights"),
+    reason="glass.multi_plane_weights not implemented",
+)
 @pytest.mark.stable
 def test_multi_plane_weights(
     benchmark: BenchmarkFixture,
