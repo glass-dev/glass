@@ -14,7 +14,7 @@ uv pip install --no-deps glass-ext-camb
 
 However, it may also be necessary to install other dependencies / dependency
 groups. For example, read the
-[prerequisites for Archer2](./archer2/README.md#prerequisites)
+[prerequisites for ARCHER2](./archer2/README.md#prerequisites)
 
 ## Adding a new benchmark
 

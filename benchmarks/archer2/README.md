@@ -1,16 +1,16 @@
-# Archer2
+# ARCHER2
 
 This document contains instructions specific to running the glass benchmarks on
-[Archer2](https://www.archer2.ac.uk/)
+[ARCHER2](https://www.archer2.ac.uk/)
 
 ## Prerequisites
 
-As Archer2 is a managed cluster, there are several steps to setting up your
+As ARCHER2 is a managed cluster, there are several steps to setting up your
 environment. First you should [setup uv](#setting-up-uv-on-archer2). Then you
 will need to install you python virtual environment. Finally, you will need to
 load specific modules for the GPU benchmark.
 
-Note that for the GPU benchmarks Archer2 only support rocm up to v0.6.x.
+Note that for the GPU benchmarks ARCHER2 only support rocm up to v0.6.x.
 Therefore, we are restricted to using `jax==0.4.35`. This in turn restricts us
 to using python 3.12. Thus, to produce a useful CPU vs GPU comparison create
 your venv using the following command
@@ -21,7 +21,7 @@ uv venv --python 3.12
 
 ### CPU prerequisites
 
-To setup your python environment for running the cpu benchmark on Archer2, run
+To setup your python environment for running the cpu benchmark on ARCHER2, run
 the following commands.
 
 ```sh
@@ -50,7 +50,7 @@ provided script [setup-gpu-env.sh](./setup-gpu-env.sh).
 
 Benchmarks should be submitted as a batch job to slurm via the provided script.
 For example to benchmark using jax with amd/rocm, run the following from the
-root of the glass repo on Archer2. You will need to make some changes to the
+root of the glass repo on ARCHER2. You will need to make some changes to the
 submissions script (updating your email, budget code, etc):
 
 ```sh
@@ -68,7 +68,7 @@ the exact "ideal" benchmark.
 [benchmarks/archer2/submit-gpu.sh](./benchmarks/archer2/submit-gpu.sh)
 specifically will submit a job to the archer2 amd gpu testbed queue.
 
-## Setting up UV on Archer2
+## Setting up UV on ARCHER2
 
 Firstly, install uv via curl onto the `/work` partition
 

@@ -1,14 +1,14 @@
-# GLASS regression testing on Archer2
+# GLASS regression testing on ARCHER2
 
 For a more consistent regression testing environment we have been trialling
-using [Archer2](https://www.archer2.ac.uk/).
+using [ARCHER2](https://www.archer2.ac.uk/).
 
 ## Setting up
 
 1. **Install uv:** Follow the instructions for
-   [Setting up UV on Archer2](../../benchmarks/README.md#setting-up-uv-on-archer2).
+   [Setting up UV on ARCHER2](../../benchmarks/README.md#setting-up-uv-on-archer2).
 
-2. **Clone GLASS:** Clone the glass repo into the `/work` partition of Archer2:
+2. **Clone GLASS:** Clone the glass repo into the `/work` partition of ARCHER2:
 
    ```sh
    cd "${HOME/home/work}"
