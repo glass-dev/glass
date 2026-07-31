@@ -26,6 +26,7 @@ on:
       - pyproject.toml
     branches:
       - main
+      - paddy/issue-1172
     types:
       - opened
       - ready_for_review
