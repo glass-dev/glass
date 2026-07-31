@@ -133,6 +133,7 @@ def coverage_regression(session: nox.Session) -> None:
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs,
         env=os.environ,
+        success_codes=[0, 5],
     )
 
 
@@ -268,6 +269,9 @@ def regression_tests(session: nox.Session) -> None:
         *session.posargs[2:],
     )
 
+    # Allow no tests to have been found if the tests have been filtered by the user
+    success_codes = [0, 5] if "-k" in session.posargs[2:] else [0]
+
     session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
     if after_revision == "local":
         session.log("Installing after-revision from local checkout")
@@ -285,6 +289,7 @@ def regression_tests(session: nox.Session) -> None:
         "--benchmark-compare-fail=mean:5%",
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs[2:],
+        success_codes=success_codes,
     )
 
     session.log("Running unstable regression tests")
@@ -298,4 +303,5 @@ def regression_tests(session: nox.Session) -> None:
         "--benchmark-compare-fail=mean:0.0005",
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs[2:],
+        success_codes=success_codes,
     )
