@@ -22,7 +22,6 @@ __lazy_modules__ = [
 
 import functools
 from collections.abc import Sequence
-import functools
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -590,7 +589,7 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C90
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, C901
-        """Convert Array API inputs to NumPy, call the function, and convert outputs back."""
+        """Convert Array API inputs to NumPy, call the function, and convert back."""
         list_of_xp = []
 
         def collect_arrays(obj) -> None:  # noqa: ANN001
