@@ -6,16 +6,15 @@ import pytest
 
 import array_api_extra as xpx
 
-glass_harmonics = pytest.importorskip(
-    "glass.harmonics",
-    reason="tests require glass.harmonics",
-)
-
-
 if TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
+
+glass_harmonics = pytest.importorskip(
+    "glass.harmonics",
+    reason="tests require glass.harmonics",
+)
 
 
 @pytest.mark.unstable
