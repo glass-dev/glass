@@ -271,9 +271,9 @@ def regression_tests(session: nox.Session) -> None:
     session.log(f"Comparing {before_revision} benchmark to revision {after_revision}")
     if after_revision == "local":
         session.log("Installing after-revision from local checkout")
-        session.install(".")
+        session.install("--force-reinstall", ".")
     else:
-        session.install(f"git+{GLASS_REPO_URL}@{after_revision}")
+        session.install("--force-reinstall", f"git+{GLASS_REPO_URL}@{after_revision}")
 
     session.log("Running stable regression tests")
     session.run(
