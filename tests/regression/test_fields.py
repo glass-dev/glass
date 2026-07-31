@@ -20,6 +20,11 @@ if TYPE_CHECKING:
     from glass._types import AngularPowerSpectra, UnifiedGenerator
     from tests.fixtures.helper_classes import GeneratorConsumer
 
+glass_fields = pytest.importorskip(
+    "glass.fields",
+    reason="tests require glass.fields",
+)
+
 
 @pytest.mark.stable
 def test_iternorm_no_size(
@@ -131,7 +136,7 @@ def test_generate_grf(  # noqa: PLR0913
     nside = 32
 
     def function_to_benchmark() -> list[Any]:
-        generator = glass.fields._generate_grf(
+        generator = glass_fields._generate_grf(
             gls,
             nside,
             rng=urng if use_rng else None,
