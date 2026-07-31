@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    from glass._types import AngularPowerSpectra, UnifiedGenerator
+    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
     from glass.shells import RadialWindow
 
 
@@ -83,7 +83,7 @@ for xp in xp_available_backends.values():
         nside: int,
         shells: list[RadialWindow],
         xp: ModuleType,
-    ) -> None:
+    ) -> FloatArray:
         """Realistic lensing simulation benchmark."""
         urng: UnifiedGenerator = rng.default_rng(xp=xp)
 
@@ -100,6 +100,8 @@ for xp in xp_available_backends.values():
 
             # compute shear field
             glass.from_convergence(convergence.kappa, shear=True)
+
+        return convergence.kappa
 
     # Run benchmark passing convergence and matter
     run_benchmark(

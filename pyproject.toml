@@ -17,7 +17,6 @@ archer2-gpu = [
     {include-group = "benchmarks"},
 ]
 benchmarks = [
-    "array_api_strict>=2.3.1",
     "camb",
     "cosmology-api",
     "cosmology-compat-camb",

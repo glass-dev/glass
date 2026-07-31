@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING
 import jax
 import numpy as np
 
-import array_api_strict
-
 if TYPE_CHECKING:
     from types import FunctionType, ModuleType
     from typing import Any
@@ -22,21 +20,18 @@ xp_available_backends: dict[str, ModuleType] = {}
 
 # environment variable to specify array backends for testing
 # can be:
-#   - a particular array library (numpy, jax, array_api_strict, ...)
+#   - a particular array library (numpy, jax, ...)
 #   - all (try finding every supported array library available in the environment)
 ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
 
 # if no backend passed, use numpy by default
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     xp_available_backends["numpy"] = np
-elif ARRAY_BACKEND == "array_api_strict":
-    xp_available_backends["array_api_strict"] = array_api_strict
 elif ARRAY_BACKEND == "jax":
     xp_available_backends["jax.numpy"] = jax.numpy
 # if all, try importing every backend
 elif ARRAY_BACKEND == "all":
     xp_available_backends["numpy"] = np
-    xp_available_backends["array_api_strict"] = array_api_strict
     xp_available_backends["jax.numpy"] = jax.numpy
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
@@ -45,7 +40,6 @@ else:
 print(f"Running benchmarks for backends: {', '.join(xp_available_backends.keys())}")  # noqa: T201
 
 # Configure backends
-array_api_strict.set_array_api_strict_flags(api_version="2025.12")
 jax.config.update("jax_enable_x64", val=True)
 
 
@@ -71,10 +65,16 @@ def run_benchmark(
     kwargs
         Extra named arguments to be passed to `function_to_benchmark`
     """
+
+    def _run() -> None:
+        """Wrap the function so asynchronous JAX work is included in the timing."""
+        out = function_to_benchmark(*args, xp=xp, **kwargs)
+        if xp.__name__ == "jax.numpy":
+            out.block_until_ready()
+
     # benchmark the task
-    result = timeit.timeit(
-        lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1
-    )
+    result = timeit.timeit(_run, number=1)
+
     # report the result
     print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 
