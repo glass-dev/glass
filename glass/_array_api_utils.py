@@ -21,16 +21,17 @@ __lazy_modules__ = [
 ]
 
 import functools
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
+
+import numpy as np
 
 import array_api_compat
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable
     from types import ModuleType
     from typing import Any
-
-    import numpy as np
 
     from glass._types import AnyArray, DTypeLike, IntArray
 
@@ -563,3 +564,89 @@ class xp_additions:  # noqa: N801
         # If any other backend use default
         dxp = default_xp(xp.__name__)
         return tuple(xp.asarray(arr) for arr in dxp.tril_indices(n, k=k, m=m))
+
+
+def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C901
+    """
+    Decorator to convert function arguments to Numpy arrays and back.
+
+    Array API arguments are converted to ``numpy.ndarray`` before calling
+    the wrapped function. Any NumPy arrays returned by the wrapped function are
+    converted back to the original array namespace. Nested tuples, lists, and
+    dictionaries containing NumPy arrays are converted recursively. Useful for
+    functions that are difficult to port to the Array API.
+
+    Parameters
+    ----------
+    func
+        Function to wrap.
+
+    Returns
+    -------
+        Wrapped function that accepts Array API arrays and returns results in
+        the corresponding array namespace.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, C901
+        """Convert Array API inputs to NumPy, call the function, and convert back."""
+        list_of_xp = []
+
+        def collect_arrays(obj) -> None:  # noqa: ANN001
+            """Recursively collect Array API arrays from nested inputs."""
+            if hasattr(obj, "__array_namespace__"):
+                list_of_xp.append(obj)
+            elif isinstance(obj, dict):
+                for v in obj.values():
+                    collect_arrays(v)
+            elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
+                for item in obj:
+                    collect_arrays(item)
+
+        for arg in args:
+            collect_arrays(arg)
+
+        for arg in kwargs.values():
+            collect_arrays(arg)
+
+        if not list_of_xp:
+            return func(*args, **kwargs)
+        if "xp" in kwargs:
+            xp = kwargs.get("xp")
+            if xp is None:
+                xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
+        else:
+            xp = array_api_compat.array_namespace(*list_of_xp, use_compat=False)
+
+        def to_numpy(obj):  # noqa: ANN001, ANN202
+            """Recursively convert Array API arrays to NumPy arrays."""
+            if hasattr(obj, "__array_namespace__"):
+                return np.asarray(obj)
+            if isinstance(obj, tuple):
+                return tuple(to_numpy(x) for x in obj)
+            if isinstance(obj, list):
+                return [to_numpy(x) for x in obj]
+            if isinstance(obj, dict):
+                return {k: to_numpy(v) for k, v in obj.items()}
+            return obj
+
+        np_args = [to_numpy(arg) for arg in args]
+        np_kwargs = {k: to_numpy(v) for k, v in kwargs.items() if k != "xp"}
+
+        result = func(*np_args, **np_kwargs)
+
+        def convert_back(obj):  # noqa: ANN001, ANN202
+            """Recursively convert NumPy arrays back to the original array namespace."""
+            if isinstance(obj, np.ndarray):
+                return xp.asarray(obj)
+            if isinstance(obj, tuple):
+                return tuple(convert_back(o) for o in obj)
+            if isinstance(obj, list):
+                return [convert_back(o) for o in obj]
+            if isinstance(obj, dict):
+                return {k: convert_back(v) for k, v in obj.items()}
+            return obj
+
+        return convert_back(result)
+
+    return wrapper
