@@ -23,7 +23,6 @@ following commands.
 
 ```sh
 uv sync --group benchmarks
-uv pip install --no-deps glass-ext-camb
 ```
 
 ### GPU prerequisites
@@ -33,7 +32,6 @@ includes on `benchmarks`:
 
 ```sh
 uv sync --group aac6-gpu
-uv pip install --no-deps glass-ext-camb
 ```
 
 ## Running the benchmarks

@@ -21,7 +21,6 @@ the following commands.
 
 ```sh
 uv sync --group benchmarks
-uv pip install --no-deps glass-ext-camb
 ```
 
 ### GPU prerequisites
@@ -31,7 +30,6 @@ which includes `benchmarks`:
 
 ```sh
 uv sync --group cosma8-gpu
-uv pip install --no-deps glass-ext-camb
 ```
 
 ## Running the benchmarks

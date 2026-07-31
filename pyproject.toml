@@ -20,6 +20,7 @@ benchmarks = [
     "camb",
     "cosmology-api",
     "cosmology-compat-camb",
+    "glass-ext-camb",
     "jax==0.4.35; python_version < '3.13'",
     "jax>=0.6.2; python_version >= '3.13'",
     "numpy<2.4",
