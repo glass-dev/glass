@@ -47,8 +47,8 @@ jobs:
           persist-credentials: false
           ref: >-
             ${{ github.event_name == 'pull_request' &&
-            format('refs/pull/{0}/head', github.event.pull_request.number) ||
-            (inputs.head_ref || github.ref) }}
+            github.event.pull_request.head.sha || (inputs.head_ref ||
+            github.ref) }}
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
