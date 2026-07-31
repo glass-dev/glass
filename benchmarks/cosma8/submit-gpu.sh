@@ -7,7 +7,7 @@
 #SBATCH -p mi300x
 #SBATCH -A do018
 #SBATCH --exclusive
-#SBATCH -t 8:00:0
+#SBATCH -t 6:00:0
 #SBATCH --mail-type=END # notifications for job done fail
 #SBATCH --mail-user=<email> #PLEASE PUT YOUR EMAIL ADDRESS HERE (without the <>)
 #SBATCH --nodes=1
@@ -91,18 +91,12 @@ export XLA_FLAGS="--xla_gpu_enable_latency_hiding_scheduler=true"
 export ARRAY_BACKEND="$ARRAY_BACKEND"
 export HEALPY_DATAPATH="$HEALPY_DATAPATH"
 
-# Run benchmarks with shared memory on and off
-for i in {0,1}
+# Run benchmarks with a range of nside values
+for n in {128,256,512,1024}
 do
-    echo "Running benchmarks with HSA_XNACK=$i"
-    export HSA_XNACK=$i
+    echo "Running benchmark with nside/lmax = $n"
+    sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
 
-    for n in {128,256,512,1024}
-    do
-        echo "Running benchmark with nside/lmax = $n"
-        sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
-
-        # Run benchmark via slurm
-        "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
-    done
+    # Run benchmark via slurm
+    "$GLASS_DIR/.venv/bin/python" benchmarks/lensing.py
 done
