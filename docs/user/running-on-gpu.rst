@@ -7,7 +7,7 @@ compatible as of version
 `v2026.2 <https://github.com/glass-dev/glass/releases/tag/v2026.2>`_. Thus, it is
 possible to pass arrays from any Array API compatible backends. Therefore,
 running GLASS on GPU is as simple as selecting an array backend which is both
-Array API compatible and GPU enabled. For example, by if JAX is installed with
+Array API compatible and GPU enabled. For example, if JAX is installed with
 the relevant optional dependencies it will by default utilise any GPU devices
 it has available.
 
