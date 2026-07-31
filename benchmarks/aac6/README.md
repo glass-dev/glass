@@ -48,7 +48,7 @@ submissions script (updating your email, budget code, etc):
 sbatch benchmarks/aac6/submit-gpu.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
 ```
 
-> To understand what HEALPY_DATAPATH is, read an explanation in
+> To understand what `HEALPY_DATAPATH` is, read an explanation in
 > [benchmarks/README.md#healpy-data](../README.md#healpy-data)
 
 This script will attempt to run a range of benchmarks with different nside

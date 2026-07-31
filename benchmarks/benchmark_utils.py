@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from timeit import timeit
+import timeit
 from typing import TYPE_CHECKING
 
 import jax
@@ -42,7 +42,7 @@ else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
 
-print("Running benchmarks for backends: ", ", ".join(xp_available_backends.keys()))  # noqa: T201
+print(f"Running benchmarks for backends: {", ".join(xp_available_backends.keys())}")  # noqa: T201
 
 # Configure backends
 array_api_strict.set_array_api_strict_flags(api_version="2025.12")
@@ -72,7 +72,7 @@ def run_benchmark(
         Extra named arguments to be passed to `function_to_benchmark`
     """
     # benchmark the task
-    result = timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
+    result = timeit.timeit(lambda: function_to_benchmark(*args, xp=xp, **kwargs), number=1)
     # report the result
     print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 
@@ -85,7 +85,11 @@ class CosmologyWrapper:
     xp: ModuleType
 
     def __init__(
-        self, *, cosmo: Cosmology, cosmo_xp: ModuleType = np, xp: ModuleType
+        self,
+        *,
+        cosmo: Cosmology,
+        cosmo_xp: ModuleType = np,
+        xp: ModuleType,
     ) -> None:
         self.cosmo = cosmo
         self.cosmo_xp = cosmo_xp

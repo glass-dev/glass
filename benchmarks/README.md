@@ -21,7 +21,7 @@ groups. For example, read the
 Any new benchmarks should be added as new `.py` file in the `benchmarks`
 directory.
 
-To create a benchmark, add a new `,py` file in the `benchmarks` directory and
+To create a benchmark, add a new `.py` file in the `benchmarks` directory and
 write a function you wish to benchmark. Then pass this function, along with any
 arg/kwargs, into `benchmark_utils.run_benchmark`.
 
