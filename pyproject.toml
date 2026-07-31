@@ -319,6 +319,7 @@ overrides."tool.ty".first = [
 analysis.respect-type-ignore-comments = false
 rules.invalid-argument-type = "ignore"
 src.include = [
+    "benchmarks",
     "glass",
     "tests",
 ]
