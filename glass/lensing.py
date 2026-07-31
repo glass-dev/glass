@@ -422,7 +422,7 @@ def shear_from_convergence(
         fl = fl * (pw2 / pw0)
 
     # apply correction to E-modes
-    hp.almxfl(alm, fl, inplace=xp.__name__ != "jax.numpy")
+    alm = hp.almxfl(alm, fl, inplace=xp.__name__ != "jax.numpy")
 
     # transform to shear maps
     return hp.alm2map_spin([alm, blm], nside, 2, lmax)  # ty: ignore[invalid-return-type]
