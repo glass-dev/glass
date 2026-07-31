@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.stable
-def test_redshifts(
+def test_redshifts_demo(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
     xp: ModuleType,
