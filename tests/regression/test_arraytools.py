@@ -6,12 +6,15 @@ import pytest
 
 import array_api_extra as xpx
 
-import glass.arraytools
-
 if TYPE_CHECKING:
     from types import ModuleType
 
     from pytest_benchmark.fixture import BenchmarkFixture
+
+glass_arraytools = pytest.importorskip(
+    "glass.arraytools",
+    reason="tests require glass.arraytools",
+)
 
 
 @pytest.mark.unstable
@@ -28,7 +31,7 @@ def test_broadcast_leading_axes(
     c_in = xp.zeros(c_shape)
 
     dims, *rest = benchmark(
-        glass.arraytools.broadcast_leading_axes,
+        glass_arraytools.broadcast_leading_axes,
         (a_in, 0),
         (b_in, 1),
         (c_in, 2),
@@ -52,7 +55,7 @@ def test_cumulative_trapezoid_1d(
     f = xp.arange(scaled_length + 1)[1:]  # [1, 2, 3, 4,...]
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
-    ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
+    ct = benchmark(glass_arraytools.cumulative_trapezoid, f, x)
 
     # Compare to int64 as old versions of glass round to int64 if `dtype` is not passed.
     xpx.testing.assert_equal(
@@ -78,7 +81,7 @@ def test_cumulative_trapezoid_2d(
     )
     x = xp.arange(scaled_length)  # [0, 1, 2, 3,...]
 
-    ct = benchmark(glass.arraytools.cumulative_trapezoid, f, x)
+    ct = benchmark(glass_arraytools.cumulative_trapezoid, f, x)
 
     expected_first_4_out = xp.asarray([0, 1, 4, 7])
 
