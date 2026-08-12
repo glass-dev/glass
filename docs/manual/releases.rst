@@ -24,8 +24,7 @@ These notes document the changes between individual GLASS releases.
   :class:`glass.cosmology.CosmologyWithInverseComovingDistance`, and
   :class:`glass.cosmology.CosmologyWithOmegaM` protocols.
 
-* Changed ``UnifiedGenerator`` to a protocol, ensuring that random number
-  generators provide the methods required by GLASS.
+* Changed ``glass.rng.Generator`` class now wraps returned values ensuring all methods return the correct array backend.
 
 * Changed the random number generator handling to wrap NumPy generators for
   unknown array backends.
