@@ -41,7 +41,7 @@ jobs:
   publish-pypi:
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: dist
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     environment:
       name: publish
       url: https://pypi.org/project/glass
@@ -67,7 +67,7 @@ jobs:
   publish-test-pypi:
     if: github.event_name == 'workflow_dispatch'
     needs: dist
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     environment:
       name: test-publish
       url: https://test.pypi.org/project/glass
