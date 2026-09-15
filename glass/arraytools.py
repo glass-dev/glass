@@ -110,7 +110,7 @@ def broadcast_leading_axes(
     return (dims, *arrs)
 
 
-def ndinterp(  # noqa: PLR0913
+def ndinterp(  # noqa: PLR0913,PLR0917
     x: float | FloatArray,
     xq: FloatArray,
     fq: FloatArray,
