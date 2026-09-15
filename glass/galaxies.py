@@ -268,7 +268,7 @@ def redshifts_from_nz(
     return typing.cast("FloatArray", redshifts)
 
 
-def galaxy_shear(  # noqa: PLR0913
+def galaxy_shear(  # noqa: PLR0913,PLR0917
     lon: FloatArray,
     lat: FloatArray,
     eps: FloatArray,

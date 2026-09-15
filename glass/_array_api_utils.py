@@ -148,7 +148,7 @@ class xp_additions:  # noqa: N801
         return xp.asarray(result_dxp, copy=True)
 
     @staticmethod
-    def interp(  # noqa: PLR0913
+    def interp(  # noqa: PLR0913,PLR0917
         x: AnyArray,
         x_points: AnyArray,
         y_points: AnyArray,
