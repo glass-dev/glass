@@ -60,5 +60,5 @@ jobs:
           fail_on_error: true
           filter_mode: nofilter
           reporter: github-pr-review
-          vale_flags: --glob='!.nox/*'
+          vale_flags: --glob='!{.nox,.venv}/**'
           version: 3.14.1
