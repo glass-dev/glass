@@ -138,7 +138,7 @@ def test_almxfl(
         (True, 180, 90),
     ],
 )
-def test_ang2pix(  # noqa: PLR0913
+def test_ang2pix(  # noqa: PLR0913,PLR0917
     healpix_inputs: type[HealpixInputs],
     lonlat: bool,  # noqa: FBT001
     max_phi: float,
@@ -161,7 +161,7 @@ def test_ang2pix(  # noqa: PLR0913
         (True, 180, 90),
     ],
 )
-def test_ang2vec(  # noqa: PLR0913
+def test_ang2vec(  # noqa: PLR0913,PLR0917
     healpix_inputs: type[HealpixInputs],
     lonlat: bool,  # noqa: FBT001
     max_phi: float,

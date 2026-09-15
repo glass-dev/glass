@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     ],
 )
 @pytest.mark.parametrize("remove_monopole", [True, False])
-def test_positions_from_delta(  # noqa: PLR0913
+def test_positions_from_delta(  # noqa: PLR0913,PLR0917
     benchmark: BenchmarkFixture,
     data_transformer: type[DataTransformer],
     generator_consumer: type[GeneratorConsumer],

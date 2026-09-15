@@ -164,6 +164,13 @@ following changes:
   `bash .github/release_notes.sh | tee -a docs/manual/releases.rst` to generate
   the draft and then editing it to make it more user-friendly.
 
+<!-- prettier-ignore -->
+> [!IMPORTANT]
+> Make sure to test the release workflow by running the `workflow_dispatch`
+> trigger for the desired commit for the
+> [Release workflow](https://github.com/glass-dev/glass/actions/workflows/release.yaml).
+> This test workflow will do a deployment to TestPyPI.
+
 Once these changes are merged into the `main` branch, a new release with title
 `glass yyyy.mm` should be created in the GitHub repository. The description of
 the release should be a copy of its release note.
