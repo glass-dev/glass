@@ -301,6 +301,8 @@ for more details.
 
 ## Failure of the `Regression tests / Regression test` Workflow
 
+<!-- vale proselint.Annotations = NO -->
+
 <!-- prettier-ignore -->
 > [!NOTE]
 > There are two types of regression tests in GLASS: `stable` and `unstable`.
@@ -310,6 +312,8 @@ for more details.
 > percentage change during regression tests. The unstable tests may have
 > higher variance, and are therefore measured in absolute time change during
 > regression tests.
+
+<!-- vale proselint.Annotations = YES -->
 
 The regression tests are run in GitHub Actions for every pull request to ensure
 that new changes do not degrade the performances of GLASS. This workflow uses

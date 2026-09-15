@@ -41,7 +41,7 @@ jobs:
   publish-pypi:
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: dist
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     environment:
       name: publish
       url: https://pypi.org/project/glass
@@ -60,14 +60,14 @@ jobs:
 
       - name: Publish to PyPI
         # yamllint disable-line rule:line-length
-        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           verbose: true
 
   publish-test-pypi:
     if: github.event_name == 'workflow_dispatch'
     needs: dist
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     environment:
       name: test-publish
       url: https://test.pypi.org/project/glass
@@ -86,7 +86,7 @@ jobs:
 
       - name: Publish to TestPyPI
         # yamllint disable-line rule:line-length
-        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true
