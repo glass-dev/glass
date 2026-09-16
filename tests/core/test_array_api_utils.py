@@ -15,13 +15,13 @@ HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
 HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
-def test_rng_dispatcher_numpy() -> None:
+def test_default_rng_numpy() -> None:
     rng = glass.rng.default_rng(xp=np)
     assert isinstance(rng, np.random.Generator)
 
 
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
-def test_rng_dispatcher_jax() -> None:
+def test_default_rng_jax() -> None:
     import jax.numpy as jnp
 
     rng = glass.rng.default_rng(xp=jnp)
@@ -29,7 +29,7 @@ def test_rng_dispatcher_jax() -> None:
 
 
 @pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
-def test_rng_dispatcher_array_api_strict() -> None:
+def test_default_rng_array_api_strict() -> None:
     import array_api_strict
 
     rng = glass.rng.default_rng(xp=array_api_strict)
