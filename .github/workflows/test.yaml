@@ -37,7 +37,7 @@ jobs:
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           python-version: 3.14
 
@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
-        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
         with:
           base-path: glass/
           file: ${{ env.REG_COV_NAME }}.xml
@@ -101,7 +101,7 @@ jobs:
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -139,7 +139,7 @@ jobs:
 
       - name: Upload core coverage to Coveralls
         # yamllint disable-line rule:line-length
-        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
         with:
           base-path: glass/
           file: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}.xml
@@ -156,7 +156,7 @@ jobs:
     steps:
       - name: Coveralls finished
         # yamllint disable-line rule:line-length
-        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
         with:
           carryforward:
             ${{ env.REG_COV_NAME }},${{ env.CORE_COV_NAME }}-3.11,${{
@@ -179,7 +179,7 @@ jobs:
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           python-version: 3.14
 
