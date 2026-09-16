@@ -181,8 +181,8 @@ def test_deflect_many(
     abs_alpha = urng.uniform(0, 2 * math.pi, size=n)
     arg_alpha = urng.uniform(-math.pi, math.pi, size=n)
 
-    lon_ = uxpx.degrees(urng.uniform(-math.pi, math.pi, size=n))
-    lat_ = uxpx.degrees(xp.asin(urng.uniform(-1, 1, size=n)))
+    lon_ = xpx.rad2deg(urng.uniform(-math.pi, math.pi, size=n))
+    lat_ = xpx.rad2deg(xp.asin(urng.uniform(-1, 1, size=n)))
 
     lon, lat = glass.deflect(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
 

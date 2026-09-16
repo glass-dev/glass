@@ -762,4 +762,4 @@ def deflect(
 
     d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
 
-    return lon - uxpx.degrees(d), uxpx.degrees(tp)
+    return lon - xpx.rad2deg(d), typing.cast("FloatArray", xpx.rad2deg(tp))

@@ -10,7 +10,6 @@ import array_api_extra as xpx
 import glass
 import glass.healpix as hp
 import glass.points
-from glass._array_api_utils import xp_additions as uxpx
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -695,10 +694,10 @@ def test_displacement_random(
     phi_d = xp.atan2(v[:, 1], v[:, 0])
 
     # compute longitude and latitude
-    from_lon = uxpx.degrees(phi)
-    from_lat = 90.0 - uxpx.degrees(theta)
-    to_lon = uxpx.degrees(phi_d)
-    to_lat = 90.0 - uxpx.degrees(theta_d)
+    from_lon = xpx.rad2deg(phi)
+    from_lat = 90.0 - xpx.rad2deg(theta)
+    to_lon = xpx.rad2deg(phi_d)
+    to_lat = 90.0 - xpx.rad2deg(theta_d)
 
     # compute displacement and compare to input
     alpha_in = r * xp.exp(1j * x)

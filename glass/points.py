@@ -595,7 +595,7 @@ def uniform_positions(
         size = (ngal_sphere[k],)
         # sample uniformly over the sphere
         lon = xrng.uniform(-180, 180, size=size)
-        lat = uxpx.degrees(xp.asin(xrng.uniform(-1, 1, size=size)))
+        lat = xpx.rad2deg(xp.asin(xrng.uniform(-1, 1, size=size)))
 
         # report count
         if dims:
