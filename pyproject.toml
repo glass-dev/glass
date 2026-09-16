@@ -17,8 +17,8 @@ dev = [
     "jupyter",
     "nox",
     "nox-uv",
-    {include-group = "build"},
-    {include-group = "lint"},
+    { include-group = "build" },
+    { include-group = "lint" },
 ]
 docs = [
     "array-api-strict>=2.5",
@@ -37,7 +37,7 @@ docs = [
 ]
 doctest = [
     "jax",
-    {include-group = "test"},
+    { include-group = "test" },
 ]
 lint = [
     "prek",
@@ -94,18 +94,20 @@ license-files = [
     "LICENSE",
 ]
 maintainers = [
-    {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
+    { email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore" },
 ]
 name = "glass"
-optional-dependencies = {examples = [
-    "camb",
-    "cosmology-api",
-    "cosmology-compat-camb",
-    "glass-ext-camb",
-    "jupyter",
-    "matplotlib",
-    "numpy<2.4", # TODO: remove when cmbant/CAMB#203 is fixed
-]}
+optional-dependencies = {
+    examples = [
+        "camb",
+        "cosmology-api",
+        "cosmology-compat-camb",
+        "glass-ext-camb",
+        "jupyter",
+        "matplotlib",
+        "numpy<2.4", # TODO: remove when cmbant/CAMB#203 is fixed
+    ],
+}
 requires-python = ">=3.11"
 
 [project.urls]
@@ -115,22 +117,34 @@ Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
-report = {exclude_also = [
-    "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
-    "@(?:typing\\.)?overload\\n",
-    "class\\s+\\w+\\([^)]*\\b(?:typing\\.)?Protocol\\b[^)]*\\):", # protocol classes
-    "if (?:typing\\.)?TYPE_CHECKING:",
-], omit = [
-    "_types.py", # typing-only module
-    "_version.py", # not being tracked anyway
-], precision = 2, show_missing = true, skip_covered = true, skip_empty = true, sort = "cover"}
-run = {branch = true, parallel = true, source = [
-    "glass",
-]}
 paths.source = [
     "src",
     ".nox*/*/lib/python*/site-packages",
 ]
+report = {
+    exclude_also = [
+        "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
+        "@(?:typing\\.)?overload\\n",
+        "class\\s+\\w+\\([^)]*\\b(?:typing\\.)?Protocol\\b[^)]*\\):", # protocol classes
+        "if (?:typing\\.)?TYPE_CHECKING:",
+    ],
+    omit = [
+        "_types.py", # typing-only module
+        "_version.py", # not being tracked anyway
+    ],
+    precision = 2,
+    show_missing = true,
+    skip_covered = true,
+    skip_empty = true,
+    sort = "cover",
+}
+run = {
+    branch = true,
+    parallel = true,
+    source = [
+        "glass",
+    ],
+}
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
@@ -181,10 +195,6 @@ xfail_strict = true
 [tool.ruff]
 fix = true
 force-exclude = true
-show-fixes = true
-src = [
-    "glass",
-]
 format.docstring-code-format = true
 format.preview = true
 lint.allowed-confusables = [
@@ -200,77 +210,96 @@ lint.ignore = [
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
     "RUF003", # ambiguous-unicode-character-comment
 ]
-lint.isort = {known-first-party = [
-    "glass",
-    "tests",
-], known-third-party = [
-    "healpix",
-    "jax",
-], section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "array-api",
-    "cosmo",
-    "first-party",
-    "local-folder",
-], sections = {"array-api" = [
-    "array_api_compat",
-    "array_api_extra",
-    "array_api_strict",
-], "cosmo" = [
-    "camb",
-    "cosmology",
-]}}
-lint.per-file-ignores = {"__init__.py" = [
-    "F401", # unused-import
-], "docs/*" = [
-    "D100", # undocumented-public-module
-    "INP001", # implicit-namespace-package
-], "examples/*" = [
-    "ANN001", # missing-type-function-argument
-    "ANN002", # missing-type-args
-    "ANN201", # missing-return-type-undocumented-public-function
-    "D103", # undocumented-public-function
-    "PLR2004", # magic-value-comparison
-    "T201", # print
-], "glass/*" = [
-    "D205", # missing-blank-line-after-summary
-    "D401", # non-imperative-mood
-    "EM101", # raw-string-in-exception
-    "EM102", # f-string-in-exception
-    "PLR2004", # TODO: magic-value-comparison
-    "TRY003", # raise-vanilla-args
-], "glass/grf/_*" = [
-    "SLF001", # private-member-access
-], "tests/*" = [
-    "INP001", # implicit-namespace-package
-    "S101", # assert
-], "tests/core/*" = [
-    "ANN001", # missing-type-function-argument
-    "ANN202", # missing-return-type-private-function
-    "D100", # undocumented-public-module
-    "D103", # TODO: undocumented-public-function
-    "PLC0415", # import-outside-top-level
-    "PLR2004", # magic-value-comparison
-    "SLF001", # private-member-access
-], "tests/regression/*" = [
-    "D100", # undocumented-public-module
-    "PLR2004", # magic-value-comparison
-    "S311", # suspicious-non-cryptographic-random-usage
-    "SLF001", # private-member-access
-]}
+lint.isort = {
+    known-first-party = [
+        "glass",
+        "tests",
+    ],
+    known-third-party = [
+        "healpix",
+        "jax",
+    ],
+    section-order = [
+        "future",
+        "standard-library",
+        "third-party",
+        "array-api",
+        "cosmo",
+        "first-party",
+        "local-folder",
+    ],
+    sections = {
+        "array-api" = [
+            "array_api_compat",
+            "array_api_extra",
+            "array_api_strict",
+        ],
+        "cosmo" = [
+            "camb",
+            "cosmology",
+        ],
+    },
+}
+lint.mccabe.max-complexity = 18
+lint.per-file-ignores = {
+    "__init__.py" = [
+        "F401", # unused-import
+    ],
+    "docs/*" = [
+        "D100", # undocumented-public-module
+        "INP001", # implicit-namespace-package
+    ],
+    "examples/*" = [
+        "ANN001", # missing-type-function-argument
+        "ANN002", # missing-type-args
+        "ANN201", # missing-return-type-undocumented-public-function
+        "D103", # undocumented-public-function
+        "PLR2004", # magic-value-comparison
+        "T201", # print
+    ],
+    "glass/*" = [
+        "D205", # missing-blank-line-after-summary
+        "D401", # non-imperative-mood
+        "EM101", # raw-string-in-exception
+        "EM102", # f-string-in-exception
+        "PLR2004", # TODO: magic-value-comparison
+        "TRY003", # raise-vanilla-args
+    ],
+    "glass/grf/_*" = [
+        "SLF001", # private-member-access
+    ],
+    "tests/*" = [
+        "INP001", # implicit-namespace-package
+        "S101", # assert
+    ],
+    "tests/core/*" = [
+        "ANN001", # missing-type-function-argument
+        "ANN202", # missing-return-type-private-function
+        "D100", # undocumented-public-module
+        "D103", # TODO: undocumented-public-function
+        "PLC0415", # import-outside-top-level
+        "PLR2004", # magic-value-comparison
+        "SLF001", # private-member-access
+    ],
+    "tests/regression/*" = [
+        "D100", # undocumented-public-module
+        "PLR2004", # magic-value-comparison
+        "S311", # suspicious-non-cryptographic-random-usage
+        "SLF001", # private-member-access
+    ],
+}
+lint.pydocstyle.convention = "numpy"
 lint.select = [
     "ALL",
 ]
-lint.mccabe.max-complexity = 18
-lint.pydocstyle.convention = "numpy"
+show-fixes = true
+src = [
+    "glass",
+]
 
 [tool.tomlsort]
 all = true
 in_place = true
-spaces_indent_inline_array = 4
-trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
 # https://github.com/pappasam/toml-sort/issues/94
@@ -286,6 +315,8 @@ overrides."tool.ty".first = [
     "src",
     "terminal",
 ]
+spaces_indent_inline_array = 4
+trailing_comma_inline_array = true
 
 [tool.ty]
 analysis.respect-type-ignore-comments = false
