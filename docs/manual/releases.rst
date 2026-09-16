@@ -4,6 +4,11 @@ Release notes
 
 These notes document the changes between individual GLASS releases.
 
+2026.3 (16 Sep 2026)
+--------------------
+
+* Fixes issues in the release of ``2026.3``.
+
 2026.3 (31 Jul 2026)
 --------------------
 
