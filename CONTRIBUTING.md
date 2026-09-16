@@ -164,6 +164,13 @@ following changes:
   `bash .github/release_notes.sh | tee -a docs/manual/releases.rst` to generate
   the draft and then editing it to make it more user-friendly.
 
+<!-- prettier-ignore -->
+> [!IMPORTANT]
+> Make sure to test the release workflow by running the `workflow_dispatch`
+> trigger for the desired commit for the
+> [Release workflow](https://github.com/glass-dev/glass/actions/workflows/release.yaml).
+> This test workflow will do a deployment to TestPyPI.
+
 Once these changes are merged into the `main` branch, a new release with title
 `glass yyyy.mm` should be created in the GitHub repository. The description of
 the release should be a copy of its release note.
@@ -294,6 +301,8 @@ for more details.
 
 ## Failure of the `Regression tests / Regression test` Workflow
 
+<!-- vale proselint.Annotations = NO -->
+
 <!-- prettier-ignore -->
 > [!NOTE]
 > There are two types of regression tests in GLASS: `stable` and `unstable`.
@@ -303,6 +312,8 @@ for more details.
 > percentage change during regression tests. The unstable tests may have
 > higher variance, and are therefore measured in absolute time change during
 > regression tests.
+
+<!-- vale proselint.Annotations = YES -->
 
 The regression tests are run in GitHub Actions for every pull request to ensure
 that new changes do not degrade the performances of GLASS. This workflow uses

@@ -26,14 +26,14 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           python-version: 3.14
 
@@ -49,16 +49,16 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Spellcheck
-        uses: crate-ci/typos@37bb98842b0d8c4ffebdb75301a13db0267cef89 # v1
+        uses: crate-ci/typos@8a48f81b6c64dcfea44b3633223084c4be58ac5f # v1
 
       - name: Run Vale
         # yamllint disable-line rule:line-length
-        uses: errata-ai/vale-action@85f9f7f2c5f449ac0ae5b66662961bae3f77ca6a # v2.1.2
+        uses: errata-ai/vale-action@518a9136acc6e6668ce7c00d367051e0941e87ff # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           fail_on_error: true
           filter_mode: nofilter
           reporter: github-pr-review
-          vale_flags: --glob='!.nox/*'
+          vale_flags: --glob='!{.nox,.venv}/**'
           version: 3.14.1
