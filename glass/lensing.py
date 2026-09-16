@@ -749,7 +749,7 @@ def deflect(
     #              cosθ cos|α| + sinθ sin|α| cosγ)
     # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
 
-    t = uxpx.radians(xp.asarray(lat))
+    t = xpx.deg2rad(xp.asarray(lat))
     ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
 
     a = xp.hypot(alpha1, alpha2)  # abs(alpha)

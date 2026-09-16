@@ -444,35 +444,6 @@ class xp_additions:  # noqa: N801
         return dxp.vectorize(pyfunc, otypes=otypes)
 
     @staticmethod
-    def radians(deg_arr: AnyArray) -> AnyArray:
-        """
-        Convert angles from degrees to radians.
-
-        Parameters
-        ----------
-        deg_arr
-            Array of angles in degrees.
-
-        Returns
-        -------
-            Array of angles in radians.
-
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
-        """
-        xp = deg_arr.__array_namespace__()
-
-        if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.radians(deg_arr)
-
-        # If any other backend use default
-        dxp = default_xp(xp.__name__)
-        return xp.asarray(dxp.radians(deg_arr))
-
-    @staticmethod
     def degrees(rad_arr: AnyArray) -> AnyArray:
         """
         Convert angles from radians to degrees.
