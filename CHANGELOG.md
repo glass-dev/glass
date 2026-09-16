@@ -4,6 +4,10 @@
 
 All functional changes to the project are documented in this file.
 
+## [2026.4] (16 Sep 2026)
+
+See [2026.3].
+
 ## [2026.3] (31 Jul 2026)
 
 - gh-1172: Allow regression tests to be run from forks (1176)
@@ -283,6 +287,7 @@ All functional changes to the project are documented in this file.
 
 - Initial wide release for GLASS paper
 
+[2026.4]: https://github.com/glass-dev/glass/compare/v2026.3...v2026.4
 [2026.3]: https://github.com/glass-dev/glass/compare/v2026.2...v2026.3
 [2026.2]: https://github.com/glass-dev/glass/compare/v2026.1...v2026.2
 [2026.1]: https://github.com/glass-dev/glass/compare/v2025.3...v2026.1
