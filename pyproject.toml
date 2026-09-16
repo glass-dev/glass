@@ -17,8 +17,8 @@ dev = [
     "jupyter",
     "nox",
     "nox-uv",
-    {include-group = "build"},
-    {include-group = "lint"},
+    { include-group = "build" },
+    { include-group = "lint" },
 ]
 docs = [
     "array-api-strict>=2.5",
@@ -37,7 +37,7 @@ docs = [
 ]
 doctest = [
     "jax",
-    {include-group = "test"},
+    { include-group = "test" },
 ]
 lint = [
     "prek",
@@ -94,10 +94,10 @@ license-files = [
     "LICENSE",
 ]
 maintainers = [
-    {email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore"},
+    { email = "n.tessore@ucl.ac.uk", name = "Nicolas Tessore" },
 ]
 name = "glass"
-optional-dependencies = {examples = [
+optional-dependencies = { examples = [
     "camb",
     "cosmology-api",
     "cosmology-compat-camb",
@@ -105,7 +105,7 @@ optional-dependencies = {examples = [
     "jupyter",
     "matplotlib",
     "numpy<2.4", # TODO: remove when cmbant/CAMB#203 is fixed
-]}
+] }
 requires-python = ">=3.11"
 
 [project.urls]
@@ -115,7 +115,11 @@ Homepage = "https://github.com/glass-dev/glass"
 Issues = "https://github.com/glass-dev/glass/issues"
 
 [tool.coverage]
-report = {exclude_also = [
+paths.source = [
+    "src",
+    ".nox*/*/lib/python*/site-packages",
+]
+report = { exclude_also = [
     "(?:from\\s+[^\\s]+\\s+)?import\\s+.*",
     "@(?:typing\\.)?overload\\n",
     "class\\s+\\w+\\([^)]*\\b(?:typing\\.)?Protocol\\b[^)]*\\):", # protocol classes
@@ -123,14 +127,10 @@ report = {exclude_also = [
 ], omit = [
     "_types.py", # typing-only module
     "_version.py", # not being tracked anyway
-], precision = 2, show_missing = true, skip_covered = true, skip_empty = true, sort = "cover"}
-run = {branch = true, parallel = true, source = [
+], precision = 2, show_missing = true, skip_covered = true, skip_empty = true, sort = "cover" }
+run = { branch = true, parallel = true, source = [
     "glass",
-]}
-paths.source = [
-    "src",
-    ".nox*/*/lib/python*/site-packages",
-]
+] }
 
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
@@ -181,10 +181,6 @@ xfail_strict = true
 [tool.ruff]
 fix = true
 force-exclude = true
-show-fixes = true
-src = [
-    "glass",
-]
 format.docstring-code-format = true
 format.preview = true
 lint.allowed-confusables = [
@@ -200,7 +196,7 @@ lint.ignore = [
     "ISC001", # single-line-implicit-string-concatenation (ruff-format recommended)
     "RUF003", # ambiguous-unicode-character-comment
 ]
-lint.isort = {known-first-party = [
+lint.isort = { known-first-party = [
     "glass",
     "tests",
 ], known-third-party = [
@@ -214,15 +210,16 @@ lint.isort = {known-first-party = [
     "cosmo",
     "first-party",
     "local-folder",
-], sections = {"array-api" = [
+], sections = { "array-api" = [
     "array_api_compat",
     "array_api_extra",
     "array_api_strict",
 ], "cosmo" = [
     "camb",
     "cosmology",
-]}}
-lint.per-file-ignores = {"__init__.py" = [
+] } }
+lint.mccabe.max-complexity = 18
+lint.per-file-ignores = { "__init__.py" = [
     "F401", # unused-import
 ], "docs/*" = [
     "D100", # undocumented-public-module
@@ -259,33 +256,24 @@ lint.per-file-ignores = {"__init__.py" = [
     "PLR2004", # magic-value-comparison
     "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
-]}
+] }
+lint.pydocstyle.convention = "numpy"
 lint.select = [
     "ALL",
 ]
-lint.mccabe.max-complexity = 18
-lint.pydocstyle.convention = "numpy"
+show-fixes = true
+src = [
+    "glass",
+]
 
 [tool.tomlsort]
 all = true
 in_place = true
-spaces_indent_inline_array = 4
-trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
-# https://github.com/pappasam/toml-sort/issues/94
-overrides."tool.hatch".first = [
-    "build",
-    "version",
-]
 overrides."tool.ruff.lint.isort.section-order".inline_arrays = false
-# https://github.com/pappasam/toml-sort/issues/94
-overrides."tool.ty".first = [
-    "analysis",
-    "rules",
-    "src",
-    "terminal",
-]
+spaces_indent_inline_array = 4
+trailing_comma_inline_array = true
 
 [tool.ty]
 analysis.respect-type-ignore-comments = false
