@@ -600,7 +600,7 @@ def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
     """
     xp = _utils.default_xp() if xp is None else xp
 
-    i, j = uxpx.tril_indices(n, xp=xp)
+    i, j = xpx.tril_indices(n, xp=xp)
     return xp.stack([i, i - j]).T
 
 
