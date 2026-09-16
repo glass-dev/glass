@@ -171,7 +171,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_equal(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
+    xpx.testing.assert_equal(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
