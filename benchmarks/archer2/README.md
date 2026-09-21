@@ -10,7 +10,7 @@ environment. First you should [setup uv](#setting-up-uv-on-archer2). Then you
 will need to install you python virtual environment. Finally, you will need to
 load specific modules for the GPU benchmark.
 
-Note that for the GPU benchmarks ARCHER2 only support rocm up to v0.6.x.
+Note that for the GPU benchmarks ARCHER2 only support ROCm up to v0.6.x.
 Therefore, we are restricted to using `jax==0.4.35`. This in turn restricts us
 to using python 3.12. Thus, to produce a useful CPU vs GPU comparison create
 your venv using the following command
@@ -30,7 +30,7 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the gpu benchmark, there is an additional dependency group `archer2-gpu`
+For the GPU benchmark, there is an additional dependency group `archer2-gpu`
 which includes on `benchmarks`:
 
 ```sh
@@ -64,7 +64,7 @@ example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
 [benchmarks/archer2/submit-gpu.sh](./submit-gpu.sh) specifically will submit a
-job to the archer2 amd gpu testbed queue.
+job to the ARCHER2 AMD GPU testbed queue.
 
 ## Setting up uv on ARCHER2
 

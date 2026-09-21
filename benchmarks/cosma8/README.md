@@ -25,7 +25,7 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the gpu benchmark, there is an additional dependency group `cosma8-gpu`
+For the GPU benchmark, there is an additional dependency group `cosma8-gpu`
 which includes `benchmarks`:
 
 ```sh
@@ -35,7 +35,7 @@ uv sync --group cosma8-gpu
 ## Running the benchmarks
 
 Benchmarks can be submitted as a batch job to slurm via the provided script. For
-example to benchmark using jax with amd/rocm, run the following from the root of
+example to benchmark using JAX with AMD/ROCm, run the following from the root of
 the glass repo on cosma8. You will need to make some changes to the submissions
 script (updating your email, budget code, etc):
 

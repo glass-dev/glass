@@ -27,7 +27,7 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the gpu benchmark, there is an additional dependency group `aac6-gpu` which
+For the GPU benchmark, there is an additional dependency group `aac6-gpu` which
 includes on `benchmarks`:
 
 ```sh
@@ -38,7 +38,7 @@ uv sync --group aac6-gpu
 
 Benchmarks can be submitted as a batch job to slurm via the provided script.
 
-For example to benchmark using jax with amd/rocm, run the following from the
+For example to benchmark using JAX with AMD/ROCm, run the following from the
 root of the glass repo on AAC6. You will need to make some changes to the
 submissions script (updating your email, budget code, etc):
 
