@@ -127,6 +127,5 @@ Indexing
 Deprecated
 ----------
 
-.. autofunction:: lognormal_gls
 .. autofunction:: generate_gaussian
 .. autofunction:: generate_lognormal

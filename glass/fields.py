@@ -300,37 +300,6 @@ def discretized_cls(
     return gls
 
 
-@deprecated("use glass.solve_gaussian_spectra() instead")
-def lognormal_gls(
-    cls: AngularPowerSpectra,
-    shift: float = 1.0,
-) -> AngularPowerSpectra:
-    """
-    Compute Gaussian Cls for a lognormal random field.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.lognormal_fields` and
-       :func:`glass.compute_gaussian_spectra` or
-       :func:`glass.solve_gaussian_spectra` instead.
-
-    Parameters
-    ----------
-    cls
-        Angular matter power spectra in GLASS ordering.
-    shift
-        The shift parameter for the lognormal transformation.
-
-    Returns
-    -------
-        The Gaussian angular power spectra for a lognormal random field.
-
-    """
-    n = nfields_from_nspectra(len(cls))
-    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
-    return solve_gaussian_spectra(fields, cls)
-
-
 def _generate_grf(
     gls: AngularPowerSpectra,
     nside: int,
