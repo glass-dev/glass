@@ -19,7 +19,6 @@ Lensing fields
 --------------
 
 .. autofunction:: from_convergence
-.. autofunction:: shear_from_convergence
 
 """  # noqa: D400
 
@@ -33,8 +32,6 @@ __lazy_modules__ = [
 
 import typing
 from typing import TYPE_CHECKING, Literal
-
-import numpy as np
 
 import array_api_compat
 import array_api_extra as xpx
@@ -363,63 +360,6 @@ def from_convergence(  # noqa: PLR0913
 
     # all done
     return results
-
-
-def shear_from_convergence(
-    kappa: FloatArray,
-    lmax: int | None = None,
-    *,
-    discretized: bool = True,
-) -> FloatArray:
-    """
-    Weak lensing shear from convergence.
-
-    Computes the shear from the convergence using a spherical harmonic
-    transform.
-
-    .. deprecated:: 2023.6
-       Use the more general :func:`glass.from_convergence` function instead.
-
-    Parameters
-    ----------
-    kappa
-        The convergence map.
-    lmax
-        The maximum angular mode number to use in the transform.
-    discretized
-        Whether to correct the pixel window function in the output map.
-
-    Returns
-    -------
-        The shear map.
-
-    """
-    nside = hp.get_nside(kappa)
-    if lmax is None:
-        lmax = 3 * nside - 1
-
-    # compute alm
-    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
-
-    # zero B-modes
-    blm = np.zeros_like(alm)
-
-    # factor to convert convergence alm to shear alm
-    ell = np.arange(lmax + 1)
-    fl = np.sqrt((ell + 2) * (ell + 1) * ell * (ell - 1))
-    fl /= np.clip(ell * (ell + 1), 1, None)
-    fl *= -1
-
-    # if discretised, factor out spin-0 kernel and apply spin-2 kernel
-    if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
-        fl *= pw2 / pw0
-
-    # apply correction to E-modes
-    hp.almxfl(alm, fl, inplace=True)
-
-    # transform to shear maps
-    return hp.alm2map_spin([alm, blm], nside, 2, lmax)
 
 
 class MultiPlaneConvergence:

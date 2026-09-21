@@ -63,7 +63,6 @@ __all__ = [
     "restrict",
     "rng",
     "save_cls",
-    "shear_from_convergence",
     "smail_nz",
     "solve_gaussian_spectra",
     "spectra_indices",
@@ -114,7 +113,6 @@ from glass.lensing import (
     from_convergence,
     multi_plane_matrix,
     multi_plane_weights,
-    shear_from_convergence,
 )
 from glass.observations import (
     equal_dens_zbins,
