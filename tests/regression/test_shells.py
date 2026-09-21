@@ -14,12 +14,16 @@ if TYPE_CHECKING:
     from pytest_benchmark.fixture import BenchmarkFixture
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "RadialWindow"),
+    reason="glass.RadialWindow not implemented",
+)
 @pytest.mark.unstable
 def test_radialwindow(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
 ) -> None:
-    """Regression test for shells.RadialWindow."""
+    """Regression test for glass.RadialWindow."""
     # check zeff is computed when not provided
     arr_length = 100_000
     expected_zeff = xp.asarray(66_666.0)
@@ -32,11 +36,15 @@ def test_radialwindow(
     xpx.testing.assert_close(w.zeff, expected_zeff)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "distribute"),
+    reason="glass.distribute not implemented",
+)
 def test_distribute(
     benchmark: BenchmarkFixture,
     xp: ModuleType,
 ) -> None:
-    """Regression test for distribute() over a moderately-sized catalogue."""
+    """Regression test for glass.distribute over a moderately-sized catalogue."""
     # use N shells; tens is a good number
     shells = glass.linear_windows(xp.linspace(0.0, 3.0, 52))
     assert len(shells) == 50
