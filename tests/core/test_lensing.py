@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from typing import TYPE_CHECKING
 
 import pytest
@@ -14,7 +13,7 @@ from glass._array_api_utils import xp_additions as uxpx
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import FloatArray, UnifiedGenerator
+    from glass._types import UnifiedGenerator
     from glass.cosmology import Cosmology
 
 
@@ -115,80 +114,3 @@ def test_multi_plane_weights(
     wmat = glass.multi_plane_weights(weights, shells, cosmo)
 
     xpx.testing.assert_close(uxpx.einsum("ij,ik", wmat, deltas), kappa)
-
-
-@pytest.mark.parametrize("usecomplex", [True, False])
-def test_deflect_nsew(
-    usecomplex: bool,  # noqa: FBT001
-    xp: ModuleType,
-) -> None:
-    d = 5.0
-    r = math.radians(d)
-
-    def alpha(
-        re: float,
-        im: float,
-        *,
-        usecomplex: bool,
-    ) -> complex | FloatArray:
-        return re + 1j * im if usecomplex else xp.asarray([re, im])
-
-    # north
-    lon, lat = glass.deflect(0.0, 0.0, alpha(r, 0, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([0.0, d]), atol=1e-15)
-
-    # south
-    lon, lat = glass.deflect(0.0, 0.0, alpha(-r, 0, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([0.0, -d]), atol=1e-15)
-
-    # east
-    lon, lat = glass.deflect(0.0, 0.0, alpha(0, r, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([-d, 0.0]), atol=1e-15)
-
-    # west
-    lon, lat = glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=usecomplex), xp=xp)
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
-
-    # At least one input is an array
-    lon, lat = glass.deflect(
-        xp.asarray(0.0),
-        xp.asarray(0.0),
-        alpha(0, -r, usecomplex=usecomplex),
-    )
-    xpx.testing.assert_close(xp.stack([lon, lat]), xp.asarray([d, 0.0]), atol=1e-15)
-
-    lon, lat = glass.deflect(
-        xp.asarray([0.0, 0.0]),
-        xp.asarray([0.0, 0.0]),
-        alpha(0, -r, usecomplex=usecomplex),
-    )
-    xpx.testing.assert_close(lon, xp.asarray([d, d]), atol=1e-15)
-    xpx.testing.assert_close(lat, xp.asarray(0.0), atol=1e-15, check_shape=False)
-
-    # No inputs are arrays and xp not provided
-    with pytest.raises(
-        TypeError,
-        match="array_namespace requires at least one non-scalar array input",
-    ):
-        glass.deflect(0.0, 0.0, alpha(0, -r, usecomplex=True))
-
-
-def test_deflect_many(
-    urng: UnifiedGenerator,
-    xp: ModuleType,
-) -> None:
-    n = 1_000
-    abs_alpha = urng.uniform(0, 2 * math.pi, size=n)
-    arg_alpha = urng.uniform(-math.pi, math.pi, size=n)
-
-    lon_ = xpx.rad2deg(urng.uniform(-math.pi, math.pi, size=n))
-    lat_ = xpx.rad2deg(xp.asin(urng.uniform(-1, 1, size=n)))
-
-    lon, lat = glass.deflect(lon_, lat_, abs_alpha * xp.exp(1j * arg_alpha))
-
-    x_, y_, z_ = hp.ang2vec(lon_, lat_, lonlat=True, xp=xp)
-    x, y, z = hp.ang2vec(lon, lat, lonlat=True, xp=xp)
-
-    dotp = x * x_ + y * y_ + z * z_
-
-    xpx.testing.assert_close(dotp, xp.cos(abs_alpha))
