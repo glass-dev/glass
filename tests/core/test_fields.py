@@ -366,12 +366,6 @@ def test_generate_grf(xp: ModuleType) -> None:
         list(glass.fields._generate_grf([xp.asarray([])], nside))
 
 
-def test_generate_lognormal(xp: ModuleType) -> None:
-    with pytest.deprecated_call():
-        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
-    next(result)
-
-
 def test_generate(xp: ModuleType) -> None:
     # shape mismatch error
 

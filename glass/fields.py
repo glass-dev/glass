@@ -398,46 +398,6 @@ def _generate_grf(
         yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
-@deprecated("use glass.generate() instead")
-def generate_lognormal(
-    gls: AngularPowerSpectra,
-    nside: int,
-    shift: float = 1.0,
-    *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
-) -> Generator[FloatArray]:
-    """
-    Sample lognormal random fields from Gaussian Cls iteratively.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.generate` instead.
-
-    Parameters
-    ----------
-    gls
-        The Gaussian angular power spectra for a lognormal random field.
-    nside
-        The resolution parameter for the HEALPix maps.
-    shift
-        The shift parameter for the lognormal transformation.
-    ncorr
-        The number of correlated fields. If not given, all fields are correlated.
-    rng
-        Random number generator. If not given, a default RNG is used.
-
-    Yields
-    ------
-    fields
-        The lognormal random fields.
-
-    """
-    n = nfields_from_nspectra(len(gls))
-    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
-    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
-
-
 def getcl(
     cls: AngularPowerSpectra,
     i: int,
