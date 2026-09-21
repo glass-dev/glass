@@ -105,7 +105,7 @@ optional-dependencies = { examples = [
     "jupyter",
     "matplotlib",
     "numpy",
-]}
+] }
 requires-python = ">=3.11"
 
 [project.urls]
