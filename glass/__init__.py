@@ -16,7 +16,6 @@ __all__ = [
     "compute_gaussian_spectra",
     "cov_from_spectra",
     "cubic_windows",
-    "deflect",
     "discretized_cls",
     "displace",
     "displacement",
@@ -112,7 +111,6 @@ from glass.galaxies import (
 )
 from glass.lensing import (
     MultiPlaneConvergence,
-    deflect,
     from_convergence,
     multi_plane_matrix,
     multi_plane_weights,
