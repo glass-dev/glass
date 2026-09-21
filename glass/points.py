@@ -595,7 +595,7 @@ def uniform_positions(
         size = (ngal_sphere[k],)
         # sample uniformly over the sphere
         lon = xrng.uniform(-180, 180, size=size)
-        lat = uxpx.degrees(xp.asin(xrng.uniform(-1, 1, size=size)))
+        lat = xpx.rad2deg(xp.asin(xrng.uniform(-1, 1, size=size)))
 
         # report count
         if dims:
@@ -757,9 +757,9 @@ def displacement(
         use_compat=False,
     )
 
-    a = uxpx.radians(from_lat)
-    b = uxpx.radians(to_lat)
-    g = uxpx.radians(to_lon - from_lon)
+    a = xpx.deg2rad(from_lat)
+    b = xpx.deg2rad(to_lat)
+    g = xpx.deg2rad(to_lon - from_lon)
 
     sa, ca = xp.sin(a), xp.cos(a)
     sb, cb = xp.sin(b), xp.cos(b)

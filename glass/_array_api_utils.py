@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from glass._types import AnyArray, DTypeLike, IntArray
+    from glass._types import AnyArray, DTypeLike
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -444,64 +444,6 @@ class xp_additions:  # noqa: N801
         return dxp.vectorize(pyfunc, otypes=otypes)
 
     @staticmethod
-    def radians(deg_arr: AnyArray) -> AnyArray:
-        """
-        Convert angles from degrees to radians.
-
-        Parameters
-        ----------
-        deg_arr
-            Array of angles in degrees.
-
-        Returns
-        -------
-            Array of angles in radians.
-
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
-        """
-        xp = deg_arr.__array_namespace__()
-
-        if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.radians(deg_arr)
-
-        # If any other backend use default
-        dxp = default_xp(xp.__name__)
-        return xp.asarray(dxp.radians(deg_arr))
-
-    @staticmethod
-    def degrees(rad_arr: AnyArray) -> AnyArray:
-        """
-        Convert angles from radians to degrees.
-
-        Parameters
-        ----------
-        rad_arr
-            Array of angles in radians.
-
-        Returns
-        -------
-            Array of angles in degrees.
-
-        Raises
-        ------
-        NotImplementedError
-            If the array backend is not supported.
-
-        """
-        xp = rad_arr.__array_namespace__()
-
-        if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.degrees(rad_arr)
-
-        # If any other backend use default
-        dxp = default_xp(xp.__name__)
-        return xp.asarray(dxp.degrees(rad_arr))
-
-    @staticmethod
     def ndindex(shape: tuple[int, ...], *, xp: ModuleType) -> np.ndindex:
         """
         Wrapper for numpy.ndindex.
@@ -528,42 +470,6 @@ class xp_additions:  # noqa: N801
         # If any other backend use default
         dxp = default_xp(xp.__name__)
         return dxp.ndindex(shape)
-
-    @staticmethod
-    def tril_indices(
-        n: int,
-        *,
-        k: int = 0,
-        m: int | None = None,
-        xp: ModuleType,
-    ) -> tuple[IntArray, ...]:
-        """
-        Return the indices for the lower-triangle of an (n, m) array.
-
-        Parameters
-        ----------
-        n
-            The row dimension of the arrays for which the returned indices will be
-            valid.
-        k
-            Diagonal offset.
-        m
-            The column dimension of the arrays for which the returned arrays will be
-            valid. By default m is taken equal to n.
-
-        Returns
-        -------
-            The row and column indices, respectively. The row indices are sorted in
-            non-decreasing order, and the corresponding column indices are strictly
-            increasing for each row.
-
-        """
-        if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.tril_indices(n, k=k, m=m)
-
-        # If any other backend use default
-        dxp = default_xp(xp.__name__)
-        return tuple(xp.asarray(arr) for arr in dxp.tril_indices(n, k=k, m=m))
 
 
 def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C901
