@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     [
         (None, lambda x: x),
         (0.8, glass.linear_bias),
+        (0.8, glass.loglinear_bias),
     ],
 )
 @pytest.mark.parametrize("remove_monopole", [True, False])
