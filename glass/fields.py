@@ -398,7 +398,7 @@ def _generate_grf(
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
-        yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
+        yield hp.alm2map(alm, nside, pixwin=False, pol=False)
 
 
 def getcl(
