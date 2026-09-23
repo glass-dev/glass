@@ -20,6 +20,7 @@ import numpy as np
 import glass._array_api_utils as _utils
 import glass.rng
 from glass._array_api_utils import numpy_fallback
+from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -41,7 +42,7 @@ def alm2map(  # noqa: PLR0913
     nside: int,
     *,
     inplace: bool = False,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
     pixwin: bool = False,
     pol: bool = True,
 ) -> FloatArray:
@@ -72,7 +73,7 @@ def alm2map(  # noqa: PLR0913
         alms,
         nside,
         inplace=inplace,
-        lmax=lmax,
+        lmax=None if lmax is MISSING else lmax,
         pixwin=pixwin,
         pol=pol,
     )
@@ -233,7 +234,7 @@ def get_nside(m: FloatArray) -> int:
 def map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
     pol: bool = True,
     use_pixel_weights: bool = False,
 ) -> FloatArray:
@@ -270,7 +271,7 @@ def map2alm(
     return healpy.map2alm(
         maps,
         datapath=_get_healpy_datapath(),
-        lmax=lmax,
+        lmax=None if lmax is MISSING else lmax,
         pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
@@ -313,9 +314,9 @@ def nside2npix(nside: int) -> int:
 def pixwin(
     nside: int,
     *,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
     pol: bool = False,
-    xp: ModuleType | None = None,
+    xp: ModuleType | MISSING = MISSING,
 ) -> FloatArray | tuple[FloatArray, ...]:
     """
     Return the pixel window function for the given nside.
@@ -346,9 +347,14 @@ def pixwin(
         The temperature pixel window function.
 
     """
-    xp = _utils.default_xp() if xp is None else xp
+    xp = _utils.default_xp() if xp is MISSING else xp
 
-    output = healpy.pixwin(nside, datapath=_get_healpy_datapath(), lmax=lmax, pol=pol)
+    output = healpy.pixwin(
+        nside,
+        datapath=_get_healpy_datapath(),
+        lmax=None if lmax is MISSING else lmax,
+        pol=pol,
+    )
     return (
         tuple(xp.asarray(out, dtype=xp.float64) for out in output)
         if pol
@@ -360,8 +366,8 @@ def query_strip(
     nside: int,
     thetas: tuple[float, float],
     *,
-    dtype: DTypeLike | None = None,
-    xp: ModuleType | None = None,
+    dtype: DTypeLike | MISSING | None = MISSING,
+    xp: ModuleType | MISSING = MISSING,
 ) -> IntArray:
     """
     Computes a mask of the pixels whose centers lie within the colatitude range
@@ -383,14 +389,14 @@ def query_strip(
         The mask of the pixels which lie within the given strip.
 
     """
-    xp = _utils.default_xp() if xp is None else xp
+    xp = _utils.default_xp() if xp is MISSING else xp
 
     output = np.zeros(nside2npix(nside))
     indices = healpy.query_strip(nside, *thetas)
     output[indices] = 1
 
     # masks are usually integers, but this allows the user to override
-    if dtype is None:
+    if dtype is MISSING or dtype is None:
         return xp.asarray(output, dtype=xp.int64)
     return xp.asarray(output, dtype=dtype)
 
@@ -438,7 +444,7 @@ class Rotator:
     def __init__(
         self,
         *,
-        coord: Sequence[str] | None = None,
+        coord: Sequence[str] | MISSING | None = MISSING,
     ) -> None:
         """
         Create a rotator with given parameters.
@@ -451,7 +457,7 @@ class Rotator:
             The array library backend to use for array operations.
 
         """
-        self.coord = coord
+        self.coord = None if coord is MISSING else coord
 
     @numpy_fallback
     def rotate_map_pixel(self, m: FloatArray) -> FloatArray:

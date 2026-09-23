@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING
 import array_api_compat
 import array_api_extra as xpx
 
+from glass._types import MISSING
+
 if TYPE_CHECKING:
     from glass._types import FloatArray
 
@@ -23,7 +25,7 @@ def nnls(
     b: FloatArray,
     *,
     tol: float = 0.0,
-    maxiter: int | None = None,
+    maxiter: int | MISSING = MISSING,
 ) -> FloatArray:
     """
     Compute a non-negative least squares solution.
@@ -73,7 +75,7 @@ def nnls(
 
     _, n = a.shape
 
-    if maxiter is None:
+    if maxiter is MISSING:
         maxiter = 3 * n
 
     index = xp.arange(n)
@@ -110,7 +112,7 @@ def nnls(
 
 def cov_clip(
     cov: FloatArray,
-    rtol: float | None = None,
+    rtol: float | MISSING = MISSING,
 ) -> FloatArray:
     """
     Covariance matrix from clipping non-positive eigenvalues.
@@ -137,7 +139,7 @@ def cov_clip(
     w, v = xp.linalg.eigh(cov)
 
     # get tolerance if not given
-    if rtol is None:
+    if rtol is MISSING:
         rtol = max(v.shape[-2], v.shape[-1]) * xp.finfo(w.dtype).eps
 
     # clip negative diagonal values
@@ -152,7 +154,7 @@ def cov_clip(
 def nearcorr(
     a: FloatArray,
     *,
-    tol: float | None = None,
+    tol: float | MISSING = MISSING,
     niter: int = 100,
 ) -> FloatArray:
     """
@@ -188,7 +190,7 @@ def nearcorr(
         raise ValueError(msg)
 
     # default tolerance
-    if tol is None:
+    if tol is MISSING:
         tol = n * xp.finfo(a.dtype).eps
 
     # current result, flatten leading dimensions
@@ -233,7 +235,7 @@ def nearcorr(
 
 def cov_nearest(
     cov: FloatArray,
-    tol: float | None = None,
+    tol: float | MISSING = MISSING,
     niter: int = 100,
 ) -> FloatArray:
     """

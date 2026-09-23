@@ -38,6 +38,7 @@ import array_api_extra as xpx
 
 import glass.rng
 from glass._array_api_utils import xp_additions as uxpx
+from glass._types import MISSING
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -56,10 +57,10 @@ def _populate_random_complex_array(
 def triaxial_axis_ratio(
     zeta: float | FloatArray,
     xi: float | FloatArray,
-    size: int | tuple[int, ...] | None = None,
+    size: int | tuple[int, ...] | MISSING = MISSING,
     *,
-    rng: UnifiedGenerator | None = None,
-    xp: ModuleType | None = None,
+    rng: UnifiedGenerator | MISSING = MISSING,
+    xp: ModuleType | MISSING = MISSING,
 ) -> FloatArray:
     """
     Axis ratio of a randomly projected triaxial ellipsoid.
@@ -90,7 +91,7 @@ def triaxial_axis_ratio(
     See equations (11) and (12) in [Binney85]_ for details.
 
     """
-    if xp is None:
+    if xp is MISSING:
         xp = array_api_compat.array_namespace(zeta, xi, use_compat=False)
 
     zeta = xp.asarray(zeta)
@@ -99,7 +100,7 @@ def triaxial_axis_ratio(
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # get size from inputs if not explicitly provided
-    if size is None:
+    if size is MISSING:
         size = xp.broadcast_arrays(zeta, xi)[0].shape
 
     # draw random viewing angle (theta, phi)
@@ -131,10 +132,10 @@ def ellipticity_ryden04(  # noqa: PLR0913
     sigma: float | FloatArray,
     gamma: float | FloatArray,
     sigma_gamma: float | FloatArray,
-    size: int | tuple[int, ...] | None = None,
+    size: int | tuple[int, ...] | MISSING = MISSING,
     *,
-    rng: UnifiedGenerator | None = None,
-    xp: ModuleType | None = None,
+    rng: UnifiedGenerator | MISSING = MISSING,
+    xp: ModuleType | MISSING = MISSING,
 ) -> FloatArray:
     r"""
     Ellipticity distribution following Ryden (2004).
@@ -169,7 +170,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
         An array of :term:`ellipticity` from projected axis ratios.
 
     """
-    if xp is None:
+    if xp is MISSING:
         xp = array_api_compat.array_namespace(
             mu,
             sigma,
@@ -186,7 +187,7 @@ def ellipticity_ryden04(  # noqa: PLR0913
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # default size if not given
-    if size is None:
+    if size is MISSING:
         size = xp.broadcast_arrays(mu, sigma, gamma, sigma_gamma)[0].shape
 
     # broadcast all inputs to output shape
@@ -224,8 +225,8 @@ def ellipticity_gaussian(
     count: int | IntArray,
     sigma: float | FloatArray,
     *,
-    rng: UnifiedGenerator | None = None,
-    xp: ModuleType | None = None,
+    rng: UnifiedGenerator | MISSING = MISSING,
+    xp: ModuleType | MISSING = MISSING,
 ) -> ComplexArray:
     """
     Sample Gaussian galaxy ellipticities.
@@ -253,7 +254,7 @@ def ellipticity_gaussian(
         An array of galaxy :term:`ellipticity`.
 
     """
-    if xp is None:
+    if xp is MISSING:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
     # bring inputs into common shape
     count_broadcasted, sigma_broadcasted = xp.broadcast_arrays(
@@ -289,8 +290,8 @@ def ellipticity_intnorm(
     count: int | IntArray,
     sigma: float | FloatArray,
     *,
-    rng: UnifiedGenerator | None = None,
-    xp: ModuleType | None = None,
+    rng: UnifiedGenerator | MISSING = MISSING,
+    xp: ModuleType | MISSING = MISSING,
 ) -> ComplexArray:
     """
     Sample galaxy ellipticities with intrinsic normal distribution.
@@ -320,7 +321,7 @@ def ellipticity_intnorm(
         If the standard deviation is not in the range [0, sqrt(0.5)].
 
     """
-    if xp is None:
+    if xp is MISSING:
         xp = array_api_compat.array_namespace(count, sigma, use_compat=False)
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
@@ -365,9 +366,9 @@ def ellipticity_intnorm(
 def resample_shapes(
     epsilon: ComplexArray,
     *,
-    varg: float | None = None,
-    vargamma: float | None = None,
-    rng: UnifiedGenerator | None = None,
+    varg: float | MISSING = MISSING,
+    vargamma: float | MISSING = MISSING,
+    rng: UnifiedGenerator | MISSING = MISSING,
 ) -> ComplexArray:
     """Resample galaxy shapes with random orientations.
 
@@ -390,7 +391,7 @@ def resample_shapes(
         Complex-valued array of resampled :term:`ellipticity` values.
 
     """
-    if varg is not None and vargamma is not None:
+    if varg is not MISSING and vargamma is not MISSING:
         raise ValueError("only one of varg or vargamma can be given")
 
     xp = epsilon.__array_namespace__()
@@ -401,12 +402,12 @@ def resample_shapes(
     r = xp.hypot(xp.real(epsilon), xp.imag(epsilon))
 
     # compensate for variance of intrinsic field if given
-    if vargamma is not None:
+    if vargamma is not MISSING:
         vare = xp.mean(r**2)
         if vargamma > vare:
             raise ValueError("vargamma too large for epsilon")
         r *= xp.sqrt(1 - vargamma / vare)
-    elif varg is not None:
+    elif varg is not MISSING:
         vare = xp.mean(r**2)
         if varg > vare:
             raise ValueError("varg too large for epsilon")

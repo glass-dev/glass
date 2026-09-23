@@ -1,6 +1,10 @@
 import typing
 from typing import TYPE_CHECKING, Any
 
+from typing_extensions import sentinel
+
+MISSING = sentinel("MISSING")
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import TypeAlias
