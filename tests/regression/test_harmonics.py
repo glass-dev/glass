@@ -27,14 +27,12 @@ def test_multalm(
     xp: ModuleType,
 ) -> None:
     """Regression tests for glass.harmonics.multalm."""
-    scale_factor = 100_000
-
-    alm = xp.arange(scale_factor * 5, dtype=xp.float64)
-    bl = xp.asarray(scale_factor * 3, dtype=xp.float64)
+    alm = xp.arange(180_300, dtype=xp.float64)
+    bl = xp.full(600, fill_value=2.0, dtype=xp.float64)
 
     result = benchmark(glass_harmonics.multalm, alm, bl)
 
     xpx.testing.assert_equal(
         result[:5],
-        xp.asarray([scale_factor * x for x in [0.0, 3.0, 6.0, 9.0, 12.0]]),
+        xp.asarray([0.0, 2.0, 4.0, 6.0, 8.0]),
     )
