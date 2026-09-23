@@ -38,7 +38,6 @@ if TYPE_CHECKING:
     from glass._types import (
         AngularPowerSpectra,
         AnyArray,
-        ComplexArray,
         FloatArray,
         IntArray,
         T,
@@ -420,7 +419,7 @@ def _generate_grf(
         alm = sum(glass.harmonics.multalm(z, w[..., i + mis]) for i, z in enumerate(y))
 
         # modes with m = 0 are real-valued and come first in array
-        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)  # ty: ignore[not-subscriptable]
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
