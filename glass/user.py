@@ -128,11 +128,10 @@ class _FitsWriter:
 
         """
         if self.ext is MISSING or self.ext not in self.fits:
-            self.fits.write_table(
-                data,
-                names=None if names is MISSING else names,
-                extname=None if self.ext is MISSING else self.ext,
-            )
+            _names = None if names is MISSING else names
+            _extname = None if self.ext is MISSING else self.ext
+
+            self.fits.write_table(data, names=_names, extname=_extname)
             if self.ext is MISSING:
                 self.ext = self.fits[-1].get_extnum()
         else:
