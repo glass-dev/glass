@@ -397,7 +397,6 @@ def _generate_grf(
         alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)  # ty: ignore[not-subscriptable]
 
         # transform alm to maps
-        # can be performed in place on the temporary alm array
         yield hp.alm2map(alm, nside, pixwin=False, pol=False)
 
 

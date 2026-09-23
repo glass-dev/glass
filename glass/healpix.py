@@ -122,7 +122,7 @@ def almxfl(
 
     Returns
     -------
-        The modified alm, either a new array or a reference to input alm.
+        The new alm array with the function of l applied.
 
     """
     return healpy.almxfl(alm, fl)
