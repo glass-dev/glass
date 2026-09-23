@@ -36,11 +36,10 @@ def _get_healpy_datapath() -> str | None:
 
 
 @numpy_fallback
-def alm2map(  # noqa: PLR0913
+def alm2map(
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
     *,
-    inplace: bool = False,
     lmax: int | None = None,
     pixwin: bool = False,
     pol: bool = True,
@@ -54,8 +53,6 @@ def alm2map(  # noqa: PLR0913
         A complex array or a sequence of complex arrays.
     nside
         The nside of the output map.
-    inplace
-        If True, input alms may be modified by pixel window function and beam smoothing.
     lmax
         Explicitly define lmax.
     pixwin
@@ -71,7 +68,6 @@ def alm2map(  # noqa: PLR0913
     return healpy.alm2map(
         alms,
         nside,
-        inplace=inplace,
         lmax=lmax,
         pixwin=pixwin,
         pol=pol,
@@ -112,8 +108,6 @@ def alm2map_spin(
 def almxfl(
     alm: FloatArray,
     fl: FloatArray,
-    *,
-    inplace: bool = False,
 ) -> FloatArray:
     """
     Multiply alm by a function of l. The function is assumed to be zero where
@@ -125,19 +119,13 @@ def almxfl(
         The alm to multiply.
     fl
         The function (at l=0..fl.shape[0]-1) by which alm must be multiplied.
-    inplace
-        If True, modify the given alm, otherwise make a copy before multiplying.
 
     Returns
     -------
         The modified alm, either a new array or a reference to input alm.
 
     """
-    return healpy.almxfl(
-        alm,
-        fl,
-        inplace=inplace,
-    )
+    return healpy.almxfl(alm, fl)
 
 
 @numpy_fallback
