@@ -134,14 +134,8 @@ def gaussian_nz(
         The redshift distribution at the given ``z`` values.
 
     """
-    norm_args = () if norm is MISSING else (norm,)
-    xp = array_api_compat.array_namespace(
-        z,
-        mean,
-        sigma,
-        *norm_args,
-        use_compat=False,
-    )
+    _norm = () if norm is MISSING else (norm,)
+    xp = array_api_compat.array_namespace(z, mean, sigma, *_norm, use_compat=False)
 
     mean = xp.asarray(mean, dtype=xp.float64)
     sigma = xp.asarray(sigma, dtype=xp.float64)
@@ -201,13 +195,13 @@ def smail_nz(
     where :math:`z_0` is matched to the given mode of the distribution.
 
     """
-    norm_args = () if norm is MISSING else (norm,)
+    _norm = () if norm is MISSING else (norm,)
     xp = array_api_compat.array_namespace(
         z,
         z_mode,
         alpha,
         beta,
-        *norm_args,
+        *_norm,
         use_compat=False,
     )
 
