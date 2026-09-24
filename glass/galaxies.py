@@ -407,13 +407,13 @@ def gaussian_phz(  # noqa: PLR0913
 
     """
     if xp is MISSING:
-        lower_args = () if lower is MISSING else (lower,)
-        upper_args = () if upper is MISSING else (upper,)
+        _lower = () if lower is MISSING else (lower,)
+        _upper = () if upper is MISSING else (upper,)
         xp = array_api_compat.array_namespace(
             z,
             sigma_0,
-            *lower_args,
-            *upper_args,
+            *_lower,
+            *_upper,
             use_compat=False,
         )
 

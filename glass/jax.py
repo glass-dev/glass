@@ -78,7 +78,10 @@ def trapezoid(
 ) -> FloatArray:
     """Wrapper for jax.scipy.integrate.trapezoid."""
     return jax.scipy.integrate.trapezoid(
-        y, x=None if x is MISSING else x, dx=dx, axis=axis
+        y,
+        x=None if x is MISSING else x,
+        dx=dx,
+        axis=axis,
     )
 
 
@@ -104,7 +107,10 @@ class Generator:
         return rng
 
     def __init__(
-        self, seed: int | AnyArray, *, impl: str | MISSING | None = MISSING
+        self,
+        seed: int | AnyArray,
+        *,
+        impl: str | MISSING | None = MISSING,
     ) -> None:
         """Create a wrapper instance with a new key."""
         self.key = jax.random.key(seed, impl=None if impl is MISSING else impl)
