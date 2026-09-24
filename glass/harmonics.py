@@ -21,13 +21,13 @@ def multalm(
     """
     Multiply alm by bl.
 
-    The alm should be in GLASS order::
+    The alm should be ordered by increasing ``m`` within each ``m`` block::
 
         [
-            00,
-            10, 11,
-            20, 21, 22,
-            30, 31, 32, 33
+            00, 10, 20, 30,
+            11, 21, 31,
+            22, 32,
+            33
             ...
         ]
 
@@ -44,4 +44,8 @@ def multalm(
 
     """
     xp = array_api_compat.array_namespace(alm, bl, use_compat=False)
-    return alm * xp.repeat(bl, xp.arange(bl.size) + 1)
+    if bl.size == 0:
+        return alm
+
+    factors = xp.concat(tuple(bl[m:] for m in range(bl.size)))
+    return alm * factors
