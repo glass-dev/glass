@@ -132,12 +132,8 @@ class xp_additions:  # noqa: N801
         See https://github.com/glass-dev/glass/issues/646
 
         """
-        x_args = () if x is MISSING else (x,)
-        xp = array_api_compat.array_namespace(
-            y,
-            *x_args,
-            use_compat=False,
-        )
+        _x = () if x is MISSING else (x,)
+        xp = array_api_compat.array_namespace(y, *_x, use_compat=False)
         x_or_none = None if x is MISSING else x
 
         if xp.__name__ == "jax.numpy":
@@ -197,15 +193,18 @@ class xp_additions:  # noqa: N801
 
         """
         xp = array_api_compat.array_namespace(x, x_points, y_points, use_compat=False)
+        _left = None if left is MISSING else left
+        _right = None if right is MISSING else right
+        _period = None if period is MISSING else period
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.interp(
                 x,
                 x_points,
                 y_points,
-                left=None if left is MISSING else left,
-                right=None if right is MISSING else right,
-                period=None if period is MISSING else period,
+                left=_left,
+                right=_right,
+                period=_period,
             )
 
         # If any other backend use default
@@ -217,9 +216,9 @@ class xp_additions:  # noqa: N801
             x_dxp,
             x_points_dxp,
             y_points_dxp,
-            left=None if left is MISSING else left,
-            right=None if right is MISSING else right,
-            period=None if period is MISSING else period,
+            left=_left,
+            right=_right,
+            period=_period,
         )
         return xp.asarray(result_dxp, copy=True)
 
@@ -304,19 +303,16 @@ class xp_additions:  # noqa: N801
 
         """
         xp = array_api_compat.array_namespace(a, b, use_compat=False)
+        _rcond = None if rcond is MISSING else rcond
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.linalg.lstsq(a, b, rcond=None if rcond is MISSING else rcond)
+            return xp.linalg.lstsq(a, b, rcond=_rcond)
 
         # If any other backend use default
         dxp = default_xp(xp.__name__)
         a_dxp = dxp.asarray(a, copy=True)
         b_dxp = dxp.asarray(b, copy=True)
-        result_dxp = dxp.linalg.lstsq(
-            a_dxp,
-            b_dxp,
-            rcond=None if rcond is MISSING else rcond,
-        )
+        result_dxp = dxp.linalg.lstsq(a_dxp, b_dxp, rcond=_rcond)
         return tuple(xp.asarray(res, copy=True) for res in result_dxp)
 
     @staticmethod
