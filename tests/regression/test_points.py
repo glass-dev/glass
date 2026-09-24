@@ -21,12 +21,17 @@ if TYPE_CHECKING:
     )
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "positions_from_delta"),
+    reason="glass.positions_from_delta not implemented",
+)
 @pytest.mark.stable
 @pytest.mark.parametrize(
     ("bias", "bias_model"),
     [
         (None, lambda x: x),
         (0.8, glass.linear_bias),
+        (0.8, glass.loglinear_bias),
     ],
 )
 @pytest.mark.parametrize("remove_monopole", [True, False])
@@ -68,6 +73,10 @@ def test_positions_from_delta(  # noqa: PLR0913,PLR0917
     assert lat.shape == (xp.sum(count),)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "uniform_positions"),
+    reason="glass.uniform_positions not implemented",
+)
 @pytest.mark.stable
 def test_uniform_positions(
     benchmark: BenchmarkFixture,
@@ -75,7 +84,7 @@ def test_uniform_positions(
     generator_consumer: type[GeneratorConsumer],
     xp: ModuleType,
 ) -> None:
-    """Regression tests for glass.uniform_positionsuniform_positions."""
+    """Regression tests for glass.uniform_positions."""
     scaling_factor = 12
     shape_ngal = (int(scaling_factor / 2), 2)
 
@@ -97,6 +106,10 @@ def test_uniform_positions(
     assert lon.shape == lat.shape == (xp.sum(count),)
 
 
+@pytest.mark.skipif(
+    not hasattr(glass, "displace"),
+    reason="glass.displace not implemented",
+)
 @pytest.mark.parametrize(
     ("r_to_alpha"),
     [
@@ -105,10 +118,6 @@ def test_uniform_positions(
         # Real
         (lambda r: [r, 0]),
     ],
-)
-@pytest.mark.skipif(
-    not hasattr(glass, "displace"),
-    reason="test requires glass.displace",
 )
 def test_displace(
     benchmark: BenchmarkFixture,
@@ -136,11 +145,11 @@ def test_displace(
     assert lat.shape == (scale_length,)
 
 
-@pytest.mark.stable
 @pytest.mark.skipif(
     not hasattr(glass, "displacement"),
-    reason="test requires glass.displacement",
+    reason="glass.displacement not implemented",
 )
+@pytest.mark.stable
 def test_displacement(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
