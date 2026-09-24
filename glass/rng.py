@@ -125,9 +125,9 @@ class Generator:
             Array of random floats.
 
         """
-        size = None if size is MISSING else size
-        dtype = self.default_dtype if (dtype is MISSING or dtype is None) else dtype
-        return self.xp.asarray(self.rng.random(size), dtype=dtype)
+        _size = None if size is MISSING else size
+        _dtype = self.default_dtype if (dtype is MISSING or dtype is None) else dtype
+        return self.xp.asarray(self.rng.random(_size), dtype=_dtype)
 
     def normal(
         self,
@@ -152,8 +152,8 @@ class Generator:
             Array of samples from the normal distribution.
 
         """
-        size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.normal(loc, scale, size))
+        _size = None if size is MISSING else size
+        return self.xp.asarray(self.rng.normal(loc, scale, _size))
 
     def poisson(
         self,
@@ -175,8 +175,8 @@ class Generator:
             Array of samples from the Poisson distribution.
 
         """
-        size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.poisson(lam, size))
+        _size = None if size is MISSING else size
+        return self.xp.asarray(self.rng.poisson(lam, _size))
 
     def standard_normal(
         self,
@@ -198,9 +198,9 @@ class Generator:
             Array of samples from the standard normal distribution.
 
         """
-        size = None if size is MISSING else size
-        dtype = self.default_dtype if (dtype is MISSING or dtype is None) else dtype
-        return self.xp.asarray(self.rng.standard_normal(size), dtype=dtype)
+        _size = None if size is MISSING else size
+        _dtype = self.default_dtype if (dtype is MISSING or dtype is None) else dtype
+        return self.xp.asarray(self.rng.standard_normal(_size), dtype=_dtype)
 
     def uniform(
         self,
@@ -225,8 +225,8 @@ class Generator:
             Array of samples from the uniform distribution.
 
         """
-        size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.uniform(low, high, size))
+        _size = None if size is MISSING else size
+        return self.xp.asarray(self.rng.uniform(low, high, _size))
 
     def multinomial(
         self,
@@ -251,5 +251,5 @@ class Generator:
             The drawn sample.
 
         """
-        size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.multinomial(n, pvals, size))
+        _size = None if size is MISSING else size
+        return self.xp.asarray(self.rng.multinomial(n, pvals, _size))
