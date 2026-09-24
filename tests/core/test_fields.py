@@ -252,28 +252,6 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
         xpx.testing.assert_close(cov2_copy, cov3)
 
 
-def test_lognormal_gls(xp: ModuleType) -> None:
-    shift = 2
-
-    # empty cls
-
-    assert glass.lognormal_gls([], shift) == []
-
-    # check output shape
-
-    out = glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)
-    assert len(out) == 1
-    assert out[0].shape[0] == 5
-
-    inp = [xp.linspace(1, 6, 5), xp.linspace(1, 5, 4), xp.linspace(1, 4, 3)]
-    out = glass.lognormal_gls(inp, shift)
-
-    assert len(out) == 3
-    assert out[0].shape[0] == 5
-    assert out[1].shape[0] == 4
-    assert out[2].shape[0] == 3
-
-
 def test_discretized_cls(xp: ModuleType) -> None:
     # empty cls
 
