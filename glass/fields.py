@@ -645,11 +645,11 @@ def effective_cls(
         If the shapes of *weights1* and *weights2* are incompatible.
 
     """
-    weights2_args = () if weights2 is MISSING else (weights2,)
+    _weights2 = () if weights2 is MISSING else (weights2,)
     xp = array_api_compat.array_namespace(
         *cls,
         weights1,
-        *weights2_args,
+        *_weights2,
         use_compat=False,
     )
     # this is the number of fields
