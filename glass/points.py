@@ -518,9 +518,15 @@ def positions_from_delta(  # noqa: PLR0913
         If the bias model is not a string or callable.
 
     """
-    _bias = () if bias is MISSING else (bias,)
-    _vis = () if vis is MISSING else (vis,)
-    xp = array_api_compat.array_namespace(ngal, delta, *_bias, *_vis, use_compat=False)
+    bias_args = () if bias is MISSING else (bias,)
+    vis_args = () if vis is MISSING else (vis,)
+    xp = array_api_compat.array_namespace(
+        ngal,
+        delta,
+        *bias_args,
+        *vis_args,
+        use_compat=False,
+    )
 
     bias_or_none: float | FloatArray | None = None if bias is MISSING else bias
     vis_or_none: FloatArray | None = None if vis is MISSING else vis
