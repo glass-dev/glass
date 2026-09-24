@@ -163,13 +163,16 @@ def test_cls2cov_jax(jnp: ModuleType) -> None:
         xpx.testing.assert_close(cov2, cov3)
 
 
-def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
+def test_cls2cov_no_jax(xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Test does not support jax")
+
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [xp_no_jax.asarray([1.0, 0.5, 0.3]), None, xp_no_jax.asarray([0.7, 0.6, 0.1])],
+        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],
         nl,
         nf,
         nc,
@@ -177,17 +180,17 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
     cov = next(generator)
 
     assert cov.shape == (nl, nc + 1)
-    assert cov.dtype == xp_no_jax.float64
+    assert cov.dtype == xp.float64
 
-    xpx.testing.assert_equal(cov[:, 0], xp_no_jax.asarray([0.5, 0.25, 0.15]))
-    xpx.testing.assert_equal(cov[:, 1], xp_no_jax.asarray(0.0), check_shape=False)
-    xpx.testing.assert_equal(cov[:, 2], xp_no_jax.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov[:, 1], xp.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 2], xp.asarray(0.0), check_shape=False)
 
     # test negative value error
 
     generator = glass.cls2cov(
         [
-            xp_no_jax.asarray(arr)
+            xp.asarray(arr)
             for arr in [
                 [-1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
@@ -207,7 +210,7 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
 
     generator = glass.cls2cov(
         [
-            xp_no_jax.asarray(arr)
+            xp.asarray(arr)
             for arr in [
                 [1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
@@ -222,27 +225,27 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
         nc,
     )
 
-    cov1 = xp_no_jax.asarray(next(generator), copy=False)
-    cov1_copy = xp_no_jax.asarray(cov1, copy=True)
-    cov2 = xp_no_jax.asarray(next(generator), copy=False)
-    cov2_copy = xp_no_jax.asarray(cov2, copy=True)
+    cov1 = xp.asarray(next(generator), copy=False)
+    cov1_copy = xp.asarray(cov1, copy=True)
+    cov2 = xp.asarray(next(generator), copy=False)
+    cov2_copy = xp.asarray(cov2, copy=True)
     cov3 = next(generator)
 
     assert cov1.shape == (nl, nc + 1)
     assert cov2.shape == (nl, nc + 1)
     assert cov3.shape == (nl, nc + 1)
 
-    assert cov1.dtype == xp_no_jax.float64
-    assert cov2.dtype == xp_no_jax.float64
-    assert cov3.dtype == xp_no_jax.float64
+    assert cov1.dtype == xp.float64
+    assert cov2.dtype == xp.float64
+    assert cov3.dtype == xp.float64
 
     # cov1|2|3 reuse the same data, so should all equal the third result
-    xpx.testing.assert_equal(cov1[:, 0], xp_no_jax.asarray([0.45, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1[:, 0], xp.asarray([0.45, 0.25, 0.15]))
     xpx.testing.assert_equal(cov1, cov2)
     xpx.testing.assert_equal(cov2, cov3)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    xpx.testing.assert_equal(cov1_copy[:, 0], xp_no_jax.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1_copy[:, 0], xp.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
