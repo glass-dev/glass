@@ -77,12 +77,8 @@ def trapezoid(
     axis: int = -1,
 ) -> FloatArray:
     """Wrapper for jax.scipy.integrate.trapezoid."""
-    return jax.scipy.integrate.trapezoid(
-        y,
-        x=None if x is MISSING else x,
-        dx=dx,
-        axis=axis,
-    )
+    _x = None if x is MISSING else x
+    return jax.scipy.integrate.trapezoid(y, x=_x, dx=dx, axis=axis)
 
 
 class Generator:
@@ -113,7 +109,8 @@ class Generator:
         impl: str | MISSING | None = MISSING,
     ) -> None:
         """Create a wrapper instance with a new key."""
-        self.key = jax.random.key(seed, impl=None if impl is MISSING else impl)
+        _impl = None if impl is MISSING else impl
+        self.key = jax.random.key(seed, impl=_impl)
         self.lock = threading.Lock()
 
     @property
@@ -125,8 +122,8 @@ class Generator:
 
     def split(self, size: int | tuple[int, ...] | MISSING | None = MISSING) -> AnyArray:
         """Split random key."""
-        size = None if size is MISSING else size
-        shape = _shape(size)
+        _size = None if size is MISSING else size
+        shape = _shape(_size)
         with self.lock:
             keys = jax.random.split(self.key, 1 + math.prod(shape))
             self.key = keys[0]
@@ -144,10 +141,10 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
-        size = None if size is MISSING else size
+        _size = None if size is MISSING else size
         return jax.random.uniform(
             self.__key,
-            _shape(size),
+            _shape(_size),
             dtype,
         )
 
@@ -159,10 +156,10 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
-        size = None if size is MISSING else size
+        _size = None if size is MISSING else size
         return loc + scale * jax.random.normal(
             self.__key,
-            _shape(size, loc, scale),
+            _shape(_size, loc, scale),
             dtype,
         )
 
@@ -173,11 +170,11 @@ class Generator:
         dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a Poisson distribution."""
-        size = None if size is MISSING else size
+        _size = None if size is MISSING else size
         return jax.random.poisson(
             self.__key,
             lam,
-            _shape(size, lam),
+            _shape(_size, lam),
             dtype,
         )
 
@@ -187,10 +184,10 @@ class Generator:
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-        size = None if size is MISSING else size
+        _size = None if size is MISSING else size
         return jax.random.normal(
             self.__key,
-            _shape(size),
+            _shape(_size),
             dtype,
         )
 
@@ -205,11 +202,11 @@ class Generator:
         # Ensure arrays are jax arrays
         low = jnp.asarray(low)
         high = jnp.asarray(high)
-        size = None if size is MISSING else size
+        _size = None if size is MISSING else size
 
         return jax.random.uniform(
             self.__key,
-            _shape(size, low, high),
+            _shape(_size, low, high),
             dtype,
             low,
             high,
@@ -226,11 +223,11 @@ class Generator:
         # Ensure arrays are jax arrays
         n = jnp.asarray(n)
         pvals = jnp.asarray(pvals)
-        size = None if size is MISSING else size
+        _size = None if size is MISSING else size
 
         # JAX's shape parameter is the full shape of pvals including the
         # categories axis, so infer only the batch dimensions here.
-        batch_shape = _shape(size, n, pvals[..., 0])
+        batch_shape = _shape(_size, n, pvals[..., 0])
         # Append the categories axis, or pass None to let JAX default to
         # pvals.shape when there are no batch dimensions.
         shape = (*batch_shape, pvals.shape[-1]) if batch_shape else None
