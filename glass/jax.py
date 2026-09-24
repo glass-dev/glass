@@ -16,8 +16,6 @@ import jax.random
 import jax.scipy
 import jax.typing
 
-from glass._types import MISSING
-
 if TYPE_CHECKING:
     from typing import Self
 
@@ -72,13 +70,12 @@ def _shape(
 
 def trapezoid(
     y: AnyArray,
-    x: AnyArray | MISSING | None = MISSING,
+    x: AnyArray | None = None,
     dx: float | AnyArray = 1.0,
     axis: int = -1,
 ) -> FloatArray:
     """Wrapper for jax.scipy.integrate.trapezoid."""
-    _x = None if x is MISSING else x
-    return jax.scipy.integrate.trapezoid(y, x=_x, dx=dx, axis=axis)
+    return jax.scipy.integrate.trapezoid(y, x=x, dx=dx, axis=axis)
 
 
 class Generator:
@@ -102,15 +99,9 @@ class Generator:
         rng.lock = threading.Lock()
         return rng
 
-    def __init__(
-        self,
-        seed: int | AnyArray,
-        *,
-        impl: str | MISSING | None = MISSING,
-    ) -> None:
+    def __init__(self, seed: int | AnyArray, *, impl: str | None = None) -> None:
         """Create a wrapper instance with a new key."""
-        _impl = None if impl is MISSING else impl
-        self.key = jax.random.key(seed, impl=_impl)
+        self.key = jax.random.key(seed, impl=impl)
         self.lock = threading.Lock()
 
     @property
@@ -120,10 +111,9 @@ class Generator:
             self.key, key = jax.random.split(self.key)
         return key
 
-    def split(self, size: int | tuple[int, ...] | MISSING | None = MISSING) -> AnyArray:
+    def split(self, size: int | tuple[int, ...] | None = None) -> AnyArray:
         """Split random key."""
-        _size = None if size is MISSING else size
-        shape = _shape(_size)
+        shape = _shape(size)
         with self.lock:
             keys = jax.random.split(self.key, 1 + math.prod(shape))
             self.key = keys[0]
@@ -137,14 +127,13 @@ class Generator:
 
     def random(
         self,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Return random floats in the half-open interval [0.0, 1.0)."""
-        _size = None if size is MISSING else size
         return jax.random.uniform(
             self.__key,
-            _shape(_size),
+            _shape(size),
             dtype,
         )
 
@@ -152,42 +141,39 @@ class Generator:
         self,
         loc: float | FloatArray = 0.0,
         scale: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Normal distribution (mean=loc, stdev=scale)."""
-        _size = None if size is MISSING else size
         return loc + scale * jax.random.normal(
             self.__key,
-            _shape(_size, loc, scale),
+            _shape(size, loc, scale),
             dtype,
         )
 
     def poisson(
         self,
         lam: float | FloatArray,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a Poisson distribution."""
-        _size = None if size is MISSING else size
         return jax.random.poisson(
             self.__key,
             lam,
-            _shape(_size, lam),
+            _shape(size, lam),
             dtype,
         )
 
     def standard_normal(
         self,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a standard Normal distribution (mean=0, stdev=1)."""
-        _size = None if size is MISSING else size
         return jax.random.normal(
             self.__key,
-            _shape(_size),
+            _shape(size),
             dtype,
         )
 
@@ -195,18 +181,17 @@ class Generator:
         self,
         low: float | FloatArray = 0.0,
         high: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = float,
     ) -> FloatArray:
         """Draw samples from a Uniform distribution."""
         # Ensure arrays are jax arrays
         low = jnp.asarray(low)
         high = jnp.asarray(high)
-        _size = None if size is MISSING else size
 
         return jax.random.uniform(
             self.__key,
-            _shape(_size, low, high),
+            _shape(size, low, high),
             dtype,
             low,
             high,
@@ -216,18 +201,17 @@ class Generator:
         self,
         n: int | IntArray,
         pvals: FloatArray,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
         dtype: DTypeLike = int,
     ) -> IntArray:
         """Draw samples from a multinomial distribution."""
         # Ensure arrays are jax arrays
         n = jnp.asarray(n)
         pvals = jnp.asarray(pvals)
-        _size = None if size is MISSING else size
 
         # JAX's shape parameter is the full shape of pvals including the
         # categories axis, so infer only the batch dimensions here.
-        batch_shape = _shape(_size, n, pvals[..., 0])
+        batch_shape = _shape(size, n, pvals[..., 0])
         # Append the categories axis, or pass None to let JAX default to
         # pvals.shape when there are no batch dimensions.
         shape = (*batch_shape, pvals.shape[-1]) if batch_shape else None

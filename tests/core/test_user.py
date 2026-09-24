@@ -89,6 +89,20 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
+def test_write_catalog_without_names(tmp_path: pathlib.Path) -> None:
+    import fitsio
+
+    filename = tmp_path / "unnamed.fits"
+    data = np.array([(1.0,), (2.0,)], dtype=[("VALUE", "f8")])
+    with glass.write_catalog(filename, ext=None) as out:
+        out.write(data)
+        out.write(data)
+
+    with fitsio.FITS(filename) as fits:
+        np.testing.assert_array_equal(fits[1].read()["VALUE"], [1.0, 2.0, 1.0, 2.0])
+
+
+@pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
 def test_write_exception(tmp_path: pathlib.Path) -> None:
     class TestWriteError(Exception):
         """Custom exception for controlled testing."""

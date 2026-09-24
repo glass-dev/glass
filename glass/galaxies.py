@@ -38,7 +38,6 @@ import glass.healpix as hp
 import glass.rng
 import glass.shells
 from glass._array_api_utils import xp_additions as uxpx
-from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -94,7 +93,7 @@ def redshifts(
     n: int | IntArray,
     w: glass.shells.RadialWindow,
     *,
-    rng: UnifiedGenerator | MISSING = MISSING,
+    rng: UnifiedGenerator | None = None,
 ) -> FloatArray:
     """
     Sample redshifts from a radial window function.
@@ -125,7 +124,7 @@ def redshifts_from_bins(
     z: FloatArray,
     nz_dict: Mapping[Any, FloatArray],
     *,
-    rng: UnifiedGenerator | MISSING = MISSING,
+    rng: UnifiedGenerator | None = None,
 ) -> FloatArray:
     """Sample redshifts for a catalogue of redshift bins.
 
@@ -191,7 +190,7 @@ def redshifts_from_nz(
     z: FloatArray,
     nz: FloatArray,
     *,
-    rng: UnifiedGenerator | MISSING = MISSING,
+    rng: UnifiedGenerator | None = None,
     warn: bool = True,
 ) -> FloatArray:
     """
@@ -352,10 +351,10 @@ def gaussian_phz(  # noqa: PLR0913
     z: float | FloatArray,
     sigma_0: float | FloatArray,
     *,
-    lower: float | FloatArray | MISSING = MISSING,
-    upper: float | FloatArray | MISSING = MISSING,
-    rng: UnifiedGenerator | MISSING = MISSING,
-    xp: ModuleType | MISSING = MISSING,
+    lower: float | FloatArray | None = None,
+    upper: float | FloatArray | None = None,
+    rng: UnifiedGenerator | None = None,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     r"""
     Photometric redshifts assuming a Gaussian error.
@@ -406,14 +405,12 @@ def gaussian_phz(  # noqa: PLR0913
     See the :doc:`/examples/1-basic/photoz` example.
 
     """
-    if xp is MISSING:
-        _lower = () if lower is MISSING else (lower,)
-        _upper = () if upper is MISSING else (upper,)
+    if xp is None:
         xp = array_api_compat.array_namespace(
             z,
             sigma_0,
-            *_lower,
-            *_upper,
+            lower,
+            upper,
             use_compat=False,
         )
 
@@ -424,11 +421,11 @@ def gaussian_phz(  # noqa: PLR0913
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
     # Ensure lower and upper are arrays that have the same shape and type
-    lower_arr = xp.asarray(0.0 if lower is MISSING else lower, dtype=xp.float64)
-    upper_arr = xp.asarray(xp.inf if upper is MISSING else upper, dtype=xp.float64)
-    if lower is MISSING and upper is not MISSING:
+    lower_arr = xp.asarray(0.0 if lower is None else lower, dtype=xp.float64)
+    upper_arr = xp.asarray(xp.inf if upper is None else upper, dtype=xp.float64)
+    if lower is None and upper is not None:
         lower_arr = xp.zeros_like(upper_arr, dtype=xp.float64)
-    if upper is MISSING and lower is not MISSING:
+    if upper is None and lower is not None:
         upper_arr = xp.full_like(lower_arr, fill_value=math.inf, dtype=xp.float64)
 
     sigma = xp.add(1, z_arr) * sigma_0_arr

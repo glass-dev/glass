@@ -55,7 +55,6 @@ import glass.healpix as hp
 import glass.rng
 import glass.shells
 from glass._array_api_utils import xp_additions as uxpx
-from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -320,7 +319,7 @@ def _apply_visibility(
 def _sample_number_galaxies(
     n: FloatArray,
     *,
-    rng: UnifiedGenerator | MISSING = MISSING,
+    rng: UnifiedGenerator | None = None,
 ) -> IntArray:
     """
     Sample the actual number of galaxies in each
@@ -444,13 +443,13 @@ def _sample_galaxies_per_pixel(
 def positions_from_delta(  # noqa: PLR0913
     ngal: float | FloatArray,
     delta: FloatArray,
-    bias: float | FloatArray | MISSING = MISSING,
-    vis: FloatArray | MISSING = MISSING,
+    bias: float | FloatArray | None = None,
+    vis: FloatArray | None = None,
     *,
     bias_model: Callable[..., Any] = linear_bias,
     remove_monopole: bool = False,
     batch: int = 1_000_000,
-    rng: UnifiedGenerator | MISSING = MISSING,
+    rng: UnifiedGenerator | None = None,
 ) -> Generator[
     tuple[
         FloatArray,
@@ -518,12 +517,7 @@ def positions_from_delta(  # noqa: PLR0913
         If the bias model is not a string or callable.
 
     """
-    _bias = () if bias is MISSING else (bias,)
-    _vis = () if vis is MISSING else (vis,)
-    xp = array_api_compat.array_namespace(ngal, delta, *_bias, *_vis, use_compat=False)
-
-    bias_or_none = None if bias is MISSING else bias
-    vis_or_none = None if vis is MISSING else vis
+    xp = array_api_compat.array_namespace(ngal, delta, bias, vis, use_compat=False)
 
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
@@ -531,20 +525,15 @@ def positions_from_delta(  # noqa: PLR0913
     if not callable(bias_model):
         raise TypeError("bias_model must be callable")
 
-    bias_or_none, delta, dims, ngal, vis_or_none = _broadcast_inputs(
-        bias_or_none,
-        delta,
-        ngal,
-        vis_or_none,
-    )
+    bias, delta, dims, ngal, vis = _broadcast_inputs(bias, delta, ngal, vis)
 
     # iterate the leading dimensions
     for k in itertools.product(*map(range, dims)):
-        n = _compute_density_contrast(bias_or_none, bias_model, delta, k)
+        n = _compute_density_contrast(bias, bias_model, delta, k)
 
         n = _compute_expected_count(k, n, ngal, remove_monopole=remove_monopole)
 
-        n = _apply_visibility(k, n, vis_or_none)
+        n = _apply_visibility(k, n, vis)
 
         n = _sample_number_galaxies(n, rng=xrng)
 
@@ -554,8 +543,8 @@ def positions_from_delta(  # noqa: PLR0913
 def uniform_positions(
     ngal: float | IntArray | FloatArray,
     *,
-    rng: UnifiedGenerator | MISSING = MISSING,
-    xp: ModuleType | MISSING = MISSING,
+    rng: UnifiedGenerator | None = None,
+    xp: ModuleType | None = None,
 ) -> Generator[
     tuple[
         FloatArray,
@@ -588,7 +577,7 @@ def uniform_positions(
         counts with the same shape is returned.
 
     """
-    if xp is MISSING:
+    if xp is None:
         xp = array_api_compat.array_namespace(ngal, use_compat=False)
 
     xrng = glass.rng.Generator(rng=rng, xp=xp)
@@ -620,7 +609,7 @@ def uniform_positions(
 
 def position_weights(
     densities: FloatArray,
-    bias: FloatArray | float | MISSING = MISSING,
+    bias: FloatArray | float | None = None,
 ) -> FloatArray:
     r"""
     Compute relative weights for angular clustering.
@@ -646,31 +635,18 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    _bias = () if bias is MISSING else (bias,)
-    xp = array_api_compat.array_namespace(
-        densities,
-        *_bias,
-        use_compat=False,
-    )
+    xp = array_api_compat.array_namespace(densities, bias, use_compat=False)
 
-    bias_or_none = None if bias is MISSING else bias
-    bias_or_none = (
-        bias_or_none
-        if bias_or_none is None or not isinstance(bias_or_none, float)
-        else xp.asarray(bias_or_none)
-    )
+    bias = bias if bias is None or not isinstance(bias, float) else xp.asarray(bias)
 
     # bring densities and bias into the same shape
-    if bias_or_none is not None:
-        densities, bias_or_none = glass.arraytools.broadcast_first(
-            densities,
-            bias_or_none,
-        )
+    if bias is not None:
+        densities, bias = glass.arraytools.broadcast_first(densities, bias)
     # normalise densities after shape has been fixed
     densities = densities / xp.sum(densities, axis=0)
     # apply bias after normalisation
-    if bias_or_none is not None:
-        densities = densities * bias_or_none
+    if bias is not None:
+        densities = densities * bias
     # densities now contains the relative contribution with bias applied
     return densities
 

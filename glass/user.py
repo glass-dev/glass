@@ -28,8 +28,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from glass._types import MISSING
-
 if TYPE_CHECKING:
     import importlib.util
     from collections.abc import Generator
@@ -96,7 +94,7 @@ class _FitsWriter:
 
     """
 
-    def __init__(self, fits: fitsio.FITS, ext: str | MISSING = MISSING) -> None:
+    def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
         """
         Create a new, uninitialised writer.
 
@@ -114,7 +112,7 @@ class _FitsWriter:
     def _append(
         self,
         data: FloatArray | list[FloatArray],
-        names: list[str] | MISSING = MISSING,
+        names: list[str] | None = None,
     ) -> None:
         """
         Write the FITS file.
@@ -127,11 +125,9 @@ class _FitsWriter:
             The names of the columns.
 
         """
-        if self.ext is MISSING or self.ext not in self.fits:
-            _names = None if names is MISSING else names
-            _extname = None if self.ext is MISSING else self.ext
-            self.fits.write_table(data, names=_names, extname=_extname)
-            if self.ext is MISSING:
+        if self.ext is None or self.ext not in self.fits:
+            self.fits.write_table(data, names=names, extname=self.ext)
+            if self.ext is None:
                 self.ext = self.fits[-1].get_extnum()
         else:
             hdu = self.fits[self.ext]
@@ -140,7 +136,7 @@ class _FitsWriter:
 
     def write(
         self,
-        data: FloatArray | MISSING = MISSING,
+        data: FloatArray | None = None,
         /,
         **columns: FloatArray,
     ) -> None:
@@ -159,7 +155,7 @@ class _FitsWriter:
 
         """
         # if data is given, write it as it is
-        if data is not MISSING:
+        if data is not None:
             self._append(data)
 
         # if keyword arguments are given, treat them as names and columns
@@ -172,7 +168,7 @@ class _FitsWriter:
 def write_catalog(
     filename: PathLike[str],
     *,
-    ext: str | MISSING = MISSING,
+    ext: str | None = None,
 ) -> Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.

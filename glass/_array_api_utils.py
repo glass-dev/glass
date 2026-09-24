@@ -28,8 +28,6 @@ import numpy as np
 
 import array_api_compat
 
-from glass._types import MISSING
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
@@ -45,17 +43,17 @@ class CompatibleBackendNotFoundError(Exception):
 
     """
 
-    def __init__(self, missing_backend: str, users_backend: str | MISSING) -> None:
+    def __init__(self, missing_backend: str, users_backend: str | None) -> None:
         self.message = (
             f"{missing_backend} is required here as "
             "no alternative has been provided by the user."
-            if users_backend is MISSING
+            if users_backend is None
             else f"GLASS depends on functions not supported by {users_backend}"
         )
         super().__init__(self.message)
 
 
-def default_xp(backend: str | MISSING = MISSING) -> ModuleType:
+def default_xp(backend: str | None = None) -> ModuleType:
     """
     Returns the library backend we default to if none is specified by the user.
     Raises a helpful error if the default is not installed.
@@ -105,7 +103,7 @@ class xp_additions:  # noqa: N801
     @staticmethod
     def trapezoid(
         y: AnyArray,
-        x: AnyArray | MISSING | None = MISSING,
+        x: AnyArray | None = None,
         dx: float = 1.0,
         axis: int = -1,
     ) -> AnyArray:
@@ -132,22 +130,20 @@ class xp_additions:  # noqa: N801
         See https://github.com/glass-dev/glass/issues/646
 
         """
-        _x = () if x is MISSING else (x,)
-        xp = array_api_compat.array_namespace(y, *_x, use_compat=False)
-        x_or_none = None if x is MISSING else x
+        xp = array_api_compat.array_namespace(y, x, use_compat=False)
 
         if xp.__name__ == "jax.numpy":
             import glass.jax  # noqa: PLC0415
 
-            return glass.jax.trapezoid(y, x=x_or_none, dx=dx, axis=axis)
+            return glass.jax.trapezoid(y, x=x, dx=dx, axis=axis)
 
         if xp.__name__ == "numpy":
-            return xp.trapezoid(y, x=x_or_none, dx=dx, axis=axis)
+            return xp.trapezoid(y, x=x, dx=dx, axis=axis)
 
         # If any other backend use default
         dxp = default_xp(xp.__name__)
         y_dxp = dxp.asarray(y, copy=True)
-        x_dxp = None if x is MISSING else dxp.asarray(x, copy=True)
+        x_dxp = None if x is None else dxp.asarray(x, copy=True)
         result_dxp = dxp.trapezoid(y_dxp, x_dxp, dx=dx, axis=axis)
         return xp.asarray(result_dxp, copy=True)
 
@@ -156,9 +152,9 @@ class xp_additions:  # noqa: N801
         x: AnyArray,
         x_points: AnyArray,
         y_points: AnyArray,
-        left: float | MISSING | None = MISSING,
-        right: float | MISSING | None = MISSING,
-        period: float | MISSING | None = MISSING,
+        left: float | None = None,
+        right: float | None = None,
+        period: float | None = None,
     ) -> AnyArray:
         """
         One-dimensional linear interpolation for monotonically increasing sample points.
@@ -193,18 +189,15 @@ class xp_additions:  # noqa: N801
 
         """
         xp = array_api_compat.array_namespace(x, x_points, y_points, use_compat=False)
-        _left = None if left is MISSING else left
-        _right = None if right is MISSING else right
-        _period = None if period is MISSING else period
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
             return xp.interp(
                 x,
                 x_points,
                 y_points,
-                left=_left,
-                right=_right,
-                period=_period,
+                left=left,
+                right=right,
+                period=period,
             )
 
         # If any other backend use default
@@ -216,9 +209,9 @@ class xp_additions:  # noqa: N801
             x_dxp,
             x_points_dxp,
             y_points_dxp,
-            left=_left,
-            right=_right,
-            period=_period,
+            left=left,
+            right=right,
+            period=period,
         )
         return xp.asarray(result_dxp, copy=True)
 
@@ -261,7 +254,7 @@ class xp_additions:  # noqa: N801
     def linalg_lstsq(
         a: AnyArray,
         b: AnyArray,
-        rcond: float | MISSING | None = MISSING,
+        rcond: float | None = None,
     ) -> tuple[AnyArray, AnyArray, int, AnyArray]:
         """
         Solve a linear least squares problem.
@@ -303,16 +296,15 @@ class xp_additions:  # noqa: N801
 
         """
         xp = array_api_compat.array_namespace(a, b, use_compat=False)
-        _rcond = None if rcond is MISSING else rcond
 
         if xp.__name__ in {"numpy", "jax.numpy"}:
-            return xp.linalg.lstsq(a, b, rcond=_rcond)
+            return xp.linalg.lstsq(a, b, rcond=rcond)
 
         # If any other backend use default
         dxp = default_xp(xp.__name__)
         a_dxp = dxp.asarray(a, copy=True)
         b_dxp = dxp.asarray(b, copy=True)
-        result_dxp = dxp.linalg.lstsq(a_dxp, b_dxp, rcond=_rcond)
+        result_dxp = dxp.linalg.lstsq(a_dxp, b_dxp, rcond=rcond)
         return tuple(xp.asarray(res, copy=True) for res in result_dxp)
 
     @staticmethod

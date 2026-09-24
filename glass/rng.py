@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from glass._types import MISSING
-
 if TYPE_CHECKING:
     from types import ModuleType
 
@@ -75,7 +73,7 @@ class Generator:
     def __init__(
         self,
         *,
-        rng: UnifiedGenerator | MISSING = MISSING,
+        rng: UnifiedGenerator | None = None,
         seed: int | IntArray = SEED,
         xp: ModuleType,
     ) -> None:
@@ -93,7 +91,7 @@ class Generator:
         self.xp = xp
         self.default_dtype = xp.float64
 
-        if rng is MISSING:
+        if rng is None:
             if xp.__name__ == "jax.numpy":
                 import glass.jax  # noqa: PLC0415
 
@@ -107,8 +105,8 @@ class Generator:
 
     def random(
         self,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
-        dtype: DTypeLike | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
+        dtype: DTypeLike | None = None,
     ) -> FloatArray:
         """
         Return random floats in the half-open interval [0.0, 1.0).
@@ -125,15 +123,14 @@ class Generator:
             Array of random floats.
 
         """
-        _size = None if size is MISSING else size
-        _dtype = self.default_dtype if (dtype is MISSING or dtype is None) else dtype
-        return self.xp.asarray(self.rng.random(_size), dtype=_dtype)
+        dtype = dtype if dtype is not None else self.default_dtype
+        return self.xp.asarray(self.rng.random(size), dtype=dtype)
 
     def normal(
         self,
         loc: float | FloatArray = 0.0,
         scale: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
     ) -> FloatArray:
         """
         Draw samples from a Normal distribution (mean=loc, stdev=scale).
@@ -152,13 +149,12 @@ class Generator:
             Array of samples from the normal distribution.
 
         """
-        _size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.normal(loc, scale, _size))
+        return self.xp.asarray(self.rng.normal(loc, scale, size))
 
     def poisson(
         self,
         lam: float | FloatArray,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
     ) -> IntArray:
         """
         Draw samples from a Poisson distribution.
@@ -175,13 +171,12 @@ class Generator:
             Array of samples from the Poisson distribution.
 
         """
-        _size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.poisson(lam, _size))
+        return self.xp.asarray(self.rng.poisson(lam, size))
 
     def standard_normal(
         self,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
-        dtype: DTypeLike | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
+        dtype: DTypeLike | None = None,
     ) -> FloatArray:
         """
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
@@ -198,15 +193,14 @@ class Generator:
             Array of samples from the standard normal distribution.
 
         """
-        _size = None if size is MISSING else size
-        _dtype = self.default_dtype if (dtype is MISSING or dtype is None) else dtype
-        return self.xp.asarray(self.rng.standard_normal(_size), dtype=_dtype)
+        dtype = dtype if dtype is not None else self.default_dtype
+        return self.xp.asarray(self.rng.standard_normal(size), dtype=dtype)
 
     def uniform(
         self,
         low: float | FloatArray = 0.0,
         high: float | FloatArray = 1.0,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
     ) -> FloatArray:
         """
         Draw samples from a Uniform distribution.
@@ -225,14 +219,13 @@ class Generator:
             Array of samples from the uniform distribution.
 
         """
-        _size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.uniform(low, high, _size))
+        return self.xp.asarray(self.rng.uniform(low, high, size))
 
     def multinomial(
         self,
         n: int | IntArray,
         pvals: FloatArray,
-        size: int | tuple[int, ...] | MISSING | None = MISSING,
+        size: int | tuple[int, ...] | None = None,
     ) -> IntArray:
         """
         Draw samples from a multinomial distribution.
@@ -251,5 +244,4 @@ class Generator:
             The drawn sample.
 
         """
-        _size = None if size is MISSING else size
-        return self.xp.asarray(self.rng.multinomial(n, pvals, _size))
+        return self.xp.asarray(self.rng.multinomial(n, pvals, size))

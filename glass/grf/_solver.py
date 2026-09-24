@@ -12,7 +12,6 @@ from transformcl import cltocorr, corrtocl
 
 import glass.grf
 from glass._array_api_utils import numpy_fallback
-from glass._types import MISSING
 
 if TYPE_CHECKING:
     from glass._types import AnyArray
@@ -28,14 +27,14 @@ def _relerr(dx: AnyArray, x: AnyArray) -> float:
 def solve(  # noqa: PLR0912, PLR0913
     cl: AnyArray,
     t1: glass.grf.Transformation,
-    t2: glass.grf.Transformation | MISSING = MISSING,
+    t2: glass.grf.Transformation | None = None,
     *,
     pad: int = 0,
-    initial: AnyArray | MISSING = MISSING,
+    initial: AnyArray | None = None,
     cltol: float = 1e-5,
     gltol: float = 1e-5,
     maxiter: int = 20,
-    monopole: float | MISSING | None = MISSING,
+    monopole: float | None = None,
 ) -> tuple[AnyArray, AnyArray, int]:
     """
     Solve for a Gaussian angular power spectrum.
@@ -88,7 +87,7 @@ def solve(  # noqa: PLR0912, PLR0913
     :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
-    if t2 is MISSING:
+    if t2 is None:
         t2 = t1
 
     n = cl.shape[0]
@@ -96,20 +95,19 @@ def solve(  # noqa: PLR0912, PLR0913
         msg = "pad must be a positive integer"
         raise ValueError(msg)
 
-    if initial is MISSING:
+    if initial is None:
         gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
     else:
         gl = np.zeros(n)
         gl[: initial.shape[0]] = initial[:n]
 
-    _monopole = None if monopole is MISSING else monopole
-    if _monopole is not None:
-        gl[0] = _monopole
+    if monopole is not None:
+        gl[0] = monopole
 
     gt = cltocorr(np.pad(gl, (0, pad)))
     rl = corrtocl(glass.grf.corr(t1, t2, gt))
     fl = rl[:n] - cl
-    if _monopole is not None:
+    if monopole is not None:
         fl[0] = 0
     clerr = _relerr(fl, cl)
 
@@ -125,7 +123,7 @@ def solve(  # noqa: PLR0912, PLR0913
         ft = cltocorr(np.pad(fl, (0, pad)))
         dt = glass.grf.dcorr(t1, t2, gt)
         xl = -corrtocl(ft / dt)[:n]
-        if _monopole is not None:
+        if monopole is not None:
             xl[0] = 0
 
         # we know the "direction" of the step xl at this point
@@ -135,7 +133,7 @@ def solve(  # noqa: PLR0912, PLR0913
             gt_ = cltocorr(np.pad(gl_, (0, pad)))
             rl_ = corrtocl(glass.grf.corr(t1, t2, gt_))
             fl_ = rl_[:n] - cl
-            if _monopole is not None:
+            if monopole is not None:
                 fl_[0] = 0
             clerr_ = _relerr(fl_, cl)
             if clerr_ <= clerr:
