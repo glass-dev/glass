@@ -518,18 +518,12 @@ def positions_from_delta(  # noqa: PLR0913
         If the bias model is not a string or callable.
 
     """
-    bias_args = () if bias is MISSING else (bias,)
-    vis_args = () if vis is MISSING else (vis,)
-    xp = array_api_compat.array_namespace(
-        ngal,
-        delta,
-        *bias_args,
-        *vis_args,
-        use_compat=False,
-    )
+    _bias = () if bias is MISSING else (bias,)
+    _vis = () if vis is MISSING else (vis,)
+    xp = array_api_compat.array_namespace(ngal, delta, *_bias, *_vis, use_compat=False)
 
-    bias_or_none: float | FloatArray | None = None if bias is MISSING else bias
-    vis_or_none: FloatArray | None = None if vis is MISSING else vis
+    bias_or_none = None if bias is MISSING else bias
+    vis_or_none = None if vis is MISSING else vis
 
     xrng = glass.rng.Generator(rng=rng, xp=xp)
 
@@ -652,14 +646,14 @@ def position_weights(
         The relative weight of each shell for angular clustering.
 
     """
-    bias_args = () if bias is MISSING else (bias,)
+    _bias = () if bias is MISSING else (bias,)
     xp = array_api_compat.array_namespace(
         densities,
-        *bias_args,
+        *_bias,
         use_compat=False,
     )
 
-    bias_or_none: FloatArray | float | None = None if bias is MISSING else bias
+    bias_or_none = None if bias is MISSING else bias
     bias_or_none = (
         bias_or_none
         if bias_or_none is None or not isinstance(bias_or_none, float)
