@@ -646,12 +646,7 @@ def effective_cls(
 
     """
     _weights2 = () if weights2 is MISSING else (weights2,)
-    xp = array_api_compat.array_namespace(
-        *cls,
-        weights1,
-        *_weights2,
-        use_compat=False,
-    )
+    xp = array_api_compat.array_namespace(*cls, weights1, *_weights2, use_compat=False)
     # this is the number of fields
     n = nfields_from_nspectra(len(cls))
 
