@@ -102,14 +102,14 @@ def solve(  # noqa: PLR0912, PLR0913
         gl = np.zeros(n)
         gl[: initial.shape[0]] = initial[:n]
 
-    monopole = None if monopole is MISSING else monopole
-    if monopole is not None:
-        gl[0] = monopole
+    _monopole = None if monopole is MISSING else monopole
+    if _monopole is not None:
+        gl[0] = _monopole
 
     gt = cltocorr(np.pad(gl, (0, pad)))
     rl = corrtocl(glass.grf.corr(t1, t2, gt))
     fl = rl[:n] - cl
-    if monopole is not None:
+    if _monopole is not None:
         fl[0] = 0
     clerr = _relerr(fl, cl)
 
@@ -125,7 +125,7 @@ def solve(  # noqa: PLR0912, PLR0913
         ft = cltocorr(np.pad(fl, (0, pad)))
         dt = glass.grf.dcorr(t1, t2, gt)
         xl = -corrtocl(ft / dt)[:n]
-        if monopole is not None:
+        if _monopole is not None:
             xl[0] = 0
 
         # we know the "direction" of the step xl at this point
@@ -135,7 +135,7 @@ def solve(  # noqa: PLR0912, PLR0913
             gt_ = cltocorr(np.pad(gl_, (0, pad)))
             rl_ = corrtocl(glass.grf.corr(t1, t2, gt_))
             fl_ = rl_[:n] - cl
-            if monopole is not None:
+            if _monopole is not None:
                 fl_[0] = 0
             clerr_ = _relerr(fl_, cl)
             if clerr_ <= clerr:
