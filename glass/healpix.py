@@ -69,11 +69,12 @@ def alm2map(  # noqa: PLR0913
         A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
 
     """
+    _lmax = None if lmax is MISSING else lmax
     return healpy.alm2map(
         alms,
         nside,
         inplace=inplace,
-        lmax=None if lmax is MISSING else lmax,
+        lmax=_lmax,
         pixwin=pixwin,
         pol=pol,
     )
@@ -268,10 +269,11 @@ def map2alm(
         alm or a tuple of 3 alm (almT, almE, almB) if polarized input.
 
     """
+    _lmax = None if lmax is MISSING else lmax
     return healpy.map2alm(
         maps,
         datapath=_get_healpy_datapath(),
-        lmax=None if lmax is MISSING else lmax,
+        lmax=_lmax,
         pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
@@ -348,13 +350,8 @@ def pixwin(
 
     """
     xp = _utils.default_xp() if xp is MISSING else xp
-
-    output = healpy.pixwin(
-        nside,
-        datapath=_get_healpy_datapath(),
-        lmax=None if lmax is MISSING else lmax,
-        pol=pol,
-    )
+    _lmax = None if lmax is MISSING else lmax
+    output = healpy.pixwin(nside, datapath=_get_healpy_datapath(), lmax=_lmax, pol=pol)
     return (
         tuple(xp.asarray(out, dtype=xp.float64) for out in output)
         if pol
