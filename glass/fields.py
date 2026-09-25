@@ -287,7 +287,10 @@ def discretized_cls(
         ]
 
     pw = (
-        hp.pixwin(nside, lmax=None if lmax is MISSING else lmax, xp=xp)
+        typing.cast(
+            "FloatArray",
+            hp.pixwin(nside, lmax=None if lmax is MISSING else lmax, xp=xp),
+        )
         if nside is not MISSING and nside is not None
         else None
     )

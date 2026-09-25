@@ -46,7 +46,9 @@ class CompatibleBackendNotFoundError(Exception):
     """
 
     def __init__(
-        self, missing_backend: str, users_backend: str | MISSING | None
+        self,
+        missing_backend: str,
+        users_backend: str | MISSING | None,
     ) -> None:
         self.message = (
             f"{missing_backend} is required here as "
