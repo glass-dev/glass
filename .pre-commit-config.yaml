@@ -86,7 +86,7 @@ repos:
         args:
           - --fix=safe
   - repo: https://github.com/astral-sh/ty-pre-commit
-    rev: v0.0.63
+    rev: v0.0.83
     hooks:
       - id: ty
         args:

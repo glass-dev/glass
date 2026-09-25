@@ -20,6 +20,12 @@ def test_default_rng_numpy() -> None:
     assert isinstance(rng, np.random.Generator)
 
 
+def test_explicit_none_rng() -> None:
+    rng = glass.rng.Generator(rng=None, xp=np)
+    assert rng.random(size=None).shape == ()
+    assert rng.normal(size=None).shape == ()
+
+
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_default_rng_jax() -> None:
     import jax.numpy as jnp

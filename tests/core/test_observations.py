@@ -66,6 +66,12 @@ def test_gaussian_nz(
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
     xpx.testing.assert_equal(nz, xp.zeros_like(nz))
 
+    # Explicit None retains the same default as an omitted norm.
+    xpx.testing.assert_equal(
+        glass.gaussian_nz(z, mean, sigma, norm=None),
+        glass.gaussian_nz(z, mean, sigma),
+    )
+
     # check the value of each entry is close to the norm
 
     norm = 1
@@ -98,6 +104,10 @@ def test_smail_nz(xp: ModuleType) -> None:
 
     pz = glass.smail_nz(z, mode, alpha, beta, norm=0)
     xpx.testing.assert_equal(pz, xp.zeros_like(pz))
+    xpx.testing.assert_equal(
+        glass.smail_nz(z, mode, alpha, beta, norm=None),
+        glass.smail_nz(z, mode, alpha, beta),
+    )
 
 
 def test_fixed_zbins_default_xp() -> None:
@@ -115,6 +125,7 @@ def test_fixed_zbins_default_xp() -> None:
         ],
     )
     zbins = glass.fixed_zbins(zmin, zmax, nbins=nbins)
+    assert glass.fixed_zbins(zmin, zmax, nbins=nbins, dz=None, xp=None) == zbins
     assert len(zbins) == nbins
     xpx.testing.assert_close(np.asarray(zbins), expected_zbins, rtol=1e-15)
 
