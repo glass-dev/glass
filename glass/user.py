@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from glass._types import MISSING
+
 if TYPE_CHECKING:
     import importlib.util
     from collections.abc import Generator
@@ -94,7 +96,7 @@ class _FitsWriter:
 
     """
 
-    def __init__(self, fits: fitsio.FITS, ext: str | None = None) -> None:
+    def __init__(self, fits: fitsio.FITS, ext: str | MISSING | None = MISSING) -> None:
         """
         Create a new, uninitialised writer.
 
@@ -107,12 +109,12 @@ class _FitsWriter:
 
         """
         self.fits = fits
-        self.ext = ext
+        self.ext = None if ext is MISSING else ext
 
     def _append(
         self,
         data: FloatArray | list[FloatArray],
-        names: list[str] | None = None,
+        names: list[str] | MISSING | None = MISSING,
     ) -> None:
         """
         Write the FITS file.
@@ -125,6 +127,7 @@ class _FitsWriter:
             The names of the columns.
 
         """
+        names = None if names is MISSING else names
         if self.ext is None or self.ext not in self.fits:
             self.fits.write_table(data, names=names, extname=self.ext)
             if self.ext is None:
@@ -136,7 +139,7 @@ class _FitsWriter:
 
     def write(
         self,
-        data: FloatArray | None = None,
+        data: FloatArray | MISSING | None = MISSING,
         /,
         **columns: FloatArray,
     ) -> None:
@@ -155,7 +158,7 @@ class _FitsWriter:
 
         """
         # if data is given, write it as it is
-        if data is not None:
+        if data is not MISSING and data is not None:
             self._append(data)
 
         # if keyword arguments are given, treat them as names and columns
@@ -168,7 +171,7 @@ class _FitsWriter:
 def write_catalog(
     filename: PathLike[str],
     *,
-    ext: str | None = None,
+    ext: str | MISSING | None = MISSING,
 ) -> Generator[_FitsWriter]:
     """
     Write a catalogue into a FITS file.

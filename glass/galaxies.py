@@ -38,6 +38,7 @@ import glass.healpix as hp
 import glass.rng
 import glass.shells
 from glass._array_api_utils import xp_additions as uxpx
+from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -93,7 +94,7 @@ def redshifts(
     n: int | IntArray,
     w: glass.shells.RadialWindow,
     *,
-    rng: UnifiedGenerator | None = None,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
 ) -> FloatArray:
     """
     Sample redshifts from a radial window function.
@@ -124,7 +125,7 @@ def redshifts_from_bins(
     z: FloatArray,
     nz_dict: Mapping[Any, FloatArray],
     *,
-    rng: UnifiedGenerator | None = None,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
 ) -> FloatArray:
     """Sample redshifts for a catalogue of redshift bins.
 
@@ -190,7 +191,7 @@ def redshifts_from_nz(
     z: FloatArray,
     nz: FloatArray,
     *,
-    rng: UnifiedGenerator | None = None,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
     warn: bool = True,
 ) -> FloatArray:
     """
@@ -351,10 +352,10 @@ def gaussian_phz(  # noqa: PLR0913
     z: float | FloatArray,
     sigma_0: float | FloatArray,
     *,
-    lower: float | FloatArray | None = None,
-    upper: float | FloatArray | None = None,
-    rng: UnifiedGenerator | None = None,
-    xp: ModuleType | None = None,
+    lower: float | FloatArray | MISSING | None = MISSING,
+    upper: float | FloatArray | MISSING | None = MISSING,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
+    xp: ModuleType | MISSING | None = MISSING,
 ) -> FloatArray:
     r"""
     Photometric redshifts assuming a Gaussian error.
@@ -405,7 +406,9 @@ def gaussian_phz(  # noqa: PLR0913
     See the :doc:`/examples/1-basic/photoz` example.
 
     """
-    if xp is None:
+    lower = None if lower is MISSING else lower
+    upper = None if upper is MISSING else upper
+    if xp is MISSING or xp is None:
         xp = array_api_compat.array_namespace(
             z,
             sigma_0,

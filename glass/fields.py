@@ -29,6 +29,7 @@ import glass.healpix as hp
 import glass.rng
 import glass.shells
 from glass._array_api_utils import xp_additions as uxpx
+from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
@@ -38,6 +39,7 @@ if TYPE_CHECKING:
     from glass._types import (
         AngularPowerSpectra,
         AnyArray,
+        ComplexArray,
         FloatArray,
         IntArray,
         T,
@@ -235,9 +237,9 @@ def cls2cov(
 def discretized_cls(
     cls: AngularPowerSpectra,
     *,
-    lmax: int | None = None,
-    ncorr: int | None = None,
-    nside: int | None = None,
+    lmax: int | MISSING | None = MISSING,
+    ncorr: int | MISSING | None = MISSING,
+    nside: int | MISSING | None = MISSING,
 ) -> AngularPowerSpectra:
     """
     Apply discretisation effects to angular power spectra.
@@ -273,7 +275,7 @@ def discretized_cls(
 
     xp = array_api_compat.array_namespace(*cls, use_compat=False)
 
-    if ncorr is not None:
+    if ncorr is not MISSING and ncorr is not None:
         n = nfields_from_nspectra(len(cls))
         cls = [
             cls[i * (i + 1) // 2 + j] if j <= ncorr else xp.asarray([])
@@ -282,12 +284,16 @@ def discretized_cls(
         ]
 
     # None stands for no pixel window requested
-    pw = hp.pixwin(nside, lmax=lmax, xp=xp) if nside is not None else None
+    pw = (
+        hp.pixwin(nside, lmax=None if lmax is MISSING else lmax, xp=xp)
+        if nside is not MISSING and nside is not None
+        else None
+    )
 
     gls = []
     for cl in cls:
         if cl.shape[0] > 0:
-            if lmax is not None:
+            if lmax is not MISSING and lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
             if pw is not None:
                 n = min(cl.shape[0], pw.shape[0])
@@ -331,8 +337,8 @@ def _generate_grf(
     gls: AngularPowerSpectra,
     nside: int,
     *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
+    ncorr: int | MISSING | None = MISSING,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
 ) -> Generator[FloatArray]:
     """
     Iteratively sample Gaussian random fields (internal use).
@@ -378,7 +384,7 @@ def _generate_grf(
     ngrf = nfields_from_nspectra(len(gls))
 
     # number of correlated fields if not specified
-    if ncorr is None:
+    if ncorr is MISSING or ncorr is None:
         ncorr = ngrf - 1
 
     # number of modes
@@ -415,8 +421,10 @@ def _generate_grf(
         # compute the correlated variate
         alm = sum(glass.harmonics.multalm(z, w[..., i + mis]) for i, z in enumerate(y))
 
+        alm = _glass_to_healpix_alm(alm)
+
         # modes with m = 0 are real-valued and come first in array
-        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)  # ty: ignore[not-subscriptable]
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -428,8 +436,8 @@ def generate_gaussian(
     gls: AngularPowerSpectra,
     nside: int,
     *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
+    ncorr: int | MISSING | None = MISSING,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
 ) -> Generator[FloatArray]:
     """
     Sample Gaussian random fields from Cls iteratively.
@@ -482,8 +490,8 @@ def generate_lognormal(
     nside: int,
     shift: float = 1.0,
     *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
+    ncorr: int | MISSING | None = MISSING,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
 ) -> Generator[FloatArray]:
     """
     Sample lognormal random fields from Gaussian Cls iteratively.
@@ -520,7 +528,7 @@ def getcl(
     cls: AngularPowerSpectra,
     i: int,
     j: int,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
 ) -> FloatArray:
     """
     Return a specific angular power spectrum from an array in
@@ -546,7 +554,7 @@ def getcl(
     if j > i:
         i, j = j, i
     cl = cls[i * (i + 1) // 2 + i - j]
-    if lmax is not None:
+    if lmax is not MISSING and lmax is not None:
         if cl.shape[0] > lmax + 1:
             cl = cl[: lmax + 1]
         else:
@@ -575,7 +583,7 @@ def enumerate_spectra(
         yield i, j, cl
 
 
-def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
+def spectra_indices(n: int, *, xp: ModuleType | MISSING | None = MISSING) -> IntArray:
     """
     Return an array of indices in :ref:`standard order <twopoint_order>`
     for a set of two-point functions for *n* fields.  Each row is a pair
@@ -592,7 +600,7 @@ def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
            [2, 0]])
 
     """
-    xp = _utils.default_xp() if xp is None else xp
+    xp = _utils.default_xp() if xp is MISSING or xp is None else xp
 
     i, j = xpx.tril_indices(n, xp=xp)
     return xp.stack([i, i - j]).T
@@ -601,9 +609,9 @@ def spectra_indices(n: int, *, xp: ModuleType | None = None) -> IntArray:
 def effective_cls(
     cls: AngularPowerSpectra,
     weights1: FloatArray,
-    weights2: FloatArray | None = None,
+    weights2: FloatArray | MISSING | None = MISSING,
     *,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
 ) -> FloatArray:
     """
     Compute effective angular power spectra from weights.
@@ -643,12 +651,14 @@ def effective_cls(
     n = nfields_from_nspectra(len(cls))
 
     # find lmax if not given
-    if lmax is None:
+    if lmax is MISSING or lmax is None:
         lmax = max((cl.shape[0] for cl in cls), default=0) - 1
 
     # broadcast weights1 such that its shape ends in n
     weights1 = xp.asarray(weights1)
-    weights2 = xp.asarray(weights2) if weights2 is not None else weights1
+    weights2 = (
+        weights1 if weights2 is MISSING or weights2 is None else xp.asarray(weights2)
+    )
 
     shape1, shape2 = weights1.shape, weights2.shape
     for i, shape in enumerate((shape1, shape2)):
@@ -709,7 +719,7 @@ def gaussian_fields(
 
 def lognormal_fields(
     shells: Sequence[glass.shells.RadialWindow],
-    shift: Callable[[float], float] | None = None,
+    shift: Callable[[float], float] | MISSING | None = MISSING,
 ) -> Sequence[glass.grf.Lognormal]:
     """
     Create lognormal fields for radial windows *shells*.  If *shifts* is
@@ -728,7 +738,7 @@ def lognormal_fields(
         A sequence describing the lognormal fields.
 
     """
-    if shift is None:
+    if shift is MISSING or shift is None:
         shift = lambda _z: 1.0  # noqa: E731
 
     return [glass.grf.Lognormal(shift(shell.zeff)) for shell in shells]
@@ -835,8 +845,8 @@ def generate(
     gls: AngularPowerSpectra,
     nside: int,
     *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
+    ncorr: int | MISSING | None = MISSING,
+    rng: UnifiedGenerator | MISSING | None = MISSING,
 ) -> Iterator[AnyArray]:
     """
     Sample random fields from Gaussian angular power spectra.
@@ -934,6 +944,28 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
     return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
 
 
+def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
+    """
+    Reorder alms in GLASS order to conform to (new) HEALPix order.
+
+    Parameters
+    ----------
+    alm
+        alm in GLASS order.
+
+    Returns
+    -------
+        alm in HEALPix order.
+
+    """
+    xp = alm.__array_namespace__()
+
+    n = _inv_triangle_number(alm.size)
+    ell = xp.arange(n)
+    out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
+    return xp.concat(out)
+
+
 def lognormal_shift_hilbert2011(z: float) -> float:
     """
     Lognormal shift of Hilbert et al. (2011) for convergence fields.
@@ -957,7 +989,7 @@ def lognormal_shift_hilbert2011(z: float) -> float:
 def cov_from_spectra(
     spectra: AngularPowerSpectra,
     *,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
 ) -> AnyArray:
     """
     Construct covariance matrix from spectra.
@@ -984,7 +1016,11 @@ def cov_from_spectra(
     n = nfields_from_nspectra(len(spectra))
 
     # first case: maximum length in input spectra
-    k = max((cl.shape[0] for cl in spectra), default=0) if lmax is None else lmax + 1
+    k = (
+        max((cl.shape[0] for cl in spectra), default=0)
+        if lmax is MISSING or lmax is None
+        else lmax + 1
+    )
 
     # this is the covariance matrix of the spectra
     # the leading dimension is k, then it is a n-by-n covariance matrix
@@ -1027,7 +1063,7 @@ def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
 def regularized_spectra(
     spectra: AngularPowerSpectra,
     *,
-    lmax: int | None = None,
+    lmax: int | MISSING | None = MISSING,
     method: Literal["nearest", "clip"] = "nearest",
     **method_kwargs: float | None,
 ) -> AngularPowerSpectra:
