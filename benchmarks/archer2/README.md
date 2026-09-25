@@ -49,8 +49,8 @@ provided script [setup-gpu-env.sh](./setup-gpu-env.sh).
 Benchmarks should be submitted as a batch job to slurm via the provided script.
 For example to benchmark using the currently installed version of JAX (CPU or
 GPU), run the following from the root of the glass repo on ARCHER2. You will
-need to make some changes to the submissions script (updating your email,
-budget code, etc.):
+need to make some changes to the submissions script (updating your email, budget
+code, etc.):
 
 ```sh
 sbatch benchmarks/archer2/submit.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
@@ -64,11 +64,11 @@ values for the [lensing benchmark](../lensing.py). It is intended as more of an
 example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
-[benchmarks/archer2/submit.sh](./submit.sh) specifically will submit a
-job to the ARCHER2 AMD GPU testbed queue. We use this queue for both CPU and
-GPU benchmarks as the CPUs within the GPU partition are newer and result in
-faster benchmark results for CPU runs. Therefore, for a fair comparison of
-CPU to GPU, we must run both on the GPU partition.
+[benchmarks/archer2/submit.sh](./submit.sh) specifically will submit a job to
+the ARCHER2 AMD GPU testbed queue. We use this queue for both CPU and GPU
+benchmarks as the CPUs within the GPU partition are newer and result in faster
+benchmark results for CPU runs. Therefore, for a fair comparison of CPU to GPU,
+we must run both on the GPU partition.
 
 ## Setting up uv on ARCHER2
 

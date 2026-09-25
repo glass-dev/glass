@@ -54,5 +54,5 @@ values for the [lensing benchmark](../lensing.py). It is intended as more of an
 example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
-[benchmarks/aac6/submit.sh](./submit.sh) specifically will submit a job
-to the SH5_MI300A_SPX queue to utilise shared CPU/GPU memory.
+[benchmarks/aac6/submit.sh](./submit.sh) specifically will submit a job to the
+SH5_MI300A_SPX queue to utilise shared CPU/GPU memory.
