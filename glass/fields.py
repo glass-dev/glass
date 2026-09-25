@@ -15,7 +15,7 @@ import sys
 import typing
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import transformcl
 
@@ -136,8 +136,6 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
     n = row.shape[:-1]
     # initialise empty matrix to start iteration
     m = xp.zeros((*n, k, k))
-    a: Any = xp.zeros((*n, k))
-    s = xp.ones(n)
 
     while True:
         # cut matrix down to size
