@@ -15,7 +15,7 @@ import sys
 import typing
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import transformcl
 
@@ -118,52 +118,28 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         shape, or is not positive semi-definite.
 
     """
-    for i, row in enumerate(cov):
-        # number of correlations, this will determine matrix size
-        k = row.shape[-1] - 1
-        if k < 0:
-            raise ValueError("empty covariance matrix")
+    it = iter(cov)
 
-        # check for first iteration
-        if i == 0:
-            # extract input array backend
-            xp = row.__array_namespace__()
-            # get shape of covariance
-            n = row.shape[:-1]
-            # initialise empty matrix to start iteration
-            m = xp.zeros((*n, k, k))
-            a = xp.zeros((*n, k))
-            s = xp.ones(n)
-        else:
-            # make sure input shape is compatible with previous iteration
-            if row.shape[:-1] != n:
-                raise ValueError("shape mismatch in covariance")
+    try:
+        row = next(it)
+    except StopIteration:
+        return
 
-            # compute new entries of matrix A
-            # see https://arxiv.org/pdf/2302.01942
+    # number of correlations, this will determine matrix size
+    k = row.shape[-1] - 1
+    if k < 0:
+        raise ValueError("empty covariance matrix")
 
-            # compute a^T @ m via matmul by adding a new axis
-            atm = a[..., None, :] @ m
+    # extract input array backend
+    xp = row.__array_namespace__()
+    # get shape of covariance
+    n = row.shape[:-1]
+    # initialise empty matrix to start iteration
+    m = xp.zeros((*n, k, k))
+    a: Any = xp.zeros((*n, k))
+    s = xp.ones(n)
 
-            # build the updated matrix m
-            # append zero column to matrix block
-            m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
-            # generate the bottom right corner: 1 where s > 0, 0 otherwise
-            u = xp.where(
-                s > 0,
-                xp.ones(n, dtype=atm.dtype),
-                xp.zeros(n, dtype=atm.dtype),
-            )
-            # assemble the new row
-            r = xp.concat([-atm, u[..., None, None]], axis=-1)
-            # set zero standard deviation to unity to prevent division by zero
-            # this should be fine as corresponding entries in r are zero
-            s = xp.where(s > 0, s, xp.ones(n, dtype=s.dtype))
-            # scale new row with standard deviation
-            r /= s[..., None, None]
-            # concatenate first row and rest of matrix
-            m = xp.concat([m, r], axis=-2)
-
+    while True:
         # cut matrix down to size
         m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
 
@@ -181,10 +157,46 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         s = xp.sqrt(s)
 
         # concatenate a and s into a single scaling vector
-        w = xp.concat([a, s[..., None]], axis=-1)
+        yield xp.concat([a, s[..., None]], axis=-1)
 
-        # yield the scaling vector
-        yield w
+        try:
+            row = next(it)
+        except StopIteration:
+            return
+
+        # number of correlations, this will determine matrix size
+        k = row.shape[-1] - 1
+        if k < 0:
+            raise ValueError("empty covariance matrix")
+
+        # make sure input shape is compatible with previous iteration
+        if row.shape[:-1] != n:
+            raise ValueError("shape mismatch in covariance")
+
+        # compute new entries of matrix A
+        # see https://arxiv.org/pdf/2302.01942
+
+        # compute a^T @ m via matmul by adding a new axis
+        atm = a[..., None, :] @ m
+
+        # build the updated matrix m
+        # append zero column to matrix block
+        m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
+        # generate the bottom right corner: 1 where s > 0, 0 otherwise
+        u = xp.where(
+            s > 0,
+            xp.ones(n, dtype=atm.dtype),
+            xp.zeros(n, dtype=atm.dtype),
+        )
+        # assemble the new row
+        r = xp.concat([-atm, u[..., None, None]], axis=-1)
+        # set zero standard deviation to unity to prevent division by zero
+        # this should be fine as corresponding entries in r are zero
+        s = xp.where(s > 0, s, xp.ones(n, dtype=s.dtype))
+        # scale new row with standard deviation
+        r /= s[..., None, None]
+        # concatenate first row and rest of matrix
+        m = xp.concat([m, r], axis=-2)
 
 
 def cls2cov(
@@ -284,16 +296,16 @@ def discretized_cls(
             for j in range(i + 1)
         ]
 
-    if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
+    # None stands for no pixel window requested
+    pw = hp.pixwin(nside, lmax=lmax, xp=xp) if nside is not None else None
 
     gls = []
     for cl in cls:
         if cl.shape[0] > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
-            if nside is not None:
-                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
+            if pw is not None:
+                n = min(cl.shape[0], pw.shape[0])
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls

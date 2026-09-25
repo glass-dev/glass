@@ -317,7 +317,7 @@ def test_discretized_cls(xp: ModuleType) -> None:
     )
 
     for cl in result:
-        n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
+        n = min(cl.shape[0], pw.shape[0])
         expected = xp.ones(n) * pw[:n] ** 2
         xpx.testing.assert_equal(cl[:n], expected)
 
