@@ -41,6 +41,7 @@ import glass._array_api_utils as _utils
 import glass.arraytools
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
+from glass._types import MISSING
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -53,7 +54,7 @@ def vmap_galactic_ecliptic(
     galactic: tuple[float, float] = (30, 90),
     ecliptic: tuple[float, float] = (20, 80),
     *,
-    xp: ModuleType | None = None,
+    xp: ModuleType | MISSING | None = MISSING,
 ) -> FloatArray:
     """
     Visibility map masking galactic and ecliptic plane.
@@ -85,7 +86,7 @@ def vmap_galactic_ecliptic(
         If the ``ecliptic`` argument is not a pair of numbers.
 
     """
-    xp = _utils.default_xp() if xp is None else xp
+    xp = _utils.default_xp() if xp is MISSING or xp is None else xp
 
     if len(galactic) != 2:
         msg = "galactic stripe must be a pair of numbers"
@@ -106,7 +107,7 @@ def gaussian_nz(
     mean: float | FloatArray,
     sigma: float | FloatArray,
     *,
-    norm: float | FloatArray | None = None,
+    norm: float | FloatArray | MISSING | None = MISSING,
 ) -> FloatArray:
     """
     Gaussian redshift distribution.
@@ -133,6 +134,7 @@ def gaussian_nz(
         The redshift distribution at the given ``z`` values.
 
     """
+    norm = None if norm is MISSING else norm
     xp = array_api_compat.array_namespace(z, mean, sigma, norm, use_compat=False)
 
     mean = xp.asarray(mean, dtype=xp.float64)
@@ -156,7 +158,7 @@ def smail_nz(
     alpha: float | FloatArray,
     beta: float | FloatArray,
     *,
-    norm: float | FloatArray | None = None,
+    norm: float | FloatArray | MISSING | None = MISSING,
 ) -> FloatArray:
     r"""
     Redshift distribution following Smail et al. (1994).
@@ -193,6 +195,7 @@ def smail_nz(
     where :math:`z_0` is matched to the given mode of the distribution.
 
     """
+    norm = None if norm is MISSING else norm
     xp = array_api_compat.array_namespace(
         z,
         z_mode,
@@ -219,9 +222,9 @@ def fixed_zbins(
     zmin: float,
     zmax: float,
     *,
-    nbins: int | None = None,
-    dz: float | None = None,
-    xp: ModuleType | None = None,
+    nbins: int | MISSING | None = MISSING,
+    dz: float | MISSING | None = MISSING,
+    xp: ModuleType | MISSING | None = MISSING,
 ) -> list[tuple[float, float]]:
     """
     Tomographic redshift bins of fixed size.
@@ -252,11 +255,11 @@ def fixed_zbins(
         If both ``nbins`` and ``dz`` are given.
 
     """
-    xp = _utils.default_xp() if xp is None else xp
+    xp = _utils.default_xp() if xp is MISSING or xp is None else xp
 
-    if nbins is not None and dz is None:
+    if nbins is not MISSING and nbins is not None and (dz is MISSING or dz is None):
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
-    elif nbins is None and dz is not None:
+    elif (nbins is MISSING or nbins is None) and dz is not MISSING and dz is not None:
         zbinedges = xp.arange(
             zmin,
             xp.nextafter(xp.asarray(zmax + dz), xp.asarray(zmax)),

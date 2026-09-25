@@ -14,6 +14,7 @@ import array_api_compat
 import array_api_extra as xpx
 
 from glass._array_api_utils import xp_additions as uxpx
+from glass._types import MISSING
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -49,7 +50,7 @@ def broadcast_leading_axes(
         float | FloatArray,
         int,
     ],
-    xp: ModuleType | None = None,
+    xp: ModuleType | MISSING | None = MISSING,
 ) -> tuple[
     tuple[int, ...],
     *tuple[FloatArray, ...],
@@ -89,7 +90,7 @@ def broadcast_leading_axes(
     (3, 4, 5, 6)
 
     """
-    if xp is None:
+    if xp is MISSING or xp is None:
         xp = array_api_compat.array_namespace(
             *[arg[0] for arg in args],
             use_compat=False,
@@ -115,9 +116,9 @@ def ndinterp(  # noqa: PLR0913,PLR0917
     xq: FloatArray,
     fq: FloatArray,
     axis: int = -1,
-    left: float | None = None,
-    right: float | None = None,
-    period: float | None = None,
+    left: float | MISSING | None = MISSING,
+    right: float | MISSING | None = MISSING,
+    period: float | MISSING | None = MISSING,
 ) -> FloatArray:
     """
     Interpolate multi-dimensional array over axis.
