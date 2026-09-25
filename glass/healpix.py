@@ -331,7 +331,7 @@ def pixwin(
     lmax: int | None = None,
     pol: Literal[True],
     xp: ModuleType | None = None,
-) -> tuple[FloatArray, ...]:
+) -> tuple[FloatArray, FloatArray]:
     # returns temperature, polarisation
     ...
 
