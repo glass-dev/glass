@@ -181,10 +181,7 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         s = xp.sqrt(s)
 
         # concatenate a and s into a single scaling vector
-        w = xp.concat([a, s[..., None]], axis=-1)
-
-        # yield the scaling vector
-        yield w
+        yield xp.concat([a, s[..., None]], axis=-1)
 
 
 def cls2cov(
@@ -284,16 +281,16 @@ def discretized_cls(
             for j in range(i + 1)
         ]
 
-    if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
+    # None stands for no pixel window requested
+    pw = hp.pixwin(nside, lmax=lmax, xp=xp) if nside is not None else None
 
     gls = []
     for cl in cls:
         if cl.shape[0] > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
-            if nside is not None:
-                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
+            if pw is not None:
+                n = min(cl.shape[0], pw.shape[0])
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls

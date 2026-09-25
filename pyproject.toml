@@ -277,7 +277,7 @@ trailing_comma_inline_array = true
 
 [tool.ty]
 analysis.respect-type-ignore-comments = false
-rules.invalid-argument-type = "ignore"
+rules = { all = "error", invalid-argument-type = "ignore" }
 src.include = [
     "glass",
     "tests",
@@ -290,3 +290,9 @@ include = [
     "tests/core/**",
 ]
 rules.unsupported-operator = "ignore"
+
+[[tool.ty.overrides]]
+include = [
+    "glass/fields.py",
+]
+rules.possibly-unresolved-reference = "ignore"
