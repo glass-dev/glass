@@ -277,7 +277,7 @@ trailing_comma_inline_array = true
 
 [tool.ty]
 analysis.respect-type-ignore-comments = false
-rules.invalid-argument-type = "ignore"
+rules = { all = "error", invalid-argument-type = "ignore" }
 src.include = [
     "glass",
     "tests",
