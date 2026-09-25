@@ -12,7 +12,6 @@ from transformcl import cltocorr, corrtocl
 
 import glass.grf
 from glass._array_api_utils import numpy_fallback
-from glass._types import MISSING
 
 if TYPE_CHECKING:
     from glass._types import AnyArray
@@ -28,14 +27,14 @@ def _relerr(dx: AnyArray, x: AnyArray) -> float:
 def solve(  # noqa: PLR0912, PLR0913
     cl: AnyArray,
     t1: glass.grf.Transformation,
-    t2: glass.grf.Transformation | MISSING | None = MISSING,
+    t2: glass.grf.Transformation | None = None,
     *,
     pad: int = 0,
-    initial: AnyArray | MISSING | None = MISSING,
+    initial: AnyArray | None = None,
     cltol: float = 1e-5,
     gltol: float = 1e-5,
     maxiter: int = 20,
-    monopole: float | MISSING | None = MISSING,
+    monopole: float | None = None,
 ) -> tuple[AnyArray, AnyArray, int]:
     """
     Solve for a Gaussian angular power spectrum.
@@ -88,7 +87,7 @@ def solve(  # noqa: PLR0912, PLR0913
     :func:`glass.grf.compute`: Direct computation for band-limited spectra.
 
     """
-    if t2 is MISSING or t2 is None:
+    if t2 is None:
         t2 = t1
 
     n = cl.shape[0]
@@ -96,13 +95,12 @@ def solve(  # noqa: PLR0912, PLR0913
         msg = "pad must be a positive integer"
         raise ValueError(msg)
 
-    if initial is MISSING or initial is None:
+    if initial is None:
         gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
     else:
         gl = np.zeros(n)
         gl[: initial.shape[0]] = initial[:n]
 
-    monopole = None if monopole is MISSING else monopole
     if monopole is not None:
         gl[0] = monopole
 

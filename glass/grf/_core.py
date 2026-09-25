@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING
 
 import transformcl
 
-from glass._types import MISSING
-
 if TYPE_CHECKING:
     from types import NotImplementedType
 
@@ -143,7 +141,7 @@ def dcorr(t1: Transformation, t2: Transformation, x: AnyArray, /) -> AnyArray:
 def compute(
     cl: AnyArray,
     t1: Transformation,
-    t2: Transformation | MISSING | None = MISSING,
+    t2: Transformation | None = None,
 ) -> AnyArray:
     """
     Compute a band-limited Gaussian angular power spectrum for the
@@ -174,7 +172,7 @@ def compute(
     :func:`glass.grf.solve`: Iterative solver for non-band-limited spectra.
 
     """
-    if t2 is MISSING or t2 is None:
+    if t2 is None:
         t2 = t1
 
     # transform C_l to C(\theta), apply transformation, and transform back

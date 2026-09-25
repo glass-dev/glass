@@ -66,7 +66,6 @@ import glass.algorithm
 import glass.arraytools
 import glass.rng
 from glass._array_api_utils import xp_additions as uxpx
-from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
@@ -284,7 +283,7 @@ class RadialWindow:
 def tophat_windows(
     zbins: FloatArray,
     dz: float = 1e-3,
-    weight: Callable[[FloatArray], FloatArray] | MISSING | None = MISSING,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Tophat window functions from the given redshift bin edges.
@@ -338,7 +337,7 @@ def tophat_windows(
     xp = zbins.__array_namespace__()
 
     wht: Callable[[FloatArray], FloatArray]
-    wht = xp.ones_like if weight is MISSING or weight is None else weight
+    wht = weight if weight is not None else xp.ones_like
     ws = []
     for zmin, zmax in itertools.pairwise(zbins):
         n = int(max(xp.round((zmax - zmin) / dz), 2))
@@ -352,7 +351,7 @@ def tophat_windows(
 def linear_windows(
     zgrid: FloatArray,
     dz: float = 1e-3,
-    weight: Callable[[FloatArray], FloatArray] | MISSING | None = MISSING,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Linear interpolation window functions.
@@ -412,7 +411,7 @@ def linear_windows(
         w = xp.concat(
             (xp.linspace(0.0, 1.0, n, endpoint=False), xp.linspace(1.0, 0.0, m)),
         )
-        if weight is not MISSING and weight is not None:
+        if weight is not None:
             w *= weight(z)
         ws.append(RadialWindow(z, w, zmid))
     return ws
@@ -421,7 +420,7 @@ def linear_windows(
 def cubic_windows(
     zgrid: FloatArray,
     dz: float = 1e-3,
-    weight: Callable[[FloatArray], FloatArray] | MISSING | None = MISSING,
+    weight: Callable[[FloatArray], FloatArray] | None = None,
 ) -> list[RadialWindow]:
     """
     Cubic interpolation window functions.
@@ -482,7 +481,7 @@ def cubic_windows(
         u = xp.linspace(0.0, 1.0, n, endpoint=False)
         v = xp.linspace(1.0, 0.0, m)
         w = xp.concat([u**2 * (3 - 2 * u), v**2 * (3 - 2 * v)])
-        if weight is not MISSING and weight is not None:
+        if weight is not None:
             w *= weight(z)
         ws.append(RadialWindow(z, w, zmid))
     return ws
@@ -845,9 +844,9 @@ def _uniform_grid(
     start: float,
     stop: float,
     *,
-    step: float | MISSING | None = MISSING,
-    num: int | MISSING | None = MISSING,
-    xp: ModuleType | MISSING | None = MISSING,
+    step: float | None = None,
+    num: int | None = None,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Create a uniform grid.
@@ -875,11 +874,11 @@ def _uniform_grid(
         If both ``step`` and ``num`` are given.
 
     """
-    xp = _utils.default_xp() if xp is MISSING or xp is None else xp
+    xp = _utils.default_xp() if xp is None else xp
 
-    if step is not MISSING and step is not None and (num is MISSING or num is None):
+    if step is not None and num is None:
         return xp.arange(start, stop + step, step)
-    if (step is MISSING or step is None) and num is not MISSING and num is not None:
+    if step is None and num is not None:
         return xp.linspace(start, stop, num + 1, dtype=xp.float64)
     msg = "exactly one of grid step size or number of steps must be given"
     raise ValueError(msg)
@@ -889,9 +888,9 @@ def redshift_grid(
     zmin: float,
     zmax: float,
     *,
-    dz: float | MISSING | None = MISSING,
-    num: int | MISSING | None = MISSING,
-    xp: ModuleType | MISSING | None = MISSING,
+    dz: float | None = None,
+    num: int | None = None,
+    xp: ModuleType | None = None,
 ) -> FloatArray:
     """
     Redshift grid with uniform spacing in redshift.
@@ -922,8 +921,8 @@ def distance_grid(
     zmin: float,
     zmax: float,
     *,
-    dx: float | MISSING | None = MISSING,
-    num: int | MISSING | None = MISSING,
+    dx: float | None = None,
+    num: int | None = None,
 ) -> FloatArray:
     """
     Redshift grid with uniform spacing in comoving distance.
@@ -1017,7 +1016,7 @@ def distribute(
     redshifts: FloatArray,
     shells: Sequence[RadialWindow],
     *,
-    rng: UnifiedGenerator | MISSING | None = MISSING,
+    rng: UnifiedGenerator | None = None,
 ) -> IntArray:
     """
     Distribute redshifts over shells.

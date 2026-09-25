@@ -47,7 +47,6 @@ import array_api_extra as xpx
 
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
-from glass._types import MISSING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -61,7 +60,7 @@ if TYPE_CHECKING:
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[False] = False,
     deflection: Literal[False] = False,
@@ -75,7 +74,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[True],
     deflection: Literal[False] = False,
@@ -89,7 +88,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[False] = False,
     deflection: Literal[True],
@@ -103,7 +102,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[False] = False,
     deflection: Literal[False] = False,
@@ -117,7 +116,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[True],
     deflection: Literal[True],
@@ -134,7 +133,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[True],
     deflection: Literal[False] = False,
@@ -151,7 +150,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[False] = False,
     deflection: Literal[True],
@@ -168,7 +167,7 @@ def from_convergence(
 @typing.overload
 def from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: Literal[True],
     deflection: Literal[True],
@@ -185,7 +184,7 @@ def from_convergence(
 
 def from_convergence(  # noqa: PLR0913
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     potential: bool = False,
     deflection: bool = False,
@@ -300,7 +299,7 @@ def from_convergence(  # noqa: PLR0913
 
     # get the NSIDE parameter
     nside = hp.get_nside(kappa)
-    if lmax is MISSING or lmax is None:
+    if lmax is None:
         lmax = 3 * nside - 1
 
     # compute alm
@@ -374,7 +373,7 @@ def from_convergence(  # noqa: PLR0913
 
 def shear_from_convergence(
     kappa: FloatArray,
-    lmax: int | MISSING | None = MISSING,
+    lmax: int | None = None,
     *,
     discretized: bool = True,
 ) -> FloatArray:
@@ -402,7 +401,7 @@ def shear_from_convergence(
 
     """
     nside = hp.get_nside(kappa)
-    if lmax is MISSING or lmax is None:
+    if lmax is None:
         lmax = 3 * nside - 1
 
     # compute alm
@@ -689,7 +688,7 @@ def deflect(
     lon: float | FloatArray,
     lat: float | FloatArray,
     alpha: complex | ComplexArray | FloatArray,
-    xp: ModuleType | MISSING | None = MISSING,
+    xp: ModuleType | None = None,
 ) -> tuple[
     FloatArray,
     FloatArray,
@@ -736,7 +735,7 @@ def deflect(
     exponential map.
 
     """
-    if xp is MISSING or xp is None:
+    if xp is None:
         xp = array_api_compat.array_namespace(lon, lat, alpha, use_compat=False)
 
     alpha = xp.asarray(alpha)
