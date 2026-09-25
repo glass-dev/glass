@@ -118,26 +118,55 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         shape, or is not positive semi-definite.
 
     """
-    it = iter(cov)
+    for i, row in enumerate(cov):
+        # number of correlations, this will determine matrix size
+        k = row.shape[-1] - 1
+        if k < 0:
+            raise ValueError("empty covariance matrix")
 
-    try:
-        row = next(it)
-    except StopIteration:
-        return
+        # check for first iteration
+        if i == 0:
+            # extract input array backend
+            xp = row.__array_namespace__()
+            # get shape of covariance
+            n = row.shape[:-1]
+            # initialise empty matrix to start iteration
+            m = xp.zeros((*n, k, k))
+            a = xp.zeros((*n, k))
+            s = xp.ones(n)
+        else:
+            # make sure input shape is compatible with previous iteration
+            if row.shape[:-1] != n:
+                raise ValueError("shape mismatch in covariance")
 
-    # number of correlations, this will determine matrix size
-    k = row.shape[-1] - 1
-    if k < 0:
-        raise ValueError("empty covariance matrix")
+            # compute new entries of matrix A
+            # see https://arxiv.org/pdf/2302.01942
 
-    # extract input array backend
-    xp = row.__array_namespace__()
-    # get shape of covariance
-    n = row.shape[:-1]
-    # initialise empty matrix to start iteration
-    m = xp.zeros((*n, k, k))
+            # compute a^T @ m via matmul by adding a new axis
+            atm = a[..., None, :] @ m
 
-    while True:
+            # build the updated matrix m
+            # append zero column to matrix block
+            m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
+            # generate the bottom right corner: 1 where s > 0, 0 otherwise
+            u = xp.where(
+                s > 0,
+                xp.ones(n, dtype=atm.dtype),
+                xp.zeros(n, dtype=atm.dtype),
+            )
+            # assemble the new row
+            r = xp.concat([-atm, u[..., None, None]], axis=-1)
+            # set zero standard deviation to unity to prevent division by zero
+            # this should be fine as corresponding entries in r are zero
+            s = xp.where(s > 0, s, xp.ones(n, dtype=s.dtype))
+            # scale new row with standard deviation
+            r /= s[..., None, None]
+            # concatenate first row and rest of matrix
+            m = xp.concat([m, r], axis=-2)
+
+        # cut matrix down to size
+        m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
+
         # get correlation vector
         # reverse vector to order it from oldest to newest
         c = row[..., :0:-1]
@@ -153,48 +182,6 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
 
         # concatenate a and s into a single scaling vector
         yield xp.concat([a, s[..., None]], axis=-1)
-
-        try:
-            row = next(it)
-        except StopIteration:
-            return
-
-        # number of correlations, this will determine matrix size
-        k = row.shape[-1] - 1
-        if k < 0:
-            raise ValueError("empty covariance matrix")
-
-        # make sure input shape is compatible with previous iteration
-        if row.shape[:-1] != n:
-            raise ValueError("shape mismatch in covariance")
-
-        # compute new entries of matrix A
-        # see https://arxiv.org/pdf/2302.01942
-
-        # compute a^T @ m via matmul by adding a new axis
-        atm = a[..., None, :] @ m
-
-        # build the updated matrix m
-        # append zero column to matrix block
-        m = xp.concat([m, xp.zeros((*n, m.shape[-2], 1), dtype=m.dtype)], axis=-1)
-        # generate the bottom right corner: 1 where s > 0, 0 otherwise
-        u = xp.where(
-            s > 0,
-            xp.ones(n, dtype=atm.dtype),
-            xp.zeros(n, dtype=atm.dtype),
-        )
-        # assemble the new row
-        r = xp.concat([-atm, u[..., None, None]], axis=-1)
-        # set zero standard deviation to unity to prevent division by zero
-        # this should be fine as corresponding entries in r are zero
-        s = xp.where(s > 0, s, xp.ones(n, dtype=s.dtype))
-        # scale new row with standard deviation
-        r /= s[..., None, None]
-        # concatenate first row and rest of matrix
-        m = xp.concat([m, r], axis=-2)
-
-        # cut matrix down to the size needed by the next row, after extending it
-        m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
 
 
 def cls2cov(

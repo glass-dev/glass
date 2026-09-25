@@ -290,3 +290,9 @@ include = [
     "tests/core/**",
 ]
 rules.unsupported-operator = "ignore"
+
+[[tool.ty.overrides]]
+include = [
+    "glass/fields.py",
+]
+rules.possibly-unresolved-reference = "ignore"
