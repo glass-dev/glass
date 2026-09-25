@@ -138,9 +138,6 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
     m = xp.zeros((*n, k, k))
 
     while True:
-        # cut matrix down to size
-        m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
-
         # get correlation vector
         # reverse vector to order it from oldest to newest
         c = row[..., :0:-1]
@@ -195,6 +192,9 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         r /= s[..., None, None]
         # concatenate first row and rest of matrix
         m = xp.concat([m, r], axis=-2)
+
+        # cut matrix down to the size needed by the next row, after extending it
+        m = m[..., m.shape[-2] - k :, m.shape[-1] - k :]
 
 
 def cls2cov(

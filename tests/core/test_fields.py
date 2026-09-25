@@ -119,6 +119,18 @@ def test_iternorm_errors(xp: ModuleType) -> None:
         list(glass.iternorm([xp.asarray([1.0]), xp.asarray([0.1, 1.0])]))
 
 
+def test_iternorm_nonmonotonic_row_widths(xp: ModuleType) -> None:
+    """A wider row can follow a narrower row after the factor is extended."""
+    rows = [xp.asarray(row) for row in ([1.0], [1.0, 0.0], [1.0, 0.0], [1.0, 0.0, 0.0])]
+
+    for row, scaling in zip(rows, glass.iternorm(rows), strict=True):
+        assert scaling.shape == row.shape
+        xpx.testing.assert_close(
+            scaling,
+            xp.asarray([0.0] * (row.shape[-1] - 1) + [1.0]),
+        )
+
+
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_cls2cov_jax(jnp: ModuleType) -> None:
     nl, nf, nc = 3, 3, 2
