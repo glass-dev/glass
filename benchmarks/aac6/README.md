@@ -43,7 +43,7 @@ root of the glass repo on AAC6. You will need to make some changes to the
 submissions script (updating your email, budget code, etc):
 
 ```sh
-sbatch benchmarks/aac6/submit-gpu.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
+sbatch benchmarks/aac6/submit.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
 ```
 
 > To understand what `HEALPY_DATAPATH` is, read an explanation in
@@ -54,5 +54,5 @@ values for the [lensing benchmark](../lensing.py). It is intended as more of an
 example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
-[benchmarks/aac6/submit-gpu.sh](./submit-gpu.sh) specifically will submit a job
+[benchmarks/aac6/submit.sh](./submit.sh) specifically will submit a job
 to the SH5_MI300A_SPX queue to utilise shared CPU/GPU memory.

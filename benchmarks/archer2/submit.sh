@@ -3,7 +3,7 @@
 
 #SBATCH --job-name=glass_benchmark_gpu
 #SBATCH --output=%x-%j.out
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=32
 #SBATCH --nodes=1
 #SBATCH --gpus=1
 #SBATCH --time=8:00:0
@@ -11,8 +11,8 @@
 #SBATCH --qos=gpu-shd
 
 # Recommended environment settings
-# Stop unintentional multi-threading within software libraries
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export OMP_PLACES=cores
 # Ensure the cpus-per-task option is propagated to srun commands
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
@@ -86,11 +86,11 @@ fi
 # Setup environment
 source "$GLASS_DIR/benchmarks/archer2/setup-gpu-env.sh"
 
-for n in {128,256,512,1024}
+for n in {128,256,512,1024,2048}
 do
     echo "Running benchmark with nside/lmax = $n"
     sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
 
     # Run benchmark via slurm
-    HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/lensing.py"
+    HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun --hint=nomultithread --distribution=block:block "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/lensing.py"
 done

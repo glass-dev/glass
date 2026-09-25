@@ -42,17 +42,18 @@ provided script [setup-gpu-env.sh](./setup-gpu-env.sh).
 
 > Note that many of the modules loaded are only available once you are running
 > on a GPU worker node. However, `setup-gpu-env.sh` is called automatically by
-> the submission script [submit-gpu.sh](./submit-gpu.sh).
+> the submission script [submit.sh](./submit.sh).
 
 ## Running the benchmarks
 
 Benchmarks should be submitted as a batch job to slurm via the provided script.
-For example to benchmark using JAX with AMD/ROCM, run the following from the
-root of the glass repo on ARCHER2. You will need to make some changes to the
-submissions script (updating your email, budget code, etc.):
+For example to benchmark using the currently installed version of JAX (CPU or
+GPU), run the following from the root of the glass repo on ARCHER2. You will
+need to make some changes to the submissions script (updating your email,
+budget code, etc.):
 
 ```sh
-sbatch benchmarks/archer2/submit-gpu.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
+sbatch benchmarks/archer2/submit.sh -d "$(pwd)" -x jax --healpy-datapath "$HEALPY_DATAPATH"
 ```
 
 > To understand what `HEALPY_DATAPATH` is, read an explanation in
@@ -63,8 +64,11 @@ values for the [lensing benchmark](../lensing.py). It is intended as more of an
 example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
-[benchmarks/archer2/submit-gpu.sh](./submit-gpu.sh) specifically will submit a
-job to the ARCHER2 AMD GPU testbed queue.
+[benchmarks/archer2/submit.sh](./submit.sh) specifically will submit a
+job to the ARCHER2 AMD GPU testbed queue. We use this queue for both CPU and
+GPU benchmarks as the CPUs within the GPU partition are newer and result in
+faster benchmark results for CPU runs. Therefore, for a fair comparison of
+CPU to GPU, we must run both on the GPU partition.
 
 ## Setting up uv on ARCHER2
 
