@@ -40,8 +40,6 @@ __lazy_modules__ = [
 import typing
 from typing import TYPE_CHECKING, Literal
 
-import numpy as np
-
 import array_api_compat
 import array_api_extra as xpx
 
@@ -400,6 +398,8 @@ def shear_from_convergence(
         The shear map.
 
     """
+    xp = kappa.__array_namespace__()
+
     nside = hp.get_nside(kappa)
     if lmax is None:
         lmax = 3 * nside - 1
@@ -408,21 +408,21 @@ def shear_from_convergence(
     alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
 
     # zero B-modes
-    blm = np.zeros_like(alm)
+    blm = xp.zeros_like(alm)
 
     # factor to convert convergence alm to shear alm
-    ell = np.arange(lmax + 1)
-    fl = np.sqrt((ell + 2) * (ell + 1) * ell * (ell - 1))
-    fl /= np.clip(ell * (ell + 1), 1, None)
+    ell = xp.arange(lmax + 1, dtype=xp.float64)
+    fl = xp.sqrt((ell + 2) * (ell + 1) * ell * (ell - 1))
+    fl /= xp.clip(ell * (ell + 1), 1, None)
     fl *= -1
 
     # if discretised, factor out spin-0 kernel and apply spin-2 kernel
     if discretized:
-        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=np)
-        fl *= pw2 / pw0
+        pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=xp)
+        fl = fl * (pw2 / pw0)
 
     # apply correction to E-modes
-    hp.almxfl(alm, fl, inplace=True)
+    alm = hp.almxfl(alm, fl, inplace=xp.__name__ != "jax.numpy")
 
     # transform to shear maps
     return hp.alm2map_spin([alm, blm], nside, 2, lmax)
@@ -564,9 +564,9 @@ class MultiPlaneConvergence:
 
         # lensing weight of mass plane to be added
         f = 3 * self.cosmo.Omega_m0 / 2
-        f *= x2 * self.r23
-        f *= (1 + self.z2) / self.cosmo.H_over_H0(self.z2)
-        f *= w2
+        f = f * (x2 * self.r23)
+        f = f * ((1 + self.z2) / self.cosmo.H_over_H0(self.z2))
+        f = f * w2
 
         # create kappa planes on first iteration
         if self.kappa2 is None:
