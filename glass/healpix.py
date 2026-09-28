@@ -317,6 +317,18 @@ def pixwin(
     nside: int,
     *,
     lmax: int | None = None,
+    pol: bool,
+    xp: ModuleType | None = None,
+) -> FloatArray | tuple[FloatArray, FloatArray]:
+    # returns temperature and optionally polarisation
+    ...
+
+
+@typing.overload
+def pixwin(
+    nside: int,
+    *,
+    lmax: int | None = None,
     pol: Literal[False] = False,
     xp: ModuleType | None = None,
 ) -> FloatArray:
