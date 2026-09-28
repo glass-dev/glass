@@ -877,9 +877,9 @@ def _uniform_grid(
     """
     xp = _utils.default_xp() if xp is MISSING or xp is None else xp
 
-    if step is not MISSING and step is not None and (num is MISSING or num is None):
+    if (step is not MISSING and step is not None) and (num is MISSING or num is None):
         return xp.arange(start, stop + step, step)
-    if (step is MISSING or step is None) and num is not MISSING and num is not None:
+    if (step is MISSING or step is None) and (num is not MISSING and num is not None):
         return xp.linspace(start, stop, num + 1, dtype=xp.float64)
     msg = "exactly one of grid step size or number of steps must be given"
     raise ValueError(msg)

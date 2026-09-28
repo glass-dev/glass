@@ -257,9 +257,9 @@ def fixed_zbins(
     """
     xp = _utils.default_xp() if xp is MISSING or xp is None else xp
 
-    if nbins is not MISSING and nbins is not None and (dz is MISSING or dz is None):
+    if (nbins is not MISSING and nbins is not None) and (dz is MISSING or dz is None):
         zbinedges = xp.linspace(zmin, zmax, nbins + 1)
-    elif (nbins is MISSING or nbins is None) and dz is not MISSING and dz is not None:
+    elif (nbins is MISSING or nbins is None) and (dz is not MISSING and dz is not None):
         zbinedges = xp.arange(
             zmin,
             xp.nextafter(xp.asarray(zmax + dz), xp.asarray(zmax)),
