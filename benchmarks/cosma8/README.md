@@ -52,7 +52,7 @@ example of what can be done and how to submit such a script rather than defining
 the exact "ideal" benchmark.
 
 [benchmarks/cosma8/submit-gpu.sh](./submit-gpu.sh) specifically will submit a
-job the mi300x queue. However, if you wish to run on a GPU with shared memory
+job to the mi300x queue. However, if you wish to run on a GPU with shared memory
 architecture, you will need to ssh onto the ga008 partition:
 
 ```sh
