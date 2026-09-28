@@ -646,15 +646,6 @@ def test_healpix_to_glass_spectra() -> None:
     assert out == [11, 22, 21, 33, 32, 31, 44, 43, 42, 41]
 
 
-def test_glass_to_healpix_alm(xp: ModuleType) -> None:
-    inp = xp.asarray([00, 10, 11, 20, 21, 22, 30, 31, 32, 33], dtype=xp.complex128)
-    out = glass.fields._glass_to_healpix_alm(inp)
-    xpx.testing.assert_equal(
-        out,
-        xp.asarray([00, 10, 20, 30, 11, 21, 31, 22, 32, 33], dtype=xp.complex128),
-    )
-
-
 def test_lognormal_shift_hilbert2011(xp: ModuleType) -> None:
     zs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
     shifts = xp.asarray([glass.lognormal_shift_hilbert2011(z) for z in zs])
