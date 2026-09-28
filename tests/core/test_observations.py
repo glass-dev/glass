@@ -66,7 +66,8 @@ def test_gaussian_nz(
     nz = glass.gaussian_nz(z, mean, sigma, norm=0)
     xpx.testing.assert_equal(nz, xp.zeros_like(nz))
 
-    # Explicit None retains the same default as an omitted norm.
+    # explicit None retains the same default as an omitted norm
+
     xpx.testing.assert_equal(
         glass.gaussian_nz(z, mean, sigma, norm=None),
         glass.gaussian_nz(z, mean, sigma),
