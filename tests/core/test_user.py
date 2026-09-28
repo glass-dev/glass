@@ -89,7 +89,7 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_catalog_without_names(tmp_path: pathlib.Path) -> None:
+def test_write_catalog_without_extension(tmp_path: pathlib.Path) -> None:
     import fitsio
 
     filename = tmp_path / "unnamed.fits"
