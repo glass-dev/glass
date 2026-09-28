@@ -290,4 +290,4 @@ include = [
     "glass/**",
     "tests/core/**",
 ]
-rules.unsupported-operator = "ignore"
+rules = { deprecated = "ignore", unsupported-operator = "ignore" }
