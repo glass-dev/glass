@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 import contextlib
 import importlib.util
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 import glass.rng
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 with contextlib.suppress(ImportError):
     # only import if jax is available
@@ -20,8 +26,8 @@ def test_default_rng_numpy() -> None:
     assert isinstance(rng, np.random.Generator)
 
 
-def test_explicit_none_rng() -> None:
-    rng = glass.rng.Generator(rng=None, xp=np)
+def test_explicit_none_rng(xp: ModuleType) -> None:
+    rng = glass.rng.Generator(rng=None, xp=xp)
     assert rng.random(size=None).shape == ()
     assert rng.normal(size=None).shape == ()
 
