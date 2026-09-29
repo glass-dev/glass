@@ -257,16 +257,16 @@ def test_lognormal_gls(xp: ModuleType) -> None:
 
     # empty cls
 
-    assert glass.lognormal_gls([], shift) == []
+    assert glass.lognormal_gls([], shift) == []  # ty: ignore[deprecated]
 
     # check output shape
 
-    out = glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)
+    out = glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)  # ty: ignore[deprecated]
     assert len(out) == 1
     assert out[0].shape[0] == 5
 
     inp = [xp.linspace(1, 6, 5), xp.linspace(1, 5, 4), xp.linspace(1, 4, 3)]
-    out = glass.lognormal_gls(inp, shift)
+    out = glass.lognormal_gls(inp, shift)  # ty: ignore[deprecated]
 
     assert len(out) == 3
     assert out[0].shape[0] == 5
@@ -390,13 +390,13 @@ def test_generate_grf(xp: ModuleType) -> None:
 
 def test_generate_gaussian(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        result = glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
+        result = glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)  # ty: ignore[deprecated]
     next(result)
 
 
 def test_generate_lognormal(xp: ModuleType) -> None:
     with pytest.deprecated_call():
-        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
+        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)  # ty: ignore[deprecated]
     next(result)
 
 

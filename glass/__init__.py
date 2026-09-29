@@ -95,14 +95,14 @@ from glass.fields import (
     enumerate_spectra,
     gaussian_fields,
     generate,
-    generate_gaussian,
-    generate_lognormal,
+    generate_gaussian,  # ty: ignore[deprecated]
+    generate_lognormal,  # ty: ignore[deprecated]
     getcl,
     glass_to_healpix_spectra,
     healpix_to_glass_spectra,
     iternorm,
     lognormal_fields,
-    lognormal_gls,
+    lognormal_gls,  # ty: ignore[deprecated]
     lognormal_shift_hilbert2011,
     nfields_from_nspectra,
     regularized_spectra,
