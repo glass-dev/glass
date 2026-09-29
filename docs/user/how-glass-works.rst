@@ -28,7 +28,7 @@ of the simulation.  For example, the :func:`~glass.tophat_windows`
 function takes redshift boundaries and returns a sequence of top hat windows,
 which are flat and non-overlapping.
 
-.. vale proselint.Spelling = OFF
+.. vale proselint.Spelling = NO
 
 .. plot::
 
@@ -50,7 +50,7 @@ which are flat and non-overlapping.
     plt.ylabel("window function $W(z)$")
     plt.tight_layout()
 
-.. vale proselint.Spelling = ON
+.. vale proselint.Spelling = YES
 
 Given such a sequence of window functions :math:`W_i`, GLASS discretises a
 continuous field :math:`F` (e.g. the matter density in the universe) by using
