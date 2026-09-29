@@ -196,11 +196,11 @@ def cls2cov(
     """
     Return array of Cls as a covariance matrix for iterative sampling.
 
-    Note that the behaviour of ``cls2cov`` may differ depending on the array
-    backend being used, e.g. NumPy or JAX. This happens because the underlying
-    data is updated each time the next value is generated as ``cov`` is reused.
-    Therefore, due to the immutability restraint, many copies will be created
-    when working with JAX.
+    Note that yielded arrays have backend-dependent aliasing semantics. With a
+    mutable backend such as NumPy, each yield reuses the same underlying ``cov``
+    array, so advancing the generator mutates all previously yielded values. JAX's
+    immutable arrays instead produce a distinct value for each yield. Explicitly
+    copy each yielded NumPy array if it must retain its value.
 
     Parameters
     ----------
