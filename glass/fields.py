@@ -17,6 +17,8 @@ import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+import s2fft
+import s2fft.sampling
 import transformcl
 
 import array_api_compat
