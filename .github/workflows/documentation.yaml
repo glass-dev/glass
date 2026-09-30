@@ -61,4 +61,4 @@ jobs:
           filter_mode: nofilter
           reporter: github-pr-review
           vale_flags: --glob='!{.nox,.venv}/**'
-          version: 3.14.1
+          version: 3.23.0
