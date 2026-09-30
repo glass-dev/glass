@@ -23,6 +23,7 @@ benchmarks = [
     "glass-ext-camb",
     "jax==0.4.35; python_version < '3.13'",
     "jax>=0.6.2; python_version >= '3.13'",
+    "matplotlib",
     "numpy<2.4",
 ]
 build = [

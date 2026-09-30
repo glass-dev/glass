@@ -57,6 +57,14 @@ for xp in xp_available_backends.values():
     )
 ```
 
+## Generating benchmark plots
+
+To generate a plot displaying benchmarking results, a script has been provided:
+
+```sh
+uv run python generate-benchmark-graph.py -h
+```
+
 ##  healpy-data
 
 glass depends on data from the healpy-data repo. If not found locally, glass
