@@ -82,6 +82,7 @@ dependencies = [
     "array-api-extra>=0.11.1",
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
+    "s2fft>=1.4.0",
     "transformcl>=2026.1",
 ]
 description = "Generator for Large Scale Structure"
