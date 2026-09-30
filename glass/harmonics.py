@@ -9,6 +9,9 @@ __lazy_modules__ = [
 import typing
 from typing import TYPE_CHECKING
 
+import s2fft
+import s2fft.sampling
+
 import array_api_compat
 
 import glass.healpix as hp
@@ -54,63 +57,17 @@ def multalm(
     return alm * factors
 
 
-@typing.overload
 def inverse_transform(
     alm: ComplexArray,
     *,
     lmax: int,
     nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
-    spin: typing.Literal[0] = 0,
 ) -> FloatArray:
-    # returns a real scalar map
-    ...
-
-
-@typing.overload
-def inverse_transform(
-    alm: ComplexArray,
-    *,
-    lmax: int,
-    nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
-    spin: typing.Literal[1, 2],
-) -> ComplexArray:
-    # returns a complex map for spin 1 or 2
-    ...
-
-
-@typing.overload
-def inverse_transform(
-    alm: ComplexArray,
-    *,
-    lmax: int,
-    nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
-    spin: int,
-) -> FloatArray | ComplexArray:
-    # returns a real or complex map depending on the spin
-    ...
-
-
-def inverse_transform(  # noqa: PLR0913
-    alm: ComplexArray,
-    *,
-    lmax: int,
-    nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
-    spin: int = 0,
-) -> FloatArray | ComplexArray:
     """
     Compute the inverse spherical harmonic transform of alm.
 
-    Convert HEALPix harmonic coefficients into a map without pixel-window
-    smoothing. For non-zero spin, ``alm`` contains E modes and B modes are set
-    to zero.
+    Convert scalar HEALPix harmonic coefficients into a map without pixel-window
+    smoothing. Use the S2FFT healpy wrapper for JAX arrays.
 
     Parameters
     ----------
@@ -120,54 +77,23 @@ def inverse_transform(  # noqa: PLR0913
         The maximum multipole of the spherical harmonic transform.
     nside
         The nside parameter of the output map.
-    pixwin
-        Whether to apply the pixel window function. Has no effect for non-zero
-        spin.
-    pol
-        Whether to compute polarization. Has no effect for non-zero spin.
-    spin
-        Spin of the output map. Zero produces a real scalar map; non-zero spin
-        produces a complex map whose real and imaginary parts are the two
-        spin components.
 
     Returns
     -------
-        The map resulting from the inverse spherical harmonic transform.
+        The real-space map resulting from the inverse spherical harmonic transform.
 
     """
     xp = alm.__array_namespace__()
 
-    if spin == 0:
-        return hp.alm2map(alm, nside, lmax=lmax, pixwin=pixwin, pol=pol)
+    if xp.__name__ != "jax.numpy":
+        return hp.alm2map(alm, nside, lmax=lmax)
 
-    maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
-    return maps[0] + 1j * maps[1]
-
-
-def transform(
-    maps: FloatArray,
-    *,
-    lmax: int,
-    pol: bool = True,
-    use_pixel_weights: bool = False,
-) -> ComplexArray:
-    """
-    Compute the spherical harmonic transform of a map.
-
-    Parameters
-    ----------
-    maps
-        The real-space map to transform.
-    lmax
-        The maximum multipole of the spherical harmonic transform.
-    pol
-        Whether to compute polarization.
-    use_pixel_weights
-        Whether to use pixel weights in the transform.
-
-    Returns
-    -------
-        The spherical harmonic coefficients resulting from the transform.
-
-    """
-    return hp.map2alm(maps, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights)
+    bandlimit = lmax + 1
+    flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
+    return s2fft.inverse(
+        flm,
+        bandlimit,
+        method="jax_healpy",
+        nside=nside,
+        sampling="healpix",
+    )
