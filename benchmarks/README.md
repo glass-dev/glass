@@ -76,3 +76,21 @@ submitting a job. To download this data we can use git:
 git clone --depth 1 https://github.com/healpy/healpy-data
 export HEALPY_DATAPATH="$(pwd)/healpy-data"
 ```
+
+## Profiling
+
+### AMD
+
+To profile this benchmark on AMD hardware, we have followed the
+[ROCm Systems Profiler python documentation](https://rocm.docs.amd.com/projects/rocprofiler-systems/en/latest/how-to/profiling-python-scripts.html).
+This states that once the profiler is installed a
+[perfetto](https://perfetto.dev) compatible trace can be generated using the
+following command:
+
+```sh
+# Generates a perfetto trace profile for the lensing benchmark using JAX
+ARRAY_BACKEND=jax rocprof-sys-python benchmarks/lensing.py
+```
+
+However, this profiling tool is difficult to install and we have thus only
+managed to run the pre-installed version on the AAC6 AMD machine.
