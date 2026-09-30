@@ -17,6 +17,8 @@ import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+import s2fft
+import s2fft.sampling
 import transformcl
 
 import array_api_compat
@@ -423,7 +425,17 @@ def _generate_grf(
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
-        yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
+        if xp.__name__ == "jax.numpy":
+            flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, n)
+            yield s2fft.inverse(
+                flm,
+                n,
+                method="jax_healpy",
+                nside=nside,
+                sampling="healpix",
+            )
+        else:
+            yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
 
 
 @deprecated("use glass.generate() instead")
