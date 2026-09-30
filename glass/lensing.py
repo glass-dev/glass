@@ -45,6 +45,7 @@ import numpy as np
 import array_api_compat
 import array_api_extra as xpx
 
+import glass.harmonics
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
@@ -323,7 +324,7 @@ def from_convergence(  # noqa: PLR0913
 
     # if potential is requested, compute map and add to output
     if potential:
-        psi = hp.alm2map(alm, nside, lmax=lmax)
+        psi = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
         results += (psi,)
 
     # if no spin-weighted maps are requested, stop here

@@ -398,7 +398,11 @@ def test_distance_grid(
         match="exactly one of grid step size or number of steps must be given",
     ):
         glass.distance_grid(
-            cosmo_with_inverse_comoving_distance, zmin, zmax, dx=dx, num=num
+            cosmo_with_inverse_comoving_distance,
+            zmin,
+            zmax,
+            dx=dx,
+            num=num,
         )
 
 
