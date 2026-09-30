@@ -30,7 +30,7 @@ help() {
   echo "    -x | --array-backend <array_backend> The array backend to use for the benchmarks."
   echo "                                         Defaults to NumPy."
   echo "    --healpy-datapath <healpy-datapath>  The path to the healpy-data repo to allow"
-  echo "                                         running offline. Defaults to <glass/dir>/healpy-data"
+  echo "                                         running offline. Defaults to <glass/dir>/healpy-data."
 }
 
 # check for no input arguments and show help
