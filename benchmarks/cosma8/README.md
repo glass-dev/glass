@@ -25,11 +25,11 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the GPU benchmark, there is an additional dependency group `cosma8-gpu`
-which includes `benchmarks`:
+For the GPU benchmark, there is an additional dependency group `jax-rocm7` which
+includes `benchmarks`:
 
 ```sh
-uv sync --group cosma8-gpu
+uv sync --group jax-rocm7
 ```
 
 ## Running the benchmarks

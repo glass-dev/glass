@@ -27,11 +27,11 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the GPU benchmark, there is an additional dependency group `aac6-gpu` which
+For the GPU benchmark, there is an additional dependency group `jax-rocm7` which
 includes on `benchmarks`:
 
 ```sh
-uv sync --group aac6-gpu
+uv sync --group jax-rocm7
 ```
 
 ## Running the benchmarks

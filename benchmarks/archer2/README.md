@@ -30,11 +30,11 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the GPU benchmark, there is an additional dependency group `archer2-gpu`
-which includes on `benchmarks`:
+For the GPU benchmark, there is an additional dependency group `jax-rocm6` which
+includes on `benchmarks`:
 
 ```sh
-uv sync --group archer2-gpu
+uv sync --group jax-rocm6
 ```
 
 Once your python environment is setup you must load the relevant modules via the
