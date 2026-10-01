@@ -70,8 +70,8 @@ SAFE. For further information
 
 ### CUDA
 
-Cosma8 provides some direct ssh access nodes for testing CUDA applications -
-see the [docs](https://cosma.readthedocs.io/en/latest/gpu.html). 
+Cosma8 provides some direct ssh access nodes for testing CUDA applications - see
+the [docs](https://cosma.readthedocs.io/en/latest/gpu.html).
 
 Fist install your dependencies
 
