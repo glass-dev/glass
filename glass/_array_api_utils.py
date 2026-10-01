@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from types import ModuleType
     from typing import Any
 
-    from glass._types import AnyArray, DTypeLike
+    from glass._types import AnyArray, DTypeLike, P, R
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -473,7 +473,7 @@ class xp_additions:  # noqa: N801
         return typing.cast("Iterator[tuple[int, ...]]", dxp.ndindex(shape))
 
 
-def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C901
+def numpy_fallback(func: Callable[P, R]) -> Callable[P, R]:  # noqa: C901
     """
     Decorator to convert function arguments to Numpy arrays and back.
 
@@ -556,4 +556,4 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C90
 
         return convert_back(result)
 
-    return wrapper
+    return typing.cast("Callable[P, R]", wrapper)

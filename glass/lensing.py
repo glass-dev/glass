@@ -288,7 +288,7 @@ def from_convergence(  # noqa: PLR0913
         return ()
 
     # get the NSIDE parameter
-    nside = typing.cast("int", hp.get_nside(kappa))
+    nside = hp.get_nside(kappa)
     if lmax is None:
         lmax = 3 * nside - 1
 
