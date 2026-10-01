@@ -650,7 +650,7 @@ def effective_cls(
 
     # find lmax if not given
     if lmax is None:
-        lmax = max((cl.shape[0] for cl in cls), default=0) - 1
+        lmax = typing.cast("int", max((cl.shape[0] for cl in cls), default=0) - 1)
 
     # broadcast weights1 such that its shape ends in n
     weights1 = xp.asarray(weights1)
@@ -1026,8 +1026,7 @@ def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
     """
     cov = cov_from_spectra(spectra)
     xp = cov.__array_namespace__()
-    is_positive_semi_definite: bool = xp.all(xp.linalg.eigvalsh(cov) >= 0)
-    return is_positive_semi_definite
+    return bool(xp.all(xp.linalg.eigvalsh(cov) >= 0))
 
 
 def regularized_spectra(

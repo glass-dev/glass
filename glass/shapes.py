@@ -100,7 +100,7 @@ def triaxial_axis_ratio(
 
     # get size from inputs if not explicitly provided
     if size is None:
-        size = xp.broadcast_arrays(zeta, xi)[0].shape
+        size = typing.cast("tuple[int, ...]", xp.broadcast_arrays(zeta, xi)[0].shape)
 
     # draw random viewing angle (theta, phi)
     cos2_theta = xrng.uniform(low=-1.0, high=1.0, size=size)
@@ -187,7 +187,10 @@ def ellipticity_ryden04(  # noqa: PLR0913
 
     # default size if not given
     if size is None:
-        size = xp.broadcast_arrays(mu, sigma, gamma, sigma_gamma)[0].shape
+        size = typing.cast(
+            "tuple[int, ...]",
+            xp.broadcast_arrays(mu, sigma, gamma, sigma_gamma)[0].shape,
+        )
 
     # broadcast all inputs to output shape
     # this makes it possible to efficiently resample later

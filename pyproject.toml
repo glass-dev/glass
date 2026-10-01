@@ -64,6 +64,7 @@ lint = [
 test = [
     "cosmology-api",
     "fitsio",
+    "packaging",
     "pytest",
     "pytest-benchmark",
     "pytest-cov",
