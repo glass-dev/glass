@@ -93,7 +93,7 @@ from glass.fields import (
     enumerate_spectra,
     gaussian_fields,
     generate,
-    generate_lognormal,
+    generate_lognormal,  # ty: ignore[deprecated]
     getcl,
     glass_to_healpix_spectra,
     healpix_to_glass_spectra,
