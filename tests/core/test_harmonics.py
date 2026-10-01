@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -50,3 +51,18 @@ def test_multalm(xp: ModuleType) -> None:
 
     result = glass.harmonics.multalm(alm, bl)
     xpx.testing.assert_equal(result, alm)
+
+
+def test_inverse_transform() -> None:
+    jax = pytest.importorskip("jax", reason="test requires jax")
+
+    alm_numpy = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], dtype=np.float32)
+    alm_jax = jax.numpy.asarray(alm_numpy, dtype=jax.numpy.float32)
+    lmax = 2
+    nside = 2
+
+    # https://github.com/data-apis/array-api-extra/issues/1005
+    xpx.testing.assert_equal(
+        glass.harmonics.inverse_transform(alm_numpy, lmax=lmax, nside=nside),
+        np.asarray(glass.harmonics.inverse_transform(alm_jax, lmax=lmax, nside=nside)),
+    )
