@@ -18,4 +18,4 @@ jobs:
     name: On label
     permissions:
       contents: read
-    uses: ./.github/workflows/run-examples.yaml
+    uses: $/.github/workflows/run-examples.yaml
