@@ -7,6 +7,16 @@ requires = [
 ]
 
 [dependency-groups]
+benchmarks = [
+    "camb",
+    "cosmology-api",
+    "cosmology-compat-camb",
+    "glass-ext-camb",
+    "jax==0.4.35; python_version < '3.13'",
+    "jax>=0.6.2; python_version >= '3.13'",
+    "matplotlib",
+    "numpy<2.4",
+]
 build = [
     "build",
 ]
@@ -38,6 +48,15 @@ docs = [
 doctest = [
     "jax",
     { include-group = "test" },
+]
+jax-rocm6 = [
+    "jax-rocm60-pjrt==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
+    "jax-rocm60-plugin==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
+    { include-group = "benchmarks" },
+]
+jax-rocm7 = [
+    "jax[rocm7-local]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.13'",
+    { include-group = "benchmarks" },
 ]
 lint = [
     "prek",
@@ -221,6 +240,13 @@ lint.isort = { known-first-party = [
 lint.mccabe.max-complexity = 18
 lint.per-file-ignores = { "__init__.py" = [
     "F401", # unused-import
+], "benchmarks/*" = [
+    "D100", # undocumented-public-module
+    "INP001", # implicit-namespace-package
+    "N806", # non-lowercase-variable-in-function
+    "PLR2004", # magic-value-comparison
+    "S311", # suspicious-non-cryptographic-random-usage
+    "SLF001", # private-member-access
 ], "docs/*" = [
     "D100", # undocumented-public-module
     "INP001", # implicit-namespace-package
@@ -279,6 +305,7 @@ trailing_comma_inline_array = true
 analysis.respect-type-ignore-comments = false
 rules = { all = "error", invalid-argument-type = "ignore" }
 src.include = [
+    "benchmarks",
     "glass",
     "tests",
 ]
