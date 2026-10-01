@@ -57,7 +57,7 @@ def read_timings(
 def main() -> None:
     """Generate a benchmark plot from a given list of csv files."""
     parser = argparse.ArgumentParser(
-        description="Plot benchmark timings from one or more CSV files."
+        description="Plot benchmark timings from one or more CSV files.",
     )
     parser.add_argument(
         "data_files",

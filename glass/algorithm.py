@@ -139,7 +139,8 @@ def cov_clip(
     # get tolerance if not given
     if rtol is None:
         rtol = typing.cast(
-            "float", max(v.shape[-2], v.shape[-1]) * xp.finfo(w.dtype).eps
+            "float",
+            max(v.shape[-2], v.shape[-1]) * xp.finfo(w.dtype).eps,
         )
 
     # clip negative diagonal values
