@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
 import array_api_extra as xpx
 
 import glass
@@ -53,11 +51,6 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
     results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
     assert len(results) == 3
-
-
-def test_shear_from_convergence() -> None:
-    """Add unit tests for :func:`glass.shear_from_convergence`."""
-    pytest.skip("No test yet implemented")
 
 
 def test_multi_plane_matrix(
