@@ -21,12 +21,6 @@ Lensing fields
 .. autofunction:: from_convergence
 .. autofunction:: shear_from_convergence
 
-
-Applying lensing
-----------------
-
-.. autofunction:: deflect
-
 """  # noqa: D400
 
 from __future__ import annotations
@@ -682,84 +676,3 @@ def multi_plane_weights(
     # combine weights and the matrix of lensing contributions
     mat = multi_plane_matrix(shells, cosmo)
     return xp.matmul(mat.T, weights)
-
-
-def deflect(
-    lon: float | FloatArray,
-    lat: float | FloatArray,
-    alpha: complex | ComplexArray | FloatArray,
-    xp: ModuleType | None = None,
-) -> tuple[
-    FloatArray,
-    FloatArray,
-]:
-    r"""
-    Apply deflections to positions.
-
-    .. deprecated:: >2025.2
-       Use :func:`glass.displace` instead.
-
-    Takes an array of :term:`deflection` values and applies them
-    to the given positions.
-
-    Parameters
-    ----------
-    lon
-        Longitudes to be deflected.
-    lat
-        Latitudes to be deflected.
-    alpha
-        Deflection values. Must be complex-valued or have a leading
-        axis of size 2 for the real and imaginary component.
-    xp
-        The array library backend to use for array operations. If this is not
-        specified, the backend will be determined from the input arrays.
-
-    Returns
-    -------
-        The longitudes and latitudes after deflection.
-
-    Raises
-    ------
-    ValueError
-        If neither an array nor the array backend ``xp`` are provided.
-
-    Notes
-    -----
-    Deflections on the sphere are :term:`defined <deflection>` as
-    follows:  The complex deflection :math:`\alpha` transports a point
-    on the sphere an angular distance :math:`|\alpha|` along the
-    geodesic with bearing :math:`\arg\alpha` in the original point.
-
-    In the language of differential geometry, this function is the
-    exponential map.
-
-    """
-    if xp is None:
-        xp = array_api_compat.array_namespace(lon, lat, alpha, use_compat=False)
-
-    alpha = xp.asarray(alpha)
-    if xp.isdtype(alpha.dtype, "complex floating"):
-        alpha1, alpha2 = xp.real(alpha), xp.imag(alpha)
-    else:
-        alpha1, alpha2 = alpha
-
-    # we know great-circle navigation:
-    # θ' = arctan2(√[(cosθ sin|α| - sinθ cos|α| cosγ)² + (sinθ sinγ)²],
-    #              cosθ cos|α| + sinθ sin|α| cosγ)
-    # δ = arctan2(sin|α| sinγ, sinθ cos|α| - cosθ sin|α| cosγ)
-
-    t = xpx.deg2rad(xp.asarray(lat))
-    ct, st = xp.sin(t), xp.cos(t)  # sin and cos flipped: lat not co-lat
-
-    a = xp.hypot(alpha1, alpha2)  # abs(alpha)
-    g = xp.atan2(alpha2, alpha1)  # arg(alpha)
-    ca, sa = xp.cos(a), xp.sin(a)
-    cg, sg = xp.cos(g), xp.sin(g)
-
-    # flipped atan2 arguments for lat instead of co-lat
-    tp = xp.atan2(ct * ca + st * sa * cg, xp.hypot(ct * sa - st * ca * cg, st * sg))
-
-    d = xp.atan2(sa * sg, st * ca - ct * sa * cg)
-
-    return lon - xpx.rad2deg(d), typing.cast("FloatArray", xpx.rad2deg(tp))
