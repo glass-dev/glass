@@ -273,8 +273,7 @@ class RadialWindow:
 
         """
         if self.za.shape[0] > 0:
-            return typing.cast(
-                "float",
+            return float(
                 uxpx.trapezoid(
                     self.za * self.wa,
                     self.za,

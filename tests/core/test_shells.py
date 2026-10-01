@@ -463,7 +463,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xpx.testing.assert_equal(w.zeff, xp.asarray(1.0))
+    assert w.zeff == 1.0
 
     # check zeff is NaN when redshift array is empty
 
