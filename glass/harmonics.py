@@ -8,9 +8,6 @@ __lazy_modules__ = [
 
 from typing import TYPE_CHECKING
 
-import s2fft
-import s2fft.sampling
-
 import array_api_compat
 
 import glass.healpix as hp
@@ -86,6 +83,9 @@ def inverse_transform(
 
     if xp.__name__ != "jax.numpy":
         return hp.alm2map(alm, nside, lmax=lmax)
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
 
     bandlimit = lmax + 1
     flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
