@@ -525,7 +525,7 @@ def effective_cls(
 
     # find lmax if not given
     if lmax is None:
-        lmax = int(max((cl.shape[0] for cl in cls), default=0) - 1)
+        lmax = max((cl.shape[0] for cl in cls), default=0) - 1  # ty: ignore[unsound-assignment]
 
     # broadcast weights1 such that its shape ends in n
     weights1 = xp.asarray(weights1)
