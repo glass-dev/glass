@@ -469,8 +469,6 @@ class Rotator:
         ----------
         coord
             A string or a tuple of 1 or 2 strings or a sequence of tuple.
-        xp
-            The array library backend to use for array operations.
 
         """
         self.coord = coord
