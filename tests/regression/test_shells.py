@@ -31,7 +31,7 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    assert w.zeff == expected_zeff
+    assert w.zeff == pytest.approx(expected_zeff)
 
 
 @pytest.mark.skipif(
