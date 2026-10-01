@@ -38,7 +38,6 @@ if TYPE_CHECKING:
     from glass._types import (
         AngularPowerSpectra,
         AnyArray,
-        ComplexArray,
         FloatArray,
         IntArray,
         T,
@@ -196,6 +195,12 @@ def cls2cov(
 ) -> Generator[FloatArray]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
+
+    Note that yielded arrays have backend-dependent aliasing semantics. With a
+    mutable backend such as NumPy, each yield reuses the same underlying ``cov``
+    array, so advancing the generator mutates all previously yielded values.
+    JAX's immutable arrays instead produce a distinct value for each yield.
+    Explicitly copy each yielded NumPy array if it must retain its value.
 
     Parameters
     ----------
@@ -388,10 +393,8 @@ def _generate_grf(
         # compute the correlated variate
         alm = sum(glass.harmonics.multalm(z, w[..., i + mis]) for i, z in enumerate(y))
 
-        alm = _glass_to_healpix_alm(alm)
-
         # modes with m = 0 are real-valued and come first in array
-        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)
+        alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)  # ty: ignore[not-subscriptable]
 
         # transform alm to maps
         # can be performed in place on the temporary alm array
@@ -814,28 +817,6 @@ def healpix_to_glass_spectra(spectra: Sequence[T]) -> list[T]:
 
     comb = [(i + k, i) for k in range(n) for i in range(n - k)]
     return [spectra[comb.index((i, j))] for i, j in spectra_indices(n)]
-
-
-def _glass_to_healpix_alm(alm: ComplexArray) -> ComplexArray:
-    """
-    Reorder alms in GLASS order to conform to (new) HEALPix order.
-
-    Parameters
-    ----------
-    alm
-        alm in GLASS order.
-
-    Returns
-    -------
-        alm in HEALPix order.
-
-    """
-    xp = alm.__array_namespace__()
-
-    n = _inv_triangle_number(alm.size)
-    ell = xp.arange(n)
-    out = [alm[ell[m:] * (ell[m:] + 1) // 2 + m] for m in ell]
-    return xp.concat(out)
 
 
 def lognormal_shift_hilbert2011(z: float) -> float:

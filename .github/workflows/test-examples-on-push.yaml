@@ -26,4 +26,4 @@ jobs:
     name: On push
     permissions:
       contents: read
-    uses: ./.github/workflows/run-examples.yaml
+    uses: $/.github/workflows/run-examples.yaml
