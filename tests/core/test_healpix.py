@@ -150,7 +150,7 @@ def test_ang2pix(  # noqa: PLR0913,PLR0917
     thetas = healpix_inputs.longitudes(max_theta, rng=urng)
     phis = healpix_inputs.latitudes(max_phi, rng=urng)
     old = healpix.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat)
-    new = hp.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat, xp=xp)
+    new = hp.ang2pix(healpix_inputs.nside, thetas, phis, lonlat=lonlat)
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
@@ -173,7 +173,7 @@ def test_ang2vec(  # noqa: PLR0913,PLR0917
     thetas = healpix_inputs.longitudes(max_theta, rng=urng)
     phis = healpix_inputs.latitudes(max_phi, rng=urng)
     old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
-    new = hp.ang2vec(thetas, phis, lonlat=lonlat, xp=xp)
+    new = hp.ang2vec(thetas, phis, lonlat=lonlat)
     assert type(old) is type(new)
     assert len(old) == len(new)
     for i in range(len(old)):

@@ -151,8 +151,6 @@ def ang2pix(
         Angular coordinates of a point on the sphere.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
-    xp
-        The array library backend to use for array operations.
 
     Returns
     -------
@@ -185,8 +183,6 @@ def ang2vec(
         Angular coordinates of a point on the sphere.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
-    xp
-        The array library backend to use for array operations.
 
     Returns
     -------
