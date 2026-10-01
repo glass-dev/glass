@@ -35,7 +35,7 @@ repos:
         args:
           - --strict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
+    rev: v0.16.9
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -86,7 +86,7 @@ repos:
         args:
           - --fix=safe
   - repo: https://github.com/astral-sh/ty-pre-commit
-    rev: v0.0.83
+    rev: v0.0.84
     hooks:
       - id: ty
         args:
