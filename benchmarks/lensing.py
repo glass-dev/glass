@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 import os
+from ast import literal_eval
+from typing import TYPE_CHECKING
 
+import jax
 import numpy as np
 from benchmark_utils import CosmologyWrapper, run_benchmark, xp_available_backends
 
@@ -17,8 +19,6 @@ import glass
 import glass.ext.camb  # ty: ignore[unresolved-import]
 from glass import rng
 
-import jax
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
@@ -26,8 +26,13 @@ if TYPE_CHECKING:
     from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
     from glass.shells import RadialWindow
 
-def lensing_benchmark(xp: ModuleType):
-    """Realistic lensing benchmark. Including setup steps and core simulation to be timed."""
+
+def lensing_benchmark(xp: ModuleType) -> None:
+    """
+    Realistic lensing benchmark.
+
+    Includes setup steps and core simulation to be timed.
+    """
     # cosmology for the simulation
     h = 0.7
     Oc = 0.25
@@ -58,7 +63,7 @@ def lensing_benchmark(xp: ModuleType):
     shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]
+    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]  # ty:ignore[unresolved-attribute]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -71,11 +76,6 @@ def lensing_benchmark(xp: ModuleType):
 
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
-
-    # localised redshift distribution
-    # the actual density per arcmin2 does not matter here, it is never used
-    z = xp.linspace(0.0, 1.0, 101)
-    dndz = xp.exp(-((z - 0.5) ** 2) / (0.1) ** 2)
 
     def timed_function(  # noqa: PLR0913
         *,
@@ -117,12 +117,12 @@ def lensing_benchmark(xp: ModuleType):
     )
 
 
-RUN_PROFILE: bool = os.environ.get("RUN_PROFILE", False)
+RUN_PROFILE: bool = literal_eval(os.environ.get("RUN_PROFILE", "False"))
 
 # Run benchmarks for each requested backend
 for xp in xp_available_backends.values():
     if RUN_PROFILE and xp.__name__ == "jax.numpy":
         with jax.profiler.trace("jax_trace", create_perfetto_trace=True):
-            lensing_benchmark()
+            lensing_benchmark(xp)
     else:
-        lensing_benchmark()
+        lensing_benchmark(xp)
