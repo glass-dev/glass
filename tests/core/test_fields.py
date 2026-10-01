@@ -267,28 +267,6 @@ def test_cls2cov_no_jax(xp: ModuleType) -> None:
         xpx.testing.assert_close(cov2_copy, cov3)
 
 
-def test_lognormal_gls(xp: ModuleType) -> None:
-    shift = 2
-
-    # empty cls
-
-    assert glass.lognormal_gls([], shift) == []  # ty: ignore[deprecated]
-
-    # check output shape
-
-    out = glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)  # ty: ignore[deprecated]
-    assert len(out) == 1
-    assert out[0].shape[0] == 5
-
-    inp = [xp.linspace(1, 6, 5), xp.linspace(1, 5, 4), xp.linspace(1, 4, 3)]
-    out = glass.lognormal_gls(inp, shift)  # ty: ignore[deprecated]
-
-    assert len(out) == 3
-    assert out[0].shape[0] == 5
-    assert out[1].shape[0] == 4
-    assert out[2].shape[0] == 3
-
-
 def test_discretized_cls(xp: ModuleType) -> None:
     # empty cls
 
@@ -401,18 +379,6 @@ def test_generate_grf(xp: ModuleType) -> None:
 
     with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([xp.asarray([])], nside))
-
-
-def test_generate_gaussian(xp: ModuleType) -> None:
-    with pytest.deprecated_call():
-        result = glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)  # ty: ignore[deprecated]
-    next(result)
-
-
-def test_generate_lognormal(xp: ModuleType) -> None:
-    with pytest.deprecated_call():
-        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)  # ty: ignore[deprecated]
-    next(result)
 
 
 def test_generate(xp: ModuleType) -> None:

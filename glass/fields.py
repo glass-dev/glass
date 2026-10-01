@@ -302,37 +302,6 @@ def discretized_cls(
     return gls
 
 
-@deprecated("use glass.solve_gaussian_spectra() instead")
-def lognormal_gls(
-    cls: AngularPowerSpectra,
-    shift: float = 1.0,
-) -> AngularPowerSpectra:
-    """
-    Compute Gaussian Cls for a lognormal random field.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.lognormal_fields` and
-       :func:`glass.compute_gaussian_spectra` or
-       :func:`glass.solve_gaussian_spectra` instead.
-
-    Parameters
-    ----------
-    cls
-        Angular matter power spectra in GLASS ordering.
-    shift
-        The shift parameter for the lognormal transformation.
-
-    Returns
-    -------
-        The Gaussian angular power spectra for a lognormal random field.
-
-    """
-    n = nfields_from_nspectra(len(cls))
-    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
-    return solve_gaussian_spectra(fields, cls)
-
-
 def _generate_grf(
     gls: AngularPowerSpectra,
     nside: int,
@@ -425,101 +394,7 @@ def _generate_grf(
         alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)  # ty: ignore[not-subscriptable]
 
         # transform alm to maps
-        # can be performed in place on the temporary alm array
-        yield hp.alm2map(alm, nside, pixwin=False, pol=False, inplace=True)
-
-
-@deprecated("use glass.generate() instead")
-def generate_gaussian(
-    gls: AngularPowerSpectra,
-    nside: int,
-    *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
-) -> Generator[FloatArray]:
-    """
-    Sample Gaussian random fields from Cls iteratively.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.generate` instead.
-
-    A generator that iteratively samples HEALPix maps of Gaussian random fields
-    with the given angular power spectra ``gls`` and resolution parameter
-    ``nside``.
-
-    The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated. This saves memory, as only `ncorr` previous
-    fields need to be kept.
-
-    The ``gls`` array must contain the angular power spectra of the
-    Gaussian random fields in :ref:`standard order <twopoint_order>`.
-
-    Parameters
-    ----------
-    gls
-        The Gaussian angular power spectra for a random field.
-    nside
-        The resolution parameter for the HEALPix maps.
-    ncorr
-        The number of correlated fields. If not given, all fields are correlated.
-    rng
-        Random number generator. If not given, a default RNG is used.
-
-    Yields
-    ------
-    fields
-        The Gaussian random fields.
-
-    Raises
-    ------
-    ValueError
-        If all gls are empty.
-
-    """
-    n = nfields_from_nspectra(len(gls))
-    fields = [glass.grf.Normal() for _ in range(n)]
-    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
-
-
-@deprecated("use glass.generate() instead")
-def generate_lognormal(
-    gls: AngularPowerSpectra,
-    nside: int,
-    shift: float = 1.0,
-    *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
-) -> Generator[FloatArray]:
-    """
-    Sample lognormal random fields from Gaussian Cls iteratively.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.generate` instead.
-
-    Parameters
-    ----------
-    gls
-        The Gaussian angular power spectra for a lognormal random field.
-    nside
-        The resolution parameter for the HEALPix maps.
-    shift
-        The shift parameter for the lognormal transformation.
-    ncorr
-        The number of correlated fields. If not given, all fields are correlated.
-    rng
-        Random number generator. If not given, a default RNG is used.
-
-    Yields
-    ------
-    fields
-        The lognormal random fields.
-
-    """
-    n = nfields_from_nspectra(len(gls))
-    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
-    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
+        yield hp.alm2map(alm, nside, pixwin=False, pol=False)
 
 
 def getcl(
