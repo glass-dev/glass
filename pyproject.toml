@@ -17,6 +17,19 @@ benchmarks = [
     "matplotlib",
     "numpy<2.4",
 ]
+benchmarks-cuda13 = [
+    "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
+    { include-group = "benchmarks" },
+]
+benchmarks-rocm6 = [
+    "jax-rocm60-pjrt==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
+    "jax-rocm60-plugin==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
+    { include-group = "benchmarks" },
+]
+benchmarks-rocm7 = [
+    "jax[rocm7-local]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.13'",
+    { include-group = "benchmarks" },
+]
 build = [
     "build",
 ]
@@ -48,15 +61,6 @@ docs = [
 doctest = [
     "jax",
     { include-group = "test" },
-]
-jax-rocm6 = [
-    "jax-rocm60-pjrt==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
-    "jax-rocm60-plugin==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
-    { include-group = "benchmarks" },
-]
-jax-rocm7 = [
-    "jax[rocm7-local]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.13'",
-    { include-group = "benchmarks" },
 ]
 lint = [
     "prek",

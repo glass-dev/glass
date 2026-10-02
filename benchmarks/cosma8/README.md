@@ -25,14 +25,24 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the GPU benchmark, there is an additional dependency group `jax-rocm7` which
-includes `benchmarks`:
+For GPU benchmarks, there are additional dependency groups which also include
+`benchmarks`.
+
+To run on the AMD partitions of Cosma8:
 
 ```sh
-uv sync --group jax-rocm7
+uv sync --group benchmarks-rocm7
+```
+
+To run on the CUDA partitions of Cosma8:
+
+```sh
+uv sync --group benchmarks-cuda13
 ```
 
 ## Running the benchmarks
+
+### ROCm
 
 Benchmarks can be submitted as a batch job to slurm via the provided script. For
 example to benchmark using JAX with AMD/ROCm, run the following from the root of
@@ -65,3 +75,31 @@ ssh ga008
 Access to these different partitions/queues must be requested via the DiRAC
 SAFE. For further information
 [read the docs](https://cosma.readthedocs.io/en/latest/account.html).
+
+### CUDA
+
+Cosma8 provides some direct ssh access nodes for testing CUDA applications - see
+the [docs](https://cosma.readthedocs.io/en/latest/gpu.html).
+
+Fist install your dependencies
+
+```sh
+uv venv
+uv sync --group benchmarks-cuda13
+```
+
+Then setup your env on the GPU node
+
+```sh
+ssh gn005
+cd glass
+export XLA_PYTHON_CLIENT_PREALLOCATE=false # <-- Needed to prevent OOM errors
+```
+
+Finally, run the benchmark:
+
+```sh
+export ARRAY_BACKEND=jax
+export HEALPY_DATAPATH="$(pwd)/healpy-data"
+uv run python benchmarks/lensing.py
+```
