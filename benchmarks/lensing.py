@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import os
+from ast import literal_eval
 from typing import TYPE_CHECKING
 
+import jax
 import numpy as np
 from benchmark_utils import CosmologyWrapper, run_benchmark, xp_available_backends
 
@@ -24,15 +27,19 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
-# Run benchmarks for each requested backend
-for xp in xp_available_backends.values():
+def lensing_benchmark(xp: ModuleType) -> None:
+    """
+    Realistic lensing benchmark.
+
+    Includes setup steps and core simulation to be timed.
+    """
     # cosmology for the simulation
     h = 0.7
     Oc = 0.25
     Ob = 0.05
 
     # basic parameters of the simulation
-    nside = lmax = 256
+    nside = lmax = 128
 
     # set up CAMB parameters for matter angular power spectrum
     pars = camb.set_params(
@@ -56,7 +63,7 @@ for xp in xp_available_backends.values():
     shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]
+    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]  # ty:ignore[unresolved-attribute]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -70,12 +77,7 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    # localised redshift distribution
-    # the actual density per arcmin2 does not matter here, it is never used
-    z = xp.linspace(0.0, 1.0, 101)
-    dndz = xp.exp(-((z - 0.5) ** 2) / (0.1) ** 2)
-
-    def lensing_benchmark(  # noqa: PLR0913
+    def timed_function(  # noqa: PLR0913
         *,
         cosmo: CosmologyWrapper,
         fields: Sequence[glass.grf.Lognormal],
@@ -84,7 +86,7 @@ for xp in xp_available_backends.values():
         shells: list[RadialWindow],
         xp: ModuleType,
     ) -> FloatArray:
-        """Realistic lensing simulation benchmark."""
+        """Core simulation of the Realistic lensing benchmark to be timed."""
         urng: UnifiedGenerator = rng.default_rng(xp=xp)
 
         # this will compute the convergence field iteratively
@@ -105,7 +107,7 @@ for xp in xp_available_backends.values():
 
     # Run benchmark passing convergence and matter
     run_benchmark(
-        lensing_benchmark,
+        timed_function,
         cosmo=cosmo,
         fields=fields,
         gls=gls,
@@ -113,3 +115,14 @@ for xp in xp_available_backends.values():
         shells=shells,
         xp=xp,
     )
+
+
+RUN_PROFILE: bool = literal_eval(os.environ.get("RUN_PROFILE", "False"))
+
+# Run benchmarks for each requested backend
+for xp in xp_available_backends.values():
+    if RUN_PROFILE and xp.__name__ == "jax.numpy":
+        with jax.profiler.trace("jax_trace", create_perfetto_trace=True):
+            lensing_benchmark(xp)
+    else:
+        lensing_benchmark(xp)
