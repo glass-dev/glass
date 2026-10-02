@@ -25,6 +25,7 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
+GRADIENTS_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 SHARED_PYTEST_BENCHMARK_FLAGS = [
@@ -101,6 +102,21 @@ def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     _setup_array_backend(session)
     session.run("pytest", *session.posargs)
+
+
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+    uv_sync_locked=False,
+)
+def tests_gradients(session: nox.Session) -> None:
+    """Run the JAX gradients unit tests."""
+    session.install(ARRAY_BACKENDS["jax"])
+    session.run(
+        "pytest",
+        GRADIENTS_TESTS_LOC,
+        *session.posargs,
+    )
 
 
 @nox_uv.session(
