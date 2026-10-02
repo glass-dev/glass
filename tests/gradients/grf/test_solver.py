@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-jax = pytest.importorskip("jax", reason="tests require jax")
-import jax.numpy as jnp  # noqa: E402
+pytest.importorskip("jax", reason="tests require jax")
+import jax.numpy as jnp
+import jax.test_util
 
-import glass  # noqa: E402
+import glass
 
 if TYPE_CHECKING:
     from collections.abc import Callable
