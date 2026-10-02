@@ -398,7 +398,11 @@ def test_distance_grid(
         match="exactly one of grid step size or number of steps must be given",
     ):
         glass.distance_grid(
-            cosmo_with_inverse_comoving_distance, zmin, zmax, dx=dx, num=num
+            cosmo_with_inverse_comoving_distance,
+            zmin,
+            zmax,
+            dx=dx,
+            num=num,
         )
 
 
@@ -459,7 +463,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xpx.testing.assert_equal(w.zeff, xp.asarray(1.0))
+    assert w.zeff == 1.0
 
     # check zeff is NaN when redshift array is empty
 

@@ -64,6 +64,9 @@ def test_iternorm_specify_size(
         array_in = [xp.asarray([1.0, 0.5, 0.1])] * 10_000
     elif num_dimensions == 2:
         array_in = [xp.asarray([[1.0, 0.5, 0.1]] * 3)] * 10_000
+    else:
+        msg = f"unsupported num_dimensions: {num_dimensions}"
+        raise ValueError(msg)
 
     def function_to_benchmark() -> list[Any]:
         generator = glass.iternorm(array_in)

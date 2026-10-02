@@ -330,7 +330,7 @@ def galaxy_shear(  # noqa: PLR0913,PLR0917
     for i in range(0, size, 10_000):
         upper_bound = min(size, i + 10_000)
         s = slice(i, upper_bound)
-        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True, xp=xp)
+        ipix = hp.ang2pix(nside, lon[s], lat[s], lonlat=True)
         k = xpx.at(k)[s].set(kappa[ipix])
         g = xpx.at(g)[s].set(gamma1[ipix] + 1j * gamma2[ipix])
 
