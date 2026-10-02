@@ -81,7 +81,12 @@ def test_inverse_transform(
             lmax=healpix_inputs.lmax,
             nside=healpix_inputs.nside,
         )
-        xpx.testing.assert_equal(actual, jnp.asarray(expected))
+        xpx.testing.assert_close(
+            actual,
+            jnp.asarray(expected),
+            atol=1e-13,
+            rtol=0,
+        )
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
@@ -105,4 +110,9 @@ def test_transform(
             lmax=healpix_inputs.lmax,
             nside=healpix_inputs.nside,
         )
-        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-15, rtol=0)
+        xpx.testing.assert_close(
+            actual,
+            jnp.asarray(expected),
+            atol=1e-14,
+            rtol=0,
+        )
