@@ -118,10 +118,10 @@ auto-differentiability. To verify this, we have unit tests, which utilise
 [`jax.test_util.check_grads`](https://docs.jax.dev/en/latest/_autosummary/jax.test_util.check_grads.html),
 defined in [tests/gradients/](./tests/gradients/).
 
-These gradients tests can be run directly from pytest like so:
+These gradients tests can be run via nox:
 
 ```sh
-uv run pytest tests/gradients
+uv run nox -s coverage_gradients
 ```
 
 ## Documenting
