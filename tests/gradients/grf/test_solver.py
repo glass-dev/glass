@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 pytest.importorskip("jax", reason="tests require jax")
+
 import jax.numpy as jnp
 import jax.test_util
 
@@ -25,6 +26,7 @@ def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
 def test_one_transformation(cl: FloatArray) -> None:
     """Tests glass.grf.solve is auto differentiable when using JAX."""
     pytest.skip("glass.grf.solve is not auto differentiable")
+
     lam = 0.12345
     t = glass.grf.Lognormal(lam)
 
@@ -41,6 +43,7 @@ def test_one_transformation(cl: FloatArray) -> None:
 def test_pad(cl: FloatArray) -> None:
     """Tests glass.grf.solve is auto differentiable when using JAX and pad."""
     pytest.skip("glass.grf.solve is not auto differentiable")
+
     lam = 0.12345
     t = glass.grf.Lognormal(lam)
 
@@ -57,6 +60,7 @@ def test_pad(cl: FloatArray) -> None:
 def test_initial(cl: FloatArray) -> None:
     """Tests glass.grf.solve is auto differentiable when using JAX and initial."""
     pytest.skip("glass.grf.solve is not auto differentiable")
+
     lam = 0.12345
     t = glass.grf.Lognormal(lam)
     gl = glass.grf.compute(cl, t)
@@ -74,6 +78,7 @@ def test_initial(cl: FloatArray) -> None:
 def test_no_iterations(cl: FloatArray) -> None:
     """Tests glass.grf.solve is auto differentiable when using JAX and maxiter=0."""
     pytest.skip("glass.grf.solve is not auto differentiable")
+
     lam = 0.12345
     t = glass.grf.Lognormal(lam)
 
@@ -90,6 +95,7 @@ def test_no_iterations(cl: FloatArray) -> None:
 def test_monopole(cl: FloatArray) -> None:
     """Tests glass.grf.solve is auto differentiable when using JAX with monopole."""
     pytest.skip("glass.grf.solve is not auto differentiable")
+
     lam = 0.12345
     t = glass.grf.Lognormal(lam)
     cltol = 1e-7

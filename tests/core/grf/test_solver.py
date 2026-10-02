@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -103,7 +104,7 @@ def test_monopole(
 ) -> None:
     t = glass.grf.Lognormal()
 
-    rng = get_rng(np)
+    rng = typing.cast("np.random.Generator", get_rng(np))
     cl[0] = rng.random()
     gl0 = rng.random()
 

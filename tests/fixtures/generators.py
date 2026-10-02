@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
 
 
-
 @pytest.fixture(scope="session")
 def get_rng() -> Callable[..., UnifiedGenerator]:
     """
@@ -23,7 +22,7 @@ def get_rng() -> Callable[..., UnifiedGenerator]:
 
     Use `urng` for array API tests.
     """
-    return lambda xp : glass.rng.default_rng(xp=xp)
+    return lambda xp: glass.rng.default_rng(xp=xp)
 
 
 @pytest.fixture

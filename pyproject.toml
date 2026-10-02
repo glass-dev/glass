@@ -280,6 +280,7 @@ lint.per-file-ignores = { "__init__.py" = [
     "SLF001", # private-member-access
 ], "tests/gradients/*" = [
     "D100", # undocumented-public-module
+    "SLF001", # private-member-access
 ], "tests/regression/*" = [
     "D100", # undocumented-public-module
     "PLR2004", # magic-value-comparison
@@ -318,6 +319,7 @@ terminal.error-on-warning = true
 include = [
     "glass/**",
     "tests/core/**",
+    "tests/fixtures/**",
 ]
 rules.unsupported-operator = "ignore"
 
