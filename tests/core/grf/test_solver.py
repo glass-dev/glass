@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -10,21 +11,22 @@ import array_api_extra as xpx
 import glass.grf
 
 if TYPE_CHECKING:
-    from glass._types import FloatArray
+    from collections.abc import Callable
+
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 @pytest.fixture(scope="session")
-def cl() -> FloatArray:
-    lmax = 100
-    ell = np.arange(lmax + 1)
-    return 1e-2 / (2 * ell + 1) ** 2
+def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
+    """Generate a consistent cl for JAX."""
+    return get_cl(np)
 
 
 def test_one_transformation(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
-    lam = rng.random()
+    lam = get_rng(np).random()
     t = glass.grf.Lognormal(lam)
 
     gl1, _, _ = glass.grf.solve(cl, t)
@@ -35,9 +37,9 @@ def test_one_transformation(
 
 def test_pad(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
-    lam = rng.random()
+    lam = get_rng(np).random()
     t = glass.grf.Lognormal(lam)
 
     # check that output size matches pad
@@ -51,9 +53,9 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
-    lam = rng.random()
+    lam = get_rng(np).random()
     t = glass.grf.Lognormal(lam)
 
     gl = glass.grf.compute(cl, t)
@@ -75,12 +77,12 @@ def test_no_iterations(cl: FloatArray) -> None:
 
 def test_lognormal(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
     t1 = glass.grf.Lognormal()
     t2 = glass.grf.Lognormal()
 
-    gl0 = rng.random()
+    gl0 = get_rng(np).random()
 
     cltol = 1e-7
 
@@ -98,10 +100,11 @@ def test_lognormal(
 
 def test_monopole(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
     t = glass.grf.Lognormal()
 
+    rng = typing.cast("np.random.Generator", get_rng(np))
     cl[0] = rng.random()
     gl0 = rng.random()
 

@@ -18,8 +18,9 @@ concurrency:
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 env:
-  REG_COV_NAME: cov-reg
   CORE_COV_NAME: cov-core
+  GRAD_COV_NAME: cov-grad
+  REG_COV_NAME: cov-reg
 
 jobs:
   tests-reg:
@@ -146,10 +147,61 @@ jobs:
           flag-name: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
           parallel: true
 
+  tests-grad:
+    if: github.event.pull_request.draft == false
+    name: JAX gradients Tests
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up uv
+        # yamllint disable-line rule:line-length
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: 3.14
+
+      - name: Cache nox
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          key:
+            tests-core-${{ hashFiles('pyproject.toml') }}-${{
+            hashFiles('noxfile.py') }}
+          path: .nox
+
+      - name: Install only dev dependencies
+        run: uv sync --only-dev
+
+      - name: Run JAX gradients tests and generate coverage report
+        run: uv run nox -s coverage_gradients --verbose
+        env:
+          COVERAGE_FILE: ${{ env.GRAD_COV_NAME }}
+          FORCE_COLOR: 1
+
+      - name: Generate XML report for JAX gradients tests
+        run: >-
+          uv run coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
+          env.GRAD_COV_NAME }}.xml
+
+      - name: Upload JAX gradients coverage to Coveralls
+        # yamllint disable-line rule:line-length
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
+        with:
+          base-path: glass/
+          file: ${{ env.GRAD_COV_NAME }}.xml
+          flag-name: ${{ env.GRAD_COV_NAME }}
+          parallel: true
+
   aggregate-tests:
     needs:
       - tests-reg
       - tests-core
+      - tests-grad
     if: always()
     permissions: {}
     runs-on: ubuntu-latest
@@ -161,7 +213,9 @@ jobs:
           carryforward:
             ${{ env.REG_COV_NAME }},${{ env.CORE_COV_NAME }}-3.11,${{
             env.CORE_COV_NAME }}-3.12,${{ env.CORE_COV_NAME }}-3.13,${{
-            env.CORE_COV_NAME }}-3.14
+            env.CORE_COV_NAME }}-3.14,${{ env.GRAD_COV_NAME }}-3.11,${{
+            env.GRAD_COV_NAME }}-3.12,${{ env.GRAD_COV_NAME }}-3.13,${{
+            env.GRAD_COV_NAME }}-3.14
           parallel-finished: true
 
   build:

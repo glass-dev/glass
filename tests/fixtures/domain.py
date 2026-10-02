@@ -10,6 +10,7 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
 
     from glass._types import FloatArray
@@ -142,3 +143,9 @@ def shells(xp: ModuleType) -> list[glass.RadialWindow]:  # noqa: D103
             5.0,
         ),
     ]
+
+
+@pytest.fixture(scope="session")
+def get_cl() -> Callable[..., FloatArray]:
+    """Generate a consistent cl for a chosen array backend."""
+    return lambda xp: 1e-2 / (2 * xp.arange(100 + 1) + 1) ** 2
