@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -67,21 +66,17 @@ def test_inverse_transform(
     alm = healpix_inputs.alm(rng=rng)
 
     with jax.enable_x64(True):
-        # https://github.com/data-apis/array-api-extra/issues/1005
-        xpx.testing.assert_equal(
-            glass.harmonics.inverse_transform(
-                alm,
-                lmax=healpix_inputs.lmax,
-                nside=healpix_inputs.nside,
-            ),
-            np.asarray(
-                glass.harmonics.inverse_transform(
-                    jnp.asarray(alm),
-                    lmax=healpix_inputs.lmax,
-                    nside=healpix_inputs.nside,
-                ),
-            ),
+        expected = glass.harmonics.inverse_transform(
+            alm,
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
         )
+        actual = glass.harmonics.inverse_transform(
+            jnp.asarray(alm),
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
+        )
+        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-12, rtol=0)
 
 
 def test_transform(
@@ -95,20 +90,14 @@ def test_transform(
     kappa = healpix_inputs.kappa(rng=rng)
 
     with jax.enable_x64(True):
-        # https://github.com/data-apis/array-api-extra/issues/1005
-        xpx.testing.assert_close(
-            glass.harmonics.transform(
-                kappa,
-                lmax=healpix_inputs.lmax,
-                nside=healpix_inputs.nside,
-            ),
-            np.asarray(
-                glass.harmonics.transform(
-                    jnp.asarray(kappa),
-                    lmax=healpix_inputs.lmax,
-                    nside=healpix_inputs.nside,
-                ),
-            ),
-            atol=1e-15,
-            rtol=0,
+        expected = glass.harmonics.transform(
+            kappa,
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
         )
+        actual = glass.harmonics.transform(
+            jnp.asarray(kappa),
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
+        )
+        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-15, rtol=0)
