@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import HealpixInputs
 
 # check if available for testing
-HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
 HAVE_JAX = importlib.util.find_spec("jax") is not None
 HAVE_S2FFT = importlib.util.find_spec("s2fft") is not None
 
@@ -82,7 +81,7 @@ def test_inverse_transform(
             lmax=healpix_inputs.lmax,
             nside=healpix_inputs.nside,
         )
-        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-12, rtol=0)
+        xpx.testing.assert_equal(actual, jnp.asarray(expected))
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
