@@ -222,7 +222,7 @@ def map2alm(
     lmax: int | None = None,
     pol: bool = True,
     use_pixel_weights: bool = False,
-) -> FloatArray:
+) -> ComplexArray:
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
 

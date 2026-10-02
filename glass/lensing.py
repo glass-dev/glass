@@ -35,6 +35,7 @@ from typing import TYPE_CHECKING, Literal
 import array_api_compat
 import array_api_extra as xpx
 
+import glass.harmonics
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
@@ -293,7 +294,7 @@ def from_convergence(  # noqa: PLR0913
         lmax = 3 * nside - 1
 
     # compute alm
-    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
+    alm = glass.harmonics.transform(kappa, lmax=lmax, nside=nside)
 
     # mode number; all conversions are factors of this.
     # Must be float to allow division later
@@ -313,7 +314,7 @@ def from_convergence(  # noqa: PLR0913
 
     # if potential is requested, compute map and add to output
     if potential:
-        psi = hp.alm2map(alm, nside, lmax=lmax)
+        psi = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
         results += (psi,)
 
     # if no spin-weighted maps are requested, stop here

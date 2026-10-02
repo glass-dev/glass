@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
 
 import pytest
@@ -10,6 +11,13 @@ import glass.harmonics
 
 if TYPE_CHECKING:
     from types import ModuleType
+
+    from glass._types import UnifiedGenerator
+    from tests.fixtures.helper_classes import HealpixInputs
+
+# check if available for testing
+HAVE_JAX = importlib.util.find_spec("jax") is not None
+HAVE_S2FFT = importlib.util.find_spec("s2fft") is not None
 
 
 def test_multalm(xp: ModuleType) -> None:
@@ -50,3 +58,51 @@ def test_multalm(xp: ModuleType) -> None:
 
     result = glass.harmonics.multalm(alm, bl)
     xpx.testing.assert_equal(result, alm)
+
+
+@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
+def test_inverse_transform(
+    healpix_inputs: type[HealpixInputs],
+    rng: UnifiedGenerator,
+) -> None:
+    import jax
+    import jax.numpy as jnp
+
+    alm = healpix_inputs.alm(rng=rng)
+
+    with jax.enable_x64(True):  # noqa: FBT003
+        expected = glass.harmonics.inverse_transform(
+            alm,
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
+        )
+        actual = glass.harmonics.inverse_transform(
+            jnp.asarray(alm),
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
+        )
+        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-13, rtol=0)
+
+
+@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
+def test_transform(
+    healpix_inputs: type[HealpixInputs],
+    rng: UnifiedGenerator,
+) -> None:
+    import jax
+    import jax.numpy as jnp
+
+    kappa = healpix_inputs.kappa(rng=rng)
+
+    with jax.enable_x64(True):  # noqa: FBT003
+        expected = glass.harmonics.transform(
+            kappa,
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
+        )
+        actual = glass.harmonics.transform(
+            jnp.asarray(kappa),
+            lmax=healpix_inputs.lmax,
+            nside=healpix_inputs.nside,
+        )
+        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)

@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
+import glass.healpix as hp
+
 if TYPE_CHECKING:
     from glass._types import ComplexArray, FloatArray
 
@@ -49,3 +51,94 @@ def multalm(
 
     factors = xp.concat(tuple(bl[m:] for m in range(bl.size)))
     return alm * factors
+
+
+def inverse_transform(
+    alm: ComplexArray,
+    *,
+    lmax: int,
+    nside: int,
+) -> FloatArray:
+    """
+    Compute the inverse spherical harmonic transform of alm.
+
+    Convert scalar HEALPix harmonic coefficients into a map without pixel-window
+    smoothing. Use the S2FFT healpy wrapper for JAX arrays.
+
+    Parameters
+    ----------
+    alm
+        The spherical harmonic coefficients to transform.
+    lmax
+        The maximum multipole of the spherical harmonic transform.
+    nside
+        The nside parameter of the output map.
+
+    Returns
+    -------
+        The real-space map resulting from the inverse spherical harmonic transform.
+
+    """
+    xp = alm.__array_namespace__()
+
+    if xp.__name__ != "jax.numpy":
+        return hp.alm2map(alm, nside, lmax=lmax)
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
+    maps = s2fft.inverse(
+        flm,
+        bandlimit,
+        method="jax",
+        nside=nside,
+        sampling="healpix",
+    )
+    # S2FFT returns complex values, but the map should be real-valued
+    # https://github.com/astro-informatics/s2fft/issues/411
+    return xp.real(maps)
+
+
+def transform(
+    maps: FloatArray,
+    *,
+    lmax: int,
+    nside: int,
+) -> ComplexArray:
+    """
+    Compute the spherical harmonic transform of a map.
+
+    Parameters
+    ----------
+    maps
+        The real-space map to transform.
+    lmax
+        The maximum multipole of the spherical harmonic transform.
+    nside
+        The nside parameter of the input map.
+
+    Returns
+    -------
+        The spherical harmonic coefficients resulting from the transform.
+
+    """
+    xp = maps.__array_namespace__()
+
+    if xp.__name__ != "jax.numpy":
+        return hp.map2alm(maps, lmax=lmax)
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    flm = s2fft.forward(
+        maps,
+        bandlimit,
+        iter=3,
+        method="jax",
+        nside=nside,
+        sampling="healpix",
+    )
+    return s2fft.sampling.reindex.flm_2d_to_hp_fast(flm, bandlimit)

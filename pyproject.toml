@@ -40,6 +40,7 @@ docs = [
     "matplotlib",
     "myst-parser",
     "nbsphinx",
+    "s2fft",
     "sphinx-autodoc-typehints",
     "sphinx-toolbox",
     "sphinx<8.2.0",
@@ -47,6 +48,7 @@ docs = [
 ]
 doctest = [
     "jax",
+    "s2fft",
     { include-group = "test" },
 ]
 jax-rocm6 = [
@@ -82,6 +84,7 @@ typechecking = [
     "pytest",
     "pytest-benchmark",
     "pytest-mock",
+    "s2fft",
 ]
 
 [project]

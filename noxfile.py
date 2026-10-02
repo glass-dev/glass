@@ -1,5 +1,6 @@
 """Nox config."""
 
+import itertools
 import os
 import pathlib
 import shutil
@@ -22,8 +23,8 @@ ALL_PYTHON = [
     "3.14",
 ]
 ARRAY_BACKENDS = {
-    "array_api_strict": "array-api-strict>=2",
-    "jax": "jax>=0.4.32",
+    "array_api_strict": ("array-api-strict>=2",),
+    "jax": ("jax>=0.4.32", "s2fft>=1.4.0"),
 }
 REG_TESTS_LOC = pathlib.Path("tests/regression")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
@@ -85,11 +86,11 @@ def _setup_array_backend(session: nox.Session) -> None:
     """Installs the requested array_backend."""
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
-        session.install(ARRAY_BACKENDS["array_api_strict"])
+        session.install(*ARRAY_BACKENDS["array_api_strict"])
     elif array_backend == "jax":
-        session.install(ARRAY_BACKENDS["jax"])
+        session.install(*ARRAY_BACKENDS["jax"])
     elif array_backend == "all":
-        session.install(*ARRAY_BACKENDS.values())
+        session.install(*itertools.chain.from_iterable(ARRAY_BACKENDS.values()))
 
 
 @nox_uv.session(

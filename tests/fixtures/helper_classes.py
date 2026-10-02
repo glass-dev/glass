@@ -94,12 +94,19 @@ class HealpixInputs:
 
     @staticmethod
     def alm(*, rng: UnifiedGenerator) -> ComplexArray:
-        """Generate random alm coefficients."""
-        return rng.standard_normal(  # ty: ignore[unsupported-operator]
-            HealpixInputs.alm_size,
-        ) + 1j * rng.standard_normal(
-            HealpixInputs.alm_size,
+        """Generate random alm coefficients for a real-valued map."""
+        real = rng.standard_normal(HealpixInputs.alm_size)
+        imag = rng.standard_normal(HealpixInputs.alm_size)
+
+        xp = real.__array_namespace__()
+        # a real-valued map should have zero imaginary components for m=0 modes
+        imag = xp.concat(
+            (
+                xp.zeros_like(imag[: HealpixInputs.lmax + 1]),
+                imag[HealpixInputs.lmax + 1 :],
+            ),
         )
+        return real + 1j * imag
 
     @staticmethod
     def fl(*, rng: UnifiedGenerator) -> FloatArray:
