@@ -109,21 +109,6 @@ def tests(session: nox.Session) -> None:
     uv_groups=["test"],
     uv_sync_locked=False,
 )
-def tests_gradients(session: nox.Session) -> None:
-    """Run the JAX gradients unit tests."""
-    session.install(ARRAY_BACKENDS["jax"])
-    session.run(
-        "pytest",
-        GRADIENTS_TESTS_LOC,
-        *session.posargs,
-    )
-
-
-@nox_uv.session(
-    python=ALL_PYTHON,
-    uv_groups=["test"],
-    uv_sync_locked=False,
-)
 def coverage(session: nox.Session) -> None:
     """Run tests and compute coverage for the core tests."""
     _setup_array_backend(session)
@@ -150,6 +135,23 @@ def coverage_regression(session: nox.Session) -> None:
         *session.posargs,
         env=os.environ,
         success_codes=[0, 5],
+    )
+
+
+@nox_uv.session(
+    python=ALL_PYTHON,
+    uv_groups=["test"],
+    uv_sync_locked=False,
+)
+def coverage_gradients(session: nox.Session) -> None:
+    """Run tests and compute coverage for the JAX gradients tests."""
+    session.install(ARRAY_BACKENDS["jax"])
+    session.run(
+        "pytest",
+        GRADIENTS_TESTS_LOC,
+        "--cov",
+        *session.posargs,
+        env=os.environ,
     )
 
 
