@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import HealpixInputs
 
+# check if available for testing
 HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
 
 
