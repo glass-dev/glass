@@ -270,8 +270,6 @@ lint.per-file-ignores = { "__init__.py" = [
 ], "tests/*" = [
     "INP001", # implicit-namespace-package
     "S101", # assert
-], "tests/auto_diff/*" = [
-    "D100", # undocumented-public-module
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
@@ -280,6 +278,8 @@ lint.per-file-ignores = { "__init__.py" = [
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
     "SLF001", # private-member-access
+], "tests/gradients/*" = [
+    "D100", # undocumented-public-module
 ], "tests/regression/*" = [
     "D100", # undocumented-public-module
     "PLR2004", # magic-value-comparison
