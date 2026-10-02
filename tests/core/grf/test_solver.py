@@ -12,7 +12,7 @@ import glass.grf
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from glass._types import FloatArray
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 @pytest.fixture(scope="session")
@@ -23,9 +23,9 @@ def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
 
 def test_one_transformation(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
-    lam = rng.random()
+    lam = get_rng(np).random()
     t = glass.grf.Lognormal(lam)
 
     gl1, _, _ = glass.grf.solve(cl, t)
@@ -36,9 +36,9 @@ def test_one_transformation(
 
 def test_pad(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
-    lam = rng.random()
+    lam = get_rng(np).random()
     t = glass.grf.Lognormal(lam)
 
     # check that output size matches pad
@@ -52,9 +52,9 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
-    lam = rng.random()
+    lam = get_rng(np).random()
     t = glass.grf.Lognormal(lam)
 
     gl = glass.grf.compute(cl, t)
@@ -76,12 +76,12 @@ def test_no_iterations(cl: FloatArray) -> None:
 
 def test_lognormal(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
     t1 = glass.grf.Lognormal()
     t2 = glass.grf.Lognormal()
 
-    gl0 = rng.random()
+    gl0 = get_rng(np).random()
 
     cltol = 1e-7
 
@@ -99,10 +99,11 @@ def test_lognormal(
 
 def test_monopole(
     cl: FloatArray,
-    rng: np.random.Generator,
+    get_rng: Callable[..., UnifiedGenerator],
 ) -> None:
     t = glass.grf.Lognormal()
 
+    rng = get_rng(np)
     cl[0] = rng.random()
     gl0 = rng.random()
 

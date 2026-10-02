@@ -4,26 +4,26 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass.rng
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
 
 
+
 @pytest.fixture(scope="session")
-def rng() -> np.random.Generator:
+def get_rng() -> Callable[..., UnifiedGenerator]:
     """
-    RNG fixture for non array API tests.
+    Return an RNG fixture for non array API tests.
 
     Use `urng` for array API tests.
-
     """
-    return np.random.default_rng(seed=glass.rng.SEED)
+    return lambda xp : glass.rng.default_rng(xp=xp)
 
 
 @pytest.fixture
