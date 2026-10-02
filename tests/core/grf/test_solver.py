@@ -10,14 +10,15 @@ import array_api_extra as xpx
 import glass.grf
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from glass._types import FloatArray
 
 
 @pytest.fixture(scope="session")
-def cl() -> FloatArray:
-    lmax = 100
-    ell = np.arange(lmax + 1)
-    return 1e-2 / (2 * ell + 1) ** 2
+def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
+    """Generate a consistent cl for JAX."""
+    return get_cl(np)
 
 
 def test_one_transformation(

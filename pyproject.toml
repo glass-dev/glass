@@ -270,6 +270,8 @@ lint.per-file-ignores = { "__init__.py" = [
 ], "tests/*" = [
     "INP001", # implicit-namespace-package
     "S101", # assert
+], "tests/auto_diff/*" = [
+    "D100", # undocumented-public-module
 ], "tests/core/*" = [
     "ANN001", # missing-type-function-argument
     "ANN202", # missing-return-type-private-function
