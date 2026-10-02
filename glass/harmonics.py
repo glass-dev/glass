@@ -89,13 +89,16 @@ def inverse_transform(
 
     bandlimit = lmax + 1
     flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
-    return s2fft.inverse(
+    maps = s2fft.inverse(
         flm,
         bandlimit,
-        method="jax_healpy",
+        method="jax",
         nside=nside,
         sampling="healpix",
     )
+    # S2FFT returns complex values, but the map should be real-valued
+    # https://github.com/astro-informatics/s2fft/issues/411
+    return xp.real(maps)
 
 
 def transform(
@@ -133,7 +136,8 @@ def transform(
     flm = s2fft.forward(
         maps,
         bandlimit,
-        method="jax_healpy",
+        iter=3,
+        method="jax",
         nside=nside,
         sampling="healpix",
     )
