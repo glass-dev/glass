@@ -96,3 +96,45 @@ def inverse_transform(
         nside=nside,
         sampling="healpix",
     )
+
+
+def transform(
+    maps: FloatArray,
+    *,
+    lmax: int,
+    nside: int,
+) -> ComplexArray:
+    """
+    Compute the spherical harmonic transform of a map.
+
+    Parameters
+    ----------
+    maps
+        The real-space map to transform.
+    lmax
+        The maximum multipole of the spherical harmonic transform.
+    nside
+        The nside parameter of the input map.
+
+    Returns
+    -------
+        The spherical harmonic coefficients resulting from the transform.
+
+    """
+    xp = maps.__array_namespace__()
+
+    if xp.__name__ != "jax.numpy":
+        return hp.map2alm(maps, lmax=lmax)
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    flm = s2fft.forward(
+        maps,
+        bandlimit,
+        method="jax_healpy",
+        nside=nside,
+        sampling="healpix",
+    )
+    return s2fft.sampling.reindex.flm_2d_to_hp_fast(flm, bandlimit)
