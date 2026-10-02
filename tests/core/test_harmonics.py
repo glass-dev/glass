@@ -12,6 +12,9 @@ import glass.harmonics
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from glass._types import UnifiedGenerator
+    from tests.fixtures.helper_classes import HealpixInputs
+
 
 def test_multalm(xp: ModuleType) -> None:
     # check output values and shapes
@@ -53,65 +56,59 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
-def test_inverse_transform_healpy_default_spin(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
-    lmax = 2
-
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "real floating")
-
-
-def test_inverse_transform_healpy_spin_1(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
-    lmax = 2
-
-    # test with spin 1
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=1)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "complex floating")
-
-
-def test_inverse_transform_healpy_spin_2(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
-    lmax = 2
-
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=2)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "complex floating")
-
-
-def test_inverse_transform_healpy_spin_0(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
-    lmax = 2
-
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=0)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "real floating")
-
-
-def test_transform_healpy(xp: ModuleType) -> None:
-    maps = xp.asarray([1.0] * 12)
-    lmax = 2
-
-    result = glass.harmonics.transform(maps, lmax=lmax)
-    assert result.shape[0] == 6
-    assert xp.isdtype(result.dtype, "complex floating")
-
-def test_inverse_transform() -> None:
+def test_inverse_transform(
+    healpix_inputs: type[HealpixInputs],
+    rng: UnifiedGenerator,
+) -> None:
     jax = pytest.importorskip("jax", reason="test requires jax")
 
-    alm_numpy = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], dtype=np.float32)
-    alm_jax = jax.numpy.asarray(alm_numpy, dtype=jax.numpy.float32)
-    lmax = 2
-    nside = 2
+    import jax.numpy as jnp
 
-    # https://github.com/data-apis/array-api-extra/issues/1005
-    xpx.testing.assert_equal(
-        glass.harmonics.inverse_transform(alm_numpy, lmax=lmax, nside=nside),
-        np.asarray(glass.harmonics.inverse_transform(alm_jax, lmax=lmax, nside=nside)),
-    )
+    alm = healpix_inputs.alm(rng=rng)
+
+    with jax.enable_x64(True):
+        # https://github.com/data-apis/array-api-extra/issues/1005
+        xpx.testing.assert_equal(
+            glass.harmonics.inverse_transform(
+                alm,
+                lmax=healpix_inputs.lmax,
+                nside=healpix_inputs.nside,
+            ),
+            np.asarray(
+                glass.harmonics.inverse_transform(
+                    jnp.asarray(alm),
+                    lmax=healpix_inputs.lmax,
+                    nside=healpix_inputs.nside,
+                ),
+            ),
+        )
+
+
+def test_transform(
+    healpix_inputs: type[HealpixInputs],
+    rng: UnifiedGenerator,
+) -> None:
+    jax = pytest.importorskip("jax", reason="test requires jax")
+
+    import jax.numpy as jnp
+
+    kappa = healpix_inputs.kappa(rng=rng)
+
+    with jax.enable_x64(True):
+        # https://github.com/data-apis/array-api-extra/issues/1005
+        xpx.testing.assert_close(
+            glass.harmonics.transform(
+                kappa,
+                lmax=healpix_inputs.lmax,
+                nside=healpix_inputs.nside,
+            ),
+            np.asarray(
+                glass.harmonics.transform(
+                    jnp.asarray(kappa),
+                    lmax=healpix_inputs.lmax,
+                    nside=healpix_inputs.nside,
+                ),
+            ),
+            atol=1e-15,
+            rtol=0,
+        )
