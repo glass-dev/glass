@@ -139,7 +139,6 @@ def coverage_regression(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=ALL_PYTHON,
     uv_groups=["test"],
     uv_sync_locked=False,
 )
