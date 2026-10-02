@@ -91,7 +91,7 @@ uv sync --group benchmarks-cuda13
 Then setup your env on the GPU node
 
 ```sh
-ssh gn005
+ssh gn005 # or <-- another CUDA partition
 cd glass
 export XLA_PYTHON_CLIENT_PREALLOCATE=false # <-- Needed to prevent OOM errors
 ```
