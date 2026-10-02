@@ -11,6 +11,7 @@ __lazy_modules__ = [
 
 import os
 import pathlib
+import typing
 from typing import TYPE_CHECKING
 
 import healpix
@@ -24,6 +25,7 @@ from glass._array_api_utils import numpy_fallback
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
+    from typing import Literal
 
     from glass._types import ComplexArray, DTypeLike, FloatArray, IntArray
 
@@ -36,11 +38,10 @@ def _get_healpy_datapath() -> str | None:
 
 
 @numpy_fallback
-def alm2map(  # noqa: PLR0913
+def alm2map(
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
     *,
-    inplace: bool = False,
     lmax: int | None = None,
     pixwin: bool = False,
     pol: bool = True,
@@ -54,8 +55,6 @@ def alm2map(  # noqa: PLR0913
         A complex array or a sequence of complex arrays.
     nside
         The nside of the output map.
-    inplace
-        If True, input alms may be modified by pixel window function and beam smoothing.
     lmax
         Explicitly define lmax.
     pixwin
@@ -71,7 +70,6 @@ def alm2map(  # noqa: PLR0913
     return healpy.alm2map(
         alms,
         nside,
-        inplace=inplace,
         lmax=lmax,
         pixwin=pixwin,
         pol=pol,
@@ -112,8 +110,6 @@ def alm2map_spin(
 def almxfl(
     alm: FloatArray,
     fl: FloatArray,
-    *,
-    inplace: bool = False,
 ) -> FloatArray:
     """
     Multiply alm by a function of l. The function is assumed to be zero where
@@ -125,19 +121,13 @@ def almxfl(
         The alm to multiply.
     fl
         The function (at l=0..fl.shape[0]-1) by which alm must be multiplied.
-    inplace
-        If True, modify the given alm, otherwise make a copy before multiplying.
 
     Returns
     -------
-        The modified alm, either a new array or a reference to input alm.
+        The new alm array with the function of l applied.
 
     """
-    return healpy.almxfl(
-        alm,
-        fl,
-        inplace=inplace,
-    )
+    return healpy.almxfl(alm, fl)
 
 
 @numpy_fallback
@@ -161,8 +151,6 @@ def ang2pix(
         Angular coordinates of a point on the sphere.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
-    xp
-        The array library backend to use for array operations.
 
     Returns
     -------
@@ -195,8 +183,6 @@ def ang2vec(
         Angular coordinates of a point on the sphere.
     lonlat
         If True, automatically adjust latitudes to be within [-90, 90] range.
-    xp
-        The array library backend to use for array operations.
 
     Returns
     -------
@@ -308,6 +294,42 @@ def nside2npix(nside: int) -> int:
 
     """
     return int(healpix.nside2npix(nside))
+
+
+@typing.overload
+def pixwin(
+    nside: int,
+    *,
+    lmax: int | None = None,
+    pol: Literal[False] = False,
+    xp: ModuleType | None = None,
+) -> FloatArray:
+    # returns temperature
+    ...
+
+
+@typing.overload
+def pixwin(
+    nside: int,
+    *,
+    lmax: int | None = None,
+    pol: Literal[True],
+    xp: ModuleType | None = None,
+) -> tuple[FloatArray, FloatArray]:
+    # returns temperature, polarisation
+    ...
+
+
+@typing.overload
+def pixwin(
+    nside: int,
+    *,
+    lmax: int | None = None,
+    pol: bool,
+    xp: ModuleType | None = None,
+) -> FloatArray | tuple[FloatArray, FloatArray]:
+    # returns temperature and optionally polarisation
+    ...
 
 
 def pixwin(
@@ -447,8 +469,6 @@ class Rotator:
         ----------
         coord
             A string or a tuple of 1 or 2 strings or a sequence of tuple.
-        xp
-            The array library backend to use for array operations.
 
         """
         self.coord = coord

@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-import array_api_extra as xpx
-
 import glass
 
 if TYPE_CHECKING:
@@ -33,7 +31,7 @@ def test_radialwindow(
 
     w = benchmark(glass.RadialWindow, za, wa)
 
-    xpx.testing.assert_close(w.zeff, expected_zeff)
+    assert w.zeff == pytest.approx(expected_zeff)
 
 
 @pytest.mark.skipif(

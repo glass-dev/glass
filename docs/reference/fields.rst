@@ -122,11 +122,3 @@ Indexing
 .. autofunction:: glass_to_healpix_spectra
 .. autofunction:: healpix_to_glass_spectra
 .. autofunction:: cov_from_spectra
-
-
-Deprecated
-----------
-
-.. autofunction:: lognormal_gls
-.. autofunction:: generate_gaussian
-.. autofunction:: generate_lognormal

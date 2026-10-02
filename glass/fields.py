@@ -181,10 +181,7 @@ def iternorm(cov: Iterable[FloatArray]) -> Iterator[FloatArray]:
         s = xp.sqrt(s)
 
         # concatenate a and s into a single scaling vector
-        w = xp.concat([a, s[..., None]], axis=-1)
-
-        # yield the scaling vector
-        yield w
+        yield xp.concat([a, s[..., None]], axis=-1)
 
 
 def cls2cov(
@@ -195,6 +192,12 @@ def cls2cov(
 ) -> Generator[FloatArray]:
     """
     Return array of Cls as a covariance matrix for iterative sampling.
+
+    Note that yielded arrays have backend-dependent aliasing semantics. With a
+    mutable backend such as NumPy, each yield reuses the same underlying ``cov``
+    array, so advancing the generator mutates all previously yielded values.
+    JAX's immutable arrays instead produce a distinct value for each yield.
+    Explicitly copy each yielded NumPy array if it must retain its value.
 
     Parameters
     ----------
@@ -284,50 +287,19 @@ def discretized_cls(
             for j in range(i + 1)
         ]
 
-    if nside is not None:
-        pw = hp.pixwin(nside, lmax=lmax, xp=xp)
+    # None stands for no pixel window requested
+    pw = hp.pixwin(nside, lmax=lmax, xp=xp) if nside is not None else None
 
     gls = []
     for cl in cls:
         if cl.shape[0] > 0:
             if lmax is not None:
                 cl = cl[: lmax + 1]  # noqa: PLW2901
-            if nside is not None:
-                n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
+            if pw is not None:
+                n = min(cl.shape[0], pw.shape[0])
                 cl = cl[:n] * pw[:n] ** 2  # noqa: PLW2901
         gls.append(cl)
     return gls
-
-
-@deprecated("use glass.solve_gaussian_spectra() instead")
-def lognormal_gls(
-    cls: AngularPowerSpectra,
-    shift: float = 1.0,
-) -> AngularPowerSpectra:
-    """
-    Compute Gaussian Cls for a lognormal random field.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.lognormal_fields` and
-       :func:`glass.compute_gaussian_spectra` or
-       :func:`glass.solve_gaussian_spectra` instead.
-
-    Parameters
-    ----------
-    cls
-        Angular matter power spectra in GLASS ordering.
-    shift
-        The shift parameter for the lognormal transformation.
-
-    Returns
-    -------
-        The Gaussian angular power spectra for a lognormal random field.
-
-    """
-    n = nfields_from_nspectra(len(cls))
-    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
-    return solve_gaussian_spectra(fields, cls)
 
 
 def _generate_grf(
@@ -423,99 +395,6 @@ def _generate_grf(
 
         # transform alm to maps
         yield glass.harmonics.inverse_transform(alm, lmax=n - 1, nside=nside)
-
-
-@deprecated("use glass.generate() instead")
-def generate_gaussian(
-    gls: AngularPowerSpectra,
-    nside: int,
-    *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
-) -> Generator[FloatArray]:
-    """
-    Sample Gaussian random fields from Cls iteratively.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.generate` instead.
-
-    A generator that iteratively samples HEALPix maps of Gaussian random fields
-    with the given angular power spectra ``gls`` and resolution parameter
-    ``nside``.
-
-    The optional argument ``ncorr`` can be used to artificially limit now many
-    realised fields are correlated. This saves memory, as only `ncorr` previous
-    fields need to be kept.
-
-    The ``gls`` array must contain the angular power spectra of the
-    Gaussian random fields in :ref:`standard order <twopoint_order>`.
-
-    Parameters
-    ----------
-    gls
-        The Gaussian angular power spectra for a random field.
-    nside
-        The resolution parameter for the HEALPix maps.
-    ncorr
-        The number of correlated fields. If not given, all fields are correlated.
-    rng
-        Random number generator. If not given, a default RNG is used.
-
-    Yields
-    ------
-    fields
-        The Gaussian random fields.
-
-    Raises
-    ------
-    ValueError
-        If all gls are empty.
-
-    """
-    n = nfields_from_nspectra(len(gls))
-    fields = [glass.grf.Normal() for _ in range(n)]
-    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
-
-
-@deprecated("use glass.generate() instead")
-def generate_lognormal(
-    gls: AngularPowerSpectra,
-    nside: int,
-    shift: float = 1.0,
-    *,
-    ncorr: int | None = None,
-    rng: UnifiedGenerator | None = None,
-) -> Generator[FloatArray]:
-    """
-    Sample lognormal random fields from Gaussian Cls iteratively.
-
-    .. deprecated:: 2025.1
-
-       Use :func:`glass.generate` instead.
-
-    Parameters
-    ----------
-    gls
-        The Gaussian angular power spectra for a lognormal random field.
-    nside
-        The resolution parameter for the HEALPix maps.
-    shift
-        The shift parameter for the lognormal transformation.
-    ncorr
-        The number of correlated fields. If not given, all fields are correlated.
-    rng
-        Random number generator. If not given, a default RNG is used.
-
-    Yields
-    ------
-    fields
-        The lognormal random fields.
-
-    """
-    n = nfields_from_nspectra(len(gls))
-    fields = [glass.grf.Lognormal(shift) for _ in range(n)]
-    yield from generate(fields, gls, nside, ncorr=ncorr, rng=rng)
 
 
 def getcl(
@@ -646,7 +525,7 @@ def effective_cls(
 
     # find lmax if not given
     if lmax is None:
-        lmax = max((cl.shape[0] for cl in cls), default=0) - 1
+        lmax = max((cl.shape[0] for cl in cls), default=0) - 1  # ty: ignore[unsound-assignment]
 
     # broadcast weights1 such that its shape ends in n
     weights1 = xp.asarray(weights1)
@@ -1022,8 +901,7 @@ def check_posdef_spectra(spectra: AngularPowerSpectra) -> bool:
     """
     cov = cov_from_spectra(spectra)
     xp = cov.__array_namespace__()
-    is_positive_semi_definite: bool = xp.all(xp.linalg.eigvalsh(cov) >= 0)
-    return is_positive_semi_definite
+    return bool(xp.all(xp.linalg.eigvalsh(cov) >= 0))
 
 
 def regularized_spectra(

@@ -21,6 +21,7 @@ __lazy_modules__ = [
 ]
 
 import functools
+import typing
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -29,11 +30,11 @@ import numpy as np
 import array_api_compat
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterator
     from types import ModuleType
     from typing import Any
 
-    from glass._types import AnyArray, DTypeLike
+    from glass._types import AnyArray, DTypeLike, P, R
 
 
 class CompatibleBackendNotFoundError(Exception):
@@ -444,7 +445,7 @@ class xp_additions:  # noqa: N801
         return dxp.vectorize(pyfunc, otypes=otypes)
 
     @staticmethod
-    def ndindex(shape: tuple[int, ...], *, xp: ModuleType) -> np.ndindex:
+    def ndindex(shape: tuple[int, ...], *, xp: ModuleType) -> Iterator[tuple[int, ...]]:
         """
         Wrapper for numpy.ndindex.
 
@@ -465,14 +466,14 @@ class xp_additions:  # noqa: N801
 
         """
         if xp.__name__ == "numpy":
-            return xp.ndindex(shape)
+            return typing.cast("Iterator[tuple[int, ...]]", np.ndindex(shape))
 
         # If any other backend use default
         dxp = default_xp(xp.__name__)
-        return dxp.ndindex(shape)
+        return typing.cast("Iterator[tuple[int, ...]]", dxp.ndindex(shape))
 
 
-def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C901
+def numpy_fallback(func: Callable[P, R]) -> Callable[P, R]:  # noqa: C901
     """
     Decorator to convert function arguments to Numpy arrays and back.
 
@@ -555,4 +556,4 @@ def numpy_fallback(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: C90
 
         return convert_back(result)
 
-    return wrapper
+    return typing.cast("Callable[P, R]", wrapper)

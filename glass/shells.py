@@ -273,10 +273,13 @@ class RadialWindow:
 
         """
         if self.za.shape[0] > 0:
-            return uxpx.trapezoid(
-                self.za * self.wa,
-                self.za,
-            ) / uxpx.trapezoid(self.wa, self.za)
+            return float(
+                uxpx.trapezoid(
+                    self.za * self.wa,
+                    self.za,
+                )
+                / uxpx.trapezoid(self.wa, self.za),
+            )
         return math.nan
 
 
@@ -413,7 +416,7 @@ def linear_windows(
         )
         if weight is not None:
             w *= weight(z)
-        ws.append(RadialWindow(z, w, zmid))
+        ws.append(RadialWindow(z, w, float(zmid)))
     return ws
 
 

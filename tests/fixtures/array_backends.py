@@ -104,7 +104,7 @@ def xp(request: pytest.FixtureRequest) -> ModuleType:
     Access array library functions using `xp.` in tests.
 
     """
-    return request.param
+    return request.param  # ty: ignore[unsound-return-statement]
 
 
 @pytest.fixture(
@@ -132,16 +132,7 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
        the older versions of glass.
 
     """
-    return request.param
-
-
-@pytest.fixture(
-    params=[xp for name, xp in xp_available_backends.items() if name != "jax.numpy"],
-    scope="session",
-)
-def xp_no_jax(request: pytest.FixtureRequest) -> ModuleType:
-    """Fixture for array backends excluding jax."""
-    return request.param
+    return request.param  # ty: ignore[unsound-return-statement]
 
 
 @pytest.fixture(scope="session")

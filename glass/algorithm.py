@@ -74,7 +74,7 @@ def nnls(
     _, n = a.shape
 
     if maxiter is None:
-        maxiter = 3 * n
+        maxiter = 3 * n  # ty: ignore[unsound-assignment]
 
     index = xp.arange(n)
     q = xp.full(n, fill_value=False)
@@ -138,7 +138,7 @@ def cov_clip(
 
     # get tolerance if not given
     if rtol is None:
-        rtol = max(v.shape[-2], v.shape[-1]) * xp.finfo(w.dtype).eps
+        rtol = max(v.shape[-2], v.shape[-1]) * xp.finfo(w.dtype).eps  # ty: ignore[unsound-assignment]
 
     # clip negative diagonal values
     w = xp.clip(w, rtol * xp.max(w, axis=-1, keepdims=True), None)
@@ -189,7 +189,7 @@ def nearcorr(
 
     # default tolerance
     if tol is None:
-        tol = n * xp.finfo(a.dtype).eps
+        tol = n * xp.finfo(a.dtype).eps  # ty: ignore[unsound-assignment]
 
     # current result, flatten leading dimensions
     y = xp.reshape(a, (-1, n, n))

@@ -119,6 +119,18 @@ def test_iternorm_errors(xp: ModuleType) -> None:
         list(glass.iternorm([xp.asarray([1.0]), xp.asarray([0.1, 1.0])]))
 
 
+def test_iternorm_nonmonotonic_row_widths(xp: ModuleType) -> None:
+    """A wider row can follow a narrower row after the factor is extended."""
+    rows = [xp.asarray(row) for row in ([1.0], [1.0, 0.0], [1.0, 0.0], [1.0, 0.0, 0.0])]
+
+    for row, scaling in zip(rows, glass.iternorm(rows), strict=True):
+        assert scaling.shape == row.shape
+        xpx.testing.assert_close(
+            scaling,
+            xp.asarray([0.0] * (row.shape[-1] - 1) + [1.0]),
+        )
+
+
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_cls2cov_jax(jnp: ModuleType) -> None:
     nl, nf, nc = 3, 3, 2
@@ -163,13 +175,16 @@ def test_cls2cov_jax(jnp: ModuleType) -> None:
         xpx.testing.assert_close(cov2, cov3)
 
 
-def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
+def test_cls2cov_no_jax(xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy":
+        pytest.skip("Test does not support jax")
+
     # check output values and shape
 
     nl, nf, nc = 3, 2, 2
 
     generator = glass.cls2cov(
-        [xp_no_jax.asarray([1.0, 0.5, 0.3]), None, xp_no_jax.asarray([0.7, 0.6, 0.1])],
+        [xp.asarray([1.0, 0.5, 0.3]), None, xp.asarray([0.7, 0.6, 0.1])],
         nl,
         nf,
         nc,
@@ -177,17 +192,17 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
     cov = next(generator)
 
     assert cov.shape == (nl, nc + 1)
-    assert cov.dtype == xp_no_jax.float64
+    assert cov.dtype == xp.float64
 
-    xpx.testing.assert_equal(cov[:, 0], xp_no_jax.asarray([0.5, 0.25, 0.15]))
-    xpx.testing.assert_equal(cov[:, 1], xp_no_jax.asarray(0.0), check_shape=False)
-    xpx.testing.assert_equal(cov[:, 2], xp_no_jax.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 0], xp.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov[:, 1], xp.asarray(0.0), check_shape=False)
+    xpx.testing.assert_equal(cov[:, 2], xp.asarray(0.0), check_shape=False)
 
     # test negative value error
 
     generator = glass.cls2cov(
         [
-            xp_no_jax.asarray(arr)
+            xp.asarray(arr)
             for arr in [
                 [-1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
@@ -207,7 +222,7 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
 
     generator = glass.cls2cov(
         [
-            xp_no_jax.asarray(arr)
+            xp.asarray(arr)
             for arr in [
                 [1.0, 0.5, 0.3],
                 [0.8, 0.4, 0.2],
@@ -222,27 +237,27 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
         nc,
     )
 
-    cov1 = xp_no_jax.asarray(next(generator), copy=False)
-    cov1_copy = xp_no_jax.asarray(cov1, copy=True)
-    cov2 = xp_no_jax.asarray(next(generator), copy=False)
-    cov2_copy = xp_no_jax.asarray(cov2, copy=True)
+    cov1 = xp.asarray(next(generator), copy=False)
+    cov1_copy = xp.asarray(cov1, copy=True)
+    cov2 = xp.asarray(next(generator), copy=False)
+    cov2_copy = xp.asarray(cov2, copy=True)
     cov3 = next(generator)
 
     assert cov1.shape == (nl, nc + 1)
     assert cov2.shape == (nl, nc + 1)
     assert cov3.shape == (nl, nc + 1)
 
-    assert cov1.dtype == xp_no_jax.float64
-    assert cov2.dtype == xp_no_jax.float64
-    assert cov3.dtype == xp_no_jax.float64
+    assert cov1.dtype == xp.float64
+    assert cov2.dtype == xp.float64
+    assert cov3.dtype == xp.float64
 
     # cov1|2|3 reuse the same data, so should all equal the third result
-    xpx.testing.assert_equal(cov1[:, 0], xp_no_jax.asarray([0.45, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1[:, 0], xp.asarray([0.45, 0.25, 0.15]))
     xpx.testing.assert_equal(cov1, cov2)
     xpx.testing.assert_equal(cov2, cov3)
 
     # cov1 has the expected value for the first iteration (different to cov1_copy)
-    xpx.testing.assert_equal(cov1_copy[:, 0], xp_no_jax.asarray([0.5, 0.25, 0.15]))
+    xpx.testing.assert_equal(cov1_copy[:, 0], xp.asarray([0.5, 0.25, 0.15]))
 
     # The copies should not be equal
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
@@ -250,28 +265,6 @@ def test_cls2cov_no_jax(xp_no_jax: ModuleType) -> None:
 
     with pytest.raises(AssertionError, match="Not equal to tolerance"):
         xpx.testing.assert_close(cov2_copy, cov3)
-
-
-def test_lognormal_gls(xp: ModuleType) -> None:
-    shift = 2
-
-    # empty cls
-
-    assert glass.lognormal_gls([], shift) == []
-
-    # check output shape
-
-    out = glass.lognormal_gls([xp.linspace(1, 5, 5)], shift)
-    assert len(out) == 1
-    assert out[0].shape[0] == 5
-
-    inp = [xp.linspace(1, 6, 5), xp.linspace(1, 5, 4), xp.linspace(1, 4, 3)]
-    out = glass.lognormal_gls(inp, shift)
-
-    assert len(out) == 3
-    assert out[0].shape[0] == 5
-    assert out[1].shape[0] == 4
-    assert out[2].shape[0] == 3
 
 
 def test_discretized_cls(xp: ModuleType) -> None:
@@ -317,7 +310,7 @@ def test_discretized_cls(xp: ModuleType) -> None:
     )
 
     for cl in result:
-        n = min(cl.shape[0], pw.shape[0])  # ty: ignore[unresolved-attribute]
+        n = min(cl.shape[0], pw.shape[0])
         expected = xp.ones(n) * pw[:n] ** 2
         xpx.testing.assert_equal(cl[:n], expected)
 
@@ -386,18 +379,6 @@ def test_generate_grf(xp: ModuleType) -> None:
 
     with pytest.raises(ValueError, match="all gls are empty"):
         list(glass.fields._generate_grf([xp.asarray([])], nside))
-
-
-def test_generate_gaussian(xp: ModuleType) -> None:
-    with pytest.deprecated_call():
-        result = glass.generate_gaussian([xp.asarray([1.0, 0.5, 0.1])], 4)
-    next(result)
-
-
-def test_generate_lognormal(xp: ModuleType) -> None:
-    with pytest.deprecated_call():
-        result = glass.generate_lognormal([xp.asarray([1.0, 0.5, 0.1])], 4)
-    next(result)
 
 
 def test_generate(xp: ModuleType) -> None:

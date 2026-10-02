@@ -171,7 +171,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_equal(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
+    xpx.testing.assert_equal(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -463,7 +463,7 @@ def test_radial_window_zeff_none(xp: ModuleType) -> None:
 
     w = glass.RadialWindow(za, wa)
 
-    xpx.testing.assert_equal(w.zeff, xp.asarray(1.0))
+    assert w.zeff == 1.0
 
     # check zeff is NaN when redshift array is empty
 
