@@ -13,7 +13,14 @@ uv sync --group benchmarks
 
 However, it may also be necessary to install other dependencies / dependency
 groups. For example, read the
-[prerequisites for ARCHER2](./archer2/README.md#prerequisites)
+[prerequisites for ARCHER2](./archer2/README.md#prerequisites).
+
+to make use of GPU accelerators, see the below list of architectures and their
+dependencies:
+
+- AMD, ROCm v6 - `uv sync --group benchmarks-rocm6`
+- AMD, ROCM v7 - `uv sync --group benchmarks-rocm7`
+- Nvidia , CUDA v3 - `uv sync --group benchmarks-cuda13`
 
 ## Adding a new benchmark
 
