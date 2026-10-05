@@ -19,12 +19,6 @@ if TYPE_CHECKING:
     from glass._types import AnyArray, UnifiedGenerator
 
 
-@pytest.fixture(scope="session")
-def rng() -> glass.jax.Generator:
-    """JAX RNG."""
-    return glass.jax.Generator(seed=42)
-
-
 def test_normal(get_rng: Callable[..., UnifiedGenerator]) -> None:
     """Tests that glass.grf.Normal is auto differentiable when using JAX."""
     t = glass.grf.Normal()
