@@ -157,7 +157,6 @@ def map2alm(
     *,
     lmax: int | None = None,
     pol: bool = True,
-    use_pixel_weights: bool = False,
 ) -> ComplexArray:
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
@@ -179,11 +178,7 @@ def map2alm(
     lmax
         Maximum l of the power spectrum.
     pol
-        If True, assumes input maps are TQU. If False, only the temperature map
-        is considered.
-    use_pixel_weights
-        If True, use pixel by pixel weighting, healpy will automatically
-        download the weights, if needed.
+        If True, assumes input maps are TQU.
 
     Returns
     -------
@@ -195,7 +190,7 @@ def map2alm(
         datapath=_get_healpy_datapath(),
         lmax=lmax,
         pol=pol,
-        use_pixel_weights=use_pixel_weights,
+        use_pixel_weights=True,
     )
 
 

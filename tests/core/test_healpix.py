@@ -129,7 +129,6 @@ def test_map2alm_with_pulled_data(
         kappa,
         lmax=healpix_inputs.lmax,
         pol=False,
-        use_pixel_weights=True,
     )
     assert result.shape == (78,)
 
@@ -152,17 +151,14 @@ def test_map2alm_with_pulled_data_wrong_path(
             kappa,
             lmax=healpix_inputs.lmax,
             pol=pol,
-            use_pixel_weights=True,
         )
 
 
 @pytest.mark.parametrize("pol", [True, False])
-@pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_individual(
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
-    use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
@@ -171,31 +167,20 @@ def test_map2alm_individual(
         np.asarray(kappa),
         lmax=healpix_inputs.lmax,
         pol=pol,
-        use_pixel_weights=use_pixel_weights,
     )
     new = hp.map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
         pol=pol,
-        use_pixel_weights=use_pixel_weights,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.parametrize(
-    ("pol", "use_pixel_weights"),
-    [
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    ],
-)
+@pytest.mark.parametrize("pol", [False, True])
 def test_map2alm_sequence(
     healpix_inputs: type[HealpixInputs],
     pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
-    use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
@@ -206,13 +191,11 @@ def test_map2alm_sequence(
         [np.asarray(kappa1), np.asarray(kappa2), np.asarray(kappa3)],
         lmax=healpix_inputs.lmax,
         pol=pol,
-        use_pixel_weights=use_pixel_weights,
     )
     new = hp.map2alm(
         [kappa1, kappa2, kappa3],
         lmax=healpix_inputs.lmax,
         pol=pol,
-        use_pixel_weights=use_pixel_weights,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
