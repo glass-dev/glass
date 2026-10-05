@@ -43,7 +43,6 @@ def alm2map(
     nside: int,
     *,
     lmax: int | None = None,
-    pol: bool = True,
 ) -> FloatArray:
     """
     Computes a HEALPix map given the alm.
@@ -56,8 +55,6 @@ def alm2map(
         The nside of the output map.
     lmax
         Explicitly define lmax.
-    pol
-        If True, assumes input alms are TEB.
 
     Returns
     -------
@@ -68,7 +65,6 @@ def alm2map(
         alms,
         nside,
         lmax=lmax,
-        pol=pol,
     )
 
 
