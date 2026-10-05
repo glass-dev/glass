@@ -160,6 +160,8 @@ def test_map2alm_individual(
     old = healpy.map2alm(
         np.asarray(kappa),
         lmax=healpix_inputs.lmax,
+        # to match the default behaviour of glass.healpix.map2alm
+        use_pixel_weights=True,
     )
     new = hp.map2alm(
         kappa,
@@ -180,6 +182,8 @@ def test_map2alm_sequence(
     old = healpy.map2alm(
         [np.asarray(kappa1), np.asarray(kappa2), np.asarray(kappa3)],
         lmax=healpix_inputs.lmax,
+        # to match the default behaviour of glass.healpix.map2alm
+        use_pixel_weights=True,
     )
     new = hp.map2alm(
         [kappa1, kappa2, kappa3],
