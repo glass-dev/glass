@@ -34,8 +34,6 @@ uv sync --group jax-rocm7
 
 ## Running the benchmarks
 
-### ROCm
-
 Benchmarks can be submitted as a batch job to slurm via the provided script. For
 example to benchmark using JAX with AMD/ROCm, run the following from the root of
 the glass repo on cosma8. You will need to make some changes to the submissions
@@ -67,32 +65,3 @@ ssh ga008
 Access to these different partitions/queues must be requested via the DiRAC
 SAFE. For further information
 [read the docs](https://cosma.readthedocs.io/en/latest/account.html).
-
-### CUDA
-
-Cosma8 provides some direct ssh access nodes for testing CUDA applications - see
-the [docs](https://cosma.readthedocs.io/en/latest/gpu.html).
-
-Fist install your dependencies
-
-```sh
-uv venv
-uv sync --group benchmarks
-uv pip install jax[cuda13]
-```
-
-Then setup your env on the GPU node
-
-```sh
-ssh gn005
-cd glass
-export XLA_PYTHON_CLIENT_PREALLOCATE=false
-export ARRAY_BACKEND=jax
-export HEALPY_DATAPATH="$(pwd)/healpy-data"
-```
-
-Finally, run the profile:
-
-```sh
-RUN_PROFILE=True uv run python benchmarks/lensing.py
-```
