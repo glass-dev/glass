@@ -226,7 +226,6 @@ lint.isort = { known-first-party = [
 ], known-third-party = [
     "healpix",
     "jax",
-    "s2fft",
 ], section-order = [
     "future",
     "standard-library",
