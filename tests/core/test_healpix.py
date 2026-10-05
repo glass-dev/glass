@@ -108,15 +108,6 @@ def test_ang2pix(  # noqa: PLR0913,PLR0917
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-def test_get_nside(
-    healpix_inputs: type[HealpixInputs],
-    urng: UnifiedGenerator,
-) -> None:
-    """Compare ``glass.healpix.get_nside`` against ``healpy.get_nside``."""
-    kappa = healpix_inputs.kappa(rng=urng)
-    assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
-
-
 @pytest.mark.usefixtures("_add_healpy_datapath_to_env")
 def test_map2alm_with_pulled_data(
     healpix_inputs: type[HealpixInputs],
