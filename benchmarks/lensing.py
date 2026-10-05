@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import os
-from ast import literal_eval
 from typing import TYPE_CHECKING
 
-import jax
 import numpy as np
 from benchmark_utils import CosmologyWrapper, run_benchmark, xp_available_backends
 
@@ -27,12 +24,7 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
-def lensing_benchmark(xp: ModuleType) -> None:
-    """
-    Realistic lensing benchmark.
-
-    Includes setup steps and core simulation to be timed.
-    """
+for xp in xp_available_backends.values():
     # cosmology for the simulation
     h = 0.7
     Oc = 0.25
@@ -63,7 +55,7 @@ def lensing_benchmark(xp: ModuleType) -> None:
     shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]  # ty:ignore[unresolved-attribute]
+    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -115,14 +107,3 @@ def lensing_benchmark(xp: ModuleType) -> None:
         shells=shells,
         xp=xp,
     )
-
-
-RUN_PROFILE: bool = literal_eval(os.environ.get("RUN_PROFILE", "False"))
-
-# Run benchmarks for each requested backend
-for xp in xp_available_backends.values():
-    if RUN_PROFILE and xp.__name__ == "jax.numpy":
-        with jax.profiler.trace("jax_trace", create_perfetto_trace=True):
-            lensing_benchmark(xp)
-    else:
-        lensing_benchmark(xp)

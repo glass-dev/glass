@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import timeit
+from ast import literal_eval
 from typing import TYPE_CHECKING
 
 import jax
@@ -23,6 +24,7 @@ xp_available_backends: dict[str, ModuleType] = {}
 #   - a particular array library (numpy, jax, ...)
 #   - all (try finding every supported array library available in the environment)
 ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
+RUN_PROFILE: bool = literal_eval(os.environ.get("RUN_PROFILE", "False"))
 
 # if no backend passed, use numpy by default
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
@@ -73,7 +75,12 @@ def run_benchmark(
             out.block_until_ready()
 
     # benchmark the task
-    result = timeit.timeit(_run, number=1)
+    result = 0.0
+    if RUN_PROFILE and xp.__name__ == "jax.numpy":
+        with jax.profiler.trace("jax_trace", create_perfetto_trace=True):
+            result = timeit.timeit(_run, number=1)
+    else:
+        result = timeit.timeit(_run, number=1)
 
     # report the result
     print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201

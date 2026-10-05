@@ -84,5 +84,8 @@ There are several methods to profile GLASS:
 - cProfile, [as we have done with the regression tests](../CONTRIBUTING.md).
 - [JAX in-built profiler](https://docs.jax.dev/en/latest/profiling.html), which
   we are utilising within the lensing benchmark (set the env var `RUN_PROFILE`).
+  - There is a known issue with this profiler in that there is a limit to the
+    buffer size (amount of individual execution datapoints that will be
+    collected). This results in truncated profile traces.
 - rocprof-sys-python, as
   [trialed on the AAC6 machine](./aac6/README.md#profiling)
