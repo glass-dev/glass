@@ -24,7 +24,7 @@ ALL_PYTHON = [
 ]
 ARRAY_BACKENDS = {
     "array_api_strict": ("array-api-strict>=2",),
-    "jax": ("jax>=0.4.32", "s2fft>=1.4.0"),
+    "jax": ("jax>=0.4.35", "s2fft>=1.4.0"),
 }
 GRAD_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")
