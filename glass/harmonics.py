@@ -59,12 +59,14 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
-) -> FloatArray:
+    spin: int = 0,
+) -> FloatArray | ComplexArray:
     """
     Compute the inverse spherical harmonic transform of alm.
 
-    Convert scalar HEALPix harmonic coefficients into a map without pixel-window
-    smoothing. Use the S2FFT healpy wrapper for JAX arrays.
+    Convert HEALPix harmonic coefficients into a map without pixel-window
+    smoothing. For non-zero spin, ``alm`` contains E modes and B modes are set
+    to zero. Use S2FFT's native transform for JAX arrays.
 
     Parameters
     ----------
@@ -74,22 +76,34 @@ def inverse_transform(
         The maximum multipole of the spherical harmonic transform.
     nside
         The nside parameter of the output map.
+    spin
+        Spin of the output map. Zero produces a real scalar map; non-zero spin
+        produces a complex map whose real and imaginary parts are the two
+        spin components.
 
     Returns
     -------
-        The real-space map resulting from the inverse spherical harmonic transform.
+        The map resulting from the inverse spherical harmonic transform.
 
     """
     xp = alm.__array_namespace__()
 
     if xp.__name__ != "jax.numpy":
-        return hp.alm2map(alm, nside, lmax=lmax)
+        if spin == 0:
+            return hp.alm2map(alm, nside, lmax=lmax)
+
+        maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+        return maps[0] + 1j * maps[1]
 
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415
 
     bandlimit = lmax + 1
     flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
+
+    if spin:
+        # Spin-weighted harmonics have no modes with ell < spin.
+        flm = flm.at[:spin].set(0)
 
     # S2FFT implementation requires L >= 2 * nside
     if bandlimit < 2 * nside:
@@ -101,11 +115,16 @@ def inverse_transform(
     maps = s2fft.inverse(
         flm,
         bandlimit,
+        spin=spin,
         method="jax",
         nside=nside,
         sampling="healpix",
     )
-    # S2FFT returns complex values, but the map should be real-valued
+
+    if spin:
+        # Healpy's E-only convention has the opposite sign to S2FFT's.
+        return -maps
+    # S2FFT returns complex values, but the scalar map should be real-valued.
     # https://github.com/astro-informatics/s2fft/issues/411
     return xp.real(maps)
 

@@ -85,6 +85,38 @@ def test_inverse_transform(
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
+@pytest.mark.parametrize("spin", [1, 2])
+def test_inverse_transform_spin(
+    healpix_inputs: type[HealpixInputs],
+    rng: UnifiedGenerator,
+    spin: int,
+) -> None:
+    import jax
+    import jax.numpy as jnp
+
+    # keep well below the map resolution to isolate spin conventions from
+    # S2FFT's larger HEALPix errors near the fixture's full bandlimit
+    lmax = 2
+    alm_size = (lmax + 1) * (lmax + 2) // 2
+    alm = healpix_inputs.alm(rng=rng)[:alm_size]
+
+    with jax.enable_x64(True):  # noqa: FBT003
+        expected = glass.harmonics.inverse_transform(
+            alm,
+            lmax=lmax,
+            nside=healpix_inputs.nside,
+            spin=spin,
+        )
+        actual = glass.harmonics.inverse_transform(
+            jnp.asarray(alm),
+            lmax=lmax,
+            nside=healpix_inputs.nside,
+            spin=spin,
+        )
+        xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
+
+
+@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
 def test_transform(
     healpix_inputs: type[HealpixInputs],
     rng: UnifiedGenerator,

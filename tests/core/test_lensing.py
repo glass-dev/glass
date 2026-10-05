@@ -61,7 +61,7 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
-def test_from_convergence_low_bandlimit_jax() -> None:
+def test_from_convergence_low_bandlimit_jax(urng: UnifiedGenerator) -> None:
     import jax
     import jax.numpy as jnp
 
@@ -69,10 +69,42 @@ def test_from_convergence_low_bandlimit_jax() -> None:
     nside = 4
 
     with jax.enable_x64(True):  # noqa: FBT003
-        kappa = jnp.ones(hp.nside2npix(nside))
+        kappa = jnp.asarray(urng.random(hp.nside2npix(nside)))
         (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
         assert potential.shape == kappa.shape
         assert bool(jnp.all(jnp.isfinite(potential)))
+
+
+@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
+def test_from_convergence_spin_jax(
+    monkeypatch: pytest.MonkeyPatch,
+    urng: UnifiedGenerator,
+) -> None:
+    import jax
+    import jax.numpy as jnp
+
+    lmax = 2
+    nside = 4
+
+    # numpy_fallback converts CPU results back to JAX, so output types alone
+    # cannot reveal an accidental call to the Healpy spin wrapper
+    monkeypatch.setattr(
+        hp,
+        "alm2map_spin",
+        lambda *_: pytest.fail(
+            "from_convergence called hp.alm2map_spin for JAX deflection or shear",
+        ),
+    )
+
+    with jax.enable_x64(True):  # noqa: FBT003
+        kappa = jnp.asarray(urng.random(hp.nside2npix(nside)))
+        alpha, gamma = glass.from_convergence(
+            kappa,
+            lmax=lmax,
+            deflection=True,
+            shear=True,
+        )
+        assert alpha.shape == gamma.shape == kappa.shape
 
 
 def test_multi_plane_matrix(
