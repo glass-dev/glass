@@ -64,8 +64,7 @@ def alm2map(
 
     Returns
     -------
-        A HEALPix map in RING scheme at nside, or a two-dimensional array
-        containing the T, Q, and U maps for polarized input.
+        A HEALPix map in RING scheme at nside or a 3D array of T,Q,U maps.
 
     """
     return healpy.alm2map(
