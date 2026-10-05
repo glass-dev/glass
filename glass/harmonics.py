@@ -54,6 +54,42 @@ def multalm(
     return alm * factors
 
 
+@typing.overload
+def inverse_transform(
+    alm: ComplexArray,
+    *,
+    lmax: int,
+    nside: int,
+    spin: typing.Literal[0] = 0,
+) -> FloatArray:
+    # returns a real scalar map
+    ...
+
+
+@typing.overload
+def inverse_transform(
+    alm: ComplexArray,
+    *,
+    lmax: int,
+    nside: int,
+    spin: typing.Literal[1, 2],
+) -> ComplexArray:
+    # returns a complex map for spin 1 or 2
+    ...
+
+
+@typing.overload
+def inverse_transform(
+    alm: ComplexArray,
+    *,
+    lmax: int,
+    nside: int,
+    spin: int,
+) -> FloatArray | ComplexArray:
+    # returns a real or complex map depending on the spin
+    ...
+
+
 def inverse_transform(
     alm: ComplexArray,
     *,
