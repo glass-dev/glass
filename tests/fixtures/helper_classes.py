@@ -95,7 +95,7 @@ class HealpixInputs:
     @staticmethod
     def alm(*, rng: UnifiedGenerator) -> ComplexArray:
         """Generate random alm coefficients."""
-        return rng.standard_normal(
+        return rng.standard_normal(  # ty: ignore[unsupported-operator]
             HealpixInputs.alm_size,
         ) + 1j * rng.standard_normal(
             HealpixInputs.alm_size,
