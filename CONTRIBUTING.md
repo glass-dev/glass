@@ -111,6 +111,19 @@ def test_something(xp: ModuleType, urng: UnifiedGenerator) -> None:
     ...
 ```
 
+### JAX auto-differentiability tests
+
+GLASS supports JAX as an array backend and we would like to guarantee
+auto-differentiability. To verify this, we have unit tests, which utilise
+[`jax.test_util.check_grads`](https://docs.jax.dev/en/latest/_autosummary/jax.test_util.check_grads.html),
+defined in [tests/gradients/](./tests/gradients/).
+
+These gradients tests can be run via nox:
+
+```sh
+uv run nox -s coverage_gradients
+```
+
 ## Documenting
 
 GLASS's documentation is mainly written in the form of
@@ -198,9 +211,9 @@ the code's functionality.
 GLASS supports running various critical commands using
 [nox](https://github.com/wntrblm/nox) to make them less intimidating for new
 developers. All of these commands (or sessions in the language of `nox`) -
-`lint`, `tests`, `coverage`, `coverage_regression`, `doctests`, `examples`,
-`docs`, `build`, `version`, and `regression_tests` - are defined in
-[noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
+`lint`, `tests`, `coverage`, `coverage_regression`, `coverage_gradients`,
+`doctests`, `examples`, `docs`, `build`, `version`, and `regression_tests` - are
+defined in [noxfile.py](https://github.com/glass-dev/glass/main/noxfile.py).
 
 `nox` can be installed via `uv` using -
 
