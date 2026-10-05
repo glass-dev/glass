@@ -145,6 +145,8 @@ def transform(
     flm = s2fft.forward(
         maps,
         bandlimit,
+        # iterations are set here to match the `healpy_jax` method's behaviour
+        # without this there are large numerical errors in the transform
         iter=3,
         method="jax",
         nside=nside,
