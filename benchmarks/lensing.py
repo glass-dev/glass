@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
+# Run benchmarks for each requested backend
 for xp in xp_available_backends.values():
     # cosmology for the simulation
     h = 0.7
@@ -31,7 +32,7 @@ for xp in xp_available_backends.values():
     Ob = 0.05
 
     # basic parameters of the simulation
-    nside = lmax = 128
+    nside = lmax = 256
 
     # set up CAMB parameters for matter angular power spectrum
     pars = camb.set_params(
@@ -69,7 +70,7 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    def timed_function(  # noqa: PLR0913
+    def lensing_benchmark(  # noqa: PLR0913
         *,
         cosmo: CosmologyWrapper,
         fields: Sequence[glass.grf.Lognormal],
@@ -78,7 +79,7 @@ for xp in xp_available_backends.values():
         shells: list[RadialWindow],
         xp: ModuleType,
     ) -> FloatArray:
-        """Core simulation of the Realistic lensing benchmark to be timed."""
+        """Realistic lensing simulation benchmark."""
         urng: UnifiedGenerator = rng.default_rng(xp=xp)
 
         # this will compute the convergence field iteratively
@@ -99,7 +100,7 @@ for xp in xp_available_backends.values():
 
     # Run benchmark passing convergence and matter
     run_benchmark(
-        timed_function,
+        lensing_benchmark,
         cosmo=cosmo,
         fields=fields,
         gls=gls,
