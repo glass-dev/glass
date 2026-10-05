@@ -91,10 +91,10 @@ def inverse_transform(
     bandlimit = lmax + 1
     flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
 
-    # the S2FFT implementation requires L >= 2 * nside
+    # S2FFT implementation requires L >= 2 * nside
     if bandlimit < 2 * nside:
         padding = 2 * nside - bandlimit
-        # pad missing modes with zeros.
+        # pad missing modes with zeros
         flm = xp.pad(flm, ((0, padding), (padding, padding)))
         bandlimit = 2 * nside
 
@@ -142,14 +142,23 @@ def transform(
     import s2fft.sampling  # noqa: PLC0415
 
     bandlimit = lmax + 1
+    # the S2FFT implementation needs at least two modes per nside
+    effective_bandlimit = max(bandlimit, 2 * nside)
+
     flm = s2fft.forward(
         maps,
-        bandlimit,
-        # iterations are set here to match the `healpy_jax` method's behaviour
+        effective_bandlimit,
+        # iterations are set here to match the healpy_jax method's behaviour,
         # without this there are large numerical errors in the transform
         iter=3,
         method="jax",
         nside=nside,
         sampling="healpix",
     )
+
+    if effective_bandlimit != bandlimit:
+        # keep the requested ell rows and the corresponding centered m columns
+        offset = effective_bandlimit - bandlimit
+        flm = flm[:bandlimit, offset : offset + 2 * bandlimit - 1]
+
     return s2fft.sampling.reindex.flm_2d_to_hp_fast(flm, bandlimit)

@@ -106,3 +106,38 @@ def test_transform(
             nside=healpix_inputs.nside,
         )
         xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
+
+
+@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
+def test_transform_low_bandlimit(
+    healpix_inputs: type[HealpixInputs],
+    rng: UnifiedGenerator,
+) -> None:
+    import jax
+    import jax.numpy as jnp
+
+    low_lmax = 2
+    full_lmax = 2 * healpix_inputs.nside - 1
+    kappa = healpix_inputs.kappa(rng=rng)
+
+    with jax.enable_x64(True):  # noqa: FBT003
+        low_alms = glass.harmonics.transform(
+            jnp.asarray(kappa),
+            lmax=low_lmax,
+            nside=healpix_inputs.nside,
+        )
+        full_alms = glass.harmonics.transform(
+            jnp.asarray(kappa),
+            lmax=full_lmax,
+            nside=healpix_inputs.nside,
+        )
+        # HEALPix packs alms in blocks of increasing m, then increasing ell.
+        full_indices = [
+            m * (2 * full_lmax + 1 - m) // 2 + ell
+            for m in range(low_lmax + 1)
+            for ell in range(m, low_lmax + 1)
+        ]
+
+        n_low_alms = sum(ell + 1 for ell in range(low_lmax + 1))
+        assert low_alms.shape == (n_low_alms,)
+        xpx.testing.assert_equal(low_alms, full_alms[jnp.asarray(full_indices)])
