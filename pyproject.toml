@@ -16,6 +16,7 @@ benchmarks = [
     "jax>=0.6.2; python_version >= '3.13'",
     "matplotlib",
     "numpy<2.4",
+    "s2fft",
 ]
 build = [
     "build",
