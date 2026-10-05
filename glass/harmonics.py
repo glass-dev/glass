@@ -151,10 +151,11 @@ def inverse_transform(
     maps = s2fft.inverse(
         flm,
         bandlimit,
-        spin=spin,
         method="jax",
         nside=nside,
+        reality=spin == 0,
         sampling="healpix",
+        spin=spin,
     )
 
     if spin:
@@ -208,6 +209,7 @@ def transform(
         iter=3,
         method="jax",
         nside=nside,
+        reality=True,
         sampling="healpix",
     )
 
