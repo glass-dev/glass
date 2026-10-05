@@ -46,6 +46,12 @@ or conda:
 conda install -c conda-forge glass
 ```
 
+For JAX arrays, install the JAX extra, which includes S2FFT:
+
+```sh
+pip install 'glass[jax]'
+```
+
 If you are interested in the latest version of the code, you can pip-install
 this repository:
 

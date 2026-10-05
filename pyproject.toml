@@ -129,6 +129,9 @@ optional-dependencies = { examples = [
     "jupyter",
     "matplotlib",
     "numpy",
+], jax = [
+    "jax",
+    "s2fft",
 ] }
 requires-python = ">=3.11"
 
