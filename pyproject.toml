@@ -130,8 +130,8 @@ optional-dependencies = { examples = [
     "matplotlib",
     "numpy",
 ], jax = [
-    "jax>=0.4.35",
-    "s2fft>=1.4.0",
+    "jax",
+    "s2fft",
 ] }
 requires-python = ">=3.11"
 
