@@ -58,7 +58,8 @@ def alm2map(
 
     Returns
     -------
-        A HEALPix map in RING scheme at nside or a 3D array of T,Q,U maps.
+        A HEALPix map in RING scheme at nside or a 3D array of T,Q,U maps (if
+        polarized input).
 
     """
     return healpy.alm2map(
@@ -156,7 +157,6 @@ def map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,
     lmax: int | None = None,
-    pol: bool = True,
 ) -> ComplexArray:
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
@@ -177,8 +177,6 @@ def map2alm(
         The input map or a list of n input maps. Must be in ring ordering.
     lmax
         Maximum l of the power spectrum.
-    pol
-        If True, assumes input maps are TQU.
 
     Returns
     -------
@@ -189,7 +187,6 @@ def map2alm(
         maps,
         datapath=_get_healpy_datapath(),
         lmax=lmax,
-        pol=pol,
         use_pixel_weights=True,
     )
 
