@@ -90,6 +90,14 @@ def inverse_transform(
 
     bandlimit = lmax + 1
     flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
+
+    # the S2FFT implementation requires L >= 2 * nside
+    if bandlimit < 2 * nside:
+        padding = 2 * nside - bandlimit
+        # pad missing modes with zeros.
+        flm = xp.pad(flm, ((0, padding), (padding, padding)))
+        bandlimit = 2 * nside
+
     maps = s2fft.inverse(
         flm,
         bandlimit,
