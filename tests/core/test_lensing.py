@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -69,7 +70,8 @@ def test_from_convergence_low_bandlimit_jax(urng: UnifiedGenerator) -> None:
     nside = 4
 
     with jax.enable_x64(True):  # noqa: FBT003
-        kappa = jnp.asarray(urng.random(hp.nside2npix(nside)))
+        # the NumPy transform is for array-api-strict compliance
+        kappa = jnp.asarray(np.asarray(urng.random(hp.nside2npix(nside))))
         (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
         assert potential.shape == kappa.shape
         assert bool(jnp.all(jnp.isfinite(potential)))
@@ -97,7 +99,8 @@ def test_from_convergence_spin_jax(
     )
 
     with jax.enable_x64(True):  # noqa: FBT003
-        kappa = jnp.asarray(urng.random(hp.nside2npix(nside)))
+        # the NumPy transform is for array-api-strict compliance
+        kappa = jnp.asarray(np.asarray(urng.random(hp.nside2npix(nside))))
         alpha, gamma = glass.from_convergence(
             kappa,
             lmax=lmax,
