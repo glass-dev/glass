@@ -145,7 +145,7 @@ def coverage_regression(session: nox.Session) -> None:
 )
 def coverage_gradients(session: nox.Session) -> None:
     """Run tests and compute coverage for the JAX gradients tests."""
-    session.install(ARRAY_BACKENDS["jax"])
+    session.install(*ARRAY_BACKENDS["jax"])
     session.run(
         "pytest",
         GRAD_TESTS_LOC,
