@@ -60,7 +60,10 @@ SH5_MI300A_SPX queue to utilise shared CPU/GPU memory.
 ## Profiling
 
 These instructions detail how to run a profile on aac6 using the
-`rocprof-sys-python` profiler. First of all, request an interactive node:
+`rocprof-sys-python` profiler. This process is based on the
+[ROCm Systems Profiler python documentation](https://rocm.docs.amd.com/projects/rocprofiler-systems/en/latest/how-to/profiling-python-scripts.html)
+
+First of all, request an interactive node:
 
 ```sh
 srun -p SH5_MI300A_SPX --exclusive -t 1:0:0 --nodes=1 --tasks-per-node=1 \
