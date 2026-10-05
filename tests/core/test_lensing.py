@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
+
+import pytest
 
 import array_api_extra as xpx
 
@@ -13,6 +16,10 @@ if TYPE_CHECKING:
 
     from glass._types import UnifiedGenerator
     from glass.cosmology import Cosmology
+
+# check if available for testing
+HAVE_JAX = importlib.util.find_spec("jax") is not None
+HAVE_S2FFT = importlib.util.find_spec("s2fft") is not None
 
 
 def test_from_convergence(urng: UnifiedGenerator) -> None:
@@ -51,6 +58,21 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
     results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
     assert len(results) == 3
+
+
+@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
+def test_from_convergence_low_bandlimit_jax() -> None:
+    import jax
+    import jax.numpy as jnp
+
+    lmax = 2
+    nside = 4
+
+    with jax.enable_x64(True):  # noqa: FBT003
+        kappa = jnp.ones(hp.nside2npix(nside))
+        (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
+        assert potential.shape == kappa.shape
+        assert bool(jnp.all(jnp.isfinite(potential)))
 
 
 def test_multi_plane_matrix(
