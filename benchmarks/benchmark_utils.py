@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import timeit
-from ast import literal_eval
 from typing import TYPE_CHECKING
 
 import jax
@@ -24,7 +23,7 @@ xp_available_backends: dict[str, ModuleType] = {}
 #   - a particular array library (numpy, jax, ...)
 #   - all (try finding every supported array library available in the environment)
 ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
-RUN_PROFILE: bool = literal_eval(os.environ.get("RUN_PROFILE", "False"))
+RUN_PROFILE: bool = os.environ.get("RUN_PROFILE", "False") != "False"
 
 # if no backend passed, use numpy by default
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
