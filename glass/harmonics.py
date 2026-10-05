@@ -139,7 +139,7 @@ def inverse_transform(
 
     if spin:
         # Spin-weighted harmonics have no modes with ell < spin.
-        flm = flm.at[:abs(spin)].set(0)
+        flm = flm.at[: abs(spin)].set(0)
 
     # S2FFT implementation requires L >= 2 * nside
     if bandlimit < 2 * nside:
