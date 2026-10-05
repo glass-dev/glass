@@ -25,7 +25,7 @@ ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
     "jax": "jax>=0.4.32",
 }
-GRADIENTS_TESTS_LOC = pathlib.Path("tests/gradients")
+GRAD_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")
 GLASS_REPO_URL = "https://github.com/glass-dev/glass"
 SHARED_PYTEST_BENCHMARK_FLAGS = [
@@ -147,7 +147,7 @@ def coverage_gradients(session: nox.Session) -> None:
     session.install(ARRAY_BACKENDS["jax"])
     session.run(
         "pytest",
-        GRADIENTS_TESTS_LOC,
+        GRAD_TESTS_LOC,
         "--cov",
         *session.posargs,
         env=os.environ,
