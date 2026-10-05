@@ -43,7 +43,6 @@ def alm2map(
     nside: int,
     *,
     lmax: int | None = None,
-    pixwin: bool = False,
     pol: bool = True,
 ) -> FloatArray:
     """
@@ -57,8 +56,6 @@ def alm2map(
         The nside of the output map.
     lmax
         Explicitly define lmax.
-    pixwin
-        Smooth the alm using the pixel window functions.
     pol
         If True, assumes input alms are TEB.
 
@@ -71,7 +68,6 @@ def alm2map(
         alms,
         nside,
         lmax=lmax,
-        pixwin=pixwin,
         pol=pol,
     )
 

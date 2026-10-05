@@ -31,7 +31,6 @@ if TYPE_CHECKING:
 )
 def test_alm2map_individual(
     healpix_inputs: type[HealpixInputs],
-    pixwin: bool,  # noqa: FBT001
     pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
     xp: ModuleType,
@@ -42,31 +41,20 @@ def test_alm2map_individual(
         np.asarray(alm),
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
         pol=pol,
     )
     new = hp.alm2map(
         alm,
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
         pol=pol,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.parametrize(
-    ("pixwin", "pol"),
-    [
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    ],
-)
+@pytest.mark.parametrize("pol", [False, True])
 def test_alm2map_sequence(
     healpix_inputs: type[HealpixInputs],
-    pixwin: bool,  # noqa: FBT001
     pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
     xp: ModuleType,
@@ -79,14 +67,12 @@ def test_alm2map_sequence(
         [np.asarray(alm), np.asarray(blm), np.asarray(clm)],
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
         pol=pol,
     )
     new = hp.alm2map(
         [alm, blm, clm],
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
         pol=pol,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
