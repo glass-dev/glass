@@ -61,7 +61,7 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
     assert len(results) == 3
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     lmax = 2
     nside = 4
@@ -73,7 +73,7 @@ def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     assert bool(jnp.all(jnp.isfinite(potential)))
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_from_convergence_spin_jax(
     jnp: ModuleType,
     monkeypatch: pytest.MonkeyPatch,

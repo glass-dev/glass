@@ -148,9 +148,7 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
 @pytest.fixture(scope="session")
 def ap() -> ModuleType:
     """Fixture for the array_api_strict array backend."""
-    ap = pytest.importorskip(
-        "array_api_strict", reason="test requires array_api_strict"
-    )
+    ap = pytest.importorskip("array_api_strict", reason="test requires array_api_strict")
     _configure_array_api_strict(ap)
     return typing.cast("ModuleType", ap)
 

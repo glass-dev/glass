@@ -61,7 +61,7 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_inverse_transform(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
@@ -82,7 +82,7 @@ def test_inverse_transform(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-13, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 @pytest.mark.parametrize("spin", [1, 2])
 def test_inverse_transform_spin(
     healpix_inputs: type[HealpixInputs],
@@ -111,7 +111,7 @@ def test_inverse_transform_spin(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_transform(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
@@ -132,7 +132,7 @@ def test_transform(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_transform_low_bandlimit(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
