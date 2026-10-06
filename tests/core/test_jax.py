@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 jax = pytest.importorskip("jax", reason="tests require jax")
+jax.config.update("jax_enable_x64", val=True)
 
 import jax.numpy as jnp  # noqa: E402
 from jax.typing import ArrayLike  # noqa: E402

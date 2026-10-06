@@ -6,19 +6,22 @@ import pytest
 
 pytest.importorskip("jax", reason="tests require jax")
 
-import jax.numpy as jnp
 import jax.test_util
 
 import glass
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from types import ModuleType
 
     from glass._types import AnyArray, FloatArray
 
 
 @pytest.fixture(scope="session")
-def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
+def cl(
+    get_cl: Callable[..., FloatArray],
+    jnp: ModuleType,
+) -> FloatArray:
     """Generate a consistent cl for JAX."""
     return get_cl(jnp)
 
