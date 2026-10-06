@@ -10,6 +10,7 @@ import array_api_extra as xpx
 import glass
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
+from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -60,27 +61,23 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
     assert len(results) == 3
 
 
-@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
-def test_from_convergence_low_bandlimit_jax() -> None:
-    import jax
-    import jax.numpy as jnp
-
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     lmax = 2
     nside = 4
 
-    with jax.enable_x64(True):  # noqa: FBT003
-        rng = glass.rng.Generator(xp=jnp)
-        kappa = rng.random(hp.nside2npix(nside))
-        (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
-        assert potential.shape == kappa.shape
-        assert bool(jnp.all(jnp.isfinite(potential)))
+    rng = glass.rng.Generator(xp=jnp)
+    kappa = rng.random(hp.nside2npix(nside))
+    (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
+    assert potential.shape == kappa.shape
+    assert bool(jnp.all(jnp.isfinite(potential)))
 
 
-@pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
-def test_from_convergence_spin_jax(monkeypatch: pytest.MonkeyPatch) -> None:
-    import jax
-    import jax.numpy as jnp
-
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires jax and s2fft")
+def test_from_convergence_spin_jax(
+    jnp: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     lmax = 2
     nside = 4
 
@@ -94,16 +91,15 @@ def test_from_convergence_spin_jax(monkeypatch: pytest.MonkeyPatch) -> None:
         ),
     )
 
-    with jax.enable_x64(True):  # noqa: FBT003
-        rng = glass.rng.Generator(xp=jnp)
-        kappa = rng.random(hp.nside2npix(nside))
-        alpha, gamma = glass.from_convergence(
-            kappa,
-            lmax=lmax,
-            deflection=True,
-            shear=True,
-        )
-        assert alpha.shape == gamma.shape == kappa.shape
+    rng = glass.rng.Generator(xp=jnp)
+    kappa = rng.random(hp.nside2npix(nside))
+    alpha, gamma = glass.from_convergence(
+        kappa,
+        lmax=lmax,
+        deflection=True,
+        shear=True,
+    )
+    assert alpha.shape == gamma.shape == kappa.shape
 
 
 def test_multi_plane_matrix(
