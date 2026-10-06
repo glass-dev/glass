@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def rng() -> UnifiedGenerator:
     """
     RNG fixture for non array API tests.
