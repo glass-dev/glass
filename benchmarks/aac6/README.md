@@ -28,7 +28,7 @@ uv sync --group benchmarks
 ### GPU prerequisites
 
 For the GPU benchmark, there is an additional dependency group
-`benchmarks-rocm7` which includes on `benchmarks`:
+`benchmarks-rocm7` which includes `benchmarks`:
 
 ```sh
 uv sync --group benchmarks-rocm7
