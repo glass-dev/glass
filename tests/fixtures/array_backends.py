@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import importlib.metadata
 import os
+import typing
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -55,25 +56,34 @@ def _import_and_add_numpy(xp_available_backends: dict[str, ModuleType]) -> None:
     xp_available_backends["numpy"] = np
 
 
+def _configure_array_api_strict(array_api_strict: ModuleType) -> None:
+    """Set up array_api_strict for tests."""
+    _check_version("array_api_strict", "2.3.1")
+    array_api_strict.set_array_api_strict_flags(api_version="2025.12")
+
+
 def _import_and_add_array_api_strict(
     xp_available_backends: dict[str, ModuleType],
 ) -> None:
     """Add array_api_strict to the backends dictionary."""
     import array_api_strict  # noqa: PLC0415
 
-    _check_version("array_api_strict", "2.3.1")
+    _configure_array_api_strict(array_api_strict)
     xp_available_backends["array_api_strict"] = array_api_strict
-    array_api_strict.set_array_api_strict_flags(api_version="2025.12")
+
+
+def _configure_jax(jax: ModuleType) -> None:
+    """Set up JAX for tests."""
+    _check_version("jax", "0.6.2")
+    jax.config.update("jax_enable_x64", val=True)
 
 
 def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add jax to the backends dictionary."""
     import jax  # noqa: PLC0415
 
-    _check_version("jax", "0.6.2")
+    _configure_jax(jax)
     xp_available_backends["jax.numpy"] = jax.numpy
-    # enable 64 bit numbers
-    jax.config.update("jax_enable_x64", val=True)
 
 
 # a dictionary with all array backends to test
@@ -138,10 +148,14 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
 @pytest.fixture(scope="session")
 def ap() -> ModuleType:
     """Fixture for the array_api_strict array backend."""
-    return xp_available_backends["array_api_strict"]
+    ap = pytest.importorskip("array_api_strict", reason="test require array_api_strict")
+    _configure_array_api_strict(ap)
+    return typing.cast("ModuleType", ap)
 
 
 @pytest.fixture(scope="session")
 def jnp() -> ModuleType:
-    """Fixture for the jax.numpy array backend."""
-    return xp_available_backends["jax.numpy"]
+    """JAX NumPy with 64-bit values enabled for the test session."""
+    jax = pytest.importorskip("jax", reason="test require jax")
+    _configure_jax(jax)
+    return typing.cast("ModuleType", jax.numpy)
