@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-from types import ModuleType
 from typing import TYPE_CHECKING
 
 import numpy as np
