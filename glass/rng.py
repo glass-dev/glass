@@ -49,10 +49,7 @@ def default_rng(
 
     rng = np.random.default_rng(seed=seed)
 
-    if xp.__name__ == "numpy":
-        return rng
-
-    return Generator(rng=rng, xp=xp)
+    return rng if xp.__name__ == "numpy" else Generator(rng=rng, xp=xp)
 
 
 class Generator:
