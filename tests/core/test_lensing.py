@@ -61,7 +61,7 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
-def test_from_convergence_low_bandlimit_jax(rng: UnifiedGenerator) -> None:
+def test_from_convergence_low_bandlimit_jax() -> None:
     import jax
     import jax.numpy as jnp
 
@@ -69,17 +69,14 @@ def test_from_convergence_low_bandlimit_jax(rng: UnifiedGenerator) -> None:
     nside = 4
 
     with jax.enable_x64(True):  # noqa: FBT003
-        kappa = jnp.asarray(rng.random(hp.nside2npix(nside)))
+        kappa = glass.rng.Generator(xp=jnp).random(hp.nside2npix(nside))
         (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
         assert potential.shape == kappa.shape
         assert bool(jnp.all(jnp.isfinite(potential)))
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
-def test_from_convergence_spin_jax(
-    monkeypatch: pytest.MonkeyPatch,
-    rng: UnifiedGenerator,
-) -> None:
+def test_from_convergence_spin_jax(monkeypatch: pytest.MonkeyPatch) -> None:
     import jax
     import jax.numpy as jnp
 
@@ -97,7 +94,7 @@ def test_from_convergence_spin_jax(
     )
 
     with jax.enable_x64(True):  # noqa: FBT003
-        kappa = jnp.asarray(rng.random(hp.nside2npix(nside)))
+        kappa = glass.rng.Generator(xp=jnp).random(hp.nside2npix(nside))
         alpha, gamma = glass.from_convergence(
             kappa,
             lmax=lmax,
