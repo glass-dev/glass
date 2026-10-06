@@ -101,9 +101,9 @@ def alm2map_spin(
 
 @numpy_fallback
 def almxfl(
-    alm: FloatArray,
+    alm: ComplexArray,
     fl: FloatArray,
-) -> FloatArray:
+) -> ComplexArray:
     """
     Multiply alm by a function of l. The function is assumed to be zero where
     not defined.

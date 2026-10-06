@@ -321,9 +321,6 @@ def from_convergence(  # noqa: PLR0913
     if not (deflection or shear):
         return results
 
-    # zero B-modes for spin-weighted maps
-    blm = xp.zeros_like(alm)
-
     # compute deflection alms in place
     fl = xp.sqrt(ell * (ell + 1))
     # missing spin-1 pixel window function here
