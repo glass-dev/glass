@@ -102,7 +102,7 @@ def inverse_transform(
 
     Convert HEALPix harmonic coefficients into a map without pixel-window
     smoothing. For non-zero spin, ``alm`` contains E modes and B modes are set
-    to zero. Use S2FFT's native transform for JAX arrays.
+    to zero.
 
     Parameters
     ----------

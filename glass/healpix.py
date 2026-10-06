@@ -100,6 +100,30 @@ def alm2map_spin(
 
 
 @numpy_fallback
+def almxfl(
+    alm: ComplexArray,
+    fl: FloatArray,
+) -> ComplexArray:
+    """
+    Multiply alm by a function of l. The function is assumed to be zero where
+    not defined.
+
+    Parameters
+    ----------
+    alm
+        The alm to multiply.
+    fl
+        The function (at l=0..fl.shape[0]-1) by which alm must be multiplied.
+
+    Returns
+    -------
+        The new alm array with the function of l applied.
+
+    """
+    return healpy.almxfl(alm, fl)
+
+
+@numpy_fallback
 def ang2pix(
     nside: int,
     theta: float | FloatArray,
