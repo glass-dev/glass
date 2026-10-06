@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import typing
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -24,9 +23,9 @@ def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
 
 def test_one_transformation(
     cl: FloatArray,
-    get_rng: Callable[..., UnifiedGenerator],
+    rng: UnifiedGenerator,
 ) -> None:
-    lam = get_rng(np).random()
+    lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
     gl1, _, _ = glass.grf.solve(cl, t)
@@ -37,9 +36,9 @@ def test_one_transformation(
 
 def test_pad(
     cl: FloatArray,
-    get_rng: Callable[..., UnifiedGenerator],
+    rng: UnifiedGenerator,
 ) -> None:
-    lam = get_rng(np).random()
+    lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
     # check that output size matches pad
@@ -53,9 +52,9 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
-    get_rng: Callable[..., UnifiedGenerator],
+    rng: UnifiedGenerator,
 ) -> None:
-    lam = get_rng(np).random()
+    lam = rng.random()
     t = glass.grf.Lognormal(lam)
 
     gl = glass.grf.compute(cl, t)
@@ -77,12 +76,12 @@ def test_no_iterations(cl: FloatArray) -> None:
 
 def test_lognormal(
     cl: FloatArray,
-    get_rng: Callable[..., UnifiedGenerator],
+    rng: UnifiedGenerator,
 ) -> None:
     t1 = glass.grf.Lognormal()
     t2 = glass.grf.Lognormal()
 
-    gl0 = get_rng(np).random()
+    gl0 = rng.random()
 
     cltol = 1e-7
 
@@ -100,12 +99,11 @@ def test_lognormal(
 
 def test_monopole(
     cl: FloatArray,
-    get_rng: Callable[..., UnifiedGenerator],
+    rng: UnifiedGenerator,
 ) -> None:
     t = glass.grf.Lognormal()
 
-    rng = typing.cast("np.random.Generator", get_rng(np))
-    cl[0] = rng.random()
+    cl[0] = rng.random()  # ty: ignore[invalid-assignment]
     gl0 = rng.random()
 
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=None, gltol=1e-8)
