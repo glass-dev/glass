@@ -66,7 +66,7 @@ def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     lmax = 2
     nside = 4
 
-    rng = glass.rng.Generator(xp=jnp)
+    rng = glass.rng.default_rng(xp=jnp)
     kappa = rng.random(hp.nside2npix(nside))
     (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
     assert potential.shape == kappa.shape
@@ -91,7 +91,7 @@ def test_from_convergence_spin_jax(
         ),
     )
 
-    rng = glass.rng.Generator(xp=jnp)
+    rng = glass.rng.default_rng(xp=jnp)
     kappa = rng.random(hp.nside2npix(nside))
     alpha, gamma = glass.from_convergence(
         kappa,
