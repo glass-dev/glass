@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -62,7 +61,7 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
 
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
-def test_from_convergence_low_bandlimit_jax(urng: UnifiedGenerator) -> None:
+def test_from_convergence_low_bandlimit_jax(rng: UnifiedGenerator) -> None:
     import jax
     import jax.numpy as jnp
 
@@ -70,8 +69,7 @@ def test_from_convergence_low_bandlimit_jax(urng: UnifiedGenerator) -> None:
     nside = 4
 
     with jax.enable_x64(True):  # noqa: FBT003
-        # the NumPy transform is for array-api-strict compliance
-        kappa = jnp.asarray(np.asarray(urng.random(hp.nside2npix(nside))))
+        kappa = jnp.asarray(rng.random(hp.nside2npix(nside)))
         (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
         assert potential.shape == kappa.shape
         assert bool(jnp.all(jnp.isfinite(potential)))
@@ -80,7 +78,7 @@ def test_from_convergence_low_bandlimit_jax(urng: UnifiedGenerator) -> None:
 @pytest.mark.skipif(not (HAVE_JAX and HAVE_S2FFT), reason="test requires jax and s2fft")
 def test_from_convergence_spin_jax(
     monkeypatch: pytest.MonkeyPatch,
-    urng: UnifiedGenerator,
+    rng: UnifiedGenerator,
 ) -> None:
     import jax
     import jax.numpy as jnp
@@ -99,8 +97,7 @@ def test_from_convergence_spin_jax(
     )
 
     with jax.enable_x64(True):  # noqa: FBT003
-        # the NumPy transform is for array-api-strict compliance
-        kappa = jnp.asarray(np.asarray(urng.random(hp.nside2npix(nside))))
+        kappa = jnp.asarray(rng.random(hp.nside2npix(nside)))
         alpha, gamma = glass.from_convergence(
             kappa,
             lmax=lmax,
