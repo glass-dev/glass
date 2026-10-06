@@ -10,8 +10,6 @@ import pytest
 import glass
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
 
 # check if available for testing
@@ -25,10 +23,9 @@ cls_file = "Cls.npz"
 
 
 def test_read_write_cls(
-    get_rng: Callable[..., UnifiedGenerator],
+    rng: UnifiedGenerator,
     tmp_path: pathlib.Path,
 ) -> None:
-    rng = get_rng(np)
     cls: AngularPowerSpectra = [rng.normal(size=(10,)) for _ in range(10)]
     glass.save_cls(tmp_path / cls_file, cls)
 
