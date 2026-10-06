@@ -48,7 +48,7 @@ def test_init() -> None:
 def test_init_mix_of_backends_np_array_api_strict() -> None:
     import array_api_strict as xp
 
-    rng = glass.rng.Generator(rng=np.random.default_rng(), xp=xp)
+    rng = glass.rng.Generator(rng=glass.rng.default_rng(xp=np), xp=xp)
     assert rng.random(1).__array_namespace__().__name__ == "array_api_strict"
     assert rng.poisson(1).__array_namespace__().__name__ == "array_api_strict"
     assert rng.standard_normal(1).__array_namespace__().__name__ == "array_api_strict"
