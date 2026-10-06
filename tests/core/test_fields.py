@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -12,6 +11,7 @@ import glass
 import glass.fields
 import glass.healpix as hp
 import glass.rng
+from tests._optional_dependencies import HAVE_JAX
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -19,8 +19,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
-
-HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 @pytest.fixture(scope="session")

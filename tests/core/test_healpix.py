@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import math
 from typing import TYPE_CHECKING
 
@@ -13,14 +12,13 @@ import array_api_extra as xpx
 
 import glass.healpix as hp
 import glass.rng
+from tests._optional_dependencies import HAVE_ARRAY_API_STRICT
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import HealpixInputs
-
-HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
 
 
 @pytest.mark.parametrize(

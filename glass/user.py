@@ -29,13 +29,13 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    import importlib.util
     from collections.abc import Generator
     from os import PathLike
 
     from glass._types import AngularPowerSpectra, FloatArray
+    from tests._optional_dependencies import HAVE_FITSIO
 
-    if importlib.util.find_spec("fitsio") is not None:
+    if HAVE_FITSIO:
         import fitsio
 
 
