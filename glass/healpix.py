@@ -43,6 +43,8 @@ def alm2map(
     nside: int,
     *,
     lmax: int | None = None,
+    pixwin: bool = False,
+    pol: bool = True,
 ) -> FloatArray:
     """
     Computes a HEALPix map given the alm.
@@ -55,6 +57,10 @@ def alm2map(
         The nside of the output map.
     lmax
         Explicitly define lmax.
+    pixwin
+        Smooth the alm using the pixel window functions.
+    pol
+        If True, assumes input alms are TEB.
 
     Returns
     -------
@@ -66,6 +72,8 @@ def alm2map(
         alms,
         nside,
         lmax=lmax,
+        pixwin=pixwin,
+        pol=pol,
     )
 
 
@@ -163,6 +171,8 @@ def map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,
     lmax: int | None = None,
+    pol: bool = True,
+    use_pixel_weights: bool = False,
 ) -> ComplexArray:
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
@@ -183,6 +193,12 @@ def map2alm(
         The input map or a list of n input maps. Must be in ring ordering.
     lmax
         Maximum l of the power spectrum.
+    pol
+        If True, assumes input maps are TQU. If False, only the temperature map
+        is considered.
+    use_pixel_weights
+        If True, use pixel by pixel weighting, healpy will automatically
+        download the weights, if needed.
 
     Returns
     -------
@@ -193,7 +209,8 @@ def map2alm(
         maps,
         datapath=_get_healpy_datapath(),
         lmax=lmax,
-        use_pixel_weights=True,
+        pol=pol,
+        use_pixel_weights=use_pixel_weights,
     )
 
 

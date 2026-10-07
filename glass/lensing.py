@@ -294,7 +294,13 @@ def from_convergence(  # noqa: PLR0913
         lmax = 3 * nside - 1
 
     # compute alm
-    alm = glass.harmonics.transform(kappa, lmax=lmax, nside=nside)
+    alm = glass.harmonics.transform(
+        kappa,
+        lmax=lmax,
+        nside=nside,
+        pol=False,
+        use_pixel_weights=True,
+    )
 
     # mode number; all conversions are factors of this.
     # Must be float to allow division later
