@@ -64,6 +64,7 @@ def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     kappa = rng.random(hp.nside2npix(nside))
     (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
+
     assert potential.shape == kappa.shape
     assert bool(jnp.all(jnp.isfinite(potential)))
 
@@ -94,7 +95,10 @@ def test_from_convergence_spin_jax(
         deflection=True,
         shear=True,
     )
+
     assert alpha.shape == gamma.shape == kappa.shape
+    assert bool(jnp.all(jnp.isfinite(alpha)))
+    assert bool(jnp.all(jnp.isfinite(gamma)))
 
 
 def test_multi_plane_matrix(
