@@ -12,6 +12,7 @@ import array_api_extra as xpx
 
 import glass.healpix as hp
 import glass.rng
+from tests._optional_dependencies import HAVE_ARRAY_API_STRICT
 
 if TYPE_CHECKING:
     from types import ModuleType
