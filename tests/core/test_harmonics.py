@@ -133,8 +133,8 @@ def test_inverse_transform_s2fft_spin(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
-def test_transform_healpy() -> None:
-    maps = np.asarray([1.0] * 12)
+def test_transform_healpy(xp: ModuleType) -> None:
+    maps = xp.asarray([1.0] * 12)
     nside = 1
     lmax = 2
 
