@@ -394,7 +394,13 @@ def _generate_grf(
         alm = xpx.at(alm)[:n].set(xp.real(alm[:n]) + xp.imag(alm[:n]) + 0j)  # ty: ignore[not-subscriptable]
 
         # transform alm to maps
-        yield hp.alm2map(alm, nside, pixwin=False, pol=False)
+        yield glass.harmonics.inverse_transform(
+            alm,
+            lmax=n - 1,
+            nside=nside,
+            pixwin=False,
+            pol=False,
+        )
 
 
 def getcl(

@@ -64,7 +64,8 @@ def alm2map(
 
     Returns
     -------
-        A HEALPix map in RING scheme at nside or a list of T,Q,U maps.
+        A HEALPix map in RING scheme at nside, or a two-dimensional array
+        containing the T, Q, and U maps for polarized input.
 
     """
     return healpy.alm2map(
@@ -108,9 +109,9 @@ def alm2map_spin(
 
 @numpy_fallback
 def almxfl(
-    alm: FloatArray,
+    alm: ComplexArray,
     fl: FloatArray,
-) -> FloatArray:
+) -> ComplexArray:
     """
     Multiply alm by a function of l. The function is assumed to be zero where
     not defined.
@@ -222,7 +223,7 @@ def map2alm(
     lmax: int | None = None,
     pol: bool = True,
     use_pixel_weights: bool = False,
-) -> FloatArray:
+) -> ComplexArray:
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
 
@@ -243,7 +244,8 @@ def map2alm(
     lmax
         Maximum l of the power spectrum.
     pol
-        If True, assumes input maps are TQU.
+        If True, assumes input maps are TQU. If False, only the temperature map
+        is considered.
     use_pixel_weights
         If True, use pixel by pixel weighting, healpy will automatically
         download the weights, if needed.

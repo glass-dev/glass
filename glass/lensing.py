@@ -35,6 +35,7 @@ from typing import TYPE_CHECKING, Literal
 import array_api_compat
 import array_api_extra as xpx
 
+import glass.harmonics
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
 
@@ -293,7 +294,12 @@ def from_convergence(  # noqa: PLR0913
         lmax = 3 * nside - 1
 
     # compute alm
-    alm = hp.map2alm(kappa, lmax=lmax, pol=False, use_pixel_weights=True)
+    alm = glass.harmonics.transform(
+        kappa,
+        lmax=lmax,
+        pol=False,
+        use_pixel_weights=True,
+    )
 
     # mode number; all conversions are factors of this.
     # Must be float to allow division later
@@ -313,15 +319,12 @@ def from_convergence(  # noqa: PLR0913
 
     # if potential is requested, compute map and add to output
     if potential:
-        psi = hp.alm2map(alm, nside, lmax=lmax)
+        psi = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
         results += (psi,)
 
     # if no spin-weighted maps are requested, stop here
     if not (deflection or shear):
         return results
-
-    # zero B-modes for spin-weighted maps
-    blm = xp.zeros_like(alm)
 
     # compute deflection alms in place
     fl = xp.sqrt(ell * (ell + 1))
@@ -330,8 +333,7 @@ def from_convergence(  # noqa: PLR0913
 
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
-        alpha = hp.alm2map_spin([alm, blm], nside, 1, lmax)
-        alpha = alpha[0] + 1j * alpha[1]
+        alpha = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=1)
         results += (alpha,)
 
     # if no shear is requested, stop here
@@ -353,8 +355,7 @@ def from_convergence(  # noqa: PLR0913
     alm = hp.almxfl(alm, fl)
 
     # transform to shear maps
-    gamma = hp.alm2map_spin([alm, blm], nside, 2, lmax)
-    gamma = gamma[0] + 1j * gamma[1]
+    gamma = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=2)
     results += (gamma,)
 
     # all done

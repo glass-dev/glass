@@ -17,3 +17,5 @@ General
 -------
 
 .. autofunction:: multalm
+.. autofunction:: inverse_transform
+.. autofunction:: transform
