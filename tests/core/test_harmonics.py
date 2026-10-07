@@ -14,9 +14,6 @@ from tests._optional_dependencies import HAVE_S2FFT
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from glass._types import UnifiedGenerator
-    from tests.fixtures.helper_classes import HealpixInputs
-
 
 def test_multalm(xp: ModuleType) -> None:
     # check output values and shapes
@@ -65,6 +62,7 @@ def test_inverse_transform_healpy() -> None:
 
     expected = hp.alm2map(alm, nside=nside, lmax=lmax)
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
+
     xpx.testing.assert_equal(actual, expected)
 
 
@@ -77,56 +75,59 @@ def test_inverse_transform_healpy_spin(spin: int) -> None:
     result = hp.alm2map_spin([alm, np.zeros_like(alm)], nside, spin, lmax)
     expected = result[0] + 1j * result[1]
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=spin)
+
     xpx.testing.assert_equal(actual, expected)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_inverse_transform_s2fft(
-    healpix_inputs: type[HealpixInputs],
-    jnp: ModuleType,
-    rng: UnifiedGenerator,
-) -> None:
-    alm = healpix_inputs.alm(rng=rng)
+def test_inverse_transform_s2fft(jnp: ModuleType) -> None:
+    # use real m=0 coefficients and complex coefficients for m > 0.
+    alm = np.arange(78, dtype=np.complex128) / 78
+    alm[12:] += 1j * np.arange(66) / 78
+    lmax = 11
+    nside = 4
 
     expected = glass.harmonics.inverse_transform(
         alm,
-        lmax=healpix_inputs.lmax,
-        nside=healpix_inputs.nside,
+        lmax=lmax,
+        nside=nside,
     )
     actual = glass.harmonics.inverse_transform(
         jnp.asarray(alm),
-        lmax=healpix_inputs.lmax,
-        nside=healpix_inputs.nside,
+        lmax=lmax,
+        nside=nside,
     )
+
+    assert expected.__array_namespace__() == np
+    assert actual.__array_namespace__() == jnp
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-13, rtol=0)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 @pytest.mark.parametrize("spin", [1, 2])
 def test_inverse_transform_s2fft_spin(
-    healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
-    rng: UnifiedGenerator,
     spin: int,
 ) -> None:
-    # keep well below the map resolution to isolate spin conventions from
-    # S2FFT's larger HEALPix errors near the fixture's full bandlimit
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     lmax = 2
-    alm_size = (lmax + 1) * (lmax + 2) // 2
-    alm = healpix_inputs.alm(rng=rng)[:alm_size]
+    nside = 1
 
     expected = glass.harmonics.inverse_transform(
         alm,
         lmax=lmax,
-        nside=healpix_inputs.nside,
+        nside=nside,
         spin=spin,
     )
     actual = glass.harmonics.inverse_transform(
         jnp.asarray(alm),
         lmax=lmax,
-        nside=healpix_inputs.nside,
+        nside=nside,
         spin=spin,
     )
+
+    assert expected.__array_namespace__() == np
+    assert actual.__array_namespace__() == jnp
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
@@ -142,49 +143,49 @@ def test_transform_healpy() -> None:
         use_pixel_weights=True,
     )
     actual = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
+
     xpx.testing.assert_equal(actual, expected)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform_s2fft(
-    healpix_inputs: type[HealpixInputs],
-    jnp: ModuleType,
-    rng: UnifiedGenerator,
-) -> None:
-    kappa = healpix_inputs.kappa(rng=rng)
+def test_transform_s2fft(jnp: ModuleType) -> None:
+    kappa = np.linspace(-1.0, 1.0, 192)
+    lmax = 11
+    nside = 4
 
     expected = glass.harmonics.transform(
         kappa,
-        lmax=healpix_inputs.lmax,
-        nside=healpix_inputs.nside,
+        lmax=lmax,
+        nside=nside,
     )
     actual = glass.harmonics.transform(
         jnp.asarray(kappa),
-        lmax=healpix_inputs.lmax,
-        nside=healpix_inputs.nside,
+        lmax=lmax,
+        nside=nside,
     )
+
+    assert expected.__array_namespace__() == np
+    assert actual.__array_namespace__() == jnp
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform_s2fft_low_bandlimit(
-    healpix_inputs: type[HealpixInputs],
-    jnp: ModuleType,
-    rng: UnifiedGenerator,
-) -> None:
+def test_transform_s2fft_low_bandlimit(jnp: ModuleType) -> None:
     low_lmax = 2
-    full_lmax = 2 * healpix_inputs.nside - 1
-    kappa = healpix_inputs.kappa(rng=rng)
+    nside = 4
+    full_lmax = 2 * nside - 1
+    kappa = np.linspace(-1.0, 1.0, 12 * nside**2)
+    kappa_jax = jnp.asarray(kappa)
 
     low_alms = glass.harmonics.transform(
-        jnp.asarray(kappa),
+        kappa_jax,
         lmax=low_lmax,
-        nside=healpix_inputs.nside,
+        nside=nside,
     )
     full_alms = glass.harmonics.transform(
-        jnp.asarray(kappa),
+        kappa_jax,
         lmax=full_lmax,
-        nside=healpix_inputs.nside,
+        nside=nside,
     )
     # HEALPix packs alms in blocks of increasing m, then increasing ell.
     full_indices = [
