@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
-pytest.importorskip("jax", reason="tests require jax")
-
 import jax.test_util
+import pytest
 
 import glass
 
