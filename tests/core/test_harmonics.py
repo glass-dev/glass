@@ -52,7 +52,7 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
-def test_inverse_transform_default_spin(xp: ModuleType) -> None:
+def test_inverse_transform_healpy_default_spin(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     nside = 1
     lmax = 2
@@ -62,7 +62,7 @@ def test_inverse_transform_default_spin(xp: ModuleType) -> None:
     assert xp.isdtype(result.dtype, "real floating")
 
 
-def test_inverse_transform_spin_1(xp: ModuleType) -> None:
+def test_inverse_transform_healpy_spin_1(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     nside = 1
     lmax = 2
@@ -73,7 +73,7 @@ def test_inverse_transform_spin_1(xp: ModuleType) -> None:
     assert xp.isdtype(result.dtype, "complex floating")
 
 
-def test_inverse_transform_spin_2(xp: ModuleType) -> None:
+def test_inverse_transform_healpy_spin_2(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     nside = 1
     lmax = 2
@@ -83,7 +83,7 @@ def test_inverse_transform_spin_2(xp: ModuleType) -> None:
     assert xp.isdtype(result.dtype, "complex floating")
 
 
-def test_inverse_transform_spin_0(xp: ModuleType) -> None:
+def test_inverse_transform_healpy_spin_0(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     nside = 1
     lmax = 2
@@ -93,7 +93,7 @@ def test_inverse_transform_spin_0(xp: ModuleType) -> None:
     assert xp.isdtype(result.dtype, "real floating")
 
 
-def test_transform(xp: ModuleType) -> None:
+def test_transform_healpy(xp: ModuleType) -> None:
     maps = xp.asarray([1.0] * 12)
     lmax = 2
 
