@@ -2,18 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
-pytest.importorskip("jax", reason="tests require jax")
-
-import jax.numpy as jnp
 import jax.test_util
 
 import glass
 import glass.jax
 
 if TYPE_CHECKING:
-    from types import NotImplementedType
+    from types import ModuleType, NotImplementedType
 
     from glass._types import AnyArray, UnifiedGenerator
 
@@ -44,7 +39,10 @@ def test_lognormal(rng: UnifiedGenerator) -> None:
     )
 
 
-def test_sqnormal(rng: UnifiedGenerator) -> None:
+def test_sqnormal(
+    jnp: ModuleType,
+    rng: UnifiedGenerator,
+) -> None:
     """Tests that glass.grf.SquaredNormal is auto differentiable when using JAX."""
     lam = rng.uniform()
     var = rng.uniform()
@@ -103,7 +101,10 @@ def test_corr_lognormal(rng: UnifiedGenerator) -> None:
     )
 
 
-def test_corr_sqnormal(rng: UnifiedGenerator) -> None:
+def test_corr_sqnormal(
+    jnp: ModuleType,
+    rng: UnifiedGenerator,
+) -> None:
     """Tests that glass.grf.SquaredNormal.corr is auto differentiable when using JAX."""
     lam1, var1 = rng.uniform(size=2)
     a1 = jnp.sqrt(1 - var1)

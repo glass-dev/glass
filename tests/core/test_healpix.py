@@ -12,7 +12,6 @@ import array_api_extra as xpx
 
 import glass.healpix as hp
 import glass.rng
-from tests._optional_dependencies import HAVE_ARRAY_API_STRICT
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -369,7 +368,6 @@ def test_query_strip_float64(
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
 def test_query_strip_none(
     ap: ModuleType,

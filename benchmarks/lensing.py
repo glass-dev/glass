@@ -14,13 +14,13 @@ from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
 # almost all GLASS functionality is available from the `glass` namespace
 import glass
 import glass.ext.camb  # ty: ignore[unresolved-import]
-from glass import rng
+import glass.rng
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from types import ModuleType
 
-    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
+    from glass._types import AngularPowerSpectra, FloatArray
     from glass.shells import RadialWindow
 
 
@@ -56,7 +56,10 @@ for xp in xp_available_backends.values():
     shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]
+    cls = [
+        xp.asarray(cl)
+        for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)  # ty: ignore[unresolved-attribute]
+    ]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -85,7 +88,7 @@ for xp in xp_available_backends.values():
         xp: ModuleType,
     ) -> FloatArray:
         """Realistic lensing simulation benchmark."""
-        urng: UnifiedGenerator = rng.default_rng(xp=xp)
+        urng = glass.rng.default_rng(xp=xp)
 
         # this will compute the convergence field iteratively
         convergence = glass.MultiPlaneConvergence(cosmo)

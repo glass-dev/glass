@@ -2,19 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
-pytest.importorskip("jax", reason="tests require jax")
-import jax.numpy as jnp
 import jax.test_util
 
 import glass
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import AnyArray
 
 
-def test_compute() -> None:
+def test_compute(jnp: ModuleType) -> None:
     """Tests that glass.grf.compute is auto differentiable when using JAX."""
     t1 = glass.grf.Normal()
     t2 = glass.grf.Normal()

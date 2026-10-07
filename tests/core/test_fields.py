@@ -11,7 +11,6 @@ import glass
 import glass.fields
 import glass.healpix as hp
 import glass.rng
-from tests._optional_dependencies import HAVE_JAX
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -129,7 +128,6 @@ def test_iternorm_nonmonotonic_row_widths(xp: ModuleType) -> None:
         )
 
 
-@pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_cls2cov_jax(jnp: ModuleType) -> None:
     nl, nf, nc = 3, 3, 2
 
