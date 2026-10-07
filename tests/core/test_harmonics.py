@@ -60,8 +60,8 @@ def test_multalm(xp: ModuleType) -> None:
 
 def test_inverse_transform_healpy(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
     lmax = 2
+    nside = 1
 
     expected = hp.alm2map(alm, nside=nside, lmax=lmax)
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
@@ -135,8 +135,8 @@ def test_inverse_transform_s2fft_spin(
 
 def test_transform_healpy(xp: ModuleType) -> None:
     maps = xp.asarray([1.0] * 12)
-    nside = 1
     lmax = 2
+    nside = 1
 
     expected = hp.map2alm(
         maps,
