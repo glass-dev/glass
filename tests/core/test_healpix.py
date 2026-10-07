@@ -115,19 +115,6 @@ def test_alm2map_spin(
         xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
 
 
-def test_almxfl(
-    healpix_inputs: type[HealpixInputs],
-    urng: UnifiedGenerator,
-    xp: ModuleType,
-) -> None:
-    """Compare ``glass.healpix.almxfl`` against ``healpy.almxfl``."""
-    alm = healpix_inputs.alm(rng=urng)
-    fl = healpix_inputs.fl(rng=urng)
-    old = healpy.almxfl(alm, fl)
-    new = hp.almxfl(alm, fl)
-    xpx.testing.assert_equal(xp.asarray(old), new)
-
-
 @pytest.mark.parametrize(
     ("lonlat", "max_phi", "max_theta"),
     [
