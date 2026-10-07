@@ -95,9 +95,8 @@ def test_inverse_transform_spin_0(xp: ModuleType) -> None:
 
 def test_transform(xp: ModuleType) -> None:
     maps = xp.asarray([1.0] * 12)
-    nside = 1
     lmax = 2
 
-    result = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
+    result = glass.harmonics.transform(maps, lmax=lmax)
     assert result.shape[0] == 6
     assert xp.isdtype(result.dtype, "complex floating")

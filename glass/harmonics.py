@@ -148,7 +148,6 @@ def transform(
     maps: FloatArray,
     *,
     lmax: int,
-    nside: int,  # noqa: ARG001
     pol: bool = True,
     use_pixel_weights: bool = False,
 ) -> ComplexArray:
@@ -161,8 +160,6 @@ def transform(
         The real-space map to transform.
     lmax
         The maximum multipole of the spherical harmonic transform.
-    nside
-        The nside parameter of the input map.
     pol
         Whether to compute polarization.
     use_pixel_weights
@@ -173,9 +170,4 @@ def transform(
         The spherical harmonic coefficients resulting from the transform.
 
     """
-    return hp.map2alm(
-        maps,
-        lmax=lmax,
-        pol=pol,
-        use_pixel_weights=use_pixel_weights,
-    )
+    return hp.map2alm(maps, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights)

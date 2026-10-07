@@ -297,7 +297,6 @@ def from_convergence(  # noqa: PLR0913
     alm = glass.harmonics.transform(
         kappa,
         lmax=lmax,
-        nside=nside,
         pol=False,
         use_pixel_weights=True,
     )
