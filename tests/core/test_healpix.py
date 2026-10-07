@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import math
 from typing import TYPE_CHECKING
 
@@ -19,8 +18,6 @@ if TYPE_CHECKING:
 
     from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import HealpixInputs
-
-HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
 
 
 @pytest.mark.parametrize(
@@ -323,7 +320,6 @@ def test_query_strip_float64(
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.skipif(not HAVE_ARRAY_API_STRICT, reason="test requires array_api_strict")
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
 def test_query_strip_none(
     ap: ModuleType,

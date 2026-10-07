@@ -60,6 +60,8 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
+    pixwin: bool = False,
+    pol: bool = True,
     spin: typing.Literal[0] = 0,
 ) -> FloatArray:
     # returns a real scalar map
@@ -72,6 +74,8 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
+    pixwin: bool = False,
+    pol: bool = True,
     spin: typing.Literal[1, 2],
 ) -> ComplexArray:
     # returns a complex map for spin 1 or 2
@@ -84,17 +88,21 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
+    pixwin: bool = False,
+    pol: bool = True,
     spin: int,
 ) -> FloatArray | ComplexArray:
     # returns a real or complex map depending on the spin
     ...
 
 
-def inverse_transform(
+def inverse_transform(  # noqa: PLR0913
     alm: ComplexArray,
     *,
     lmax: int,
     nside: int,
+    pixwin: bool = False,
+    pol: bool = True,
     spin: int = 0,
 ) -> FloatArray | ComplexArray:
     """
@@ -112,6 +120,10 @@ def inverse_transform(
         The maximum multipole of the spherical harmonic transform.
     nside
         The nside parameter of the output map.
+    pixwin
+        Whether to apply the pixel window function.
+    pol
+        Whether to compute polarization.
     spin
         Spin of the output map. Zero produces a real scalar map; non-zero spin
         produces a complex map whose real and imaginary parts are the two
@@ -125,7 +137,7 @@ def inverse_transform(
     xp = alm.__array_namespace__()
 
     if spin == 0:
-        return hp.alm2map(alm, nside, lmax=lmax)
+        return hp.alm2map(alm, nside, lmax=lmax, pixwin=pixwin, pol=pol)
 
     maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
     return maps[0] + 1j * maps[1]
@@ -136,6 +148,8 @@ def transform(
     *,
     lmax: int,
     nside: int,  # noqa: ARG001
+    pol: bool = True,
+    use_pixel_weights: bool = False,
 ) -> ComplexArray:
     """
     Compute the spherical harmonic transform of a map.
@@ -148,10 +162,19 @@ def transform(
         The maximum multipole of the spherical harmonic transform.
     nside
         The nside parameter of the input map.
+    pol
+        Whether to compute polarization.
+    use_pixel_weights
+        Whether to use pixel weights in the transform.
 
     Returns
     -------
         The spherical harmonic coefficients resulting from the transform.
 
     """
-    return hp.map2alm(maps, lmax=lmax)
+    return hp.map2alm(
+        maps,
+        lmax=lmax,
+        pol=pol,
+        use_pixel_weights=use_pixel_weights,
+    )
