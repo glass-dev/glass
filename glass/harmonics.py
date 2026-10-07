@@ -121,9 +121,10 @@ def inverse_transform(  # noqa: PLR0913
     nside
         The nside parameter of the output map.
     pixwin
-        Whether to apply the pixel window function.
+        Whether to apply the pixel window function. Has no effect for non-zero
+        spin.
     pol
-        Whether to compute polarization.
+        Whether to compute polarization. Has no effect for non-zero spin.
     spin
         Spin of the output map. Zero produces a real scalar map; non-zero spin
         produces a complex map whose real and imaginary parts are the two
