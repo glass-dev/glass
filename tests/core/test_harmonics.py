@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 import array_api_extra as xpx
+import numpy as np
 
 import glass.harmonics
 from tests._optional_dependencies import HAVE_S2FFT
@@ -61,8 +62,49 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
+def test_inverse_transform_healpy_default_spin() -> None:
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
+    assert result.shape[0] == 12
+    assert np.issubdtype(result.dtype, np.floating)
+
+
+def test_inverse_transform_healpy_spin_1() -> None:
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    # test with spin 1
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=1)
+    assert result.shape[0] == 12
+    assert np.issubdtype(result.dtype, np.complexfloating)
+
+
+def test_inverse_transform_healpy_spin_2() -> None:
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=2)
+    assert result.shape[0] == 12
+    assert np.issubdtype(result.dtype, np.complexfloating)
+
+
+def test_inverse_transform_healpy_spin_0() -> None:
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=0)
+    assert result.shape[0] == 12
+    assert np.issubdtype(result.dtype, np.floating)
+
+
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_inverse_transform(
+def test_inverse_transform_s2fft(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
     rng: UnifiedGenerator,
@@ -84,7 +126,7 @@ def test_inverse_transform(
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 @pytest.mark.parametrize("spin", [1, 2])
-def test_inverse_transform_spin(
+def test_inverse_transform_s2fft_spin(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
     rng: UnifiedGenerator,
@@ -111,8 +153,18 @@ def test_inverse_transform_spin(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
+def test_transform_healpy() -> None:
+    maps = np.asarray([1.0] * 12)
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
+    assert result.shape[0] == 6
+    assert np.issubdtype(result.dtype, np.complexfloating)
+
+
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform(
+def test_transform_s2fft(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
     rng: UnifiedGenerator,
@@ -133,7 +185,7 @@ def test_transform(
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform_low_bandlimit(
+def test_transform_s2fft_low_bandlimit(
     healpix_inputs: type[HealpixInputs],
     jnp: ModuleType,
     rng: UnifiedGenerator,
