@@ -50,3 +50,54 @@ def test_multalm(xp: ModuleType) -> None:
 
     result = glass.harmonics.multalm(alm, bl)
     xpx.testing.assert_equal(result, alm)
+
+
+def test_inverse_transform_default_spin(xp: ModuleType) -> None:
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
+    assert result.shape[0] == 12
+    assert xp.isdtype(result.dtype, "real floating")
+
+
+def test_inverse_transform_spin_1(xp: ModuleType) -> None:
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    # test with spin 1
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=1)
+    assert result.shape[0] == 12
+    assert xp.isdtype(result.dtype, "complex floating")
+
+
+def test_inverse_transform_spin_2(xp: ModuleType) -> None:
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=2)
+    assert result.shape[0] == 12
+    assert xp.isdtype(result.dtype, "complex floating")
+
+
+def test_inverse_transform_spin_0(xp: ModuleType) -> None:
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=0)
+    assert result.shape[0] == 12
+    assert xp.isdtype(result.dtype, "real floating")
+
+
+def test_transform(xp: ModuleType) -> None:
+    maps = xp.asarray([1.0] * 12)
+    nside = 1
+    lmax = 2
+
+    result = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
+    assert result.shape[0] == 6
+    assert xp.isdtype(result.dtype, "complex floating")
