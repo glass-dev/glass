@@ -10,16 +10,13 @@ import array_api_extra as xpx
 import glass
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
+from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
     from glass.cosmology import Cosmology
-
-# check if available for testing
-HAVE_JAX = importlib.util.find_spec("jax") is not None
-HAVE_S2FFT = importlib.util.find_spec("s2fft") is not None
 
 
 def test_from_convergence(urng: UnifiedGenerator) -> None:
