@@ -58,8 +58,8 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
-def test_inverse_transform_healpy(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+def test_inverse_transform_healpy() -> None:
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     lmax = 2
     nside = 1
 
@@ -69,15 +69,12 @@ def test_inverse_transform_healpy(xp: ModuleType) -> None:
 
 
 @pytest.mark.parametrize("spin", [1, 2])
-def test_inverse_transform_healpy_spin(
-    xp: ModuleType,
-    spin: int,
-) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+def test_inverse_transform_healpy_spin(spin: int) -> None:
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     lmax = 2
     nside = 1
 
-    result = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+    result = hp.alm2map_spin([alm, np.zeros_like(alm)], nside, spin, lmax)
     expected = result[0] + 1j * result[1]
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=spin)
     xpx.testing.assert_equal(actual, expected)
@@ -133,8 +130,8 @@ def test_inverse_transform_s2fft_spin(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
-def test_transform_healpy(xp: ModuleType) -> None:
-    maps = xp.asarray([1.0] * 12)
+def test_transform_healpy() -> None:
+    maps = np.asarray([1.0] * 12)
     lmax = 2
     nside = 1
 
