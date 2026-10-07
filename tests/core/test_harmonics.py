@@ -9,16 +9,13 @@ import pytest
 import array_api_extra as xpx
 
 import glass.harmonics
+from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType
 
     from glass._types import UnifiedGenerator
     from tests.fixtures.helper_classes import HealpixInputs
-
-# check if available for testing
-HAVE_JAX = importlib.util.find_spec("jax") is not None
-HAVE_S2FFT = importlib.util.find_spec("s2fft") is not None
 
 
 def test_multalm(xp: ModuleType) -> None:
