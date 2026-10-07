@@ -143,3 +143,24 @@ def test_transform_healpy() -> None:
     )
     actual = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
     xpx.testing.assert_equal(actual, expected)
+
+
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+def test_transform_s2fft(
+    healpix_inputs: type[HealpixInputs],
+    jnp: ModuleType,
+    rng: UnifiedGenerator,
+) -> None:
+    kappa = healpix_inputs.kappa(rng=rng)
+
+    expected = glass.harmonics.transform(
+        kappa,
+        lmax=healpix_inputs.lmax,
+        nside=healpix_inputs.nside,
+    )
+    actual = glass.harmonics.transform(
+        jnp.asarray(kappa),
+        lmax=healpix_inputs.lmax,
+        nside=healpix_inputs.nside,
+    )
+    xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
