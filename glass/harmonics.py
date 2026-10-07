@@ -60,8 +60,6 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
     spin: typing.Literal[0] = 0,
 ) -> FloatArray:
     # returns a real scalar map
@@ -74,8 +72,6 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
     spin: typing.Literal[1, 2],
 ) -> ComplexArray:
     # returns a complex map for spin 1 or 2
@@ -88,21 +84,17 @@ def inverse_transform(
     *,
     lmax: int,
     nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
     spin: int,
 ) -> FloatArray | ComplexArray:
     # returns a real or complex map depending on the spin
     ...
 
 
-def inverse_transform(  # noqa: PLR0913
+def inverse_transform(
     alm: ComplexArray,
     *,
     lmax: int,
     nside: int,
-    pixwin: bool = False,
-    pol: bool = True,
     spin: int = 0,
 ) -> FloatArray | ComplexArray:
     """
@@ -120,12 +112,6 @@ def inverse_transform(  # noqa: PLR0913
         The maximum multipole of the spherical harmonic transform.
     nside
         The nside parameter of the output map.
-    pixwin
-        Whether to apply the pixel window function on the Healpy backend. Has no
-        effect for non-zero spin.
-    pol
-        Whether to compute polarization on the Healpy backend. Has no effect for
-        non-zero spin.
     spin
         Spin of the output map. Zero produces a real scalar map; non-zero spin
         produces a complex map whose real and imaginary parts are the two
@@ -140,7 +126,7 @@ def inverse_transform(  # noqa: PLR0913
 
     if xp.__name__ != "jax.numpy":
         if spin == 0:
-            return hp.alm2map(alm, nside, lmax=lmax, pixwin=pixwin, pol=pol)
+            return hp.alm2map(alm, nside, lmax=lmax)
 
         maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
         return maps[0] + 1j * maps[1]
@@ -185,8 +171,6 @@ def transform(
     *,
     lmax: int,
     nside: int,
-    pol: bool = True,
-    use_pixel_weights: bool = False,
 ) -> ComplexArray:
     """
     Compute the spherical harmonic transform of a map.
@@ -199,10 +183,6 @@ def transform(
         The maximum multipole of the spherical harmonic transform.
     nside
         The nside parameter of the input map.
-    pol
-        Whether to compute polarization on the Healpy backend.
-    use_pixel_weights
-        Whether to use pixel weights in the Healpy transform.
 
     Returns
     -------
@@ -212,12 +192,7 @@ def transform(
     xp = maps.__array_namespace__()
 
     if xp.__name__ != "jax.numpy":
-        return hp.map2alm(
-            maps,
-            lmax=lmax,
-            pol=pol,
-            use_pixel_weights=use_pixel_weights,
-        )
+        return hp.map2alm(maps, lmax=lmax)
 
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415
