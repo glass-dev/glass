@@ -297,8 +297,6 @@ def from_convergence(  # noqa: PLR0913
     alm = glass.harmonics.transform(
         kappa,
         lmax=lmax,
-        pol=False,
-        use_pixel_weights=True,
     )
 
     # mode number; all conversions are factors of this.
