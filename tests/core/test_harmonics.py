@@ -81,7 +81,7 @@ def test_inverse_transform_healpy_spin(spin: int) -> None:
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_inverse_transform_s2fft(jnp: ModuleType) -> None:
-    # use real m=0 coefficients and complex coefficients for m > 0.
+    # use real m=0 coefficients and complex coefficients for m > 0
     alm = np.arange(78, dtype=np.complex128) / 78
     alm[12:] += 1j * np.arange(66) / 78
     lmax = 11
@@ -186,7 +186,7 @@ def test_transform_s2fft_low_bandlimit(jnp: ModuleType) -> None:
         lmax=full_lmax,
         nside=nside,
     )
-    # HEALPix packs alms in blocks of increasing m, then increasing ell.
+    # HEALPix packs alms in blocks of increasing m, then increasing ell
     full_indices = [
         m * (2 * full_lmax + 1 - m) // 2 + ell
         for m in range(low_lmax + 1)
