@@ -141,7 +141,6 @@ def test_map2alm_with_pulled_data_wrong_path(
         )
 
 
-@pytest.mark.parametrize("pol", [True, False])
 @pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_individual(
     healpix_inputs: type[HealpixInputs],
@@ -164,6 +163,7 @@ def test_map2alm_individual(
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
+@pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_sequence(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
