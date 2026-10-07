@@ -82,6 +82,11 @@ def test_transform_healpy(xp: ModuleType) -> None:
     maps = xp.asarray([1.0] * 12)
     lmax = 2
 
-    expected = hp.map2alm(maps, lmax=lmax)
+    expected = hp.map2alm(
+        maps,
+        lmax=lmax,
+        # using pixel weights is the default in the transform
+        use_pixel_weights=True,
+    )
     actual = glass.harmonics.transform(maps, lmax=lmax)
     xpx.testing.assert_equal(actual, expected)
