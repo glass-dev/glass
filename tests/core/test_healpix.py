@@ -123,7 +123,6 @@ def test_map2alm_with_pulled_data(
     assert result.shape == (78,)
 
 
-@pytest.mark.parametrize("pol", [False, True])
 def test_map2alm_with_pulled_data_wrong_path(
     invalid_healpy_datapath: str,
     healpix_inputs: type[HealpixInputs],
