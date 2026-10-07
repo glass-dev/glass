@@ -135,6 +135,7 @@ def map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,
     lmax: int | None = None,
+    use_pixel_weights: bool = False,
 ) -> ComplexArray:
     """
     Computes the alm of a HEALPix map. The input maps must all be in ring ordering.
@@ -155,6 +156,8 @@ def map2alm(
         The input map or a list of n input maps. Must be in ring ordering.
     lmax
         Maximum l of the power spectrum.
+    use_pixel_weights
+        Whether to use pixel weights in the computation.
 
     Returns
     -------
@@ -165,7 +168,7 @@ def map2alm(
         maps,
         datapath=_get_healpy_datapath(),
         lmax=lmax,
-        use_pixel_weights=True,
+        use_pixel_weights=use_pixel_weights,
     )
 
 

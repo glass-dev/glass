@@ -151,4 +151,5 @@ def transform(
         The spherical harmonic coefficients resulting from the transform.
 
     """
-    return hp.map2alm(maps, lmax=lmax)
+    # the only time GLASS used map2alm was with pixel weights
+    return hp.map2alm(maps, lmax=lmax, use_pixel_weights=True)
