@@ -7,6 +7,7 @@ import pytest
 import array_api_extra as xpx
 
 import glass.harmonics
+import glass.healpix as hp
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -52,51 +53,35 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
-def test_inverse_transform_healpy_default_spin(xp: ModuleType) -> None:
+def test_inverse_transform_healpy(xp: ModuleType) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     nside = 1
     lmax = 2
 
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "real floating")
+    expected = hp.alm2map(alm, nside=nside, lmax=lmax)
+    actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
+    xpx.testing.assert_equal(actual, expected)
 
 
-def test_inverse_transform_healpy_spin_1(xp: ModuleType) -> None:
+@pytest.mark.parametrize("spin", [1, 2])
+def test_inverse_transform_healpy_spin(
+    xp: ModuleType,
+    spin: int,
+) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
     lmax = 2
-
-    # test with spin 1
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=1)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "complex floating")
-
-
-def test_inverse_transform_healpy_spin_2(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     nside = 1
-    lmax = 2
 
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=2)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "complex floating")
-
-
-def test_inverse_transform_healpy_spin_0(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    nside = 1
-    lmax = 2
-
-    result = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=0)
-    assert result.shape[0] == 12
-    assert xp.isdtype(result.dtype, "real floating")
+    result = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+    expected = result[0] + 1j * result[1]
+    actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=spin)
+    xpx.testing.assert_equal(actual, expected)
 
 
 def test_transform_healpy(xp: ModuleType) -> None:
     maps = xp.asarray([1.0] * 12)
     lmax = 2
 
-    result = glass.harmonics.transform(maps, lmax=lmax)
-    assert result.shape[0] == 6
-    assert xp.isdtype(result.dtype, "complex floating")
+    expected = hp.map2alm(maps, lmax=lmax)
+    actual = glass.harmonics.transform(maps, lmax=lmax)
+    xpx.testing.assert_equal(actual, expected)
