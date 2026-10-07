@@ -174,16 +174,15 @@ def test_transform_s2fft_low_bandlimit(jnp: ModuleType) -> None:
     low_lmax = 2
     nside = 4
     full_lmax = 2 * nside - 1
-    kappa = np.linspace(-1.0, 1.0, 12 * nside**2)
-    kappa_jax = jnp.asarray(kappa)
+    kappa = jnp.linspace(-1.0, 1.0, 12 * nside**2)
 
     low_alms = glass.harmonics.transform(
-        kappa_jax,
+        kappa,
         lmax=low_lmax,
         nside=nside,
     )
     full_alms = glass.harmonics.transform(
-        kappa_jax,
+        kappa,
         lmax=full_lmax,
         nside=nside,
     )
