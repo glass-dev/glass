@@ -119,6 +119,7 @@ def test_map2alm_with_pulled_data(
     result = hp.map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
+        use_pixel_weights=True,
     )
     assert result.shape == (78,)
 
@@ -138,6 +139,7 @@ def test_map2alm_with_pulled_data_wrong_path(
         hp.map2alm(
             kappa,
             lmax=healpix_inputs.lmax,
+            use_pixel_weights=True,
         )
 
 
