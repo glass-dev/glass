@@ -143,24 +143,6 @@ def ang2pix(
 
 
 @numpy_fallback
-def get_nside(m: FloatArray) -> int:
-    """
-    Return the nside of the given map.
-
-    Parameters
-    ----------
-    m
-        The map to get the nside from.
-
-    Returns
-    -------
-        The HEALPix nside parameter of the map.
-
-    """
-    return int(healpy.get_nside(m))
-
-
-@numpy_fallback
 def map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,

@@ -289,7 +289,7 @@ def from_convergence(  # noqa: PLR0913
         return ()
 
     # get the NSIDE parameter
-    nside = hp.get_nside(kappa)
+    nside = hp.npix2nside(kappa.shape[-1])
     if lmax is None:
         lmax = 3 * nside - 1
 
