@@ -121,10 +121,11 @@ def inverse_transform(  # noqa: PLR0913
     nside
         The nside parameter of the output map.
     pixwin
-        Whether to apply the pixel window function. Has no effect for non-zero
-        spin.
+        Whether to apply the pixel window function on the Healpy backend. Has no
+        effect for non-zero spin.
     pol
-        Whether to compute polarization. Has no effect for non-zero spin.
+        Whether to compute polarization on the Healpy backend. Has no effect for
+        non-zero spin.
     spin
         Spin of the output map. Zero produces a real scalar map; non-zero spin
         produces a complex map whose real and imaginary parts are the two
@@ -137,18 +138,53 @@ def inverse_transform(  # noqa: PLR0913
     """
     xp = alm.__array_namespace__()
 
-    if spin == 0:
-        return hp.alm2map(alm, nside, lmax=lmax, pixwin=pixwin, pol=pol)
+    if xp.__name__ != "jax.numpy":
+        if spin == 0:
+            return hp.alm2map(alm, nside, lmax=lmax, pixwin=pixwin, pol=pol)
 
-    maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
-    return maps[0] + 1j * maps[1]
+        maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+        return maps[0] + 1j * maps[1]
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
+
+    if spin:
+        # Spin-weighted harmonics have no modes with ell < spin.
+        flm = flm.at[: abs(spin)].set(0)
+
+    # S2FFT implementation requires L >= 2 * nside
+    if bandlimit < 2 * nside:
+        padding = 2 * nside - bandlimit
+        # pad missing modes with zeros
+        flm = xp.pad(flm, ((0, padding), (padding, padding)))
+        bandlimit = 2 * nside
+
+    maps = s2fft.inverse(
+        flm,
+        bandlimit,
+        method="jax",
+        nside=nside,
+        reality=spin == 0,
+        sampling="healpix",
+        spin=spin,
+    )
+
+    if spin:
+        # Healpy's E-only convention has the opposite sign to S2FFT's.
+        return -maps
+    # S2FFT returns complex values, but the scalar map should be real-valued.
+    # https://github.com/astro-informatics/s2fft/issues/411
+    return xp.real(maps)
 
 
 def transform(
     maps: FloatArray,
     *,
     lmax: int,
-    nside: int,  # noqa: ARG001
+    nside: int,
     pol: bool = True,
     use_pixel_weights: bool = False,
 ) -> ComplexArray:
@@ -164,18 +200,47 @@ def transform(
     nside
         The nside parameter of the input map.
     pol
-        Whether to compute polarization.
+        Whether to compute polarization on the Healpy backend.
     use_pixel_weights
-        Whether to use pixel weights in the transform.
+        Whether to use pixel weights in the Healpy transform.
 
     Returns
     -------
         The spherical harmonic coefficients resulting from the transform.
 
     """
-    return hp.map2alm(
+    xp = maps.__array_namespace__()
+
+    if xp.__name__ != "jax.numpy":
+        return hp.map2alm(
+            maps,
+            lmax=lmax,
+            pol=pol,
+            use_pixel_weights=use_pixel_weights,
+        )
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    # the S2FFT implementation needs at least two modes per nside
+    effective_bandlimit = max(bandlimit, 2 * nside)
+
+    flm = s2fft.forward(
         maps,
-        lmax=lmax,
-        pol=pol,
-        use_pixel_weights=use_pixel_weights,
+        effective_bandlimit,
+        # iterations are set here to match the healpy_jax method's behaviour,
+        # without this there are large numerical errors in the transform
+        iter=3,
+        method="jax",
+        nside=nside,
+        reality=True,
+        sampling="healpix",
     )
+
+    if effective_bandlimit != bandlimit:
+        # keep the requested ell rows and the corresponding centered m columns
+        offset = effective_bandlimit - bandlimit
+        flm = flm[:bandlimit, offset : offset + 2 * bandlimit - 1]
+
+    return s2fft.sampling.reindex.flm_2d_to_hp_fast(flm, bandlimit)

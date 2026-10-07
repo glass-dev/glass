@@ -10,7 +10,6 @@ import array_api_extra as xpx
 import glass
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
-from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType

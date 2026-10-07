@@ -9,7 +9,6 @@ import pytest
 import array_api_extra as xpx
 
 import glass.harmonics
-from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType
