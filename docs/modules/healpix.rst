@@ -16,7 +16,6 @@ This module should be imported manually if used outside of GLASS::
 ---------------------
 
 .. autofunction:: ang2pix
-.. autofunction:: ang2vec
 .. autofunction:: npix2nside
 .. autofunction:: nside2npix
 .. autofunction:: randang

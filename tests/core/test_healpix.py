@@ -151,32 +151,6 @@ def test_ang2pix(  # noqa: PLR0913,PLR0917
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.parametrize(
-    ("lonlat", "max_phi", "max_theta"),
-    [
-        (False, math.pi, math.pi / 2),
-        (True, 180, 90),
-    ],
-)
-def test_ang2vec(  # noqa: PLR0913,PLR0917
-    healpix_inputs: type[HealpixInputs],
-    lonlat: bool,  # noqa: FBT001
-    max_phi: float,
-    max_theta: float,
-    urng: UnifiedGenerator,
-    xp: ModuleType,
-) -> None:
-    """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
-    thetas = healpix_inputs.longitudes(max_theta, rng=urng)
-    phis = healpix_inputs.latitudes(max_phi, rng=urng)
-    old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
-    new = hp.ang2vec(thetas, phis, lonlat=lonlat)
-    assert type(old) is type(new)
-    assert len(old) == len(new)
-    for i in range(len(old)):
-        xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
-
-
 def test_get_nside(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,

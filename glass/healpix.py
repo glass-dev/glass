@@ -167,38 +167,6 @@ def ang2pix(
 
 
 @numpy_fallback
-def ang2vec(
-    theta: float | FloatArray,
-    phi: float | FloatArray,
-    *,
-    lonlat: bool = False,
-) -> tuple[FloatArray, FloatArray, FloatArray]:
-    """
-    Convert angles to 3D position vector.
-
-    Parameters
-    ----------
-    theta
-        Angular coordinates of a point on the sphere.
-    phi
-        Angular coordinates of a point on the sphere.
-    lonlat
-        If True, automatically adjust latitudes to be within [-90, 90] range.
-
-    Returns
-    -------
-        A normalised 3-vector pointing in the same direction as ``ang``.
-
-    """
-    x, y, z = healpix.ang2vec(
-        theta,
-        phi,
-        lonlat=lonlat,
-    )
-    return x, y, z
-
-
-@numpy_fallback
 def get_nside(m: FloatArray) -> int:
     """
     Return the nside of the given map.
