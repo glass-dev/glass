@@ -11,7 +11,6 @@ import glass
 import glass.fields
 import glass.healpix as hp
 import glass.rng
-from tests._optional_dependencies import HAVE_JAX
 
 if TYPE_CHECKING:
     from types import ModuleType
