@@ -157,7 +157,8 @@ def map2alm(
     lmax
         Maximum l of the power spectrum.
     use_pixel_weights
-        Whether to use pixel weights in the computation.
+        If True, use pixel by pixel weighting, healpy will automatically
+        download the weights, if needed.
 
     Returns
     -------
