@@ -3,10 +3,10 @@ from __future__ import annotations
 import importlib.util
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 import array_api_extra as xpx
-import numpy as np
 
 import glass.harmonics
 from tests._optional_dependencies import HAVE_S2FFT
