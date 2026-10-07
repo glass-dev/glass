@@ -1,18 +1,14 @@
 import contextlib
-import importlib.util
 
 import numpy as np
 import pytest
 
 import glass.rng
+from tests._optional_dependencies import HAVE_ARRAY_API_STRICT, HAVE_JAX
 
 with contextlib.suppress(ImportError):
     # only import if jax is available
     import glass.jax
-
-# check if available for testing
-HAVE_ARRAY_API_STRICT = importlib.util.find_spec("array_api_strict") is not None
-HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 def test_default_rng_numpy() -> None:
