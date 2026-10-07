@@ -42,7 +42,7 @@ def test_positions_from_delta(  # noqa: PLR0913,PLR0917
     xp: ModuleType,
     bias: float,
     bias_model: Callable[[int], int],
-    remove_monopole: bool,  # noqa: FBT001
+    remove_monopole: bool,
 ) -> None:
     """Regression tests for glass.positions_from_delta."""
     nside = 48

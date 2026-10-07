@@ -113,7 +113,7 @@ def test_redshifts_from_nz(
 def test_galaxy_shear(
     benchmark: BenchmarkFixture,
     urng: UnifiedGenerator,
-    reduced_shear: bool,  # noqa: FBT001
+    reduced_shear: bool,
 ) -> None:
     """Regression test for galaxies.galaxy_shear."""
     scale_factor = 100

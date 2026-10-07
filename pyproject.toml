@@ -279,14 +279,17 @@ lint.per-file-ignores = { "__init__.py" = [
     "ANN202", # missing-return-type-private-function
     "D100", # undocumented-public-module
     "D103", # TODO: undocumented-public-function
+    "FBT001", # boolean-type-hint-positional-argument
     "PLC0415", # import-outside-top-level
     "PLR2004", # magic-value-comparison
     "SLF001", # private-member-access
 ], "tests/gradients/*" = [
     "D100", # undocumented-public-module
+    "FBT001", # boolean-type-hint-positional-argument
     "SLF001", # private-member-access
 ], "tests/regression/*" = [
     "D100", # undocumented-public-module
+    "FBT001", # boolean-type-hint-positional-argument
     "PLR2004", # magic-value-comparison
     "S311", # suspicious-non-cryptographic-random-usage
     "SLF001", # private-member-access
