@@ -123,7 +123,6 @@ def test_map2alm_with_pulled_data(
     assert result.shape == (78,)
 
 
-@pytest.mark.parametrize("pol", [False, True])
 def test_map2alm_with_pulled_data_wrong_path(
     invalid_healpy_datapath: str,
     healpix_inputs: type[HealpixInputs],
@@ -142,11 +141,11 @@ def test_map2alm_with_pulled_data_wrong_path(
         )
 
 
-@pytest.mark.parametrize("pol", [True, False])
 @pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_individual(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
+    use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
@@ -154,19 +153,21 @@ def test_map2alm_individual(
     old = healpy.map2alm(
         np.asarray(kappa),
         lmax=healpix_inputs.lmax,
-        # explicitly set to True to match `glass.healpix.map2alm`
-        use_pixel_weights=True,
+        use_pixel_weights=use_pixel_weights,
     )
     new = hp.map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
+        use_pixel_weights=use_pixel_weights,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
+@pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_sequence(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
+    use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
@@ -176,12 +177,12 @@ def test_map2alm_sequence(
     old = healpy.map2alm(
         [np.asarray(kappa1), np.asarray(kappa2), np.asarray(kappa3)],
         lmax=healpix_inputs.lmax,
-        # explicitly set to True to match `glass.healpix.map2alm`
-        use_pixel_weights=True,
+        use_pixel_weights=use_pixel_weights,
     )
     new = hp.map2alm(
         [kappa1, kappa2, kappa3],
         lmax=healpix_inputs.lmax,
+        use_pixel_weights=use_pixel_weights,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 

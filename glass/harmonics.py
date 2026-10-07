@@ -192,7 +192,8 @@ def transform(
     xp = maps.__array_namespace__()
 
     if xp.__name__ != "jax.numpy":
-        return hp.map2alm(maps, lmax=lmax)
+        # the only time GLASS used map2alm was with pixel weights
+        return hp.map2alm(maps, lmax=lmax, use_pixel_weights=True)
 
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415
