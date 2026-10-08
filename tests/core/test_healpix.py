@@ -20,58 +20,32 @@ if TYPE_CHECKING:
     from tests.fixtures.helper_classes import HealpixInputs
 
 
-@pytest.mark.parametrize(
-    ("pixwin", "pol"),
-    [
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    ],
-)
 def test_alm2map_individual(
     healpix_inputs: type[HealpixInputs],
-    pixwin: bool,  # noqa: FBT001
-    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
+    """Compare ``glass.healpix._alm2map`` against ``healpy.alm2map``."""
     alm = healpix_inputs.alm(rng=urng)
     old = healpy.alm2map(
         np.asarray(alm),
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
-        pol=pol,
     )
-    new = hp.alm2map(
+    new = hp._alm2map(
         alm,
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
-        pol=pol,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.parametrize(
-    ("pixwin", "pol"),
-    [
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    ],
-)
 def test_alm2map_sequence(
     healpix_inputs: type[HealpixInputs],
-    pixwin: bool,  # noqa: FBT001
-    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
+    """Compare ``glass.healpix._alm2map`` against ``healpy.alm2map``."""
     alm = healpix_inputs.alm(rng=urng)
     blm = healpix_inputs.alm(rng=urng)
     clm = healpix_inputs.alm(rng=urng)
@@ -79,15 +53,11 @@ def test_alm2map_sequence(
         [np.asarray(alm), np.asarray(blm), np.asarray(clm)],
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
-        pol=pol,
     )
-    new = hp.alm2map(
+    new = hp._alm2map(
         [alm, blm, clm],
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
-        pixwin=pixwin,
-        pol=pol,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
@@ -99,7 +69,7 @@ def test_alm2map_spin(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.alm2map_spin`` against ``healpy.alm2map_spin``."""
+    """Compare ``glass.healpix._alm2map_spin`` against ``healpy.alm2map_spin``."""
     alm = healpix_inputs.alm(rng=urng)
     blm = healpix_inputs.alm(rng=urng)
     old = healpy.alm2map_spin(
@@ -108,24 +78,11 @@ def test_alm2map_spin(
         spin,
         healpix_inputs.lmax,
     )
-    new = hp.alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
+    new = hp._alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
     assert type(old) is type(new)
     assert len(old) == len(new)
     for i in range(len(old)):
         xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
-
-
-def test_almxfl(
-    healpix_inputs: type[HealpixInputs],
-    urng: UnifiedGenerator,
-    xp: ModuleType,
-) -> None:
-    """Compare ``glass.healpix.almxfl`` against ``healpy.almxfl``."""
-    alm = healpix_inputs.alm(rng=urng)
-    fl = healpix_inputs.fl(rng=urng)
-    old = healpy.almxfl(alm, fl)
-    new = hp.almxfl(alm, fl)
-    xpx.testing.assert_equal(xp.asarray(old), new)
 
 
 @pytest.mark.parametrize(
@@ -151,136 +108,82 @@ def test_ang2pix(  # noqa: PLR0913,PLR0917
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.parametrize(
-    ("lonlat", "max_phi", "max_theta"),
-    [
-        (False, math.pi, math.pi / 2),
-        (True, 180, 90),
-    ],
-)
-def test_ang2vec(  # noqa: PLR0913,PLR0917
-    healpix_inputs: type[HealpixInputs],
-    lonlat: bool,  # noqa: FBT001
-    max_phi: float,
-    max_theta: float,
-    urng: UnifiedGenerator,
-    xp: ModuleType,
-) -> None:
-    """Compare ``glass.healpix.ang2vec`` against ``healpix.ang2vec``."""
-    thetas = healpix_inputs.longitudes(max_theta, rng=urng)
-    phis = healpix_inputs.latitudes(max_phi, rng=urng)
-    old = healpix.ang2vec(thetas, phis, lonlat=lonlat)
-    new = hp.ang2vec(thetas, phis, lonlat=lonlat)
-    assert type(old) is type(new)
-    assert len(old) == len(new)
-    for i in range(len(old)):
-        xpx.testing.assert_equal(xp.asarray(old[i]), new[i])
-
-
-def test_get_nside(
-    healpix_inputs: type[HealpixInputs],
-    urng: UnifiedGenerator,
-) -> None:
-    """Compare ``glass.healpix.get_nside`` against ``healpy.get_nside``."""
-    kappa = healpix_inputs.kappa(rng=urng)
-    assert healpy.get_nside(np.asarray(kappa)) == hp.get_nside(kappa)
-
-
 @pytest.mark.usefixtures("_add_healpy_datapath_to_env")
 def test_map2alm_with_pulled_data(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
 ) -> None:
-    """Tests running map2alm offline works as expected."""
+    """Tests running _map2alm offline works as expected."""
     npix = healpy.nside2npix(32)
     kappa = urng.normal(size=npix)
-    result = hp.map2alm(
+    result = hp._map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
-        pol=False,
         use_pixel_weights=True,
     )
     assert result.shape == (78,)
 
 
-@pytest.mark.parametrize("pol", [False, True])
 def test_map2alm_with_pulled_data_wrong_path(
     invalid_healpy_datapath: str,
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
 ) -> None:
-    """Tests running map2alm offline incorrectly doesn't fallback to a HTTP request."""
+    """Tests running _map2alm offline incorrectly doesn't fallback to a HTTP request."""
     npix = healpy.nside2npix(32)
     kappa = urng.normal(size=npix)
     with pytest.raises(
         ValueError,
         match=f"Healpy datapath not found at '{invalid_healpy_datapath}",
     ):
-        hp.map2alm(
+        hp._map2alm(
             kappa,
             lmax=healpix_inputs.lmax,
-            pol=pol,
             use_pixel_weights=True,
         )
 
 
-@pytest.mark.parametrize("pol", [True, False])
 @pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_individual(
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
     use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
+    """Compare ``glass.healpix._map2alm`` against ``healpy.map2alm``."""
     kappa = healpix_inputs.kappa(rng=urng)
     old = healpy.map2alm(
         np.asarray(kappa),
         lmax=healpix_inputs.lmax,
-        pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
-    new = hp.map2alm(
+    new = hp._map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
-        pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
 
 
-@pytest.mark.parametrize(
-    ("pol", "use_pixel_weights"),
-    [
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    ],
-)
+@pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_sequence(
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
     urng: UnifiedGenerator,
     use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
+    """Compare ``glass.healpix._map2alm`` against ``healpy.map2alm``."""
     kappa1 = healpix_inputs.kappa(rng=urng)
     kappa2 = healpix_inputs.kappa(rng=urng)
     kappa3 = healpix_inputs.kappa(rng=urng)
     old = healpy.map2alm(
         [np.asarray(kappa1), np.asarray(kappa2), np.asarray(kappa3)],
         lmax=healpix_inputs.lmax,
-        pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
-    new = hp.map2alm(
+    new = hp._map2alm(
         [kappa1, kappa2, kappa3],
         lmax=healpix_inputs.lmax,
-        pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
     xpx.testing.assert_equal(xp.asarray(old), new)
