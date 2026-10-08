@@ -12,6 +12,8 @@ import glass.healpix as hp
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from pytest_mock import MockerFixture
+
 
 def test_multalm(xp: ModuleType) -> None:
     # check output values and shapes
@@ -78,10 +80,67 @@ def test_inverse_transform_healpy_spin(
     xpx.testing.assert_equal(actual, expected)
 
 
-def test_transform_healpy(xp: ModuleType) -> None:
-    maps = xp.asarray([1.0] * 12)
+@pytest.mark.parametrize("nside", [1, 2, 4, 8, 16])
+@pytest.mark.parametrize("use_pixel_weights", [False, True])
+def test_transform_healpy(
+    xp: ModuleType,
+    nside: int,
+    use_pixel_weights: bool,  # noqa: FBT001
+) -> None:
+    maps = xp.arange(hp.nside2npix(nside), dtype=xp.float64)
     lmax = 2
 
-    expected = hp.map2alm(maps, lmax=lmax)
-    actual = glass.harmonics.transform(maps, lmax=lmax)
+    expected = hp.map2alm(maps, lmax=lmax, use_pixel_weights=False)
+    actual = glass.harmonics.transform(
+        maps,
+        lmax=lmax,
+        use_pixel_weights=use_pixel_weights,
+    )
     xpx.testing.assert_equal(actual, expected)
+
+
+@pytest.mark.parametrize("nside", [16, 32, 64, 96, 8192, 16384])
+@pytest.mark.parametrize("use_pixel_weights", [False, True])
+def test_transform_pixel_weights(
+    xp: ModuleType,
+    mocker: MockerFixture,
+    nside: int,
+    use_pixel_weights: bool,  # noqa: FBT001
+) -> None:
+    """Only request pixel weights for supported resolutions."""
+    maps = xp.arange(12, dtype=xp.float64)
+    mocker.patch.object(hp, "npix2nside", return_value=nside)
+    map2alm = mocker.patch.object(hp, "map2alm")
+
+    result = glass.harmonics.transform(
+        maps,
+        lmax=2,
+        pol=False,
+        use_pixel_weights=use_pixel_weights,
+    )
+
+    map2alm.assert_called_once_with(
+        maps,
+        lmax=2,
+        pol=False,
+        use_pixel_weights=use_pixel_weights and nside in {32, 64, 8192},
+    )
+    assert result is map2alm.return_value
+
+
+def test_transform_default_pixel_weights(
+    xp: ModuleType,
+    mocker: MockerFixture,
+) -> None:
+    """The compatibility API defaults to an unweighted transform."""
+    maps = xp.arange(hp.nside2npix(32), dtype=xp.float64)
+    map2alm = mocker.patch.object(hp, "map2alm")
+
+    glass.harmonics.transform(maps, lmax=2)
+
+    map2alm.assert_called_once_with(
+        maps,
+        lmax=2,
+        pol=True,
+        use_pixel_weights=False,
+    )

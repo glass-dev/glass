@@ -4,6 +4,12 @@
 
 All functional changes to the project are documented in this file.
 
+## Unreleased
+
+- Preserve configurable pixel weights in `glass.harmonics.transform`, falling
+  back to unweighted transforms outside supported power-of-two NSIDE values
+  from 32 to 8192.
+
 ## [2026.4] (16 Sep 2026)
 
 See [2026.3].

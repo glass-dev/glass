@@ -163,11 +163,17 @@ def transform(
     pol
         Whether to compute polarization.
     use_pixel_weights
-        Whether to use pixel weights in the transform.
+        Whether to use pixel weights in the transform. Pixel weights are
+        supported for power-of-two NSIDE values from 32 to 8192; other
+        resolutions use an unweighted transform.
 
     Returns
     -------
         The spherical harmonic coefficients resulting from the transform.
 
     """
+    if use_pixel_weights:
+        nside = hp.npix2nside(maps.shape[-1])
+        use_pixel_weights = 32 <= nside <= 8192 and nside & (nside - 1) == 0
+
     return hp.map2alm(maps, lmax=lmax, pol=pol, use_pixel_weights=use_pixel_weights)
