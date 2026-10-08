@@ -25,14 +25,14 @@ def test_alm2map_individual(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
+    """Compare ``glass.healpix._alm2map`` against ``healpy.alm2map``."""
     alm = healpix_inputs.alm(rng=urng)
     old = healpy.alm2map(
         np.asarray(alm),
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
     )
-    new = hp.alm2map(
+    new = hp._alm2map(
         alm,
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
@@ -45,7 +45,7 @@ def test_alm2map_sequence(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.alm2map`` against ``healpy.alm2map``."""
+    """Compare ``glass.healpix._alm2map`` against ``healpy.alm2map``."""
     alm = healpix_inputs.alm(rng=urng)
     blm = healpix_inputs.alm(rng=urng)
     clm = healpix_inputs.alm(rng=urng)
@@ -54,7 +54,7 @@ def test_alm2map_sequence(
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
     )
-    new = hp.alm2map(
+    new = hp._alm2map(
         [alm, blm, clm],
         healpix_inputs.nside,
         lmax=healpix_inputs.lmax,
@@ -69,7 +69,7 @@ def test_alm2map_spin(
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.alm2map_spin`` against ``healpy.alm2map_spin``."""
+    """Compare ``glass.healpix._alm2map_spin`` against ``healpy.alm2map_spin``."""
     alm = healpix_inputs.alm(rng=urng)
     blm = healpix_inputs.alm(rng=urng)
     old = healpy.alm2map_spin(
@@ -78,7 +78,7 @@ def test_alm2map_spin(
         spin,
         healpix_inputs.lmax,
     )
-    new = hp.alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
+    new = hp._alm2map_spin([alm, blm], healpix_inputs.nside, spin, healpix_inputs.lmax)
     assert type(old) is type(new)
     assert len(old) == len(new)
     for i in range(len(old)):
@@ -113,10 +113,10 @@ def test_map2alm_with_pulled_data(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
 ) -> None:
-    """Tests running map2alm offline works as expected."""
+    """Tests running _map2alm offline works as expected."""
     npix = healpy.nside2npix(32)
     kappa = urng.normal(size=npix)
-    result = hp.map2alm(
+    result = hp._map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
         use_pixel_weights=True,
@@ -129,14 +129,14 @@ def test_map2alm_with_pulled_data_wrong_path(
     healpix_inputs: type[HealpixInputs],
     urng: UnifiedGenerator,
 ) -> None:
-    """Tests running map2alm offline incorrectly doesn't fallback to a HTTP request."""
+    """Tests running _map2alm offline incorrectly doesn't fallback to a HTTP request."""
     npix = healpy.nside2npix(32)
     kappa = urng.normal(size=npix)
     with pytest.raises(
         ValueError,
         match=f"Healpy datapath not found at '{invalid_healpy_datapath}",
     ):
-        hp.map2alm(
+        hp._map2alm(
             kappa,
             lmax=healpix_inputs.lmax,
             use_pixel_weights=True,
@@ -150,14 +150,14 @@ def test_map2alm_individual(
     use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
+    """Compare ``glass.healpix._map2alm`` against ``healpy.map2alm``."""
     kappa = healpix_inputs.kappa(rng=urng)
     old = healpy.map2alm(
         np.asarray(kappa),
         lmax=healpix_inputs.lmax,
         use_pixel_weights=use_pixel_weights,
     )
-    new = hp.map2alm(
+    new = hp._map2alm(
         kappa,
         lmax=healpix_inputs.lmax,
         use_pixel_weights=use_pixel_weights,
@@ -172,7 +172,7 @@ def test_map2alm_sequence(
     use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
 ) -> None:
-    """Compare ``glass.healpix.map2alm`` against ``healpy.map2alm``."""
+    """Compare ``glass.healpix._map2alm`` against ``healpy.map2alm``."""
     kappa1 = healpix_inputs.kappa(rng=urng)
     kappa2 = healpix_inputs.kappa(rng=urng)
     kappa3 = healpix_inputs.kappa(rng=urng)
@@ -181,7 +181,7 @@ def test_map2alm_sequence(
         lmax=healpix_inputs.lmax,
         use_pixel_weights=use_pixel_weights,
     )
-    new = hp.map2alm(
+    new = hp._map2alm(
         [kappa1, kappa2, kappa3],
         lmax=healpix_inputs.lmax,
         use_pixel_weights=use_pixel_weights,

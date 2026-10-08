@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
-import glass.healpix as hp
+from glass.healpix import _alm2map, _alm2map_spin, _map2alm
 
 if TYPE_CHECKING:
     from glass._types import ComplexArray, FloatArray
@@ -126,9 +126,9 @@ def inverse_transform(
 
     if xp.__name__ != "jax.numpy":
         if spin == 0:
-            return hp.alm2map(alm, nside, lmax=lmax)
+            return hp._alm2map(alm, nside, lmax=lmax)
 
-        maps = hp.alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+        maps = hp._alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
         return maps[0] + 1j * maps[1]
 
     import s2fft  # noqa: PLC0415
@@ -193,7 +193,7 @@ def transform(
 
     if xp.__name__ != "jax.numpy":
         # the only time GLASS used map2alm was with pixel weights
-        return hp.map2alm(maps, lmax=lmax, use_pixel_weights=True)
+        return hp._map2alm(maps, lmax=lmax, use_pixel_weights=True)
 
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415

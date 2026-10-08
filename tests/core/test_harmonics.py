@@ -60,7 +60,7 @@ def test_inverse_transform_healpy() -> None:
     lmax = 2
     nside = 1
 
-    expected = hp.alm2map(alm, nside=nside, lmax=lmax)
+    expected = hp._alm2map(alm, nside=nside, lmax=lmax)
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
 
     xpx.testing.assert_equal(actual, expected)
@@ -72,7 +72,7 @@ def test_inverse_transform_healpy_spin(spin: int) -> None:
     lmax = 2
     nside = 1
 
-    result = hp.alm2map_spin([alm, np.zeros_like(alm)], nside, spin, lmax)
+    result = hp._alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
     expected = result[0] + 1j * result[1]
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=spin)
 
@@ -136,7 +136,7 @@ def test_transform_healpy() -> None:
     lmax = 2
     nside = 1
 
-    expected = hp.map2alm(
+    expected = hp._map2alm(
         maps,
         lmax=lmax,
         # using pixel weights is the default in the transform
