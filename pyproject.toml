@@ -16,7 +16,6 @@ benchmarks = [
     "jax>=0.6.2; python_version >= '3.13'",
     "matplotlib",
     "numpy<2.4",
-    "s2fft",
 ]
 benchmarks-cuda13 = [
     "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
