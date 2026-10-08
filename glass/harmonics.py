@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
+from glass._types import MISSING
 from glass.healpix import _alm2map, _alm2map_spin, _map2alm
 
 if TYPE_CHECKING:
@@ -170,7 +171,7 @@ def transform(
     maps: FloatArray,
     *,
     lmax: int,
-    nside: int,
+    nside: int | MISSING = MISSING,
 ) -> ComplexArray:
     """
     Compute the spherical harmonic transform of a map.
@@ -182,7 +183,7 @@ def transform(
     lmax
         The maximum multipole of the spherical harmonic transform.
     nside
-        The nside parameter of the input map.
+        The nside parameter of the input map. This is only required if using JAX.
 
     Returns
     -------
@@ -194,6 +195,9 @@ def transform(
     if xp.__name__ != "jax.numpy":
         # the only time GLASS used map2alm was with pixel weights
         return _map2alm(maps, lmax=lmax, use_pixel_weights=True)
+
+    if nside is MISSING:
+        raise ValueError("nside must be specified when using JAX.")
 
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415

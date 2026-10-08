@@ -134,7 +134,6 @@ def test_inverse_transform_s2fft_spin(
 def test_transform_healpy() -> None:
     maps = np.asarray([1.0] * 12)
     lmax = 2
-    nside = 1
 
     expected = hp._map2alm(
         maps,
@@ -142,9 +141,18 @@ def test_transform_healpy() -> None:
         # using pixel weights is the default in the transform
         use_pixel_weights=True,
     )
-    actual = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
+    actual = glass.harmonics.transform(maps, lmax=lmax)
 
     xpx.testing.assert_equal(actual, expected)
+
+
+@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+def test_transform_s2fft_missing_nside(jnp: ModuleType) -> None:
+    kappa = np.linspace(-1.0, 1.0, 192)
+    lmax = 11
+
+    with pytest.raises(ValueError, match=r"nside must be specified when using JAX."):
+        glass.harmonics.transform(jnp.asarray(kappa), lmax=lmax)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
