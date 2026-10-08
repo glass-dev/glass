@@ -23,9 +23,6 @@ This module should be imported manually if used outside of GLASS::
 ``healpy`` Functions
 --------------------
 
-.. autofunction:: alm2map
-.. autofunction:: alm2map_spin
-.. autofunction:: map2alm
 .. autofunction:: pixwin
 .. autofunction:: query_strip
 .. automethod:: Rotator.rotate_map_pixel

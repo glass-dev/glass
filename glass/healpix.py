@@ -38,7 +38,7 @@ def _get_healpy_datapath() -> str | None:
 
 
 @numpy_fallback
-def alm2map(
+def _alm2map(
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
     *,
@@ -66,7 +66,7 @@ def alm2map(
 
 
 @numpy_fallback
-def alm2map_spin(
+def _alm2map_spin(
     alms: Sequence[FloatArray],
     nside: int,
     spin: int,
@@ -131,7 +131,7 @@ def ang2pix(
 
 
 @numpy_fallback
-def map2alm(
+def _map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,
     lmax: int | None = None,
