@@ -13,7 +13,7 @@ benchmarks = [
     "cosmology-compat-camb",
     "glass-ext-camb",
     "jax==0.4.35; python_version < '3.13'",
-    "jax>=0.6.2; python_version >= '3.13'",
+    "jax>=0.4.35; python_version >= '3.13'",
     "matplotlib",
     "numpy<2.4",
 ]
@@ -133,8 +133,8 @@ optional-dependencies = { examples = [
     "matplotlib",
     "numpy",
 ], jax = [
-    "jax",
-    "s2fft",
+    "jax>=0.4.35",
+    "s2fft>=1.4.0",
 ] }
 requires-python = ">=3.11"
 

@@ -74,7 +74,7 @@ def _import_and_add_array_api_strict(
 
 def _configure_jax(jax: ModuleType) -> None:
     """Set up JAX for tests."""
-    _check_version("jax", "0.6.2")
+    _check_version("jax", "0.4.35")
     jax.config.update("jax_enable_x64", val=True)
 
 
