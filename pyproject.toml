@@ -337,3 +337,11 @@ include = [
     "glass/fields.py",
 ]
 rules.possibly-unresolved-reference = "ignore"
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "jax" },
+        { group = "benchmarks" },
+    ],
+]
