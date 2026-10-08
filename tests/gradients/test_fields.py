@@ -6,14 +6,14 @@ from typing import TYPE_CHECKING
 import pytest
 
 pytest.importorskip("jax", reason="tests require jax")
+
+import jax.numpy as jnp
 import jax.test_util
 
 import glass
 
 if TYPE_CHECKING:
     from glass._types import AngularPowerSpectra, AnyArray, FloatArray, UnifiedGenerator
-
-jnp = jax.numpy
 
 
 @pytest.mark.parametrize("k", [0, 1, 2])
