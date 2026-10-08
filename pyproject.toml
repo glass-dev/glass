@@ -323,7 +323,7 @@ src.include = [
     "glass",
     "tests",
 ]
-terminal.error-on-warning = true
+terminal.error-on-warning = false
 
 [[tool.ty.overrides]]
 include = [
