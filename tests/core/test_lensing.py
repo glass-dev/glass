@@ -81,9 +81,9 @@ def test_from_convergence_spin_jax(
     # cannot reveal an accidental call to the Healpy spin wrapper
     monkeypatch.setattr(
         hp,
-        "alm2map_spin",
+        "_alm2map_spin",
         lambda *_: pytest.fail(
-            "from_convergence called hp.alm2map_spin for JAX deflection or shear",
+            "from_convergence called hp._alm2map_spin for JAX deflection or shear",
         ),
     )
 
