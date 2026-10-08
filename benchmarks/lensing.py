@@ -73,11 +73,6 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    # localised redshift distribution
-    # the actual density per arcmin2 does not matter here, it is never used
-    z = xp.linspace(0.0, 1.0, 101)
-    dndz = xp.exp(-((z - 0.5) ** 2) / (0.1) ** 2)
-
     def lensing_benchmark(  # noqa: PLR0913
         *,
         cosmo: CosmologyWrapper,
