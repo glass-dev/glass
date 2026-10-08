@@ -126,9 +126,9 @@ def inverse_transform(
 
     if xp.__name__ != "jax.numpy":
         if spin == 0:
-            return hp._alm2map(alm, nside, lmax=lmax)
+            return _alm2map(alm, nside, lmax=lmax)
 
-        maps = hp._alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+        maps = _alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
         return maps[0] + 1j * maps[1]
 
     import s2fft  # noqa: PLC0415
@@ -193,7 +193,7 @@ def transform(
 
     if xp.__name__ != "jax.numpy":
         # the only time GLASS used map2alm was with pixel weights
-        return hp._map2alm(maps, lmax=lmax, use_pixel_weights=True)
+        return _map2alm(maps, lmax=lmax, use_pixel_weights=True)
 
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415

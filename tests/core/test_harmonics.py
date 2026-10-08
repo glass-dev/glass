@@ -72,7 +72,7 @@ def test_inverse_transform_healpy_spin(spin: int) -> None:
     lmax = 2
     nside = 1
 
-    result = hp._alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+    result = hp._alm2map_spin([alm, np.zeros_like(alm)], nside, spin, lmax)
     expected = result[0] + 1j * result[1]
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=spin)
 
