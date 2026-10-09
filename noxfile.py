@@ -1,5 +1,6 @@
 """Nox config."""
 
+import itertools
 import os
 import pathlib
 import shutil
@@ -21,9 +22,10 @@ ALL_PYTHON = [
     "3.13",
     "3.14",
 ]
+JAX_DEPENDENCY = "jax>=0.6.2"
 ARRAY_BACKENDS = {
-    "array_api_strict": "array-api-strict>=2",
-    "jax": "jax>=0.4.32",
+    "array_api_strict": ("array-api-strict>=2",),
+    "jax": (JAX_DEPENDENCY, "s2fft>=1.4.0"),
 }
 GRAD_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")
@@ -86,11 +88,11 @@ def _setup_array_backend(session: nox.Session) -> None:
     """Installs the requested array_backend."""
     array_backend = os.environ.get("ARRAY_BACKEND")
     if array_backend == "array_api_strict":
-        session.install(ARRAY_BACKENDS["array_api_strict"])
+        session.install(*ARRAY_BACKENDS["array_api_strict"])
     elif array_backend == "jax":
-        session.install(ARRAY_BACKENDS["jax"])
+        session.install(*ARRAY_BACKENDS["jax"])
     elif array_backend == "all":
-        session.install(*ARRAY_BACKENDS.values())
+        session.install(*itertools.chain.from_iterable(ARRAY_BACKENDS.values()))
 
 
 @nox_uv.session(
@@ -102,6 +104,25 @@ def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     _setup_array_backend(session)
     session.run("pytest", *session.posargs)
+
+
+@nox_uv.session(
+    uv_groups=["test"],
+    uv_sync_locked=False,
+)
+def tests_jax_without_s2fft(session: nox.Session) -> None:
+    """Run core tests with JAX installed and S2FFT absent which will all be skipped."""
+    session.install(JAX_DEPENDENCY)
+    session.env["ARRAY_BACKEND"] = "jax"
+    session.run(
+        "pytest",
+        # print skip reasons for manual verification
+        "--report-chars=s",
+        "tests/core/test_harmonics.py",
+        "tests/core/test_fields.py",
+        "tests/core/test_lensing.py",
+        *session.posargs,
+    )
 
 
 @nox_uv.session(
@@ -144,7 +165,7 @@ def coverage_regression(session: nox.Session) -> None:
 )
 def coverage_gradients(session: nox.Session) -> None:
     """Run tests and compute coverage for the JAX gradients tests."""
-    session.install(ARRAY_BACKENDS["jax"])
+    session.install(*ARRAY_BACKENDS["jax"])
     session.run(
         "pytest",
         GRAD_TESTS_LOC,

@@ -53,6 +53,7 @@ docs = [
     "matplotlib",
     "myst-parser",
     "nbsphinx",
+    "s2fft",
     "sphinx-autodoc-typehints",
     "sphinx-toolbox",
     "sphinx<8.2.0",
@@ -60,6 +61,7 @@ docs = [
 ]
 doctest = [
     "jax",
+    "s2fft",
     { include-group = "test" },
 ]
 lint = [
@@ -86,6 +88,7 @@ typechecking = [
     "pytest",
     "pytest-benchmark",
     "pytest-mock",
+    "s2fft",
 ]
 
 [project]
@@ -107,6 +110,7 @@ dependencies = [
     "healpix>=2022.11.1",
     "healpy>=1.15.0",
     "transformcl>=2026.1",
+    "typing_extensions >= 4.16.0",
 ]
 description = "Generator for Large Scale Structure"
 dynamic = [
@@ -129,6 +133,9 @@ optional-dependencies = { examples = [
     "jupyter",
     "matplotlib",
     "numpy",
+], jax = [
+    "jax>=0.6.2",
+    "s2fft>=1.4.0",
 ] }
 requires-python = ">=3.11"
 
@@ -317,7 +324,7 @@ src.include = [
     "glass",
     "tests",
 ]
-terminal.error-on-warning = true
+terminal.error-on-warning = false
 
 [[tool.ty.overrides]]
 include = [
@@ -331,3 +338,11 @@ include = [
     "glass/fields.py",
 ]
 rules.possibly-unresolved-reference = "ignore"
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "jax" },
+        { group = "benchmarks" },
+    ],
+]

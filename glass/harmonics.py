@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 import array_api_compat
 
+from glass._types import MISSING
 from glass.healpix import _alm2map, _alm2map_spin, _map2alm
 
 if TYPE_CHECKING:
@@ -124,17 +125,53 @@ def inverse_transform(
     """
     xp = alm.__array_namespace__()
 
-    if spin == 0:
-        return _alm2map(alm, nside, lmax=lmax)
+    if xp.__name__ != "jax.numpy":
+        if spin == 0:
+            return _alm2map(alm, nside, lmax=lmax)
 
-    maps = _alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
-    return maps[0] + 1j * maps[1]
+        maps = _alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
+        return maps[0] + 1j * maps[1]
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
+
+    if spin:
+        # Spin-weighted harmonics have no modes with ell < spin.
+        flm = flm.at[: abs(spin)].set(0)
+
+    # S2FFT implementation requires L >= 2 * nside
+    if bandlimit < 2 * nside:
+        padding = 2 * nside - bandlimit
+        # pad missing modes with zeros
+        flm = xp.pad(flm, ((0, padding), (padding, padding)))
+        bandlimit = 2 * nside
+
+    maps = s2fft.inverse(
+        flm,
+        bandlimit,
+        method="jax",
+        nside=nside,
+        reality=spin == 0,
+        sampling="healpix",
+        spin=spin,
+    )
+
+    if spin:
+        # Healpy's E-only convention has the opposite sign to S2FFT's.
+        return -maps
+    # S2FFT returns complex values, but the scalar map should be real-valued.
+    # https://github.com/astro-informatics/s2fft/issues/411
+    return xp.real(maps)
 
 
 def transform(
     maps: FloatArray,
     *,
     lmax: int,
+    nside: int | MISSING = MISSING,
 ) -> ComplexArray:
     """
     Compute the spherical harmonic transform of a map.
@@ -145,11 +182,45 @@ def transform(
         The real-space map to transform.
     lmax
         The maximum multipole of the spherical harmonic transform.
+    nside
+        The nside parameter of the input map. This is only required if using JAX.
 
     Returns
     -------
         The spherical harmonic coefficients resulting from the transform.
 
     """
-    # the only time GLASS used _map2alm was with pixel weights
-    return _map2alm(maps, lmax=lmax, use_pixel_weights=True)
+    xp = maps.__array_namespace__()
+
+    if xp.__name__ != "jax.numpy":
+        # the only time GLASS used map2alm was with pixel weights
+        return _map2alm(maps, lmax=lmax, use_pixel_weights=True)
+
+    if nside is MISSING:
+        raise ValueError("nside must be specified when using JAX.")
+
+    import s2fft  # noqa: PLC0415
+    import s2fft.sampling  # noqa: PLC0415
+
+    bandlimit = lmax + 1
+    # the S2FFT implementation needs at least two modes per nside
+    effective_bandlimit = max(bandlimit, 2 * nside)
+
+    flm = s2fft.forward(
+        maps,
+        effective_bandlimit,
+        # iterations are set here to match the healpy_jax method's behaviour,
+        # without this there are large numerical errors in the transform
+        iter=3,
+        method="jax",
+        nside=nside,
+        reality=True,
+        sampling="healpix",
+    )
+
+    if effective_bandlimit != bandlimit:
+        # keep the requested ell rows and the corresponding centered m columns
+        offset = effective_bandlimit - bandlimit
+        flm = flm[:bandlimit, offset : offset + 2 * bandlimit - 1]
+
+    return s2fft.sampling.reindex.flm_2d_to_hp_fast(flm, bandlimit)

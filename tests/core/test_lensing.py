@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
+
 import array_api_extra as xpx
 
 import glass
 import glass.healpix as hp
 from glass._array_api_utils import xp_additions as uxpx
+from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -15,8 +18,14 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
 
 
-def test_from_convergence(urng: UnifiedGenerator) -> None:
+def test_from_convergence(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.from_convergence`."""
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
+
     # l_max = 100  # noqa: ERA001
     n_side = 32
 
@@ -51,6 +60,55 @@ def test_from_convergence(urng: UnifiedGenerator) -> None:
 
     results = glass.from_convergence(kappa, potential=True, deflection=True, shear=True)
     assert len(results) == 3
+
+
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
+def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
+    lmax = 2
+    nside = 4
+
+    rng = glass.rng.default_rng(xp=jnp)
+    kappa = rng.random(hp.nside2npix(nside))
+    (potential,) = glass.from_convergence(kappa, lmax=lmax, potential=True)
+
+    assert potential.shape == kappa.shape
+    assert bool(jnp.all(jnp.isfinite(potential)))
+
+
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
+def test_from_convergence_spin_jax(
+    jnp: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lmax = 2
+    nside = 4
+
+    # numpy_fallback converts CPU results back to JAX, so output types alone
+    # cannot reveal an accidental call to the Healpy spin wrapper
+    monkeypatch.setattr(
+        glass.harmonics,
+        "_alm2map_spin",
+        lambda *_: pytest.fail(
+            "from_convergence called hp._alm2map_spin for JAX deflection or shear",
+        ),
+    )
+
+    rng = glass.rng.default_rng(xp=jnp)
+    kappa = rng.random(hp.nside2npix(nside))
+    alpha, gamma = glass.from_convergence(
+        kappa,
+        lmax=lmax,
+        deflection=True,
+        shear=True,
+    )
+
+    assert alpha.shape == gamma.shape == kappa.shape
+    assert bool(jnp.all(jnp.isfinite(alpha)))
+    assert bool(jnp.all(jnp.isfinite(gamma)))
 
 
 def test_multi_plane_matrix(
