@@ -22,9 +22,10 @@ ALL_PYTHON = [
     "3.13",
     "3.14",
 ]
+JAX_DEPENDENCY = "jax>=0.4.35"
 ARRAY_BACKENDS = {
     "array_api_strict": ("array-api-strict>=2",),
-    "jax": ("jax>=0.4.35", "s2fft>=1.4.0"),
+    "jax": (JAX_DEPENDENCY, "s2fft>=1.4.0"),
 }
 GRAD_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")
@@ -103,6 +104,23 @@ def tests(session: nox.Session) -> None:
     """Run the unit tests."""
     _setup_array_backend(session)
     session.run("pytest", *session.posargs)
+
+
+@nox_uv.session(
+    uv_groups=["test"],
+    uv_sync_locked=False,
+)
+def tests_jax_without_s2fft(session: nox.Session) -> None:
+    """Run core tests with JAX installed and S2FFT absent."""
+    session.install(JAX_DEPENDENCY)
+    session.env["ARRAY_BACKEND"] = "jax"
+    session.run(
+        "pytest",
+        "tests/core/test_harmonics.py",
+        "tests/core/test_fields.py",
+        "tests/core/test_lensing.py",
+        *session.posargs,
+    )
 
 
 @nox_uv.session(
