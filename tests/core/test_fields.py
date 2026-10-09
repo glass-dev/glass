@@ -351,7 +351,7 @@ def test_effective_cls(xp: ModuleType) -> None:
 
 def test_generate_grf(xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
-        pytest.skip("test require s2fft")
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
 
     gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
     nside = 4
@@ -383,7 +383,7 @@ def test_generate_grf(xp: ModuleType) -> None:
 
 def test_generate(xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
-        pytest.skip("test require s2fft")
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
 
     # shape mismatch error
 

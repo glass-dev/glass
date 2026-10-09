@@ -24,7 +24,7 @@ def test_from_convergence(
 ) -> None:
     """Add unit tests for :func:`glass.from_convergence`."""
     if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
-        pytest.skip("test require s2fft")
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
 
     # l_max = 100  # noqa: ERA001
     n_side = 32
@@ -62,7 +62,9 @@ def test_from_convergence(
     assert len(results) == 3
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     lmax = 2
     nside = 4
@@ -75,7 +77,9 @@ def test_from_convergence_low_bandlimit_jax(jnp: ModuleType) -> None:
     assert bool(jnp.all(jnp.isfinite(potential)))
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 def test_from_convergence_spin_jax(
     jnp: ModuleType,
     monkeypatch: pytest.MonkeyPatch,

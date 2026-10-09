@@ -57,7 +57,7 @@ def test_multalm(xp: ModuleType) -> None:
 
 def test_inverse_transform_matches_healpy(xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
-        pytest.skip("test require s2fft")
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
 
     nside = 2
     lmax = 2
@@ -75,7 +75,7 @@ def test_spin_inverse_transform_matches_healpy(
     xp: ModuleType,
 ) -> None:
     if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
-        pytest.skip("test require s2fft")
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
 
     nside = 2
     lmax = 2
@@ -88,7 +88,9 @@ def test_spin_inverse_transform_matches_healpy(
     xpx.testing.assert_close(actual, expected, atol=1e-13, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 def test_inverse_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
     nside = 4
     lmax = 11
@@ -112,7 +114,9 @@ def test_inverse_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-13, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 @pytest.mark.parametrize("spin", [1, 2])
 def test_spin_inverse_transform_matches_numpy_with_s2fft(
     jnp: ModuleType,
@@ -142,7 +146,7 @@ def test_spin_inverse_transform_matches_numpy_with_s2fft(
 
 def test_transform_matches_healpy(xp: ModuleType) -> None:
     if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
-        pytest.skip("test require s2fft")
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
 
     nside = 2
     lmax = 2
@@ -154,7 +158,9 @@ def test_transform_matches_healpy(xp: ModuleType) -> None:
     xpx.testing.assert_close(actual, expected, atol=1e-15, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 def test_jax_transform_requires_nside_with_s2fft(jnp: ModuleType) -> None:
     lmax = 11
     kappa = np.linspace(-1.0, 1.0, 192)
@@ -163,7 +169,9 @@ def test_jax_transform_requires_nside_with_s2fft(jnp: ModuleType) -> None:
         glass.harmonics.transform(jnp.asarray(kappa), lmax=lmax)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 def test_jax_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
     nside = 4
     lmax = 11
@@ -177,7 +185,9 @@ def test_jax_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
 
 
-@pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
+@pytest.mark.skipif(
+    not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
+)
 def test_low_bandlimit_transform_matches_full_transform(jnp: ModuleType) -> None:
     nside = 4
     low_lmax = 2
