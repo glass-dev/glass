@@ -147,6 +147,13 @@ jobs:
           flag-name: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
           parallel: true
 
+      - name: Check ARRAY_BACKEND fixture selection
+        run: |-
+          set -e
+          for array_backend in all jax numpy array_api_strict; do
+            ARRAY_BACKEND=$array_backend uv run nox -s tests_backend_selection
+          done
+
   tests-grad:
     if: github.event.pull_request.draft == false
     name: JAX gradients Tests
