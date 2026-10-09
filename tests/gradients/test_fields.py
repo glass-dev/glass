@@ -113,7 +113,6 @@ def test_discretized_cls(
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(
-    rng: UnifiedGenerator,
     ncorr: int | None,
     use_rng: bool,
 ) -> None:
@@ -121,17 +120,19 @@ def test_generate_grf(
     pytest.skip("glass.fields._generate_grf is not auto differentiable")
 
     gls: AngularPowerSpectra = [jnp.asarray([1.0, 0.5, 0.1])]
-    rng_param = rng if use_rng else None
 
     def _generate_grf_by_cls(
         gls: AnyArray,
         # nside: int,
     ) -> list[FloatArray]:
+        # Must supply a fresh JAX RNG so that we generate the same sequence for each
+        # call carried out by jax.test_util.check_grads
+        rng = glass.rng.default_rng(xp=jnp) if use_rng else None
         return list(
             glass.fields._generate_grf(
                 gls,
                 nside=4,
-                rng=rng_param,
+                rng=rng,
                 ncorr=ncorr,
             )
         )
@@ -257,6 +258,8 @@ def test_generate(
         gls: AngularPowerSpectra,
     ) -> list[AnyArray]:
         fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
+        # Must supply a fresh JAX RNG so that we generate the same sequence for each
+        # call carried out by jax.test_util.check_grads
         rng = glass.rng.default_rng(xp=jnp) if use_rng else None
         return list(
             partial(glass.generate, fields, nside=16, ncorr=ncorr, rng=rng)(gls)
