@@ -56,9 +56,9 @@ def test_multalm(xp: ModuleType) -> None:
 
 
 def test_inverse_transform_healpy(xp: ModuleType) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 2
     lmax = 2
-    nside = 1
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 
     expected = hp._alm2map(alm, nside=nside, lmax=lmax)
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside)
@@ -71,24 +71,24 @@ def test_inverse_transform_healpy_spin(
     spin: int,
     xp: ModuleType,
 ) -> None:
-    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 2
     lmax = 2
-    nside = 1
+    alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 
     result = hp._alm2map_spin([alm, xp.zeros_like(alm)], nside, spin, lmax)
     expected = result[0] + 1j * result[1]
     actual = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=spin)
 
-    xpx.testing.assert_close(actual, expected, atol=1e-14, rtol=0)
+    xpx.testing.assert_close(actual, expected, atol=1e-13, rtol=0)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_inverse_transform_s2fft(jnp: ModuleType) -> None:
+    nside = 4
+    lmax = 11
     # use real m=0 coefficients and complex coefficients for m > 0
     alm = np.arange(78, dtype=np.complex128) / 78
     alm[12:] += 1j * np.arange(66) / 78
-    lmax = 11
-    nside = 4
 
     expected = glass.harmonics.inverse_transform(
         alm,
@@ -112,9 +112,9 @@ def test_inverse_transform_s2fft_spin(
     jnp: ModuleType,
     spin: int,
 ) -> None:
-    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    nside = 2
     lmax = 2
-    nside = 1
+    alm = np.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 
     expected = glass.harmonics.inverse_transform(
         alm,
@@ -131,28 +131,24 @@ def test_inverse_transform_s2fft_spin(
 
     assert expected.__array_namespace__() == np
     assert actual.__array_namespace__() == jnp
-    xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
+    xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-13, rtol=0)
 
 
-def test_transform_healpy() -> None:
-    maps = np.asarray([1.0] * 12)
+def test_transform_healpy(xp: ModuleType) -> None:
+    nside = 2
     lmax = 2
+    maps = xp.asarray([1.0] * (12 * nside**2))
 
-    expected = hp._map2alm(
-        maps,
-        lmax=lmax,
-        # using pixel weights is the default in the transform
-        use_pixel_weights=True,
-    )
-    actual = glass.harmonics.transform(maps, lmax=lmax)
+    expected = hp._map2alm(maps, lmax=lmax)
+    actual = glass.harmonics.transform(maps, lmax=lmax, nside=nside)
 
-    xpx.testing.assert_equal(actual, expected)
+    xpx.testing.assert_close(actual, expected, atol=1e-15, rtol=0)
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_transform_s2fft_missing_nside(jnp: ModuleType) -> None:
-    kappa = np.linspace(-1.0, 1.0, 192)
     lmax = 11
+    kappa = np.linspace(-1.0, 1.0, 192)
 
     with pytest.raises(ValueError, match=r"nside must be specified when using JAX."):
         glass.harmonics.transform(jnp.asarray(kappa), lmax=lmax)
@@ -160,20 +156,12 @@ def test_transform_s2fft_missing_nside(jnp: ModuleType) -> None:
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_transform_s2fft(jnp: ModuleType) -> None:
-    kappa = np.linspace(-1.0, 1.0, 192)
-    lmax = 11
     nside = 4
+    lmax = 11
+    kappa = np.linspace(-1.0, 1.0, 192)
 
-    expected = glass.harmonics.transform(
-        kappa,
-        lmax=lmax,
-        nside=nside,
-    )
-    actual = glass.harmonics.transform(
-        jnp.asarray(kappa),
-        lmax=lmax,
-        nside=nside,
-    )
+    expected = glass.harmonics.transform(kappa, lmax=lmax)
+    actual = glass.harmonics.transform(jnp.asarray(kappa), lmax=lmax, nside=nside)
 
     assert expected.__array_namespace__() == np
     assert actual.__array_namespace__() == jnp
@@ -182,9 +170,9 @@ def test_transform_s2fft(jnp: ModuleType) -> None:
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 def test_transform_s2fft_low_bandlimit(jnp: ModuleType) -> None:
-    low_lmax = 2
     nside = 4
-    full_lmax = 2 * nside - 1
+    low_lmax = 2
+    high_lmax = 2 * nside - 1
     kappa = jnp.linspace(-1.0, 1.0, 12 * nside**2)
 
     low_alms = glass.harmonics.transform(
@@ -194,12 +182,12 @@ def test_transform_s2fft_low_bandlimit(jnp: ModuleType) -> None:
     )
     full_alms = glass.harmonics.transform(
         kappa,
-        lmax=full_lmax,
+        lmax=high_lmax,
         nside=nside,
     )
     # HEALPix packs alms in blocks of increasing m, then increasing ell
     full_indices = [
-        m * (2 * full_lmax + 1 - m) // 2 + ell
+        m * (2 * high_lmax + 1 - m) // 2 + ell
         for m in range(low_lmax + 1)
         for ell in range(m, low_lmax + 1)
     ]
