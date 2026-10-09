@@ -23,63 +23,6 @@ env:
   REG_COV_NAME: cov-reg
 
 jobs:
-  tests-reg:
-    if: github.event.pull_request.draft == false
-    name: Regression Tests
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Set up uv
-        # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
-        with:
-          python-version: 3.14
-
-      - name: Cache nox
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
-        with:
-          key:
-            tests-reg-${{ hashFiles('pyproject.toml') }}-${{
-            hashFiles('noxfile.py') }}
-          path: .nox
-
-      - name: Install only dev dependencies
-        run: uv sync --only-dev
-
-      - name: Check version
-        run: uv run nox -s version
-        env:
-          FORCE_COLOR: 1
-
-      - name:
-          Run regression tests with all backends and generate coverage report
-        run: uv run nox -s coverage_regression --verbose
-        env:
-          ARRAY_BACKEND: all
-          COVERAGE_FILE: ${{ env.REG_COV_NAME }}
-          FORCE_COLOR: 1
-
-      - name: Generate XML report for regression tests
-        run: >-
-          uv run coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
-          env.REG_COV_NAME }}.xml
-
-      - name: Upload regression coverage to Coveralls
-        # yamllint disable-line rule:line-length
-        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
-        with:
-          base-path: glass/
-          file: ${{ env.REG_COV_NAME }}.xml
-          flag-name: ${{ env.REG_COV_NAME }}
-          parallel: true
-
   tests-core:
     if: github.event.pull_request.draft == false
     name: Core Tests (Python ${{ matrix.python-version }})
@@ -202,6 +145,63 @@ jobs:
           base-path: glass/
           file: ${{ env.GRAD_COV_NAME }}.xml
           flag-name: ${{ env.GRAD_COV_NAME }}
+          parallel: true
+
+  tests-reg:
+    if: github.event.pull_request.draft == false
+    name: Regression Tests
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up uv
+        # yamllint disable-line rule:line-length
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: 3.14
+
+      - name: Cache nox
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          key:
+            tests-reg-${{ hashFiles('pyproject.toml') }}-${{
+            hashFiles('noxfile.py') }}
+          path: .nox
+
+      - name: Install only dev dependencies
+        run: uv sync --only-dev
+
+      - name: Check version
+        run: uv run nox -s version
+        env:
+          FORCE_COLOR: 1
+
+      - name:
+          Run regression tests with all backends and generate coverage report
+        run: uv run nox -s coverage_regression --verbose
+        env:
+          ARRAY_BACKEND: all
+          COVERAGE_FILE: ${{ env.REG_COV_NAME }}
+          FORCE_COLOR: 1
+
+      - name: Generate XML report for regression tests
+        run: >-
+          uv run coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
+          env.REG_COV_NAME }}.xml
+
+      - name: Upload regression coverage to Coveralls
+        # yamllint disable-line rule:line-length
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
+        with:
+          base-path: glass/
+          file: ${{ env.REG_COV_NAME }}.xml
+          flag-name: ${{ env.REG_COV_NAME }}
           parallel: true
 
   aggregate-tests:
