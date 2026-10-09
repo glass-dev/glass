@@ -22,7 +22,7 @@ ALL_PYTHON = [
     "3.13",
     "3.14",
 ]
-JAX_DEPENDENCY = "jax>=0.4.35"
+JAX_DEPENDENCY = "jax>=0.6.2"
 ARRAY_BACKENDS = {
     "array_api_strict": ("array-api-strict>=2",),
     "jax": (JAX_DEPENDENCY, "s2fft>=1.4.0"),
