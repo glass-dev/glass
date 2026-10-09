@@ -116,6 +116,8 @@ def tests_jax_without_s2fft(session: nox.Session) -> None:
     session.env["ARRAY_BACKEND"] = "jax"
     session.run(
         "pytest",
+        # print skip reasons for manual verification
+        "--report-chars=s",
         "tests/core/test_harmonics.py",
         "tests/core/test_fields.py",
         "tests/core/test_lensing.py",
