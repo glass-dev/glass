@@ -111,7 +111,7 @@ def tests(session: nox.Session) -> None:
     uv_sync_locked=False,
 )
 def tests_jax_without_s2fft(session: nox.Session) -> None:
-    """Run core tests with JAX installed and S2FFT absent."""
+    """Run core tests with JAX installed and S2FFT absent which will all be skipped."""
     session.install(JAX_DEPENDENCY)
     session.env["ARRAY_BACKEND"] = "jax"
     session.run(
