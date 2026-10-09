@@ -1,6 +1,5 @@
 """Nox config."""
 
-import itertools
 import os
 import pathlib
 import shutil
@@ -110,8 +109,8 @@ def tests(session: nox.Session) -> None:
     uv_sync_locked=False,
 )
 def tests_backend_selection(session: nox.Session) -> None:
-    """Check ARRAY_BACKEND selection with all array libraries installed."""
-    session.install(*itertools.chain.from_iterable(ARRAY_BACKENDS.values()))
+    """Check ARRAY_BACKEND selection with its requested library installed."""
+    _setup_array_backend(session)
     session.run(
         "pytest",
         "tests/core/test_array_api_utils.py::test_xp_fixture_selects_requested_backend",
