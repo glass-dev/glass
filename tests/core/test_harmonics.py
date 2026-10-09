@@ -55,7 +55,7 @@ def test_multalm(xp: ModuleType) -> None:
     xpx.testing.assert_equal(result, alm)
 
 
-def test_inverse_transform_healpy(xp: ModuleType) -> None:
+def test_inverse_transform_matches_healpy(xp: ModuleType) -> None:
     nside = 2
     lmax = 2
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
@@ -67,7 +67,7 @@ def test_inverse_transform_healpy(xp: ModuleType) -> None:
 
 
 @pytest.mark.parametrize("spin", [1, 2])
-def test_inverse_transform_healpy_spin(
+def test_spin_inverse_transform_matches_healpy(
     spin: int,
     xp: ModuleType,
 ) -> None:
@@ -83,7 +83,7 @@ def test_inverse_transform_healpy_spin(
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_inverse_transform_s2fft(jnp: ModuleType) -> None:
+def test_inverse_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
     nside = 4
     lmax = 11
     # use real m=0 coefficients and complex coefficients for m > 0
@@ -108,7 +108,7 @@ def test_inverse_transform_s2fft(jnp: ModuleType) -> None:
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
 @pytest.mark.parametrize("spin", [1, 2])
-def test_inverse_transform_s2fft_spin(
+def test_spin_inverse_transform_matches_numpy_with_s2fft(
     jnp: ModuleType,
     spin: int,
 ) -> None:
@@ -134,7 +134,7 @@ def test_inverse_transform_s2fft_spin(
     xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-13, rtol=0)
 
 
-def test_transform_healpy(xp: ModuleType) -> None:
+def test_transform_matches_healpy(xp: ModuleType) -> None:
     nside = 2
     lmax = 2
     maps = xp.asarray([1.0] * (12 * nside**2))
@@ -146,7 +146,7 @@ def test_transform_healpy(xp: ModuleType) -> None:
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform_s2fft_missing_nside(jnp: ModuleType) -> None:
+def test_jax_transform_requires_nside_with_s2fft(jnp: ModuleType) -> None:
     lmax = 11
     kappa = np.linspace(-1.0, 1.0, 192)
 
@@ -155,7 +155,7 @@ def test_transform_s2fft_missing_nside(jnp: ModuleType) -> None:
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform_s2fft(jnp: ModuleType) -> None:
+def test_jax_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
     nside = 4
     lmax = 11
     kappa = np.linspace(-1.0, 1.0, 192)
@@ -169,7 +169,7 @@ def test_transform_s2fft(jnp: ModuleType) -> None:
 
 
 @pytest.mark.skipif(not HAVE_S2FFT, reason="test requires s2fft")
-def test_transform_s2fft_low_bandlimit(jnp: ModuleType) -> None:
+def test_low_bandlimit_transform_matches_full_transform(jnp: ModuleType) -> None:
     nside = 4
     low_lmax = 2
     high_lmax = 2 * nside - 1
