@@ -56,6 +56,9 @@ def test_multalm(xp: ModuleType) -> None:
 
 
 def test_inverse_transform_matches_healpy(xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test require s2fft")
+
     nside = 2
     lmax = 2
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
@@ -71,6 +74,9 @@ def test_spin_inverse_transform_matches_healpy(
     spin: int,
     xp: ModuleType,
 ) -> None:
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test require s2fft")
+
     nside = 2
     lmax = 2
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
@@ -135,6 +141,9 @@ def test_spin_inverse_transform_matches_numpy_with_s2fft(
 
 
 def test_transform_matches_healpy(xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test require s2fft")
+
     nside = 2
     lmax = 2
     maps = xp.asarray([1.0] * (12 * nside**2))

@@ -18,8 +18,14 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
 
 
-def test_from_convergence(urng: UnifiedGenerator) -> None:
+def test_from_convergence(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> None:
     """Add unit tests for :func:`glass.from_convergence`."""
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test require s2fft")
+
     # l_max = 100  # noqa: ERA001
     n_side = 32
 
