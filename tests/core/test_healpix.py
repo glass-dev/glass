@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import healpix
 import healpy
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -22,6 +21,7 @@ if TYPE_CHECKING:
 
 def test_alm2map_individual(
     healpix_inputs: type[HealpixInputs],
+    np: ModuleType,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -42,6 +42,7 @@ def test_alm2map_individual(
 
 def test_alm2map_sequence(
     healpix_inputs: type[HealpixInputs],
+    np: ModuleType,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:
@@ -146,6 +147,7 @@ def test_map2alm_with_pulled_data_wrong_path(
 @pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_individual(
     healpix_inputs: type[HealpixInputs],
+    np: ModuleType,
     urng: UnifiedGenerator,
     use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
@@ -168,6 +170,7 @@ def test_map2alm_individual(
 @pytest.mark.parametrize("use_pixel_weights", [True, False])
 def test_map2alm_sequence(
     healpix_inputs: type[HealpixInputs],
+    np: ModuleType,
     urng: UnifiedGenerator,
     use_pixel_weights: bool,  # noqa: FBT001
     xp: ModuleType,
@@ -253,6 +256,7 @@ def test_pixwin_with_pulled_data_wrong_path(
 @pytest.mark.parametrize("thetas", [((20, 80)), ((30, 90))])
 def test_query_strip_float64(
     healpix_inputs: type[HealpixInputs],
+    np: ModuleType,
     thetas: tuple[int, int],
     xp: ModuleType,
 ) -> None:
@@ -293,6 +297,7 @@ def test_query_strip_none(
 def test_randang(
     healpix_inputs: type[HealpixInputs],
     lonlat: bool,  # noqa: FBT001
+    np: ModuleType,
     xp: ModuleType,
     urng: UnifiedGenerator,
 ) -> None:
@@ -325,6 +330,7 @@ def test_randang(
 def test_rotate_map_pixel(
     coord: str,
     healpix_inputs: type[HealpixInputs],
+    np: ModuleType,
     urng: UnifiedGenerator,
     xp: ModuleType,
 ) -> None:

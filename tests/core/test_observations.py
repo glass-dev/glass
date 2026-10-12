@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -100,7 +99,7 @@ def test_smail_nz(xp: ModuleType) -> None:
     xpx.testing.assert_equal(pz, xp.zeros_like(pz))
 
 
-def test_fixed_zbins_default_xp() -> None:
+def test_fixed_zbins_default_xp(np: ModuleType) -> None:
     """Add unit tests for :func:`glass.fixed_zbins` with default xp."""
     zmin = 0.0
     zmax = 1.0

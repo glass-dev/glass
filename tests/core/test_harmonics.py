@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -91,7 +90,10 @@ def test_spin_inverse_transform_matches_healpy(
 @pytest.mark.skipif(
     not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
 )
-def test_inverse_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
+def test_inverse_transform_matches_numpy_with_s2fft(
+    jnp: ModuleType,
+    np: ModuleType,
+) -> None:
     nside = 4
     lmax = 11
     # use real m=0 coefficients and complex coefficients for m > 0
@@ -120,6 +122,7 @@ def test_inverse_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
 @pytest.mark.parametrize("spin", [1, 2])
 def test_spin_inverse_transform_matches_numpy_with_s2fft(
     jnp: ModuleType,
+    np: ModuleType,
     spin: int,
 ) -> None:
     nside = 2
@@ -161,7 +164,10 @@ def test_transform_matches_healpy(xp: ModuleType) -> None:
 @pytest.mark.skipif(
     not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
 )
-def test_jax_transform_requires_nside_with_s2fft(jnp: ModuleType) -> None:
+def test_jax_transform_requires_nside_with_s2fft(
+    jnp: ModuleType,
+    np: ModuleType,
+) -> None:
     lmax = 11
     kappa = np.linspace(-1.0, 1.0, 192)
 
@@ -172,7 +178,10 @@ def test_jax_transform_requires_nside_with_s2fft(jnp: ModuleType) -> None:
 @pytest.mark.skipif(
     not HAVE_S2FFT, reason="test requires s2fft for JAX harmonic transforms"
 )
-def test_jax_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
+def test_jax_transform_matches_numpy_with_s2fft(
+    jnp: ModuleType,
+    np: ModuleType,
+) -> None:
     nside = 4
     lmax = 11
     kappa = np.linspace(-1.0, 1.0, 192)

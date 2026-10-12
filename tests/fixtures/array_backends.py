@@ -13,7 +13,7 @@ import os
 import typing
 from typing import TYPE_CHECKING
 
-import numpy as np
+import numpy  # noqa: ICN001
 import packaging.version
 import pytest
 
@@ -50,10 +50,14 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
         raise ImportError(msg)
 
 
+def _configure_numpy() -> None:
+    _check_version("numpy", "2.2.6")
+
+
 def _import_and_add_numpy(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add numpy to the backends dictionary."""
     _check_version("numpy", "2.2.6")
-    xp_available_backends["numpy"] = np
+    xp_available_backends["numpy"] = numpy
 
 
 def _configure_array_api_strict(array_api_strict: ModuleType) -> None:
@@ -161,3 +165,9 @@ def jnp() -> ModuleType:
     jax = pytest.importorskip("jax", reason="test requires jax")
     _configure_jax(jax)
     return typing.cast("ModuleType", jax.numpy)
+
+
+@pytest.fixture(scope="session")
+def np() -> ModuleType:
+    """Fixture for the NumPy array backend."""
+    return typing.cast("ModuleType", numpy)

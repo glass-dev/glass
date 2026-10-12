@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -489,7 +488,10 @@ def test_enumerate_spectra(xp: ModuleType) -> None:
         next(it)
 
 
-def test_spectra_indices(xp: ModuleType) -> None:
+def test_spectra_indices(
+    np: ModuleType,
+    xp: ModuleType,
+) -> None:
     # explicitly testing the default array backend NumPy
     xpx.testing.assert_equal(glass.spectra_indices(0), np.zeros((0, 2), dtype=np.int64))
     xpx.testing.assert_equal(
