@@ -135,6 +135,9 @@ def inverse_transform(
     import s2fft  # noqa: PLC0415
     import s2fft.sampling  # noqa: PLC0415
 
+    # S2FFT's HEALPix reindexing scatters into an array with the same dtype as the input
+    # harmonic coefficients are complex, even when their imaginary parts are zero
+    alm = alm + 0j
     bandlimit = lmax + 1
     flm = s2fft.sampling.reindex.flm_hp_to_2d_fast(alm, bandlimit)
 

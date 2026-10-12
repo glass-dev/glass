@@ -182,7 +182,7 @@ def test_jax_transform_matches_numpy_with_s2fft(jnp: ModuleType) -> None:
 
     assert expected.__array_namespace__() == np
     assert actual.__array_namespace__() == jnp
-    xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-14, rtol=0)
+    xpx.testing.assert_close(actual, jnp.asarray(expected), atol=1e-15, rtol=0)
 
 
 @pytest.mark.skipif(

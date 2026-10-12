@@ -197,6 +197,7 @@ addopts = [
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
+    "default::FutureWarning",
 ]
 log_cli_level = "DEBUG"
 markers = [
