@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from benchmark_utils import CosmologyWrapper, run_benchmark, xp_available_backends
+from benchmark_utils import CosmologyWrapper, run_benchmark
 
 # use the CAMB cosmology that generated the matter power spectra
 import camb  # ty: ignore[unresolved-import]
@@ -24,8 +24,15 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
-# Run benchmarks for each requested backend
-for xp in xp_available_backends.values():
+def benchmark(xp: ModuleType) -> None:
+    """
+    Realistic lensing simulation benchmark.
+
+    Parameters
+    ----------
+    XP
+        The array backend for which this benchmark should be executed.
+    """
     # cosmology for the simulation
     h = 0.7
     Oc = 0.25
@@ -56,7 +63,7 @@ for xp in xp_available_backends.values():
     shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]
+    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]  # ty:ignore[unresolved-attribute]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -70,7 +77,7 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    def lensing_benchmark(  # noqa: PLR0913
+    def key_lensing_simulation(  # noqa: PLR0913
         *,
         cosmo: CosmologyWrapper,
         fields: Sequence[glass.grf.Lognormal],
@@ -79,7 +86,7 @@ for xp in xp_available_backends.values():
         shells: list[RadialWindow],
         xp: ModuleType,
     ) -> FloatArray:
-        """Realistic lensing simulation benchmark."""
+        """Time the Realistic lensing simulation benchmark."""
         urng: UnifiedGenerator = rng.default_rng(xp=xp)
 
         # this will compute the convergence field iteratively
@@ -100,7 +107,7 @@ for xp in xp_available_backends.values():
 
     # Run benchmark passing convergence and matter
     run_benchmark(
-        lensing_benchmark,
+        key_lensing_simulation,
         cosmo=cosmo,
         fields=fields,
         gls=gls,

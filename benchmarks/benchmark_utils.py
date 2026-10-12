@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import os
 import timeit
+from contextlib import nullcontext
 from typing import TYPE_CHECKING
+from warnings import warn
 
 import jax
 import numpy as np
@@ -16,32 +17,44 @@ if TYPE_CHECKING:
     from glass._types import FloatArray
     from glass.cosmology import Cosmology
 
-xp_available_backends: dict[str, ModuleType] = {}
 
-# environment variable to specify array backends for testing
-# can be:
-#   - a particular array library (numpy, jax, ...)
-#   - all (try finding every supported array library available in the environment)
-ARRAY_BACKEND: str = os.environ.get("ARRAY_BACKEND", "")
-RUN_PROFILE: bool = os.environ.get("RUN_PROFILE", "False") != "False"
+RUN_PROFILE: bool = False
 
-# if no backend passed, use numpy by default
-if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
-    xp_available_backends["numpy"] = np
-elif ARRAY_BACKEND == "jax":
-    xp_available_backends["jax.numpy"] = jax.numpy
-# if all, try importing every backend
-elif ARRAY_BACKEND == "all":
-    xp_available_backends["numpy"] = np
-    xp_available_backends["jax.numpy"] = jax.numpy
-else:
-    msg = f"unsupported array backend: {ARRAY_BACKEND}"
-    raise ValueError(msg)
 
-print(f"Running benchmarks for backends: {', '.join(xp_available_backends.keys())}")  # noqa: T201
+def set_run_profile(val: bool) -> None:  # noqa: FBT001
+    """Set the global var RUN_PROFILE."""
+    global RUN_PROFILE  # noqa: PLW0603
+    RUN_PROFILE = val
 
-# Configure backends
-jax.config.update("jax_enable_x64", val=True)
+
+def configure_backends(backend_identifier: str) -> dict[str, ModuleType]:
+    """
+    Configure the available array backends.
+
+    Parameters
+    ----------
+    backend_identifiers
+        The identifier of the array backend requested by the user ("numpy", "jax.numpy",
+        etc)
+    """
+    # Configure JAX
+    jax.config.update("jax_enable_x64", val=True)
+
+    xp_available_backends: dict[str, ModuleType] = {}
+
+    # if no backend passed, use numpy by default
+    if not backend_identifier or backend_identifier == "numpy":
+        xp_available_backends["numpy"] = np
+    elif backend_identifier == "jax":
+        xp_available_backends["jax.numpy"] = jax.numpy
+    # if all, try importing every backend
+    elif backend_identifier == "all":
+        xp_available_backends["numpy"] = np
+        xp_available_backends["jax.numpy"] = jax.numpy
+    else:
+        msg = f"unsupported array backend: {backend_identifier}"
+        raise ValueError(msg)
+    return xp_available_backends
 
 
 def run_benchmark(
@@ -73,16 +86,27 @@ def run_benchmark(
         if xp.__name__ == "jax.numpy":
             out.block_until_ready()
 
+    should_profile = RUN_PROFILE and xp.__name__ == "jax.numpy"
+
+    if RUN_PROFILE and not should_profile:
+        warn(
+            message=(
+                "Profile requested but JAX not the chosen array backend; "
+                "no profile will be generated."
+            ),
+            stacklevel=2,
+        )
+
     # benchmark the task
-    result = 0.0
-    if RUN_PROFILE and xp.__name__ == "jax.numpy":
-        with jax.profiler.trace("jax_trace", create_perfetto_trace=True):
-            result = timeit.timeit(_run, number=1)
-    else:
+    with (
+        jax.profiler.trace("jax_trace", create_perfetto_trace=True)
+        if should_profile
+        else nullcontext()
+    ):
         result = timeit.timeit(_run, number=1)
 
-    # report the result
-    print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
+        # report the result
+        print(f"Took {result:.3f} seconds with {xp.__name__}")  # noqa: T201
 
 
 class CosmologyWrapper:
