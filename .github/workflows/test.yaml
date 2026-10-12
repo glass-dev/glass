@@ -40,7 +40,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Cache nox
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
@@ -93,6 +93,7 @@ jobs:
           - "3.12"
           - "3.13"
           - "3.14"
+          - "3.15"
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -164,7 +165,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Cache nox
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
@@ -213,7 +214,8 @@ jobs:
           carryforward:
             ${{ env.GRAD_COV_NAME }},${{ env.REG_COV_NAME }},${{
             env.CORE_COV_NAME }}-3.11,${{env.CORE_COV_NAME }}-3.12,${{
-            env.CORE_COV_NAME }}-3.13,${{env.CORE_COV_NAME }}-3.14
+            env.CORE_COV_NAME }}-3.13,${{env.CORE_COV_NAME }}-3.14,${{
+            env.CORE_COV_NAME }}-3.15
           parallel-finished: true
 
   build:
@@ -233,7 +235,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Install only dev dependencies
         run: uv sync --only-dev
