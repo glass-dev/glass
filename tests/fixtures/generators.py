@@ -15,15 +15,15 @@ if TYPE_CHECKING:
     from glass._types import UnifiedGenerator
 
 
-@pytest.fixture(scope="session")
-def rng() -> np.random.Generator:
+@pytest.fixture
+def rng() -> UnifiedGenerator:
     """
     RNG fixture for non array API tests.
 
     Use `urng` for array API tests.
 
     """
-    return np.random.default_rng(seed=glass.rng.SEED)
+    return glass.rng.default_rng(xp=np)
 
 
 @pytest.fixture

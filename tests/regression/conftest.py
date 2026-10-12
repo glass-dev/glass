@@ -25,7 +25,7 @@ def urng(xpb: ModuleType) -> UnifiedGenerator:
 
     Access the relevant RNG using `urng.` in tests.
 
-    Must be used with the `xp` fixture.
+    Must be used with the `xpb` fixture.
 
     """
     return glass.rng.default_rng(xp=xpb)

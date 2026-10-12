@@ -49,10 +49,7 @@ def default_rng(
 
     rng = np.random.default_rng(seed=seed)
 
-    if xp.__name__ == "numpy":
-        return rng
-
-    return Generator(rng=rng, xp=xp)
+    return rng if xp.__name__ == "numpy" else Generator(rng=rng, xp=xp)
 
 
 class Generator:
@@ -91,17 +88,7 @@ class Generator:
         self.xp = xp
         self.default_dtype = xp.float64
 
-        if rng is None:
-            if xp.__name__ == "jax.numpy":
-                import glass.jax  # noqa: PLC0415
-
-                self.rng = glass.jax.Generator(seed=seed)
-            else:
-                import numpy as np  # noqa: PLC0415
-
-                self.rng = np.random.default_rng(seed=seed)
-        else:
-            self.rng = rng
+        self.rng = default_rng(seed=seed, xp=xp) if rng is None else rng
 
     def random(
         self,

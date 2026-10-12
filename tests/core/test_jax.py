@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 import pytest
 
 jax = pytest.importorskip("jax", reason="tests require jax")
+# needed for the JAX usage in the pytest parameterised tests
+jax.config.update("jax_enable_x64", val=True)
 
 import jax.numpy as jnp  # noqa: E402
 from jax.typing import ArrayLike  # noqa: E402
@@ -13,10 +15,12 @@ import glass.rng  # noqa: E402
 from glass.jax import Generator  # noqa: E402
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import FloatArray, IntArray
 
 
-def test_init() -> None:
+def test_init(jnp: ModuleType) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     assert isinstance(rng, Generator)
     assert isinstance(rng.key, jax.Array)
@@ -24,7 +28,7 @@ def test_init() -> None:
     assert jnp.all(rng.key == jax.random.key(glass.rng.SEED))
 
 
-def test_from_key() -> None:
+def test_from_key(jnp: ModuleType) -> None:
     key = jax.random.key(glass.rng.SEED)
     rng = Generator.from_key(key)
     assert rng.key is key
@@ -36,7 +40,7 @@ def test_from_key() -> None:
         Generator.from_key(jnp.zeros(()))
 
 
-def test_key() -> None:
+def test_key(jnp: ModuleType) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     rngkey, outkey = jax.random.split(rng.key, 2)  # ty: ignore[unresolved-attribute]
     key = rng.split()  # ty: ignore[unresolved-attribute]
@@ -44,7 +48,7 @@ def test_key() -> None:
     assert jnp.all(key == outkey)
 
 
-def test_spawn() -> None:
+def test_spawn(jnp: ModuleType) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key, *subkeys = jax.random.split(rng.key, 4)  # ty: ignore[unresolved-attribute]
     subrngs = rng.spawn(3)  # ty: ignore[unresolved-attribute]
@@ -70,6 +74,7 @@ def test_spawn() -> None:
     ],
 )
 def test_random(
+    jnp: ModuleType,
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
@@ -118,7 +123,7 @@ def test_normal(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_normal_shape_mismatch_explicit() -> None:
+def test_normal_shape_mismatch_explicit(jnp: ModuleType) -> None:
     """Explicit size incompatible with input broadcast shape."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(
@@ -128,7 +133,7 @@ def test_normal_shape_mismatch_explicit() -> None:
         rng.normal(loc=jnp.ones(5), scale=2, size=3)
 
 
-def test_normal_shape_mismatch_broadcast() -> None:
+def test_normal_shape_mismatch_broadcast(jnp: ModuleType) -> None:
     """Input shapes that cannot be broadcast together."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(
@@ -152,6 +157,7 @@ def test_normal_shape_mismatch_broadcast() -> None:
     ],
 )
 def test_standard_normal(
+    jnp: ModuleType,
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
 ) -> None:
@@ -181,6 +187,7 @@ def test_standard_normal(
     ],
 )
 def test_poisson(
+    jnp: ModuleType,
     lam: float | FloatArray,
     size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
@@ -193,7 +200,7 @@ def test_poisson(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_poisson_shape_mismatch_explicit() -> None:
+def test_poisson_shape_mismatch_explicit(jnp: ModuleType) -> None:
     """Explicit size incompatible with input broadcast shape."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(
@@ -227,6 +234,7 @@ def test_poisson_shape_mismatch_explicit() -> None:
     ],
 )
 def test_uniform(
+    jnp: ModuleType,
     low: float | FloatArray,
     high: float | FloatArray,
     size_input: int | tuple[int, ...] | None,
@@ -242,7 +250,7 @@ def test_uniform(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_uniform_shape_mismatch_explicit() -> None:
+def test_uniform_shape_mismatch_explicit(jnp: ModuleType) -> None:
     """Explicit size incompatible with input broadcast shape."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(
@@ -252,7 +260,7 @@ def test_uniform_shape_mismatch_explicit() -> None:
         rng.uniform(low=jnp.zeros(5), high=1.0, size=3)
 
 
-def test_uniform_shape_mismatch_broadcast() -> None:
+def test_uniform_shape_mismatch_broadcast(jnp: ModuleType) -> None:
     """Input shapes that cannot be broadcast together."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(
@@ -280,6 +288,7 @@ def test_uniform_shape_mismatch_broadcast() -> None:
     ],
 )
 def test_multinomial(
+    jnp: ModuleType,
     n: int | IntArray,
     pvals: FloatArray,
     size_input: int | tuple[int, ...] | None,
@@ -295,7 +304,7 @@ def test_multinomial(
     assert isinstance(rvs, ArrayLike)
 
 
-def test_multinomial_shape_mismatch_explicit() -> None:
+def test_multinomial_shape_mismatch_explicit(jnp: ModuleType) -> None:
     """Explicit size incompatible with input broadcast shape."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(
@@ -305,7 +314,7 @@ def test_multinomial_shape_mismatch_explicit() -> None:
         rng.multinomial(jnp.array([10, 20, 30]), jnp.ones((3, 4)) / 4, size=5)
 
 
-def test_multinomial_shape_mismatch_broadcast() -> None:
+def test_multinomial_shape_mismatch_broadcast(jnp: ModuleType) -> None:
     """Input shapes that cannot be broadcast together."""
     rng = glass.rng.default_rng(xp=jnp)
     with pytest.raises(

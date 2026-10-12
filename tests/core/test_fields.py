@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -19,8 +18,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from glass._types import AngularPowerSpectra, UnifiedGenerator
-
-HAVE_JAX = importlib.util.find_spec("jax") is not None
 
 
 @pytest.fixture(scope="session")
@@ -131,7 +128,6 @@ def test_iternorm_nonmonotonic_row_widths(xp: ModuleType) -> None:
         )
 
 
-@pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
 def test_cls2cov_jax(jnp: ModuleType) -> None:
     nl, nf, nc = 3, 3, 2
 

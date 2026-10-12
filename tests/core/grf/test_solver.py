@@ -10,19 +10,20 @@ import array_api_extra as xpx
 import glass.grf
 
 if TYPE_CHECKING:
-    from glass._types import FloatArray
+    from collections.abc import Callable
+
+    from glass._types import FloatArray, UnifiedGenerator
 
 
 @pytest.fixture(scope="session")
-def cl() -> FloatArray:
-    lmax = 100
-    ell = np.arange(lmax + 1)
-    return 1e-2 / (2 * ell + 1) ** 2
+def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
+    """Generate a consistent cl for JAX."""
+    return get_cl(np)
 
 
 def test_one_transformation(
     cl: FloatArray,
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
 ) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
@@ -35,7 +36,7 @@ def test_one_transformation(
 
 def test_pad(
     cl: FloatArray,
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
 ) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
@@ -51,7 +52,7 @@ def test_pad(
 
 def test_initial(
     cl: FloatArray,
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
 ) -> None:
     lam = rng.random()
     t = glass.grf.Lognormal(lam)
@@ -75,7 +76,7 @@ def test_no_iterations(cl: FloatArray) -> None:
 
 def test_lognormal(
     cl: FloatArray,
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
 ) -> None:
     t1 = glass.grf.Lognormal()
     t2 = glass.grf.Lognormal()
@@ -98,11 +99,11 @@ def test_lognormal(
 
 def test_monopole(
     cl: FloatArray,
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
 ) -> None:
     t = glass.grf.Lognormal()
 
-    cl[0] = rng.random()
+    cl[0] = rng.random()  # ty: ignore[invalid-assignment]
     gl0 = rng.random()
 
     gl, cl_out, _ = glass.grf.solve(cl, t, monopole=None, gltol=1e-8)

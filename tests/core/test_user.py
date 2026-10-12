@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import pathlib
 from typing import TYPE_CHECKING
 
@@ -8,12 +7,11 @@ import numpy as np
 import pytest
 
 import glass
+from tests._optional_dependencies import HAVE_FITSIO
 
 if TYPE_CHECKING:
-    from glass._types import AngularPowerSpectra, FloatArray
+    from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
 
-# check if available for testing
-HAVE_FITSIO = importlib.util.find_spec("fitsio") is not None
 
 delta = 1e-3  # Number of points in arrays
 my_max = 1_000  # Typically number of galaxies in loop
@@ -23,7 +21,7 @@ cls_file = "Cls.npz"
 
 
 def test_read_write_cls(
-    rng: np.random.Generator,
+    rng: UnifiedGenerator,
     tmp_path: pathlib.Path,
 ) -> None:
     cls: AngularPowerSpectra = [rng.normal(size=(10,)) for _ in range(10)]
