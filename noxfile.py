@@ -25,7 +25,7 @@ ALL_PYTHON = [
 JAX_DEPENDENCY = "jax>=0.6.2"
 ARRAY_BACKENDS = {
     "array_api_strict": ("array-api-strict>=2",),
-    "jax": (JAX_DEPENDENCY, "s2fft>=1.4.0"),
+    "jax": (JAX_DEPENDENCY, "s2fft>=1.5.0"),
 }
 GRAD_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")

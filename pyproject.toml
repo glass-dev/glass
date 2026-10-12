@@ -135,7 +135,7 @@ optional-dependencies = { examples = [
     "numpy",
 ], jax = [
     "jax>=0.6.2",
-    "s2fft>=1.4.0",
+    "s2fft>=1.5.0",
 ] }
 requires-python = ">=3.11"
 
