@@ -15,17 +15,27 @@ However, it may also be necessary to install other dependencies / dependency
 groups. For example, read the
 [prerequisites for ARCHER2](./archer2/README.md#prerequisites)
 
+## Running the benchmarks
+
+The GLASS benchmarks can be ran by executing the `main.py` script:
+
+```sh
+python benchmarks/main.py --help
+```
+
 ## Adding a new benchmark
 
 Any new benchmarks should be added as new `.py` file in the `benchmarks`
 directory.
 
 To create a benchmark, add a new `.py` file in the `benchmarks` directory and
-write a function you wish to benchmark. Then pass this function, along with any
-arg/kwargs, into `benchmark_utils.run_benchmark`.
+write a function that **must** be called `benchmark` and **must** accept the
+array backend as a named variable `xp`. This new function can then carry out any
+required setup but **must** pass a function you wish to benchmark, along with
+any arg/kwargs, into `benchmark_utils.run_benchmark`.
 
 The example below shows how to write a benchmark for the function
-`function_to_benchmark`, which runs for all supported array backends:
+`function_to_benchmark`, which will run for all supported array backends:
 
 ```py
 from typing import TYPE_CHECKING
@@ -35,25 +45,24 @@ if TYPE_CHECKING:
     from types import ModuleType
     from glass._types import FloatArray
 
-for xp in xp_available_backends.values():
+def benchmark(xp: ModuleType) - > None:
     # Do some setup which I do not want to time
     x = xp.asarray([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=xp.float64)
     y = xp.asarray([11, 12, 13, 14, 15, 16, 17, 18, 19], dtype=xp.float64)
 
     def function_to_benchmark(
-        *,
         x: FloatArray,
+        *,
         y: FloatArray,
-        xp: ModuleType,
     ) -> FloatArray:
         """An example function to be benchmarked."""
         return x / xp.vecdot(x, y)
 
     run_benchmark(
         function_to_benchmark,
-        x=x,
+        x,
         y=y,
-        xp=xp,
+        xp=xp, # <-- This is an argument required by `run_benchmark`
     )
 ```
 

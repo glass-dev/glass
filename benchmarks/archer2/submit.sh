@@ -92,5 +92,5 @@ do
     sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
 
     # Run benchmark via slurm
-    HEALPY_DATAPATH="$HEALPY_DATAPATH" ARRAY_BACKEND="$ARRAY_BACKEND" srun --hint=nomultithread --distribution=block:block "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/lensing.py"
+    HEALPY_DATAPATH="$HEALPY_DATAPATH" srun --hint=nomultithread --distribution=block:block "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/main.py" "-x" "$ARRAY_BACKEND" "--benchmarks" "lensing"
 done

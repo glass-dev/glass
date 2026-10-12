@@ -54,6 +54,9 @@ def configure_backends(backend_identifier: str) -> dict[str, ModuleType]:
     else:
         msg = f"unsupported array backend: {backend_identifier}"
         raise ValueError(msg)
+
+    print(f"Running benchmarks for backends: {', '.join(xp_available_backends.keys())}")  # noqa: T201
+
     return xp_available_backends
 
 
@@ -82,7 +85,7 @@ def run_benchmark(
 
     def _run() -> None:
         """Wrap the function so asynchronous JAX work is included in the timing."""
-        out = function_to_benchmark(*args, xp=xp, **kwargs)
+        out = function_to_benchmark(*args, **kwargs)
         if xp.__name__ == "jax.numpy":
             out.block_until_ready()
 

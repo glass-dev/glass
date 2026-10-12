@@ -77,14 +77,13 @@ def benchmark(xp: ModuleType) -> None:
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    def key_lensing_simulation(  # noqa: PLR0913
+    def key_lensing_simulation(
         *,
         cosmo: CosmologyWrapper,
         fields: Sequence[glass.grf.Lognormal],
         gls: AngularPowerSpectra,
         nside: int,
         shells: list[RadialWindow],
-        xp: ModuleType,
     ) -> FloatArray:
         """Time the Realistic lensing simulation benchmark."""
         urng: UnifiedGenerator = rng.default_rng(xp=xp)
