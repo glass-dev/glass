@@ -88,9 +88,9 @@ class HealpixInputs:
 
     alm_size: int = 78
     lmax: int = 11
-    npix: int = 192
+    npix: int = 12 * 32**2
     npts: int = 250
-    nside: int = 4
+    nside: int = 32
 
     @staticmethod
     def alm(*, rng: UnifiedGenerator) -> ComplexArray:
