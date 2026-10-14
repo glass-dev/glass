@@ -8,7 +8,6 @@ on:
         description: >-
           The hash for the revision of glass-dev/glass to act as the starting
           state to be compared against.
-        required: true
         default: main
         type: string
       head_ref:
@@ -17,21 +16,26 @@ on:
           to be compared with the initial.
         required: true
         type: string
-  pull_request:
-    paths:
-      - .github/workflows/regression-test.yaml
-      - glass/**
-    branches:
-      - main
-    types:
-      - opened
-      - ready_for_review
-      - reopened
-      - synchronize
+  workflow_call:
+    inputs:
+      base_ref:
+        description: >-
+          The hash for the revision of glass-dev/glass to act as the starting
+          state to be compared against.
+        default: main
+        type: string
+      head_ref:
+        description: >-
+          The hash for the revision of glass-dev/glass to act as the final state
+          to be compared with the initial.
+        required: true
+        type: string
 
 jobs:
   regression-tests:
-    if: github.event.pull_request.draft == false
+    if: >-
+      github.event.pull_request.draft == false &&
+      contains(github.event.pull_request.labels.*.name, 'run-regression-tests')
     name: Regression test
     permissions:
       contents: read

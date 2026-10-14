@@ -1,0 +1,24 @@
+---
+name: Run regression tests
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/regression-test.yaml
+      - glass/**
+    branches:
+      - main
+    types:
+      - labeled
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+
+jobs:
+  test-examples-on-push:
+    if: github.event.pull_request.draft == false
+    name: On push
+    permissions:
+      contents: read
+    uses: $/.github/workflows/regression-test.yaml
