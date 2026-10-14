@@ -21,9 +21,6 @@ on:
     paths:
       - .github/workflows/regression-test.yaml
       - glass/**
-      - tests/regression/**
-      - noxfile.py
-      - pyproject.toml
     branches:
       - main
     types:
