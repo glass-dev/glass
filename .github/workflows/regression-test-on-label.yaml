@@ -1,5 +1,5 @@
 ---
-name: Run regression tests
+name: Regression tests
 
 on:
   pull_request:

@@ -1,5 +1,5 @@
 ---
-name: Regression tests
+name: Regression tests (reusable workflow)
 
 on:
   workflow_dispatch:
