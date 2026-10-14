@@ -17,19 +17,6 @@ on:
         required: true
         type: string
   workflow_call:
-    inputs:
-      base_ref:
-        description: >-
-          The hash for the revision of glass-dev/glass to act as the starting
-          state to be compared against.
-        default: main
-        type: string
-      head_ref:
-        description: >-
-          The hash for the revision of glass-dev/glass to act as the final state
-          to be compared with the initial.
-        required: true
-        type: string
 
 jobs:
   regression-tests:
