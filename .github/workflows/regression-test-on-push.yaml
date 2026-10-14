@@ -4,6 +4,7 @@ name: Regression tests
 on:
   pull_request:
     paths:
+      - .github/workflows/regression-test-on-push.yaml
       - .github/workflows/regression-test.yaml
       - glass/**
     branches:
