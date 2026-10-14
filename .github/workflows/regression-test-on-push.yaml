@@ -16,7 +16,7 @@ on:
       - synchronize
 
 jobs:
-  test-examples-on-push:
+  regression-tests-on-push:
     if: github.event.pull_request.draft == false
     name: On push
     permissions:
