@@ -332,3 +332,11 @@ include = [
     "glass/fields.py",
 ]
 rules.possibly-unresolved-reference = "ignore"
+
+[tool.uv]
+conflicts = [
+    [{ extra = "examples" }, { group = "benchmarks" }],
+    [{ extra = "examples" }, { group = "benchmarks-cuda13" }],
+    [{ extra = "examples" }, { group = "benchmarks-rocm6" }],
+    [{ extra = "examples" }, { group = "benchmarks-rocm7" }],
+]
