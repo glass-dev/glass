@@ -14,7 +14,7 @@ benchmarks = [
     "glass-ext-camb",
     "jax>=0.6.2",
     "matplotlib",
-    "s2fft",
+    "s2fft>=1.5.0",
 ]
 benchmarks-cuda13 = [
     "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
@@ -47,7 +47,7 @@ docs = [
     "matplotlib",
     "myst-parser",
     "nbsphinx",
-    "s2fft",
+    "s2fft>=1.5.0",
     "sphinx-autodoc-typehints",
     "sphinx-toolbox",
     "sphinx<8.2.0",
@@ -55,7 +55,7 @@ docs = [
 ]
 doctest = [
     "jax>=0.6.2",
-    "s2fft",
+    "s2fft>=1.5.0",
     { include-group = "test" },
 ]
 lint = [
@@ -82,7 +82,7 @@ typechecking = [
     "pytest",
     "pytest-benchmark",
     "pytest-mock",
-    "s2fft",
+    "s2fft>=1.5.0",
 ]
 
 [project]
