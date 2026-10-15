@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass.rng
@@ -16,7 +15,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def rng() -> UnifiedGenerator:
+def rng(np: ModuleType) -> UnifiedGenerator:
     """
     RNG fixture for non array API tests.
 
