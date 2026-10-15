@@ -91,5 +91,4 @@ repos:
       - id: ty
         args:
           - --group=typechecking
-          - --isolated
           - --no-default-groups
