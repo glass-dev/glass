@@ -1,0 +1,21 @@
+---
+name: Regression tests
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - opened
+      - reopened
+      - synchronize
+      - unlabeled
+
+jobs:
+  regression-tests-on-label:
+    if: >-
+      github.event.pull_request.draft == false &&
+      contains(github.event.pull_request.labels.*.name, 'run-regression-tests')
+    name: On label
+    permissions:
+      contents: read
+    uses: $/.github/workflows/regression-test.yaml
