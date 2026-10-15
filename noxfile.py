@@ -75,6 +75,7 @@ def _check_revision_count(
 
 
 @nox_uv.session(
+    python=LATEST_PYTHON,
     uv_no_install_project=True,
     uv_only_groups=["lint"],
     uv_sync_locked=False,
@@ -256,6 +257,7 @@ def docs(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=LATEST_PYTHON,
     uv_no_install_project=True,
     uv_only_groups=["build"],
     uv_sync_locked=False,

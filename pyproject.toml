@@ -340,3 +340,6 @@ conflicts = [
     [{ extra = "examples" }, { group = "benchmarks-rocm6" }],
     [{ extra = "examples" }, { group = "benchmarks-rocm7" }],
 ]
+constraint-dependencies = [
+    "numpy>=2.5.2; python_version >= '3.15'",
+]
