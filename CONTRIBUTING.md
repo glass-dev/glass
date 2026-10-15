@@ -18,8 +18,10 @@ The developer installation of GLASS comes with several optional dependencies -
 These options can be used with `uv` in the following way
 
 ```bash
-uv sync --all-extras --all-groups
+uv sync --extra examples --group docs --group test
 ```
+
+Note that the `dev` group is installed by default.
 
 ## Tooling
 
