@@ -9,6 +9,8 @@ import glass
 from tests._optional_dependencies import HAVE_FITSIO
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import AngularPowerSpectra, FloatArray, UnifiedGenerator
 
 
@@ -20,6 +22,7 @@ cls_file = "Cls.npz"
 
 
 def test_read_write_cls(
+    np: ModuleType,
     rng: UnifiedGenerator,
     tmp_path: pathlib.Path,
 ) -> None:
@@ -44,7 +47,10 @@ def test_read_write_cls(
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_basic_write(tmp_path: pathlib.Path) -> None:
+def test_basic_write(
+    np: ModuleType,
+    tmp_path: pathlib.Path,
+) -> None:
     import fitsio
 
     filename_gfits = "gfits.fits"  # what GLASS creates
@@ -86,7 +92,10 @@ def test_basic_write(tmp_path: pathlib.Path) -> None:
 
 
 @pytest.mark.skipif(not HAVE_FITSIO, reason="test requires fitsio")
-def test_write_exception(tmp_path: pathlib.Path) -> None:
+def test_write_exception(
+    np: ModuleType,
+    tmp_path: pathlib.Path,
+) -> None:
     class TestWriteError(Exception):
         """Custom exception for controlled testing."""
 
