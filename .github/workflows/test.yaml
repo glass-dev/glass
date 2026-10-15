@@ -68,6 +68,7 @@ jobs:
         run: uv run nox -s doctests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1
 
       - name: Run core tests with all backends and generate coverage report
         run: uv run nox -s coverage-${{ matrix.python-version }} --verbose
@@ -75,12 +76,15 @@ jobs:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1
 
       - name: Generate XML report for core tests
         run: >-
           uv run coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
           matrix.python-version }}.xml
+        env:
+          UV_NO_SYNC: 1
 
       - name: Upload core coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -98,6 +102,8 @@ jobs:
             ARRAY_BACKEND=$array_backend uv run nox -s \
               tests_backend_selection-${{ matrix.python-version }}
           done
+        env:
+          UV_NO_SYNC: 1
 
   tests-grad:
     if: github.event.pull_request.draft == false
@@ -134,11 +140,14 @@ jobs:
         env:
           COVERAGE_FILE: ${{ env.GRAD_COV_NAME }}
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1
 
       - name: Generate XML report for JAX gradients tests
         run: >-
           uv run coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
           env.GRAD_COV_NAME }}.xml
+        env:
+          UV_NO_SYNC: 1
 
       - name: Upload JAX gradients coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -183,6 +192,7 @@ jobs:
         run: uv run nox -s version
         env:
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1
 
       - name:
           Run regression tests with all backends and generate coverage report
@@ -191,11 +201,14 @@ jobs:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.REG_COV_NAME }}
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1
 
       - name: Generate XML report for regression tests
         run: >-
           uv run coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
           env.REG_COV_NAME }}.xml
+        env:
+          UV_NO_SYNC: 1
 
       - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -221,8 +234,8 @@ jobs:
         with:
           carryforward:
             ${{ env.GRAD_COV_NAME }},${{ env.REG_COV_NAME }},${{
-            env.CORE_COV_NAME }}-3.11,${{env.CORE_COV_NAME }}-3.12,${{
-            env.CORE_COV_NAME }}-3.13,${{env.CORE_COV_NAME }}-3.14,${{
+            env.CORE_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.12,${{
+            env.CORE_COV_NAME }}-3.13,${{ env.CORE_COV_NAME }}-3.14,${{
             env.CORE_COV_NAME }}-3.15
           parallel-finished: true
 
@@ -252,3 +265,4 @@ jobs:
         run: uv run nox -s build
         env:
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1

@@ -66,3 +66,4 @@ jobs:
             ${{ github.event_name == 'pull_request' && 'local' ||
             inputs.head_ref }}
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1

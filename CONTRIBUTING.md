@@ -123,7 +123,7 @@ defined in [tests/gradients/](./tests/gradients/).
 These gradients tests can be run via nox:
 
 ```sh
-uv run nox -s coverage_gradients
+uv run --no-sync nox -s coverage_gradients
 ```
 
 ## Documenting
@@ -226,14 +226,14 @@ uv sync --only-dev
 The default sessions (`lint` and `tests`) can be executed using -
 
 ```bash
-uv run nox
+uv run --no-sync nox
 ```
 
 A particular session (for example `tests`) can be run with `nox` on all
 supported Python versions using -
 
 ```bash
-uv run nox -s tests
+uv run --no-sync nox -s tests
 ```
 
 Only `tests`, `coverage` and the `doctests` session run on all supported Python
@@ -243,7 +243,7 @@ To specify a particular Python version (for example `3.14`), use the following
 syntax -
 
 ```bash
-uv run nox -s tests-3.14
+uv run --no-sync nox -s tests-3.14
 ```
 
 One can specify a particular array backend for testing by setting the
@@ -253,20 +253,20 @@ can be tested with every supported array library by setting `ARRAY_BACKEND` to
 
 ```bash
 # run tests using numpy
-uv run nox -s tests-3.14
-ARRAY_BACKEND=numpy uv run nox -s tests-3.14
+uv run --no-sync nox -s tests-3.14
+ARRAY_BACKEND=numpy uv run --no-sync nox -s tests-3.14
 # run tests using array_api_strict
-ARRAY_BACKEND=array_api_strict uv run nox -s tests-3.14
+ARRAY_BACKEND=array_api_strict uv run --no-sync nox -s tests-3.14
 # run tests using jax
-ARRAY_BACKEND=jax uv run nox -s tests-3.14
+ARRAY_BACKEND=jax uv run --no-sync nox -s tests-3.14
 # run tests using every supported array library
-ARRAY_BACKEND=all uv run nox -s tests-3.14
+ARRAY_BACKEND=all uv run --no-sync nox -s tests-3.14
 ```
 
 The following command can be used to deploy the docs on `localhost` -
 
 ```bash
-uv run nox -s docs -- serve
+uv run --no-sync nox -s docs -- serve
 ```
 
 The `nox` environments created for each type of session on the first run is
@@ -280,7 +280,7 @@ can be run through nox. To compare the performance of two different revisions of
 GLASS.
 
 ```sh
-uv run nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
+uv run --no-sync nox -s regression-tests -- <initial-state-revision> <revision-to-compare>
 ```
 
 To filter the tests to be ran, one can pass pytest arguments via the cli after
@@ -290,7 +290,7 @@ following commands:
 
 ```sh
 # Regression tests
-uv run nox -s regression-tests -- <initial-state-revision> \
+uv run --no-sync nox -s regression-tests -- <initial-state-revision> \
 <revision-to-compare> -k test_fields
 ```
 

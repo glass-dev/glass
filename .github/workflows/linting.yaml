@@ -52,3 +52,4 @@ jobs:
         run: uv run nox -s lint -- -vv
         env:
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1

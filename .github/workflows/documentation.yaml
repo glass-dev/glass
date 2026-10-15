@@ -47,6 +47,7 @@ jobs:
         run: uv run nox -s docs --verbose
         env:
           FORCE_COLOR: 1
+          UV_NO_SYNC: 1
 
       - name: Spellcheck
         uses: crate-ci/typos@512fc24f32f44ab01972217aaaf3dc86ec234d53 # v1
