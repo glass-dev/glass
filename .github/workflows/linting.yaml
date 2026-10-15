@@ -49,6 +49,6 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run prek
-        run: uv run --no-sync nox -s lint
+        run: uv run --no-sync nox -s lint -- -vv
         env:
           FORCE_COLOR: 1
