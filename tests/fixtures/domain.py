@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 import glass
@@ -17,39 +18,48 @@ if TYPE_CHECKING:
 
 @pytest.fixture(scope="session")
 def get_cosmo() -> Callable[..., MockCosmology]:
-    """Mock cosmology to use for core tests."""
+    """Create a MockCosmology instance for any backend."""
     return MockCosmology
 
 
 @pytest.fixture(scope="session")
-def cosmo(xp: ModuleType) -> MockCosmology:
-    """Mock cosmology to use for core tests."""
-    return MockCosmology(xp)
-
-
-@pytest.fixture(scope="session")
-def cosmo_with_inverse_comoving_distance(
-    xp: ModuleType,
-) -> MockCosmologyWithInverseComovingDistance:
-    """Mock cosmology with inverse comoving distance to use for core tests."""
-    return MockCosmologyWithInverseComovingDistance(xp)
-
-
-@pytest.fixture(scope="session")
-def cosmo_with_omega_m(xp: ModuleType) -> MockCosmologyWithOmegaM:
-    """Mock cosmology with OmegaM to use for core tests."""
-    return MockCosmologyWithOmegaM(xp)
-
-
-class MockCosmology:
+def cosmo() -> MockCosmology:
     """
-    A mock class to represent Cosmology in tests.
+    Mock cosmology to use for core tests.
 
     We make use of Numpy here instead of xp as this more closely
     emulates the potential setup of the user who may use a Cosmology
     library which is not array api compatible.
-
     """
+    return MockCosmology(np)
+
+
+@pytest.fixture(scope="session")
+def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDistance:
+    """
+    Mock cosmology with inverse comoving distance to use for core tests.
+
+    We make use of Numpy here instead of xp as this more closely
+    emulates the potential setup of the user who may use a Cosmology
+    library which is not array api compatible.
+    """
+    return MockCosmologyWithInverseComovingDistance(np)
+
+
+@pytest.fixture(scope="session")
+def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
+    """
+    Mock cosmology with OmegaM to use for core tests.
+
+    We make use of Numpy here instead of xp as this more closely
+    emulates the potential setup of the user who may use a Cosmology
+    library which is not array api compatible.
+    """
+    return MockCosmologyWithOmegaM(np)
+
+
+class MockCosmology:
+    """A mock class to represent Cosmology in tests."""
 
     xp: ModuleType
 
