@@ -47,7 +47,7 @@ def configure_backends(backend_identifier: str) -> dict[str, ModuleType]:
         xp_available_backends["numpy"] = np
     elif backend_identifier == "jax":
         xp_available_backends["jax.numpy"] = jax.numpy
-    # if all, try importing every backend
+    # if all, return every supported backend
     elif backend_identifier == "all":
         xp_available_backends["numpy"] = np
         xp_available_backends["jax.numpy"] = jax.numpy
