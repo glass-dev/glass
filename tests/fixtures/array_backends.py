@@ -168,4 +168,5 @@ def jnp() -> ModuleType:
 @pytest.fixture(scope="session")
 def np() -> ModuleType:
     """Fixture for the NumPy array backend."""
+    _configure_numpy()
     return typing.cast("ModuleType", numpy)
