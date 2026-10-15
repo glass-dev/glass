@@ -94,5 +94,5 @@ do
     sed -i -E "s/nside = lmax = [0-9]+/nside = lmax = $n/g" "$GLASS_DIR/benchmarks/lensing.py"
 
     # Run benchmark via slurm
-    "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/lensing.py"
+    "$GLASS_DIR/.venv/bin/python" "$GLASS_DIR/benchmarks/main.py" "-x" "$ARRAY_BACKEND" "--benchmarks" "lensing"
 done

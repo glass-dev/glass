@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from benchmark_utils import CosmologyWrapper, run_benchmark, xp_available_backends
+from benchmark_utils import CosmologyWrapper, run_benchmark
 
 # use the CAMB cosmology that generated the matter power spectra
 import camb  # ty: ignore[unresolved-import]
@@ -24,8 +24,15 @@ if TYPE_CHECKING:
     from glass.shells import RadialWindow
 
 
-# Run benchmarks for each requested backend
-for xp in xp_available_backends.values():
+def benchmark(xp: ModuleType) -> None:
+    """
+    Realistic lensing simulation benchmark.
+
+    Parameters
+    ----------
+    XP
+        The array backend for which this benchmark should be executed.
+    """
     # cosmology for the simulation
     h = 0.7
     Oc = 0.25
@@ -73,21 +80,15 @@ for xp in xp_available_backends.values():
     # compute Gaussian spectra for lognormal fields from discretised spectra
     gls = glass.solve_gaussian_spectra(fields, cls)
 
-    # localised redshift distribution
-    # the actual density per arcmin2 does not matter here, it is never used
-    z = xp.linspace(0.0, 1.0, 101)
-    dndz = xp.exp(-((z - 0.5) ** 2) / (0.1) ** 2)
-
-    def lensing_benchmark(  # noqa: PLR0913
+    def key_lensing_simulation(
         *,
         cosmo: CosmologyWrapper,
         fields: Sequence[glass.grf.Lognormal],
         gls: AngularPowerSpectra,
         nside: int,
         shells: list[RadialWindow],
-        xp: ModuleType,
     ) -> FloatArray:
-        """Realistic lensing simulation benchmark."""
+        """Time the Realistic lensing simulation benchmark."""
         urng = glass.rng.default_rng(xp=xp)
 
         # this will compute the convergence field iteratively
@@ -108,7 +109,7 @@ for xp in xp_available_backends.values():
 
     # Run benchmark passing convergence and matter
     run_benchmark(
-        lensing_benchmark,
+        key_lensing_simulation,
         cosmo=cosmo,
         fields=fields,
         gls=gls,
