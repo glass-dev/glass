@@ -10,32 +10,29 @@ pytest.importorskip("jax", reason="tests require jax")
 import jax.numpy as jnp
 import jax.test_util
 
-import array_api_compat
-
 import glass
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import FloatArray, UnifiedGenerator
 
 
 @pytest.mark.parametrize("count", [[10], [20, 2]])
-def test_draw_nz(count: list[int]) -> None:
+def test_draw_nz(count: list[int], jnp: ModuleType) -> None:
     """Tests glass.galaxies._draw_nz is auto differentiable when using JAX."""
-    pytest.skip("glass.galaxies._draw_nz is not auto differentiable")
-
     z = jnp.asarray([0.0, 1.0, 2.0, 3.0, 4.0])
     nz = jnp.asarray([5.0, 6.0, 7.0, 8.0, 9.0])
-    rng = glass.rng.default_rng(xp=jnp)
 
     def _draw_nz_by_z_and_nz(z: FloatArray, nz: FloatArray) -> FloatArray:
         # Need to ensure all inputs use the same arrays types here otherwise we end up
         # with a mix of backends as `check_grads`` perturbs `z`` and `nz`` using NumPy.
-        xp = array_api_compat.array_namespace(z, nz, use_compat=False)
+        fresh_rng = glass.rng.default_rng(xp=jnp)
         return glass.galaxies._draw_nz(
-            xp.asarray(count),
-            z,
-            nz,
-            rng=rng,
+            jnp.asarray(count),
+            jnp.asarray(z),
+            jnp.asarray(nz),
+            rng=fresh_rng,
         )
 
     jax.test_util.check_grads(
@@ -136,8 +133,8 @@ def test_gaussian_phz_no_bounds(
     ) -> FloatArray:
         # Must supply a fresh JAX RNG so that we generate the same sequence for each
         # call carried out by jax.test_util.check_grads
-        rng = glass.rng.default_rng(xp=jnp)
-        return glass.gaussian_phz(z, sigma_0, lower=lower, upper=upper, rng=rng)
+        fresh_rng = glass.rng.default_rng(xp=jnp)
+        return glass.gaussian_phz(z, sigma_0, lower=lower, upper=upper, rng=fresh_rng)
 
     jax.test_util.check_grads(
         gaussian_phz_arrays_only,
