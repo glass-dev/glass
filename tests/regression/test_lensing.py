@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing import TYPE_CHECKING
 
 import pytest
@@ -119,15 +120,24 @@ def test_multi_plane_weights(
     ]:
         """Run setup a generator with zip before each benchmark run."""
         convergence = glass.MultiPlaneConvergence(cosmo)
-        return (convergence, zip(shells, deltas, weights, strict=False)), {}
+        return (
+            (
+                convergence,
+                typing.cast(
+                    "zip[tuple[glass.RadialWindow, FloatArray, FloatArray]]",
+                    zip(shells, deltas, weights, strict=False),
+                ),
+            ),
+            {},
+        )
 
     def multi_plane_weights_add_window(
-        convergence: type[glass.MultiPlaneConvergence],
-        zipped: tuple[list[type[glass.RadialWindow]], FloatArray, FloatArray],
-    ) -> type[glass.MultiPlaneConvergence]:
+        convergence: glass.MultiPlaneConvergence,
+        zipped: zip[tuple[glass.RadialWindow, FloatArray, FloatArray]],
+    ) -> glass.MultiPlaneConvergence:
         """Call add_window repeatedly, to be benchmarked."""
         for shell, delta, _ in zipped:
-            convergence.add_window(delta, shell)  # ty: ignore[missing-argument]
+            convergence.add_window(delta, shell)
         return convergence
 
     actual_convergence = benchmark.pedantic(
