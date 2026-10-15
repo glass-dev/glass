@@ -312,7 +312,21 @@ with `-k <test_name>`. See the
 [pytest-benchmark docs](https://pytest-benchmark.readthedocs.io/en/latest/usage.html)
 for more details.
 
-## Failure of the `Regression tests / Regression test` Workflow
+## `Regression test` Workflow
+
+The regression tests are run in GitHub Actions for every pull request, which
+updates relevant files, to ensure that new changes do not degrade the
+performances of GLASS. There may be some small cases where the regression tests
+are not automatically triggered but we believe it would be worth running them.
+For example, if we update some dependency versions this will likely not trigger
+the workflow. In this scenario, one can add the label `run-regression-tests`
+which will then trigger the workflow.
+
+This workflow uses the `nox` command detailed above comparing the head of the
+current pull request to the `main` branch. The regression tests are first run
+over the `main` branch, followed by the head of the pull request.
+
+### Failure of the `Regression tests / Regression test` Workflow
 
 <!-- vale proselint.Annotations = NO -->
 
@@ -328,12 +342,8 @@ for more details.
 
 <!-- vale proselint.Annotations = YES -->
 
-The regression tests are run in GitHub Actions for every pull request to ensure
-that new changes do not degrade the performances of GLASS. This workflow uses
-the `nox` command detailed above comparing the head of the current pull request
-to the `main` branch. The regression tests are first run over the `main` branch,
-followed by the head of the pull request. If there is any statistically
-significant regression in performance, the workflow fails with the error
+If there is any statistically significant regression in performance, the
+workflow fails with the error
 `pytest_benchmark.session.PerformanceRegression: Performance has regressed`. One
 must scroll through the logs to find lines similar to the following to find out
 which test(s) caused the regression:

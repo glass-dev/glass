@@ -51,6 +51,7 @@ def _check_version(lib: str, array_api_compliant_version: str) -> None:
 
 
 def _configure_numpy() -> None:
+    """Set up numpy for tests."""
     _check_version("numpy", "2.2.6")
 
 
@@ -170,4 +171,5 @@ def jnp() -> ModuleType:
 @pytest.fixture(scope="session")
 def np() -> ModuleType:
     """Fixture for the NumPy array backend."""
+    _configure_numpy()
     return typing.cast("ModuleType", numpy)

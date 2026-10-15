@@ -145,7 +145,7 @@ def test_map2alm_with_pulled_data_wrong_path(
 
 
 @pytest.mark.parametrize("use_pixel_weights", [True, False])
-def test_map2alm_individual(
+def test_map2alm_individual(  # noqa: PLR0913, PLR0917
     healpix_inputs: type[HealpixInputs],
     np: ModuleType,
     urng: UnifiedGenerator,
