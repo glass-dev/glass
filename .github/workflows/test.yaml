@@ -66,12 +66,16 @@ jobs:
         run: sudo apt-get install -y libbz2-dev
 
       - name: Run doctests
-        run: uv run --no-sync nox -s doctests-${{ matrix.python-version }} --verbose
+        run:
+          uv run --no-sync nox -s doctests-${{ matrix.python-version }}
+          --verbose
         env:
           FORCE_COLOR: 1
 
       - name: Run core tests with all backends and generate coverage report
-        run: uv run --no-sync nox -s coverage-${{ matrix.python-version }} --verbose
+        run:
+          uv run --no-sync nox -s coverage-${{ matrix.python-version }}
+          --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
@@ -138,8 +142,8 @@ jobs:
 
       - name: Generate XML report for JAX gradients tests
         run: >-
-          uv run --no-sync coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
-          env.GRAD_COV_NAME }}.xml
+          uv run --no-sync coverage xml --data-file ${{env.GRAD_COV_NAME }} -o
+          ${{ env.GRAD_COV_NAME }}.xml
 
       - name: Upload JAX gradients coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -195,8 +199,8 @@ jobs:
 
       - name: Generate XML report for regression tests
         run: >-
-          uv run --no-sync coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
-          env.REG_COV_NAME }}.xml
+          uv run --no-sync coverage xml --data-file ${{ env.REG_COV_NAME }} -o
+          ${{ env.REG_COV_NAME }}.xml
 
       - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
