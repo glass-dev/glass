@@ -126,6 +126,26 @@ These gradients tests can be run via nox:
 uv run nox -s coverage_gradients
 ```
 
+In some of the `gradients` tests, a wrapper function has been defined in "force"
+to auto-differentiability of the function being tested. This is needed as there
+are a few aspects of a function which automatically cause it to fail the
+`jax.test_util.check_grads` test:
+
+- **Backend mixing:** the internals of `jax.test_util.check_grads` uses NumPy to
+  apply a perturbation to the function inputs. If we have wrapped the function
+  under test such that some of its inputs are static and have an associated
+  array backend which have been fixed to JAX. When the perturbed inputs, which
+  are now NumPy arrays, are passed into `array_api_compat.array_namespace`
+  alongside the static inputs, we get the error -
+  `TypeError: Multiple namespaces for array inputs`. The solution here is to
+  wrap all inputs in `jnp.asarray` to ensure they have the same backend.
+- **RNG calls:** due to `jax.test_util.check_grads` making multiple calls to the
+  function under test, if we define an input `rng` outside of these calls then
+  the generated random number sequence will be different for each which breaks
+  the auto-differentiability. The solution here is to define a fresh `rng`
+  instance within a function that wraps the function under test and pass this
+  wrapping function into `array_api_compat.array_namespace`.
+
 ## Documenting
 
 GLASS's documentation is mainly written in the form of
