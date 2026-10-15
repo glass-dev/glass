@@ -15,7 +15,6 @@ benchmarks = [
     "jax==0.4.35; python_version < '3.13'",
     "jax>=0.6.2; python_version >= '3.13'",
     "matplotlib",
-    "numpy<2.4; python_version < '3.15'",
 ]
 benchmarks-cuda13 = [
     "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
@@ -318,7 +317,7 @@ src.include = [
     "glass",
     "tests",
 ]
-terminal.error-on-warning = false
+terminal.error-on-warning = true
 
 [[tool.ty.overrides]]
 include = [
@@ -332,11 +331,3 @@ include = [
     "glass/fields.py",
 ]
 rules.possibly-unresolved-reference = "ignore"
-
-[tool.uv]
-conflicts = [
-    [{ extra = "examples" }, { group = "benchmarks" }],
-    [{ extra = "examples" }, { group = "benchmarks-cuda13" }],
-    [{ extra = "examples" }, { group = "benchmarks-rocm6" }],
-    [{ extra = "examples" }, { group = "benchmarks-rocm7" }],
-]
