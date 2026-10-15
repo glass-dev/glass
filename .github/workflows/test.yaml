@@ -95,7 +95,8 @@ jobs:
         run: |-
           set -e
           for array_backend in all jax numpy array_api_strict; do
-            ARRAY_BACKEND=$array_backend uv run nox -s tests_backend_selection
+            ARRAY_BACKEND=$array_backend uv run nox -s \
+              tests_backend_selection-${{ matrix.python-version }}
           done
 
   tests-grad:
