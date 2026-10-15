@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
@@ -23,7 +22,7 @@ def get_cosmo() -> Callable[..., MockCosmology]:
 
 
 @pytest.fixture(scope="session")
-def cosmo() -> MockCosmology:
+def cosmo(np: ModuleType) -> MockCosmology:
     """
     Mock cosmology to use for core tests.
 
@@ -35,7 +34,9 @@ def cosmo() -> MockCosmology:
 
 
 @pytest.fixture(scope="session")
-def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDistance:
+def cosmo_with_inverse_comoving_distance(
+    np: ModuleType,
+) -> MockCosmologyWithInverseComovingDistance:
     """
     Mock cosmology with inverse comoving distance to use for core tests.
 
@@ -47,7 +48,7 @@ def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDi
 
 
 @pytest.fixture(scope="session")
-def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
+def cosmo_with_omega_m(np: ModuleType) -> MockCosmologyWithOmegaM:
     """
     Mock cosmology with OmegaM to use for core tests.
 
