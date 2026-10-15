@@ -4,7 +4,6 @@ import contextlib
 import os
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass.rng
@@ -28,7 +27,7 @@ def test_xp_fixture_selects_requested_backend(xp: ModuleType) -> None:
     assert xp.__name__ in expected
 
 
-def test_default_rng_numpy() -> None:
+def test_default_rng_numpy(np: ModuleType) -> None:
     rng = glass.rng.default_rng(xp=np)
     assert isinstance(rng, np.random.Generator)
 
@@ -48,7 +47,10 @@ def test_init(ap: ModuleType) -> None:
     assert isinstance(rng, glass.rng.Generator)
 
 
-def test_init_mix_of_backends_np_array_api_strict(ap: ModuleType) -> None:
+def test_init_mix_of_backends_np_array_api_strict(
+    np: ModuleType,
+    ap: ModuleType,
+) -> None:
     rng = glass.rng.Generator(rng=glass.rng.default_rng(xp=np), xp=ap)
     assert rng.random(1).__array_namespace__().__name__ == "array_api_strict"
     assert rng.poisson(1).__array_namespace__().__name__ == "array_api_strict"
@@ -61,7 +63,7 @@ def test_init_mix_of_backends_np_array_api_strict(ap: ModuleType) -> None:
 
 
 @pytest.mark.skipif(not HAVE_JAX, reason="test requires jax")
-def test_init_mix_of_backends_jax_np() -> None:
+def test_init_mix_of_backends_jax_np(np: ModuleType) -> None:
     rng = glass.rng.Generator(rng=glass.jax.Generator(42), xp=np)
     assert rng.random(1).__array_namespace__().__name__ == "numpy"
     assert rng.poisson(1).__array_namespace__().__name__ == "numpy"
