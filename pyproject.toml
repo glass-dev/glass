@@ -341,5 +341,6 @@ conflicts = [
     [{ extra = "examples" }, { group = "benchmarks-rocm7" }],
 ]
 constraint-dependencies = [
+    # this is only necessary due to the restriction of the benchmarks group
     "numpy>=2.5.2; python_version >= '3.15'",
 ]
