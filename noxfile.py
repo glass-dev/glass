@@ -15,11 +15,12 @@ nox.options.sessions = [
     "tests",
 ]
 
+LATEST_PYTHON = "3.14"
 ALL_PYTHON = [
     "3.11",
     "3.12",
     "3.13",
-    "3.14",
+    LATEST_PYTHON,
 ]
 ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
@@ -73,6 +74,7 @@ def _check_revision_count(
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_no_install_project=True,
     uv_only_groups=["lint"],
     uv_sync_locked=False,
@@ -105,6 +107,7 @@ def tests(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=ALL_PYTHON,
     reuse_venv=False,
     uv_groups=["test"],
     uv_sync_locked=False,
@@ -140,6 +143,7 @@ def coverage(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_groups=["test"],
     uv_sync_locked=False,
 )
@@ -158,6 +162,7 @@ def coverage_regression(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_groups=["test"],
     uv_sync_locked=False,
 )
@@ -192,6 +197,7 @@ def doctests(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_extras=["examples"],
     uv_sync_locked=False,
 )
@@ -221,6 +227,7 @@ def examples(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_groups=["docs"],
     uv_sync_locked=False,
 )
@@ -249,6 +256,7 @@ def docs(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_no_install_project=True,
     uv_only_groups=["build"],
     uv_sync_locked=False,
@@ -258,7 +266,10 @@ def build(session: nox.Session) -> None:
     session.run("python", "-m", "build")
 
 
-@nox_uv.session(uv_sync_locked=False)
+@nox_uv.session(
+    python=[LATEST_PYTHON],
+    uv_sync_locked=False,
+)
 def version(session: nox.Session) -> None:
     """
     Check the current version of the package.
@@ -272,6 +283,7 @@ def version(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    python=[LATEST_PYTHON],
     uv_no_install_project=True,
     uv_only_groups=["test"],
     uv_sync_locked=False,
