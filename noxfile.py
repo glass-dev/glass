@@ -108,7 +108,7 @@ def tests(session: nox.Session) -> None:
 
 
 @nox_uv.session(
-    python=LATEST_PYTHON,
+    python=ALL_PYTHON,
     reuse_venv=False,
     uv_groups=["test"],
     uv_sync_locked=False,
