@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import glass
@@ -17,21 +16,29 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="session")
-def cosmo() -> MockCosmology:
+def get_cosmo() -> Callable[..., MockCosmology]:
     """Mock cosmology to use for core tests."""
-    return MockCosmology()
+    return MockCosmology
 
 
 @pytest.fixture(scope="session")
-def cosmo_with_inverse_comoving_distance() -> MockCosmologyWithInverseComovingDistance:
+def cosmo(xp: ModuleType) -> MockCosmology:
+    """Mock cosmology to use for core tests."""
+    return MockCosmology(xp)
+
+
+@pytest.fixture(scope="session")
+def cosmo_with_inverse_comoving_distance(
+    xp: ModuleType,
+) -> MockCosmologyWithInverseComovingDistance:
     """Mock cosmology with inverse comoving distance to use for core tests."""
-    return MockCosmologyWithInverseComovingDistance()
+    return MockCosmologyWithInverseComovingDistance(xp)
 
 
 @pytest.fixture(scope="session")
-def cosmo_with_omega_m() -> MockCosmologyWithOmegaM:
+def cosmo_with_omega_m(xp: ModuleType) -> MockCosmologyWithOmegaM:
     """Mock cosmology with OmegaM to use for core tests."""
-    return MockCosmologyWithOmegaM()
+    return MockCosmologyWithOmegaM(xp)
 
 
 class MockCosmology:
@@ -43,6 +50,11 @@ class MockCosmology:
     library which is not array api compatible.
 
     """
+
+    xp: ModuleType
+
+    def __init__(self, xp: ModuleType) -> None:
+        self.xp = xp
 
     @property
     def Omega_m0(self) -> float:  # noqa: N802
@@ -74,8 +86,8 @@ class MockCosmology:
         :math:`x_M(z) = d_M(z)/d_H`
         """
         if z2 is None:
-            return np.asarray(z) * 1_000
-        return (np.asarray(z2) - np.asarray(z)) * 1_000
+            return self.xp.asarray(z) * 1_000
+        return (self.xp.asarray(z2) - self.xp.asarray(z)) * 1_000
 
     def rho_m_z(self, z: FloatArray) -> FloatArray:
         """Redshift-dependent matter density in Msol Mpc-3."""
@@ -87,7 +99,7 @@ class MockCosmology:
         z2: float | FloatArray | None = None,
     ) -> FloatArray:
         """Comoving distance :math:`d_c(z)` in Mpc."""
-        return np.divide(self.xm(z, z2), 1_000.0)
+        return self.xp.divide(self.xm(z, z2), 1_000.0)
 
     def transverse_comoving_distance(
         self,
@@ -103,7 +115,7 @@ class MockCosmologyWithInverseComovingDistance(MockCosmology):
 
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
-        return 1_000 * (1 / (dc + np.finfo(float).eps))
+        return 1_000 * (1 / (dc + self.xp.finfo(self.xp.float64).eps))
 
 
 class MockCosmologyWithOmegaM(MockCosmology):
