@@ -99,7 +99,6 @@ jobs:
             ARRAY_BACKEND=$array_backend uv run --no-sync nox -s \
               tests_backend_selection-${{ matrix.python-version }}
           done
-        env:
 
   tests-grad:
     if: github.event.pull_request.draft == false

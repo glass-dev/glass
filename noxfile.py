@@ -77,10 +77,7 @@ def _check_revision_count(
 @nox_uv.session(
     python=[LATEST_PYTHON],
     uv_no_install_project=True,
-    uv_only_groups=[
-        "lint",
-        "typechecking",
-    ],
+    uv_only_groups=["lint"],
     uv_sync_locked=False,
 )
 def lint(session: nox.Session) -> None:
