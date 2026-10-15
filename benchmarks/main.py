@@ -72,10 +72,11 @@ def main() -> None:
         print(f"Running {benchmark_name} benchmark")  # noqa: T201
         for xp in available_backends.values():
             spec = importlib.util.spec_from_file_location(
-                benchmark_name, benchmarks_dir / f"{benchmark_name}.py"
+                benchmark_name,
+                benchmarks_dir / f"{benchmark_name}.py",
             )
             benchmark_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(benchmark_module)  # ty:ignore[unresolved-attribute]
+            spec.loader.exec_module(benchmark_module)
 
             benchmark_module.benchmark(xp)
 
