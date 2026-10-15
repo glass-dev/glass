@@ -12,18 +12,12 @@ benchmarks = [
     "cosmology-api",
     "cosmology-compat-camb",
     "glass-ext-camb",
-    "jax==0.4.35; python_version < '3.13'",
-    "jax>=0.6.2; python_version >= '3.13'",
+    "jax>=0.6.2",
     "matplotlib",
-    "numpy<2.4",
+    "s2fft",
 ]
 benchmarks-cuda13 = [
     "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
-    { include-group = "benchmarks" },
-]
-benchmarks-rocm6 = [
-    "jax-rocm60-pjrt==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
-    "jax-rocm60-plugin==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
     { include-group = "benchmarks" },
 ]
 benchmarks-rocm7 = [
@@ -325,7 +319,7 @@ src.include = [
     "glass",
     "tests",
 ]
-terminal.error-on-warning = false
+terminal.error-on-warning = true
 
 [[tool.ty.overrides]]
 include = [
@@ -339,11 +333,3 @@ include = [
     "glass/fields.py",
 ]
 rules.possibly-unresolved-reference = "ignore"
-
-[tool.uv]
-conflicts = [
-    [
-        { extra = "jax" },
-        { group = "benchmarks" },
-    ],
-]
