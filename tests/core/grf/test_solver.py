@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pytest
 
 import array_api_extra as xpx
@@ -11,12 +10,16 @@ import glass.grf
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from types import ModuleType
 
     from glass._types import FloatArray, UnifiedGenerator
 
 
 @pytest.fixture(scope="session")
-def cl(get_cl: Callable[..., FloatArray]) -> FloatArray:
+def cl(
+    get_cl: Callable[..., FloatArray],
+    np: ModuleType,
+) -> FloatArray:
     """Generate a consistent cl for JAX."""
     return get_cl(np)
 

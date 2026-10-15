@@ -22,17 +22,27 @@ dependencies:
 - AMD, ROCM v7 - `uv sync --group benchmarks-rocm7`
 - Nvidia , CUDA v3 - `uv sync --group benchmarks-cuda13`
 
+## Running the benchmarks
+
+The GLASS benchmarks can be ran by executing the `main.py` script:
+
+```sh
+python benchmarks/main.py --help
+```
+
 ## Adding a new benchmark
 
 Any new benchmarks should be added as new `.py` file in the `benchmarks`
 directory.
 
 To create a benchmark, add a new `.py` file in the `benchmarks` directory and
-write a function you wish to benchmark. Then pass this function, along with any
-arg/kwargs, into `benchmark_utils.run_benchmark`.
+write a function that **must** be called `benchmark` and **must** accept the
+array backend as a named variable `xp`. This new function can then carry out any
+required setup but **must** pass a function you wish to benchmark, along with
+any arg/kwargs, into `benchmark_utils.run_benchmark`.
 
 The example below shows how to write a benchmark for the function
-`function_to_benchmark`, which runs for all supported array backends:
+`function_to_benchmark`, which will run for all supported array backends:
 
 ```py
 from typing import TYPE_CHECKING
@@ -42,25 +52,24 @@ if TYPE_CHECKING:
     from types import ModuleType
     from glass._types import FloatArray
 
-for xp in xp_available_backends.values():
+def benchmark(xp: ModuleType) - > None:
     # Do some setup which I do not want to time
     x = xp.asarray([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=xp.float64)
     y = xp.asarray([11, 12, 13, 14, 15, 16, 17, 18, 19], dtype=xp.float64)
 
     def function_to_benchmark(
-        *,
         x: FloatArray,
+        *,
         y: FloatArray,
-        xp: ModuleType,
     ) -> FloatArray:
         """An example function to be benchmarked."""
         return x / xp.vecdot(x, y)
 
     run_benchmark(
         function_to_benchmark,
-        x=x,
+        x,
         y=y,
-        xp=xp,
+        xp=xp, # <-- This is an argument required by `run_benchmark`
     )
 ```
 
@@ -86,18 +95,13 @@ export HEALPY_DATAPATH="$(pwd)/healpy-data"
 
 ## Profiling
 
-### AMD
+There are several methods to profile GLASS:
 
-To profile this benchmark on AMD hardware, we have followed the
-[ROCm Systems Profiler python documentation](https://rocm.docs.amd.com/projects/rocprofiler-systems/en/latest/how-to/profiling-python-scripts.html).
-This states that once the profiler is installed a
-[perfetto](https://perfetto.dev) compatible trace can be generated using the
-following command:
-
-```sh
-# Generates a perfetto trace profile for the lensing benchmark using JAX
-ARRAY_BACKEND=jax rocprof-sys-python benchmarks/lensing.py
-```
-
-However, this profiling tool is difficult to install and we have thus only
-managed to run the pre-installed version on the AAC6 AMD machine.
+- cProfile, [as we have done with the regression tests](../CONTRIBUTING.md).
+- [JAX in-built profiler](https://docs.jax.dev/en/latest/profiling.html), which
+  we are utilising within the lensing benchmark (set the env var `RUN_PROFILE`).
+  - There is a known issue with this profiler in that there is a limit to the
+    buffer size (amount of individual execution datapoints that will be
+    collected). This results in truncated profile traces.
+- rocprof-sys-python, as
+  [trialed on the AAC6 machine](./aac6/README.md#profiling)

@@ -99,7 +99,6 @@ export XLA_PYTHON_CLIENT_PREALLOCATE=false # <-- Needed to prevent OOM errors
 Finally, run the benchmark:
 
 ```sh
-export ARRAY_BACKEND=jax
 export HEALPY_DATAPATH="$(pwd)/healpy-data"
-uv run python benchmarks/lensing.py
+uv run python benchmarks/main.py --array-backend jax
 ```

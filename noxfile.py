@@ -105,6 +105,25 @@ def tests(session: nox.Session) -> None:
 
 
 @nox_uv.session(
+    reuse_venv=False,
+    uv_groups=["test"],
+    uv_sync_locked=False,
+)
+def tests_backend_selection(session: nox.Session) -> None:
+    """Check ARRAY_BACKEND selection with its requested library installed."""
+    _setup_array_backend(session)
+    session.run(
+        "pytest",
+        # print skip reasons for manual verification
+        "--report-chars=s",
+        "tests/core/test_array_api_utils.py::test_xp_fixture_selects_requested_backend",
+        "tests/core/test_array_api_utils.py::test_default_rng_jax",
+        "tests/core/test_array_api_utils.py::test_default_rng_array_api_strict",
+        *session.posargs,
+    )
+
+
+@nox_uv.session(
     python=ALL_PYTHON,
     uv_groups=["test"],
     uv_sync_locked=False,

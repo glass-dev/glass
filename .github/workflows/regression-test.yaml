@@ -1,5 +1,5 @@
 ---
-name: Regression tests
+name: Regression tests (reusable workflow)
 
 on:
   workflow_dispatch:
@@ -8,7 +8,6 @@ on:
         description: >-
           The hash for the revision of glass-dev/glass to act as the starting
           state to be compared against.
-        required: true
         default: main
         type: string
       head_ref:
@@ -17,24 +16,15 @@ on:
           to be compared with the initial.
         required: true
         type: string
-  pull_request:
-    paths:
-      - .github/workflows/regression-test.yaml
-      - glass/**
-      - tests/regression/**
-      - noxfile.py
-      - pyproject.toml
-    branches:
-      - main
-    types:
-      - opened
-      - ready_for_review
-      - reopened
-      - synchronize
+  workflow_call:
+
+concurrency:
+  cancel-in-progress: true
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
   regression-tests:
-    if: github.event.pull_request.draft == false
     name: Regression test
     permissions:
       contents: read
