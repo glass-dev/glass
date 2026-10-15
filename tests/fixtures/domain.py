@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from types import ModuleType
 
-    from glass._types import FloatArray
+    from glass._types import ComplexArray, FloatArray, UnifiedGenerator
 
 
 @pytest.fixture(scope="session")
@@ -179,3 +179,15 @@ def shells(  # noqa: D103
 def get_cl() -> Callable[..., FloatArray]:
     """Generate a consistent cl for a chosen array backend."""
     return lambda xp: 1e-2 / (2 * xp.arange(100 + 1) + 1) ** 2
+
+
+@pytest.fixture
+def epsilon(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> ComplexArray:
+    """Generate uniform random epsilon ellipticities."""
+    n = 1_000_000
+    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
+    phi = urng.uniform(0.0, 2 * xp.pi, n)
+    return r * xp.exp(1j * phi)
