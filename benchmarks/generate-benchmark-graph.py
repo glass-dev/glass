@@ -2,7 +2,7 @@ import argparse
 import csv
 from pathlib import Path
 
-import matplotlib.pyplot as plt  # ty: ignore[unresolved-import]
+import matplotlib.pyplot as plt
 
 base_font_size = 17.5
 
