@@ -161,12 +161,7 @@ class CosmologyWrapper:
         """
         if z2 is not None:
             z2 = self.cosmo_xp.asarray(z2)
-        return self.xp.asarray(
-            self.cosmo.xm(
-                self.cosmo_xp.asarray(z),
-                z2,
-            ),
-        )
+        return self.xp.asarray(self.cosmo.xm(self.cosmo_xp.asarray(z), z2))
 
     def rho_m_z(self, z: FloatArray) -> FloatArray:
         """Redshift-dependent matter density in Msol Mpc-3."""
