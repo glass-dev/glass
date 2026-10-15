@@ -81,7 +81,6 @@ jobs:
           uv run --no-sync coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
           matrix.python-version }}.xml
-        env:
 
       - name: Upload core coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -140,7 +139,6 @@ jobs:
         run: >-
           uv run --no-sync coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
           env.GRAD_COV_NAME }}.xml
-        env:
 
       - name: Upload JAX gradients coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -198,7 +196,6 @@ jobs:
         run: >-
           uv run --no-sync coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
           env.REG_COV_NAME }}.xml
-        env:
 
       - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
