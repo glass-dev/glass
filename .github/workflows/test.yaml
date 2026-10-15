@@ -65,26 +65,23 @@ jobs:
         run: sudo apt-get install -y libbz2-dev
 
       - name: Run doctests
-        run: uv run nox -s doctests-${{ matrix.python-version }} --verbose
+        run: uv run --no-sync nox -s doctests-${{ matrix.python-version }} --verbose
         env:
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name: Run core tests with all backends and generate coverage report
-        run: uv run nox -s coverage-${{ matrix.python-version }} --verbose
+        run: uv run --no-sync nox -s coverage-${{ matrix.python-version }} --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name: Generate XML report for core tests
         run: >-
-          uv run coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
+          uv run --no-sync coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
           matrix.python-version }}.xml
         env:
-          UV_NO_SYNC: 1
 
       - name: Upload core coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -99,11 +96,10 @@ jobs:
         run: |-
           set -e
           for array_backend in all jax numpy array_api_strict; do
-            ARRAY_BACKEND=$array_backend uv run nox -s \
+            ARRAY_BACKEND=$array_backend uv run --no-sync nox -s \
               tests_backend_selection-${{ matrix.python-version }}
           done
         env:
-          UV_NO_SYNC: 1
 
   tests-grad:
     if: github.event.pull_request.draft == false
@@ -136,18 +132,16 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run JAX gradients tests and generate coverage report
-        run: uv run nox -s coverage_gradients --verbose
+        run: uv run --no-sync nox -s coverage_gradients --verbose
         env:
           COVERAGE_FILE: ${{ env.GRAD_COV_NAME }}
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name: Generate XML report for JAX gradients tests
         run: >-
-          uv run coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
+          uv run --no-sync coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
           env.GRAD_COV_NAME }}.xml
         env:
-          UV_NO_SYNC: 1
 
       - name: Upload JAX gradients coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -189,26 +183,23 @@ jobs:
         run: uv sync --only-dev
 
       - name: Check version
-        run: uv run nox -s version
+        run: uv run --no-sync nox -s version
         env:
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name:
           Run regression tests with all backends and generate coverage report
-        run: uv run nox -s coverage_regression --verbose
+        run: uv run --no-sync nox -s coverage_regression --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.REG_COV_NAME }}
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name: Generate XML report for regression tests
         run: >-
-          uv run coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
+          uv run --no-sync coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
           env.REG_COV_NAME }}.xml
         env:
-          UV_NO_SYNC: 1
 
       - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -262,7 +253,6 @@ jobs:
         run: uv sync --only-dev
 
       - name: Build SDist and wheel
-        run: uv run nox -s build
+        run: uv run --no-sync nox -s build
         env:
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1

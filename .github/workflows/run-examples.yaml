@@ -37,17 +37,15 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run examples
-        run: uv run nox -s examples
+        run: uv run --no-sync nox -s examples
         timeout-minutes: 25
         env:
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name: Generate HTML
-        run: uv run nox -s examples -- html
+        run: uv run --no-sync nox -s examples -- html
         env:
           FORCE_COLOR: 1
-          UV_NO_SYNC: 1
 
       - name: Upload artefact
         # yamllint disable-line rule:line-length
