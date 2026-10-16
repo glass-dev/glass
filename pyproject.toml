@@ -14,7 +14,6 @@ benchmarks = [
     "glass-ext-camb",
     "jax>=0.6.2",
     "matplotlib",
-    "numpy",
 ]
 benchmarks-cuda13 = [
     "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
