@@ -48,6 +48,12 @@ def cosmo_with_inverse_comoving_distance(
 
 
 @pytest.fixture(scope="session")
+def get_cosmo_with_omega_m() -> Callable[..., MockCosmologyWithOmegaM]:
+    """Create a MockCosmologyWithOmegaM instance for any backend."""
+    return MockCosmologyWithOmegaM
+
+
+@pytest.fixture(scope="session")
 def cosmo_with_omega_m(np: ModuleType) -> MockCosmologyWithOmegaM:
     """
     Mock cosmology with OmegaM to use for core tests.
