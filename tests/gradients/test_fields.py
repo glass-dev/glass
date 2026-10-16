@@ -7,18 +7,20 @@ import pytest
 
 pytest.importorskip("jax", reason="tests require jax")
 
-import jax.numpy as jnp
 import jax.test_util
 
 import glass
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import AngularPowerSpectra, AnyArray, FloatArray, UnifiedGenerator
 
 
 @pytest.mark.parametrize("k", [0, 1, 2])
 @pytest.mark.parametrize("test_nd", [False, True])
 def test_iternorm(
+    jnp: ModuleType,
     k: int,
     test_nd: bool,
 ) -> None:
@@ -52,27 +54,33 @@ def test_iternorm(
 
     cov = [cov[..., i, i::-1][..., : min(i, k) + 1] for i in range(cov.shape[-1])]
 
-    def iternorm_no_generator(cov: list[FloatArray]) -> list[FloatArray]:
+    def iternorm_diffable(cov: list[FloatArray]) -> list[FloatArray]:
         return list(glass.iternorm(cov))
 
     jax.test_util.check_grads(
-        iternorm_no_generator,
+        iternorm_diffable,
         (cov,),
         order=1,
     )
 
 
-def test_cls2cov() -> None:
+def test_cls2cov(jnp: ModuleType) -> None:
     """Tests glass.cls2cov is auto differentiable when using JAX."""
-    pytest.skip("glass.cls2cov is not auto differentiable")
 
-    def cls2cov_no_generator(
+    def cls2cov_diffable(
         cls: AngularPowerSpectra,
     ) -> list[FloatArray]:
-        return list(partial(glass.cls2cov, nl=3, nf=3, nc=2)(cls))
+        return list(
+            glass.cls2cov(
+                jnp.asarray(cls),
+                nl=3,
+                nf=3,
+                nc=2,
+            )
+        )
 
     jax.test_util.check_grads(
-        cls2cov_no_generator,
+        cls2cov_diffable,
         (
             [
                 jnp.asarray(arr)
@@ -94,14 +102,13 @@ def test_cls2cov() -> None:
 @pytest.mark.parametrize("ncorr", [None, 0])
 @pytest.mark.parametrize("nside", [None, 4])
 def test_discretized_cls(
+    jnp: ModuleType,
     lmax: int | None,
     ncorr: int | None,
     nside: int | None,
 ) -> None:
     """Tests glass.discretized_cls is auto differentiable when using JAX."""
-    pytest.skip("glass.discretized_cls is not auto differentiable")
-
-    cls = [jnp.arange(10) for i in range(3)]
+    cls = [jnp.arange(10, dtype=jnp.float64) for _ in range(3)]
 
     jax.test_util.check_grads(
         partial(glass.discretized_cls, lmax=lmax, ncorr=ncorr, nside=nside),
@@ -113,6 +120,7 @@ def test_discretized_cls(
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate_grf(
+    jnp: ModuleType,
     ncorr: int | None,
     use_rng: bool,
 ) -> None:
@@ -123,16 +131,13 @@ def test_generate_grf(
 
     def _generate_grf_by_cls(
         gls: AnyArray,
-        # nside: int,
     ) -> list[FloatArray]:
-        # Must supply a fresh JAX RNG so that we generate the same sequence for each
-        # call carried out by jax.test_util.check_grads
-        rng = glass.rng.default_rng(xp=jnp) if use_rng else None
+        fresh_rng = glass.rng.default_rng(xp=jnp) if use_rng else None
         return list(
             glass.fields._generate_grf(
-                gls,
+                jnp.asarray(gls),
                 nside=4,
-                rng=rng,
+                rng=fresh_rng,
                 ncorr=ncorr,
             )
         )
@@ -149,6 +154,7 @@ def test_generate_grf(
 def test_getcl(
     i: int,
     j: int,
+    jnp: ModuleType,
     lmax: int | None,
 ) -> None:
     """Tests glass.getcl is auto differentiable when using JAX."""
@@ -165,36 +171,25 @@ def test_getcl(
     )
 
 
-def test_enumerate_spectra() -> None:
+def test_enumerate_spectra(jnp: ModuleType) -> None:
     """Tests glass.enumerate_spectra is auto differentiable when using JAX."""
-    pytest.skip("glass.enumerate_spectra is not auto differentiable")
-
     n = 100
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra: AngularPowerSpectra = [jnp.asarray(x) for x in range(tn)]
+    spectra: AngularPowerSpectra = [
+        jnp.asarray(x, dtype=jnp.float64) for x in range(tn)
+    ]
 
-    def enumerate_spectra_no_generator(
+    def enumerate_spectra_diffable(
         spectra: AngularPowerSpectra,
-    ) -> list[tuple[int, int, AnyArray]]:
-        return list(glass.enumerate_spectra(spectra))
+    ) -> list[AnyArray]:
+        return [cl for _, _, cl in glass.enumerate_spectra(spectra)]
 
     # iterator that will enumerate the spectra for checking
     jax.test_util.check_grads(
-        enumerate_spectra_no_generator,
+        enumerate_spectra_diffable,
         (spectra,),
-        order=1,
-    )
-
-
-def test_spectra_indices() -> None:
-    """Tests glass.spectra_indices is auto differentiable when using JAX."""
-    pytest.skip("glass.spectra_indices is not auto differentiable")
-
-    jax.test_util.check_grads(
-        partial(glass.spectra_indices, xp=jnp),
-        (3,),
         order=1,
     )
 
@@ -202,6 +197,7 @@ def test_spectra_indices() -> None:
 @pytest.mark.parametrize("use_weights2", [True, False])
 @pytest.mark.parametrize("lmax", [5, None])
 def test_effective_cls(
+    jnp: ModuleType,
     use_weights2: bool,
     lmax: int | None,
 ) -> None:
@@ -217,10 +213,10 @@ def test_effective_cls(
     )
 
 
-def test_compute_gaussian_spectra() -> None:
+def test_compute_gaussian_spectra(jnp: ModuleType) -> None:
     """Tests glass.compute_gaussian_spectra is auto differentiable when using JAX."""
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra: AngularPowerSpectra = [jnp.zeros(10) for _ in range(3)]
+    spectra: AngularPowerSpectra = [jnp.zeros(10, dtype=jnp.float64) for _ in range(3)]
 
     jax.test_util.check_grads(
         partial(glass.compute_gaussian_spectra, fields),
@@ -229,15 +225,25 @@ def test_compute_gaussian_spectra() -> None:
     )
 
 
-def test_solve_gaussian_spectra() -> None:
+def test_solve_gaussian_spectra(jnp: ModuleType) -> None:
     """Tests glass.solve_gaussian_spectra is auto differentiable when using JAX."""
     pytest.skip("glass.solve_gaussian_spectra is not auto differentiable")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra: AngularPowerSpectra = [jnp.zeros(5), jnp.zeros(10), jnp.zeros(15)]
+    spectra: AngularPowerSpectra = [
+        jnp.zeros(n, dtype=jnp.float64) for n in [5, 10, 15]
+    ]
+
+    def solve_gaussian_spectra_diffable(
+        spectra: AngularPowerSpectra,
+    ) -> AngularPowerSpectra:
+        return glass.solve_gaussian_spectra(
+            fields,
+            [jnp.asarray(s) for s in spectra],
+        )
 
     jax.test_util.check_grads(
-        partial(glass.solve_gaussian_spectra, fields),
+        solve_gaussian_spectra_diffable,
         (spectra,),
         order=1,
     )
@@ -246,39 +252,44 @@ def test_solve_gaussian_spectra() -> None:
 @pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
 def test_generate(
+    jnp: ModuleType,
     ncorr: int | None,
     use_rng: bool,
 ) -> None:
     """Tests glass.generate is auto differentiable when using JAX."""
     pytest.skip("glass.generate is not auto differentiable")
 
-    gls: AngularPowerSpectra = [jnp.ones(10), jnp.ones(10), jnp.ones(10)]
+    gls: AngularPowerSpectra = [jnp.ones(10, dtype=jnp.float64) for _ in range(3)]
 
-    def generate_by_gls_no_generator(
+    def generate_diffable(
         gls: AngularPowerSpectra,
     ) -> list[AnyArray]:
         fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
-        # Must supply a fresh JAX RNG so that we generate the same sequence for each
-        # call carried out by jax.test_util.check_grads
-        rng = glass.rng.default_rng(xp=jnp) if use_rng else None
         return list(
-            partial(glass.generate, fields, nside=16, ncorr=ncorr, rng=rng)(gls)
+            glass.generate(
+                fields,
+                [jnp.asarray(gl) for gl in gls],
+                nside=16,
+                ncorr=ncorr,
+                rng=glass.rng.default_rng(xp=jnp) if use_rng else None,
+            )
         )
 
     jax.test_util.check_grads(
-        generate_by_gls_no_generator,
+        generate_diffable,
         (gls,),
         order=1,
     )
 
 
 @pytest.mark.parametrize("lmax", [None, 1])
-def test_cov_from_spectra(lmax: int | None) -> None:
+def test_cov_from_spectra(
+    jnp: ModuleType,
+    lmax: int | None,
+) -> None:
     """Tests glass.cov_from_spectra is auto differentiable when using JAX."""
-    pytest.skip("glass.cov_from_spectra is not auto differentiable")
-
     spectra: AngularPowerSpectra = [
-        jnp.asarray(x)
+        jnp.asarray(x, dtype=jnp.float64)
         for x in [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
@@ -297,11 +308,9 @@ def test_cov_from_spectra(lmax: int | None) -> None:
 
 
 @pytest.mark.parametrize("lmax", [None, 1])
-# @pytest.mark.parametrize("method", ["nearest", "clip"])
 def test_regularized_spectra_nearest(
     rng: UnifiedGenerator,
     lmax: int | None,
-    # method: str,
 ) -> None:
     """Tests glass.regularized_spectra is auto differentiable when using JAX."""
     spectra: AngularPowerSpectra = [rng.random(20) for _ in range(6)]
