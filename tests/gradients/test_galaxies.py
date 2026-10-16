@@ -157,7 +157,8 @@ def test_gaussian_phz_no_bounds(
     """Tests glass.gaussian_phz is auto differentiable when using JAX."""
 
     def gaussian_phz_arrays_only(
-        z: float | FloatArray, sigma_0: int | FloatArray
+        z: float | FloatArray,
+        sigma_0: int | FloatArray,
     ) -> FloatArray:
         # Must supply a fresh JAX RNG so that we generate the same sequence for each
         # call carried out by jax.test_util.check_grads

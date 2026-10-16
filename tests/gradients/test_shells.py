@@ -70,7 +70,7 @@ def test_density_weight(
 
 
 @pytest.mark.filterwarnings(
-    "ignore:first tophat window does not start at redshift zero"
+    "ignore:first tophat window does not start at redshift zero",
 )
 def test_tophat_windows(jnp: ModuleType) -> None:
     """Tests glass.tophat_windows is auto differentiable."""

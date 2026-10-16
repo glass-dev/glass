@@ -176,7 +176,8 @@ def get_shells() -> Callable[..., list[glass.RadialWindow]]:  # noqa: D103
 
 @pytest.fixture(scope="session")
 def shells(  # noqa: D103
-    get_shells: Callable[..., list[glass.RadialWindow]], xp: ModuleType
+    get_shells: Callable[..., list[glass.RadialWindow]],
+    xp: ModuleType,
 ) -> list[glass.RadialWindow]:
     return get_shells(xp)
 

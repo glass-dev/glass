@@ -76,7 +76,7 @@ def test_cls2cov(jnp: ModuleType) -> None:
                 nl=3,
                 nf=3,
                 nc=2,
-            )
+            ),
         )
 
     jax.test_util.check_grads(
@@ -139,7 +139,7 @@ def test_generate_grf(
                 nside=4,
                 rng=fresh_rng,
                 ncorr=ncorr,
-            )
+            ),
         )
 
     jax.test_util.check_grads(
@@ -266,7 +266,7 @@ def test_generate(
                 nside=16,
                 ncorr=ncorr,
                 rng=glass.rng.default_rng(xp=jnp) if use_rng else None,
-            )
+            ),
         )
 
     jax.test_util.check_grads(
