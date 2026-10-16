@@ -159,13 +159,13 @@ run = { branch = true, parallel = true, source = [
 [tool.hatch]
 build.hooks.vcs.version-file = "glass/_version.py"
 build.targets.sdist.exclude = [
-    "/*.txt",
     ".*",
+    "/*.txt",
+    "/matplotlibrc",
+    "/noxfile.py",
     "benchmarks/*",
     "docs/*",
     "examples/*",
-    "/matplotlibrc",
-    "/noxfile.py",
     "tests/*",
 ]
 version.source = "vcs"
