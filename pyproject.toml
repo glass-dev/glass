@@ -12,18 +12,11 @@ benchmarks = [
     "cosmology-api",
     "cosmology-compat-camb",
     "glass-ext-camb",
-    "jax==0.4.35; python_version < '3.13'",
-    "jax>=0.6.2; python_version >= '3.13'",
+    "jax>=0.6.2",
     "matplotlib",
-    "numpy<2.4",
 ]
 benchmarks-cuda13 = [
     "jax[cuda13]; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
-    { include-group = "benchmarks" },
-]
-benchmarks-rocm6 = [
-    "jax-rocm60-pjrt==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
-    "jax-rocm60-plugin==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version < '3.13'",
     { include-group = "benchmarks" },
 ]
 benchmarks-rocm7 = [
@@ -160,9 +153,12 @@ run = { branch = true, parallel = true, source = [
 build.hooks.vcs.version-file = "glass/_version.py"
 build.targets.sdist.exclude = [
     ".*",
+    "/*.txt",
+    "/matplotlibrc",
+    "/noxfile.py",
+    "benchmarks/*",
     "docs/*",
     "examples/*",
-    "noxfile.py",
     "tests/*",
 ]
 version.source = "vcs"
@@ -221,6 +217,7 @@ lint.ignore = [
     "RUF003", # ambiguous-unicode-character-comment
 ]
 lint.isort = { known-first-party = [
+    "benchmarks",
     "glass",
     "tests",
 ], known-third-party = [
@@ -325,6 +322,12 @@ include = [
     "tests/core/**",
 ]
 rules.unsupported-operator = "ignore"
+
+[[tool.ty.overrides]]
+include = [
+    "benchmarks/**",
+]
+rules.unresolved-import = "ignore"
 
 [[tool.ty.overrides]]
 include = [

@@ -162,7 +162,7 @@ class CosmologyWrapper:
         if z2 is not None:
             z2 = self.cosmo_xp.asarray(z2)
         return self.xp.asarray(
-            self.cosmo.xm(  # ty:ignore[unresolved-attribute]
+            self.cosmo.xm(  # ty: ignore[unresolved-attribute]
                 self.cosmo_xp.asarray(z),
                 z2,
             ),
@@ -170,7 +170,11 @@ class CosmologyWrapper:
 
     def rho_m_z(self, z: FloatArray) -> FloatArray:
         """Redshift-dependent matter density in Msol Mpc-3."""
-        return self.xp.asarray(self.cosmo.rho_m_z(self.cosmo_xp.asarray(z)))  # ty:ignore[unresolved-attribute]
+        return self.xp.asarray(
+            self.cosmo.rho_m_z(  # ty: ignore[unresolved-attribute]
+                self.cosmo_xp.asarray(z),
+            ),
+        )
 
     def comoving_distance(
         self,
@@ -183,12 +187,18 @@ class CosmologyWrapper:
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
         return self.xp.asarray(
-            self.cosmo.inv_comoving_distance(self.cosmo_xp.asarray(dc)),  # ty:ignore[unresolved-attribute]
+            self.cosmo.inv_comoving_distance(  # ty: ignore[unresolved-attribute]
+                self.cosmo_xp.asarray(dc),
+            ),
         )
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""
-        return self.xp.asarray(self.cosmo.Omega_m(self.cosmo_xp.asarray(z)))  # ty:ignore[unresolved-attribute]
+        return self.xp.asarray(
+            self.cosmo.Omega_m(  # ty: ignore[unresolved-attribute]
+                self.cosmo_xp.asarray(z),
+            ),
+        )
 
     def transverse_comoving_distance(
         self,
