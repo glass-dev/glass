@@ -129,12 +129,12 @@ def test_multi_plane_weights(
         ), {}
 
     def multi_plane_weights_add_window(
-        convergence: glass.MultiPlaneConvergence,
-        zipped: zip[tuple[glass.RadialWindow, FloatArray, FloatArray]],
-    ) -> glass.MultiPlaneConvergence:
+        convergence: type[glass.MultiPlaneConvergence],
+        zipped: tuple[list[type[glass.RadialWindow]], FloatArray, FloatArray],
+    ) -> type[glass.MultiPlaneConvergence]:
         """Call add_window repeatedly, to be benchmarked."""
         for shell, delta, _ in zipped:
-            convergence.add_window(delta, shell)
+            convergence.add_window(delta, shell)  # ty: ignore[missing-argument]
         return convergence
 
     actual_convergence = benchmark.pedantic(
