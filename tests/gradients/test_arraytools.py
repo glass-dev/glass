@@ -90,19 +90,23 @@ def test_ndinterp(
 
 def test_trapezoid_product() -> None:
     """Tests glass.arraytools.trapezoid_product is auto differentiable."""
-    pytest.skip(
-        "glass.arraytools.trapezoid_product is not auto differentiable when period is"
-        "specified"
-    )
-
     x1 = jnp.linspace(0, 2, 100)
     f1 = jnp.full_like(x1, 2.0)
     x2 = jnp.linspace(1, 2, 10)
     f2 = jnp.full_like(x2, 0.5)
 
+    def trapezoid_product_diffable(
+        f1: FloatArray,
+        f2: FloatArray,
+    ) -> float | FloatArray:
+        return glass.arraytools.trapezoid_product(
+            (x1, jnp.asarray(f1)),
+            (x2, jnp.asarray(f2)),
+        )
+
     jax.test_util.check_grads(
-        glass.arraytools.trapezoid_product,
-        ((x1, f1), (x2, f2)),
+        trapezoid_product_diffable,
+        (f1, f2),
         order=1,
     )
 
