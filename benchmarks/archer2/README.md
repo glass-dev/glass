@@ -30,11 +30,13 @@ uv sync --group benchmarks
 
 ### GPU prerequisites
 
-For the GPU benchmark, there is an additional dependency group
-`benchmarks-rocm6` which includes `benchmarks`:
+For the GPU benchmark, we must install additional dependencies. Since we are
+limited to ROCm v6 we must downgrade our JAX dependency and install some
+additional packages:
 
 ```sh
-uv sync --group benchmarks-rocm6
+uv sync --group benchmarks
+uv pip install jax==0.4.35 jax-rocm60-pjrt==0.4.35 jax-rocm60-plugin==0.4.35
 ```
 
 Once your python environment is setup you must load the relevant modules via the
