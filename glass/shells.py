@@ -53,7 +53,6 @@ __lazy_modules__ = [
 
 import dataclasses
 import itertools
-import math
 import typing
 import warnings
 from typing import TYPE_CHECKING
@@ -227,7 +226,8 @@ class RadialWindow:
 
     za: FloatArray
     wa: FloatArray
-    zeff: FloatArray | float = math.nan
+    xp: ModuleType = dataclasses.field(init=False)
+    zeff: FloatArray
 
     def __array_namespace__(self, **kwargs: str | None) -> ModuleType:
         """
@@ -244,16 +244,26 @@ class RadialWindow:
         """
         return array_api_compat.array_namespace(self.za, self.wa, use_compat=False)
 
-    def __post_init__(self) -> None:
+    def __init__(
+        self,
+        za: FloatArray,
+        wa: FloatArray,
+        zeff: FloatArray | None = None,
+    ) -> None:
         """
         Magic method to setup optional inputs
         - Calculates the effective redshift if not given.
         - Determines xp from za and wa.
 
         """
-        xp = self.__array_namespace__()
-        if xp.isnan(xp.asarray(self.zeff)):
-            object.__setattr__(self, "zeff", self._calculate_zeff())
+        object.__setattr__(self, "za", za)
+        object.__setattr__(self, "wa", wa)
+        object.__setattr__(self, "xp", self.__array_namespace__())
+        object.__setattr__(
+            self,
+            "zeff",
+            self._calculate_zeff() if zeff is None else self.xp.asarray(zeff),
+        )
 
     def __iter__(self) -> Iterator[FloatArray]:
         """
@@ -262,7 +272,7 @@ class RadialWindow:
         To be removed upon deprecation of ``glass.ext.camb``.
 
         """
-        yield from (self.za, self.wa, self.zeff)  # ty: ignore[invalid-yield]
+        yield from (self.za, self.wa, self.zeff)
 
     def _calculate_zeff(self) -> FloatArray:
         """
@@ -278,8 +288,7 @@ class RadialWindow:
                 self.za * self.wa,
                 self.za,
             ) / uxpx.trapezoid(self.wa, self.za)
-        xp = self.__array_namespace__()
-        return xp.nan
+        return self.xp.nan
 
 
 def tophat_windows(

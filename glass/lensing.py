@@ -380,9 +380,9 @@ class MultiPlaneConvergence:
         # set up initial values of variables
         self.z2: float | FloatArray = 0.0
         self.z3: float | FloatArray = 0.0
-        self.x3: float = 0.0
-        self.w3: float = 0.0
-        self.r23: float = 1.0
+        self.x3: float | FloatArray = 0.0
+        self.w3: float | FloatArray = 0.0
+        self.r23: float | FloatArray = 1.0
         self.delta3: FloatArray | None = None
         self.kappa2: FloatArray | None = None
         self.kappa3: FloatArray | None = None
@@ -446,7 +446,7 @@ class MultiPlaneConvergence:
         self,
         delta: FloatArray,
         zsrc: float | FloatArray,
-        wlens: float = 1.0,
+        wlens: float | FloatArray = 1.0,
     ) -> None:
         """
         Add a mass plane at redshift ``zsrc`` to the convergence.
@@ -535,7 +535,7 @@ class MultiPlaneConvergence:
         return self.delta3
 
     @property
-    def wlens(self) -> float:
+    def wlens(self) -> float | FloatArray:
         """The weight of the current matter plane."""
         return self.w3
 

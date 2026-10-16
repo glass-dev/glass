@@ -481,7 +481,7 @@ def test_distribute(
     """Test distribution of redshifts over shells."""
     # well-defined shells have non-overlapping effective redshifts
     # so pick those as redshifts to sample to get a sure draw
-    redshifts = xp.asarray([shell.zeff for shell in shells])
+    redshifts = xp.stack([shell.zeff for shell in shells])
 
     # each redshift should land in its own shell
     index = glass.distribute(redshifts, shells, rng=urng)
