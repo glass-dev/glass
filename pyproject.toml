@@ -317,6 +317,7 @@ trailing_comma_inline_array = true
 analysis.respect-type-ignore-comments = false
 rules = { all = "error", invalid-argument-type = "ignore" }
 src.include = [
+    "benchmarks",
     "glass",
     "tests",
 ]

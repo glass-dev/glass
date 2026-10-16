@@ -63,7 +63,14 @@ def benchmark(xp: ModuleType) -> None:
     shells_np = glass.linear_windows(np.asarray(zb))
 
     # compute the angular matter power spectra of the shells with CAMB
-    cls = [xp.asarray(cl) for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)]
+    cls = [
+        xp.asarray(cl)
+        for cl in glass.ext.camb.matter_cls(  # ty: ignore[unresolved-attribute]
+            pars,
+            lmax,
+            shells_np,
+        )
+    ]
 
     # apply discretisation to the full set of spectra:
     # - HEALPix pixel window function (`nside=nside`)
@@ -100,9 +107,9 @@ def benchmark(xp: ModuleType) -> None:
             convergence.add_window(delta_i, shells[i])
 
             # compute shear field
-            glass.from_convergence(convergence.kappa, shear=True)
+            glass.from_convergence(convergence.kappa, shear=True)  # ty: ignore[no-matching-overload]
 
-        return convergence.kappa
+        return convergence.kappa  # ty: ignore[invalid-return-type]
 
     # Run benchmark passing convergence and matter
     run_benchmark(

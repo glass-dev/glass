@@ -76,7 +76,7 @@ def main() -> None:
                 benchmarks_dir / f"{benchmark_name}.py",
             )
             benchmark_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(benchmark_module)
+            spec.loader.exec_module(benchmark_module)  # ty: ignore[unresolved-attribute]
 
             benchmark_module.benchmark(xp)
 
