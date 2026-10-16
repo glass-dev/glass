@@ -173,7 +173,7 @@ def test_linear_windows(xp: ModuleType) -> None:
 
     # check values of zeff
 
-    xpx.testing.assert_equal(xp.asarray([w.zeff for w in ws]), zgrid[1:-1])
+    xpx.testing.assert_equal(xp.stack([w.zeff for w in ws]), zgrid[1:-1])
 
     # check weight function input
 
@@ -287,9 +287,6 @@ def test_partition(
     xp: ModuleType,
 ) -> None:
     """Add unit tests for :func:`glass.partition`."""
-    if (xp.__name__ == "jax.numpy") and (method == "nnls"):
-        pytest.skip(f"Arrays in {method} are not immutable, so do not support jax")
-
     z = xp.linspace(0.0, 5.0, 1_000)
     k = 1.0 + xp.reshape(xp.arange(6.0), (3, 2, 1))
     fz = xp.exp(-z / k)

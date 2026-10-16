@@ -438,7 +438,7 @@ class MultiPlaneConvergence:
         self._initialise_inputs(delta)
 
         zsrc = w.zeff
-        lens_weight = float(uxpx.trapezoid(w.wa, w.za) / uxpx.interp(zsrc, w.za, w.wa))
+        lens_weight = uxpx.trapezoid(w.wa, w.za) / uxpx.interp(zsrc, w.za, w.wa)
 
         self.add_plane(delta, zsrc, lens_weight)
 

@@ -227,7 +227,7 @@ class RadialWindow:
 
     za: FloatArray
     wa: FloatArray
-    zeff: float = math.nan
+    zeff: FloatArray | float = math.nan
 
     def __array_namespace__(self, **kwargs: str | None) -> ModuleType:
         """
@@ -251,7 +251,8 @@ class RadialWindow:
         - Determines xp from za and wa.
 
         """
-        if math.isnan(self.zeff):
+        xp = self.__array_namespace__()
+        if xp.isnan(xp.asarray(self.zeff)):
             object.__setattr__(self, "zeff", self._calculate_zeff())
 
     def __iter__(self) -> Iterator[FloatArray]:
@@ -263,7 +264,7 @@ class RadialWindow:
         """
         yield from (self.za, self.wa, self.zeff)  # ty: ignore[invalid-yield]
 
-    def _calculate_zeff(self) -> float:
+    def _calculate_zeff(self) -> FloatArray:
         """
         Calculate ``zeff`` if not given.
 
@@ -273,14 +274,12 @@ class RadialWindow:
 
         """
         if self.za.shape[0] > 0:
-            return float(
-                uxpx.trapezoid(
-                    self.za * self.wa,
-                    self.za,
-                )
-                / uxpx.trapezoid(self.wa, self.za),
-            )
-        return math.nan
+            return uxpx.trapezoid(
+                self.za * self.wa,
+                self.za,
+            ) / uxpx.trapezoid(self.wa, self.za)
+        xp = self.__array_namespace__()
+        return xp.nan
 
 
 def tophat_windows(
@@ -347,7 +346,7 @@ def tophat_windows(
         z = xp.linspace(zmin, zmax, n, dtype=xp.float64)
         w = wht(z)
         zeff = uxpx.trapezoid(w * z, z) / uxpx.trapezoid(w, z)
-        ws.append(RadialWindow(z, w, float(zeff)))
+        ws.append(RadialWindow(z, w, zeff))
     return ws
 
 
@@ -416,7 +415,7 @@ def linear_windows(
         )
         if weight is not None:
             w *= weight(z)
-        ws.append(RadialWindow(z, w, float(zmid)))
+        ws.append(RadialWindow(z, w, zmid))
     return ws
 
 
