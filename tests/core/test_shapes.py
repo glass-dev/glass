@@ -252,6 +252,18 @@ def test_ellipticity_intnorm(
         glass.ellipticity_intnorm(1, 0.71, xp=xp)
 
 
+@pytest.fixture
+def epsilon(
+    urng: UnifiedGenerator,
+    xp: ModuleType,
+) -> ComplexArray:
+    """Generate uniform random epsilon ellipticities."""
+    n = 1_000_000
+    r = xp.sqrt(urng.uniform(0.0, 1.0, n))
+    phi = urng.uniform(0.0, 2 * xp.pi, n)
+    return r * xp.exp(1j * phi)
+
+
 def test_resample_shapes(
     epsilon: ComplexArray,
     urng: UnifiedGenerator,
