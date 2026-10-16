@@ -224,6 +224,7 @@ lint.ignore = [
     "RUF003", # ambiguous-unicode-character-comment
 ]
 lint.isort = { known-first-party = [
+    "benchmarks",
     "glass",
     "tests",
 ], known-third-party = [
