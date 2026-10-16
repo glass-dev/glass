@@ -145,6 +145,12 @@ are a few aspects of a function which automatically cause it to fail the
   the auto-differentiability. The solution here is to define a fresh `rng`
   instance within a function that wraps the function under test and pass this
   wrapping function into `array_api_compat.array_namespace`.
+- **Exact input value of 0.0:** If 0.0 is used as an element of an input array,
+  there is a high chance that the arithmetic operation will result in a returned
+  value of exactly 0.0. It is then very unlikely that
+  `jax.text_util.check_grads` will be able to recover this exact 0.0 value after
+  perturbing the input. The solution is to use a value close to but not exactly
+  0.0.
 
 ## Documenting
 
