@@ -24,26 +24,25 @@ def test_effective_bias(
     mocker: MockerFixture,
 ) -> None:
     """Tests glass.effective_bias is auto differentiable."""
-    pytest.skip("glass.effective_bias is not auto differentiable")
-
     w = mocker.Mock()
-    w.za = jnp.linspace(0, 2, 100)
-    w.wa = jnp.full_like(w.za, 2.0)
+    w.za = jnp.linspace(0, 2, 100, dtype=jnp.float64)
+    w.wa = jnp.full_like(w.za, 2.0, dtype=jnp.float64)
 
-    z = jnp.linspace(0, 1, 10)
-    bz = jnp.full_like(z, 0.5)
+    z = jnp.linspace(0, 1, 10, dtype=jnp.float64)
+    bz = jnp.full_like(z, 0.5, dtype=jnp.float64)
 
-    def effective_bias_by_z_and_bz(
-        z: FloatArray,
+    def effective_bias_diffable(
         bz: FloatArray,
-    ) -> FloatArray:
-        z = jnp.asarray(z)
-        bz = jnp.asarray(bz)
-        return glass.effective_bias(z, bz, w)
+    ) -> float | FloatArray:
+        return glass.effective_bias(
+            z,
+            jnp.asarray(bz),
+            w,
+        )
 
     jax.test_util.check_grads(
-        effective_bias_by_z_and_bz,
-        (z, bz),
+        effective_bias_diffable,
+        (bz,),
         order=1,
     )
 
