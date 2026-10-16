@@ -145,7 +145,7 @@ def test_generate_grf(  # noqa: PLR0913,PLR0917
     generator_consumer: type[GeneratorConsumer],
     ncorr: int | None,
     urng: UnifiedGenerator,
-    use_rng: bool,  # noqa: FBT001
+    use_rng: bool,
     xp: ModuleType,
 ) -> None:
     """Regression tests of glass.fields._generate_grf with positional arguments only."""
