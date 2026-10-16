@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import TYPE_CHECKING
 
 import jax.test_util
@@ -10,6 +9,8 @@ import glass
 
 if TYPE_CHECKING:
     from types import ModuleType
+
+    from glass._types import ComplexArray, FloatArray
 
 
 def test_multalm(jnp: ModuleType) -> None:
@@ -36,15 +37,20 @@ def test_inverse_transform(
     lmax = 2
     nside = 1
 
-    jax.test_util.check_grads(
-        partial(
-            glass.harmonics.inverse_transform,
+    def inverse_transform_diffable(
+        alm: ComplexArray,
+    ) -> FloatArray | ComplexArray:
+        return glass.harmonics.inverse_transform(
+            jnp.asarray(alm),
             lmax=lmax,
             nside=nside,
             pixwin=pixwin,
             pol=pol,
             spin=spin,
-        ),
+        )
+
+    jax.test_util.check_grads(
+        inverse_transform_diffable,
         (alm,),
         order=1,
     )
@@ -63,13 +69,18 @@ def test_transform(
     maps = jnp.asarray([1.0] * 12)
     lmax = 2
 
-    jax.test_util.check_grads(
-        partial(
-            glass.harmonics.transform,
+    def transform_diffable(
+        maps: FloatArray,
+    ) -> ComplexArray:
+        return glass.harmonics.transform(
+            jnp.asarray(maps),
             lmax=lmax,
             pol=pol,
             use_pixel_weights=use_pixel_weights,
-        ),
+        )
+
+    jax.test_util.check_grads(
+        transform_diffable,
         (maps,),
         order=1,
     )
