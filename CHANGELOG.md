@@ -4,29 +4,44 @@
 
 All functional changes to the project are documented in this file.
 
+## [2026.5] (16 Oct 2026)
+
+- gh-1211: Remove `deflect` function (#1216)
+- gh-1210: Remove `shear_from_convergence` function (#1217)
+- gh-1209: Remove `generate_lognormal` function (#1215)
+- gh-1208: Remove `generate_gaussian` function (#1213)
+- gh-1207: Remove `lognormal_gls` function (#1212)
+- gh-1203: Bump `array-api-extra` to `v0.11.1` (#1204)
+- gh-1088: Add realistic benchmark tests (#1098)
+- gh-1003: Documenting how to run with JAX CUDA (#1231)
+- gh-981: Remove `inplace` calls from `glass.healpix` (#1220)
+- gh-930: Make the regressions pass if func is missing on `main` (#1180)
+- gh-893: Add docstring to explain difference for `cls2cov` (#1227)
+- gh-794: Create wrapper for harmonic transforms (#1242)
+
 ## [2026.4] (16 Sep 2026)
 
 See [2026.3].
 
 ## [2026.3] (31 Jul 2026)
 
-- gh-1172: Allow regression tests to be run from forks (1176)
-- gh-1122: Document cprofile (1175)
-- gh-1145: Default to wrapping rng if backend is not known (1169)
-- gh-1165: fix `dataclass` docstrings in `shells.py` (1166)
-- gh-1157: Add `CosmologyWithInverseComovingDistance` protocol (1164)
-- gh-1158: Add `CosmologyWithGrowthFactor` protocol (1163)
-- gh-1159: Add `CosmologyWithOmegaM` protocol (1162)
-- gh-1140: Create public `default_rng` function (1161)
-- gh-1155: Pin `array-api-strict` for `2025.12` version (1156)
-- gh-1153: Add temporary fix for NumPy in examples (1154)
-- gh-1116: add resample_shapes() (1143)
-- gh-1111: add redshifts_from_bins() (1138)
-- gh-1027: Use the official `astral` hook for `ty` (1133)
-- gh-1117: Ensure explicit shapes in `jax.random` (1126)
-- gh-1124: Allow running glass offline (1125)
-- gh-1112: distribute redshifts over shells (1114)
-- gh-1087: Rename benchmarks dir to regression (1092)
+- gh-1172: Allow regression tests to be run from forks (#1176)
+- gh-1122: Document cprofile (#1175)
+- gh-1145: Default to wrapping rng if backend is not known (#1169)
+- gh-1165: fix `dataclass` docstrings in `shells.py` (#1166)
+- gh-1157: Add `CosmologyWithInverseComovingDistance` protocol (#1164)
+- gh-1158: Add `CosmologyWithGrowthFactor` protocol (#1163)
+- gh-1159: Add `CosmologyWithOmegaM` protocol (#1162)
+- gh-1140: Create public `default_rng` function (#1161)
+- gh-1155: Pin `array-api-strict` for `2025.12` version (#1156)
+- gh-1153: Add temporary fix for NumPy in examples (#1154)
+- gh-1116: add resample_shapes() (#1143)
+- gh-1111: add redshifts_from_bins() (#1138)
+- gh-1027: Use the official `astral` hook for `ty` (#1133)
+- gh-1117: Ensure explicit shapes in `jax.random` (#1126)
+- gh-1124: Allow running glass offline (#1125)
+- gh-1112: distribute redshifts over shells (#1114)
+- gh-1087: Rename benchmarks dir to regression (#1092)
 
 ## [2026.2] (4 Jun 2026)
 
@@ -47,7 +62,7 @@ See [2026.3].
 - gh-977: Actually test deprecated fields.py functions (#1033)
 - gh-977: Port remaining functions in `fields.py` (#979)
 - gh-903: Port galaxies.py to support jax (#919)
-- gh-1002: Add a section to the contributing guidelines on regression (1019)
+- gh-1002: Add a section to the contributing guidelines on regression (#1019)
 - gh-996: Fix bug in `apply_along_axis` (#997)
 - gh-969: determine `xp` when function called in XPAdditions (#994)
 - gh-990: fix `vmap_galactic_ecliptic` porting (#991)
@@ -287,6 +302,7 @@ See [2026.3].
 
 - Initial wide release for GLASS paper
 
+[2026.5]: https://github.com/glass-dev/glass/compare/v2026.4...v2026.5
 [2026.4]: https://github.com/glass-dev/glass/compare/v2026.3...v2026.4
 [2026.3]: https://github.com/glass-dev/glass/compare/v2026.2...v2026.3
 [2026.2]: https://github.com/glass-dev/glass/compare/v2026.1...v2026.2
