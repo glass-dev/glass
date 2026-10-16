@@ -4,6 +4,21 @@
 
 All functional changes to the project are documented in this file.
 
+## [2026.5] (16 Oct 2026)
+
+- gh-1211: Remove `deflect` function (#1216)
+- gh-1210: Remove `shear_from_convergence` function (#1217)
+- gh-1209: Remove `generate_lognormal` function (#1215)
+- gh-1208: Remove `generate_gaussian` function (#1213)
+- gh-1207: Remove `lognormal_gls` function (#1212)
+- gh-1203: Bump `array-api-extra` to `v0.11.1` (#1204)
+- gh-1088: Add realistic benchmark tests (#1098)
+- gh-1003: Documenting how to run with JAX CUDA (#1231)
+- gh-981: Remove `inplace` calls from `glass.healpix` (#1220)
+- gh-930: Make the regressions pass if func is missing on `main` (#1180)
+- gh-893: Add docstring to explain difference for `cls2cov` (#1227)
+- gh-794: Create wrapper for harmonic transforms (#1242)
+
 ## [2026.4] (16 Sep 2026)
 
 See [2026.3].
@@ -287,6 +302,7 @@ See [2026.3].
 
 - Initial wide release for GLASS paper
 
+[2026.5]: https://github.com/glass-dev/glass/compare/v2026.4...v2026.5
 [2026.4]: https://github.com/glass-dev/glass/compare/v2026.3...v2026.4
 [2026.3]: https://github.com/glass-dev/glass/compare/v2026.2...v2026.3
 [2026.2]: https://github.com/glass-dev/glass/compare/v2026.1...v2026.2
