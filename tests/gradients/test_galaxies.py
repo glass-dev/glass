@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import TYPE_CHECKING
 
 import pytest
@@ -19,7 +18,10 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.parametrize("count", [[10], [20, 2]])
-def test_draw_nz(count: list[int], jnp: ModuleType) -> None:
+def test_draw_nz(
+    count: list[int],
+    jnp: ModuleType,
+) -> None:
     """Tests glass.galaxies._draw_nz is auto differentiable when using JAX."""
     z = jnp.asarray([0.0, 1.0, 2.0, 3.0, 4.0])
     nz = jnp.asarray([5.0, 6.0, 7.0, 8.0, 9.0])
@@ -42,7 +44,7 @@ def test_draw_nz(count: list[int], jnp: ModuleType) -> None:
     )
 
 
-def test_redshifts_from_bins() -> None:
+def test_redshifts_from_bins(jnp: ModuleType) -> None:
     """Tests glass.redshifts_from_bins is auto differentiable when using JAX."""
     z = jnp.asarray([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
 
@@ -70,7 +72,10 @@ def test_redshifts_from_bins() -> None:
 
 
 @pytest.mark.parametrize("count", [[10], [10, 20, 30]])
-def test_redshifts_from_nz(count: list[int]) -> None:
+def test_redshifts_from_nz(
+    count: list[int],
+    jnp: ModuleType,
+) -> None:
     """Tests glass.redshifts_from_nz is auto differentiable when using JAX."""
     z = jnp.asarray([0, 1, 2, 3, 4], dtype=jnp.float64)
     nz = jnp.asarray([1, 0, 0, 0, 0], dtype=jnp.float64)
@@ -92,7 +97,11 @@ def test_redshifts_from_nz(count: list[int]) -> None:
 
 
 @pytest.mark.parametrize("reduced_shear", [True, False])
-def test_galaxy_shear(rng: UnifiedGenerator, reduced_shear: bool) -> None:
+def test_galaxy_shear(
+    jnp: ModuleType,
+    rng: UnifiedGenerator,
+    reduced_shear: bool,
+) -> None:
     """Tests glass.galaxy_shear is auto differentiable when using JAX."""
     pytest.skip("glass.galaxy_shear is not auto differentiable")
 
@@ -103,8 +112,26 @@ def test_galaxy_shear(rng: UnifiedGenerator, reduced_shear: bool) -> None:
     gal_lat = rng.normal(size=(512,))
     gal_eps = rng.normal(size=(512,))
 
+    def galaxy_shear_diffable(  # noqa: PLR0913,PLR0917
+        lon: FloatArray,
+        lat: FloatArray,
+        eps: FloatArray,
+        kappa: FloatArray,
+        gamma1: FloatArray,
+        gamma2: FloatArray,
+    ) -> FloatArray:
+        return glass.galaxy_shear(
+            jnp.asarray(lon),
+            jnp.asarray(lat),
+            jnp.asarray(eps),
+            jnp.asarray(kappa),
+            jnp.asarray(gamma1),
+            jnp.asarray(gamma2),
+            reduced_shear=reduced_shear,
+        )
+
     jax.test_util.check_grads(
-        partial(glass.galaxy_shear, reduced_shear=reduced_shear),
+        galaxy_shear_diffable,
         (gal_lon, gal_lat, gal_eps, kappa, gamma1, gamma2),
         order=1,
     )
@@ -121,6 +148,7 @@ def test_galaxy_shear(rng: UnifiedGenerator, reduced_shear: bool) -> None:
 @pytest.mark.parametrize("lower", [0.0, None])
 @pytest.mark.parametrize("upper", [1.0, None])
 def test_gaussian_phz_no_bounds(
+    jnp: ModuleType,
     lower: float | None,
     sigma_0: float | FloatArray,
     upper: float | None,
