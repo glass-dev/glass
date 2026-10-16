@@ -108,7 +108,7 @@ def test_discretized_cls(
     nside: int | None,
 ) -> None:
     """Tests glass.discretized_cls is auto differentiable when using JAX."""
-    cls = [jnp.arange(10, dtype=jnp.float64) for _ in range(3)]
+    cls = [jnp.arange(10) for _ in range(3)]
 
     jax.test_util.check_grads(
         partial(glass.discretized_cls, lmax=lmax, ncorr=ncorr, nside=nside),
@@ -159,9 +159,7 @@ def test_getcl(
 ) -> None:
     """Tests glass.getcl is auto differentiable when using JAX."""
     cls: AngularPowerSpectra = [
-        jnp.asarray([i, j], dtype=jnp.float64)
-        for i in range(10)
-        for j in range(i, -1, -1)
+        jnp.asarray([i, j]) for i in range(10) for j in range(i, -1, -1)
     ]
 
     jax.test_util.check_grads(
@@ -177,9 +175,7 @@ def test_enumerate_spectra(jnp: ModuleType) -> None:
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra: AngularPowerSpectra = [
-        jnp.asarray(x, dtype=jnp.float64) for x in range(tn)
-    ]
+    spectra: AngularPowerSpectra = [jnp.asarray(x) for x in range(tn)]
 
     def enumerate_spectra_diffable(
         spectra: AngularPowerSpectra,
@@ -216,7 +212,7 @@ def test_effective_cls(
 def test_compute_gaussian_spectra(jnp: ModuleType) -> None:
     """Tests glass.compute_gaussian_spectra is auto differentiable when using JAX."""
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra: AngularPowerSpectra = [jnp.zeros(10, dtype=jnp.float64) for _ in range(3)]
+    spectra: AngularPowerSpectra = [jnp.zeros(10) for _ in range(3)]
 
     jax.test_util.check_grads(
         partial(glass.compute_gaussian_spectra, fields),
@@ -230,9 +226,7 @@ def test_solve_gaussian_spectra(jnp: ModuleType) -> None:
     pytest.skip("glass.solve_gaussian_spectra is not auto differentiable")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra: AngularPowerSpectra = [
-        jnp.zeros(n, dtype=jnp.float64) for n in [5, 10, 15]
-    ]
+    spectra: AngularPowerSpectra = [jnp.zeros(n) for n in [5, 10, 15]]
 
     def solve_gaussian_spectra_diffable(
         spectra: AngularPowerSpectra,
@@ -259,7 +253,7 @@ def test_generate(
     """Tests glass.generate is auto differentiable when using JAX."""
     pytest.skip("glass.generate is not auto differentiable")
 
-    gls: AngularPowerSpectra = [jnp.ones(10, dtype=jnp.float64) for _ in range(3)]
+    gls: AngularPowerSpectra = [jnp.ones(10) for _ in range(3)]
 
     def generate_diffable(
         gls: AngularPowerSpectra,
@@ -289,7 +283,7 @@ def test_cov_from_spectra(
 ) -> None:
     """Tests glass.cov_from_spectra is auto differentiable when using JAX."""
     spectra: AngularPowerSpectra = [
-        jnp.asarray(x, dtype=jnp.float64)
+        jnp.asarray(x)
         for x in [
             [110, 111, 112, 113],
             [220, 221, 222, 223],
