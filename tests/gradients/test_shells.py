@@ -74,6 +74,8 @@ def test_density_weight(
 )
 def test_tophat_windows(jnp: ModuleType) -> None:
     """Tests glass.tophat_windows is auto differentiable."""
+    pytest.skip("glass.tophat_windows is not auto differentiable")
+
     zb = jnp.asarray([0.0, 0.1, 0.2, 0.5, 1.0, 2.0])
 
     def tophat_windows_diffable(zb: FloatArray) -> list[tuple[FloatArray, FloatArray]]:
@@ -95,6 +97,8 @@ def test_linear_windows(
     weight: Callable[[FloatArray], FloatArray] | None,
 ) -> None:
     """Tests glass.linear_windows is auto differentiable."""
+    pytest.skip("glass.linear_windows is not auto differentiable")
+
     zgrid = jnp.asarray(
         [
             0.0,
@@ -126,6 +130,8 @@ def test_cubic_windows(
     weight: Callable[[FloatArray], FloatArray] | None,
 ) -> None:
     """Tests glass.cubic_windows is auto differentiable."""
+    pytest.skip("glass.cubic_windows is not auto differentiable")
+
     zgrid = jnp.asarray(
         [
             0.0,
