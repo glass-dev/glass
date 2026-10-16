@@ -26,13 +26,13 @@ jobs:
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: false
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Set build version for TestPyPI
         if: github.event_name == 'workflow_dispatch'
         run: |-
           uv sync --only-dev
-          VERSION=$(uv run hatchling version | cut -d+ -f1)
+          VERSION=$(uv run --no-sync hatchling version | cut -d+ -f1)
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       # yamllint disable-line rule:line-length

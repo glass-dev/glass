@@ -30,12 +30,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - "3.11"
           - "3.12"
           - "3.13"
           - "3.14"
+          - "3.15"
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -81,7 +83,7 @@ jobs:
 
       - name: Generate XML report for core tests
         run: >-
-          uv run coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
+          uv run --no-sync coverage xml --data-file ${{env.CORE_COV_NAME }}-${{
           matrix.python-version }} -o ${{ env.CORE_COV_NAME }}-${{
           matrix.python-version }}.xml
 
@@ -119,7 +121,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Cache nox
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
@@ -140,8 +142,8 @@ jobs:
 
       - name: Generate XML report for JAX gradients tests
         run: >-
-          uv run coverage xml --data-file ${{env.GRAD_COV_NAME }} -o ${{
-          env.GRAD_COV_NAME }}.xml
+          uv run --no-sync coverage xml --data-file ${{env.GRAD_COV_NAME }} -o
+          ${{ env.GRAD_COV_NAME }}.xml
 
       - name: Upload JAX gradients coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -169,7 +171,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Cache nox
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
@@ -197,8 +199,8 @@ jobs:
 
       - name: Generate XML report for regression tests
         run: >-
-          uv run coverage xml --data-file ${{ env.REG_COV_NAME }} -o ${{
-          env.REG_COV_NAME }}.xml
+          uv run --no-sync coverage xml --data-file ${{ env.REG_COV_NAME }} -o
+          ${{ env.REG_COV_NAME }}.xml
 
       - name: Upload regression coverage to Coveralls
         # yamllint disable-line rule:line-length
@@ -224,8 +226,9 @@ jobs:
         with:
           carryforward:
             ${{ env.GRAD_COV_NAME }},${{ env.REG_COV_NAME }},${{
-            env.CORE_COV_NAME }}-3.11,${{env.CORE_COV_NAME }}-3.12,${{
-            env.CORE_COV_NAME }}-3.13,${{env.CORE_COV_NAME }}-3.14
+            env.CORE_COV_NAME }}-3.11,${{ env.CORE_COV_NAME }}-3.12,${{
+            env.CORE_COV_NAME }}-3.13,${{ env.CORE_COV_NAME }}-3.14,${{
+            env.CORE_COV_NAME }}-3.15
           parallel-finished: true
 
   build:
@@ -245,7 +248,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: 3.14
+          python-version: 3.15
 
       - name: Install only dev dependencies
         run: uv sync --only-dev

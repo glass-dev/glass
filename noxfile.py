@@ -15,11 +15,12 @@ nox.options.sessions = [
     "tests",
 ]
 
-LATEST_PYTHON = ["3.14"]
+LATEST_PYTHON = ["3.15"]
 ALL_PYTHON = [
     "3.11",
     "3.12",
     "3.13",
+    "3.14",
     *LATEST_PYTHON,
 ]
 ARRAY_BACKENDS = {
