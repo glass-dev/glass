@@ -10,6 +10,7 @@ import glass
 import glass.fields
 import glass.healpix as hp
 import glass.rng
+from tests._optional_dependencies import HAVE_S2FFT
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -348,6 +349,9 @@ def test_effective_cls(xp: ModuleType) -> None:
 
 
 def test_generate_grf(xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
+
     gls: AngularPowerSpectra = [xp.asarray([1.0, 0.5, 0.1])]
     nside = 4
     ncorr = 1
@@ -377,6 +381,9 @@ def test_generate_grf(xp: ModuleType) -> None:
 
 
 def test_generate(xp: ModuleType) -> None:
+    if xp.__name__ == "jax.numpy" and not HAVE_S2FFT:
+        pytest.skip("test requires s2fft for JAX harmonic transforms")
+
     # shape mismatch error
 
     fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
