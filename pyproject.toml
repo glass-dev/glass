@@ -331,6 +331,12 @@ rules.unsupported-operator = "ignore"
 
 [[tool.ty.overrides]]
 include = [
+    "benchmarks/**",
+]
+rules.unresolved-import = "ignore"
+
+[[tool.ty.overrides]]
+include = [
     "glass/fields.py",
 ]
 rules.possibly-unresolved-reference = "ignore"
