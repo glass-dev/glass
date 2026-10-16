@@ -154,9 +154,12 @@ run = { branch = true, parallel = true, source = [
 build.hooks.vcs.version-file = "glass/_version.py"
 build.targets.sdist.exclude = [
     ".*",
+    "/*.txt",
+    "/matplotlibrc",
+    "/noxfile.py",
+    "benchmarks/*",
     "docs/*",
     "examples/*",
-    "noxfile.py",
     "tests/*",
 ]
 version.source = "vcs"
@@ -215,6 +218,7 @@ lint.ignore = [
     "RUF003", # ambiguous-unicode-character-comment
 ]
 lint.isort = { known-first-party = [
+    "benchmarks",
     "glass",
     "tests",
 ], known-third-party = [
@@ -307,6 +311,7 @@ trailing_comma_inline_array = true
 analysis.respect-type-ignore-comments = false
 rules = { all = "error", invalid-argument-type = "ignore" }
 src.include = [
+    "benchmarks",
     "glass",
     "tests",
 ]
@@ -318,6 +323,12 @@ include = [
     "tests/core/**",
 ]
 rules.unsupported-operator = "ignore"
+
+[[tool.ty.overrides]]
+include = [
+    "benchmarks/**",
+]
+rules.unresolved-import = "ignore"
 
 [[tool.ty.overrides]]
 include = [
