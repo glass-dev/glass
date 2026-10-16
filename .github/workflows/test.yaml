@@ -92,13 +92,14 @@ jobs:
           parallel: true
 
       - name: Check JAX without S2FFT
-        run: uv run nox -s tests_jax_without_s2fft
+        run: uv run nox -s tests_jax_without_s2fft-${{ matrix.python-version }}
 
       - name: Check ARRAY_BACKEND fixture selection
         run: |-
           set -e
           for array_backend in all jax numpy array_api_strict; do
-            ARRAY_BACKEND=$array_backend uv run nox -s tests_backend_selection
+            ARRAY_BACKEND=$array_backend uv run nox -s \
+              tests_backend_selection-${{ matrix.python-version }}
           done
 
   tests-grad:
