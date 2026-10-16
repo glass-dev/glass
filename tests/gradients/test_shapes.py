@@ -20,8 +20,6 @@ def test_triaxial_axis_ratio(
     use_xp: bool,
 ) -> None:
     """Tests glass.triaxial_axis_ratio is auto differentiable."""
-    pytest.skip("glass.triaxial_axis_ratio is not auto differentiable")
-
     sorted_uniform_rnd = jnp.sort(
         rng.uniform(
             0,
@@ -34,12 +32,11 @@ def test_triaxial_axis_ratio(
     xi = sorted_uniform_rnd[1, :]
 
     def triaxial_axis_ratio_same_rng(
-        zeta: FloatArray,
         xi: FloatArray,
     ) -> FloatArray:
         fresh_rng = glass.rng.default_rng(xp=jnp)
         return glass.triaxial_axis_ratio(
-            jnp.asarray(zeta),
+            zeta,
             jnp.asarray(xi),
             rng=fresh_rng,
             xp=jnp if use_xp else None,
@@ -47,7 +44,7 @@ def test_triaxial_axis_ratio(
 
     jax.test_util.check_grads(
         triaxial_axis_ratio_same_rng,
-        (zeta, xi),
+        (xi,),
         order=1,
     )
 
