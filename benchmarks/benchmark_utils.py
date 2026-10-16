@@ -165,7 +165,7 @@ class CosmologyWrapper:
             self.cosmo.xm(  # ty: ignore[unresolved-attribute]
                 self.cosmo_xp.asarray(z),
                 z2,
-            )
+            ),
         )
 
     def rho_m_z(self, z: FloatArray) -> FloatArray:
@@ -173,7 +173,7 @@ class CosmologyWrapper:
         return self.xp.asarray(
             self.cosmo.rho_m_z(  # ty: ignore[unresolved-attribute]
                 self.cosmo_xp.asarray(z),
-            )
+            ),
         )
 
     def comoving_distance(
@@ -197,7 +197,7 @@ class CosmologyWrapper:
         return self.xp.asarray(
             self.cosmo.Omega_m(  # ty: ignore[unresolved-attribute]
                 self.cosmo_xp.asarray(z),
-            )
+            ),
         )
 
     def transverse_comoving_distance(
