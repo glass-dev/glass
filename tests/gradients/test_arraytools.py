@@ -58,12 +58,19 @@ def test_broadcast_leading_axes() -> None:
 @pytest.mark.parametrize("axis", [-1, 1])
 @pytest.mark.parametrize("left", [0.0, None])
 @pytest.mark.parametrize("right", [0.0, None])
-def test_ndinterp_without_period(
+@pytest.mark.parametrize("period", [4.5, None])
+def test_ndinterp(
     axis: int,
     left: float | None,
     right: float | None,
+    period: float | None,
 ) -> None:
-    """Tests glass.arraytools.broadcast_leading_axes is auto differentiable."""
+    """
+    Tests glass.arraytools.ndinterp is auto differentiable.
+
+    For glass.arraytools.ndinterp to be auto differentiable, the period must keep the
+    sample coordinates away from the wrapping boundary.
+    """
     xq = jnp.asarray([0.0, 1.0, 2.0, 3.0, 4.0])
     yq = jnp.asarray([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
     x = jnp.asarray([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
@@ -74,30 +81,7 @@ def test_ndinterp_without_period(
             axis=axis,
             left=left,
             right=right,
-        ),
-        (x, xq, yq),
-        order=1,
-    )
-
-
-@pytest.mark.parametrize("axis", [-1, 1])
-def test_ndinterp_with_period(
-    axis: int,
-) -> None:
-    """Tests glass.arraytools.ndinterp is auto differentiable."""
-    pytest.skip(
-        "glass.arraytools.ndinterp is not auto differentiable when period is specified"
-    )
-
-    xq = jnp.asarray([0.0, 1.0, 2.0, 3.0, 4.0])
-    yq = jnp.asarray([[1.1, 1.2, 1.3, 1.4, 1.5], [2.1, 2.2, 2.3, 2.4, 2.5]])
-    x = jnp.asarray([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
-
-    jax.test_util.check_grads(
-        partial(
-            glass.arraytools.ndinterp,
-            axis=axis,
-            period=3.5,
+            period=period,
         ),
         (x, xq, yq),
         order=1,
