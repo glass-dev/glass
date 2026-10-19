@@ -139,8 +139,8 @@ def test_cls2cov(
     reason="glass.fields._generate_grf not implemented",
 )
 @pytest.mark.stable
-@pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
+@pytest.mark.parametrize("use_rng", [False, True])
 def test_generate_grf(  # noqa: PLR0913,PLR0917
     benchmark: BenchmarkFixture,
     generator_consumer: type[GeneratorConsumer],

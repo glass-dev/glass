@@ -17,10 +17,10 @@ if TYPE_CHECKING:
     from glass.cosmology import Cosmology
 
 
-@pytest.mark.parametrize("potential", [True, False])
 @pytest.mark.parametrize("deflection", [True, False])
-@pytest.mark.parametrize("shear", [True, False])
 @pytest.mark.parametrize("discretized", [True, False])
+@pytest.mark.parametrize("potential", [True, False])
+@pytest.mark.parametrize("shear", [True, False])
 def test_from_convergence(  # noqa: PLR0913, PLR0917
     deflection: bool,
     discretized: bool,

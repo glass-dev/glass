@@ -21,9 +21,9 @@ def test_multalm(jnp: ModuleType) -> None:
     jax.test_util.check_grads(glass.harmonics.multalm, (alm, bl), order=1)
 
 
-@pytest.mark.parametrize("spin", [0, 1, 2])
 @pytest.mark.parametrize("pixwin", [True, False])
 @pytest.mark.parametrize("pol", [True, False])
+@pytest.mark.parametrize("spin", [0, 1, 2])
 def test_inverse_transform(
     jnp: ModuleType,
     pixwin: bool,

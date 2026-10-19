@@ -117,8 +117,8 @@ def test_discretized_cls(
     )
 
 
-@pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
+@pytest.mark.parametrize("use_rng", [False, True])
 def test_generate_grf(
     jnp: ModuleType,
     ncorr: int | None,
@@ -190,8 +190,8 @@ def test_enumerate_spectra(jnp: ModuleType) -> None:
     )
 
 
-@pytest.mark.parametrize("use_weights2", [True, False])
 @pytest.mark.parametrize("lmax", [5, None])
+@pytest.mark.parametrize("use_weights2", [True, False])
 def test_effective_cls(
     jnp: ModuleType,
     lmax: int | None,
@@ -243,8 +243,8 @@ def test_solve_gaussian_spectra(jnp: ModuleType) -> None:
     )
 
 
-@pytest.mark.parametrize("use_rng", [False, True])
 @pytest.mark.parametrize("ncorr", [None, 1])
+@pytest.mark.parametrize("use_rng", [False, True])
 def test_generate(
     jnp: ModuleType,
     ncorr: int | None,

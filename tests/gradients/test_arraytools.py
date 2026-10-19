@@ -55,8 +55,8 @@ def test_broadcast_leading_axes(jnp: ModuleType) -> None:
 
 @pytest.mark.parametrize("axis", [-1, 1])
 @pytest.mark.parametrize("left", [0.0, None])
-@pytest.mark.parametrize("right", [0.0, None])
 @pytest.mark.parametrize("period", [4.5, None])
+@pytest.mark.parametrize("right", [0.0, None])
 def test_ndinterp(
     axis: int,
     jnp: ModuleType,
