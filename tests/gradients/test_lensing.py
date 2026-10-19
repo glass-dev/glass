@@ -22,12 +22,12 @@ if TYPE_CHECKING:
 @pytest.mark.parametrize("shear", [True, False])
 @pytest.mark.parametrize("discretized", [True, False])
 def test_from_convergence(  # noqa: PLR0913, PLR0917
-    jnp: ModuleType,
-    rng: UnifiedGenerator,
-    potential: bool,
     deflection: bool,
-    shear: bool,
     discretized: bool,
+    jnp: ModuleType,
+    potential: bool,
+    rng: UnifiedGenerator,
+    shear: bool,
 ) -> None:
     """Tests glass.from_convergence is auto differentiable when using JAX."""
     pytest.skip("glass.from_convergence is not auto differentiable")

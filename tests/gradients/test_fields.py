@@ -194,8 +194,8 @@ def test_enumerate_spectra(jnp: ModuleType) -> None:
 @pytest.mark.parametrize("lmax", [5, None])
 def test_effective_cls(
     jnp: ModuleType,
-    use_weights2: bool,
     lmax: int | None,
+    use_weights2: bool,
 ) -> None:
     """Tests glass.effective_cls is auto differentiable when using JAX."""
     cls: AngularPowerSpectra = [jnp.arange(15.0) for _ in range(3)]
@@ -325,7 +325,6 @@ def test_regularized_spectra_nearest(
 def test_regularized_spectra_clip(
     rng: UnifiedGenerator,
     lmax: int | None,
-    # method: str,
 ) -> None:
     """Tests glass.regularized_spectra is auto differentiable when using JAX."""
     spectra: AngularPowerSpectra = [rng.random(10) for _ in range(6)]

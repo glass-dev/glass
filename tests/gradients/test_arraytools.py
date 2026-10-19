@@ -119,8 +119,8 @@ def test_trapezoid_product(jnp: ModuleType) -> None:
     ids=["1D f", "2D f"],
 )
 def test_cumulative_trapezoid(
-    jnp: ModuleType,
     f_in: FloatArray,
+    jnp: ModuleType,
     x_in: FloatArray,
 ) -> None:
     """Tests glass.arraytools.cumulative_trapezoid is auto differentiable."""

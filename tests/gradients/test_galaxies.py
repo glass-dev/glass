@@ -97,8 +97,8 @@ def test_redshifts_from_nz(
 @pytest.mark.parametrize("reduced_shear", [True, False])
 def test_galaxy_shear(
     jnp: ModuleType,
-    rng: UnifiedGenerator,
     reduced_shear: bool,
+    rng: UnifiedGenerator,
 ) -> None:
     """Tests glass.galaxy_shear is auto differentiable when using JAX."""
     pytest.skip("glass.galaxy_shear is not auto differentiable")

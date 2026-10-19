@@ -156,9 +156,7 @@ def test_cubic_windows(
     )
 
 
-def test_restrict(
-    jnp: ModuleType,
-) -> None:
+def test_restrict(jnp: ModuleType) -> None:
     """Tests glass.restrict is auto differentiable."""
     z = jnp.linspace(0.1, 5.0, 1_000)
     f = jnp.exp(-(((z - 2.0) / 0.5) ** 2) / 2)
@@ -187,9 +185,9 @@ def test_restrict(
 
 @pytest.mark.parametrize("method", ["lstsq", "nnls", "restrict"])
 def test_partition(
-    method: str,
     get_shells: Callable[..., list[glass.RadialWindow]],
     jnp: ModuleType,
+    method: str,
 ) -> None:
     """Tests glass.partition is auto differentiable."""
     z = jnp.linspace(0.0, 5.0, 1_000)

@@ -48,9 +48,7 @@ def test_effective_bias(
     )
 
 
-def test_linear_bias(
-    rng: UnifiedGenerator,
-) -> None:
+def test_linear_bias(rng: UnifiedGenerator) -> None:
     """Tests glass.linear_bias is auto differentiable."""
     delta = rng.normal(5, 1, size=(2, 2))
     b = 2.0
@@ -62,9 +60,7 @@ def test_linear_bias(
     )
 
 
-def test_loglinear_bias(
-    rng: UnifiedGenerator,
-) -> None:
+def test_loglinear_bias(rng: UnifiedGenerator) -> None:
     """Tests glass.loglinear_bias is auto differentiable."""
     delta = rng.normal(5, 1, size=(2, 2))
     b = 2.0
@@ -133,9 +129,7 @@ def test_compute_expected_count(
     )
 
 
-def test_apply_visibility(
-    jnp: ModuleType,
-) -> None:
+def test_apply_visibility(jnp: ModuleType) -> None:
     """Tests glass.points._apply_visibility is auto differentiable."""
     k = (1, 1)
     n = 24751.77674965 * jnp.ones(12)

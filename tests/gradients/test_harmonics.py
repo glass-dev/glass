@@ -26,9 +26,9 @@ def test_multalm(jnp: ModuleType) -> None:
 @pytest.mark.parametrize("pol", [True, False])
 def test_inverse_transform(
     jnp: ModuleType,
-    spin: int,
     pixwin: bool,
     pol: bool,
+    spin: int,
 ) -> None:
     """Tests glass.harmonics.inverse_transform is auto differentiable using JAX."""
     pytest.skip("glass.harmonics.inverse_transform is not auto differentiable")

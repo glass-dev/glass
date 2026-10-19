@@ -57,8 +57,8 @@ def test_init(ap: ModuleType) -> None:
 
 
 def test_init_mix_of_backends_np_array_api_strict(
-    np: ModuleType,
     ap: ModuleType,
+    np: ModuleType,
 ) -> None:
     rng = glass.rng.Generator(rng=glass.rng.default_rng(xp=np), xp=ap)
     assert rng.random(1).__array_namespace__().__name__ == "array_api_strict"

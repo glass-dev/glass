@@ -57,8 +57,8 @@ def test_iternorm_no_size(
 def test_iternorm_specify_size(
     benchmark: BenchmarkFixture,
     generator_consumer: type[GeneratorConsumer],
-    xp: ModuleType,
     num_dimensions: int,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for glass.iternorm with k=2 and size=(3,)."""
     if num_dimensions == 1:
@@ -181,8 +181,8 @@ def test_generate_grf(  # noqa: PLR0913,PLR0917
 def test_generate(
     benchmark: BenchmarkFixture,
     generator_consumer: type[GeneratorConsumer],
-    xp: ModuleType,
     ncorr: int | None,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for glass.generate."""
     n = 10

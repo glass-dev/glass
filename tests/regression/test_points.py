@@ -37,12 +37,12 @@ if TYPE_CHECKING:
 @pytest.mark.parametrize("remove_monopole", [True, False])
 def test_positions_from_delta(  # noqa: PLR0913,PLR0917
     benchmark: BenchmarkFixture,
-    data_transformer: type[DataTransformer],
-    generator_consumer: type[GeneratorConsumer],
-    xp: ModuleType,
     bias: float,
     bias_model: Callable[[int], int],
+    data_transformer: type[DataTransformer],
+    generator_consumer: type[GeneratorConsumer],
     remove_monopole: bool,
+    xp: ModuleType,
 ) -> None:
     """Regression tests for glass.positions_from_delta."""
     nside = 48
@@ -121,8 +121,8 @@ def test_uniform_positions(
 )
 def test_displace(
     benchmark: BenchmarkFixture,
-    xp: ModuleType,
     r_to_alpha: Callable[[float], complex | list[float]],
+    xp: ModuleType,
 ) -> None:
     """Regression test for glass.displace with complex values."""
     scale_length = 100_000

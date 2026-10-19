@@ -75,8 +75,8 @@ def test_spawn(jnp: ModuleType) -> None:
 )
 def test_random(
     jnp: ModuleType,
-    size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    size_input: int | tuple[int, ...] | None,
 ) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
@@ -112,8 +112,8 @@ def test_random(
 def test_normal(
     loc: float | FloatArray,
     scale: float | FloatArray,
-    size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    size_input: int | tuple[int, ...] | None,
 ) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
@@ -158,8 +158,8 @@ def test_normal_shape_mismatch_broadcast(jnp: ModuleType) -> None:
 )
 def test_standard_normal(
     jnp: ModuleType,
-    size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    size_input: int | tuple[int, ...] | None,
 ) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
@@ -189,8 +189,8 @@ def test_standard_normal(
 def test_poisson(
     jnp: ModuleType,
     lam: float | FloatArray,
-    size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    size_input: int | tuple[int, ...] | None,
 ) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
@@ -234,11 +234,11 @@ def test_poisson_shape_mismatch_explicit(jnp: ModuleType) -> None:
     ],
 )
 def test_uniform(
+    high: float | FloatArray,
     jnp: ModuleType,
     low: float | FloatArray,
-    high: float | FloatArray,
-    size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    size_input: int | tuple[int, ...] | None,
 ) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
@@ -291,8 +291,8 @@ def test_multinomial(
     jnp: ModuleType,
     n: int | IntArray,
     pvals: FloatArray,
-    size_input: int | tuple[int, ...] | None,
     shape_output: tuple[int, ...],
+    size_input: int | tuple[int, ...] | None,
 ) -> None:
     rng = glass.rng.default_rng(xp=jnp)
     key = rng.key  # ty: ignore[unresolved-attribute]
