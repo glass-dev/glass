@@ -155,7 +155,7 @@ def ap() -> ModuleType:
     """Fixture for the array_api_strict array backend."""
     ap = pytest.importorskip(
         "array_api_strict",
-        reason="test requires array_api_strict",
+        reason="tests requires array_api_strict",
     )
     _configure_array_api_strict(ap)
     return typing.cast("ModuleType", ap)
@@ -164,7 +164,7 @@ def ap() -> ModuleType:
 @pytest.fixture(scope="session")
 def jnp() -> ModuleType:
     """JAX NumPy with 64-bit values enabled for the test session."""
-    jax = pytest.importorskip("jax", reason="test requires jax")
+    jax = pytest.importorskip("jax", reason="tests requires jax")
     _configure_jax(jax)
     return typing.cast("ModuleType", jax.numpy)
 

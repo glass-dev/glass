@@ -3,20 +3,18 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING
 
-import pytest
-
-pytest.importorskip("jax", reason="tests require jax")
-
-import jax.numpy as jnp
 import jax.test_util
+import pytest
 
 import glass.arraytools
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from glass._types import FloatArray
 
 
-def test_broadcast_first() -> None:
+def test_broadcast_first(jnp: ModuleType) -> None:
     """Tests glass.arraytools.broadcast_first is auto differentiable."""
     a = jnp.ones((2, 3, 4))
     b = jnp.ones((2, 1))
@@ -30,7 +28,7 @@ def test_broadcast_first() -> None:
     )
 
 
-def test_broadcast_leading_axes() -> None:
+def test_broadcast_leading_axes(jnp: ModuleType) -> None:
     """Tests glass.arraytools.broadcast_leading_axes is auto differentiable."""
     a_in = 0.0
     b_in = jnp.zeros((4, 10), dtype=jnp.float64)
@@ -61,9 +59,10 @@ def test_broadcast_leading_axes() -> None:
 @pytest.mark.parametrize("period", [4.5, None])
 def test_ndinterp(
     axis: int,
+    jnp: ModuleType,
     left: float | None,
-    right: float | None,
     period: float | None,
+    right: float | None,
 ) -> None:
     """
     Tests glass.arraytools.ndinterp is auto differentiable.
@@ -88,7 +87,7 @@ def test_ndinterp(
     )
 
 
-def test_trapezoid_product() -> None:
+def test_trapezoid_product(jnp: ModuleType) -> None:
     """Tests glass.arraytools.trapezoid_product is auto differentiable."""
     x1 = jnp.linspace(0, 2, 100)
     f1 = jnp.full_like(x1, 2.0)
@@ -119,7 +118,11 @@ def test_trapezoid_product() -> None:
     ],
     ids=["1D f", "2D f"],
 )
-def test_cumulative_trapezoid(f_in: FloatArray, x_in: FloatArray) -> None:
+def test_cumulative_trapezoid(
+    jnp: ModuleType,
+    f_in: FloatArray,
+    x_in: FloatArray,
+) -> None:
     """Tests glass.arraytools.cumulative_trapezoid is auto differentiable."""
     f = jnp.asarray(f_in, dtype=jnp.float64)
     x = jnp.asarray(x_in, dtype=jnp.float64)

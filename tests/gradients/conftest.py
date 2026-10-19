@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import jax
 import pytest
 
 import glass.rng
@@ -12,7 +11,8 @@ if TYPE_CHECKING:
 
     from glass._types import UnifiedGenerator
 
-
+jax = pytest.importorskip("jax", reason="tests requires jax")
+# needed for the JAX usage in the pytest parameterised tests
 jax.config.update("jax_enable_x64", val=True)
 
 
