@@ -9,6 +9,7 @@ https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/sci
 from __future__ import annotations
 
 import importlib.metadata
+import importlib.util
 import os
 import typing
 from typing import TYPE_CHECKING
@@ -98,14 +99,18 @@ xp_available_backends: dict[str, ModuleType] = {}
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     _import_and_add_numpy(xp_available_backends)
 elif ARRAY_BACKEND == "array_api_strict":
-    _import_and_add_array_api_strict(xp_available_backends)
+    if importlib.util.find_spec("array_api_strict") is not None:
+        _import_and_add_array_api_strict(xp_available_backends)
 elif ARRAY_BACKEND == "jax":
-    _import_and_add_jax(xp_available_backends)
+    if importlib.util.find_spec("jax") is not None:
+        _import_and_add_jax(xp_available_backends)
 # if all, try importing every backend
 elif ARRAY_BACKEND == "all":
     _import_and_add_numpy(xp_available_backends)
-    _import_and_add_array_api_strict(xp_available_backends)
-    _import_and_add_jax(xp_available_backends)
+    if importlib.util.find_spec("array_api_strict") is not None:
+        _import_and_add_array_api_strict(xp_available_backends)
+    if importlib.util.find_spec("jax") is not None:
+        _import_and_add_jax(xp_available_backends)
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
