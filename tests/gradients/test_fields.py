@@ -108,7 +108,7 @@ def test_discretized_cls(
     nside: int | None,
 ) -> None:
     """Tests glass.discretized_cls is auto differentiable when using JAX."""
-    cls = [jnp.arange(10, dtype=jnp.float64) for _ in range(3)]
+    cls = [jnp.arange(10.0) for _ in range(3)]
 
     jax.test_util.check_grads(
         functools.partial(glass.discretized_cls, lmax=lmax, ncorr=ncorr, nside=nside),
@@ -159,9 +159,7 @@ def test_getcl(
 ) -> None:
     """Tests glass.getcl is auto differentiable when using JAX."""
     cls: AngularPowerSpectra = [
-        jnp.asarray([i, j], dtype=jnp.float64)
-        for i in range(10)
-        for j in range(i, -1, -1)
+        jnp.asarray([float(i), float(j)]) for i in range(10) for j in range(i, -1, -1)
     ]
 
     jax.test_util.check_grads(
@@ -177,9 +175,7 @@ def test_enumerate_spectra(jnp: ModuleType) -> None:
     tn = n * (n + 1) // 2
 
     # create mock spectra with 1 element counting to tn
-    spectra: AngularPowerSpectra = [
-        jnp.asarray(x, dtype=jnp.float64) for x in range(tn)
-    ]
+    spectra: AngularPowerSpectra = [jnp.asarray(float(x)) for x in range(tn)]
 
     def enumerate_spectra_diffable(
         spectra: AngularPowerSpectra,
@@ -287,7 +283,7 @@ def test_cov_from_spectra(
 ) -> None:
     """Tests glass.cov_from_spectra is auto differentiable when using JAX."""
     spectra: AngularPowerSpectra = [
-        jnp.asarray(x, dtype=jnp.float64)
+        jnp.asarray([float(v) for v in x])
         for x in [
             [110, 111, 112, 113],
             [220, 221, 222, 223],

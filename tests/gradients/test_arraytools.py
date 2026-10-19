@@ -113,8 +113,8 @@ def test_trapezoid_product(jnp: ModuleType) -> None:
 @pytest.mark.parametrize(
     ("f_in", "x_in"),
     [
-        ([1, 2, 3, 4], [0, 1, 2, 3]),
-        ([[1, 4, 9, 16], [2, 3, 5, 7]], [0, 1, 2.5, 4]),
+        ([1.0, 2.0, 3.0, 4.0], [0.0, 1.0, 2.0, 3.0]),
+        ([[1.0, 4.0, 9.0, 16.0], [2.0, 3.0, 5.0, 7.0]], [0.0, 1.0, 2.5, 4.0]),
     ],
     ids=["1D f", "2D f"],
 )
@@ -124,8 +124,8 @@ def test_cumulative_trapezoid(
     x_in: FloatArray,
 ) -> None:
     """Tests glass.arraytools.cumulative_trapezoid is auto differentiable."""
-    f = jnp.asarray(f_in, dtype=jnp.float64)
-    x = jnp.asarray(x_in, dtype=jnp.float64)
+    f = jnp.asarray(f_in)
+    x = jnp.asarray(x_in)
 
     jax.test_util.check_grads(
         glass.arraytools.cumulative_trapezoid,
