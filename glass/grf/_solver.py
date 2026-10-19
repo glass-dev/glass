@@ -8,7 +8,7 @@ __lazy_modules__ = [
 from typing import TYPE_CHECKING
 
 import numpy as np
-from transformcl import cltocorr, corrtocl
+import transformcl
 
 import glass.grf
 from glass._array_api_utils import numpy_fallback
@@ -96,7 +96,7 @@ def solve(  # noqa: PLR0912, PLR0913
         raise ValueError(msg)
 
     if initial is None:
-        gl = corrtocl(glass.grf.icorr(t1, t2, cltocorr(cl)))
+        gl = transformcl.corrtocl(glass.grf.icorr(t1, t2, transformcl.cltocorr(cl)))
     else:
         gl = np.zeros(n)
         gl[: initial.shape[0]] = initial[:n]
@@ -104,8 +104,8 @@ def solve(  # noqa: PLR0912, PLR0913
     if monopole is not None:
         gl[0] = monopole
 
-    gt = cltocorr(np.pad(gl, (0, pad)))
-    rl = corrtocl(glass.grf.corr(t1, t2, gt))
+    gt = transformcl.cltocorr(np.pad(gl, (0, pad)))
+    rl = transformcl.corrtocl(glass.grf.corr(t1, t2, gt))
     fl = rl[:n] - cl
     if monopole is not None:
         fl[0] = 0
@@ -120,9 +120,9 @@ def solve(  # noqa: PLR0912, PLR0913
         if info > 0:
             break
 
-        ft = cltocorr(np.pad(fl, (0, pad)))
+        ft = transformcl.cltocorr(np.pad(fl, (0, pad)))
         dt = glass.grf.dcorr(t1, t2, gt)
-        xl = -corrtocl(ft / dt)[:n]
+        xl = -transformcl.corrtocl(ft / dt)[:n]
         if monopole is not None:
             xl[0] = 0
 
@@ -130,8 +130,8 @@ def solve(  # noqa: PLR0912, PLR0913
         # make xl smaller (by half) until we get an improved solution
         while True:
             gl_ = gl + xl
-            gt_ = cltocorr(np.pad(gl_, (0, pad)))
-            rl_ = corrtocl(glass.grf.corr(t1, t2, gt_))
+            gt_ = transformcl.cltocorr(np.pad(gl_, (0, pad)))
+            rl_ = transformcl.corrtocl(glass.grf.corr(t1, t2, gt_))
             fl_ = rl_[:n] - cl
             if monopole is not None:
                 fl_[0] = 0

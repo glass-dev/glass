@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import partial
+import functools
 from typing import TYPE_CHECKING
 
 import jax.test_util
@@ -111,7 +111,7 @@ def test_discretized_cls(
     cls = [jnp.arange(10, dtype=jnp.float64) for _ in range(3)]
 
     jax.test_util.check_grads(
-        partial(glass.discretized_cls, lmax=lmax, ncorr=ncorr, nside=nside),
+        functools.partial(glass.discretized_cls, lmax=lmax, ncorr=ncorr, nside=nside),
         (cls,),
         order=1,
     )
@@ -165,7 +165,7 @@ def test_getcl(
     ]
 
     jax.test_util.check_grads(
-        partial(glass.getcl, i=i, j=j, lmax=lmax),
+        functools.partial(glass.getcl, i=i, j=j, lmax=lmax),
         (cls,),
         order=1,
     )
@@ -207,7 +207,7 @@ def test_effective_cls(
     weights2 = weights1 if use_weights2 else None
 
     jax.test_util.check_grads(
-        partial(glass.effective_cls, lmax=lmax),
+        functools.partial(glass.effective_cls, lmax=lmax),
         (cls, weights1, weights2),
         order=1,
     )
@@ -219,7 +219,7 @@ def test_compute_gaussian_spectra(jnp: ModuleType) -> None:
     spectra: AngularPowerSpectra = [jnp.zeros(10, dtype=jnp.float64) for _ in range(3)]
 
     jax.test_util.check_grads(
-        partial(glass.compute_gaussian_spectra, fields),
+        functools.partial(glass.compute_gaussian_spectra, fields),
         (spectra,),
         order=1,
     )
@@ -301,7 +301,7 @@ def test_cov_from_spectra(
     ]
 
     jax.test_util.check_grads(
-        partial(glass.cov_from_spectra, lmax=lmax),
+        functools.partial(glass.cov_from_spectra, lmax=lmax),
         (spectra,),
         order=1,
     )
@@ -316,7 +316,12 @@ def test_regularized_spectra_nearest(
     spectra: AngularPowerSpectra = [rng.random(20) for _ in range(6)]
 
     jax.test_util.check_grads(
-        partial(glass.regularized_spectra, method="nearest", lmax=lmax, niter=300),
+        functools.partial(
+            glass.regularized_spectra,
+            method="nearest",
+            lmax=lmax,
+            niter=300,
+        ),
         (spectra,),
         order=1,
     )
@@ -332,7 +337,7 @@ def test_regularized_spectra_clip(
     spectra: AngularPowerSpectra = [rng.random(10) for _ in range(6)]
 
     jax.test_util.check_grads(
-        partial(glass.regularized_spectra, method="clip", lmax=lmax),
+        functools.partial(glass.regularized_spectra, method="clip", lmax=lmax),
         (spectra,),
         order=1,
     )

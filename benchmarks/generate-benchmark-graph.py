@@ -1,6 +1,6 @@
 import argparse
 import csv
-from pathlib import Path
+import pathlib
 
 import matplotlib.pyplot as plt
 
@@ -8,7 +8,7 @@ base_font_size = 17.5
 
 
 def read_timings(
-    path: Path,
+    path: pathlib.Path,
 ) -> tuple[str, tuple[int, ...], dict[str, tuple[float, ...]]]:
     """Read one benchmark's timings from a CSV file.
 
@@ -62,7 +62,7 @@ def main() -> None:
     parser.add_argument(
         "data_files",
         nargs="+",
-        type=Path,
+        type=pathlib.Path,
         help="""
         CSV files, or dirs containing CSV files, with an nside column and one column
         per implementation. Note that each file name is used as the title for each sub
@@ -72,7 +72,7 @@ def main() -> None:
     parser.add_argument(
         "-o",
         "--output",
-        type=Path,
+        type=pathlib.Path,
         help="""
         output image path (default: archer2-lensing-benchmark.png without CSVs,
         benchmark.png otherwise)
@@ -96,7 +96,7 @@ def main() -> None:
         plot_data = [read_timings(path) for path in csv_files]
     except (OSError, ValueError) as error:
         parser.error(str(error))
-    output_path = args.output or Path("benchmark.png")
+    output_path = args.output or pathlib.Path("benchmark.png")
 
     num_plots = len(plot_data)
     fig, axes = plt.subplots(nrows=num_plots, layout="constrained")

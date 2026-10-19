@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import partial
+import functools
 from typing import TYPE_CHECKING
 
 import jax.test_util
@@ -75,7 +75,7 @@ def test_ndinterp(
     x = jnp.asarray([[0.5, 1.5, 2.5, 3.5], [3.5, 2.5, 1.5, 0.5], [0.5, 3.5, 1.5, 2.5]])
 
     jax.test_util.check_grads(
-        partial(
+        functools.partial(
             glass.arraytools.ndinterp,
             axis=axis,
             left=left,

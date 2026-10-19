@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import functools
 import math
-from functools import partial
 from typing import TYPE_CHECKING
 
 import jax.test_util
@@ -142,7 +142,7 @@ def test_apply_visibility(
     vis = jnp.tile(jnp.repeat(jnp.asarray([0.0, 1.0]), 6), (3, 2, 1))
 
     jax.test_util.check_grads(
-        partial(glass.points._apply_visibility, k),
+        functools.partial(glass.points._apply_visibility, k),
         (n, vis),
         order=1,
     )
