@@ -26,7 +26,7 @@ def test_effective_bias(
 ) -> None:
     """Tests glass.effective_bias is auto differentiable."""
     w = mocker.Mock()
-    w.za = jnp.linspace(0, 2, 100, dtype=jnp.float64)
+    w.za = jnp.linspace(0, 2, 100)
     w.wa = jnp.full_like(w.za, 2.0, dtype=jnp.float64)
 
     z = jnp.linspace(0, 1, 10, dtype=jnp.float64)
