@@ -123,7 +123,6 @@ def tests_backend_selection(session: nox.Session) -> None:
         "tests/core/test_array_api_utils.py::test_default_rng_jax",
         "tests/core/test_array_api_utils.py::test_default_rng_array_api_strict",
         *session.posargs,
-        env=os.environ,
     )
 
 
@@ -139,7 +138,6 @@ def coverage(session: nox.Session) -> None:
         "pytest",
         "--cov",
         *session.posargs,
-        env=os.environ,
     )
 
 
@@ -157,7 +155,6 @@ def coverage_regression(session: nox.Session) -> None:
         "--cov",
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs,
-        env=os.environ,
         success_codes=[0, 5],
     )
 
@@ -175,7 +172,6 @@ def coverage_gradients(session: nox.Session) -> None:
         GRAD_TESTS_LOC,
         "--cov",
         *session.posargs,
-        env=os.environ,
     )
 
 
