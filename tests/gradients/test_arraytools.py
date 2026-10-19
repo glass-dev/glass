@@ -33,8 +33,8 @@ def test_broadcast_first() -> None:
 def test_broadcast_leading_axes() -> None:
     """Tests glass.arraytools.broadcast_leading_axes is auto differentiable."""
     a_in = 0.0
-    b_in = jnp.zeros((4, 10))
-    c_in = jnp.zeros((3, 1, 5, 6))
+    b_in = jnp.zeros((4, 10), dtype=jnp.float64)
+    c_in = jnp.zeros((3, 1, 5, 6), dtype=jnp.float64)
 
     def broadcast_leading_axes_by_arrays(
         a_in: float | FloatArray,
@@ -121,8 +121,8 @@ def test_trapezoid_product() -> None:
 )
 def test_cumulative_trapezoid(f_in: FloatArray, x_in: FloatArray) -> None:
     """Tests glass.arraytools.cumulative_trapezoid is auto differentiable."""
-    f = jnp.asarray(f_in)
-    x = jnp.asarray(x_in)
+    f = jnp.asarray(f_in, dtype=jnp.float64)
+    x = jnp.asarray(x_in, dtype=jnp.float64)
 
     jax.test_util.check_grads(
         glass.arraytools.cumulative_trapezoid,

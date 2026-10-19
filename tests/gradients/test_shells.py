@@ -38,7 +38,7 @@ def test_volume_weight(
     jnp: ModuleType,
 ) -> None:
     """Tests glass.VolumeWeight is auto differentiable."""
-    z = jnp.linspace(0.1, 1, 6)
+    z = jnp.linspace(0.1, 1, 6, dtype=jnp.float64)
     cosmo = get_cosmo(jnp)
 
     def volume_weight_diffable(z: FloatArray) -> FloatArray:

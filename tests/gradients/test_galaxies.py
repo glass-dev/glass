@@ -77,8 +77,8 @@ def test_redshifts_from_nz(
     jnp: ModuleType,
 ) -> None:
     """Tests glass.redshifts_from_nz is auto differentiable when using JAX."""
-    z = jnp.asarray([0, 1, 2, 3, 4])
-    nz = jnp.asarray([1, 0, 0, 0, 0])
+    z = jnp.asarray([0, 1, 2, 3, 4], dtype=jnp.float64)
+    nz = jnp.asarray([1, 0, 0, 0, 0], dtype=jnp.float64)
 
     def redshifts_from_nz_by_z_and_nz(z: FloatArray, nz: FloatArray) -> FloatArray:
         # Must supply a fresh JAX RNG so that we generate the same sequence for each
