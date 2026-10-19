@@ -257,7 +257,7 @@ def test_generate(
     """Tests glass.generate is auto differentiable when using JAX."""
     pytest.skip("glass.generate is not auto differentiable")
 
-    gls: AngularPowerSpectra = [jnp.ones(10, dtype=jnp.float64) for _ in range(3)]
+    gls: AngularPowerSpectra = [jnp.ones(10) for _ in range(3)]
 
     def generate_diffable(
         gls: AngularPowerSpectra,
