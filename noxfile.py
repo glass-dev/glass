@@ -123,6 +123,7 @@ def tests_backend_selection(session: nox.Session) -> None:
         "tests/core/test_array_api_utils.py::test_default_rng_jax",
         "tests/core/test_array_api_utils.py::test_default_rng_array_api_strict",
         *session.posargs,
+        env=os.environ,
     )
 
 
