@@ -10,6 +10,9 @@ pytest.importorskip("jax", reason="tests require jax")
 import jax.test_util
 
 import glass
+import glass.fields
+import glass.grf
+import glass.rng
 
 if TYPE_CHECKING:
     from types import ModuleType

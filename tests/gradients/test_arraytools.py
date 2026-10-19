@@ -10,7 +10,7 @@ pytest.importorskip("jax", reason="tests require jax")
 import jax.numpy as jnp
 import jax.test_util
 
-import glass
+import glass.arraytools
 
 if TYPE_CHECKING:
     from glass._types import FloatArray

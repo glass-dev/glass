@@ -7,7 +7,9 @@ import pytest
 import array_api_extra as xpx
 
 import glass
+import glass.algorithm
 import glass.fields
+import glass.grf
 import glass.healpix as hp
 import glass.rng
 

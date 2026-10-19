@@ -8,6 +8,7 @@ import pytest
 import array_api_extra as xpx
 
 import glass
+import glass.fields
 import glass.healpix as hp
 
 if TYPE_CHECKING:

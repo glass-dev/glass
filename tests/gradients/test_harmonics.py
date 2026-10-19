@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import jax.test_util
 import pytest
 
-import glass
+import glass.harmonics
 
 if TYPE_CHECKING:
     from types import ModuleType

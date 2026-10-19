@@ -9,7 +9,8 @@ pytest.importorskip("jax", reason="tests require jax")
 import jax.numpy as jnp
 import jax.test_util
 
-import glass
+import glass.galaxies
+import glass.rng
 
 if TYPE_CHECKING:
     from types import ModuleType

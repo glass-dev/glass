@@ -8,6 +8,7 @@ import jax.test_util
 import pytest
 
 import glass
+import glass.points
 
 if TYPE_CHECKING:
     from collections.abc import Callable

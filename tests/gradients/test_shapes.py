@@ -6,6 +6,7 @@ import jax.test_util
 import pytest
 
 import glass
+import glass.rng
 
 if TYPE_CHECKING:
     from types import ModuleType
