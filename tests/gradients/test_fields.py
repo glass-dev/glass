@@ -216,7 +216,7 @@ def test_effective_cls(
 def test_compute_gaussian_spectra(jnp: ModuleType) -> None:
     """Tests glass.compute_gaussian_spectra is auto differentiable when using JAX."""
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra: AngularPowerSpectra = [jnp.zeros(10, dtype=jnp.float64) for _ in range(3)]
+    spectra: AngularPowerSpectra = [jnp.zeros(10) for _ in range(3)]
 
     jax.test_util.check_grads(
         functools.partial(glass.compute_gaussian_spectra, fields),
@@ -230,9 +230,7 @@ def test_solve_gaussian_spectra(jnp: ModuleType) -> None:
     pytest.skip("glass.solve_gaussian_spectra is not auto differentiable")
 
     fields = [glass.grf.Normal(), glass.grf.Normal()]
-    spectra: AngularPowerSpectra = [
-        jnp.zeros(n, dtype=jnp.float64) for n in [5, 10, 15]
-    ]
+    spectra: AngularPowerSpectra = [jnp.zeros(n) for n in [5, 10, 15]]
 
     def solve_gaussian_spectra_diffable(
         spectra: AngularPowerSpectra,

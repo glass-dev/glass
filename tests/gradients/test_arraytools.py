@@ -31,8 +31,8 @@ def test_broadcast_first(jnp: ModuleType) -> None:
 def test_broadcast_leading_axes(jnp: ModuleType) -> None:
     """Tests glass.arraytools.broadcast_leading_axes is auto differentiable."""
     a_in = 0.0
-    b_in = jnp.zeros((4, 10), dtype=jnp.float64)
-    c_in = jnp.zeros((3, 1, 5, 6), dtype=jnp.float64)
+    b_in = jnp.zeros((4, 10))
+    c_in = jnp.zeros((3, 1, 5, 6))
 
     def broadcast_leading_axes_by_arrays(
         a_in: float | FloatArray,
