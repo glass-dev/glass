@@ -209,6 +209,8 @@ class Generator:
         n = jnp.asarray(n)
         pvals = jnp.asarray(pvals)
 
+        # JAX's shape parameter is the full shape of pvals including the
+        # categories axis, so infer only the batch dimensions here.
         batch_shape = _shape(size, n, pvals[..., 0])
         # Since JAX 0.12, shape excludes the categories axis
         if jax.__version_info__ >= (0, 12):
