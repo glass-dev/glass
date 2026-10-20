@@ -65,8 +65,8 @@ def test_inverse_transform_healpy(xp: ModuleType) -> None:
 
 @pytest.mark.parametrize("spin", [1, 2])
 def test_inverse_transform_healpy_spin(
-    xp: ModuleType,
     spin: int,
+    xp: ModuleType,
 ) -> None:
     alm = xp.asarray([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     lmax = 2

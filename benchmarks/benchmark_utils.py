@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import timeit
-from contextlib import nullcontext
+import warnings
 from typing import TYPE_CHECKING
-from warnings import warn
 
 import jax
 import numpy as np
@@ -92,7 +92,7 @@ def run_benchmark(
     should_profile = RUN_PROFILE and xp.__name__ == "jax.numpy"
 
     if RUN_PROFILE and not should_profile:
-        warn(
+        warnings.warn(
             message=(
                 "Profile requested but JAX not the chosen array backend; "
                 "no profile will be generated."
@@ -104,7 +104,7 @@ def run_benchmark(
     with (
         jax.profiler.trace("jax_trace", create_perfetto_trace=True)
         if should_profile
-        else nullcontext()
+        else contextlib.nullcontext()
     ):
         result = timeit.timeit(_run, number=1)
 

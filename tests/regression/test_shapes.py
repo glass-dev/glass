@@ -96,11 +96,11 @@ def test_ellipticity_intnorm(
     ids=["novar", "varg", "vargamma"],
 )
 def test_resample_shapes(
+    benchmark: BenchmarkFixture,
+    urng: UnifiedGenerator,
     varg: float | None,
     vargamma: float | None,
-    benchmark: BenchmarkFixture,
     xp: ModuleType,
-    urng: UnifiedGenerator,
 ) -> None:
     """Regression test for :func:`glass.resample_shapes`."""
     n = 1_000_000

@@ -24,7 +24,7 @@ ALL_PYTHON = [
 ]
 ARRAY_BACKENDS = {
     "array_api_strict": "array-api-strict>=2",
-    "jax": "jax>=0.4.32",
+    "jax": "jax>=0.6.2",
 }
 GRAD_TESTS_LOC = pathlib.Path("tests/gradients")
 REG_TESTS_LOC = pathlib.Path("tests/regression")
@@ -138,7 +138,6 @@ def coverage(session: nox.Session) -> None:
         "pytest",
         "--cov",
         *session.posargs,
-        env=os.environ,
     )
 
 
@@ -156,7 +155,6 @@ def coverage_regression(session: nox.Session) -> None:
         "--cov",
         *SHARED_PYTEST_BENCHMARK_FLAGS,
         *session.posargs,
-        env=os.environ,
         success_codes=[0, 5],
     )
 
@@ -174,7 +172,6 @@ def coverage_gradients(session: nox.Session) -> None:
         GRAD_TESTS_LOC,
         "--cov",
         *session.posargs,
-        env=os.environ,
     )
 
 
