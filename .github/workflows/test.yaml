@@ -96,7 +96,7 @@ jobs:
           parallel: true
 
       - name: Check JAX without S2FFT
-        run: uv run nox -s tests_jax_without_s2fft-${{ matrix.python-version }}
+        run: uv run --no-sync nox -s tests_jax_without_s2fft-${{ matrix.python-version }}
 
       - name: Check ARRAY_BACKEND fixture selection
         run:
