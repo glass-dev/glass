@@ -4,7 +4,7 @@ Release notes
 
 These notes document the changes between individual GLASS releases.
 
-2026.5 (16 Oct 2026)
+2026.5 (20 Oct 2026)
 --------------------
 
 * Added wrapper functions for the forward and inverse spherical harmonic transforms:

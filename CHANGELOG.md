@@ -4,7 +4,7 @@
 
 All functional changes to the project are documented in this file.
 
-## [2026.5] (16 Oct 2026)
+## [2026.5] (20 Oct 2026)
 
 - gh-1211: Remove `deflect` function (#1216)
 - gh-1210: Remove `shear_from_convergence` function (#1217)
