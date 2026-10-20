@@ -112,8 +112,8 @@ def test_redshifts_from_nz(
 @pytest.mark.parametrize("reduced_shear", [True, False])
 def test_galaxy_shear(
     benchmark: BenchmarkFixture,
+    reduced_shear: bool,
     urng: UnifiedGenerator,
-    reduced_shear: bool,  # noqa: FBT001
 ) -> None:
     """Regression test for galaxies.galaxy_shear."""
     scale_factor = 100

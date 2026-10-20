@@ -44,7 +44,7 @@ jobs:
           uv sync --only-dev
 
       - name: Build docs
-        run: uv run nox -s docs --verbose
+        run: uv run --no-sync nox -s docs --verbose
         env:
           FORCE_COLOR: 1
 

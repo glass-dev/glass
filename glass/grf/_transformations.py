@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from glass.grf import Transformation
 
 
-@dataclass
+@dataclasses.dataclass
 class Normal:
     """
     Transformation for normal fields.
@@ -58,7 +58,7 @@ class Normal:
         return NotImplemented
 
 
-@dataclass
+@dataclasses.dataclass
 class Lognormal:
     r"""
     Transformation for lognormal fields.
@@ -137,7 +137,7 @@ class Lognormal:
         return NotImplemented
 
 
-@dataclass
+@dataclasses.dataclass
 class SquaredNormal:
     r"""
     Transformation for squared normal fields as introduced by

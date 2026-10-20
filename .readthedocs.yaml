@@ -7,7 +7,7 @@ build:
     python: "3.14"
   jobs:
     post_checkout:
-      - git fetch --unshallow --tags
+      - git fetch --unshallow --tags origin || true
 
 python:
   install:

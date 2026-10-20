@@ -9,6 +9,7 @@ https://github.com/scipy/scipy/blob/36e349b6afbea057cb713fc314296f10d55194cc/sci
 from __future__ import annotations
 
 import importlib.metadata
+import importlib.util
 import os
 import typing
 from typing import TYPE_CHECKING
@@ -71,6 +72,9 @@ def _import_and_add_array_api_strict(
     xp_available_backends: dict[str, ModuleType],
 ) -> None:
     """Add array_api_strict to the backends dictionary."""
+    if importlib.util.find_spec("array_api_strict") is None:
+        return
+
     import array_api_strict  # noqa: PLC0415
 
     _configure_array_api_strict(array_api_strict)
@@ -85,6 +89,9 @@ def _configure_jax(jax: ModuleType) -> None:
 
 def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add jax to the backends dictionary."""
+    if importlib.util.find_spec("jax") is None:
+        return
+
     import jax  # noqa: PLC0415
 
     _configure_jax(jax)
@@ -154,7 +161,8 @@ def xpb(request: pytest.FixtureRequest) -> ModuleType:
 def ap() -> ModuleType:
     """Fixture for the array_api_strict array backend."""
     ap = pytest.importorskip(
-        "array_api_strict", reason="test requires array_api_strict"
+        "array_api_strict",
+        reason="tests requires array_api_strict",
     )
     _configure_array_api_strict(ap)
     return typing.cast("ModuleType", ap)
@@ -163,7 +171,7 @@ def ap() -> ModuleType:
 @pytest.fixture(scope="session")
 def jnp() -> ModuleType:
     """JAX NumPy with 64-bit values enabled for the test session."""
-    jax = pytest.importorskip("jax", reason="test requires jax")
+    jax = pytest.importorskip("jax", reason="tests requires jax")
     _configure_jax(jax)
     return typing.cast("ModuleType", jax.numpy)
 

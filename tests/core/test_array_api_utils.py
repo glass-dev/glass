@@ -18,12 +18,13 @@ with contextlib.suppress(ImportError):
 
 
 def test_xp_fixture_selects_requested_backend(xp: ModuleType) -> None:
+    backend = os.environ.get("ARRAY_BACKEND") or "numpy"
     expected = {
         "numpy": {"numpy"},
         "array_api_strict": {"array_api_strict"},
         "jax": {"jax.numpy"},
         "all": {"numpy", "array_api_strict", "jax.numpy"},
-    }[os.environ.get("ARRAY_BACKEND") or "numpy"]
+    }[backend]
     assert xp.__name__ in expected
 
 

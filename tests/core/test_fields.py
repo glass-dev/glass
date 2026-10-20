@@ -7,7 +7,9 @@ import pytest
 import array_api_extra as xpx
 
 import glass
+import glass.algorithm
 import glass.fields
+import glass.grf
 import glass.healpix as hp
 import glass.rng
 from tests._optional_dependencies import HAVE_S2FFT
@@ -29,7 +31,7 @@ def not_triangle_numbers() -> list[int]:
 @pytest.mark.parametrize("test_nd", [False, True], ids=["0d", "nd"])
 def test_iternorm(
     k: int,
-    test_nd: bool,  # noqa: FBT001
+    test_nd: bool,
     xp: ModuleType,
 ) -> None:
     """Test iternorm against explicit computation."""
