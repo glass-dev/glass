@@ -11,6 +11,13 @@ Array API compatible and GPU enabled. For example, if JAX is installed with
 the relevant optional dependencies it will by default utilise any GPU devices
 it has available.
 
+For JAX on a GPU, the appropriate accelerator-enabled JAX build should be
+installed using the
+`JAX installation instructions <https://docs.jax.dev/en/latest/installation.html>`_,
+as well as ``glass[jax]`` to add GLASS and S2FFT. A plain
+``pip install 'glass[jax]'`` installs the default JAX build, which may run on
+CPU only.
+
 Unfortunately, we have found that this does not necessarily mean running GLASS
 with GPU enabled JAX will give an immediate performance boost. The performance
 gains, or as is often the case, degradations of running GLASS on GPU depends on

@@ -30,6 +30,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - "3.11"
@@ -94,10 +95,11 @@ jobs:
           flag-name: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
           parallel: true
 
+      - name: Check JAX without S2FFT
+        run: uv run --no-sync nox -s tests_jax_without_s2fft
+
       - name: Check ARRAY_BACKEND fixture selection
-        run:
-          uv run --no-sync nox -s tests_backend_selection-${{
-          matrix.python-version }}
+        run: uv run --no-sync nox -s tests_backend_selection
         env:
           ARRAY_BACKEND: all
 
