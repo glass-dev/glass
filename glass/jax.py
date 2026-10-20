@@ -209,13 +209,13 @@ class Generator:
         n = jnp.asarray(n)
         pvals = jnp.asarray(pvals)
 
-        # JAX's shape parameter is the batch shape, excluding the categories
-        # axis since 0.12.0. Earlier JAX releases expected the full output
-        # shape, including the categories axis.
         batch_shape = _shape(size, n, pvals[..., 0])
+        # Since JAX 0.12, shape excludes the categories axis
         if jax.__version_info__ >= (0, 12):
             shape = batch_shape or None
         else:
+            # Append the categories axis, or pass None to let JAX default to
+            # pvals.shape when there are no batch dimensions
             shape = (*batch_shape, pvals.shape[-1]) if batch_shape else None
         return jax.random.multinomial(
             self.__key,
