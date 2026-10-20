@@ -72,6 +72,9 @@ def _import_and_add_array_api_strict(
     xp_available_backends: dict[str, ModuleType],
 ) -> None:
     """Add array_api_strict to the backends dictionary."""
+    if importlib.util.find_spec("array_api_strict") is None:
+        return
+
     import array_api_strict  # noqa: PLC0415
 
     _configure_array_api_strict(array_api_strict)
@@ -86,6 +89,9 @@ def _configure_jax(jax: ModuleType) -> None:
 
 def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add jax to the backends dictionary."""
+    if importlib.util.find_spec("jax") is None:
+        return
+
     import jax  # noqa: PLC0415
 
     _configure_jax(jax)
@@ -99,18 +105,14 @@ xp_available_backends: dict[str, ModuleType] = {}
 if not ARRAY_BACKEND or ARRAY_BACKEND == "numpy":
     _import_and_add_numpy(xp_available_backends)
 elif ARRAY_BACKEND == "array_api_strict":
-    if importlib.util.find_spec("array_api_strict") is not None:
-        _import_and_add_array_api_strict(xp_available_backends)
+    _import_and_add_array_api_strict(xp_available_backends)
 elif ARRAY_BACKEND == "jax":
-    if importlib.util.find_spec("jax") is not None:
-        _import_and_add_jax(xp_available_backends)
+    _import_and_add_jax(xp_available_backends)
 # if all, try importing every backend
 elif ARRAY_BACKEND == "all":
     _import_and_add_numpy(xp_available_backends)
-    if importlib.util.find_spec("array_api_strict") is not None:
-        _import_and_add_array_api_strict(xp_available_backends)
-    if importlib.util.find_spec("jax") is not None:
-        _import_and_add_jax(xp_available_backends)
+    _import_and_add_array_api_strict(xp_available_backends)
+    _import_and_add_jax(xp_available_backends)
 else:
     msg = f"unsupported array backend: {ARRAY_BACKEND}"
     raise ValueError(msg)
