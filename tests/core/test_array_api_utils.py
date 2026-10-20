@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import importlib.util
 import os
 from typing import TYPE_CHECKING
 
@@ -9,10 +8,9 @@ import pytest
 
 import glass.rng
 from tests._optional_dependencies import HAVE_JAX
-from tests.fixtures.array_backends import xp_available_backends
 
 if TYPE_CHECKING:
-    from types import ModuleType    
+    from types import ModuleType
 
 with contextlib.suppress(ImportError):
     # only import if jax is available
