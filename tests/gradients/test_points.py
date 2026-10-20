@@ -32,9 +32,7 @@ def test_effective_bias(
     z = jnp.linspace(0, 1, 10)
     bz = jnp.full_like(z, 0.5)
 
-    def effective_bias_diffable(
-        bz: FloatArray,
-    ) -> float | FloatArray:
+    def effective_bias_diffable(bz: FloatArray) -> float | FloatArray:
         return glass.effective_bias(
             z,
             jnp.asarray(bz),

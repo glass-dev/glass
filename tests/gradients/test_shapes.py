@@ -32,9 +32,7 @@ def test_triaxial_axis_ratio(
     zeta = sorted_uniform_rnd[0, :]
     xi = sorted_uniform_rnd[1, :]
 
-    def triaxial_axis_ratio_same_rng(
-        xi: FloatArray,
-    ) -> FloatArray:
+    def triaxial_axis_ratio_same_rng(xi: FloatArray) -> FloatArray:
         fresh_rng = glass.rng.default_rng(xp=jnp)
         return glass.triaxial_axis_ratio(
             zeta,
@@ -100,9 +98,7 @@ def test_ellipticity_gaussian(
     count = jnp.asarray([1_000_000, 1_000_000])
     sigma = jnp.asarray([0.128, 0.256])
 
-    def ellipticity_gaussian_diffable(
-        sigma: FloatArray,
-    ) -> ComplexArray:
+    def ellipticity_gaussian_diffable(sigma: FloatArray) -> ComplexArray:
         fresh_rng = glass.rng.default_rng(xp=jnp)
         return glass.ellipticity_gaussian(
             count,
@@ -129,9 +125,7 @@ def test_ellipticity_intnorm(
     count = jnp.asarray([1_000_000, 1_000_000])
     sigma = jnp.asarray([0.128, 0.256])
 
-    def ellipticity_intnorm_diffable(
-        sigma: FloatArray,
-    ) -> ComplexArray:
+    def ellipticity_intnorm_diffable(sigma: FloatArray) -> ComplexArray:
         fresh_rng = glass.rng.default_rng(xp=jnp)
         return glass.ellipticity_intnorm(
             count,

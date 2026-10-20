@@ -166,9 +166,7 @@ def test_restrict(jnp: ModuleType) -> None:
         wa=jnp.asarray([0.0, 0.5, 0.5, 0.0]),
     )
 
-    def restrict_diffable(
-        f: FloatArray,
-    ) -> tuple[FloatArray, FloatArray]:
+    def restrict_diffable(f: FloatArray) -> tuple[FloatArray, FloatArray]:
         zr, fr = glass.restrict(
             jnp.asarray(z),
             jnp.asarray(f),
@@ -221,9 +219,7 @@ def test_combine(
     )
     shells = get_shells(jnp)
 
-    def combine_diffable(
-        weights: FloatArray,
-    ) -> FloatArray:
+    def combine_diffable(weights: FloatArray) -> FloatArray:
         return glass.combine(
             z,
             jnp.asarray(weights),

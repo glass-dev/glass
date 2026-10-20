@@ -37,9 +37,7 @@ def test_inverse_transform(
     lmax = 2
     nside = 1
 
-    def inverse_transform_diffable(
-        alm: ComplexArray,
-    ) -> FloatArray | ComplexArray:
+    def inverse_transform_diffable(alm: ComplexArray) -> FloatArray | ComplexArray:
         return glass.harmonics.inverse_transform(
             jnp.asarray(alm),
             lmax=lmax,
@@ -69,9 +67,7 @@ def test_transform(
     maps = jnp.asarray([1.0] * 12)
     lmax = 2
 
-    def transform_diffable(
-        maps: FloatArray,
-    ) -> ComplexArray:
+    def transform_diffable(maps: FloatArray) -> ComplexArray:
         return glass.harmonics.transform(
             jnp.asarray(maps),
             lmax=lmax,
