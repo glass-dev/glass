@@ -72,6 +72,9 @@ def _import_and_add_array_api_strict(
     xp_available_backends: dict[str, ModuleType],
 ) -> None:
     """Add array_api_strict to the backends dictionary."""
+    if importlib.util.find_spec("array_api_strict") is None:
+        return
+
     import array_api_strict  # noqa: PLC0415
 
     _configure_array_api_strict(array_api_strict)
@@ -86,6 +89,9 @@ def _configure_jax(jax: ModuleType) -> None:
 
 def _import_and_add_jax(xp_available_backends: dict[str, ModuleType]) -> None:
     """Add jax to the backends dictionary."""
+    if importlib.util.find_spec("jax") is None:
+        return
+
     import jax  # noqa: PLC0415
 
     _configure_jax(jax)

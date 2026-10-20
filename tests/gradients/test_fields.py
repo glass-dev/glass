@@ -67,9 +67,7 @@ def test_iternorm(
 def test_cls2cov(jnp: ModuleType) -> None:
     """Tests glass.cls2cov is auto differentiable when using JAX."""
 
-    def cls2cov_diffable(
-        cls: AngularPowerSpectra,
-    ) -> list[FloatArray]:
+    def cls2cov_diffable(cls: AngularPowerSpectra) -> list[FloatArray]:
         return list(
             glass.cls2cov(
                 jnp.asarray(cls),
@@ -129,9 +127,7 @@ def test_generate_grf(
 
     gls: AngularPowerSpectra = [jnp.asarray([1.0, 0.5, 0.1])]
 
-    def _generate_grf_by_cls(
-        gls: AnyArray,
-    ) -> list[FloatArray]:
+    def _generate_grf_by_cls(gls: AnyArray) -> list[FloatArray]:
         fresh_rng = glass.rng.default_rng(xp=jnp) if use_rng else None
         return list(
             glass.fields._generate_grf(
@@ -177,9 +173,7 @@ def test_enumerate_spectra(jnp: ModuleType) -> None:
     # create mock spectra with 1 element counting to tn
     spectra: AngularPowerSpectra = [jnp.asarray(float(x)) for x in range(tn)]
 
-    def enumerate_spectra_diffable(
-        spectra: AngularPowerSpectra,
-    ) -> list[AnyArray]:
+    def enumerate_spectra_diffable(spectra: AngularPowerSpectra) -> list[AnyArray]:
         return [cl for _, _, cl in glass.enumerate_spectra(spectra)]
 
     # iterator that will enumerate the spectra for checking
@@ -255,9 +249,7 @@ def test_generate(
 
     gls: AngularPowerSpectra = [jnp.ones(10) for _ in range(3)]
 
-    def generate_diffable(
-        gls: AngularPowerSpectra,
-    ) -> list[AnyArray]:
+    def generate_diffable(gls: AngularPowerSpectra) -> list[AnyArray]:
         fields = [lambda x, var: x, lambda x, var: x]  # noqa: ARG005
         return list(
             glass.generate(

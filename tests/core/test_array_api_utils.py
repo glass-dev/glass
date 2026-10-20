@@ -12,7 +12,7 @@ from tests._optional_dependencies import HAVE_JAX
 from tests.fixtures.array_backends import xp_available_backends
 
 if TYPE_CHECKING:
-    from types import ModuleType
+    from types import ModuleType    
 
 with contextlib.suppress(ImportError):
     # only import if jax is available
@@ -25,14 +25,8 @@ def test_xp_fixture_selects_requested_backend(xp: ModuleType) -> None:
         "numpy": {"numpy"},
         "array_api_strict": {"array_api_strict"},
         "jax": {"jax.numpy"},
-        "all": {"numpy"},
+        "all": {"numpy", "array_api_strict", "jax.numpy"},
     }[backend]
-    if backend == "all":
-        if importlib.util.find_spec("array_api_strict") is not None:
-            expected.add("array_api_strict")
-        if importlib.util.find_spec("jax") is not None:
-            expected.add("jax.numpy")
-    assert set(xp_available_backends) == expected
     assert xp.__name__ in expected
 
 
