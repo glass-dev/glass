@@ -4,7 +4,33 @@ Release notes
 
 These notes document the changes between individual GLASS releases.
 
-2026.3 (16 Sep 2026)
+2026.5 (20 Oct 2026)
+--------------------
+
+* Added wrapper functions for the forward and inverse spherical harmonic transforms:
+
+  * :func:`glass.harmonics.inverse_transform` for the inverse spherical harmonic transform.
+  * :func:`glass.harmonics.transform` for the forward spherical harmonic transform.
+
+* Adds instructions for running JAX with CUDA.
+
+* Added a realistic benchmark test for benchmarking glass on various machines.
+
+* The ``inplace`` options in the :mod:`glass.healpix` module have been removed.
+
+* The following functions have been fully removed following deprecation:
+
+  * :func:`glass.shear_from_convergence`, use :func:`glass.from_convergence` instead.
+  * :func:`glass.deflect`, use :func:`glass.displace` instead.
+  * :func:`glass.generate_lognormal`, use :func:`glass.generate` instead.
+  * :func:`glass.generate_gaussian`, use :func:`glass.generate` instead.
+  * :func:`glass.lognormal_gls`, use :func:`glass.solve_gaussian_spectra` instead.
+
+* Regression tests will no longer fail when a new function is added.
+
+* ``array-api-extra`` has been updated to version ``0.11.1``.
+
+2026.4 (16 Sep 2026)
 --------------------
 
 * Fixes issues in the release of ``2026.3``.
