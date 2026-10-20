@@ -48,6 +48,12 @@ def cosmo_with_inverse_comoving_distance(
 
 
 @pytest.fixture(scope="session")
+def get_cosmo_with_omega_m() -> Callable[..., MockCosmologyWithOmegaM]:
+    """Create a MockCosmologyWithOmegaM instance for any backend."""
+    return MockCosmologyWithOmegaM
+
+
+@pytest.fixture(scope="session")
 def cosmo_with_omega_m(np: ModuleType) -> MockCosmologyWithOmegaM:
     """
     Mock cosmology with OmegaM to use for core tests.
@@ -138,8 +144,8 @@ class MockCosmologyWithOmegaM(MockCosmology):
 
 
 @pytest.fixture(scope="session")
-def shells(xp: ModuleType) -> list[glass.RadialWindow]:  # noqa: D103
-    return [
+def get_shells() -> Callable[..., list[glass.RadialWindow]]:  # noqa: D103
+    return lambda xp: [
         glass.RadialWindow(
             xp.asarray([0.0, 1.0, 2.0]),
             xp.asarray([0.0, 1.0, 0.0]),
@@ -166,6 +172,14 @@ def shells(xp: ModuleType) -> list[glass.RadialWindow]:  # noqa: D103
             5.0,
         ),
     ]
+
+
+@pytest.fixture(scope="session")
+def shells(  # noqa: D103
+    get_shells: Callable[..., list[glass.RadialWindow]],
+    xp: ModuleType,
+) -> list[glass.RadialWindow]:
+    return get_shells(xp)
 
 
 @pytest.fixture(scope="session")

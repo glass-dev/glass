@@ -18,12 +18,13 @@ with contextlib.suppress(ImportError):
 
 
 def test_xp_fixture_selects_requested_backend(xp: ModuleType) -> None:
+    backend = os.environ.get("ARRAY_BACKEND") or "numpy"
     expected = {
         "numpy": {"numpy"},
         "array_api_strict": {"array_api_strict"},
         "jax": {"jax.numpy"},
         "all": {"numpy", "array_api_strict", "jax.numpy"},
-    }[os.environ.get("ARRAY_BACKEND") or "numpy"]
+    }[backend]
     assert xp.__name__ in expected
 
 
@@ -48,8 +49,8 @@ def test_init(ap: ModuleType) -> None:
 
 
 def test_init_mix_of_backends_np_array_api_strict(
-    np: ModuleType,
     ap: ModuleType,
+    np: ModuleType,
 ) -> None:
     rng = glass.rng.Generator(rng=glass.rng.default_rng(xp=np), xp=ap)
     assert rng.random(1).__array_namespace__().__name__ == "array_api_strict"

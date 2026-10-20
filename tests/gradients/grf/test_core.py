@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import jax.test_util
 
-import glass
+import glass.grf
 
 if TYPE_CHECKING:
     from types import ModuleType
