@@ -31,3 +31,4 @@ Security: Some vulnerability was fixed
 - [ ] Have you added additional tests (if required)?
 - [ ] Have you modified/extended the documentation (if required)?
 - [ ] Have you added a one-liner changelog entry above (if required)?
+- [ ] Have you made a test release to TestPyPI (if required)?
