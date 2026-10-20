@@ -11,6 +11,10 @@ if TYPE_CHECKING:
 
     from glass._types import UnifiedGenerator
 
+jax = pytest.importorskip("jax", reason="tests requires jax")
+# needed for the JAX usage in the pytest parameterised tests
+jax.config.update("jax_enable_x64", val=True)
+
 
 @pytest.fixture
 def rng(jnp: ModuleType) -> UnifiedGenerator:

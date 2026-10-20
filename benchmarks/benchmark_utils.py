@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import timeit
-from contextlib import nullcontext
+import warnings
 from typing import TYPE_CHECKING
-from warnings import warn
 
 import jax
 import numpy as np
@@ -92,7 +92,7 @@ def run_benchmark(
     should_profile = RUN_PROFILE and xp.__name__ == "jax.numpy"
 
     if RUN_PROFILE and not should_profile:
-        warn(
+        warnings.warn(
             message=(
                 "Profile requested but JAX not the chosen array backend; "
                 "no profile will be generated."
@@ -104,7 +104,7 @@ def run_benchmark(
     with (
         jax.profiler.trace("jax_trace", create_perfetto_trace=True)
         if should_profile
-        else nullcontext()
+        else contextlib.nullcontext()
     ):
         result = timeit.timeit(_run, number=1)
 
@@ -162,7 +162,7 @@ class CosmologyWrapper:
         if z2 is not None:
             z2 = self.cosmo_xp.asarray(z2)
         return self.xp.asarray(
-            self.cosmo.xm(  # ty:ignore[unresolved-attribute]
+            self.cosmo.xm(  # ty: ignore[unresolved-attribute]
                 self.cosmo_xp.asarray(z),
                 z2,
             ),
@@ -170,7 +170,11 @@ class CosmologyWrapper:
 
     def rho_m_z(self, z: FloatArray) -> FloatArray:
         """Redshift-dependent matter density in Msol Mpc-3."""
-        return self.xp.asarray(self.cosmo.rho_m_z(self.cosmo_xp.asarray(z)))  # ty:ignore[unresolved-attribute]
+        return self.xp.asarray(
+            self.cosmo.rho_m_z(  # ty: ignore[unresolved-attribute]
+                self.cosmo_xp.asarray(z),
+            ),
+        )
 
     def comoving_distance(
         self,
@@ -183,12 +187,18 @@ class CosmologyWrapper:
     def inv_comoving_distance(self, dc: FloatArray) -> FloatArray:
         """Inverse function for the comoving distance in Mpc."""
         return self.xp.asarray(
-            self.cosmo.inv_comoving_distance(self.cosmo_xp.asarray(dc)),  # ty:ignore[unresolved-attribute]
+            self.cosmo.inv_comoving_distance(  # ty: ignore[unresolved-attribute]
+                self.cosmo_xp.asarray(dc),
+            ),
         )
 
     def Omega_m(self, z: FloatArray) -> FloatArray:  # noqa: N802
         """Matter density parameter at redshift z."""
-        return self.xp.asarray(self.cosmo.Omega_m(self.cosmo_xp.asarray(z)))  # ty:ignore[unresolved-attribute]
+        return self.xp.asarray(
+            self.cosmo.Omega_m(  # ty: ignore[unresolved-attribute]
+                self.cosmo_xp.asarray(z),
+            ),
+        )
 
     def transverse_comoving_distance(
         self,

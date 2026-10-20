@@ -6,6 +6,7 @@ import jax.test_util
 import pytest
 
 import glass
+import glass.grf
 
 if TYPE_CHECKING:
     from collections.abc import Callable

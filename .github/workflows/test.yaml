@@ -64,12 +64,16 @@ jobs:
         run: sudo apt-get install -y libbz2-dev
 
       - name: Run doctests
-        run: uv run nox -s doctests-${{ matrix.python-version }} --verbose
+        run:
+          uv run --no-sync nox -s doctests-${{ matrix.python-version }}
+          --verbose
         env:
           FORCE_COLOR: 1
 
       - name: Run core tests with all backends and generate coverage report
-        run: uv run nox -s coverage-${{ matrix.python-version }} --verbose
+        run:
+          uv run --no-sync nox -s coverage-${{ matrix.python-version }}
+          --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.CORE_COV_NAME }}-${{ matrix.python-version }}
@@ -91,11 +95,11 @@ jobs:
           parallel: true
 
       - name: Check ARRAY_BACKEND fixture selection
-        run: |-
-          set -e
-          for array_backend in all jax numpy array_api_strict; do
-            ARRAY_BACKEND=$array_backend uv run nox -s tests_backend_selection
-          done
+        run:
+          uv run --no-sync nox -s tests_backend_selection-${{
+          matrix.python-version }}
+        env:
+          ARRAY_BACKEND: all
 
   tests-grad:
     if: github.event.pull_request.draft == false
@@ -128,7 +132,7 @@ jobs:
         run: uv sync --only-dev
 
       - name: Run JAX gradients tests and generate coverage report
-        run: uv run nox -s coverage_gradients --verbose
+        run: uv run --no-sync nox -s coverage_gradients --verbose
         env:
           COVERAGE_FILE: ${{ env.GRAD_COV_NAME }}
           FORCE_COLOR: 1
@@ -178,13 +182,13 @@ jobs:
         run: uv sync --only-dev
 
       - name: Check version
-        run: uv run nox -s version
+        run: uv run --no-sync nox -s version
         env:
           FORCE_COLOR: 1
 
       - name:
           Run regression tests with all backends and generate coverage report
-        run: uv run nox -s coverage_regression --verbose
+        run: uv run --no-sync nox -s coverage_regression --verbose
         env:
           ARRAY_BACKEND: all
           COVERAGE_FILE: ${{ env.REG_COV_NAME }}
@@ -246,6 +250,6 @@ jobs:
         run: uv sync --only-dev
 
       - name: Build SDist and wheel
-        run: uv run nox -s build
+        run: uv run --no-sync nox -s build
         env:
           FORCE_COLOR: 1

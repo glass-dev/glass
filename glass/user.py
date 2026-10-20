@@ -23,7 +23,7 @@ __lazy_modules__ = [
     "numpy",
 ]
 
-from contextlib import contextmanager
+import contextlib
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -164,7 +164,7 @@ class _FitsWriter:
             self._append(values, names)
 
 
-@contextmanager
+@contextlib.contextmanager
 def write_catalog(
     filename: PathLike[str],
     *,

@@ -95,7 +95,7 @@ def test_alm2map_spin(
 )
 def test_ang2pix(  # noqa: PLR0913,PLR0917
     healpix_inputs: type[HealpixInputs],
-    lonlat: bool,  # noqa: FBT001
+    lonlat: bool,
     max_phi: float,
     max_theta: float,
     urng: UnifiedGenerator,
@@ -149,7 +149,7 @@ def test_map2alm_individual(
     healpix_inputs: type[HealpixInputs],
     np: ModuleType,
     urng: UnifiedGenerator,
-    use_pixel_weights: bool,  # noqa: FBT001
+    use_pixel_weights: bool,
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix._map2alm`` against ``healpy.map2alm``."""
@@ -172,7 +172,7 @@ def test_map2alm_sequence(
     healpix_inputs: type[HealpixInputs],
     np: ModuleType,
     urng: UnifiedGenerator,
-    use_pixel_weights: bool,  # noqa: FBT001
+    use_pixel_weights: bool,
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix._map2alm`` against ``healpy.map2alm``."""
@@ -207,7 +207,7 @@ def test_nside2npix(healpix_inputs: type[HealpixInputs]) -> None:
 @pytest.mark.parametrize("pol", [False, True])
 def test_pixwin(
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
+    pol: bool,
     xp: ModuleType,
 ) -> None:
     """Compare ``glass.healpix.pixwin`` against ``healpy.pixwin``."""
@@ -227,7 +227,7 @@ def test_pixwin(
 @pytest.mark.parametrize("pol", [False, True])
 def test_pixwin_with_pulled_data(
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
+    pol: bool,
     xp: ModuleType,
 ) -> None:
     """Tests running pixwin offline works as expected."""
@@ -242,7 +242,7 @@ def test_pixwin_with_pulled_data(
 def test_pixwin_with_pulled_data_wrong_path(
     invalid_healpy_datapath: str,
     healpix_inputs: type[HealpixInputs],
-    pol: bool,  # noqa: FBT001
+    pol: bool,
     xp: ModuleType,
 ) -> None:
     """Tests running pixwin offline incorrectly doesn't fallback to a HTTP request."""
@@ -296,7 +296,7 @@ def test_query_strip_none(
 @pytest.mark.parametrize("lonlat", [False, True])
 def test_randang(
     healpix_inputs: type[HealpixInputs],
-    lonlat: bool,  # noqa: FBT001
+    lonlat: bool,
     np: ModuleType,
     xp: ModuleType,
     urng: UnifiedGenerator,

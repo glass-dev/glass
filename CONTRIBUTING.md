@@ -18,8 +18,10 @@ The developer installation of GLASS comes with several optional dependencies -
 These options can be used with `uv` in the following way
 
 ```bash
-uv sync --all-extras --all-groups
+uv sync --extra examples --group docs --group test
 ```
+
+Note that the `dev` group is installed by default.
 
 ## Tooling
 
@@ -123,6 +125,31 @@ These gradients tests can be run via nox:
 ```sh
 uv run nox -s coverage_gradients
 ```
+
+In some of the `gradients` tests, a wrapper function has been defined in "force"
+to auto-differentiability of the function being tested. This is needed as there
+are a few aspects of a function which automatically cause it to fail the
+`jax.test_util.check_grads` test:
+
+- **Backend mixing:** the internals of `jax.test_util.check_grads` uses NumPy to
+  apply a perturbation to the function inputs. If we have wrapped the function
+  under test such that some of its inputs are static and have an associated
+  array backend which have been fixed to JAX. When the perturbed inputs, which
+  are now NumPy arrays, are passed into `array_api_compat.array_namespace`
+  alongside the static inputs, we get the error -
+  `TypeError: Multiple namespaces for array inputs`. The solution here is to
+  wrap all inputs in `jnp.asarray` to ensure they have the same backend.
+- **RNG calls:** due to `jax.test_util.check_grads` making multiple calls to the
+  function under test, if we define an input `rng` outside of these calls then
+  the generated random number sequence will be different for each which breaks
+  the auto-differentiability. The solution here is to define a fresh `rng`
+  instance within a function that wraps the function under test and pass this
+  wrapping function into `array_api_compat.array_namespace`.
+- **Exact input value of 0.0:** If 0.0 is used as an element of an input array,
+  there is a high chance that the arithmetic operation will result in a returned
+  value of exactly 0.0. It is then unlikely that `jax.text_util.check_grads`
+  will be able to recover this exact 0.0 value after perturbing the input. The
+  solution is to use a value close to but not exactly 0.0.
 
 ## Documenting
 

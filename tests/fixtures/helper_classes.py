@@ -70,9 +70,7 @@ class GeneratorConsumer:
     """Helper class for fully consuming generators in tests."""
 
     @staticmethod
-    def consume(
-        generator: Generator[Any],
-    ) -> list[Any]:
+    def consume(generator: Generator[Any]) -> list[Any]:
         """Generate and consume a generator returned by a given functions."""
         return list(generator)
 

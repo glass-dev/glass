@@ -8,12 +8,12 @@ import numpy as np
 from benchmark_utils import CosmologyWrapper, run_benchmark
 
 # use the CAMB cosmology that generated the matter power spectra
-import camb  # ty: ignore[unresolved-import]
-from cosmology.compat.camb import Cosmology  # ty: ignore[unresolved-import]
+import camb
+from cosmology.compat.camb import Cosmology
 
 # almost all GLASS functionality is available from the `glass` namespace
 import glass
-import glass.ext.camb  # ty: ignore[unresolved-import]
+import glass.ext.camb
 import glass.rng
 
 if TYPE_CHECKING:
@@ -65,7 +65,11 @@ def benchmark(xp: ModuleType) -> None:
     # compute the angular matter power spectra of the shells with CAMB
     cls = [
         xp.asarray(cl)
-        for cl in glass.ext.camb.matter_cls(pars, lmax, shells_np)  # ty: ignore[unresolved-attribute]
+        for cl in glass.ext.camb.matter_cls(  # ty: ignore[unresolved-attribute]
+            pars,
+            lmax,
+            shells_np,
+        )
     ]
 
     # apply discretisation to the full set of spectra:

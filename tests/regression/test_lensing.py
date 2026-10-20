@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing import TYPE_CHECKING
 
 import pytest
@@ -119,7 +120,13 @@ def test_multi_plane_weights(
     ]:
         """Run setup a generator with zip before each benchmark run."""
         convergence = glass.MultiPlaneConvergence(cosmo)
-        return (convergence, zip(shells, deltas, weights, strict=False)), {}
+        return (
+            convergence,
+            typing.cast(
+                "zip[tuple[glass.RadialWindow, FloatArray, FloatArray]]",
+                zip(shells, deltas, weights, strict=False),
+            ),
+        ), {}
 
     def multi_plane_weights_add_window(
         convergence: type[glass.MultiPlaneConvergence],
