@@ -18,8 +18,12 @@ if TYPE_CHECKING:
 
 
 def _relerr(dx: AnyArray, x: AnyArray) -> float:
-    """Compute the relative error max(|dx/x|)."""
-    q = np.divide(dx, x, where=(dx != 0), out=np.zeros_like(dx))
+    """Compute pointwise relative error, scaling zero targets by max(|x|)."""
+    scale = np.max(np.abs(x))
+    if scale == 0:
+        return float("inf") if np.any(dx != 0) else 0.0
+    denominator = np.where(x != 0, x, scale)
+    q = np.divide(dx, denominator, where=(dx != 0), out=np.zeros_like(dx))
     return float(np.fabs(q).max())
 
 
@@ -47,7 +51,9 @@ def solve(  # noqa: PLR0912, PLR0913
     The internal padding of the solver is set by *pad*, and the initial
     solution can be passed as *initial*.  The convergence is controlled
     by the relative errors *cltol* and *gltol*, and the maximum number
-    of iterations *maxiter*.
+    of iterations *maxiter*.  At exactly zero entries, errors are measured
+    relative to the largest absolute entry of the corresponding spectrum.
+    An entirely zero spectrum requires an exactly zero residual.
 
     If *monopole* is provided, the monopole of the Gaussian angular
     power spectrum is fixed to that value and ignored by the solver.
