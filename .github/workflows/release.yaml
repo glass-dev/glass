@@ -23,7 +23,7 @@ jobs:
       - name: Set up uv
         if: github.event_name == 'workflow_dispatch'
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           enable-cache: false
           python-version: 3.14
@@ -36,7 +36,7 @@ jobs:
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       # yamllint disable-line rule:line-length
-      - uses: hynek/build-and-inspect-python-package@2abe76da66d0a6a4a227101f9348ee855797cfa5 # v3.0.1
+      - uses: hynek/build-and-inspect-python-package@67230f7b8410ae0052b39c1efc89d89fff43ff10 # v3.0.2
 
   publish-pypi:
     if: github.event_name == 'release' && github.event.action == 'published'
@@ -50,7 +50,7 @@ jobs:
     steps:
       - name: Download distributions
         # yamllint disable-line rule:line-length
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: Packages
           path: dist
@@ -60,7 +60,7 @@ jobs:
 
       - name: Publish to PyPI
         # yamllint disable-line rule:line-length
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           verbose: true
 
@@ -76,7 +76,7 @@ jobs:
     steps:
       - name: Download distributions
         # yamllint disable-line rule:line-length
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: Packages
           path: dist
@@ -86,7 +86,7 @@ jobs:
 
       - name: Publish to TestPyPI
         # yamllint disable-line rule:line-length
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true
