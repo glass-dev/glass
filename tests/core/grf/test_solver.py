@@ -7,6 +7,7 @@ import pytest
 import array_api_extra as xpx
 
 import glass.grf
+from glass.grf._solver import _relerr
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -35,6 +36,34 @@ def test_one_transformation(
     gl2, _, _ = glass.grf.solve(cl, t, t)
 
     xpx.testing.assert_equal(gl1, gl2)
+
+
+@pytest.mark.parametrize("scale", [1e-20, 1.0, 1e20])
+def test_zero_spectrum_entries(np: ModuleType, scale: float) -> None:
+    cl = scale * np.asarray([1.0, 0.5, 0.0, 0.25, 0.0, 0.125])
+    _, realised, info = glass.grf.solve(cl, glass.grf.Normal())
+    assert info & 1
+    xpx.testing.assert_close(realised, cl, atol=1e-12 * scale, rtol=1e-12)
+
+
+def test_relative_error_zero_entries(np: ModuleType) -> None:
+    # Zero targets use the spectrum's scale, without hiding a large residual.
+    assert _relerr(np.asarray([0.0, 1e-8]), np.asarray([2.0, 0.0])) == 5e-9
+    assert _relerr(np.asarray([0.0, 1.0]), np.asarray([2.0, 0.0])) == 0.5
+    # Nonzero targets retain the pointwise relative-error criterion.
+    assert _relerr(np.asarray([0.0, 1e-8]), np.asarray([2.0, 1e-8])) == 1.0
+    assert _relerr(np.zeros(2), np.zeros(2)) == 0.0
+    assert _relerr(np.ones(2), np.zeros(2)) == float("inf")
+
+
+@pytest.mark.parametrize("scale", [1e-6, 1e-3])
+def test_lognormal_zero_spectrum_entries(np: ModuleType, scale: float) -> None:
+    cl = scale * np.asarray([1.0, 0.5, 0.0, 0.25, 0.0, 0.125])
+    _, realised, info = glass.grf.solve(
+        cl, glass.grf.Lognormal(), cltol=1e-8, gltol=1e-12
+    )
+    assert info & 1
+    xpx.testing.assert_close(realised, cl, atol=1e-8 * scale, rtol=1e-8)
 
 
 def test_pad(
