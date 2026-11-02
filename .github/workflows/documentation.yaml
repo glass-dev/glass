@@ -33,7 +33,7 @@ jobs:
 
       - name: Set up uv
         # yamllint disable-line rule:line-length
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           python-version: 3.14
 
@@ -49,7 +49,7 @@ jobs:
           FORCE_COLOR: 1
 
       - name: Spellcheck
-        uses: crate-ci/typos@512fc24f32f44ab01972217aaaf3dc86ec234d53 # v1
+        uses: crate-ci/typos@7f9d0819ca1c008ade73f4b41fa9d258d48f605b # v1
 
       - name: Run Vale
         # yamllint disable-line rule:line-length
