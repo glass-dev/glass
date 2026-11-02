@@ -289,17 +289,12 @@ def from_convergence(  # noqa: PLR0913
         return ()
 
     # get the NSIDE parameter
-    nside = hp.get_nside(kappa)
+    nside = hp.npix2nside(kappa.shape[-1])
     if lmax is None:
         lmax = 3 * nside - 1
 
     # compute alm
-    alm = glass.harmonics.transform(
-        kappa,
-        lmax=lmax,
-        pol=False,
-        use_pixel_weights=True,
-    )
+    alm = glass.harmonics.transform(kappa, lmax=lmax)
 
     # mode number; all conversions are factors of this.
     # Must be float to allow division later
@@ -315,7 +310,7 @@ def from_convergence(  # noqa: PLR0913
         lambda a: xp.divide(-2.0, a * (a + 1)),
         fill_value=0,
     )
-    alm = hp.almxfl(alm, fl)
+    alm = glass.harmonics.multalm(alm, fl)
 
     # if potential is requested, compute map and add to output
     if potential:
@@ -329,7 +324,7 @@ def from_convergence(  # noqa: PLR0913
     # compute deflection alms in place
     fl = xp.sqrt(ell * (ell + 1))
     # missing spin-1 pixel window function here
-    alm = hp.almxfl(alm, fl)
+    alm = glass.harmonics.multalm(alm, fl)
 
     # if deflection is requested, compute spin-1 maps and add to output
     if deflection:
@@ -352,7 +347,7 @@ def from_convergence(  # noqa: PLR0913
     if discretized:
         pw0, pw2 = hp.pixwin(nside, lmax=lmax, pol=True, xp=xp)
         fl *= pw2 / pw0
-    alm = hp.almxfl(alm, fl)
+    alm = glass.harmonics.multalm(alm, fl)
 
     # transform to shear maps
     gamma = glass.harmonics.inverse_transform(alm, lmax=lmax, nside=nside, spin=2)

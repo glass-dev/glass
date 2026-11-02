@@ -16,7 +16,6 @@ This module should be imported manually if used outside of GLASS::
 ---------------------
 
 .. autofunction:: ang2pix
-.. autofunction:: ang2vec
 .. autofunction:: npix2nside
 .. autofunction:: nside2npix
 .. autofunction:: randang
@@ -24,11 +23,6 @@ This module should be imported manually if used outside of GLASS::
 ``healpy`` Functions
 --------------------
 
-.. autofunction:: alm2map
-.. autofunction:: alm2map_spin
-.. autofunction:: almxfl
-.. autofunction:: get_nside
-.. autofunction:: map2alm
 .. autofunction:: pixwin
 .. autofunction:: query_strip
 .. automethod:: Rotator.rotate_map_pixel

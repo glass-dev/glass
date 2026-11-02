@@ -38,13 +38,11 @@ def _get_healpy_datapath() -> str | None:
 
 
 @numpy_fallback
-def alm2map(
+def _alm2map(
     alms: ComplexArray | Sequence[ComplexArray],
     nside: int,
     *,
     lmax: int | None = None,
-    pixwin: bool = False,
-    pol: bool = True,
 ) -> FloatArray:
     """
     Computes a HEALPix map given the alm.
@@ -57,10 +55,6 @@ def alm2map(
         The nside of the output map.
     lmax
         Explicitly define lmax.
-    pixwin
-        Smooth the alm using the pixel window functions.
-    pol
-        If True, assumes input alms are TEB.
 
     Returns
     -------
@@ -68,17 +62,11 @@ def alm2map(
         containing the T, Q, and U maps for polarized input.
 
     """
-    return healpy.alm2map(
-        alms,
-        nside,
-        lmax=lmax,
-        pixwin=pixwin,
-        pol=pol,
-    )
+    return healpy.alm2map(alms, nside, lmax=lmax)
 
 
 @numpy_fallback
-def alm2map_spin(
+def _alm2map_spin(
     alms: Sequence[FloatArray],
     nside: int,
     spin: int,
@@ -105,30 +93,6 @@ def alm2map_spin(
     """
     outputs = healpy.alm2map_spin(alms, nside, spin, lmax)
     return list(outputs)
-
-
-@numpy_fallback
-def almxfl(
-    alm: ComplexArray,
-    fl: FloatArray,
-) -> ComplexArray:
-    """
-    Multiply alm by a function of l. The function is assumed to be zero where
-    not defined.
-
-    Parameters
-    ----------
-    alm
-        The alm to multiply.
-    fl
-        The function (at l=0..fl.shape[0]-1) by which alm must be multiplied.
-
-    Returns
-    -------
-        The new alm array with the function of l applied.
-
-    """
-    return healpy.almxfl(alm, fl)
 
 
 @numpy_fallback
@@ -167,61 +131,10 @@ def ang2pix(
 
 
 @numpy_fallback
-def ang2vec(
-    theta: float | FloatArray,
-    phi: float | FloatArray,
-    *,
-    lonlat: bool = False,
-) -> tuple[FloatArray, FloatArray, FloatArray]:
-    """
-    Convert angles to 3D position vector.
-
-    Parameters
-    ----------
-    theta
-        Angular coordinates of a point on the sphere.
-    phi
-        Angular coordinates of a point on the sphere.
-    lonlat
-        If True, automatically adjust latitudes to be within [-90, 90] range.
-
-    Returns
-    -------
-        A normalised 3-vector pointing in the same direction as ``ang``.
-
-    """
-    x, y, z = healpix.ang2vec(
-        theta,
-        phi,
-        lonlat=lonlat,
-    )
-    return x, y, z
-
-
-@numpy_fallback
-def get_nside(m: FloatArray) -> int:
-    """
-    Return the nside of the given map.
-
-    Parameters
-    ----------
-    m
-        The map to get the nside from.
-
-    Returns
-    -------
-        The HEALPix nside parameter of the map.
-
-    """
-    return int(healpy.get_nside(m))
-
-
-@numpy_fallback
-def map2alm(
+def _map2alm(
     maps: FloatArray | Sequence[FloatArray],
     *,
     lmax: int | None = None,
-    pol: bool = True,
     use_pixel_weights: bool = False,
 ) -> ComplexArray:
     """
@@ -243,9 +156,6 @@ def map2alm(
         The input map or a list of n input maps. Must be in ring ordering.
     lmax
         Maximum l of the power spectrum.
-    pol
-        If True, assumes input maps are TQU. If False, only the temperature map
-        is considered.
     use_pixel_weights
         If True, use pixel by pixel weighting, healpy will automatically
         download the weights, if needed.
@@ -259,7 +169,6 @@ def map2alm(
         maps,
         datapath=_get_healpy_datapath(),
         lmax=lmax,
-        pol=pol,
         use_pixel_weights=use_pixel_weights,
     )
 
