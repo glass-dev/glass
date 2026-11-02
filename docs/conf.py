@@ -7,12 +7,12 @@
 
 # -- Project information -----------------------------------------------------
 
-import datetime
+import datetime as dt
 import importlib.metadata
 
 project = "GLASS"
 author = "GLASS developers"
-copyright = f"2022-{datetime.date.today().year} {author}"  # noqa: A001, DTZ011
+copyright = f"2022-{dt.date.today().year} {author}"  # noqa: A001, DTZ011
 version = importlib.metadata.version("glass")
 release = version
 
